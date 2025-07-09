@@ -309,69 +309,40 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="p-6 bg-white shadow rounded-lg">
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700">Organization ID <span
-                                    class="text-red-600">*</span></label>
-                            <input type="text" wire:model="organization_id"
-                                placeholder="Masukan Organization ID dari Satu Sehat" class="mt-1 form-control" />
-                            @error('organization_id')
-                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700">Client ID <span
-                                    class="text-red-600">*</span></label>
-                            <input type="text" wire:model="client_id"
-                                placeholder="Masukan Client ID dari Satu Sehat" class="mt-1 form-control" />
-                            @error('client_id')
-                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700">Client Secret <span
-                                    class="text-red-600">*</span></label>
-                            <input type="text" wire:model="client_secret"
-                                placeholder="Masukan Satu Sehat dari Satu Sehat" class="mt-1 form-control" />
-                            @error('client_secret')
-                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div>
-                @elseif ($currentTab === 'layanan')
-                    <div
-                        class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
-                        <div class="table-container">
-                            <table class="table">
-                                <thead>
+                </div>
+            @elseif ($currentTab === 'layanan')
+                <div
+                    class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th class="w-1 center">No</th>
+                                    <th>Fitur</th>
+                                    {{-- <th>Fitur Bulanan</th> --}}
+                                    <th>Durasi</th>
+                                    <th class="text-center">Lifetime</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($companyServices as $index => $companyService)
                                     <tr>
-                                        <th class="w-1 center">No</th>
-                                        <th>Fitur</th>
-                                        {{-- <th>Fitur Bulanan</th> --}}
-                                        <th>Durasi</th>
-                                        <th class="text-center">Lifetime</th>
+                                        <td class="center">{{ $index + 1 }}</td>
+                                        {{-- <td>{{ $companyService->service->name }}</td> --}}
+                                        <td>{{ $companyService->serviceMonth->name }}</td>
+                                        <td>{{ $companyService->duration_days }}</td>
+                                        <td>{{ $companyService->is_lifetime ? 'Ya' : 'Tidak' }}</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($companyServices as $index => $companyService)
-                                        <tr>
-                                            <td class="center">{{ $index + 1 }}</td>
-                                            {{-- <td>{{ $companyService->service->name }}</td> --}}
-                                            <td>{{ $companyService->serviceMonth->name }}</td>
-                                            <td>{{ $companyService->duration_days }}</td>
-                                            <td>{{ $companyService->is_lifetime ? 'Ya' : 'Tidak' }}</td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="10" class="no-data">
-                                                Tidak ada data</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
+                                @empty
+                                    <tr>
+                                        <td colspan="10" class="no-data">
+                                            Tidak ada data</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
+                </div>
             @endif
         </div>
     </div>

@@ -9,7 +9,6 @@ use App\Models\Company\CompanyDetail;
 use App\Models\Company\CompanyService;
 use App\Models\Company\CompanyServiceHistory;
 use App\Models\Company\CompanyServiceMonth;
-use App\Models\Company\OneHealthy;
 use App\Models\Country\Country;
 use App\service\apiservice;
 use App\Traits\Region\RegionTrait;
@@ -173,13 +172,6 @@ class AdminMasterSettingIndex extends Component
                 $this->pic_position = $company->pic_position;
                 $this->pic_phone = $company->pic_phone;
                 $this->pic_email = $company->pic_email;
-            }
-
-            $oneHealth = OneHealthy::where('company_id', $this->company_id)->first();
-            if ($oneHealth) {
-                $this->organization_id = Crypt::decryptString($oneHealth->organization_id);
-                $this->client_id = Crypt::decryptString($oneHealth->client_id);
-                $this->client_secret = Crypt::decryptString($oneHealth->client_secret);
             }
         } elseif ($tab === 'layanan') {
             $this->companyServices = CompanyService::select('id', 'start_date', 'company_id', 'service_month_id', 'duration_days', 'is_lifetime')->with('serviceMonth:id,name,description', 'company:id,name,description')->where('company_id', $this->company_id)->get();
