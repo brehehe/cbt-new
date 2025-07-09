@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class Topic extends Model
 {
@@ -22,6 +23,8 @@ class Topic extends Model
     protected static function boot()
     {
         parent::boot();
+
+        dd(Auth::user()->hasAnyRoles('admin'));
 
         static::creating(function ($modelCreate) {
             $lastOrder = static::max('order');

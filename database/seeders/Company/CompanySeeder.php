@@ -34,11 +34,11 @@ class CompanySeeder extends Seeder
     public function run(): void
     {
         $roles = [
-            ['name' => 'Super Admin'],
+            ['name' => 'Admin'],
             ['name' => 'Dosen'],
             ['name' => 'Siswa'],
             ['name' => 'Pengawas'],
-            ['name' => 'Secret'], // Tanpa company_id
+            ['name' => 'Anonymous'], // Tanpa company_id
             // ['name' => 'Sales'],
             // ['name' => 'Medis'],
         ];
@@ -80,7 +80,7 @@ class CompanySeeder extends Seeder
                 'is_lifetime' => true,
                 'expires_at'  => $serviceMonth->is_lifetime ? null : now()->addDays($serviceMonth->duration_days),
 
-                'roles'      => ['Super Admin', 'Pasien'],
+                'roles'      => ['Anonymous'],
                 'company_detail' => [
                     'one_health_code'   => '1004946874',
                     'facility_code'     => '35780100662',
