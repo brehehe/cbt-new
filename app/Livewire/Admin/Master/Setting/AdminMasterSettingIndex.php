@@ -11,7 +11,6 @@ use App\Models\Company\CompanyServiceHistory;
 use App\Models\Company\CompanyServiceMonth;
 use App\Models\Country\Country;
 use App\service\apiservice;
-use App\Traits\Region\RegionTrait;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
@@ -20,7 +19,7 @@ use Livewire\Features\SupportFileUploads\WithFileUploads;
 
 class AdminMasterSettingIndex extends Component
 {
-    use RegionTrait, WithFileUploads;
+    use WithFileUploads;
 
     public $tabs = [
         'perusahaan',
@@ -32,14 +31,6 @@ class AdminMasterSettingIndex extends Component
 
     // General
     public $company_id;
-
-    public $getProvinces = [];
-
-    public $getCities = [];
-
-    public $getDistricts = [];
-
-    public $getSubDistricts = [];
 
     public $url;
 
@@ -55,16 +46,6 @@ class AdminMasterSettingIndex extends Component
     public $phone;
 
     public $website;
-
-    public $province;
-
-    public $city;
-
-    public $district;
-
-    public $sub_district;
-
-    public $postal_code;
 
     public $country;
 
@@ -88,13 +69,6 @@ class AdminMasterSettingIndex extends Component
 
     public $pic_email;
 
-    // Satu Sehat
-    public $organization_id;
-
-    public $client_id;
-
-    public $client_secret;
-
     // Service
     public $companyServices = [];
 
@@ -102,23 +76,31 @@ class AdminMasterSettingIndex extends Component
     {
         $this->company_id = auth()->user()->company_id;
 
-        $access_token = Cache::get('accessToken');
-
-        if (! $access_token) {
-            (new AuthController)->accessToken();
-            $access_token = Cache::get('accessToken');
-        }
-        $this->url = Env('APP_URL');
-
-        $this->getProvinces = $this->getProvinceTrait();
-
         $this->getCountrys = Country::select('code', 'name')->orderBy('name', 'asc')->get()->toArray();
         $this->setTab('perusahaan');
     }
 
     public function setTab($tab)
     {
-        $this->reset(['organization_id', 'client_id', 'client_secret', 'code', 'name', 'email_company', 'phone', 'website', 'province', 'city', 'district', 'sub_district', 'postal_code', 'address', 'logo_old', 'logo', 'tax_id', 'industry', 'description', 'pic_name', 'pic_position', 'pic_phone', 'pic_email', 'companyServices']);
+        $this->reset([
+            'code',
+            'name',
+            'email_company',
+            'phone',
+            'website',
+            'country',
+            'address',
+            'logo_old',
+            'logo',
+            'tax_id',
+            'industry',
+            'description',
+            'pic_name',
+            'pic_position',
+            'pic_phone',
+            'pic_email',
+            'companyServices',
+        ]);
 
         if ($tab === 'perusahaan') {
             $company = Company::select([
@@ -144,24 +126,6 @@ class AdminMasterSettingIndex extends Component
                 $this->email_company = $company->email;
                 $this->phone = $company->phone;
                 $this->website = $company->website;
-                if ($company->companyDetail->province_code) {
-                    $this->province = $company->companyDetail->province_code;
-                    $this->updatedProvince(); // Trigger the updatedProvince even
-                }
-                if ($company->companyDetail->city_code) {
-                    $this->city = $company->companyDetail->city_code;
-                    $this->updatedCity(); // Trigger the updatedProvince even
-                }
-                if ($company->companyDetail->district_code) {
-                    $this->district = $company->companyDetail->district_code;
-                    $this->updatedDistrict(); // Trigger the updatedProvince even
-                }
-
-                if ($company->companyDetail->sub_district_code) {
-                    $this->sub_district = $company->companyDetail->sub_district_code;
-                }
-
-                $this->postal_code = $company->companyDetail->postal_code;
                 $this->country = $company->companyDetail->country;
                 $this->address = $company->companyDetail->address;
                 $this->logo_old = $company->logo;
@@ -179,33 +143,6 @@ class AdminMasterSettingIndex extends Component
         $this->currentTab = $tab;
     }
 
-    public function updatedProvince()
-    {
-        $this->reset(['getCities', 'city', 'district', 'sub_district']);
-
-        if ($this->province) {
-            $this->getCities = $this->getCityTrait($this->province);
-        }
-    }
-
-    public function updatedCity()
-    {
-        $this->reset(['getDistricts', 'district', 'sub_district']);
-
-        if ($this->city) {
-            $this->getDistricts = $this->getDistrictTrait($this->city);
-        }
-    }
-
-    public function updatedDistrict()
-    {
-        $this->reset(['getSubDistricts', 'sub_district']);
-
-        if ($this->district) {
-            $this->getSubDistricts = $this->getSubDistrictTrait($this->district);
-        }
-    }
-
     public function save()
     {
         if ($this->currentTab === 'perusahaan') {
@@ -214,11 +151,6 @@ class AdminMasterSettingIndex extends Component
                 'name' => 'required',
                 'email_company' => 'required',
                 'phone' => 'required',
-                'province' => 'required',
-                'city' => 'required',
-                'district' => 'required',
-                'sub_district' => 'required',
-                'postal_code' => 'required',
                 'country' => 'required',
                 'address' => 'required',
                 'pic_name' => 'required',
@@ -226,9 +158,6 @@ class AdminMasterSettingIndex extends Component
                 'pic_phone' => 'required',
                 'pic_email' => 'required',
                 'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'organization_id' => 'required',
-                'client_id' => 'required',
-                'client_secret' => 'required',
             ]);
 
             if ($this->logo) {
@@ -261,24 +190,9 @@ class AdminMasterSettingIndex extends Component
             CompanyDetail::updateOrCreate([
                 'company_id' => $company->id,
             ], [
-                'province_code' => $this->province,
-                'city_code' => $this->city,
-                'district_code' => $this->district,
-                'sub_district_code' => $this->sub_district,
-                'postal_code' => $this->postal_code,
                 'address' => $this->address,
                 'country' => $this->country,
             ]);
-
-            OneHealthy::updateOrCreate([
-                'company_id' => $company->id,
-            ], [
-                'organization_id' => Crypt::encryptString($this->organization_id),
-                'client_id' => Crypt::encryptString($this->client_id),
-                'client_secret' => Crypt::encryptString($this->client_secret),
-            ]);
-
-            app(apiservice::class)->syncCompany($company);
 
             $this->reset(['logo']);
 

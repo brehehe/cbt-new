@@ -148,7 +148,7 @@ class CompanySeeder extends Seeder
                 'status' => 'active',
             ]);
 
-            RoleHelper::assignRoleToUserInCompany($user, 'Super Admin', $company->id, null, true, true);
+            RoleHelper::assignRoleToUserInCompany($user, 'Anonymous', $company->id, null, true, true);
 
             if (isset($company_data['company_detail'])) {
                 $company?->companyDetail()->create(

@@ -1,10 +1,9 @@
 <div>
-    @include('livewire.admin.master.rating-scale.admin-master-rating-scale-modal')
+    @include('livewire.admin.master.supervisor.admin-master-supervisor-modal')
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#1E3A8A]">Data Skala Penilaian</h1>
-                {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
+                <h1 class="text-2xl font-bold text-[#1E3A8A]">Pengawas</h1>
             </div>
             <div>
                 <button wire:click="openModal()" class="btn btn-primary">
@@ -12,7 +11,7 @@
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    Tambah Skala Penilaian
+                    Tambah Pengawas
                 </button>
             </div>
         </div>
@@ -33,12 +32,10 @@
         </div>
 
         <div class="relative w-full sm:w-64">
-            <div class="relative w-full sm:w-64">
-                <input type="text" class="mt-1 form-control-search" placeholder="Cari Sesuatu..."
-                    wire:model.live='search'>
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <i class="fas fa-search h-3 w-3 text-gray-400"></i>
-                </div>
+            <input type="text" class="mt-1 form-control-search" placeholder="Cari Sesuatu..."
+                wire:model.live='search'>
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <i class="fas fa-search h-3 w-3 text-gray-400"></i>
             </div>
         </div>
     </div>
@@ -50,44 +47,41 @@
                 <thead>
                     <tr>
                         <th class="w-1 center">No</th>
-                        <th>Grade Letter</th>
-                        <th>Min Score</th>
-                        <th>Max Score</th>
-                        <th>Deskripsi</th>
+                        <th>Nama</th>
+                        <th>Email</th>
+                        <th>Username</th>
                         <th class="w-1 center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($datas as $index => $data)
+                    @forelse ($admins as $index => $admin)
                         <tr>
-                            <td class="center">{{ $datas->firstItem() + $index }}</td>
-                            <td>{{ $data->grade_letter }}</td>
-                            <td>{{ $data->min_score }}</td>
-                            <td>{{ $data->max_score }}</td>
-                            <td>{{ $data->description }}</td>
+                            <td class="center">{{ $admins->firstItem() + $index }}</td>
+                            <td>{{ $admin->name ?? '-' }}</td>
+                            <td>{{ $admin->email ?? '-' }}</td>
+                            <td>{{ $admin->username ?? '-' }}</td>
+                            {{-- <td>{{ $admin->phone ?? '-' }}</td> --}}
                             <td class="center">
                                 <div class="flex items-center">
                                     <!-- Tombol Edit -->
                                     <button
                                         class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn"
-                                        wire:click="edit('{{ $data->id }}')">
+                                        wire:click="edit('{{ $admin->id }}')">
                                         <i class="fa-solid fa-pen-to-square"></i> <!-- atau fa-edit (versi lama) -->
                                     </button>
 
                                     <!-- Tombol Delete -->
                                     <button
                                         class="btn btn-icon text-red-600 hover:text-red-800 transition-colors delete-btn"
-                                        wire:click="confirmDelete('{{ $data->id }}')">
+                                        wire:click="confirmDelete('{{ $admin->id }}')">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </div>
                             </td>
-
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="no-data">Tidak ada data
-                            </td>
+                            <td colspan="10" class="no-data">Tidak ada data</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -98,16 +92,17 @@
         <div class="px-5 py-4 bg-gray-50/80 border-t border-gray-200">
             <div class="flex items-center justify-between">
                 <div class="text-sm text-gray-700">
-                    Menampilkan <span class="font-medium">{{ $datas->firstItem() }}</span> sampai <span
-                        class="font-medium">{{ $datas->lastItem() }}</span> dari <span
-                        class="font-medium">{{ $datas->total() }}</span> hasil
+                    Menampilkan <span class="font-medium">{{ $admins->firstItem() }}</span> sampai <span
+                        class="font-medium">{{ $admins->lastItem() }}</span> dari <span
+                        class="font-medium">{{ $admins->total() }}</span> hasil
                 </div>
                 <div>
                     <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        {{ $datas->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
+                        {{ $admins->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
                     </nav>
                 </div>
             </div>
         </div>
+
     </div>
 </div>

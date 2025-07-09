@@ -15,6 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('name');
             $table->string('email')->nullable();
+            $table->string('nim')->nullable();
             $table->string('username')->nullable();
             $table->char('phone', 15)->nullable();
             $table->timestamp('email_verified_at')->nullable();
@@ -24,7 +25,7 @@ return new class extends Migration
             $table->foreignUuid('company_id')->nullable();
             $table->bigInteger('order')->default(0);
             $table->jsonb('alternative_contacts')->nullable()->after('phone')->comment('Alternative emails/phones for different contexts');
-            $table->enum('type_user',['employee','patient'])->default('employee')->comment('Type of user: employee, or patient');
+            $table->enum('type_user', ['employee', 'patient'])->default('employee')->comment('Type of user: employee, or patient');
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

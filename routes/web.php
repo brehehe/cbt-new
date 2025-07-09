@@ -31,6 +31,10 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
         Route::get('/setting', 'Setting\AdminMasterSettingIndex')->name('admin.master.setting');
         Route::get('/topic-question', AdminMasterTopicIndex::class)->name('admin.master.topic');
         Route::get('/rating-scale', 'RatingScale\AdminMasterRatingScaleIndex')->name('admin.master.rating-scale');
+        Route::get('/admin', 'Admin\AdminMasterAdminIndex')->name('admin.master.admin');
+        Route::get('/lecturer', 'Lecturer\AdminMasterLecturerIndex')->name('admin.master.lecturer');
+        Route::get('/student', 'Student\AdminMasterStudentIndex')->name('admin.master.student');
+        Route::get('/supervisor', 'Supervisor\AdminMasterSupervisorIndex')->name('admin.master.supervisor');
     });
 });
 
