@@ -5,8 +5,6 @@ namespace App\Livewire\Admin\Master\User;
 use App\Helpers\AlertHelper;
 use App\Helpers\RoleHelper;
 use App\Models\Doctor\Doctor;
-use App\Models\Master\CodeSystem\Patient\MasterPatientAdministrativeGender;
-use App\Models\Master\CodeSystem\Patient\MasterPatientMaritalStatus;
 use App\Models\Role\RoleCompany;
 use App\Models\User;
 use App\Models\User\UserCompanyRole;
@@ -94,18 +92,6 @@ class AdminMasterUserIndex extends Component
 
     public function mount()
     {
-        $this->maritalStatusDetails = MasterPatientMaritalStatus::select('code', 'display')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'code' => $item->code,
-                    'display' => $item->display, // versi asli
-                    'display_ind' => $item->display_ind, // otomatis dari accessor
-                ];
-            });
-
-        $this->administrativeGenderDetails = MasterPatientAdministrativeGender::select('code', 'display')->get()->toArray();
-
         $this->roles = RoleCompany::with([
             'role' => function ($query) {
                 $query->where('name', 'not like', '%Pasien%')
@@ -128,7 +114,6 @@ class AdminMasterUserIndex extends Component
             ->toArray();
 
         $this->provinces = $this->getProvinceTrait();
-
     }
 
     public function openModal()
@@ -143,7 +128,7 @@ class AdminMasterUserIndex extends Component
 
     public function closeModal()
     {
-        $this->reset(['data_id', 'name', 'username', 'email', 'password', 'profile', 'profile_old', 'phone', 'address', 'identity_card', 'blood_group', 'administrative_gender', 'birth_date', 'deceased_date', 'marital_status', 'role_id', 'is_head', 'is_active','sip_number','specialization','doctor_type','type','incentive_doctor','incentive_pharmacy','incentive_nurse','incentive_cashier','type_incentive_doctor','type_incentive_nurse','type_incentive_pharmacy','type_incentive_cashier','price_doctor','role_name','province_code','city_code','district_code','sub_district_code','provinces','cities','districts','subDistricts','rt_code','rw_code']);
+        $this->reset(['data_id', 'name', 'username', 'email', 'password', 'profile', 'profile_old', 'phone', 'address', 'identity_card', 'blood_group', 'administrative_gender', 'birth_date', 'deceased_date', 'marital_status', 'role_id', 'is_head', 'is_active', 'sip_number', 'specialization', 'doctor_type', 'type', 'incentive_doctor', 'incentive_pharmacy', 'incentive_nurse', 'incentive_cashier', 'type_incentive_doctor', 'type_incentive_nurse', 'type_incentive_pharmacy', 'type_incentive_cashier', 'price_doctor', 'role_name', 'province_code', 'city_code', 'district_code', 'sub_district_code', 'provinces', 'cities', 'districts', 'subDistricts', 'rt_code', 'rw_code']);
         $this->resetErrorBag();
         $this->resetValidation();
         return $this->dispatch('close-modal', ['id' => 'modal']);
@@ -210,14 +195,14 @@ class AdminMasterUserIndex extends Component
 
         $this->role_id =
             $user
-                ->companyRoles()
-                ->where('company_id', Auth::user()->company_id)
-                ->first()->role_company_id ?? null;
+            ->companyRoles()
+            ->where('company_id', Auth::user()->company_id)
+            ->first()->role_company_id ?? null;
         $this->role_name =
             $user
-                ->companyRoles()
-                ->where('company_id', Auth::user()->company_id)
-                ->first()->role->name ?? null;
+            ->companyRoles()
+            ->where('company_id', Auth::user()->company_id)
+            ->first()->role->name ?? null;
 
         if ($user->userDetail) {
             $this->address = $user->userDetail->address;
@@ -238,14 +223,14 @@ class AdminMasterUserIndex extends Component
             $this->rw_code = $user->userDetail->rw;
             $this->is_head =
                 $user
-                    ->companyRoles()
-                    ->where('company_id', Auth::user()->company_id)
-                    ->first()->is_head ?? false;
+                ->companyRoles()
+                ->where('company_id', Auth::user()->company_id)
+                ->first()->is_head ?? false;
             $this->is_active =
                 $user
-                    ->companyRoles()
-                    ->where('company_id', Auth::user()->company_id)
-                    ->first()->is_active ?? false;
+                ->companyRoles()
+                ->where('company_id', Auth::user()->company_id)
+                ->first()->is_active ?? false;
             if ($this->role_name == 'Dokter') {
                 $this->sip_number = $user->userDetail->sip_number;
                 $this->specialization = $user->userDetail->specialization;
@@ -255,27 +240,6 @@ class AdminMasterUserIndex extends Component
             }
         }
 
-        if ($user->userPrice) {
-            $this->price_doctor = number_format($user->userPrice->price_doctor ?? 0, 0, ',', '.');
-            $this->incentive_doctor = number_format($user->userPrice->incentive_doctor ?? 0, 0, ',', '.');
-            $this->incentive_pharmacy = number_format($user->userPrice->incentive_pharmacy ?? 0, 0, ',', '.');
-            $this->incentive_nurse = number_format($user->userPrice->incentive_nurse ?? 0, 0, ',', '.');
-            $this->incentive_cashier = number_format($user->userPrice->incentive_cashier ?? 0, 0, ',', '.');
-            $this->type_incentive_doctor = $user->userPrice->type_incentive_doctor ?? 'rupiah';
-            $this->type_incentive_nurse = $user->userPrice->type_incentive_nurse ?? 'rupiah';
-            $this->type_incentive_pharmacy = $user->userPrice->type_incentive_pharmacy ?? 'rupiah';
-            $this->type_incentive_cashier = $user->userPrice->type_incentive_cashier ?? 'rupiah';
-        } else {
-            $this->type_incentive_doctor = 'rupiah';
-            $this->type_incentive_nurse = 'rupiah';
-            $this->type_incentive_pharmacy = 'rupiah';
-            $this->type_incentive_cashier = 'rupiah';
-            $this->price_doctor = 0;
-            $this->incentive_doctor = 0;
-            $this->incentive_pharmacy = 0;
-            $this->incentive_nurse = 0;
-            $this->incentive_cashier = 0;
-        }
 
         $this->openModal();
     }
@@ -300,7 +264,8 @@ class AdminMasterUserIndex extends Component
         $this->incentive_cashier = 0; // Reset to 0 if switching to percentage
     }
 
-    public function updatedIncentiveDoctor() {
+    public function updatedIncentiveDoctor()
+    {
         $incentive_doctor = intval(Str::replace('.', '', $this->incentive_doctor));
         // Jika tipe insentif adalah persen, pastikan nilainya tidak lebih dari 100
         if ($this->type_incentive_doctor == 'persen' && $incentive_doctor > 100) {
@@ -310,7 +275,8 @@ class AdminMasterUserIndex extends Component
         }
     }
 
-    public function updatedIncentiveNurse() {
+    public function updatedIncentiveNurse()
+    {
         $incentive_nurse = intval(Str::replace('.', '', $this->incentive_nurse));
         // Jika tipe insentif adalah persen, pastikan nilainya tidak lebih dari 100
         if ($this->type_incentive_nurse == 'persen' && $incentive_nurse > 100) {
@@ -320,7 +286,8 @@ class AdminMasterUserIndex extends Component
         }
     }
 
-    public function updatedIncentivePharmacy() {
+    public function updatedIncentivePharmacy()
+    {
         $incentive_pharmacy = intval(Str::replace('.', '', $this->incentive_pharmacy));
         // Jika tipe insentif adalah persen, pastikan nilainya tidak lebih dari 100
         if ($this->type_incentive_pharmacy == 'persen' && $incentive_pharmacy > 100) {
@@ -330,7 +297,8 @@ class AdminMasterUserIndex extends Component
         }
     }
 
-    public function updatedIncentiveCashier() {
+    public function updatedIncentiveCashier()
+    {
         $incentive_cashier = intval(Str::replace('.', '', $this->incentive_cashier));
         // Jika tipe insentif adalah persen, pastikan nilainya tidak lebih dari 100
         if ($this->type_incentive_cashier == 'persen' && $incentive_cashier > 100) {
@@ -409,9 +377,6 @@ class AdminMasterUserIndex extends Component
             if ($this->role_name == 'Dokter') {
                 $this->updateUserDoctor($user);
             }
-
-            // Update user prices
-            $this->updateUserPrices($user, $currentCompanyId);
 
             // Assign role (hanya untuk karyawan)
             $this->assignUserRole($user, $currentCompanyId);
@@ -506,7 +471,8 @@ class AdminMasterUserIndex extends Component
         }
     }
 
-    public function updateUserDoctor($user){
+    public function updateUserDoctor($user)
+    {
         Doctor::updateOrCreate(
             ['user_id' => $user->id],
             [
@@ -593,31 +559,6 @@ class AdminMasterUserIndex extends Component
             ],
         );
     }
-
-    /**
-     * Update user prices
-     */
-    protected function updateUserPrices($user, $companyId)
-    {
-        UserPrice::updateOrCreate(
-            [
-                'user_id' => $user->id,
-                'company_id' => $companyId,
-            ],
-            [
-                'price_doctor' => $this->price_doctor ? intval(Str::replace('.', '', $this->price_doctor)) : 0,
-                'type_incentive_doctor' => $this->type_incentive_doctor,
-                'type_incentive_nurse' => $this->type_incentive_nurse,
-                'type_incentive_pharmacy' => $this->type_incentive_pharmacy,
-                'type_incentive_cashier' => $this->type_incentive_cashier,
-                'incentive_doctor' => $this->incentive_doctor ? intval(Str::replace('.', '', $this->incentive_doctor)) : 0,
-                'incentive_pharmacy' => $this->incentive_pharmacy ? intval(Str::replace('.', '', $this->incentive_pharmacy)) : 0,
-                'incentive_nurse' => $this->incentive_nurse ? intval(Str::replace('.', '', $this->incentive_nurse)) : 0,
-                'incentive_cashier' => $this->incentive_cashier ? intval(Str::replace('.', '', $this->incentive_cashier)) : 0,
-            ],
-        );
-    }
-
     /**
      * Assign user role
      */
@@ -648,87 +589,12 @@ class AdminMasterUserIndex extends Component
         AlertHelper::success('Pengguna Berhasil Dihapus');
     }
 
-    public function price($id) {
-        $user = User::findOrFail($id);
-        $this->data_id = $user->id;
-
-        if ($user->userPrice) {
-            $this->incentive_doctor = number_format($user->userPrice->incentive_doctor ?? 0, 0, ',', '.');
-            $this->incentive_pharmacy = number_format($user->userPrice->incentive_pharmacy ?? 0, 0, ',', '.');
-            $this->incentive_nurse = number_format($user->userPrice->incentive_nurse ?? 0, 0, ',', '.');
-            $this->incentive_cashier = number_format($user->userPrice->incentive_cashier ?? 0, 0, ',', '.');
-            $this->type_incentive_doctor = $user->userPrice->type_incentive_doctor ?? 'rupiah';
-            $this->type_incentive_nurse = $user->userPrice->type_incentive_nurse ?? 'rupiah';
-            $this->type_incentive_pharmacy = $user->userPrice->type_incentive_pharmacy ?? 'rupiah';
-            $this->type_incentive_cashier = $user->userPrice->type_incentive_cashier ?? 'rupiah';
-        } else {
-            $this->type_incentive_doctor = 'rupiah';
-            $this->type_incentive_nurse = 'rupiah';
-            $this->type_incentive_pharmacy = 'rupiah';
-            $this->type_incentive_cashier = 'rupiah';
-            $this->incentive_doctor = 0;
-            $this->incentive_pharmacy = 0;
-            $this->incentive_nurse = 0;
-            $this->incentive_cashier = 0;
-        }
-
-        return $this->dispatch('open-modal', ['id' => 'modal-price']);
-    }
-
-    public function closeModalPrice() {
+    public function closeModalPrice()
+    {
         $this->reset(['data_id', 'incentive_doctor', 'incentive_pharmacy', 'incentive_nurse', 'incentive_cashier', 'type_incentive_doctor', 'type_incentive_nurse', 'type_incentive_pharmacy', 'type_incentive_cashier']);
         $this->resetErrorBag();
         $this->resetValidation();
         return $this->dispatch('close-modal', ['id' => 'modal-price']);
-    }
-
-    public function submitPrice() {
-        $user = User::findOrFail($this->data_id);
-
-        $this->validate([
-            'incentive_doctor' => 'nullable|numeric',
-            'incentive_pharmacy' => 'nullable|numeric',
-            'incentive_nurse' => 'nullable|numeric',
-            'incentive_cashier' => 'nullable|numeric',
-            'type_incentive_doctor' => 'required|in:rupiah,persen',
-            'type_incentive_nurse' => 'required|in:rupiah,persen',
-            'type_incentive_pharmacy' => 'required|in:rupiah,persen',
-            'type_incentive_cashier' => 'required|in:rupiah,persen',
-        ]);
-        try {
-            DB::beginTransaction();
-
-            UserPrice::updateOrCreate(
-                [
-                    'user_id' => $user->id,
-                    'company_id' => Auth::user()->company_id,
-                ],
-                [
-                    'incentive_doctor' => $this->incentive_doctor ? intval(Str::replace('.', '', $this->incentive_doctor)) : 0,
-                    'incentive_pharmacy' => $this->incentive_pharmacy ? intval(Str::replace('.', '', $this->incentive_pharmacy)) : 0,
-                    'incentive_nurse' => $this->incentive_nurse ? intval(Str::replace('.', '', $this->incentive_nurse)) : 0,
-                    'incentive_cashier' => $this->incentive_cashier ? intval(Str::replace('.', '', $this->incentive_cashier)) : 0,
-                    'type_incentive_doctor' => $this->type_incentive_doctor,
-                    'type_incentive_nurse' => $this->type_incentive_nurse,
-                    'type_incentive_pharmacy' => $this->type_incentive_pharmacy,
-                    'type_incentive_cashier' => $this->type_incentive_cashier,
-                ]
-            );
-
-            DB::commit();
-            AlertHelper::success('Berhasil', 'Insentif berhasil disimpan.');
-            return $this->closeModalPrice();
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            AlertHelper::error('Gagal', 'Insentif gagal disimpan. ' . $th->getMessage());
-            Log::error('Error saving user price: ' . $th->getMessage(), [
-                'user_id' => Auth::id(),
-                'data' => [
-                    'user_id' => $user->id,
-                ],
-            ]);
-        }
-        return;
     }
 
     public function render()
