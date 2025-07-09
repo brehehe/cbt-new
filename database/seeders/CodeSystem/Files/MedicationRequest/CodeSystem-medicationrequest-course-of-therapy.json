@@ -1,0 +1,17 @@
+{
+  "concept" : [{
+    "code" : "continuous",
+    "display" : "Continuing long term therapy",
+    "definition" : "Pengobatan yang diharapkan berlanjut hingga permintaan selanjutnya danpasien harus diasumsikan mengonsumsinya kecuali jika dihentikan secara eksplisit"
+  },
+  {
+    "code" : "acute",
+    "display" : "Short course (acute) therapy",
+    "definition" : "Pengobatan pasien yang diharapkan dikonsumsi pada durasi pemberian tertentu dan tidak diberikan lagi"
+  },
+  {
+    "code" : "seasonal",
+    "display" : "Seasonal",
+    "definition" : "Pengobatan yang diharapkan digunakan pada waktu tertentu pada waktu yang telah dijadwalkan dalam setahun"
+  }]
+}

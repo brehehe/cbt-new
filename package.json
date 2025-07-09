@@ -1,0 +1,43 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite"
+    },
+    "dependencies": {
+        "autoprefixer": "^10.4.21",
+        "axios": "^1.7.4",
+        "concurrently": "^9.0.1",
+        "laravel-vite-plugin": "^1.0",
+        "tailwindcss": "^4.1.5",
+        "vite": "^6.2.5"
+    },
+    "optionalDependencies": {
+        "@rollup/rollup-linux-x64-gnu": "4.9.5",
+        "@tailwindcss/oxide-linux-x64-gnu": "^4.0.1",
+        "lightningcss-linux-x64-gnu": "^1.29.1"
+    },
+    "devDependencies": {
+        "@tailwindcss/vite": "^4.1.5",
+        "postcss": "^8.5.3"
+    },
+    "name": "mediction",
+    "version": "1.0.0",
+    "description": "",
+    "main": "vite.config.js",
+    "directories": {
+        "test": "tests"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/brehehe/mediction.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/brehehe/mediction/issues"
+    },
+    "homepage": "https://github.com/brehehe/mediction#readme"
+}

@@ -1,0 +1,39 @@
+{
+    "concept" : [
+        {
+            "code" : "s",
+            "display" : "second",
+            "definition" : "Detik"
+        },
+        {
+            "code" : "min",
+            "display" : "minute",
+            "definition" : "Menit"
+        },
+        {
+            "code" : "h",
+            "display" : "hour",
+            "definition" : "Jam"
+        },
+        {
+            "code" : "d",
+            "display" : "day",
+            "definition" : "Hari"
+        },
+        {
+            "code" : "wk",
+            "display" : "week",
+            "definition" : "Minggu"
+        },
+        {
+            "code" : "mo",
+            "display" : "month",
+            "definition" : "Bulan"
+        },
+        {
+            "code" : "a",
+            "display" : "year",
+            "definition" : "Tahun"
+        }
+    ]
+}
