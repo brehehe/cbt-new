@@ -12,7 +12,7 @@ class RoleHelper {
 
     public static function assignRoleToUserInCompany($user, $roleName, $companyId, $medicalRecordNumber = null, $is_head = null, $is_active = null)
     {
-        $is_head = $is_head ?? false;
+        $is_head   = $is_head ?? false;
         $is_active = $is_active ?? true;
 
         // Cari role global dulu

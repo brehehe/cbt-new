@@ -85,7 +85,17 @@
                         <div class="flex items-center gap-3">
                             <i
                                 class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/master/topic-question') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
-                            <span class="sidebar-text">Topik ujian</span>
+                            <span class="sidebar-text">Topik Ujian</span>
+                        </div>
+                    </a>
+                </div>
+                <div>
+                    <a href="{{ route('admin.master.material-category') }}"
+                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/material-category') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
+                        <div class="flex items-center gap-3">
+                            <i
+                                class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/master/material-category') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
+                            <span class="sidebar-text">Kategori Materi</span>
                         </div>
                     </a>
                 </div>

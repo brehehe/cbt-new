@@ -139,7 +139,7 @@ class AuthLoginIndex extends Component
                 'text' => 'Anda berhasil login ke sistem!',
             ]);
 
-            return redirect()->intended(route('user.dashboard'));
+            return redirect()->intended(route('admin.dashboard'));
         }
 
         $this->showAlert('Email, username, atau password salah');

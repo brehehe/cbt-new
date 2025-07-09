@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Admin\Master\MaterialCategory\AdminMasterMaterialCategoryIndex;
 use App\Livewire\Admin\Master\Topic\AdminMasterTopicIndex;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -30,6 +31,7 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
         Route::get('/user', 'User\AdminMasterUserIndex')->name('admin.master.user');
         Route::get('/setting', 'Setting\AdminMasterSettingIndex')->name('admin.master.setting');
         Route::get('/topic-question', AdminMasterTopicIndex::class)->name('admin.master.topic');
+        Route::get('/material-category', AdminMasterMaterialCategoryIndex::class)->name('admin.master.material-category');
         Route::get('/rating-scale', 'RatingScale\AdminMasterRatingScaleIndex')->name('admin.master.rating-scale');
     });
 });

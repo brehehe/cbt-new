@@ -1,18 +1,17 @@
 <?php
 
-namespace {{ namespace }};
+namespace App\Models\Master\Question;
 
-{{ factoryImport }}
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Model;
 use App\Models\Company\Company;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
-class {{ class }} extends Model
+class Material extends Model
 {
-    {{ factory }}
+    //
     use SoftDeletes, HasUuids;
     protected $guarded = ['id'];
 
