@@ -79,7 +79,7 @@ class AdminMasterStudentIndex extends Component
 
         if ($user->userDetail) {
             $this->address = $user->userDetail->address;
-            $this->identity_card = Crypt::decryptString($user->userDetail->identity_card);
+            $this->identity_card = $user->userDetail->identity_card ? Crypt::decryptString($user->userDetail->identity_card) : null;
             $this->is_head =
                 $user
                 ->companyRoles()

@@ -37,9 +37,10 @@
                 @php
                     $menuItems = [
                         ['label' => 'Skala Penilaian', 'url' => '/admin/master/rating-scale', 'icon' => 'fa-chart-bar'],
+                        ['label' => 'Jadwal', 'url' => '/admin/master/timetable', 'icon' => 'fa-clock'],
                         ['label' => 'Admin', 'url' => '/admin/master/admin', 'icon' => 'fa-user-shield'],
                         ['label' => 'Dosen', 'url' => '/admin/master/lecturer', 'icon' => 'fa-chalkboard-teacher'],
-                        ['label' => 'Supervisor', 'url' => '/admin/master/supervisor', 'icon' => 'fa-user-tie'],
+                        ['label' => 'Pengawas', 'url' => '/admin/master/supervisor', 'icon' => 'fa-user-tie'],
                         ['label' => 'Mahasiswa', 'url' => '/admin/master/student', 'icon' => 'fa-user-graduate'],
                         ['label' => 'Pengaturan', 'url' => '/admin/master/setting', 'icon' => 'fa-cog'],
                     ];

@@ -35,6 +35,7 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
         Route::get('/lecturer', 'Lecturer\AdminMasterLecturerIndex')->name('admin.master.lecturer');
         Route::get('/student', 'Student\AdminMasterStudentIndex')->name('admin.master.student');
         Route::get('/supervisor', 'Supervisor\AdminMasterSupervisorIndex')->name('admin.master.supervisor');
+        Route::get('/timetable', 'Timetable\AdminMasterTimetableIndex')->name('admin.master.timetable');
     });
 });
 

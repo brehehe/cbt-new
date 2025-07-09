@@ -2,14 +2,20 @@
 
 namespace App\Livewire\Admin\Master\Supervisor;
 
+use App\Helpers\AlertHelper;
+use App\Helpers\RoleHelper;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Crypt;
+use App\Models\User\UserDetail;
+use Auth;
+use DB;
+use Crypt;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
+use Log;
+use Illuminate\Support\Facades\Validator;
+use Hash;
 
 class AdminMasterSupervisorIndex extends Component
 {
@@ -77,9 +83,10 @@ class AdminMasterSupervisorIndex extends Component
         $this->profile_old = $user->profile;
         $this->phone = trim($user->phone ?? 0);
 
+
         if ($user->userDetail) {
             $this->address = $user->userDetail->address;
-            $this->identity_card = Crypt::decryptString($user->userDetail->identity_card);
+            $this->identity_card = $user->userDetail->identity_card ? Crypt::decryptString($user->userDetail->identity_card) : null;
             $this->is_head =
                 $user
                 ->companyRoles()
