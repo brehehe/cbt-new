@@ -35,6 +35,16 @@
                 </div>
                 <!-- Registration -->
                 <div>
+                    <a href="/admin/master/rating-scale"
+                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/rating-scale') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
+                        <div class="flex items-center gap-3">
+                            <i
+                                class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/master/rating-scale') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
+                            <span class="sidebar-text">Skala Penilaian</span>
+                        </div>
+                    </a>
+                </div>
+                <div>
                     <a href="/admin/master/user"
                         class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/user') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
                         <div class="flex items-center gap-3">
@@ -70,9 +80,11 @@
                     </a>
                 </div>
                 <div>
-                    <a href="{{ route('admin.master.topic') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/topic-question') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
+                    <a href="{{ route('admin.master.topic') }}"
+                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/topic-question') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
                         <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/master/topic-question') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
+                            <i
+                                class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/master/topic-question') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
                             <span class="sidebar-text">Topik ujian</span>
                         </div>
                     </a>

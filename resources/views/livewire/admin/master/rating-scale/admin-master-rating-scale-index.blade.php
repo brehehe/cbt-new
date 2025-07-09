@@ -1,17 +1,18 @@
 <div>
-    @include('livewire.admin.master.user.admin-master-user-modal')
+    @include('livewire.admin.master.rating-scale.admin-master-rating-scale-modal')
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#1E3A8A]">User</h1>
+                <h1 class="text-2xl font-bold text-[#1E3A8A]">Data Skala Penilaian</h1>
+                {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div>
-                <button wire:click="openModal('modal')" class="btn btn-primary">
+                <button wire:click="openModal()" class="btn btn-primary">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    Tambah User
+                    Tambah Skala Penilaian
                 </button>
             </div>
         </div>
@@ -32,10 +33,12 @@
         </div>
 
         <div class="relative w-full sm:w-64">
-            <input type="text" class="mt-1 form-control-search" placeholder="Cari Sesuatu..."
-                wire:model.live='search'>
-            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <i class="fas fa-search h-3 w-3 text-gray-400"></i>
+            <div class="relative w-full sm:w-64">
+                <input type="text" class="mt-1 form-control-search" placeholder="Cari Sesuatu..."
+                    wire:model.live='search'>
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fas fa-search h-3 w-3 text-gray-400"></i>
+                </div>
             </div>
         </div>
     </div>
@@ -47,38 +50,23 @@
                 <thead>
                     <tr>
                         <th class="w-1 center">No</th>
-                        <th>Nama</th>
-                        <th>Role</th>
-                        {{-- <th>Username</th> --}}
-                        {{-- <th>Email</th> --}}
-                        <th>Username</th>
+                        <th>Grade Letter</th>
+                        <th>Min Score</th>
+                        <th>Max Score</th>
+                        <th>Deskripsi</th>
                         <th class="w-1 center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($users as $index => $user)
+                    @forelse ($datas as $index => $data)
                         <tr>
-                            <td class="center">{{ $users->firstItem() + $index }}</td>
-                            <td>{{ $user->name ?? '-' }}</td>
-                            <td>
-                                @if ($user->companyRoles()->where('company_id', Auth::user()->company_id)->first()->role->name)
-                                    {{ $user->companyRoles()->where('company_id', Auth::user()->company_id)->first()->role->name }}
-                                @else
-                                    Tidak Ada Role
-                                @endif
-                            </td>
-                            <td>{{ $user->username ?? '-' }}</td>
-                            {{-- <td>{{ $user->email ?? '-' }}</td> --}}
-                            {{-- <td>{{ $user->phone ?? '-' }}</td> --}}
+                            <td class="center">{{ $datas->firstItem() + $index }}</td>
+                            <td>{{ $data->name }}</td>
+                            <td>{{ $data->min_score }}</td>
+                            <td>{{ $data->max_score }}</td>
+                            <td>{{ $data->description }}</td>
                             <td class="center">
                                 <div class="flex items-center">
-                                    <!-- Tombol Price -->
-                                    <button
-                                        class="btn btn-icon text-yellow-600 hover:text-yellow-800 transition-colors edit-btn"
-                                        wire:click="price('{{ $user->id }}')">
-                                        <i class="fa-solid fa-tags"></i>
-                                    </button>
-
                                     <!-- Tombol Edit -->
                                     <button
                                         class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn"
@@ -94,10 +82,12 @@
                                     </button>
                                 </div>
                             </td>
+
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="no-data">Tidak ada data</td>
+                            <td colspan="10" class="no-data">Tidak ada data
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -108,17 +98,16 @@
         <div class="px-5 py-4 bg-gray-50/80 border-t border-gray-200">
             <div class="flex items-center justify-between">
                 <div class="text-sm text-gray-700">
-                    Menampilkan <span class="font-medium">{{ $users->firstItem() }}</span> sampai <span
-                        class="font-medium">{{ $users->lastItem() }}</span> dari <span
-                        class="font-medium">{{ $users->total() }}</span> hasil
+                    Menampilkan <span class="font-medium">{{ $datas->firstItem() }}</span> sampai <span
+                        class="font-medium">{{ $datas->lastItem() }}</span> dari <span
+                        class="font-medium">{{ $datas->total() }}</span> hasil
                 </div>
                 <div>
                     <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        {{ $users->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
+                        {{ $datas->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
                     </nav>
                 </div>
             </div>
         </div>
-
     </div>
 </div>

@@ -73,25 +73,52 @@ class AlertHelper
             ->toast()
             ->timer($timer)
             ->withOptions([
-                'width' => '500px',
-                'padding' => '14px',
+                'width' => '350px',
+                'padding' => '10px',
                 'background' => '#ffffff',
                 'color' => $iconColor,
                 'customClass' => [
-                    'popup' => 'animate__animated animate__fadeInRight rounded-lg shadow-xl',
-                    'title' => 'text-base font-bold',
-                    'content' => 'text-sm',
+                    'popup' => 'animate__animated animate__fadeInRight rounded-lg shadow-2xl border',
+                    'title' => 'text-base font-semibold text-gray-800',
+                    'content' => 'text-sm text-gray-600 mt-1',
                     'timerProgressBar' => 'progress-bar-' . $type,
                 ],
                 'showConfirmButton' => false,
                 'timerProgressBar' => $timer > 0,
                 'didOpen' => "(toast) => {
+                    // Basic styling that definitely works
+                    toast.style.borderRadius = '12px';
+                    toast.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
+                    toast.style.border = '1px solid #e5e7eb';
+
+                    // Progress bar color
                     const progressBar = toast.querySelector('.swal2-timer-progress-bar');
                     if (progressBar) {
                         progressBar.style.backgroundColor = '{$iconColor}';
+                        progressBar.style.height = '3px';
                     }
-                    toast.addEventListener('mouseenter', Swal.stopTimer);
-                    toast.addEventListener('mouseleave', Swal.resumeTimer);
+
+                    // Close button styling
+                    const closeButton = toast.querySelector('.swal2-close');
+                    if (closeButton) {
+                        closeButton.style.fontSize = '20px';
+                        closeButton.style.fontWeight = 'bold';
+                        closeButton.style.color = '#9ca3af';
+                        closeButton.style.top = '10px';
+                        closeButton.style.right = '10px';
+                    }
+
+                    // Hover effects
+                    toast.addEventListener('mouseenter', () => {
+                        Swal.stopTimer();
+                        toast.style.transform = 'scale(1.02)';
+                        toast.style.transition = 'transform 0.2s ease';
+                    });
+
+                    toast.addEventListener('mouseleave', () => {
+                        Swal.resumeTimer();
+                        toast.style.transform = 'scale(1)';
+                    });
                 }",
             ])
             ->show();
@@ -118,8 +145,7 @@ class AlertHelper
         ?string $cancelColor = null,
         $confirmAction = 'save',
         ?string $type = 'question'
-    ): void
-    {
+    ): void {
         $type = strtolower($type);
         $config = self::$alertConfig[$type] ?? self::$alertConfig['question'];
 
@@ -296,7 +322,6 @@ class AlertHelper
             $confirmAction,
             'info'
         );
-
     }
 
     /**
