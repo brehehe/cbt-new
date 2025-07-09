@@ -149,9 +149,9 @@ class AlertHelper
         $type = strtolower($type);
         $config = self::$alertConfig[$type] ?? self::$alertConfig['question'];
 
-        $confirmText = $confirmText ?? $config['confirmText'];
+        $confirmText  = $confirmText ?? $config['confirmText'];
         $confirmColor = $confirmColor ?? self::$colors['primary'];
-        $cancelColor = $cancelColor ?? self::$colors['secondary'];
+        $cancelColor  = $cancelColor ?? self::$colors['secondary'];
 
         $alert = LivewireAlert::title($title)
             ->text($text)
@@ -160,39 +160,37 @@ class AlertHelper
             ->confirmButtonColor($confirmColor)
             ->denyButtonColor($cancelColor)
             ->withOptions([
-                'icon' => $config['icon'],
+                'width' => '500px',
+                'padding' => '10px',
+                'background' => '#ffffff',
+                'icon'      => $config['icon'],
                 'iconColor' => $confirmColor,
                 'showClass' => [
-                    'popup' => 'animate__animated animate__fadeInDown animate__faster'
+                    'popup' => 'animate__animated animate__fadeInDown animate__faster',
                 ],
                 'hideClass' => [
-                    'popup' => 'animate__animated animate__fadeOutUp animate__faster'
+                    'popup' => 'animate__animated animate__fadeOutUp animate__faster',
                 ],
-                // 'backdrop' => 'rgba(0,0,0,0.7)',
                 'customClass' => [
-                    'title' => 'text-xl font-bold text-gray-800',
-                    'content' => 'text-gray-600 text-base',
+                    'title'         => 'text-xl font-bold text-gray-800',
+                    'content'       => 'text-gray-600 text-base',
                     'confirmButton' => 'rounded-lg px-6 py-3 font-medium text-white',
-                    'cancelButton' => 'rounded-lg px-6 py-3 font-medium text-white',
-                    'popup' => 'rounded-xl shadow-2xl border-0'
+                    'cancelButton'  => 'rounded-lg px-6 py-3 font-medium text-white',
+                    'popup'         => 'rounded-xl shadow-2xl border-0',
                 ],
                 'buttonsStyling' => true,
             ]);
 
-        // Handle action dengan atau tanpa parameter
+        // Handle confirmAction: bisa string, array 1-3 elemen
         if (is_array($confirmAction)) {
-            // Format: ['actionName', ['param1', 'param2', ...]]
-            if (count($confirmAction) == 2 && is_array($confirmAction[1])) {
-                $alert->onConfirm($confirmAction[0], $confirmAction[1]);
+            $actionName = $confirmAction[0];
+            $params     = $confirmAction[1] ?? [];
+
+            if (!is_array($params)) {
+                $params = [$params];
             }
-            // Format: ['actionName', 'param1']
-            else if (count($confirmAction) == 2) {
-                $alert->onConfirm($confirmAction[0], [$confirmAction[1]]);
-            }
-            // Format: ['actionName']
-            else {
-                $alert->onConfirm($confirmAction[0]);
-            }
+
+            $alert->onConfirm($actionName, $params);
         } else {
             $alert->onConfirm($confirmAction);
         }

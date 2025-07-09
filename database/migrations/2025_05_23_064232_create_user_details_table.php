@@ -17,23 +17,8 @@ return new class extends Migration
             $table->string('doctor_id')->nullable()->comment('ID dokter, jika pengguna adalah dokter');
 
             // Untuk semua jenis pengguna
-            $table->string('province_code')->nullable()->comment('Kode provinsi by one health');
-            $table->string('province')->nullable();  // Provinsi
-            $table->string('city_code')->nullable()->comment('Kode kabupaten by one health');
-            $table->string('city')->nullable(); // Kota/Kabupaten
-            $table->string('district_code')->nullable()->comment('Kode kecamatan by one health');
-            $table->string('district')->nullable(); // Kecamatan
-            $table->string('sub_district_code')->nullable()->comment('Kode kelurahan by one health');
-            $table->string('sub_district')->nullable(); // Kelurahan
-            $table->string('postal_code')->nullable();
             $table->longText('address')->nullable()->comment('Alamat lengkap pengguna');
             $table->string('country')->default('ID');
-            $table->string('rt', 5)->nullable()->comment('Kode RT by one health');
-            $table->string('rw', 5)->nullable()->comment('Kode RW by one health');
-            $table->string('longitude')->default(0)->comment('Kode longitude by one health');
-            $table->string('latitude')->default(0)->comment('Kode latitude by one health');
-            $table->string('altitude')->default(0)->comment('Kode altitude by one health');
-            $table->string('ihs_number')->nullable()->comment('Nomor IHS untuk pasien (bisa kosong untuk non-pasien)');
             $table->longText('identity_card')->nullable()->comment('Foto / path file kartu identitas (KTP, BPJS, dll)');
             $table->string('blood_group')->nullable()->comment('Golongan darah (jika tersedia)');
             $table->string('administrative_gender')->nullable()->comment('Jenis kelamin administratif, mengacu pada terminologi AdministrativeGender');
@@ -48,7 +33,7 @@ return new class extends Migration
             $table->string('sip_number')->nullable()->comment('Nomor Surat Izin Praktik (hanya untuk dokter)');
             $table->string('specialization')->nullable()->comment('Spesialisasi dokter');
             $table->enum('doctor_type', ['general', 'specialist'])->default('general')->comment('Tipe dokter (umum atau spesialis)');
-            $table->enum('type',['in','out'])->default('in')->comment('Tipe dokter (in house atau out house)');
+            $table->enum('type', ['in', 'out'])->default('in')->comment('Tipe dokter (in house atau out house)');
 
             $table->bigInteger('order')->default(0);
             $table->softDeletes();

@@ -47,6 +47,7 @@ class AdminMasterRatingScaleIndex extends Component
         $this->min_score = $data->min_score;
         $this->max_score = $data->max_score;
         $this->description = $data->description;
+        $this->openModal();
     }
 
     public function confirmDelete($id)
@@ -58,7 +59,7 @@ class AdminMasterRatingScaleIndex extends Component
     {
         try {
             DB::beginTransaction();
-            $data = RatingScale::find($id);
+            $data = RatingScale::find($id[0]);
             $data->delete();
             DB::commit();
             AlertHelper::success('Berhasil', 'Data berhasil dihapus!');

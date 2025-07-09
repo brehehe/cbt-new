@@ -6,7 +6,7 @@
     <!-- Logo Section -->
     <div class="flex-shrink-0 h-16 flex items-center gap-3 px-6 border-b border-gray-100">
         <div>
-            <h2 class="text-lg font-bold text-[#1E3A8A]">Mediction</h2>
+            <h2 class="text-lg font-bold text-[#1E3A8A]">PROCBT</h2>
             <p class="text-xs text-gray-500">Healthcare System</p>
         </div>
     </div>
@@ -17,7 +17,7 @@
             <nav class="space-y-1">
                 <!-- Dashboard -->
                 <div>
-                    <a href="/user"
+                    <a href="/admin"
                         class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
                         <div class="flex items-center gap-3">
                             <i
@@ -34,51 +34,34 @@
                     </div>
                 </div>
                 <!-- Registration -->
-                <div>
-                    <a href="/admin/master/rating-scale"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/rating-scale') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
-                        <div class="flex items-center gap-3">
-                            <i
-                                class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/master/rating-scale') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
-                            <span class="sidebar-text">Skala Penilaian</span>
-                        </div>
-                    </a>
-                </div>
-                <div>
-                    <a href="/admin/master/user"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/user') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
-                        <div class="flex items-center gap-3">
-                            <i
-                                class="fa-solid fa-users-medical mr-2 text-lg {{ Request::is('admin/master/user') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
-                            <span class="sidebar-text">User</span>
-                        </div>
-                    </a>
-                </div>
-                <div>
-                    <a href="/admin/master/role"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/role') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
-                        <div class="flex items-center gap-3">
-                            <i
-                                class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/master/role') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
-                            <span class="sidebar-text">Role</span>
-                        </div>
-                    </a>
-                </div>
-                <div>
-                    <a href="/admin/master/setting"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/setting') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
-                        <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 mr-2 {{ Request::is('admin/master/setting') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }} shrink-0"
-                                fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <circle cx="12" cy="12" r="3" />
-                                <path
-                                    d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33h.09a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v.09a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
-                            </svg>
+                @php
+                    $menuItems = [
+                        ['label' => 'Skala Penilaian', 'url' => '/admin/master/rating-scale', 'icon' => 'fa-chart-bar'],
+                        ['label' => 'Jadwal', 'url' => '/admin/master/timetable', 'icon' => 'fa-clock'],
+                        ['label' => 'Admin', 'url' => '/admin/master/admin', 'icon' => 'fa-user-shield'],
+                        ['label' => 'Dosen', 'url' => '/admin/master/lecturer', 'icon' => 'fa-chalkboard-teacher'],
+                        ['label' => 'Pengawas', 'url' => '/admin/master/supervisor', 'icon' => 'fa-user-tie'],
+                        ['label' => 'Mahasiswa', 'url' => '/admin/master/student', 'icon' => 'fa-user-graduate'],
+                        ['label' => 'Pengaturan', 'url' => '/admin/master/setting', 'icon' => 'fa-cog'],
+                    ];
+                @endphp
 
-                            <span class="sidebar-text">Pengaturan</span>
-                        </div>
-                    </a>
-                </div>
+                @foreach ($menuItems as $item)
+                    <div>
+                        <a href="{{ $item['url'] }}"
+                            class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
+            {{ Request::is(ltrim($item['url'], '/')) ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }}">
+                            <div class="flex items-center gap-3">
+                                <i
+                                    class="fa-solid {{ $item['icon'] }} text-lg mr-2
+                {{ Request::is(ltrim($item['url'], '/')) ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}">
+                                </i>
+                                <span class="sidebar-text">{{ $item['label'] }}</span>
+                            </div>
+                        </a>
+                    </div>
+                @endforeach
+
                 <div>
                     <a href="{{ route('admin.master.topic') }}"
                         class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/topic-question') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
