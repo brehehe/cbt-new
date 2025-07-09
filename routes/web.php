@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Admin\Master\Topic\AdminMasterTopicIndex;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -21,18 +22,19 @@ Route::group(['namespace' => 'App\Livewire\Auth'], function () {
     Route::get('register', 'Register\AuthRegisterIndex')->name('register');
 });
 
-Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'user', 'middleware' => ['auth', 'verified']], function () {
-    Route::get('/', 'Dashboard\AdminDashboardIndex')->name('user.dashboard');
+Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middleware' => ['auth', 'verified']], function () {
+    Route::get('/', 'Dashboard\AdminDashboardIndex')->name('admin.dashboard');
 
     Route::group(['namespace' => 'Master', 'prefix' => 'master'], function () {
-        Route::get('/role', 'Role\AdminMasterRoleIndex')->name('user.master.role');
-        Route::get('/user', 'User\AdminMasterUserIndex')->name('user.master.user');
-        Route::get('/setting', 'Setting\AdminMasterSettingIndex')->name('user.master.setting');
+        Route::get('/role', 'Role\AdminMasterRoleIndex')->name('admin.master.role');
+        Route::get('/user', 'User\AdminMasterUserIndex')->name('admin.master.user');
+        Route::get('/setting', 'Setting\AdminMasterSettingIndex')->name('admin.master.setting');
+        Route::get('/topic-question', AdminMasterTopicIndex::class)->name('admin.master.topic');
     });
 });
 
 if (config('app.env') === 'local' || config('app.env') === 'development') {
-    Route::redirect('', '/user');
+    Route::redirect('', '/admin');
 }
 
 Route::get('logout', function () {

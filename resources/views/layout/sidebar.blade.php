@@ -18,10 +18,10 @@
                 <!-- Dashboard -->
                 <div>
                     <a href="/user"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('user') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
+                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
                         <div class="flex items-center gap-3">
                             <i
-                                class="fa-light fa-house mr-2 text-lg {{ Request::is('user') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
+                                class="fa-light fa-house mr-2 text-lg {{ Request::is('admin') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
                             <span class="sidebar-text">Dashboard</span>
                         </div>
                     </a>
@@ -35,30 +35,30 @@
                 </div>
                 <!-- Registration -->
                 <div>
-                    <a href="/user/master/user"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('user/master/user') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
+                    <a href="/admin/master/user"
+                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/user') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
                         <div class="flex items-center gap-3">
                             <i
-                                class="fa-solid fa-users-medical mr-2 text-lg {{ Request::is('user/master/user') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
+                                class="fa-solid fa-users-medical mr-2 text-lg {{ Request::is('admin/master/user') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
                             <span class="sidebar-text">User</span>
                         </div>
                     </a>
                 </div>
                 <div>
-                    <a href="/user/master/role"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('user/master/role') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
+                    <a href="/admin/master/role"
+                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/role') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
                         <div class="flex items-center gap-3">
                             <i
-                                class="fa-solid fa-tag mr-2 text-lg {{ Request::is('user/master/role') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
+                                class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/master/role') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
                             <span class="sidebar-text">Role</span>
                         </div>
                     </a>
                 </div>
                 <div>
-                    <a href="/user/master/setting"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('user/master/setting') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
+                    <a href="/admin/master/setting"
+                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/setting') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
                         <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 mr-2 {{ Request::is('user/master/setting') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }} shrink-0"
+                            <svg class="w-5 h-5 mr-2 {{ Request::is('admin/master/setting') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }} shrink-0"
                                 fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <circle cx="12" cy="12" r="3" />
                                 <path
@@ -66,6 +66,14 @@
                             </svg>
 
                             <span class="sidebar-text">Pengaturan</span>
+                        </div>
+                    </a>
+                </div>
+                <div>
+                    <a href="{{ route('admin.master.topic') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/topic-question') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/master/topic-question') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
+                            <span class="sidebar-text">Topik ujian</span>
                         </div>
                     </a>
                 </div>
