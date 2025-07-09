@@ -35,13 +35,10 @@ class CompanySeeder extends Seeder
     {
         $roles = [
             ['name' => 'Super Admin'],
-            ['name' => 'Dokter'],
-            ['name' => 'Perawat'],
-            ['name' => 'Terapis'],
-            ['name' => 'Apoteker'],
-            ['name' => 'Resepsionis'],
-            ['name' => 'Kasir'],
-            ['name' => 'Pasien'], // Tanpa company_id
+            ['name' => 'Dosen'],
+            ['name' => 'Siswa'],
+            ['name' => 'Pengawas'],
+            ['name' => 'Secret'], // Tanpa company_id
             // ['name' => 'Sales'],
             // ['name' => 'Medis'],
         ];
@@ -84,12 +81,6 @@ class CompanySeeder extends Seeder
                 'expires_at'  => $serviceMonth->is_lifetime ? null : now()->addDays($serviceMonth->duration_days),
 
                 'roles'      => ['Super Admin', 'Pasien'],
-                'one_health' => [
-                    'organization_id' => config('app.one_health.organization_id'),
-                    'client_id'       => config('app.one_health.client_id'),
-                    'client_secret'   => config('app.one_health.client_secret'),
-                ],
-                'branch' => 'Pusat',
                 'company_detail' => [
                     'one_health_code'   => '1004946874',
                     'facility_code'     => '35780100662',
@@ -105,59 +96,6 @@ class CompanySeeder extends Seeder
                     'country'           => 'ID',
                     'rt'                => 001,
                     'rw'                => 002,
-                ],
-                'medicine_types' => [
-                    [
-                        'name' => 'Paten',
-                        'service_price' => 1000,
-                        'is_single' => true,
-                    ],
-                    [
-                        'name' => 'Puyer',
-                        'service_price' => 1000,
-                        'is_single' => false,
-                    ],
-                    [
-                        'name' => 'Capsule',
-                        'service_price' => 500,
-                        'is_single' => false,
-                    ],
-                    [
-                        'name' => 'Syrup',
-                        'service_price' => 2000,
-                        'is_single' => false,
-                    ],
-                    [
-                        'name' => 'Cream',
-                        'service_price' => 1500,
-                        'is_single' => false,
-                    ],
-                    [
-                        'name' => 'Mix',
-                        'service_price' => 1000,
-                        'is_single' => false,
-                    ],
-                ],
-                'payment_methods' => [
-                    'Tunai',
-                ],
-                'poly' => [
-                    [
-                        'name' => 'Poli Umum',
-                        'slug' => Str::slug('Poli Umum'),
-                        'description' => 'Pelayanan umum untuk semua pasien',
-                        'mode' => 'instance',
-                        'physical_type' => 'si',
-                        'status' => 'active',
-                    ],
-                    [
-                        'name' => 'Instalasi Farmasi',
-                        'slug' => Str::slug('Instalasi Farmasi'),
-                        'description' => 'Pelayanan farmasi untuk semua pasien',
-                        'mode' => 'instance',
-                        'physical_type' => 'si',
-                        'status' => 'active',
-                    ]
                 ],
             ],
         ];
@@ -194,14 +132,6 @@ class CompanySeeder extends Seeder
                 ]);
             }
 
-            foreach ($company_data['payment_methods'] as $key => $value) {
-                PaymentMethod::create([
-                    'company_id'            => $company->id,
-                    'name'                  => $value,
-                    'is_offline_payment'    => true,
-                ]);
-            }
-
             $user = User::create([
                 'name'              => $company->pic_name,
                 'email'             => $company->email_company,
@@ -219,35 +149,6 @@ class CompanySeeder extends Seeder
             ]);
 
             RoleHelper::assignRoleToUserInCompany($user, 'Super Admin', $company->id, null, true, true);
-
-            // 1. Buat user baru
-            // $dokter = User::create([
-            //     'name'              => 'Dokter ' . $company->name,
-            //     'email'             => 'dokter.' . strtolower(str_replace(' ', '', $company->name)) . '@example.com',
-            //     'username'          => 'dokter' . strtolower(str_replace(' ', '', $company->name)),
-            //     'password'          => bcrypt('12345678'), // Default password, sebaiknya diganti nanti
-            //     'email_verified_at' => now(),
-            //     'company_id'        => $company->id,
-            // ]);
-
-            // // 2. Detail user dokter
-            // UserDetail::create([
-            //     'user_id' => $dokter->id,
-            //     // 'administrative_gender' => AdministrativeGender::first()->code,
-            //     'address' => $company->address,
-            //     'status' => 'active',
-            // ]);
-
-            // // 3. Assign role Dokter ke user tersebut
-            // RoleHelper::assignRoleToUserInCompany($dokter, 'Dokter', $company->id, null, false, true);
-
-            if (isset($company_data['one_health']['organization_id'])) {
-                $company->oneHealthy()->create([
-                    'organization_id' => Crypt::encryptString($company_data['one_health']['organization_id']),
-                    'client_id'       => Crypt::encryptString($company_data['one_health']['client_id']),
-                    'client_secret'   => Crypt::encryptString($company_data['one_health']['client_secret']),
-                ]);
-            }
 
             if (isset($company_data['company_detail'])) {
                 $company?->companyDetail()->create(
@@ -267,64 +168,6 @@ class CompanySeeder extends Seeder
                         'rw'                => $company_data['company_detail']['rw'],
                     ]
                 );
-            }
-
-            Branch::create([
-                'company_id' => $company->id,
-                'name'       => $company_data['branch'],
-            ]);
-
-            foreach ($company_data['medicine_types'] as $medicine_type) {
-                $company->medicineTypes()->create([
-                    'name' => $medicine_type['name'],
-                    'service_price' => $medicine_type['service_price'],
-                    'is_single' => $medicine_type['is_single'],
-                ]);
-            }
-
-            $companyService = CompanyService::create([
-                'company_id'      => $company->id,
-                'service_month_id'      => $company_data['service_id'],
-                'start_date'      => now(),
-                'duration_days'   => $serviceMonth->is_lifetime ? 0 : $serviceMonth->duration_days,
-                'expires_at'      => $serviceMonth->is_lifetime ? null : now()->addDays($serviceMonth->duration_days),
-                'is_lifetime'     => $serviceMonth->is_lifetime,
-            ]);
-
-            $serviceMonthDetails = ServiceMonth::where('id', $company_data['service_id'])
-                ->with('serviceMonthDetails')
-                ->first()
-                ->serviceMonthDetails;
-
-            foreach ($serviceMonthDetails as $detail) {
-                CompanyServiceMonth::create([
-                    'company_id'         => $company->id,
-                    'company_service_id' => $companyService->id,
-                    'service_month_id'   => $detail->id,
-                    'start_date'         => now(),
-                    'duration_days'      => $serviceMonth->is_lifetime ? 0 : $serviceMonth->duration_days,
-                    'expires_at'         =>
-
-                    $serviceMonth->is_lifetime ? null : now()->addDays($serviceMonth->duration_days),
-                    'is_lifetime'        => $serviceMonth->is_lifetime,
-                    'order'              => 0,
-                ]);
-            }
-
-            app(apiservice::class)->createCompany($company);
-
-            foreach ($company_data['poly'] as $key => $poly) {
-                $location = Location::create([
-                    'company_id'    => $company->id,
-                    'name'          => $poly['name'],
-                    'slug'          => $poly['slug'],
-                    'description'   => $poly['description'],
-                    'mode'          => $poly['mode'],
-                    'physical_type' => $poly['physical_type'],
-                    'status'        => $poly['status'],
-                ]);
-
-                app(apiservice::class)->syncLocation($location);
             }
         }
     }
