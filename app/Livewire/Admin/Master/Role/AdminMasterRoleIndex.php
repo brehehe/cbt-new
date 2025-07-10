@@ -23,14 +23,9 @@ class AdminMasterRoleIndex extends Component
     public $data_id;
     public $name;
 
-    public function updatedPerPage()
+    public function hydrate()
     {
         $this->resetPage();
-    }
-
-    public function updatedSearch()
-    {
-        $this->perPage();
     }
 
     public function openModal()

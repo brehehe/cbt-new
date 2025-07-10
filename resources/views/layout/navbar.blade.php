@@ -3,15 +3,17 @@
         <div class="flex justify-between h-16">
             <!-- Left Section: Logo & Sidebar Toggle -->
             <div class="flex items-center">
-                <img src="{{ asset('asset/img/logo.png') }}" alt="Mediction Logo" class="h-7 w-auto mr-2">
-                <button id="toggleSidebar" class="p-2 rounded-xl text-[#1E3A8A] hover:bg-[#C3D4EC]/20 transition-all duration-200 cursor-pointer">
+                <img src="{{ asset('asset/img/LogoPROCBT.png') }}" alt="Mediction Logo" class="h-7 w-auto mr-2">
+                <button id="toggleSidebar"
+                    class="p-2 rounded-xl text-[#1E3A8A] hover:bg-[#C3D4EC]/20 transition-all duration-200 cursor-pointer">
                     <i class="fas fa-bars text-lg"></i>
                 </button>
             </div>
 
             <!-- Center Section: Company Info (Desktop Only) -->
             <div class="hidden xl:flex items-center gap-4 flex-1 justify-center">
-                <div class="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                <div
+                    class="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
                     <div class="flex items-center gap-2">
                         <i class="fas fa-building text-blue-600"></i>
                         <div class="text-left">
@@ -36,17 +38,20 @@
                             @if ($isExpired)
                                 <i class="fas fa-exclamation-triangle text-red-500"></i>
                                 <div class="text-left">
-                                    <p class="text-xs text-red-600 font-medium">EXPIRED {{ abs($daysLeft) }} hari yang lalu</p>
+                                    <p class="text-xs text-red-600 font-medium">EXPIRED {{ abs($daysLeft) }} hari yang
+                                        lalu</p>
                                 </div>
                             @elseif($isExpiringSoon)
                                 <i class="fas fa-clock text-orange-500"></i>
                                 <div class="text-left">
-                                    <p class="text-xs text-orange-600 font-medium">Berakhir Dalam {{ $daysLeft }} hari lagi</p>
+                                    <p class="text-xs text-orange-600 font-medium">Berakhir Dalam {{ $daysLeft }}
+                                        hari lagi</p>
                                 </div>
                             @else
                                 <i class="fas fa-calendar-check text-green-500"></i>
                                 <div class="text-left">
-                                    <p class="text-xs text-green-600 font-medium">Aktif Hingga {{ \Carbon\Carbon::parse($expiredDate)->format('d M Y') }}</p>
+                                    <p class="text-xs text-green-600 font-medium">Aktif Hingga
+                                        {{ \Carbon\Carbon::parse($expiredDate)->format('d M Y') }}</p>
                                 </div>
                             @endif
                         @endif
@@ -58,12 +63,16 @@
             <div class="flex items-center gap-2 sm:gap-4">
                 <!-- Mobile Company Info Button -->
                 <div class="xl:hidden flex items-center">
-                    <div x-data="{ open: false }" class="relative" @mouseenter="if(window.innerWidth>=1280){ open = true }" @mouseleave="if(window.innerWidth>=1280){ open = false }">
-                        <button @click="open = !open" class="p-2 rounded-xl text-[#1E3A8A] hover:bg-[#C3D4EC]/20 transition-all duration-200">
+                    <div x-data="{ open: false }" class="relative"
+                        @mouseenter="if(window.innerWidth>=1280){ open = true }"
+                        @mouseleave="if(window.innerWidth>=1280){ open = false }">
+                        <button @click="open = !open"
+                            class="p-2 rounded-xl text-[#1E3A8A] hover:bg-[#C3D4EC]/20 transition-all duration-200">
                             <i class="fas fa-building text-lg"></i>
                         </button>
                         <!-- Mobile Company Info Dropdown -->
-                        <div x-show="open" x-transition @click.away="open = false" class="absolute right-0 mt-2 w-72 sm:w-80 bg-white border border-gray-200 rounded-xl shadow-lg z-50">
+                        <div x-show="open" x-transition @click.away="open = false"
+                            class="absolute right-0 mt-2 w-72 sm:w-80 bg-white border border-gray-200 rounded-xl shadow-lg z-50">
                             <div class="p-4">
                                 <div class="flex items-center gap-2 mb-3">
                                     <i class="fas fa-building text-blue-600"></i>
@@ -97,7 +106,8 @@
                                             <i class="fas fa-calendar-check text-green-500"></i>
                                             <div>
                                                 <p class="text-xs text-green-600 font-medium">Aktif Hingga</p>
-                                                <p class="text-xs text-green-500">{{ \Carbon\Carbon::parse($expiredDate)->format('d M Y') }}</p>
+                                                <p class="text-xs text-green-500">
+                                                    {{ \Carbon\Carbon::parse($expiredDate)->format('d M Y') }}</p>
                                             </div>
                                         @endif
                                     @endif
@@ -108,13 +118,17 @@
                 </div>
 
                 <!-- Notifications -->
-                <div x-data="{ open: false }" class="relative" @mouseenter="if(window.innerWidth>=1280){ open = true }" @mouseleave="if(window.innerWidth>=1280){ open = false }">
-                    <button @click="open = !open" class="p-2 rounded-xl text-gray-500 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A] transition-all duration-200 relative">
+                <div x-data="{ open: false }" class="relative" @mouseenter="if(window.innerWidth>=1280){ open = true }"
+                    @mouseleave="if(window.innerWidth>=1280){ open = false }">
+                    <button @click="open = !open"
+                        class="p-2 rounded-xl text-gray-500 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A] transition-all duration-200 relative">
                         <i class="fas fa-bell text-lg"></i>
-                        <span class="absolute top-1 right-1 h-4 w-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center">3</span>
+                        <span
+                            class="absolute top-1 right-1 h-4 w-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center">3</span>
                     </button>
                     <!-- Notifications Dropdown -->
-                    <div x-show="open" x-transition @click.away="open = false" class="absolute right-0 mt-2 w-72 sm:w-80 bg-white border border-gray-200 rounded-xl shadow-lg z-50">
+                    <div x-show="open" x-transition @click.away="open = false"
+                        class="absolute right-0 mt-2 w-72 sm:w-80 bg-white border border-gray-200 rounded-xl shadow-lg z-50">
                         <div class="p-4 font-semibold text-gray-700 border-b">Notifikasi</div>
                         <ul class="max-h-60 overflow-y-auto divide-y divide-gray-100">
                             <li class="p-4 hover:bg-gray-50 cursor-pointer">
@@ -137,11 +151,15 @@
                 </div>
 
                 <!-- Profile Dropdown -->
-                <div x-data="{ open: false }" class="relative cursor-pointer" @mouseenter="if(window.innerWidth>=1280){ open = true }" @mouseleave="if(window.innerWidth>=1280){ open = false }">
-                    <button @click="open = !open" class="flex items-center gap-2 sm:gap-3 p-2 rounded-xl hover:bg-[#C3D4EC]/20 transition-all duration-200">
+                <div x-data="{ open: false }" class="relative cursor-pointer"
+                    @mouseenter="if(window.innerWidth>=1280){ open = true }"
+                    @mouseleave="if(window.innerWidth>=1280){ open = false }">
+                    <button @click="open = !open"
+                        class="flex items-center gap-2 sm:gap-3 p-2 rounded-xl hover:bg-[#C3D4EC]/20 transition-all duration-200">
                         <!-- Profile Image -->
                         <div class="h-8 w-8 rounded-lg overflow-hidden bg-white flex items-center justify-center">
-                            <img src="{{ auth()->user()->profile ?? asset('asset/img/profile.png') }}" alt="Profile" class="h-full w-full object-cover">
+                            <img src="{{ auth()->user()->profile ?? asset('asset/img/profile.png') }}" alt="Profile"
+                                class="h-full w-full object-cover">
                         </div>
                         <!-- Profile Info (Hidden on small screens) -->
                         <div class="hidden sm:block text-left">
@@ -155,23 +173,29 @@
                         <i class="fas fa-chevron-down text-gray-400 hidden sm:block"></i>
                     </button>
                     <!-- Profile Dropdown Menu -->
-                    <div x-show="open" x-transition @click.away="open = false" class="absolute right-0 w-48 sm:w-52 mt-2 backdrop-blur-sm rounded-xl shadow-lg border bg-white border-gray-100 z-50">
+                    <div x-show="open" x-transition @click.away="open = false"
+                        class="absolute right-0 w-48 sm:w-52 mt-2 backdrop-blur-sm rounded-xl shadow-lg border bg-white border-gray-100 z-50">
                         <!-- Mobile Profile Info (Shown only on small screens) -->
                         <div class="sm:hidden p-3 border-b border-gray-100">
                             <p class="text-sm font-medium text-gray-900">{{ auth()->user()->name ?? 'Admin User' }}</p>
-                            <p class="text-xs text-gray-500">{{ Auth::user()->companyRoles()->where('company_id', Auth::user()->company_id)->first()->role->name ?? 'No Role' }}</p>
+                            <p class="text-xs text-gray-500">
+                                {{ Auth::user()->companyRoles()->where('company_id', Auth::user()->company_id)->first()->role->name ?? 'No Role' }}
+                            </p>
                         </div>
                         <div class="p-2">
-                            <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A] rounded-lg transition-all duration-200">
+                            <a href="#"
+                                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A] rounded-lg transition-all duration-200">
                                 <i class="fas fa-user w-4"></i>
                                 <span>Profile</span>
                             </a>
-                            <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A] rounded-lg transition-all duration-200">
+                            <a href="#"
+                                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A] rounded-lg transition-all duration-200">
                                 <i class="fas fa-cog w-4"></i>
                                 <span>Settings</span>
                             </a>
                             <hr class="my-1 border-gray-100">
-                            <a href="/logout" class="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200">
+                            <a href="/logout"
+                                class="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200">
                                 <i class="fas fa-sign-out-alt w-4"></i>
                                 <span>Sign Out</span>
                             </a>

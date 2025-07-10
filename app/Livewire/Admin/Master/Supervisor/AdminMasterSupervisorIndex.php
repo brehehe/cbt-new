@@ -6,15 +6,14 @@ use App\Helpers\AlertHelper;
 use App\Helpers\RoleHelper;
 use App\Models\User;
 use App\Models\User\UserDetail;
-use Auth;
-use DB;
-use Crypt;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Log;
-use Illuminate\Support\Facades\Validator;
 use Hash;
 
 class AdminMasterSupervisorIndex extends Component
@@ -42,9 +41,9 @@ class AdminMasterSupervisorIndex extends Component
 
     // User Detail
     public $address;
-    public $identity_card;
-    public $is_head = false;
-    public $is_active = false;
+    // public $identity_card;
+    public $is_head = true;
+    public $is_active = true;
 
     public function openModal()
     {
@@ -63,7 +62,7 @@ class AdminMasterSupervisorIndex extends Component
             'profile_old',
             'phone',
             'address',
-            'identity_card',
+            // 'identity_card',
             'is_head',
             'is_active',
         ]);
@@ -83,20 +82,17 @@ class AdminMasterSupervisorIndex extends Component
         $this->profile_old = $user->profile;
         $this->phone = trim($user->phone ?? 0);
 
-
         if ($user->userDetail) {
-            $this->address = $user->userDetail->address;
-            $this->identity_card = $user->userDetail->identity_card ? Crypt::decryptString($user->userDetail->identity_card) : null;
             $this->is_head =
                 $user
                 ->companyRoles()
                 ->where('company_id', Auth::user()->company_id)
-                ->first()->is_head ?? false;
+                ->first()->is_head ?? true;
             $this->is_active =
                 $user
                 ->companyRoles()
                 ->where('company_id', Auth::user()->company_id)
-                ->first()->is_active ?? false;
+                ->first()->is_active ?? true;
         }
 
         $this->openModal();
@@ -138,8 +134,8 @@ class AdminMasterSupervisorIndex extends Component
                     ->where('company_id', $currentCompanyId)
                     ->ignore($this->data_id),
             ],
-            'address' => 'required|string|max:500',
-            'identity_card' => 'nullable|string|max:20',
+            // 'address' => 'required|string|max:500',
+            // 'identity_card' => 'nullable|string|max:20',
         ]);
 
         try {
@@ -158,7 +154,7 @@ class AdminMasterSupervisorIndex extends Component
             $user = $userResult['user'];
 
             // Update user detail
-            $this->updateUserDetail($user, $validatedData);
+            // $this->updateUserDetail($user, $validatedData);
 
             // Assign role (hanya untuk karyawan)
             $this->assignUserRole($user, $currentCompanyId);
@@ -326,9 +322,9 @@ class AdminMasterSupervisorIndex extends Component
         ];
 
         // Handle identity card encryption
-        if (!empty($validatedData['identity_card'])) {
-            $detailData['identity_card'] = Crypt::encryptString($validatedData['identity_card']);
-        }
+        // if (!empty($validatedData['identity_card'])) {
+        //     $detailData['identity_card'] = Crypt::encryptString($validatedData['identity_card']);
+        // }
 
         UserDetail::updateOrCreate(
             ['user_id' => $user->id],
@@ -342,7 +338,7 @@ class AdminMasterSupervisorIndex extends Component
     protected function assignUserRole($user, $companyId)
     {
         // Check if role assignment properties exist
-        $isHead = $this->is_head ?? false;
+        $isHead = $this->is_head ?? true;
         $isActive = $this->is_active ?? true;
 
         RoleHelper::assignRoleToUserInCompany(
@@ -373,6 +369,7 @@ class AdminMasterSupervisorIndex extends Component
 
     public function render()
     {
+
         $user = User::companyRole('Pengawas', Auth::user()->company_id)
             ->search($this->search)
             ->where('type_user', 'employee')
