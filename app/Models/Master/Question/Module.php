@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
-class Material extends Model
+class Module extends Model
 {
     //
     use SoftDeletes, HasUuids;
@@ -47,20 +47,17 @@ class Material extends Model
         $term = '%'. $term .'%';
 
         $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id', 'material_category_id', 'name', 'level', 'description'], 'ILIKE', $term)
-            ->orWhereHas('materialCategory', function ($query) use ($term) {
-                $query->whereAny(['company_id', 'name', 'description'], 'ILIKE', $term);
-            });
+            $query->whereAny(['company_id', 'name', 'duration', 'description', 'random_question'], 'ILIKE', $term);
         });
     }
 
     /**
-     * Get the materialCategory that owns the Material
+     * Get the questionType that owns the Module
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function materialCategory(): BelongsTo
+    public function questionType(): BelongsTo
     {
-        return $this->belongsTo(MaterialCategory::class, 'material_category_id', 'id');
+        return $this->belongsTo(QuestionType::class, 'question_type_id', 'id');
     }
 }

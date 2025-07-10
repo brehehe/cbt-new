@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Livewire\Admin\Master\Topic;
+namespace App\Livewire\Admin\Master\ExamType;
 
-use App\Helpers\AlertHelper;
-use App\Models\Master\Question\Topic;
-use App\Services\Topic\TopicService;
 use Exception;
-use Illuminate\Support\Facades\Auth;
+use Throwable;
+use Livewire\Component;
+use App\Helpers\AlertHelper;
+use App\Models\Master\Exam\ExamType;
+use App\Services\ExamType\ExamTypeService;
+use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Livewire\Component;
-use Livewire\WithPagination;
-use Throwable;
+use Illuminate\Support\Facades\Auth;
 
-class AdminMasterTopicIndex extends Component
+class AdminMasterExamTypeIndex extends Component
 {
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
@@ -23,10 +23,9 @@ class AdminMasterTopicIndex extends Component
 
     public function render()
     {
-        $topics = Topic::search($this->search)
-            ->select('id', 'company_id', 'name', 'description');
-        return view('livewire.admin.master.topic.admin-master-topic-index', [
-            'topics' => $topics->paginate($this->perPage)
+        $exam_types = ExamType::search($this->search)->select('id', 'name', 'description');
+        return view('livewire.admin.master.exam-type.admin-master-exam-type-index', [
+           'exam_types' => $exam_types->paginate($this->perPage)
         ])->extends('layout.app')->section('content');
     }
 
@@ -34,7 +33,7 @@ class AdminMasterTopicIndex extends Component
     {
         // dd(Auth::user()?->company);
     }
-    
+
     public function hydrate ()
     {
         $this->resetPage();
@@ -56,26 +55,26 @@ class AdminMasterTopicIndex extends Component
     {
         $this->validate(
             [
-                'name'        => 'required',
-                'description' => 'nullable',
+                'name'                 => 'required',
+                'description'          => 'nullable',
             ],
             [
-                'name.required' => 'Nama Topik wajib diisi.'
+                'name.required' => 'Nama tipe ujian wajib diisi.',
             ]
         );
 
         try {
             DB::beginTransaction();
-                $request = [
-                    'id'          => $this->data_id,
-                    'company_id'  => Auth::user()?->company?->id,
-                    'name'        => $this->name,
-                    'description' => $this->description,
+                 $request = [
+                    'id'                   => $this->data_id,
+                    'company_id'           => Auth::user()?->company?->id,
+                    'name'                 => $this->name,
+                    'description'          => $this->description,
                 ];
 
-                $topic = app(TopicService::class)->updateOrCreate($request);
-                if (!$topic) {
-                    throw new Exception("Ada kesalahaan saat TopicService => updateOrCreate", 500);
+                $exam_type = app(ExamTypeService::class)->updateOrCreate($request);
+                if (!$exam_type) {
+                    throw new Exception("Ada kesalahaan saat ExamTypeService => updateOrCreate", 500);
                 }
 
             DB::commit();
@@ -86,7 +85,7 @@ class AdminMasterTopicIndex extends Component
                 'file'    => $th->getFile(),
                 'line'    => $th->getLine(),
             ];
-            Log::error('Ada Kesalahaan saat AdminMasterTopicIndex => submit', $error);
+            Log::error('Ada Kesalahaan saat AdminMasterExamTypeIndex => submit', $error);
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
         }
 
@@ -96,10 +95,10 @@ class AdminMasterTopicIndex extends Component
 
     public function edit($id)
     {
-        $result            = Topic::findOrFail($id);
-        $this->data_id     = $result?->id;
-        $this->name        = $result?->name;
-        $this->description = $result?->description;
+        $result                     = ExamType::findOrFail($id);
+        $this->data_id              = $result?->id;
+        $this->name                 = $result?->name;
+        $this->description          = $result?->description;
         $this->openModal();
     }
 
@@ -111,14 +110,14 @@ class AdminMasterTopicIndex extends Component
     public function delete($id)
     {
         try {
-           app(TopicService::class)->delete($id[0]);
+            app(ExamTypeService::class)->delete($id[0]);
         } catch (Exception | Throwable $th) {
             $error = [
                 'message' => $th->getMessage(),
                 'file'    => $th->getFile(),
                 'line'    => $th->getLine(),
             ];
-            Log::error('Ada Kesalahaan saat AdminMasterToppicIndex => delete', $error);
+            Log::error('Ada Kesalahaan saat AdminMasterExamTypeIndex => delete', $error);
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menghapus data');
         }
 

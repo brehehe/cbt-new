@@ -1,3 +1,4 @@
+@section('title', 'Topik Ujian')
 <div>
     {{-- Be like water. --}}
     @include('livewire.admin.master.topic.admin-master-topic-modal')

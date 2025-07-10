@@ -1,11 +1,11 @@
-@section('title', 'Kategori Materi')
+@section('title', 'Modul Soal')
 <div>
-    {{-- Nothing in the world is as soft and yielding as water. --}}
-    @include('livewire.admin.master.material-category.admin-master-material-category-modal')
+    {{-- Knowing others is intelligence; knowing yourself is true wisdom. --}}
+    @include('livewire.admin.master.module.admin-master-module-modal')
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#1E3A8A]">Kategori Materi Ujian</h1>
+                <h1 class="text-2xl font-bold text-[#1E3A8A]">Modul Soal</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div>
@@ -50,20 +50,29 @@
                 <thead>
                     <tr>
                         <th class="w-1 center">No</th>
-                        <th>Nama Topic</th>
-                        <th>Induk Kategori Materi</th>
-                        <th>Nama</th>
+                        <th>Tipe Soal</th>
+                        <th>Modul</th>
+                        <th>Durasi</th>
+                        <th>Soal Acak</th>
                         <th>Deskripsi</th>
                         <th class="w-1 center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($material_categories as $index => $result)
+                    @forelse ($modules as $index => $result)
                         <tr>
-                            <td class="center">{{ $material_categories->firstItem() + $index }}</td>
-                            <td>{{ $result?->topic?->name }}</td>
-                            <td>{{ $result?->parent?->name }}</td>
+                            <td class="center">{{ $modules->firstItem() + $index }}</td>
+                            <td>{{ $result?->questionType?->name }}</td>
                             <td>{{ $result?->name }}</td>
+                            <td>{{ $result?->duration }} Menit</td>
+                            <td>
+                                <div class="flex items-center mt-2" wire:key="{{ rand() }}">
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer" {{ $result?->random_question ? 'checked' : '' }} disabled>
+                                        <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    </label>
+                                </div>
+                            </td>
                             <td>{{ $result?->description }}</td>
                             <td class="center">
                                 <div class="flex items-center">
@@ -101,13 +110,13 @@
         <div class="px-5 py-4 bg-gray-50/80 border-t border-gray-200">
             <div class="flex items-center justify-between">
                 <div class="text-sm text-gray-700">
-                    Menampilkan <span class="font-medium">{{ $material_categories->firstItem() }}</span> sampai <span
-                        class="font-medium">{{ $material_categories->lastItem() }}</span> dari <span
-                        class="font-medium">{{ $material_categories->total() }}</span> hasil
+                    Menampilkan <span class="font-medium">{{ $modules->firstItem() }}</span> sampai <span
+                        class="font-medium">{{ $modules->lastItem() }}</span> dari <span
+                        class="font-medium">{{ $modules->total() }}</span> hasil
                 </div>
                 <div>
                     <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        {{ $material_categories->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
+                        {{ $modules->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
                     </nav>
                 </div>
             </div>

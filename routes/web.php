@@ -1,6 +1,10 @@
 <?php
 
+use App\Livewire\Admin\Master\ExamType\AdminMasterExamTypeIndex;
+use App\Livewire\Admin\Master\Material\AdminMasterMaterialIndex;
 use App\Livewire\Admin\Master\MaterialCategory\AdminMasterMaterialCategoryIndex;
+use App\Livewire\Admin\Master\Module\AdminMasterModuleIndex;
+use App\Livewire\Admin\Master\QuestionType\AdminMasterQuestionTypeIndex;
 use App\Livewire\Admin\Master\Topic\AdminMasterTopicIndex;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -38,6 +42,10 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
         Route::get('/student', 'Student\AdminMasterStudentIndex')->name('admin.master.student');
         Route::get('/supervisor', 'Supervisor\AdminMasterSupervisorIndex')->name('admin.master.supervisor');
         Route::get('/timetable', 'Timetable\AdminMasterTimetableIndex')->name('admin.master.timetable');
+        Route::get('/material', AdminMasterMaterialIndex::class)->name('admin.master.material');
+        Route::get('/question-type', AdminMasterQuestionTypeIndex::class)->name('admin.master.question-type');
+        Route::get('/exam-type', AdminMasterExamTypeIndex::class)->name('admin.master.exam-type');
+        Route::get('/module', AdminMasterModuleIndex::class)->name('admin.master.module');
     });
 });
 

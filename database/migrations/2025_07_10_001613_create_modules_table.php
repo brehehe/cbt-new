@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('material_categories', function (Blueprint $table) {
+        Schema::create('modules', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('company_id')->nullable();
-            $table->foreignUuid('topic_id')->nullable();
-            $table->foreignUuid('material_category_id')->nullable();
-            $table->string('name')->comment('nama kategori materi ujian');
-            $table->string('description')->nullable()->comment('deskripsi kategori materi ujian');
+            $table->foreignUuid('question_type_id')->nullable();
+            $table->string('name')->comment('Nama modul soal');
+            $table->bigInteger('duration')->default(0)->comment('durasi waktu pengerjaan');
+            $table->longText('description')->nullable()->comment('keterangan modul');
+            $table->boolean('random_question')->default(false)->comment('apakah soal dalam modul diacak atau urut');
             $table->bigInteger('order')->default(0);
             $table->softDeletes();
             $table->timestamps();
@@ -29,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('material_categories');
+        Schema::dropIfExists('modules');
     }
 };

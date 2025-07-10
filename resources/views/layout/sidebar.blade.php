@@ -82,6 +82,46 @@
                         </div>
                     </a>
                 </div>
+                <div>
+                    <a href="{{ route('admin.master.material') }}"
+                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/material') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
+                        <div class="flex items-center gap-3">
+                            <i
+                                class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/master/material') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
+                            <span class="sidebar-text">Materi</span>
+                        </div>
+                    </a>
+                </div>
+                <div>
+                    <a href="{{ route('admin.master.question-type') }}"
+                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/question-type') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
+                        <div class="flex items-center gap-3">
+                            <i
+                                class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/master/question-type') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
+                            <span class="sidebar-text">Tipe Soal</span>
+                        </div>
+                    </a>
+                </div>
+                <div>
+                    <a href="{{ route('admin.master.exam-type') }}"
+                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/exam-type') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
+                        <div class="flex items-center gap-3">
+                            <i
+                                class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/master/exam-type') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
+                            <span class="sidebar-text">Tipe Ujian</span>
+                        </div>
+                    </a>
+                </div>
+                <div>
+                    <a href="{{ route('admin.master.module') }}"
+                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/module') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
+                        <div class="flex items-center gap-3">
+                            <i
+                                class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/master/module') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
+                            <span class="sidebar-text">Modul Soal</span>
+                        </div>
+                    </a>
+                </div>
             </nav>
         </div>
     </div>

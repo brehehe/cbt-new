@@ -1,0 +1,147 @@
+<?php
+
+namespace App\Livewire\Admin\Master\Module;
+
+use Exception;
+use Livewire\Component;
+use App\Helpers\AlertHelper;
+use Livewire\WithPagination;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Master\Question\Module;
+use App\Models\Master\Question\QuestionType;
+use App\Services\Module\ModuleService;
+use App\Services\QuestionType\QuestionTypeService;
+use Throwable;
+
+class AdminMasterModuleIndex extends Component
+{
+    use WithPagination;
+    protected $paginationTheme = 'bootstrap';
+    public $perPage = 10, $search;
+
+    public $question_types;
+    public $data_id, $question_type_id, $name, $duration, $description, $random_question;
+    public $updateRandomQuestion;
+
+    public function render()
+    {
+        $modules = Module::search($this->search)->select('id', 'question_type_id', 'name', 'duration', 'description', 'random_question')
+            ->with([
+                'questionType:id,name'
+            ]);
+        return view('livewire.admin.master.module.admin-master-module-index', [
+            'modules' => $modules->paginate($this->perPage)
+        ])->extends('layout.app')->section('content');
+    }
+
+     public function mount()
+    {
+        // dd(Auth::user()?->company);
+        $this->question_types = QuestionType::select('id', 'name')->get();
+    }
+
+    public function hydrate ()
+    {
+        $this->resetPage();
+    }
+
+    public function openModal()
+    {
+        return $this->dispatch('open-modal', ['id' => 'modal']);
+    }
+
+    public function closeModal()
+    {
+        $this->resetValidation();
+        $this->reset(['data_id', 'question_type_id', 'name', 'duration', 'description', 'random_question']);
+        return $this->dispatch('close-modal', ['id' => 'modal']);
+    }
+
+    public function submit()
+    {
+        $this->validate(
+            [
+                'question_type_id' => 'required|exists:question_types,id',
+                'name'             => 'required',
+                'description'      => 'nullable',
+                'duration'         => 'required|numeric|min:1',
+            ],
+            [
+                'question_type_id.required' => 'Tipe soal wajib diisi.',
+                'question_type_id.exists'   => 'Tipe soal tidak valid.',
+                'name.required'             => 'Nama modul wajib diisi.',
+                'duration.required'         => 'Durasi pengerjaan modul wajib diisi.',
+                'duration.numeric'          => 'Durasi pengerjaan modul hanya bernilai angka.',
+                'duration.min'              => 'Durasi pengerjaan modul minimal 1 menit.',
+            ]
+        );
+
+        try {
+            DB::beginTransaction();
+                 $request = [
+                    'id'               => $this->data_id,
+                    'company_id'       => Auth::user()?->company?->id,
+                    'question_type_id' => $this->question_type_id,
+                    'name'             => $this->name,
+                    'duration'         => $this->duration,
+                    'random_question'  => $this->random_question,
+                    'description'      => $this->description,
+                ];
+
+                $module = app(ModuleService::class)->updateOrCreate($request);
+                if (!$module) {
+                    throw new Exception("Ada kesalahaan saat ModuleService => updateOrCreate", 500);
+                }
+
+            DB::commit();
+        } catch (Exception | Throwable $th) {
+            DB::rollBack();
+            $error = [
+                'message' => $th->getMessage(),
+                'file'    => $th->getFile(),
+                'line'    => $th->getLine(),
+            ];
+            Log::error('Ada Kesalahaan saat AdminMasterModuleIndex => submit', $error);
+            return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
+        }
+
+        $this->closeModal();
+        return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
+    }
+
+    public function edit($id)
+    {
+        $result                 = Module::findOrFail($id);
+        $this->data_id          = $result?->id;
+        $this->question_type_id = $result?->question_type_id;
+        $this->name             = $result?->name;
+        $this->duration         = $result?->duration;
+        $this->random_question  = $result?->random_question;
+        $this->description      = $result?->description;
+        $this->openModal();
+    }
+
+    public function confirmDelete($id)
+    {
+        return AlertHelper::confirmDelete('delete', 'Anda yakin ingin menghapus data ini?', $id);
+    }
+
+    public function delete($id)
+    {
+        try {
+            app(ModuleService::class)->delete($id[0]);
+        } catch (Exception | Throwable $th) {
+            $error = [
+                'message' => $th->getMessage(),
+                'file'    => $th->getFile(),
+                'line'    => $th->getLine(),
+            ];
+            Log::error('Ada Kesalahaan saat AdminMasterModuleIndex => delete', $error);
+            return AlertHelper::error('Gagal', 'Ada kesalahan saat menghapus data');
+        }
+
+        return AlertHelper::success('Berhasil', 'Data berhasil dihapus.');
+    }
+}

@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('material_categories', function (Blueprint $table) {
+        Schema::create('question_types', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('company_id')->nullable();
-            $table->foreignUuid('topic_id')->nullable();
-            $table->foreignUuid('material_category_id')->nullable();
-            $table->string('name')->comment('nama kategori materi ujian');
-            $table->string('description')->nullable()->comment('deskripsi kategori materi ujian');
+             $table->string('name')->comment('nama tipe soal');
+            $table->text('description')->comment('keteranagan tipe soal');
             $table->bigInteger('order')->default(0);
             $table->softDeletes();
             $table->timestamps();
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('material_categories');
+        Schema::dropIfExists('question_types');
     }
 };

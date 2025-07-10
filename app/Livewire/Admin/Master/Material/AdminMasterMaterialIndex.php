@@ -1,51 +1,47 @@
 <?php
 
-namespace App\Livewire\Admin\Master\MaterialCategory;
+namespace App\Livewire\Admin\Master\Material;
 
-use Exception;
-use Throwable;
-use Livewire\Component;
 use App\Helpers\AlertHelper;
-use Livewire\WithPagination;
+use App\Models\Master\Question\Material;
+use App\Models\Master\Question\MaterialCategory;
+use App\Services\Material\MaterialService;
+use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Master\Question\Topic;
-use App\Models\Master\Question\MaterialCategory;
-use App\Services\MaterialCategory\MaterialCategoryService;
+use Livewire\Component;
+use Livewire\WithPagination;
+use Throwable;
 
-class AdminMasterMaterialCategoryIndex extends Component
+class AdminMasterMaterialIndex extends Component
 {
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
     public $perPage = 10, $search;
 
-    public $data_id, $topic_id, $material_category_id, $name, $description;
+    public $material_categories;
+    public $data_id, $material_category_id, $name, $level, $description;
 
     public function render()
     {
-        $material_categories = MaterialCategory::search($this->search)
-            ->select('id', 'company_id', 'topic_id', 'material_category_id', 'name', 'description')
+        $materials = Material::search($this->search)->select('id', 'material_category_id', 'name', 'level', 'description')
             ->with([
-                'topic:id,name'
+                'materialCategory:id,name'
             ]);
-        $select_material_categories = MaterialCategory::search($this->search)
-            ->select('id', 'company_id', 'topic_id', 'material_category_id', 'name', 'description')
-            ->with([
-                'topic:id,name'
-            ])->where('topic_id', $this->topic_id)->get();
-
-        $topics = Topic::select('id', 'name')->get();
-        return view('livewire.admin.master.material-category.admin-master-material-category-index',[
-            'material_categories'        => $material_categories->paginate($this->perPage),
-            'select_material_categories' => $select_material_categories,
-            'topics'                     => $topics
+        return view('livewire.admin.master.material.admin-master-material-index', [
+            'materials' => $materials->paginate($this->perPage)
         ])->extends('layout.app')->section('content');
     }
 
     public function mount()
     {
         // dd(Auth::user()?->company);
+        $this->material_categories = MaterialCategory::search($this->search)
+            ->select('id', 'company_id', 'topic_id', 'material_category_id', 'name', 'description')
+            ->with([
+                'topic:id,name'
+            ])->whereDoesntHave('childs')->get();
     }
 
     public function hydrate ()
@@ -61,7 +57,7 @@ class AdminMasterMaterialCategoryIndex extends Component
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['data_id', 'topic_id', 'material_category_id', 'name', 'description']);
+        $this->reset(['data_id', 'material_category_id', 'name', 'level', 'description']);
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
 
@@ -69,16 +65,16 @@ class AdminMasterMaterialCategoryIndex extends Component
     {
         $this->validate(
             [
-                'topic_id'             => 'required|exists:topics,id',
-                'material_category_id' => 'nullable|exists:material_categories,id',
+                'material_category_id' => 'required|exists:material_categories,id',
                 'name'                 => 'required',
+                'level'                => 'required',
                 'description'          => 'nullable',
             ],
             [
-                'topic_id.required'           => 'Topik ujian wajib diisi.',
-                'topic_id.exists'             => 'Topik ujian tidak valid.',
-                'material_category_id.exists' => 'Induk kategori materi tidak valid.',
-                'name.required'               => 'Nama kategori materi wajib diisi.',
+                'material_category_id.required' => 'kategori materi wajib diisi.',
+                'material_category_id.exists'   => 'Kategori materi tidak valid.',
+                'name.required'                 => 'Nama materi wajib diisi.',
+                'level.required'                => 'Level materi wajib diisi.',
             ]
         );
 
@@ -87,15 +83,15 @@ class AdminMasterMaterialCategoryIndex extends Component
                 $request = [
                     'id'                   => $this->data_id,
                     'company_id'           => Auth::user()?->company?->id,
-                    'topic_id'             => $this->topic_id,
                     'material_category_id' => $this->material_category_id,
                     'name'                 => $this->name,
+                    'level'                => $this->level,
                     'description'          => $this->description,
                 ];
 
-                $material_category = app(MaterialCategoryService::class)->updateOrCreate($request);
-                if (!$material_category) {
-                    throw new Exception("Ada kesalahaan saat MaterialCategoryService => updateOrCreate", 500);
+                $material = app(MaterialService::class)->updateOrCreate($request);
+                if (!$material) {
+                    throw new Exception("Ada kesalahaan saat MaterialService => updateOrCreate", 500);
                 }
 
             DB::commit();
@@ -106,7 +102,7 @@ class AdminMasterMaterialCategoryIndex extends Component
                 'file'    => $th->getFile(),
                 'line'    => $th->getLine(),
             ];
-            Log::error('Ada Kesalahaan saat AdminMasterMaterialCategoryIndex => submit', $error);
+            Log::error('Ada Kesalahaan saat AdminMasterMaterialIndex => submit', $error);
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
         }
 
@@ -116,11 +112,11 @@ class AdminMasterMaterialCategoryIndex extends Component
 
     public function edit($id)
     {
-        $result                     = MaterialCategory::findOrFail($id);
+        $result                     = Material::findOrFail($id);
         $this->data_id              = $result?->id;
-        $this->topic_id             = $result?->topic_id;
         $this->material_category_id = $result?->material_category_id;
         $this->name                 = $result?->name;
+        $this->level                = $result?->level;
         $this->description          = $result?->description;
         $this->openModal();
     }
@@ -133,14 +129,14 @@ class AdminMasterMaterialCategoryIndex extends Component
     public function delete($id)
     {
         try {
-            app(MaterialCategoryService::class)->delete($id[0]);
+            app(MaterialService::class)->delete($id[0]);
         } catch (Exception | Throwable $th) {
             $error = [
                 'message' => $th->getMessage(),
                 'file'    => $th->getFile(),
                 'line'    => $th->getLine(),
             ];
-            Log::error('Ada Kesalahaan saat AdminMasterMaterialCategoryIndex => delete', $error);
+            Log::error('Ada Kesalahaan saat AdminMasterMaterialIndex => delete', $error);
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menghapus data');
         }
 

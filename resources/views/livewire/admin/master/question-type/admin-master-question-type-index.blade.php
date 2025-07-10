@@ -1,11 +1,11 @@
-@section('title', 'Kategori Materi')
+@section('title', 'Tipe Soal')
 <div>
-    {{-- Nothing in the world is as soft and yielding as water. --}}
-    @include('livewire.admin.master.material-category.admin-master-material-category-modal')
+    {{-- Knowing others is intelligence; knowing yourself is true wisdom. --}}
+    @include('livewire.admin.master.question-type.admin-master-question-type-modal')
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#1E3A8A]">Kategori Materi Ujian</h1>
+                <h1 class="text-2xl font-bold text-[#1E3A8A]">Tipe Soal</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div>
@@ -50,19 +50,15 @@
                 <thead>
                     <tr>
                         <th class="w-1 center">No</th>
-                        <th>Nama Topic</th>
-                        <th>Induk Kategori Materi</th>
-                        <th>Nama</th>
+                        <th>Tipe Soal</th>
                         <th>Deskripsi</th>
                         <th class="w-1 center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($material_categories as $index => $result)
+                    @forelse ($question_types as $index => $result)
                         <tr>
-                            <td class="center">{{ $material_categories->firstItem() + $index }}</td>
-                            <td>{{ $result?->topic?->name }}</td>
-                            <td>{{ $result?->parent?->name }}</td>
+                            <td class="center">{{ $question_types->firstItem() + $index }}</td>
                             <td>{{ $result?->name }}</td>
                             <td>{{ $result?->description }}</td>
                             <td class="center">
@@ -101,13 +97,13 @@
         <div class="px-5 py-4 bg-gray-50/80 border-t border-gray-200">
             <div class="flex items-center justify-between">
                 <div class="text-sm text-gray-700">
-                    Menampilkan <span class="font-medium">{{ $material_categories->firstItem() }}</span> sampai <span
-                        class="font-medium">{{ $material_categories->lastItem() }}</span> dari <span
-                        class="font-medium">{{ $material_categories->total() }}</span> hasil
+                    Menampilkan <span class="font-medium">{{ $question_types->firstItem() }}</span> sampai <span
+                        class="font-medium">{{ $question_types->lastItem() }}</span> dari <span
+                        class="font-medium">{{ $question_types->total() }}</span> hasil
                 </div>
                 <div>
                     <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        {{ $material_categories->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
+                        {{ $question_types->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
                     </nav>
                 </div>
             </div>

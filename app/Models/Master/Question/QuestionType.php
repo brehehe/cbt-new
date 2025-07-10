@@ -6,11 +6,11 @@ use App\Models\Company\Company;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
-class Material extends Model
+class QuestionType extends Model
 {
     //
     use SoftDeletes, HasUuids;
@@ -47,20 +47,17 @@ class Material extends Model
         $term = '%'. $term .'%';
 
         $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id', 'material_category_id', 'name', 'level', 'description'], 'ILIKE', $term)
-            ->orWhereHas('materialCategory', function ($query) use ($term) {
-                $query->whereAny(['company_id', 'name', 'description'], 'ILIKE', $term);
-            });
+            $query->whereAny(['company_id', 'name', 'description'], 'ILIKE', $term);
         });
     }
 
     /**
-     * Get the materialCategory that owns the Material
+     * Get all of the modules for the QuestionType
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function materialCategory(): BelongsTo
+    public function modules(): HasMany
     {
-        return $this->belongsTo(MaterialCategory::class, 'material_category_id', 'id');
+        return $this->hasMany(Module::class, 'question_type_id', 'id');
     }
 }

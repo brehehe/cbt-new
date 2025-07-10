@@ -6,6 +6,7 @@ namespace Database\Seeders;
 
 use Database\Seeders\Company\CompanySeeder;
 use Database\Seeders\Country\CountrySeeder;
+use Database\Seeders\Master\Question\QuestionTypeSeeder;
 use Database\Seeders\Service\ServiceMonthSeeder;
 use Database\Seeders\Service\ServiceSeeder;
 use Illuminate\Database\Seeder;
@@ -23,6 +24,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ServiceSeeder::class,
             ServiceMonthSeeder::class,
+
+            //Master
+            QuestionTypeSeeder::class,
 
             // Region
             CountrySeeder::class,

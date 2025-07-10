@@ -21,6 +21,7 @@ class TopicService
                 'id' => $request['id'] ?? null
             ],
             [
+                'company_id'  => $request['company_id'] ?? null,
                 'name'        => $request['name'] ?? null,
                 'description' => $request['description'] ?? null,
             ]
@@ -29,8 +30,9 @@ class TopicService
         return $topic;
     }
 
-    public function delete($topic)
+    public function delete($id)
     {
-        $topic->delete();
+        $result = Topic::findOrFail($id);
+        $result->delete();
     }
 }
