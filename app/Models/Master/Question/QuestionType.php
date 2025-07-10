@@ -60,4 +60,14 @@ class QuestionType extends Model
     {
         return $this->hasMany(Module::class, 'question_type_id', 'id');
     }
+
+    /**
+     * Get all of the questions for the Topic
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function questions(): HasMany
+    {
+        return $this->hasMany(Question::class, 'topic_id', 'id');
+    }
 }

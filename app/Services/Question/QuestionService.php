@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Services\Module;
+namespace App\Services\Question;
 
-use App\Models\Master\Question\Module;
+use App\Models\Master\Question\Question;
+use App\Traits\UploadFile;
 
-class ModuleService
+class QuestionService
 {
+    use UploadFile;
     /**
      * Create a new class instance.
      */
@@ -13,10 +15,10 @@ class ModuleService
     {
         //
     }
-
     public function updateOrCreate($request)
     {
-        $material = Module::updateOrCreate(
+        dd($request);
+        $question = Question::updateOrCreate(
             [
                 'id' => $request['id'] ?? null
             ],
@@ -30,12 +32,12 @@ class ModuleService
             ]
         );
 
-        return $material;
+        return $question;
     }
 
     public function delete($id)
     {
-        $result = Module::findOrFail($id);
+        $result = Question::findOrFail($id);
         $result->delete();
     }
 }

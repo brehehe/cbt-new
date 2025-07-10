@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
@@ -62,5 +63,15 @@ class Material extends Model
     public function materialCategory(): BelongsTo
     {
         return $this->belongsTo(MaterialCategory::class, 'material_category_id', 'id');
+    }
+
+    /**
+     * Get all of the questions for the Topic
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function questions(): HasMany
+    {
+        return $this->hasMany(Question::class, 'topic_id', 'id');
     }
 }

@@ -6,11 +6,11 @@ use App\Models\Company\Company;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
-class Topic extends Model
+class Question extends Model
 {
     //
     use SoftDeletes, HasUuids;
@@ -25,7 +25,7 @@ class Topic extends Model
     {
         parent::boot();
 
-        static::addGlobalScope('company_scope', function (Builder $builder) {
+        static::addGlobalScope('user_scope', function (Builder $builder) {
             $user = Auth::user();
 
             if (!$user || !$user->hasRole('Anonymous')) {
@@ -47,27 +47,48 @@ class Topic extends Model
         $term = '%'. $term .'%';
 
         $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id', 'name', 'description'], 'ILIKE', $term);
+            $query->whereAny(['company_id', 'question', 'description'], 'ILIKE', $term);
         });
     }
 
     /**
-     * Get all of the materialCategories for the Topic
+     * Get the topic that owns the Question
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function materialCategories(): HasMany
+    public function topic(): BelongsTo
     {
-        return $this->hasMany(MaterialCategory::class, 'topic_id', 'id');
+        return $this->belongsTo(Topic::class, 'topic_id', 'id');
     }
 
     /**
-     * Get all of the questions for the Topic
+     * Get the materialCategory that owns the Question
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function questions(): HasMany
+    public function materialCategory(): BelongsTo
     {
-        return $this->hasMany(Question::class, 'topic_id', 'id');
+        return $this->belongsTo(MaterialCategory::class, 'material_category_id', 'id');
     }
+
+    /**
+     * Get the material that owns the Question
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function material(): BelongsTo
+    {
+        return $this->belongsTo(Material::class, 'material_id', 'id');
+    }
+
+    /**
+     * Get the questionType that owns the Question
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function questionType(): BelongsTo
+    {
+        return $this->belongsTo(QuestionType::class, 'question_type_id', 'id');
+    }
+
 }

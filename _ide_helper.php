@@ -24796,1890 +24796,6 @@ namespace App\Livewire\Admin\Dashboard {
             }
     }
 
-namespace App\Livewire\Admin\Registration\New {
-    /**
-     * 
-     *
-     */
-    class AdminRegistrationNewIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Registration\New\AdminRegistrationNewIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Registration\Appointments {
-    /**
-     * 
-     *
-     */
-    class AdminRegistrationAppointmentsIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Registration\Appointments\AdminRegistrationAppointmentsIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Registration\Queue {
-    /**
-     * 
-     *
-     */
-    class AdminRegistrationQueueIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Registration\Queue\AdminRegistrationQueueIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Consultation\Patient {
-    /**
-     * 
-     *
-     */
-    class AdminConsultationPatientIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Consultation\Patient\AdminConsultationPatientIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Consultation\Patient\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminConsultationPatientDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Consultation\Patient\Detail\AdminConsultationPatientDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Consultation\Consultation {
-    /**
-     * 
-     *
-     */
-    class AdminConsultationConsultationIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Consultation\Consultation\AdminConsultationConsultationIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Consultation\Consultation\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminConsultationConsultationDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Consultation\Consultation\Detail\AdminConsultationConsultationDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Consultation\History {
-    /**
-     * 
-     *
-     */
-    class AdminConsultationHistoryIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Consultation\History\AdminConsultationHistoryIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Consultation\History\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminConsultationHistoryDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Consultation\History\Detail\AdminConsultationHistoryDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Purchase\Defecta {
-    /**
-     * 
-     *
-     */
-    class AdminPurchaseDefectaIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Purchase\Defecta\AdminPurchaseDefectaIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Purchase\Draft\MailOrder {
-    /**
-     * 
-     *
-     */
-    class AdminPurchaseDraftMailOrderIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Purchase\Draft\MailOrder\AdminPurchaseDraftMailOrderIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Purchase\MailOrder {
-    /**
-     * 
-     *
-     */
-    class AdminPurchaseMailOrderIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Purchase\MailOrder\AdminPurchaseMailOrderIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Purchase\MailOrder\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminPurchaseMailOrderDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Purchase\MailOrder\Detail\AdminPurchaseMailOrderDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Logistic\GoodCome {
-    /**
-     * 
-     *
-     */
-    class AdminLogisticGoodComeIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Logistic\GoodCome\AdminLogisticGoodComeIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Logistic\GoodCome\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminLogisticGoodComeDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Logistic\GoodCome\Detail\AdminLogisticGoodComeDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Logistic\ProductStock {
-    /**
-     * 
-     *
-     */
-    class AdminLogisticProductStockIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Logistic\ProductStock\AdminLogisticProductStockIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Logistic\StockIn {
-    /**
-     * 
-     *
-     */
-    class AdminLogisticStockInIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Logistic\StockIn\AdminLogisticStockInIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Logistic\StockOut {
-    /**
-     * 
-     *
-     */
-    class AdminLogisticStockOutIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Logistic\StockOut\AdminLogisticStockOutIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Logistic\ImportStockProduct {
-    /**
-     * 
-     *
-     */
-    class AdminLogisticImportStockProductIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Logistic\ImportStockProduct\AdminLogisticImportStockProductIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Logistic\StockProduct {
-    /**
-     * 
-     *
-     */
-    class AdminLogisticStockProductIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Logistic\StockProduct\AdminLogisticStockProductIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Logistic\StockProduct\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminLogisticStockProductDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Logistic\StockProduct\Detail\AdminLogisticStockProductDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Logistic\Return {
-    /**
-     * 
-     *
-     */
-    class AdminLogisticReturnIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Logistic\Return\AdminLogisticReturnIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Logistic\DeadStock {
-    /**
-     * 
-     *
-     */
-    class AdminLogisticDeadStockIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Logistic\DeadStock\AdminLogisticDeadStockIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Logistic\Return\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminLogisticReturnDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Logistic\Return\Detail\AdminLogisticReturnDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Pharmacy\Consultation {
-    /**
-     * 
-     *
-     */
-    class AdminPharmacyConsultationIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Pharmacy\Consultation\AdminPharmacyConsultationIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Pharmacy\Consultation\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminPharmacyConsultationDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Pharmacy\Consultation\Detail\AdminPharmacyConsultationDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Pharmacy\Sale {
-    /**
-     * 
-     *
-     */
-    class AdminPharmacySaleIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Pharmacy\Sale\AdminPharmacySaleIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Pharmacy\Sale\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminPharmacySaleDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Pharmacy\Sale\Detail\AdminPharmacySaleDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Pharmacy\Sale\Recipe {
-    /**
-     * 
-     *
-     */
-    class AdminPharmacySaleRecipeIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Pharmacy\Sale\Recipe\AdminPharmacySaleRecipeIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Pharmacy\TakeMedicine {
-    /**
-     * 
-     *
-     */
-    class AdminPharmacyTakeMedicineIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Pharmacy\TakeMedicine\AdminPharmacyTakeMedicineIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Pharmacy\TakeMedicine\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminPharmacyTakeMedicineDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Pharmacy\TakeMedicine\Detail\AdminPharmacyTakeMedicineDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Sale\Price {
-    /**
-     * 
-     *
-     */
-    class AdminSalePriceIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Sale\Price\AdminSalePriceIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Sale\ProductPrice {
-    /**
-     * 
-     *
-     */
-    class AdminSaleProductPriceIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Sale\ProductPrice\AdminSaleProductPriceIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Sale\Pos {
-    /**
-     * 
-     *
-     */
-    class AdminSalePosIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Sale\Pos\AdminSalePosIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Sale\Pos\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminSalePosDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Sale\Pos\Detail\AdminSalePosDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Sale\Pos\Recipe {
-    /**
-     * 
-     *
-     */
-    class AdminSalePosRecipeIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Sale\Pos\Recipe\AdminSalePosRecipeIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Sale\Report {
-    /**
-     * 
-     *
-     */
-    class AdminSaleReportIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Sale\Report\AdminSaleReportIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Sale\Report\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminSaleReportDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Sale\Report\Detail\AdminSaleReportDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Sale\ReportProduct {
-    /**
-     * 
-     *
-     */
-    class AdminSaleReportProductIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Sale\ReportProduct\AdminSaleReportProductIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Sale\ReportPayment {
-    /**
-     * 
-     *
-     */
-    class AdminSaleReportPaymentIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Sale\ReportPayment\AdminSaleReportPaymentIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Sale\ReportProfitLoss {
-    /**
-     * 
-     *
-     */
-    class AdminSaleReportProfitLossIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Sale\ReportProfitLoss\AdminSaleReportProfitLossIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Report\Incentive {
-    /**
-     * 
-     *
-     */
-    class AdminReportIncentiveIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Report\Incentive\AdminReportIncentiveIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Report\Stock {
-    /**
-     * 
-     *
-     */
-    class AdminReportStockIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Report\Stock\AdminReportStockIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Report\StockIn {
-    /**
-     * 
-     *
-     */
-    class AdminReportStockInIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Report\StockIn\AdminReportStockInIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Report\StockOut {
-    /**
-     * 
-     *
-     */
-    class AdminReportStockOutIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Report\StockOut\AdminReportStockOutIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Report\ReturPurchase {
-    /**
-     * 
-     *
-     */
-    class AdminReportReturnPurchaseIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Report\ReturPurchase\AdminReportReturnPurchaseIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Report\Purchase {
-    /**
-     * 
-     *
-     */
-    class AdminReportPurchaseIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Report\Purchase\AdminReportPurchaseIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Report\Purchase\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminReportPurchaseDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Report\Purchase\Detail\AdminReportPurchaseDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Report\PurchaseProduct {
-    /**
-     * 
-     *
-     */
-    class AdminReportPurchaseProductIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Report\PurchaseProduct\AdminReportPurchaseProductIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Report\GoodsCome {
-    /**
-     * 
-     *
-     */
-    class AdminReportGoodsComeIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Report\GoodsCome\AdminReportGoodsComeIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Report\GoodsCome\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminReportGoodsComeDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Report\GoodsCome\Detail\AdminReportGoodsComeDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Report\Sale {
-    /**
-     * 
-     *
-     */
-    class AdminReportSaleIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Report\Sale\AdminReportSaleIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Report\Sale\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminReportSaleDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Report\Sale\Detail\AdminReportSaleDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Report\SaleProduct {
-    /**
-     * 
-     *
-     */
-    class AdminReportSaleProductIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Report\SaleProduct\AdminReportSaleProductIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Report\Payment {
-    /**
-     * 
-     *
-     */
-    class AdminReportPaymentIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Report\Payment\AdminReportPaymentIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Report\ProfitLoss {
-    /**
-     * 
-     *
-     */
-    class AdminReportProfitLossIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Report\ProfitLoss\AdminReportProfitLossIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Report\DeadStock {
-    /**
-     * 
-     *
-     */
-    class AdminReportDeadStockIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Report\DeadStock\AdminReportDeadStockIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Report\StockOpname {
-    /**
-     * 
-     *
-     */
-    class AdminReportStockOpnameIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Report\StockOpname\AdminReportStockOpnameIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Report\StockOpname\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminReportStockOpnameDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Report\StockOpname\Detail\AdminReportStockOpnameDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Report\StockOpnameProduct {
-    /**
-     * 
-     *
-     */
-    class AdminReportStockOpnameProductIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Report\StockOpnameProduct\AdminReportStockOpnameProductIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Finance\Cost {
-    /**
-     * 
-     *
-     */
-    class AdminFinanceCostIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Finance\Cost\AdminFinanceCostIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Finance\Cost\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminFinanceCostDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Finance\Cost\Detail\AdminFinanceCostDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Finance\Finance {
-    /**
-     * 
-     *
-     */
-    class AdminFinanceFinanceIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Finance\Finance\AdminFinanceFinanceIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Finance\Finance\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminFinanceFinanceDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Finance\Finance\Detail\AdminFinanceFinanceDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Finance\DeadStock {
-    /**
-     * 
-     *
-     */
-    class AdminFinanceDeadStockIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Finance\DeadStock\AdminFinanceDeadStockIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Finance\DeadStock\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminFinanceDeadStockDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Finance\DeadStock\Detail\AdminFinanceDeadStockDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Finance\StockOpname {
-    /**
-     * 
-     *
-     */
-    class AdminFinanceStockOpnameIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Finance\StockOpname\AdminFinanceStockOpnameIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Finance\StockOpname\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminFinanceStockOpnameDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Finance\StockOpname\Detail\AdminFinanceStockOpnameDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Finance\Purchase {
-    /**
-     * 
-     *
-     */
-    class AdminFinancePurchaseIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Finance\Purchase\AdminFinancePurchaseIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Finance\Purchase\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminFinancePurchaseDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Finance\Purchase\Detail\AdminFinancePurchaseDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Finance\Sale {
-    /**
-     * 
-     *
-     */
-    class AdminFinanceSaleIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Finance\Sale\AdminFinanceSaleIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Finance\Sale\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminFinanceSaleDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Finance\Sale\Detail\AdminFinanceSaleDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Finance\BalanceSheet {
-    /**
-     * 
-     *
-     */
-    class AdminFinanceBalanceSheetIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Finance\BalanceSheet\AdminFinanceBalanceSheetIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Finance\ProfitLoss {
-    /**
-     * 
-     *
-     */
-    class AdminFinanceProfitLossIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Finance\ProfitLoss\AdminFinanceProfitLossIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Finance\CashFlow {
-    /**
-     * 
-     *
-     */
-    class AdminFinanceCashFlowIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Finance\CashFlow\AdminFinanceCashFlowIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Finance\Ledger {
-    /**
-     * 
-     *
-     */
-    class AdminFinanceLedgerIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Finance\Ledger\AdminFinanceLedgerIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Finance\Journal {
-    /**
-     * 
-     *
-     */
-    class AdminFinanceJournalIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Finance\Journal\AdminFinanceJournalIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Product\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminMasterProductDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Product\Detail\AdminMasterProductDetailIndex::modal($name);
-        }
-
-            }
-    /**
-     * 
-     *
-     */
-    class AdminMasterProductDetailData {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Product\Detail\AdminMasterProductDetailData::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Product\Package {
-    /**
-     * 
-     *
-     */
-    class AdminMasterProductPackageIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Product\Package\AdminMasterProductPackageIndex::modal($name);
-        }
-
-            }
-    /**
-     * 
-     *
-     */
-    class AdminMasterProductPackageData {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Product\Package\AdminMasterProductPackageData::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Product\Category {
-    /**
-     * 
-     *
-     */
-    class AdminMasterProductCategoryIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Product\Category\AdminMasterProductCategoryIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Product\Factory {
-    /**
-     * 
-     *
-     */
-    class AdminMasterProductFactoryIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Product\Factory\AdminMasterProductFactoryIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Product\Rack {
-    /**
-     * 
-     *
-     */
-    class AdminMasterProductRackIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Product\Rack\AdminMasterProductRackIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Product\Unit {
-    /**
-     * 
-     *
-     */
-    class AdminMasterProductUnitIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Product\Unit\AdminMasterProductUnitIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Account\Account {
-    /**
-     * 
-     *
-     */
-    class AdminMasterAccountAccountIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Account\Account\AdminMasterAccountAccountIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Account\CategoryAccount {
-    /**
-     * 
-     *
-     */
-    class AdminMasterAccountCategoryAccountIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Account\CategoryAccount\AdminMasterAccountCategoryAccountIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Recipe {
-    /**
-     * 
-     *
-     */
-    class AdminMasterRecipeIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Recipe\AdminMasterRecipeIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Recipe\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminMasterRecipeDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Recipe\Detail\AdminMasterRecipeDetailIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Supplier {
-    /**
-     * 
-     *
-     */
-    class AdminMasterSupplierIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Supplier\AdminMasterSupplierIndex::modal($name);
-        }
-
-            }
-    }
-
 namespace App\Livewire\Admin\Master\Role {
     /**
      * 
@@ -26722,258 +24838,6 @@ namespace App\Livewire\Admin\Master\User {
             }
     }
 
-namespace App\Livewire\Admin\Master\Doctor {
-    /**
-     * 
-     *
-     */
-    class AdminMasterDoctorIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Doctor\AdminMasterDoctorIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Patient {
-    /**
-     * 
-     *
-     */
-    class AdminMasterPatientIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Patient\AdminMasterPatientIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Poly {
-    /**
-     * 
-     *
-     */
-    class AdminMasterPolyIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Poly\AdminMasterPolyIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Icd {
-    /**
-     * 
-     *
-     */
-    class AdminMasterIcdIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Icd\AdminMasterIcdIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\MedicineType {
-    /**
-     * 
-     *
-     */
-    class AdminMasterMedicineTypeIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\MedicineType\AdminMasterMedicineTypeIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\PaymentMethod {
-    /**
-     * 
-     *
-     */
-    class AdminMasterPaymentMethodIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\PaymentMethod\AdminMasterPaymentMethodIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\ServiceMonth {
-    /**
-     * 
-     *
-     */
-    class AdminMasterServiceMonthIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\ServiceMonth\AdminMasterServiceMonthIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\DoctorControl {
-    /**
-     * 
-     *
-     */
-    class AdminMasterDoctorControlIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\DoctorControl\AdminMasterDoctorControlIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Action {
-    /**
-     * 
-     *
-     */
-    class AdminMasterActionIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Action\AdminMasterActionIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Discount {
-    /**
-     * 
-     *
-     */
-    class AdminMasterDiscountIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Discount\AdminMasterDiscountIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Promotion {
-    /**
-     * 
-     *
-     */
-    class AdminMasterPromotionIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Promotion\AdminMasterPromotionIndex::modal($name);
-        }
-
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Promotion\Detail {
-    /**
-     * 
-     *
-     */
-    class AdminMasterPromotionDetailIndex {
-        /**
-         * 
-         *
-         * @see \Flux\FluxManager::bootModal()
-         * @param mixed $name
-         * @static 
-         */
-        public static function modal($name)
-        {
-            return \App\Livewire\Admin\Master\Promotion\Detail\AdminMasterPromotionDetailIndex::modal($name);
-        }
-
-            }
-    }
-
 namespace App\Livewire\Admin\Master\Setting {
     /**
      * 
@@ -26990,6 +24854,279 @@ namespace App\Livewire\Admin\Master\Setting {
         public static function modal($name)
         {
             return \App\Livewire\Admin\Master\Setting\AdminMasterSettingIndex::modal($name);
+        }
+
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Topic {
+    /**
+     * 
+     *
+     */
+    class AdminMasterTopicIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Master\Topic\AdminMasterTopicIndex::modal($name);
+        }
+
+            }
+    }
+
+namespace App\Livewire\Admin\Master\MaterialCategory {
+    /**
+     * 
+     *
+     */
+    class AdminMasterMaterialCategoryIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Master\MaterialCategory\AdminMasterMaterialCategoryIndex::modal($name);
+        }
+
+            }
+    }
+
+namespace App\Livewire\Admin\Master\RatingScale {
+    /**
+     * 
+     *
+     */
+    class AdminMasterRatingScaleIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Master\RatingScale\AdminMasterRatingScaleIndex::modal($name);
+        }
+
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Admin {
+    /**
+     * 
+     *
+     */
+    class AdminMasterAdminIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Master\Admin\AdminMasterAdminIndex::modal($name);
+        }
+
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Lecturer {
+    /**
+     * 
+     *
+     */
+    class AdminMasterLecturerIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Master\Lecturer\AdminMasterLecturerIndex::modal($name);
+        }
+
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Student {
+    /**
+     * 
+     *
+     */
+    class AdminMasterStudentIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Master\Student\AdminMasterStudentIndex::modal($name);
+        }
+
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Supervisor {
+    /**
+     * 
+     *
+     */
+    class AdminMasterSupervisorIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Master\Supervisor\AdminMasterSupervisorIndex::modal($name);
+        }
+
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Timetable {
+    /**
+     * 
+     *
+     */
+    class AdminMasterTimetableIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Master\Timetable\AdminMasterTimetableIndex::modal($name);
+        }
+
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Material {
+    /**
+     * 
+     *
+     */
+    class AdminMasterMaterialIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Master\Material\AdminMasterMaterialIndex::modal($name);
+        }
+
+            }
+    }
+
+namespace App\Livewire\Admin\Master\QuestionType {
+    /**
+     * 
+     *
+     */
+    class AdminMasterQuestionTypeIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Master\QuestionType\AdminMasterQuestionTypeIndex::modal($name);
+        }
+
+            }
+    }
+
+namespace App\Livewire\Admin\Master\ExamType {
+    /**
+     * 
+     *
+     */
+    class AdminMasterExamTypeIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Master\ExamType\AdminMasterExamTypeIndex::modal($name);
+        }
+
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Module {
+    /**
+     * 
+     *
+     */
+    class AdminMasterModuleIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Master\Module\AdminMasterModuleIndex::modal($name);
+        }
+
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Question {
+    /**
+     * 
+     *
+     */
+    class AdminMasterQuestionIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Master\Question\AdminMasterQuestionIndex::modal($name);
         }
 
             }
@@ -31856,6 +29993,7 @@ namespace  {
     class Validator extends \Illuminate\Support\Facades\Validator {}
     class View extends \Illuminate\Support\Facades\View {}
     class Vite extends \Illuminate\Support\Facades\Vite {}
+    class Webp extends \Buglinjo\LaravelWebp\Webp {}
     class LivewireAlert extends \Jantinnerezo\LivewireAlert\LivewireAlert {}
     class Flux extends \Flux\Flux {}
     class Livewire extends \Livewire\Livewire {}
