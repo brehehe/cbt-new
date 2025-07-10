@@ -26,6 +26,31 @@
                         </div>
                     </a>
                 </div>
+                <!-- Divider: Ujian -->
+                <div>
+                    <div
+                        class="w-full group flex items-center justify-between custom-padding text-xs font-bold text-[#1E3A8A] uppercase tracking-wide">
+                        Ujian
+                    </div>
+                </div>
+                @php
+                    $exams = [['label' => 'Ujian', 'url' => '/admin/exam/timetable', 'icon' => 'fa-file-lines']];
+                @endphp
+                @foreach ($exams as $exam)
+                    <div>
+                        <a href="{{ $exam['url'] }}"
+                            class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
+         {{ Request::is(ltrim($exam['url'], '/')) ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }}">
+                            <div class="flex items-center gap-3">
+                                <i
+                                    class="fa-solid {{ $exam['icon'] }} text-lg mr-2
+             {{ Request::is(ltrim($exam['url'], '/')) ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}">
+                                </i>
+                                <span class="sidebar-text">{{ $exam['label'] }}</span>
+                            </div>
+                        </a>
+                    </div>
+                @endforeach
                 <!-- Divider: Master -->
                 <div>
                     <div
@@ -33,9 +58,8 @@
                         Master
                     </div>
                 </div>
-                <!-- Registration -->
                 @php
-                    $menuItems = [
+                    $masters = [
                         ['label' => 'Skala Penilaian', 'url' => '/admin/master/rating-scale', 'icon' => 'fa-chart-bar'],
                         ['label' => 'Jadwal', 'url' => '/admin/master/timetable', 'icon' => 'fa-clock'],
                         ['label' => 'Admin', 'url' => '/admin/master/admin', 'icon' => 'fa-user-shield'],
@@ -46,17 +70,17 @@
                     ];
                 @endphp
 
-                @foreach ($menuItems as $item)
+                @foreach ($masters as $master)
                     <div>
-                        <a href="{{ $item['url'] }}"
+                        <a href="{{ $master['url'] }}"
                             class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
-            {{ Request::is(ltrim($item['url'], '/')) ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }}">
+            {{ Request::is(ltrim($master['url'], '/')) ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }}">
                             <div class="flex items-center gap-3">
                                 <i
-                                    class="fa-solid {{ $item['icon'] }} text-lg mr-2
-                {{ Request::is(ltrim($item['url'], '/')) ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}">
+                                    class="fa-solid {{ $master['icon'] }} text-lg mr-2
+                {{ Request::is(ltrim($master['url'], '/')) ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}">
                                 </i>
-                                <span class="sidebar-text">{{ $item['label'] }}</span>
+                                <span class="sidebar-text">{{ $master['label'] }}</span>
                             </div>
                         </a>
                     </div>

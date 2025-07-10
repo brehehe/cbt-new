@@ -34,8 +34,8 @@ class AdminMasterTopicIndex extends Component
     {
         // dd(Auth::user()?->company);
     }
-    
-    public function hydrate ()
+
+    public function hydrate()
     {
         $this->resetPage();
     }
@@ -66,18 +66,18 @@ class AdminMasterTopicIndex extends Component
 
         try {
             DB::beginTransaction();
-                $request = [
-                    'id'          => $this->data_id,
-                    'company_id'  => Auth::user()?->company?->id,
-                    'name'        => $this->name,
-                    'description' => $this->description,
-                ];
+            $request = [
+                'id'          => $this->data_id,
+                'company_id'  => Auth::user()?->company?->id,
+                'name'        => $this->name,
+                'description' => $this->description,
+            ];
 
-                $topic = app(TopicService::class)->updateOrCreate($request);
-                if (!$topic) {
-                    throw new Exception("Ada kesalahaan saat TopicService => updateOrCreate", 500);
-                }
+            $topic = app(TopicService::class)->updateOrCreate($request);
 
+            if (!$topic) {
+                throw new Exception("Ada kesalahaan saat TopicService => updateOrCreate", 500);
+            }
             DB::commit();
         } catch (Exception | Throwable $th) {
             DB::rollBack();
@@ -111,7 +111,7 @@ class AdminMasterTopicIndex extends Component
     public function delete($id)
     {
         try {
-           app(TopicService::class)->delete($id[0]);
+            app(TopicService::class)->delete($id[0]);
         } catch (Exception | Throwable $th) {
             $error = [
                 'message' => $th->getMessage(),

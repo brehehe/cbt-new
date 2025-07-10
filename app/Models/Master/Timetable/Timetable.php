@@ -3,6 +3,8 @@
 namespace App\Models\Master\Timetable;
 
 use App\Models\Company\Company;
+use App\Models\Master\Question\Module;
+use App\Models\User\UserTimetable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -20,9 +22,17 @@ class Timetable extends Model
 
     public function module()
     {
-        // return $this->belongsTo(Module::class, 'module_id', 'id');
-        return $this->belongsTo(Company::class, 'module_id', 'id');
+        return $this->belongsTo(Module::class, 'module_id', 'id');
     }
+
+    public function userTimetable()
+    {
+        return $this->hasOne(UserTimetable::class, 'timetable_id', 'id');
+    }
+
+    protected $casts = [
+        'supervisors' => 'array',
+    ];
 
     protected static function boot()
     {

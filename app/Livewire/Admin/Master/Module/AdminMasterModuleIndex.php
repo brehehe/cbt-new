@@ -36,13 +36,13 @@ class AdminMasterModuleIndex extends Component
         ])->extends('layout.app')->section('content');
     }
 
-     public function mount()
+    public function mount()
     {
         // dd(Auth::user()?->company);
         $this->question_types = QuestionType::select('id', 'name')->get();
     }
 
-    public function hydrate ()
+    public function hydrate()
     {
         $this->resetPage();
     }
@@ -80,20 +80,20 @@ class AdminMasterModuleIndex extends Component
 
         try {
             DB::beginTransaction();
-                 $request = [
-                    'id'               => $this->data_id,
-                    'company_id'       => Auth::user()?->company?->id,
-                    'question_type_id' => $this->question_type_id,
-                    'name'             => $this->name,
-                    'duration'         => $this->duration,
-                    'random_question'  => $this->random_question,
-                    'description'      => $this->description,
-                ];
+            $request = [
+                'id'               => $this->data_id,
+                'company_id'       => Auth::user()?->company?->id,
+                'question_type_id' => $this->question_type_id,
+                'name'             => $this->name,
+                'duration'         => $this->duration,
+                'random_question'  => $this->random_question,
+                'description'      => $this->description,
+            ];
 
-                $module = app(ModuleService::class)->updateOrCreate($request);
-                if (!$module) {
-                    throw new Exception("Ada kesalahaan saat ModuleService => updateOrCreate", 500);
-                }
+            $module = app(ModuleService::class)->updateOrCreate($request);
+            if (!$module) {
+                throw new Exception("Ada kesalahaan saat ModuleService => updateOrCreate", 500);
+            }
 
             DB::commit();
         } catch (Exception | Throwable $th) {
@@ -126,6 +126,28 @@ class AdminMasterModuleIndex extends Component
     public function confirmDelete($id)
     {
         return AlertHelper::confirmDelete('delete', 'Anda yakin ingin menghapus data ini?', $id);
+    }
+
+    public function toggleRandomQuestion($id)
+    {
+        try {
+            DB::beginTransaction();
+            $module = Module::find($id);
+            if ($module) {
+                $module->random_question = !$module->random_question;
+                $module->save();
+            }
+            DB::commit();
+        } catch (Exception | Throwable $th) {
+            DB::rollBack();
+            $error = [
+                'message' => $th->getMessage(),
+                'file'    => $th->getFile(),
+                'line'    => $th->getLine(),
+            ];
+            Log::error('Ada Kesalahaan saat AdminMasterModuleIndex => toggleRandomQuestion', $error);
+            return AlertHelper::error('Gagal', 'Ada kesalahan saat mengubah data');
+        }
     }
 
     public function delete($id)

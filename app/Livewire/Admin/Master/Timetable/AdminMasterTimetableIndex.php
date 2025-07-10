@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Master\Timetable;
 
 use App\Helpers\AlertHelper;
+use App\Models\Master\Question\Module;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Master\Timetable\Timetable;
@@ -31,6 +32,7 @@ class AdminMasterTimetableIndex extends Component
 
     public function mount()
     {
+        $this->modules = Module::select('id', 'name')->get()->pluck('name', 'id')->toArray();
         $this->getSupervisors = User::companyRole('Pengawas', Auth::user()->company_id)->select('name', 'id')->get()->pluck('name', 'id')->toArray();
     }
 
@@ -64,6 +66,36 @@ class AdminMasterTimetableIndex extends Component
         $this->end_time = $data->end_time;
         $this->description = $data->description;
         $this->openModal();
+    }
+
+    public function confirmGenerateToken($id)
+    {
+        return AlertHelper::confirmSave('generateToken', 'Apakah Anda Yakin Membuat Token?', $id);
+    }
+
+    public function generateToken($id)
+    {
+        try {
+            DB::beginTransaction();
+            $token = '';
+            $codeAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $codeAlphabet .= 'abcdefghijklmnopqrstuvwxyz';
+            $codeAlphabet .= '0123456789';
+            $max = strlen($codeAlphabet); // edited
+            for ($i = 0; $i < 5; $i++) {
+                $token .= $codeAlphabet[random_int(0, $max - 1)];
+            }
+
+            Timetable::where('id', $id[0])->update([
+                'code' => $token,
+            ]);
+            DB::commit();
+        } catch (\Throwable $th) {
+            DB::rollback();
+            AlertHelper::error('Gagal', 'Token gagal dibuat!');
+            return Log::info('Gagal Menghapus Token : ' . $th);
+        }
+        AlertHelper::success('Berhasil', 'Token berhasil dibuat!');
     }
 
     public function confirmDelete($id)

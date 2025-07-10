@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckUserTimetable;
 use App\Livewire\Admin\Master\ExamType\AdminMasterExamTypeIndex;
 use App\Livewire\Admin\Master\Material\AdminMasterMaterialIndex;
 use App\Livewire\Admin\Master\MaterialCategory\AdminMasterMaterialCategoryIndex;
@@ -28,8 +29,14 @@ Route::group(['namespace' => 'App\Livewire\Auth'], function () {
     Route::get('register', 'Register\AuthRegisterIndex')->name('register');
 });
 
-Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middleware' => ['auth', 'verified']], function () {
+Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middleware' => ['auth', 'verified', CheckUserTimetable::class]], function () {
     Route::get('/', 'Dashboard\AdminDashboardIndex')->name('admin.dashboard');
+
+    Route::group(['namespace' => 'Exam', 'prefix' => 'exam'], function () {
+        Route::get('/timetable', 'Timetable\AdminExamTimetableIndex')->name('admin.exam.timetable');
+        Route::get('/warning', 'Warning\AdminExamWarningIndex')->name('admin.exam.warning');
+        Route::get('/detail', 'Detail\AdminExamDetailIndex')->name('admin.exam.detail');
+    });
 
     Route::group(['namespace' => 'Master', 'prefix' => 'master'], function () {
         Route::get('/role', 'Role\AdminMasterRoleIndex')->name('admin.master.role');

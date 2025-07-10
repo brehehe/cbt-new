@@ -1,19 +1,10 @@
 <div>
-    @include('livewire.admin.master.timetable.admin-master-timetable-modal')
+    @include('livewire.admin.exam.timetable.admin-exam-timetable-modal')
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#1E3A8A]">Jadwal</h1>
+                <h1 class="text-2xl font-bold text-[#1E3A8A]">Ujian</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
-            </div>
-            <div>
-                <button wire:click="openModal()" class="btn btn-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Tambah Jadwal
-                </button>
             </div>
         </div>
     </div>
@@ -51,11 +42,11 @@
                     <tr>
                         <th class="w-1 center">No</th>
                         <th>Nama</th>
+                        <th>Tipe</th>
                         <th>Modul</th>
-                        <th>Waktu Mulai</th>
-                        <th>Waktu Selesai</th>
-                        <th>Token</th>
-                        <th class="w-1 center">Aksi</th>
+                        <th>Durasi</th>
+                        <th>Deskripsi</th>
+                        <th class="right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -63,46 +54,28 @@
                         <tr>
                             <td class="center">{{ $timetables->firstItem() + $index }}</td>
                             <td>{{ $timetable->name ?? '-' }}</td>
+                            <td>{{ $timetable->module->questionType->name ?? '-' }}</td>
                             <td>{{ $timetable->module->name ?? '-' }}</td>
-                            <td>{{ $timetable->start_time }}</td>
-                            <td>{{ $timetable->end_time }}</td>
-                            <td>{{ $timetable->code ?? '-' }}</td>
-                            <td class="center">
-                                <div class="flex items-center">
-                                    @if (!$timetable->code)
-                                        <button
-                                            class="btn btn-icon text-green-600 hover:text-green-800 transition-colors edit-btn"
-                                            wire:click="confirmGenerateToken('{{ $timetable->id }}')">
-                                            <i class="fa-solid fa-repeat"></i> <!-- atau fa-edit (versi lama) -->
-                                        </button>
-                                    @endif
-                                    @if (!$timetable->code)
-                                        <!-- Tombol Edit -->
+                            <td>{{ $timetable->module->duration ?? 0 }} / Menit</td>
+                            <td>{{ $timetable->description ?? '-' }}</td>
+                            <td>
+                                @if (!$timetable->userTimetable)
+                                    <div class="flex justify-end items-center">
                                         <button
                                             class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn"
-                                            wire:click="edit('{{ $timetable->id }}')">
-                                            <i class="fa-solid fa-pen-to-square"></i> <!-- atau fa-edit (versi lama) -->
+                                            wire:click="openModalStartExam('{{ $timetable->id }}')">
+                                            <i class="fa-solid fa-book"></i> Masuk Ujian
                                         </button>
-
-                                        <!-- Tombol Delete -->
+                                    </div>
+                                @else
+                                    <div class="flex justify-end items-center">
                                         <button
-                                            class="btn btn-icon text-red-600 hover:text-red-800 transition-colors delete-btn"
-                                            wire:click="confirmDelete('{{ $timetable->id }}')">
-                                            <i class="fa-solid fa-trash"></i>
+                                            class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn"
+                                            wire:click="confirmBackExam('{{ $timetable->userTimetable->id }}')">
+                                            <i class="fa-regular fa-book-open-cover"></i> Kembali Ujian
                                         </button>
-                                    @else
-                                        <button
-                                            class="btn btn-icon text-yellow-600 hover:text-yellow-800 transition-colors delete-btn"
-                                            wire:click="liveSession('{{ $timetable->id }}')">
-                                            <i class="fa-solid fa-camera-movie"></i>
-                                        </button>
-                                        <button
-                                            class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors delete-btn"
-                                            wire:click="confirmDetail('{{ $timetable->id }}')">
-                                            <i class="fa-solid fa-eye"></i>
-                                        </button>
-                                    @endif
-                                </div>
+                                    </div>
+                                @endif
                             </td>
                         </tr>
                     @empty
