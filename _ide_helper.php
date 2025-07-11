@@ -24796,6 +24796,69 @@ namespace App\Livewire\Admin\Dashboard {
             }
     }
 
+namespace App\Livewire\Admin\Exam\Timetable {
+    /**
+     * 
+     *
+     */
+    class AdminExamTimetableIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Exam\Timetable\AdminExamTimetableIndex::modal($name);
+        }
+
+            }
+    }
+
+namespace App\Livewire\Admin\Exam\Warning {
+    /**
+     * 
+     *
+     */
+    class AdminExamWarningIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Exam\Warning\AdminExamWarningIndex::modal($name);
+        }
+
+            }
+    }
+
+namespace App\Livewire\Admin\Exam\Detail {
+    /**
+     * 
+     *
+     */
+    class AdminExamDetailIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Exam\Detail\AdminExamDetailIndex::modal($name);
+        }
+
+            }
+    }
+
 namespace App\Livewire\Admin\Master\Role {
     /**
      * 
@@ -25127,6 +25190,24 @@ namespace App\Livewire\Admin\Master\Question {
         public static function modal($name)
         {
             return \App\Livewire\Admin\Master\Question\AdminMasterQuestionIndex::modal($name);
+        }
+
+            }
+    /**
+     * 
+     *
+     */
+    class AdminMasterQuestionUpdate {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Master\Question\AdminMasterQuestionUpdate::modal($name);
         }
 
             }
@@ -30005,6 +30086,11 @@ namespace  {
 }
 
 
+namespace Facades\Livewire\Features\SupportFileUploads {
+    /**
+     * @mixin \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl     */
+    class GenerateSignedUploadUrl extends \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl {}
+}
 
 
 

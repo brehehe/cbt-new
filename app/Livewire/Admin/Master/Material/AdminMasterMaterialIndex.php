@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Master\Material;
 use App\Helpers\AlertHelper;
 use App\Models\Master\Question\Material;
 use App\Models\Master\Question\MaterialCategory;
+use App\Models\Master\Question\Topic;
 use App\Services\Material\MaterialService;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -20,8 +21,8 @@ class AdminMasterMaterialIndex extends Component
     protected $paginationTheme = 'bootstrap';
     public $perPage = 10, $search;
 
-    public $material_categories;
-    public $data_id, $material_category_id, $name, $level, $description;
+    public $topics = [], $material_categories = [];
+    public $data_id, $topic_id, $material_category_id, $name, $level, $description;
 
     public function render()
     {
@@ -36,12 +37,14 @@ class AdminMasterMaterialIndex extends Component
 
     public function mount()
     {
-        // dd(Auth::user()?->company);
-        $this->material_categories = MaterialCategory::search($this->search)
-            ->select('id', 'company_id', 'topic_id', 'material_category_id', 'name', 'description')
-            ->with([
-                'topic:id,name'
-            ])->whereDoesntHave('childs')->get();
+        $this->topics              = Topic::select('id', 'name')->get();
+    }
+
+     public function updatedTopicId($value)
+    {
+        $this->material_category_id = null;
+        $this->material_categories = MaterialCategory::select('id', 'topic_id', 'name')
+            ->where('topic_id', $value)->whereDoesntHave('childs')->get();
     }
 
     public function hydrate ()
@@ -57,7 +60,7 @@ class AdminMasterMaterialIndex extends Component
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['data_id', 'material_category_id', 'name', 'level', 'description']);
+        $this->reset(['data_id', 'topic_id', 'material_category_id', 'name', 'level', 'description']);
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
 

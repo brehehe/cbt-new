@@ -15,17 +15,31 @@
 
         <!-- Body -->
         <div class="px-6 py-4 text-gray-600">
-             <div class="mb-4">
-                <label for="material_category_id" class="block text-sm font-medium text-gray-700">Kategori Materi</label>
-                <select class="mt-1 form-control" wire:model='material_category_id'>
-                    <option value="">Pilih kategori materi</option>
-                    @foreach ($material_categories as $material_category)
-                        <option {{ $material_category?->id == $material_category_id ? 'selected' : '' }} value="{{ $material_category?->id }}">{{ $material_category?->name }}</option>
-                    @endforeach
-                </select>
-                @error('material_category_id')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                @enderror
+            <div class="grid grid-cols-2 gap-4">
+                <div class="mb-4">
+                    <label for="topic_id" class="block text-sm font-medium text-gray-700">Topik Soal <span class="text-red-600">*</span></label>
+                    <select class="mt-1 form-control" wire:model.lazy='topic_id'>
+                        <option value="">Pilih topik soal</option>
+                        @foreach ($topics as $topic)
+                            <option value="{{ $topic?->id }}">{{ $topic?->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('topic_id')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div class="mb-4">
+                    <label for="material_category_id" class="block text-sm font-medium text-gray-700">Kategori Materi</label>
+                    <select class="mt-1 form-control" wire:model='material_category_id'>
+                        <option value="">Pilih kategori materi</option>
+                        @foreach ($material_categories as $material_category)
+                            <option {{ $material_category?->id == $material_category_id ? 'selected' : '' }} value="{{ $material_category?->id }}">{{ $material_category?->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('material_category_id')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
             <div class="mb-4">
                 <label for="name" class="block text-sm font-medium text-gray-700">Nama Materi <span class="text-red-600">*</span></label>

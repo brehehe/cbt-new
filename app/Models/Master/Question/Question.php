@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,6 +16,10 @@ class Question extends Model
     //
     use SoftDeletes, HasUuids;
     protected $guarded = ['id'];
+
+    protected $casts = [
+        'images' => 'array'
+    ];
 
     public function company()
     {
@@ -89,6 +94,26 @@ class Question extends Model
     public function questionType(): BelongsTo
     {
         return $this->belongsTo(QuestionType::class, 'question_type_id', 'id');
+    }
+
+    /**
+     * Get all of the answers for the Question
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function answers(): HasMany
+    {
+        return $this->hasMany(Answer::class, 'question_id', 'id');
+    }
+
+    /**
+     * Get all of the moduleQuestion for the Question
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function moduleQuestions(): HasMany
+    {
+        return $this->hasMany(ModuleQuestion::class, 'question_id', 'id');
     }
 
 }

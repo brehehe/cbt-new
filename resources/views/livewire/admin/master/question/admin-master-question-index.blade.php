@@ -44,4 +44,75 @@
         </div>
     </div>
     <!-- Table Section -->
+    <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="w-1 center">No</th>
+                        <th>Topik Soal</th>
+                        <th>Kategori Materi</th>
+                        <th>Materi</th>
+                        <th>Tipe Soal</th>
+                        <th>Pertanyaan</th>
+                        <th>Deskripsi</th>
+                        <th class="w-1 center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($questions as $index => $result)
+                        <tr>
+                            <td class="center">{{ $questions->firstItem() + $index }}</td>
+                            <td>{{ $result?->topic?->name }}</td>
+                            <td>{{ $result?->materialCategory?->name }}</td>
+                            <td>{{ $result?->material?->name }}</td>
+                            <td>{{ $result?->questionType?->name }}</td>
+                            <td>{{ $result?->question }}</td>
+                            <td>{{ $result?->description }}</td>
+                            <td class="center">
+                                <div class="flex items-center">
+                                    <a class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn" href="{{ route('admin.master.question.update', $result) }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </a>
+                                    <button
+                                        class="btn btn-icon text-red-600 hover:text-red-800 transition-colors delete-btn"
+                                        wire:click="confirmDelete('{{ $result->id }}')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="10" class="no-data">Tidak ada data</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="px-5 py-4 bg-gray-50/80 border-t border-gray-200">
+            <div class="flex items-center justify-between">
+                <div class="text-sm text-gray-700">
+                    Menampilkan <span class="font-medium">{{ $questions->firstItem() }}</span> sampai <span
+                        class="font-medium">{{ $questions->lastItem() }}</span> dari <span
+                        class="font-medium">{{ $questions->total() }}</span> hasil
+                </div>
+                <div>
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                        {{ $questions->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

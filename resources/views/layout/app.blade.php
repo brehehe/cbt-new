@@ -13,6 +13,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/all.css">
 
+    {{-- file pond --}}
+    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet" />
+    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet"
+/>
     <style>
         .shadow-top {
             box-shadow: 0 -1px 3px 0 rgba(0, 0, 0, 0.1);
@@ -42,7 +46,7 @@
 
         </div>
     </main>
-
+    @filepondScripts
     @livewireScripts
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Add jQuery -->
@@ -51,6 +55,16 @@
     <!-- Add Selectize JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js" integrity="sha512-IOebNkvA/HZjMM7MxL0NYeLYEalloZ8ckak+NDtOViP7oiYzG5vn6WVXyrJDiJPhl4yRdmNAG49iuLmhkUdVsQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <!-- file pond -->
+    <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+    <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+    <script>
+        // Register the plugin
+        FilePond.registerPlugin(FilePondPluginImagePreview);
+
+        // ... FilePond initialisation code here
+    </script>
     @stack('scripts')
 </body>
 

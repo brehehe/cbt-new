@@ -14,7 +14,7 @@
         </div>
 
         <!-- Body -->
-        <div class="px-6 py-4 text-gray-600">
+        <div class="px-6 py-4 text-gray-600 overflow-auto" style="max-height: 80vh">
             <div class="grid grid-cols-2 gap-4">
                 <div class="mb-4">
                     <label for="topic_id" class="block text-sm font-medium text-gray-700">Topik Soal <span class="text-red-600">*</span></label>
@@ -76,7 +76,8 @@
             </div>
             <div class="mb-4">
                 <label for="images" class="block text-sm font-medium text-gray-700">Gambar</label>
-                <input type="file" id="images" wire:model.defer="images" placeholder="" class="mt-1 form-control">
+                {{-- <input type="file" id="images" wire:model.defer="images" placeholder="" class="mt-1 form-control" multiple> --}}
+                <x-filepond::upload wire:model="images" multiple accept=".jpg,.jpeg,.png"/>
                 @error('images')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror

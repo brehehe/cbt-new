@@ -5,7 +5,9 @@ use App\Livewire\Admin\Master\ExamType\AdminMasterExamTypeIndex;
 use App\Livewire\Admin\Master\Material\AdminMasterMaterialIndex;
 use App\Livewire\Admin\Master\MaterialCategory\AdminMasterMaterialCategoryIndex;
 use App\Livewire\Admin\Master\Module\AdminMasterModuleIndex;
+use App\Livewire\Admin\Master\Module\AdminMasterModuleQuestionIndex;
 use App\Livewire\Admin\Master\Question\AdminMasterQuestionIndex;
+use App\Livewire\Admin\Master\Question\AdminMasterQuestionUpdate;
 use App\Livewire\Admin\Master\QuestionType\AdminMasterQuestionTypeIndex;
 use App\Livewire\Admin\Master\Topic\AdminMasterTopicIndex;
 use App\Models\User;
@@ -54,7 +56,9 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
         Route::get('/question-type', AdminMasterQuestionTypeIndex::class)->name('admin.master.question-type');
         Route::get('/exam-type', AdminMasterExamTypeIndex::class)->name('admin.master.exam-type');
         Route::get('/module', AdminMasterModuleIndex::class)->name('admin.master.module');
+        Route::get('/module-question/{id}', AdminMasterModuleQuestionIndex::class)->name('admin.master.module-question');
         Route::get('/question', AdminMasterQuestionIndex::class)->name('admin.master.question');
+        Route::get('/question/{id}', AdminMasterQuestionUpdate::class)->name('admin.master.question.update');
     });
 });
 

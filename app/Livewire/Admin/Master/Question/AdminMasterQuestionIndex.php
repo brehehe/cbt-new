@@ -17,16 +17,18 @@ use App\Models\Master\Question\QuestionType;
 use App\Services\Question\QuestionService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\WithFileUploads;
+use Spatie\LivewireFilepond\WithFilePond;
 use Throwable;
 
 class AdminMasterQuestionIndex extends Component
 {
-    use WithPagination, WithFileUploads;
+    use WithPagination, WithFileUploads, WithFilePond;
     protected $paginationTheme = 'bootstrap';
     public $perPage = 10, $search;
 
-    public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id ,$question, $description, $images, $weight_correct, $weight_incorrect;
+    public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id ,$question, $description, $weight_correct, $weight_incorrect;
     public $topics = [], $material_categories = [], $materials = [], $question_types = [];
+    public $images = [], $old_images = [];
 
     public function render()
     {
@@ -44,26 +46,25 @@ class AdminMasterQuestionIndex extends Component
 
     public function updated()
     {
-        // $this->material_categories = MaterialCategory::select('id', 'topic_id', 'name')->where('topic_id', $this->topic_id)->get();
-        // $this->materials           = Material::select('id', 'material_category_id', 'name')->where('material_category_id', $this->material_category_id)->get();
+        //
     }
 
     public function updatedTopicId($value)
-{
-    $this->material_category_id = null;
-    $this->material_id = null;
-    $this->material_categories = MaterialCategory::select('id', 'topic_id', 'name')
-        ->where('topic_id', $value)
-        ->get();
-}
+    {
+        $this->material_category_id = null;
+        $this->material_id = null;
+        $this->material_categories = MaterialCategory::select('id', 'topic_id', 'name')
+            ->where('topic_id', $value)
+            ->get();
+    }
 
-public function updatedMaterialCategoryId($value)
-{
-    $this->material_id = null;
-    $this->materials = Material::select('id', 'material_category_id', 'name')
-        ->where('material_category_id', $value)
-        ->get();
-}
+    public function updatedMaterialCategoryId($value)
+    {
+        $this->material_id = null;
+        $this->materials = Material::select('id', 'material_category_id', 'name')
+            ->where('material_category_id', $value)
+            ->get();
+    }
 
     public function hydrate ()
     {
@@ -91,7 +92,7 @@ public function updatedMaterialCategoryId($value)
                 'material_id'          => 'nullable|exists:materials,id',
                 'question_type_id'     => 'required|exists:question_types,id',
                 'question'             => 'required',
-                'images'               => 'nullable|file|mimes:jpg,jpeg,png',
+                'images.*'             => 'nullable|file|mimetypes:image/jpg,image/jpeg,image/png',
                 'description'          => 'nullable',
             ],
             [
@@ -101,8 +102,8 @@ public function updatedMaterialCategoryId($value)
                 'question_type_id.required'   => 'Tipe soal wajib diisi.',
                 'question_type_id.exists'     => 'Tipe soal tidak valid.',
                 'question.required'           => 'Pertanyaan wajib diisi.',
-                'images.file'                 => 'Gambar wajib berupa file.',
-                'images.mimes'                => 'Gambar hanya berformat : .jpg, .jpeg, .png.',
+                'images.*.file'               => 'Gambar wajib berupa file.',
+                'images.*.mimes'              => 'Gambar hanya berformat : .jpg, .jpeg, .png.',
             ]
         );
 
@@ -117,7 +118,10 @@ public function updatedMaterialCategoryId($value)
                     'question_type_id'     => $this->question_type_id,
                     'question'             => $this->question,
                     'images'               => $this->images,
+                    'old_images'           => $this->old_images,
                     'description'          => $this->description,
+                    'weight_correct'       => $this->weight_correct,
+                    'weight_incorrect'     => $this->weight_incorrect,
                 ];
 
                 $question = app(QuestionService::class)->updateOrCreate($request);
