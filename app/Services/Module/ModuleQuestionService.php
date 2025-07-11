@@ -24,4 +24,10 @@ class ModuleQuestionService
             ]);
         }
     }
+
+    public function delete($id)
+    {
+        $result = ModuleQuestion::findOrFail($id);
+        $result->delete();
+    }
 }

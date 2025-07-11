@@ -35,7 +35,7 @@
                                 @this.set('question_type_id', e ? e : '');
                             }
                         });"
-                            wire:model.live="question_type_id" id="question_type_id">
+                            wire:model.live="question_type_id" id="question_type_id" {{ !empty($module_questions) ? 'disabled' : '' }}>
                             <option value="">Pilih Topik Soal</option>
                             @foreach ($question_types as $question_type)
                                 <option value="{{ $question_type?->id }}">{{ $question_type?->name }}</option>
@@ -137,7 +137,6 @@
                             <td>{{ $result?->question?->description }}</td>
                             <td class="center">
                                 <div class="flex items-center">
-                        
                                     <button
                                         class="btn btn-icon text-red-600 hover:text-red-800 transition-colors delete-btn"
                                         wire:click="confirmDelete('{{ $result->id }}')">
