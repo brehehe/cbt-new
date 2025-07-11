@@ -70,7 +70,7 @@ class AdminMasterTimetableIndex extends Component
 
     public function confirmGenerateToken($id)
     {
-        return AlertHelper::confirmSave('generateToken', 'Apakah Anda Yakin Membuat Token?', $id);
+        return AlertHelper::confirmWarning('generateToken', 'Apakah Anda Yakin Membuat Token?', $id);
     }
 
     public function generateToken($id)

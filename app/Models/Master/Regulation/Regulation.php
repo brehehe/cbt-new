@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Models\User;
+namespace App\Models\Master\Regulation;
 
 use App\Models\Company\Company;
-use App\Models\Master\Timetable\Timetable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
-class UserTimetable extends Model
+class Regulation extends Model
 {
     //
     use SoftDeletes, HasUuids;
@@ -19,16 +18,6 @@ class UserTimetable extends Model
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id', 'id');
-    }
-
-    public function timetable()
-    {
-        return $this->belongsTo(Timetable::class, 'timetable_id', 'id');
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     protected static function boot()
@@ -54,7 +43,7 @@ class UserTimetable extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
-        $term = '%' . $term . '%';
+        $term = '%'. $term .'%';
 
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id'], 'ILIKE', $term);

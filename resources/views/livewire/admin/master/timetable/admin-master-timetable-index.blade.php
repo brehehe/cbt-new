@@ -66,14 +66,28 @@
                             <td>{{ $timetable->module->name ?? '-' }}</td>
                             <td>{{ $timetable->start_time }}</td>
                             <td>{{ $timetable->end_time }}</td>
-                            <td>{{ $timetable->code ?? '-' }}</td>
+                            <td>
+                                @if ($timetable->code)
+                                    <div class="flex items-center gap-2">
+                                        <span
+                                            class="font-mono text-sm bg-gray-100 px-2 py-1 rounded">{{ $timetable->code }}</span>
+                                        <button onclick="copyToClipboard('{{ trim($timetable->code) }}')"
+                                            class="btn btn-icon text-gray-600 hover:text-blue-600 transition-colors"
+                                            title="Copy Token">
+                                            <i class="fa-solid fa-copy text-xs"></i>
+                                        </button>
+                                    </div>
+                                @else
+                                    <span class="text-gray-400">-</span>
+                                @endif
+                            </td>
                             <td class="center">
                                 <div class="flex items-center">
                                     @if (!$timetable->code)
                                         <button
                                             class="btn btn-icon text-green-600 hover:text-green-800 transition-colors edit-btn"
                                             wire:click="confirmGenerateToken('{{ $timetable->id }}')">
-                                            <i class="fa-solid fa-repeat"></i> <!-- atau fa-edit (versi lama) -->
+                                            <i class="fa-solid fa-square-binary"></i> <!-- atau fa-edit (versi lama) -->
                                         </button>
                                     @endif
                                     @if (!$timetable->code)
@@ -131,3 +145,34 @@
         </div>
     </div>
 </div>
+@push('scripts')
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                // Tampilkan notifikasi sukses
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Token berhasil disalin!'
+                });
+            }).catch(function(err) {
+                // Fallback untuk browser lama
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+
+                alert('Token berhasil disalin!');
+            });
+        }
+    </script>
+@endpush

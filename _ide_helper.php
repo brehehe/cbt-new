@@ -24985,6 +24985,27 @@ namespace App\Livewire\Admin\Master\RatingScale {
             }
     }
 
+namespace App\Livewire\Admin\Master\Regulation {
+    /**
+     * 
+     *
+     */
+    class AdminMasterRegulationIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Master\Regulation\AdminMasterRegulationIndex::modal($name);
+        }
+
+            }
+    }
+
 namespace App\Livewire\Admin\Master\Admin {
     /**
      * 
@@ -25169,6 +25190,24 @@ namespace App\Livewire\Admin\Master\Module {
         public static function modal($name)
         {
             return \App\Livewire\Admin\Master\Module\AdminMasterModuleIndex::modal($name);
+        }
+
+            }
+    /**
+     * 
+     *
+     */
+    class AdminMasterModuleQuestionIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Master\Module\AdminMasterModuleQuestionIndex::modal($name);
         }
 
             }
@@ -30086,11 +30125,6 @@ namespace  {
 }
 
 
-namespace Facades\Livewire\Features\SupportFileUploads {
-    /**
-     * @mixin \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl     */
-    class GenerateSignedUploadUrl extends \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl {}
-}
 
 
 

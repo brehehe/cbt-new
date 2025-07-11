@@ -3,27 +3,22 @@
 namespace App\Livewire\Admin\Exam\Warning;
 
 use App\Helpers\AlertHelper;
+use App\Models\Master\Regulation\Regulation;
 use App\Models\User\UserTimetable;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
-use Session;
+use Illuminate\Support\Carbon;
 
 class AdminExamWarningIndex extends Component
 {
-    public $user_timetable_id, $userTimetable;
+    public $user_timetable_id, $userTimetable, $regulations = [];
 
     public function mount()
     {
-        if (session()->has('saved')) {
-            AlertHelper::success(session('saved.title'), session('saved.text'));
-            session()->forget('saved');
-
-            return;
-        }
-
         $userTimetable = UserTimetable::whereIn('status', ['exam', 'warning'])
             ->where('user_id', Auth::id())
             ->first();
+
         if (!$userTimetable) {
             return redirect()->route('admin.exam.timetable');
         }
@@ -35,11 +30,27 @@ class AdminExamWarningIndex extends Component
         if ($userTimetable->status == 'exam') {
             return redirect()->route('admin.exam.detail');
         }
+
+        $this->userTimetable = $userTimetable;
+
+        $this->regulations = Regulation::select('description', 'type')
+            ->orderBy('type', 'desc')
+            ->get()
+            // ->pluck('type', 'description')
+            ->toArray();
+
+
+        if (session()->has('saved')) {
+            AlertHelper::success(session('saved.title'), session('saved.text'));
+            session()->forget('saved');
+
+            return;
+        }
     }
 
     public function confirmStartUjian()
     {
-        return AlertHelper::confirmInfo('startUjian', 'Apakah yakin ingin memulai ujian?');
+        return AlertHelper::confirmWarning('startUjian', 'Apakah yakin ingin memulai ujian?');
     }
 
     public function startUjian()
@@ -50,6 +61,7 @@ class AdminExamWarningIndex extends Component
 
         $userTimetable->update([
             'status' => 'exam',
+            'start_exam' => Carbon::now(),
         ]);
 
         session()->flash('saved', [

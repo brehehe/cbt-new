@@ -21,7 +21,7 @@
                         class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
                         <div class="flex items-center gap-3">
                             <i
-                                class="fa-light fa-house mr-2 text-lg {{ Request::is('admin') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
+                                class="fa-solid fa-house mr-2 text-lg {{ Request::is('admin') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
                             <span class="sidebar-text">Dashboard</span>
                         </div>
                     </a>
@@ -61,6 +61,7 @@
                 @php
                     $masters = [
                         ['label' => 'Skala Penilaian', 'url' => '/admin/master/rating-scale', 'icon' => 'fa-chart-bar'],
+                        ['label' => 'Regulasi', 'url' => '/admin/master/regulation', 'icon' => 'fa-scroll'],
                         ['label' => 'Jadwal', 'url' => '/admin/master/timetable', 'icon' => 'fa-clock'],
                         ['label' => 'Admin', 'url' => '/admin/master/admin', 'icon' => 'fa-user-shield'],
                         ['label' => 'Dosen', 'url' => '/admin/master/lecturer', 'icon' => 'fa-chalkboard-teacher'],

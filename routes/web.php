@@ -47,6 +47,7 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
         Route::get('/topic-question', AdminMasterTopicIndex::class)->name('admin.master.topic');
         Route::get('/material-category', AdminMasterMaterialCategoryIndex::class)->name('admin.master.material-category');
         Route::get('/rating-scale', 'RatingScale\AdminMasterRatingScaleIndex')->name('admin.master.rating-scale');
+        Route::get('/regulation', 'Regulation\AdminMasterRegulationIndex')->name('admin.master.regulation');
         Route::get('/admin', 'Admin\AdminMasterAdminIndex')->name('admin.master.admin');
         Route::get('/lecturer', 'Lecturer\AdminMasterLecturerIndex')->name('admin.master.lecturer');
         Route::get('/student', 'Student\AdminMasterStudentIndex')->name('admin.master.student');

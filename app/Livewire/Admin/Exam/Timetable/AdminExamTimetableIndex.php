@@ -67,17 +67,15 @@ class AdminExamTimetableIndex extends Component
                 ->find($this->data_id);
 
             if (!$timeTable) {
-                AlertHelper::error('Gagal', 'Token Ujian Tidak Ditemukan');
+                AlertHelper::error('Gagal', 'Token Yang Dimasukkan Tidak Sesuai');
                 return;
             }
 
-            $userTimetable = UserTimetable::create([
+            UserTimetable::create([
                 'user_id' => Auth::id(),
                 'timetable_id' => $timeTable->id,
                 'start_process' => Carbon::now(),
             ]);
-
-            Session::put('user_timetable_id', $userTimetable->id);
 
             DB::commit();
             session()->flash('saved', [
