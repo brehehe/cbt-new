@@ -122,7 +122,9 @@ class AdminMasterModuleQuestionIndex extends Component
 
     public function modalModuleQuestion()
     {
-        $this->questions = Question::select('id', 'question_type_id', 'question')->where('question_type_id', $this->question_type_id)->get();
+        $this->questions = Question::select('id', 'question_type_id', 'question')->where('question_type_id', $this->question_type_id)->whereHas('answers', function ($query) {
+            $query->where('is_correct', true);
+        })->get();
         return $this->dispatch('open-modal', ['id' => 'modal-module-question']);
     }
 
@@ -160,4 +162,28 @@ class AdminMasterModuleQuestionIndex extends Component
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
         }
     }
+
+    public function confirmDelete($id)
+    {
+        return AlertHelper::confirmDelete('delete', 'Anda yakin ingin menghapus data ini?', $id);
+    }
+
+    public function delete($id)
+    {
+        try {
+            app(ModuleQuestionService::class)->delete($id[0]);
+        } catch (Exception | Throwable $th) {
+            $error = [
+                'message' => $th->getMessage(),
+                'file'    => $th->getFile(),
+                'line'    => $th->getLine(),
+            ];
+            Log::error('Ada Kesalahaan saat AdminMasterModuleQuestionIndex => delete', $error);
+            return AlertHelper::error('Gagal', 'Ada kesalahan saat menghapus data');
+        }
+
+        return AlertHelper::success('Berhasil', 'Data berhasil dihapus.');
+    }
+
+
 }
