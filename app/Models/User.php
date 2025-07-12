@@ -6,11 +6,8 @@ namespace App\Models;
 
 use App\Helpers\RoleHelper;
 use App\Models\Company\Company;
-use App\Models\Patient\Patient;
-use App\Models\User\ControlDoctor;
 use App\Models\User\UserCompanyRole;
 use App\Models\User\UserDetail;
-use App\Models\User\UserPrice;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -70,11 +67,6 @@ class User extends Authenticatable
     public function company()
     {
         return $this->belongsTo(Company::class);
-    }
-
-    public function patient()
-    {
-        return $this->hasOne(Patient::class, 'user_id','id');
     }
 
     public function companies()
@@ -253,17 +245,6 @@ class User extends Authenticatable
               });
         });
     }
-
-    public function userPrice()
-    {
-        return $this->hasOne(UserPrice::class, 'user_id', 'id');
-    }
-
-    public function controlDoctors()
-    {
-        return $this->hasMany(ControlDoctor::class, 'user_id');
-    }
-
     public function user() {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }

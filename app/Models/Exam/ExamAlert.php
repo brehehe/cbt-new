@@ -3,6 +3,7 @@
 namespace App\Models\Exam;
 
 use App\Models\Company\Company;
+use App\Models\Master\Timetable\Timetable;
 use App\Models\User;
 use App\Models\User\UserTimetable;
 use Illuminate\Database\Eloquent\Builder;
@@ -30,7 +31,7 @@ class ExamAlert extends Model
             $user = Auth::user();
 
             if (!$user || !$user->hasRole('Anonymous')) {
-                $builder->where('company_id', optional($user?->company_id)?->id)->orderBy('order', 'asc');
+                $builder->where('company_id', optional($user?->company)?->id)->orderBy('order', 'asc');
             }
 
             $builder->orderBy('order', 'asc');
@@ -59,5 +60,10 @@ class ExamAlert extends Model
     public function userTimetable()
     {
         return $this->belongsTo(UserTimetable::class);
+    }
+
+    public function timetable()
+    {
+        return $this->belongsTo(Timetable::class);
     }
 }

@@ -112,7 +112,7 @@
                                         </button> --}}
                                         <button
                                             class="btn btn-icon text-green-600 hover:text-green-800 transition-colors delete-btn"
-                                            wire:click="confirmRecording('{{ $timetable->id }}')">
+                                            wire:click="confirmVideo('{{ $timetable->id }}')">
                                             <i class="fa-solid fa-video"></i>
                                         </button>
                                         <button

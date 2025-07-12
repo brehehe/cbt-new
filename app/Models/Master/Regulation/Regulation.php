@@ -28,7 +28,7 @@ class Regulation extends Model
             $user = Auth::user();
 
             if (!$user || !$user->hasRole('Anonymous')) {
-                $builder->where('company_id', optional($user?->company_id)?->id)->orderBy('order', 'asc');
+                $builder->where('company_id', optional($user?->company)?->id)->orderBy('order', 'asc');
             }
 
             $builder->orderBy('order', 'asc');

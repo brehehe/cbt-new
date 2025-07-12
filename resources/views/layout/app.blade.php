@@ -26,12 +26,75 @@
             .shadow-top {
                 box-shadow: 0 -1px 3px 0 rgba(0, 0, 0, 0.1);
             }
+
+            /* Watermark Logo Styles */
+            .watermark-logo {
+                position: fixed;
+                top: 50%;
+                left: 35%;
+                transform: translate(-50%, -50%);
+                opacity: 0.1;
+                z-index: 1;
+                pointer-events: none;
+                width: 500px;
+                height: auto;
+            }
+
+            /* User Info Watermark */
+            .watermark-user {
+                position: fixed;
+                bottom: 0px;
+                right: 20px;
+                background: rgba(255, 255, 255, 0.9);
+                padding: 8px 12px;
+                border-radius: 8px;
+                font-size: 12px;
+                color: #666;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                z-index: 1000;
+                backdrop-filter: blur(10px);
+            }
+
+            /* Alternative: Corner watermark */
+            .watermark-corner {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                opacity: 0.3;
+                z-index: 1;
+                pointer-events: none;
+                width: 80px;
+                height: auto;
+            }
+
+            /* Content wrapper to ensure watermark doesn't interfere */
+            .content-wrapper {
+                position: relative;
+                z-index: 10;
+            }
         </style>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
     </head>
 
     <body class="bg-white">
+        <!-- Watermark Logo (Background) -->
+        <div class="watermark-logo">
+            <img src="{{ asset('asset/img/LogoPROCBT-blue.png') }}" alt="Watermark Logo" />
+            {{ Auth::user()->name . ' - ' . (Auth::user()->nim ?? (Auth::user()->username ?? '-')) }}
+        </div>
+
+        {{-- @auth
+            <div class="watermark-user">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-user text-blue-500"></i>
+                    <span>{{ Auth::user()->name }}</span>
+                    <span class="text-gray-400">|</span>
+                    <span class="text-xs">{{ now()->format('d/m/Y H:i') }}</span>
+                </div>
+            </div>
+        @endauth --}}
+
         @include('layout.navbar')
         @include('layout.sidebar')
 

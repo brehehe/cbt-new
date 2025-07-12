@@ -32,13 +32,13 @@
         </div>
         <div>
             <label for="start_time" class="block text-sm font-medium text-gray-700">Waktu Mulai</label>
-            <input disabled type="datetime-local" id="start_time" value="{{ $timetable['start_time'] }}"
-                placeholder="Masukkan" class="mt-1 form-control">
+            <input disabled type="text" id="start_time" value="{{ $start_time }}" placeholder="Masukkan"
+                class="mt-1 form-control">
         </div>
         <div>
             <label for="end_time" class="block text-sm font-medium text-gray-700">Waktu Selesai</label>
-            <input disabled type="datetime-local" id="end_time" value="{{ $timetable['end_time'] }}"
-                placeholder="Masukkan" class="mt-1 form-control">
+            <input disabled type="text" id="end_time" value="{{ $end_time }}" placeholder="Masukkan"
+                class="mt-1 form-control">
         </div>
         <div class="md:col-span-4">
             <label for="supervisors" class="block text-sm font-medium text-gray-700">Pengawas</label>

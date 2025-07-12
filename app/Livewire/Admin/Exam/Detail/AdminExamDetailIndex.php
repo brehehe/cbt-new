@@ -55,6 +55,7 @@ class AdminExamDetailIndex extends Component
     {
         // Buat recording entry baru
         $this->currentRecording = ExamRecording::create([
+            'timetable_id' => $this->userTimetable->timetable_id,
             'user_timetable_id' => $this->userTimetableId,
             'start_time' => now(),
             'chunk_number' => 1,
@@ -79,6 +80,7 @@ class AdminExamDetailIndex extends Component
             if ($chunkNumber && $chunkNumber > $this->currentRecording->chunk_number) {
                 // Buat entry baru untuk chunk berikutnya
                 $this->currentRecording = ExamRecording::create([
+                    'timetable_id' => $this->userTimetable->timetable_id,
                     'user_timetable_id' => $this->userTimetableId,
                     'video_path' => $filename,
                     'chunk_number' => $chunkNumber,
@@ -115,6 +117,7 @@ class AdminExamDetailIndex extends Component
 
         // Buat recording baru
         $this->currentRecording = ExamRecording::create([
+            'timetable_id' => $this->userTimetable->timetable_id,
             'user_timetable_id' => $this->userTimetableId,
             'start_time' => now(),
             'chunk_number' => $this->currentRecording ? $this->currentRecording->chunk_number + 1 : 1,
@@ -125,6 +128,7 @@ class AdminExamDetailIndex extends Component
     public function logAlert($alertType, $description, $metadata = [])
     {
         ExamAlert::create([
+            'timetable_id' => $this->userTimetable->timetable_id,
             'user_timetable_id' => $this->userTimetableId,
             'alert_type' => $alertType,
             'description' => $description,
