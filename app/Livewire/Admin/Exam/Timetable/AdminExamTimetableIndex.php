@@ -83,6 +83,7 @@ class AdminExamTimetableIndex extends Component
 
             foreach ($modulesQuestions as $moduleQuestion) {
                 UserModuleQuestion::create([
+                    'timetable_id' => $timeTable->id,
                     'user_timetable_id' => $UserTimetable->id,
                     'module_question_id' => $moduleQuestion->id,
                 ]);
