@@ -232,6 +232,8 @@ class AdminExamDetailIndex extends Component
                 'answer_id' => $this->answer_id,
                 'is_mark' => $this->isMark,
             ]);
+
+        $this->refreshQuestionData();
     }
 
     private function navigateToQuestion($direction)
