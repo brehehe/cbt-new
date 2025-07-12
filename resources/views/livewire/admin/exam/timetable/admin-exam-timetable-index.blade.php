@@ -45,8 +45,8 @@
                         <th>Tipe</th>
                         <th>Modul</th>
                         <th>Durasi</th>
-                        <th>Deskripsi</th>
-                        <th class="right">Aksi</th>
+                        <th style="width: 50%">Deskripsi</th>
+                        <th style="width: 15%" class="center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -54,10 +54,10 @@
                         <tr>
                             <td class="center">{{ $timetables->firstItem() + $index }}</td>
                             <td>{{ $timetable->name ?? '-' }}</td>
-                            <td>{{ $timetable->module->questionType->name ?? '-' }}</td>
-                            <td>{{ $timetable->module->name ?? '-' }}</td>
-                            <td>{{ $timetable->module->duration ?? 0 }} / Menit</td>
-                            <td>{{ $timetable->description ?? '-' }}</td>
+                            <td>{{ $timetable->timetableModule->questionType->name ?? '-' }}</td>
+                            <td>{{ $timetable->timetableModule->name ?? '-' }}</td>
+                            <td>{{ $timetable->timetableModule->duration ?? 0 }} / Menit</td>
+                            <td>{{ $timetable->timetableModule->description ?? '-' }}</td>
                             <td>
                                 @if (!$timetable->userTimetable)
                                     <div class="flex justify-end items-center">

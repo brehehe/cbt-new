@@ -3,6 +3,7 @@
 namespace App\Models\Timetable;
 
 use App\Models\Company\Company;
+use App\Models\Master\Question\QuestionType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -58,5 +59,10 @@ class TimetableQuestion extends Model
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id'], 'ILIKE', $term);
         });
+    }
+
+    public function questionType()
+    {
+        return $this->belongsTo(QuestionType::class, 'question_type_id', 'id');
     }
 }

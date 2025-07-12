@@ -174,6 +174,10 @@ class AdminExamTimetableIndex extends Component
                     ->where('end_time', '>=', $now->copy()->subMinutes(5));
             });
 
+        if (!empty($userTimetableStatusDone)) {
+            $timetables->whereNotIn('id', $userTimetableStatusDone);
+        }
+
         return view('livewire.admin.exam.timetable.admin-exam-timetable-index', [
             'timetables' => $timetables->paginate($this->perPage),
         ])
