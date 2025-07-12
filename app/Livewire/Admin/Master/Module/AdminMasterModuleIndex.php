@@ -30,7 +30,7 @@ class AdminMasterModuleIndex extends Component
         $modules = Module::search($this->search)->select('id', 'question_type_id', 'name', 'duration', 'description', 'random_question')
             ->with([
                 'questionType:id,name'
-            ]);
+            ])->orderBy('order', 'asc');
         return view('livewire.admin.master.module.admin-master-module-index', [
             'modules' => $modules->paginate($this->perPage)
         ])->extends('layout.app')->section('content');

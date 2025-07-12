@@ -141,6 +141,42 @@
     color: var(--gray-900);
 }
 
+.text-green-100 {
+    color: var(--green-100);
+}
+
+.text-green-200 {
+    color: var(--green-200);
+}
+
+.text-green-300 {
+    color: var(--green-300);
+}
+
+.text-green-400 {
+    color: var(--green-400);
+}
+
+.text-green-500 {
+    color: var(--green-500);
+}
+
+.text-green-600 {
+    color: var(--green-600);
+}
+
+.text-green-700 {
+    color: var(--green-700);
+}
+
+.text-green-800 {
+    color: var(--green-800);
+}
+
+.text-green-900 {
+    color: var(--green-900);
+}
+
 /* Hover text color utilities */
 .hover\:text-yellow-100:hover {
     color: var(--yellow-100);
@@ -1192,6 +1228,9 @@ input[type="number"] {
     .md\:col-span-3 {
         grid-column: span 3 / span 3;
     }
+    .md\:col-span-4 {
+        grid-column: span 4 / span 4;
+    }
 }
 
 button {
@@ -1212,6 +1251,10 @@ button {
 
 .grid-cols-4 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .border-end {

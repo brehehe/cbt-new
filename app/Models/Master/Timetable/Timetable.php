@@ -25,9 +25,9 @@ class Timetable extends Model
         return $this->belongsTo(Module::class, 'module_id', 'id');
     }
 
-    public function userTimetable()
+    public function userTimetables()
     {
-        return $this->hasOne(UserTimetable::class, 'timetable_id', 'id');
+        return $this->hasMany(UserTimetable::class, 'timetable_id', 'id');
     }
 
     protected $casts = [

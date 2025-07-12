@@ -3,8 +3,10 @@
 namespace App\Livewire\Admin\Exam\Timetable;
 
 use App\Helpers\AlertHelper;
+use App\Models\Master\Question\ModuleQuestion;
 use App\Models\Master\Timetable\Timetable;
 use App\Models\User;
+use App\Models\User\UserModuleQuestion;
 use App\Models\User\UserTimetable;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -67,17 +69,24 @@ class AdminExamTimetableIndex extends Component
                 ->find($this->data_id);
 
             if (!$timeTable) {
-                AlertHelper::error('Gagal', 'Token Ujian Tidak Ditemukan');
+                AlertHelper::error('Gagal', 'Token Yang Dimasukkan Tidak Sesuai');
                 return;
             }
 
-            $userTimetable = UserTimetable::create([
+            $modulesQuestions = $timeTable->module->random_question ? ModuleQuestion::withoutGlobalScope('user_scope')->select('id')->where('module_id', $timeTable->module->id)->inRandomOrder()->get() : ModuleQuestion::withoutGlobalScope('user_scope')->select('id')->where('module_id', $timeTable->module->id)->orderBy('order', 'asc')->get();
+
+            $UserTimetable = UserTimetable::create([
                 'user_id' => Auth::id(),
                 'timetable_id' => $timeTable->id,
                 'start_process' => Carbon::now(),
             ]);
 
-            Session::put('user_timetable_id', $userTimetable->id);
+            foreach ($modulesQuestions as $moduleQuestion) {
+                UserModuleQuestion::create([
+                    'user_timetable_id' => $UserTimetable->id,
+                    'module_question_id' => $moduleQuestion->id,
+                ]);
+            }
 
             DB::commit();
             session()->flash('saved', [
@@ -87,7 +96,7 @@ class AdminExamTimetableIndex extends Component
             return redirect()->route('admin.exam.warning');
         } catch (\Throwable $th) {
             DB::rollback();
-            AlertHelper::error('Gagal', $th->getMessage());
+            AlertHelper::error('Gagal' . $th->getMessage());
             return Log::error($th->getMessage());
         }
     }

@@ -7,6 +7,7 @@ namespace Database\Seeders;
 use Database\Seeders\Company\CompanySeeder;
 use Database\Seeders\Country\CountrySeeder;
 use Database\Seeders\Master\Question\QuestionTypeSeeder;
+use Database\Seeders\Question\QuestionSeeder;
 use Database\Seeders\Service\ServiceMonthSeeder;
 use Database\Seeders\Service\ServiceSeeder;
 use Illuminate\Database\Seeder;
@@ -25,14 +26,17 @@ class DatabaseSeeder extends Seeder
             ServiceSeeder::class,
             ServiceMonthSeeder::class,
 
-            //Master
-            QuestionTypeSeeder::class,
-
             // Region
             CountrySeeder::class,
 
             // Company
             CompanySeeder::class,
+
+            //Master
+            QuestionTypeSeeder::class,
+
+            // Question
+            QuestionSeeder::class,
         ]);
     }
 }

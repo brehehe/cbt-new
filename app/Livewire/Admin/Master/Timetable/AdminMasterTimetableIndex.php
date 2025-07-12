@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-
+use Session;
 
 class AdminMasterTimetableIndex extends Component
 {
@@ -32,6 +32,7 @@ class AdminMasterTimetableIndex extends Component
 
     public function mount()
     {
+        Session::forget('timetable_id');
         $this->modules = Module::select('id', 'name')->get()->pluck('name', 'id')->toArray();
         $this->getSupervisors = User::companyRole('Pengawas', Auth::user()->company_id)->select('name', 'id')->get()->pluck('name', 'id')->toArray();
     }
@@ -70,7 +71,7 @@ class AdminMasterTimetableIndex extends Component
 
     public function confirmGenerateToken($id)
     {
-        return AlertHelper::confirmSave('generateToken', 'Apakah Anda Yakin Membuat Token?', $id);
+        return AlertHelper::confirmWarning('generateToken', 'Apakah Anda Yakin Membuat Token?', $id);
     }
 
     public function generateToken($id)
@@ -149,6 +150,11 @@ class AdminMasterTimetableIndex extends Component
             AlertHelper::error('Gagal', 'Data gagal disimpan!');
             return Log::info('Gagal Menyimpan Data Jadwal : ' . $th);
         }
+    }
+
+    public function confirmDetail($id)
+    {
+        return redirect()->route('admin.master.timetable.detail', ['timetable_id' => $id]);
     }
 
     public function render()

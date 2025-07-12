@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Models\Master\Question;
+namespace App\Models\User;
 
 use App\Models\Company\Company;
+use App\Models\Master\Question\Answer;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Master\Question\ModuleQuestion;
 
-class QuestionType extends Model
+class UserModuleQuestion extends Model
 {
     //
     use SoftDeletes, HasUuids;
@@ -38,7 +39,7 @@ class QuestionType extends Model
         static::creating(function ($modelCreate) {
             $lastOrder = static::max('order');
             $modelCreate->order = $lastOrder ? $lastOrder + 1 : 1;
-            // $modelCreate->company_id = $modelCreate->company_id ?? auth()->user()->company_id;
+            $modelCreate->company_id = $modelCreate->company_id ?? auth()->user()->company_id;
         });
     }
 
@@ -47,27 +48,17 @@ class QuestionType extends Model
         $term = '%' . $term . '%';
 
         $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id', 'name', 'description'], 'ILIKE', $term);
+            $query->whereAny(['company_id'], 'ILIKE', $term);
         });
     }
 
-    /**
-     * Get all of the modules for the QuestionType
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function modules(): HasMany
+    public function moduleQuestion()
     {
-        return $this->hasMany(Module::class, 'question_type_id', 'id');
+        return $this->belongsTo(ModuleQuestion::class, 'module_question_id', 'id');
     }
 
-    /**
-     * Get all of the questions for the Topic
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function questions(): HasMany
+    public function answer()
     {
-        return $this->hasMany(Question::class, 'topic_id', 'id');
+        return $this->belongsTo(Answer::class, 'answer_id', 'id');
     }
 }

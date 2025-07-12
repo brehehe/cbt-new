@@ -11,14 +11,18 @@
                     <h2 class="mb-2 font-semibold text-blue-800">Informasi Ujian</h2>
                     <div class="grid grid-cols-2 gap-4 text-sm text-blue-700">
                         <div>
-                            <p><span class="font-medium">Mata Kuliah:</span> Matematika Dasar</p>
-                            <p><span class="font-medium">Durasi:</span> 90 Menit</p>
-                            <p><span class="font-medium">Jumlah Soal:</span> 40 Soal</p>
+                            <p><span class="font-medium">Modul:</span>
+                                {{ $userTimetable->timetable->module->name ?? '-' }}</p>
+                            <p><span class="font-medium">Durasi:</span>
+                                {{ $userTimetable->timetable->module->duration }} Menit</p>
                         </div>
                         <div>
-                            <p><span class="font-medium">Jenis Ujian:</span> UTS</p>
-                            <p><span class="font-medium">Semester:</span> Ganjil 2024/2025</p>
-                            <p><span class="font-medium">Dosen:</span> Dr. Jane Doe</p>
+                            <p><span class="font-medium">Jumlah Soal:</span> 40 Soal</p>
+                            <p><span class="font-medium">Jenis Ujian:</span>
+                                {{ $userTimetable->timetable->module->questionType->name ?? '-' }}
+                            </p>
+                            {{-- <p><span class="font-medium">Semester:</span> Ganjil 2024/2025</p>
+                            <p><span class="font-medium">Dosen:</span> Dr. Jane Doe</p> --}}
                         </div>
                     </div>
                 </div>
@@ -26,38 +30,31 @@
                 <div class="space-y-4">
                     <h2 class="font-semibold text-gray-900">Peraturan yang harus dipatuhi:</h2>
                     <ul class="space-y-3 text-gray-600">
-                        <li class="flex items-start">
-                            <svg class="flex-shrink-0 w-5 h-5 mr-2 text-red-500" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
-                            <span>Dilarang keras membuka tab/aplikasi lain selama ujian berlangsung</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="flex-shrink-0 w-5 h-5 mr-2 text-red-500" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
-                            <span>Dilarang mengambil screenshot atau merekam layar</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="flex-shrink-0 w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M5 13l4 4L19 7" />
-                            </svg>
-                            <span>Kamera harus menyala dan wajah harus terlihat selama ujian</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="flex-shrink-0 w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M5 13l4 4L19 7" />
-                            </svg>
-                            <span>Pastikan koneksi internet stabil sebelum memulai ujian</span>
-                        </li>
+                        @forelse ($regulations as $regulation)
+                            <li class="flex items-start">
+                                <i
+                                    class="{{ $regulation['type'] == 'licensing' ? 'fa-solid fa-circle-check text-green-500' : 'fa-solid fa-triangle-exclamation text-red-500' }} w-5 h-5 mr-2 mt-1">
+                                </i>
+                                <span>{{ $regulation['description'] }}</span>
+                            </li>
+                        @empty
+                            <li class="flex items-start">
+                                <i class="fa-solid fa-triangle-exclamation text-red-500 w-5 h-5 mr-2 mt-1"></i>
+                                <span>Dilarang keras membuka tab/aplikasi lain selama ujian berlangsung</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fa-solid fa-triangle-exclamation text-red-500 w-5 h-5 mr-2 mt-1"></i>
+                                <span>Dilarang mengambil screenshot atau merekam layar</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fa-solid fa-circle-check text-green-500 w-5 h-5 mr-2 mt-1"></i>
+                                <span>Kamera harus menyala dan wajah harus terlihat selama ujian</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fa-solid fa-circle-check text-green-500 w-5 h-5 mr-2 mt-1"></i>
+                                <span>Pastikan koneksi internet stabil sebelum memulai ujian</span>
+                            </li>
+                        @endforelse
                     </ul>
                 </div>
 

@@ -3,7 +3,7 @@
         <div class="flex justify-between h-16">
             <!-- Left Section: Logo & Sidebar Toggle -->
             <div class="flex items-center">
-                <img src="{{ asset('asset/img/LogoPROCBT.png') }}" alt="Mediction Logo" class="h-7 w-auto mr-2">
+                <img src="{{ asset('asset/img/LogoPROCBT-blue.png') }}" alt="Mediction Logo" class="h-7 w-auto mr-2">
                 <button id="toggleSidebar"
                     class="p-2 rounded-xl text-[#1E3A8A] hover:bg-[#C3D4EC]/20 transition-all duration-200 cursor-pointer">
                     <i class="fas fa-bars text-lg"></i>
@@ -11,7 +11,7 @@
             </div>
 
             <!-- Center Section: Company Info (Desktop Only) -->
-            <div class="hidden xl:flex items-center gap-4 flex-1 justify-center">
+            {{-- <div class="hidden xl:flex items-center gap-4 flex-1 justify-center">
                 <div
                     class="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
                     <div class="flex items-center gap-2">
@@ -57,14 +57,13 @@
                         @endif
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Right Section: Actions -->
             <div class="flex items-center gap-2 sm:gap-4">
                 <!-- Mobile Company Info Button -->
                 <div class="xl:hidden flex items-center">
-                    <div x-data="{ open: false }" class="relative"
-                        @mouseenter="if(window.innerWidth>=1280){ open = true }"
+                    <div x-data="{ open: false }" class="relative" {{-- @mouseenter="if(window.innerWidth>=1280){ open = true }" --}}
                         @mouseleave="if(window.innerWidth>=1280){ open = false }">
                         <button @click="open = !open"
                             class="p-2 rounded-xl text-[#1E3A8A] hover:bg-[#C3D4EC]/20 transition-all duration-200">
@@ -118,7 +117,7 @@
                 </div>
 
                 <!-- Notifications -->
-                <div x-data="{ open: false }" class="relative" @mouseenter="if(window.innerWidth>=1280){ open = true }"
+                <div x-data="{ open: false }" class="relative" {{-- @mouseenter="if(window.innerWidth>=1280){ open = true }" --}}
                     @mouseleave="if(window.innerWidth>=1280){ open = false }">
                     <button @click="open = !open"
                         class="p-2 rounded-xl text-gray-500 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A] transition-all duration-200 relative">
@@ -151,8 +150,7 @@
                 </div>
 
                 <!-- Profile Dropdown -->
-                <div x-data="{ open: false }" class="relative cursor-pointer"
-                    @mouseenter="if(window.innerWidth>=1280){ open = true }"
+                <div x-data="{ open: false }" class="relative cursor-pointer" {{-- @mouseenter="if(window.innerWidth>=1280){ open = true }" --}}
                     @mouseleave="if(window.innerWidth>=1280){ open = false }">
                     <button @click="open = !open"
                         class="flex items-center gap-2 sm:gap-3 p-2 rounded-xl hover:bg-[#C3D4EC]/20 transition-all duration-200">

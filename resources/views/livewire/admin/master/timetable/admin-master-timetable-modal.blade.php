@@ -10,7 +10,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M13 16h-1v-4h-1m1-4h.01M12 20.5C6.753 20.5 2.5 16.247 2.5 11S6.753 1.5 12 1.5 21.5 5.753 21.5 11 17.247 20.5 12 20.5z" />
                 </svg>
-                <h2 class="text-xl font-semibold text-gray-800">Modal Role</h2>
+                <h2 class="text-xl font-semibold text-gray-800">Modal Jadwal</h2>
             </div>
             <button wire:click="closeModal()"
                 class="text-gray-500 hover:text-red-500 transition-colors text-2xl leading-none cursor-pointer">
@@ -24,7 +24,7 @@
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700">Nama <span
                             class="text-red-600">*</span></label>
-                    <input type="text" id="name" wire:model.defer="name" placeholder="Masukkan"
+                    <input type="text" id="name" wire:model.defer="name" placeholder="Masukkan Nama"
                         class="mt-1 form-control">
                     @error('name')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
@@ -105,7 +105,7 @@
             </div> --}}
                 <div>
                     <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
-                    <textarea id="description" wire:model.defer="description" placeholder="Masukkan" class="mt-1 form-control"></textarea>
+                    <textarea id="description" wire:model.defer="description" placeholder="Masukkan Deskripsi" class="mt-1 form-control"></textarea>
                 </div>
             </div>
         </div>

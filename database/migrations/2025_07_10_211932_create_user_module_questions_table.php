@@ -11,15 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_timetables', function (Blueprint $table) {
+        Schema::create('user_module_questions', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('user_id');
-            $table->foreignUuid('timetable_id');
-            $table->dateTime('start_process');
-            $table->dateTime('start_exam')->nullable();
-            $table->dateTime('end_exam')->nullable();
-            $table->integer('mark')->default(0);
-            $table->enum('status', ['warning', 'exam', 'done'])->default('warning');
+            $table->foreignUuid('user_timetable_id');
+            $table->foreignUuid('timetable_id')->nullable();
+            $table->foreignUuid('module_question_id')->nullable();
+            $table->foreignUuid('answer_id')->nullable();
+            $table->boolean('is_mark')->default(false);
+            $table->enum('status', ['default', 'wrong', 'correct', 'unanswered'])->default('default');
             $table->foreignUuid('company_id')->nullable();
             $table->bigInteger('order')->default(0);
             $table->softDeletes();
@@ -32,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_timetables');
+        Schema::dropIfExists('user_module_questions');
     }
 };

@@ -3,6 +3,8 @@
 namespace App\Models\User;
 
 use App\Models\Company\Company;
+use App\Models\Master\Timetable\Timetable;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -18,6 +20,21 @@ class UserTimetable extends Model
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id', 'id');
+    }
+
+    public function timetable()
+    {
+        return $this->belongsTo(Timetable::class, 'timetable_id', 'id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function userModuleQuestions()
+    {
+        return $this->hasMany(UserModuleQuestion::class, 'user_timetable_id', 'id');
     }
 
     protected static function boot()
@@ -41,12 +58,33 @@ class UserTimetable extends Model
         });
     }
 
-    public function scopeSearch(Builder $query, $term): void
+    public function scopeSearch($query, $search)
     {
-        $term = '%'. $term .'%';
-
-        $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id'], 'ILIKE', $term);
+        return $query->where(function ($q) use ($search) {
+            $q->where('start_process', 'ilike', "%{$search}%")
+                ->orWhere('start_exam', 'ilike', "%{$search}%")
+                ->orWhere('end_exam', 'ilike', "%{$search}%")
+                ->orWhere('mark', 'ilike', "%{$search}%")
+                ->orWhere('status', 'ilike', "%{$search}%")
+                ->orWhereHas('user', function ($qd) use ($search) {
+                    $qd->where('name', 'ilike', "%{$search}%")
+                        ->orWhere('nim', 'ilike', "%{$search}%")
+                        ->orWhere('username', 'ilike', "%{$search}%")
+                        ->orWhere('email', 'ilike', "%{$search}%");
+                })
+                ->orWhereHas('timetable', function ($qd) use ($search) {
+                    $qd->where('name', 'ilike', "%{$search}%")
+                        ->orWhere('description', 'ilike', "%{$search}%")
+                        ->orWhere('start_time', 'ilike', "%{$search}%")
+                        ->orWhere('end_time', 'ilike', "%{$search}%")
+                        ->orWhereHas('module', function ($qd) use ($search) {
+                            $qd->where('name', 'ilike', "%{$search}%")
+                                ->orWhere('description', 'ilike', "%{$search}%");
+                        });
+                })
+                ->orWhereHas('company', function ($qd) use ($search) {
+                    $qd->where('name', 'ilike', "%{$search}%");
+                });
         });
     }
 }
