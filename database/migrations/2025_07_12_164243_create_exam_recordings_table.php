@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('exam_recordings', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->foreignUuid('timetable_id')->nullable();
             $table->foreignUuid('user_timetable_id');
             $table->string('video_path')->nullable();
             $table->integer('chunk_number')->default(1);

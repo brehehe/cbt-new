@@ -63,16 +63,7 @@ class Timetable extends Model
         static::creating(function ($modelCreate) {
             $lastOrder = static::max('order');
             $modelCreate->order = $lastOrder ? $lastOrder + 1 : 1;
-            // $modelCreate->company_id = $modelCreate->company_id ?? auth()->user()->company_id;
-        });
-    }
-
-    public function scopeSearch(Builder $query, $term): void
-    {
-        $term = '%'. $term .'%';
-
-        $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id', 'name', 'start_time', 'end_time', 'description'], 'ILIKE', $term);
+            $modelCreate->company_id = $modelCreate->company_id ?? auth()->user()->company_id;
         });
 
         static::saved(function ($model) {
@@ -129,6 +120,15 @@ class Timetable extends Model
                     }
                 }
             }
+        });
+    }
+
+    public function scopeSearch(Builder $query, $term): void
+    {
+        $term = '%' . $term . '%';
+
+        $query->where(function ($query) use ($term) {
+            $query->whereAny(['company_id', 'name', 'start_time', 'end_time', 'description'], 'ILIKE', $term);
         });
     }
 }

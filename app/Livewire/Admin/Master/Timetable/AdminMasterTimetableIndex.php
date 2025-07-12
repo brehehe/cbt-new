@@ -83,12 +83,12 @@ class AdminMasterTimetableIndex extends Component
             $codeAlphabet .= 'abcdefghijklmnopqrstuvwxyz';
             $codeAlphabet .= '0123456789';
             $max = strlen($codeAlphabet); // edited
-            for ($i = 0; $i < 5; $i++) {
+            for ($i = 0; $i < 10; $i++) {
                 $token .= $codeAlphabet[random_int(0, $max - 1)];
             }
 
             Timetable::where('id', $id[0])->update([
-                'code' => $token,
+                'code' => trim($token),
             ]);
             DB::commit();
         } catch (\Throwable $th) {
@@ -155,6 +155,16 @@ class AdminMasterTimetableIndex extends Component
     public function confirmDetail($id)
     {
         return redirect()->route('admin.master.timetable.detail', ['timetable_id' => $id]);
+    }
+
+    public function confirmVideo($id)
+    {
+        return redirect()->route('admin.master.timetable.video', ['timetable_id' => $id]);
+    }
+
+    public function confirmAlert($id)
+    {
+        return redirect()->route('admin.master.timetable.alert', ['timetable_id' => $id]);
     }
 
     public function render()

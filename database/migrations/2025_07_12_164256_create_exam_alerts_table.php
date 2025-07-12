@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('exam_alerts', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->foreignUuid('timetable_id')->nullable();
             $table->foreignUuid('user_timetable_id');
             $table->enum('alert_type', ['right_click', 'dev_tools', 'view_source', 'alt_tab', 'ctrl_tab', 'copy_paste', 'tab_switch', 'window_blur', 'fullscreen_exit', 'camera_error', 'page_reload']);
             $table->text('description');
