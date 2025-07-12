@@ -79,7 +79,12 @@
                 class="mt-1 form-control"></textarea>
         </div>
     </div>
-    <div class="grid grid-cols-4 gap-4 mb-4">
+    <div class="grid grid-cols-5 gap-4 mb-4">
+        <div>
+            <label for="total_soal" class="block text-sm font-medium text-gray-700">Total Soal</label>
+            <input disabled type="number" id="total_soal" value="{{ $user_timetable->userModuleQuestions->count() }}"
+                placeholder="Masukkan" class="mt-1 form-control">
+        </div>
         <div>
             <label for="terjawab" class="block text-sm font-medium text-gray-700">Terjawab</label>
             <input disabled type="number" id="terjawab"
@@ -104,7 +109,7 @@
                 value="{{ $user_timetable->userModuleQuestions->where('status', 'wrong')->count() }}"
                 placeholder="Masukkan" class="mt-1 form-control">
         </div>
-        <div class="md:col-span-4">
+        <div class="md:col-span-5">
             <label for="nilai" class="block text-sm font-medium text-gray-700">Nilai</label>
             <input disabled type="number" id="nilai" value="{{ $user_timetable->mark }}" placeholder="Masukkan"
                 class="mt-1 form-control">

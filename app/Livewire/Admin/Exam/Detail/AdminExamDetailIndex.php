@@ -45,6 +45,7 @@ class AdminExamDetailIndex extends Component
             ]);
 
             $this->isMark = $userModuleQuestion->is_mark;
+            $this->saveCurrentAnswer();
             $this->refreshQuestionData();
         });
     }
@@ -278,6 +279,7 @@ class AdminExamDetailIndex extends Component
     public function changeQuestionNavigation($id)
     {
         $this->questionNavigationId = $id;
+        $this->saveCurrentAnswer();
         $this->updateCurrentQuestionMark();
         $this->updatePercentage();
     }
@@ -296,6 +298,8 @@ class AdminExamDetailIndex extends Component
 
     public function finishExam()
     {
+        $this->saveCurrentAnswer();
+
         $userTimetable = UserTimetable::whereIn('status', ['exam', 'warning'])
             ->where('user_id', Auth::id())
             ->first();
