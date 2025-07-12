@@ -281,8 +281,8 @@ class AdminExamDetailIndex extends Component
 
     public function changeQuestionNavigation($id)
     {
-        $this->questionNavigationId = $id;
         $this->saveCurrentAnswer();
+        $this->questionNavigationId = $id;
         $this->updateCurrentQuestionMark();
         $this->updatePercentage();
     }
