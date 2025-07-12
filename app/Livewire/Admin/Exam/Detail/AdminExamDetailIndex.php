@@ -38,6 +38,7 @@ class AdminExamDetailIndex extends Component
     public function updateMark()
     {
         DB::transaction(function () {
+            $this->saveCurrentAnswer();
             $userModuleQuestion = UserModuleQuestion::findOrFail($this->questionNavigationId);
 
             $userModuleQuestion->update([
@@ -45,7 +46,6 @@ class AdminExamDetailIndex extends Component
             ]);
 
             $this->isMark = $userModuleQuestion->is_mark;
-            $this->saveCurrentAnswer();
             $this->refreshQuestionData();
         });
     }
