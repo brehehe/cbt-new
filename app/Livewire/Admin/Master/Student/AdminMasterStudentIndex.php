@@ -2,7 +2,10 @@
 
 namespace App\Livewire\Admin\Master\Student;
 
+use App\Helpers\AlertHelper;
+use App\Helpers\RoleHelper;
 use App\Models\User;
+use App\Models\User\UserDetail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Crypt;
@@ -10,6 +13,8 @@ use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
+use Log;
+use Hash;
 
 class AdminMasterStudentIndex extends Component
 {
@@ -125,7 +130,7 @@ class AdminMasterStudentIndex extends Component
             'phone' => [
                 'required',
                 'string',
-                'max:20',
+                'max:15',
                 Rule::unique('users', 'phone')
                     ->where('type_user', 'employee')
                     ->where('company_id', $currentCompanyId)
@@ -155,6 +160,7 @@ class AdminMasterStudentIndex extends Component
 
             // Assign role (hanya untuk karyawan)
             $this->assignUserRole($user, $currentCompanyId);
+
 
             // Commit transaction jika semua berhasil
             DB::commit();
@@ -189,7 +195,7 @@ class AdminMasterStudentIndex extends Component
             ]);
 
             // Show user-friendly error message
-            if (app()->environment('local')) {
+            if (in_array(app()->environment(), ['local', 'development'])) {
                 $errorMessage .= ' Error: ' . $e->getMessage();
             }
 

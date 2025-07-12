@@ -358,6 +358,8 @@ class AdminMasterUserIndex extends Component
             'type' => $this->role_name == 'Dokter' ? 'required|in:in,out' : 'nullable',
         ]);
 
+        
+
         try {
             DB::beginTransaction();
 

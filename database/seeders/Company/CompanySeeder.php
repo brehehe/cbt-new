@@ -36,7 +36,7 @@ class CompanySeeder extends Seeder
         $roles = [
             ['name' => 'Admin'],
             ['name' => 'Dosen'],
-            ['name' => 'Siswa'],
+            ['name' => 'Mahasiswa'],
             ['name' => 'Pengawas'],
             ['name' => 'Anonymous'], // Tanpa company_id
             // ['name' => 'Sales'],

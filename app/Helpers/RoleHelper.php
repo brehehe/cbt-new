@@ -8,7 +8,8 @@ use App\Models\User\UserCompanyRole;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
-class RoleHelper {
+class RoleHelper
+{
 
     public static function assignRoleToUserInCompany($user, $roleName, $companyId, $medicalRecordNumber = null, $is_head = null, $is_active = null)
     {
@@ -20,8 +21,8 @@ class RoleHelper {
 
         // Cari mapping role_company sesuai role_id dan company_id
         $roleCompany = RoleCompany::where('role_id', $role->uuid)
-                                  ->where('company_id', $companyId)
-                                  ->firstOrFail();
+            ->where('company_id', $companyId)
+            ->firstOrFail();
 
         // Cek apakah user sudah punya role di company ini
         $userCompanyRole = UserCompanyRole::where('user_id', $user->id)
@@ -59,8 +60,8 @@ class RoleHelper {
 
         // Cari mapping role_company
         $roleCompany = RoleCompany::where('role_id', $role->uuid)
-                                  ->where('company_id', $companyId)
-                                  ->first();
+            ->where('company_id', $companyId)
+            ->first();
 
         if (!$roleCompany) {
             return false;

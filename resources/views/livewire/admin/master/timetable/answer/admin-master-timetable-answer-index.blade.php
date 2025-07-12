@@ -68,13 +68,13 @@
         <div>
             <label for="terjawab" class="block text-sm font-medium text-gray-700">Terjawab</label>
             <input disabled type="number" id="terjawab"
-                value="{{ $user_timetable->userModuleQuestions->whereNotNull('answer_id')->count() }}"
+                value="{{ $user_timetable->userModuleQuestions->whereNotNull('timetable_answer_id')->count() }}"
                 placeholder="Masukkan" class="mt-1 form-control">
         </div>
         <div>
             <label for="tidak_terjawab" class="block text-sm font-medium text-gray-700">Tidak Terjawab</label>
             <input disabled type="number" id="tidak_terjawab"
-                value="{{ $user_timetable->userModuleQuestions->whereNull('answer_id')->count() }}"
+                value="{{ $user_timetable->userModuleQuestions->whereNull('timetable_answer_id')->count() }}"
                 placeholder="Masukkan" class="mt-1 form-control">
         </div>
         <div>
@@ -134,13 +134,13 @@
                     @forelse ($userModuleQuestions as $index => $userModuleQuestion)
                         @php
                             // 1) Koleksi semua pilihan jawaban untuk soal ini
-                            $answers = $userModuleQuestion->moduleQuestion?->question?->answers ?? collect();
+                            $answers = $userModuleQuestion->timetableQuestion?->answers ?? collect();
 
                             // 2) Jawaban BENAR
                             $correctAnswer = $answers->firstWhere('is_correct', true);
 
                             // 3) Jawaban yang dipilih user (relasi answer: belongsTo/hasOne)
-                            $chosenAnswer = $userModuleQuestion->answer; // <- bisa null
+                            $chosenAnswer = $userModuleQuestion->timetableAnswer; // <- bisa null
 
                             // 4) Posisi jawaban benar di koleksi (0‑based)
                             $posCorrect = $answers->search(fn($a) => $a->is_correct);
@@ -157,7 +157,7 @@
                             <td class="center">{{ $userModuleQuestions->firstItem() + $index }}</td>
 
                             {{-- Pertanyaan --}}
-                            <td>{{ optional($userModuleQuestion->moduleQuestion?->question)->question ?? '-' }}</td>
+                            <td>{{ optional($userModuleQuestion->timetableQuestion)->question ?? '-' }}</td>
 
                             {{-- Jawaban benar --}}
                             <td>
@@ -168,7 +168,7 @@
                             {{-- Jawaban yang dipilih user --}}
                             <td>
                                 {{ $letter($labelChosen) }}.
-                                {{ optional($chosenAnswer)->context ?? '-' }}
+                                {{ optional($chosenAnswer)->timetable_answer->context ?? '-' }}
                             </td>
                             <td>
                                 @if ($userModuleQuestion->status === 'correct')
