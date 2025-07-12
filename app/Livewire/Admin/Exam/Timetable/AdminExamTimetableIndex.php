@@ -14,7 +14,7 @@ use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Session;
 
 class AdminExamTimetableIndex extends Component
@@ -144,7 +144,7 @@ class AdminExamTimetableIndex extends Component
 
     public function render()
     {
-        // dd(Auth::id());
+        // dd(Auth::user()->company);
 
         $userTimetableStatusDone = UserTimetable::query()
             ->where('user_id', Auth::id())

@@ -203,8 +203,7 @@ class AuthLoginIndex extends Component
             ->where(function ($query) use ($identifier) {
                 $query->where('username', $identifier)
                     ->orWhere('email', $identifier)
-                    ->orWhere('phone', $identifier)
-                    ->orWhere('nim', $identifier);
+                    ->orWhere('phone', $identifier);
             })->get();
 
         // Filter users yang punya akses ke company ini
@@ -298,8 +297,6 @@ class AuthLoginIndex extends Component
             return 'username';
         } elseif ($user->phone === $identifier) {
             return 'phone';
-        } elseif ($user->nim === $identifier) {
-            return 'nim';
         }
 
         return 'unknown';
@@ -312,9 +309,6 @@ class AuthLoginIndex extends Component
     {
         switch ($loginMethod) {
             case 'email':
-                return 'email';
-            case 'nim':
-                return 'nim';
             case 'alternative_email':
                 return 'email';
             case 'username':
@@ -335,8 +329,6 @@ class AuthLoginIndex extends Component
         switch ($loginMethod) {
             case 'email':
                 return $user->email;
-            case 'nim':
-                return $user->nim;
             case 'username':
                 return $user->username;
             case 'phone':

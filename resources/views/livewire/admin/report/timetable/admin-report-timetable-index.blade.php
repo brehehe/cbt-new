@@ -58,15 +58,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($timetables as $index => $timetable)
+                    @forelse ($timetables as $index => $result)
                         <tr>
                             <td class="center">{{ $timetables->firstItem() + $index }}</td>
-                            <td>{{ $timetable->name ?? '-' }}</td>
-                            <td>{{ $timetable->module->name ?? '-' }}</td>
-                            <td>{{ $timetable->start_time?->format('d F Y H:i') }}</td>
-                            <td>{{ $timetable->end_time?->format('d F Y H:i') }}</td>
+                            <td>{{ $result?->name ?? '-' }}</td>
+                            <td>{{ $result?->module->name ?? '-' }}</td>
+                            <td>{{ $result?->start_time?->format('d F Y H:i') }}</td>
+                            <td>{{ $result?->end_time?->format('d F Y H:i') }}</td>
                             <td class="center">
-                                <a href="#" class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors delete-btn" data-bs-toggle="tooltip" title="Lihat data detail"><i class="fa-solid fa-eye"></i></a>
+                                <a href="{{ route('admin.report.timetable-detail', $result?->id) }}" class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors delete-btn" data-bs-toggle="tooltip" title="Lihat data detail"><i class="fa-solid fa-eye"></i></a>
                             </td>
                         </tr>
                     @empty
