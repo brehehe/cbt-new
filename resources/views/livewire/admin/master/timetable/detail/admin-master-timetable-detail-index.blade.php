@@ -63,8 +63,8 @@
         <div>
             <label for="start_time" class="block text-sm font-medium text-gray-700">Waktu Mulai <span
                     class="text-red-600">*</span></label>
-            <input disabled type="datetime-local" id="start_time" value="{{ $timetable['start_time'] }}"
-                placeholder="Masukkan" class="mt-1 form-control">
+            <input disabled type="text" id="start_time" wire:model.defer="start_time" placeholder="Masukkan"
+                class="mt-1 form-control">
             @error('start_time')
                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
             @enderror
@@ -72,8 +72,8 @@
         <div>
             <label for="end_time" class="block text-sm font-medium text-gray-700">Waktu Selesai <span
                     class="text-red-600">*</span></label>
-            <input disabled type="datetime-local" id="end_time" value="{{ $timetable['end_time'] }}"
-                placeholder="Masukkan" class="mt-1 form-control">
+            <input disabled type="text" id="end_time" wire:model.defer="end_time" placeholder="Masukkan"
+                class="mt-1 form-control">
             @error('end_time')
                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
             @enderror

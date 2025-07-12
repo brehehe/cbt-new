@@ -3,6 +3,7 @@
 namespace App\Models\Exam;
 
 use App\Models\Company\Company;
+use App\Models\Master\Timetable\Timetable;
 use App\Models\User;
 use App\Models\User\UserTimetable;
 use Illuminate\Database\Eloquent\Builder;
@@ -60,5 +61,10 @@ class ExamRecording extends Model
     public function userTimetable()
     {
         return $this->belongsTo(UserTimetable::class);
+    }
+
+    public function timetable()
+    {
+        return $this->belongsTo(Timetable::class);
     }
 }

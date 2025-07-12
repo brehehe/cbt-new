@@ -7,13 +7,16 @@ use App\Models\Master\Timetable\Timetable;
 use App\Models\User;
 use Auth;
 use Livewire\Component;
+use Livewire\WithPagination;
+use Carbon\Carbon;
 
 class AdminMasterTimetableAnswerIndex extends Component
 {
-    use \Livewire\WithPagination;
+    use WithPagination;
     public $user_timetable_id, $timetable_id, $timetable, $user_timetable;
     public $search = '', $perPage = 5;
     public $modules = [], $supervisors = [], $getSupervisors = [], $module_id;
+    public $start_time, $end_time;
 
     public function hydrate()
     {
@@ -37,6 +40,8 @@ class AdminMasterTimetableAnswerIndex extends Component
             return redirect()->route('admin.master.timetable.detail', ['timetable_id' => $this->timetable_id]);
         }
 
+        $this->start_time = Carbon::parse($timetable->start_time)->format('d/m/Y H:i');
+        $this->end_time = Carbon::parse($timetable->end_time)->format('d/m/Y H:i');
         $this->modules = Module::select('id', 'name')->get()->pluck('name', 'id')->toArray();
         $this->getSupervisors = User::companyRole('Pengawas', Auth::user()->company_id)->select('name', 'id')->get()->pluck('name', 'id')->toArray();
 
