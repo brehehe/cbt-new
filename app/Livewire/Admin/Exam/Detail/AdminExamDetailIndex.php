@@ -233,6 +233,7 @@ class AdminExamDetailIndex extends Component
                 'is_mark' => $this->isMark,
             ]);
 
+        $this->reset('answer_id');
         $this->refreshQuestionData();
     }
 
