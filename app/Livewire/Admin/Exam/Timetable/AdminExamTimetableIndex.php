@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Exam\Timetable;
 use App\Helpers\AlertHelper;
 use App\Models\Master\Question\ModuleQuestion;
 use App\Models\Master\Timetable\Timetable;
+use App\Models\Timetable\TimetableQuestion;
 use App\Models\User;
 use App\Models\User\UserModuleQuestion;
 use App\Models\User\UserTimetable;
@@ -69,11 +70,23 @@ class AdminExamTimetableIndex extends Component
                 ->find($this->data_id);
 
             if (!$timeTable) {
-                AlertHelper::error('Gagal', 'Token Yang Dimasukkan Tidak Sesuai');
+                AlertHelper::error('Gagal', 'Token Yang Dimasukan Tidak Sesuai');
                 return;
             }
 
-            $modulesQuestions = $timeTable->module->random_question ? ModuleQuestion::withoutGlobalScope('user_scope')->select('id')->where('module_id', $timeTable->module->id)->inRandomOrder()->get() : ModuleQuestion::withoutGlobalScope('user_scope')->select('id')->where('module_id', $timeTable->module->id)->orderBy('order', 'asc')->get();
+            $transactionModule = $timeTable->timetableModule;
+
+            $modulesQuestions = $transactionModule->random_question ?
+                TimetableQuestion::withoutGlobalScope('user_scope')
+                ->select('id')
+                ->where('timetable_module_id', $transactionModule->id)
+                ->inRandomOrder()
+                ->get() :
+                TimetableQuestion::withoutGlobalScope('user_scope')
+                ->select('id')
+                ->where('timetable_module_id', $transactionModule->id)
+                ->inRandomOrder()
+                ->get();
 
             $UserTimetable = UserTimetable::create([
                 'user_id' => Auth::id(),
@@ -83,9 +96,9 @@ class AdminExamTimetableIndex extends Component
 
             foreach ($modulesQuestions as $moduleQuestion) {
                 UserModuleQuestion::create([
-                    'timetable_id' => $timeTable->id,
                     'user_timetable_id' => $UserTimetable->id,
-                    'module_question_id' => $moduleQuestion->id,
+                    'timetable_module_id' => $transactionModule->id,
+                    'timetable_question_id' => $moduleQuestion->id,
                 ]);
             }
 

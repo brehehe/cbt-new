@@ -1,20 +1,16 @@
 <?php
 
-namespace App\Models\User;
+namespace App\Models\Timetable;
 
 use App\Models\Company\Company;
-use App\Models\Master\Question\Answer;
+use App\Models\Master\Timetable\Timetable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Master\Question\ModuleQuestion;
-use App\Models\Timetable\TimetableAnswer;
-use App\Models\Timetable\TimetableModule;
-use App\Models\Timetable\TimetableQuestion;
 
-class UserModuleQuestion extends Model
+class TimetableModule extends Model
 {
     //
     use SoftDeletes, HasUuids;
@@ -23,6 +19,21 @@ class UserModuleQuestion extends Model
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id', 'id');
+    }
+
+    public function timetable()
+    {
+        return $this->belongsTo(Timetable::class, 'timetable_id', 'id');
+    }
+
+    public function answers()
+    {
+        return $this->hasMany(TimetableAnswer::class, 'timetable_module_id', 'id');
+    }
+
+    public function questions()
+    {
+        return $this->hasMany(TimetableQuestion::class, 'timetable_module_id', 'id');
     }
 
     protected static function boot()
@@ -53,30 +64,5 @@ class UserModuleQuestion extends Model
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id'], 'ILIKE', $term);
         });
-    }
-
-    public function moduleQuestion()
-    {
-        return $this->belongsTo(ModuleQuestion::class, 'module_question_id', 'id');
-    }
-
-    public function answer()
-    {
-        return $this->belongsTo(Answer::class, 'answer_id', 'id');
-    }
-
-    public function timetableModule()
-    {
-        return $this->belongsTo(TimetableModule::class, 'timetable_module_id', 'id');
-    }
-
-    public function timetableQuestion()
-    {
-        return $this->belongsTo(TimetableQuestion::class, 'timetable_question_id', 'id');
-    }
-
-    public function timetableAnswer()
-    {
-        return $this->belongsTo(TimetableAnswer::class, 'timetable_answer_id', 'id');
     }
 }

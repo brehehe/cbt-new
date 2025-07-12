@@ -133,25 +133,26 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($userTimetables as $index => $userTimetable)
+                    @forelse ($userModuleQuestions as $index => $userModuleQuestion)
                         <tr>
-                            <td class="center">{{ $userTimetables->firstItem() + $index }}</td>
-                            <td>{{ $userTimetable->user->nim ?? ($userTimetable->user->username ?? '-') }}</td>
-                            <td>{{ $userTimetable->user->name ?? '-' }}</td>
-                            <td>{{ $userTimetable->userModuleQuestions->whereNotNull('answer_id')->count() }}</td>
-                            <td>{{ $userTimetable->userModuleQuestions->whereNull('answer_id')->count() }}</td>
+                            <td class="center">{{ $userModuleQuestions->firstItem() + $index }}</td>
+                            <td>{{ $userModuleQuestion->user->nim ?? ($userModuleQuestion->user->username ?? '-') }}
+                            </td>
+                            <td>{{ $userModuleQuestion->user->name ?? '-' }}</td>
+                            <td>{{ $userModuleQuestion->userModuleQuestions->whereNotNull('answer_id')->count() }}</td>
+                            <td>{{ $userModuleQuestion->userModuleQuestions->whereNull('answer_id')->count() }}</td>
                             <td><span
-                                    class="px-2 py-1 rounded bg-green-100 text-green-700 font-semibold">{{ $userTimetable->userModuleQuestions->where('status', 'correct')->count() }}</span>
+                                    class="px-2 py-1 rounded bg-green-100 text-green-700 font-semibold">{{ $userModuleQuestion->userModuleQuestions->where('status', 'correct')->count() }}</span>
                             </td>
                             <td><span
-                                    class="px-2 py-1 rounded bg-red-100 text-red-700 font-semibold">{{ $userTimetable->userModuleQuestions->where('status', 'wrong')->count() }}</span>
+                                    class="px-2 py-1 rounded bg-red-100 text-red-700 font-semibold">{{ $userModuleQuestion->userModuleQuestions->where('status', 'wrong')->count() }}</span>
                             </td>
-                            <td>{{ $userTimetable->mark }}</td>
+                            <td>{{ $userModuleQuestion->mark }}</td>
                             <td class="center">
                                 <div class="flex items-center">
                                     <button
                                         class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors delete-btn"
-                                        wire:click="confirmDetail('{{ $userTimetable->id }}')">
+                                        wire:click="confirmDetail('{{ $userModuleQuestion->id }}')">
                                         <i class="fa-solid fa-eye"></i>
                                     </button>
                                 </div>
@@ -170,13 +171,13 @@
         <div class="px-5 py-4 bg-gray-50/80 border-t border-gray-200">
             <div class="flex items-center justify-between">
                 <div class="text-sm text-gray-700">
-                    Menampilkan <span class="font-medium">{{ $userTimetables->firstItem() }}</span> sampai <span
-                        class="font-medium">{{ $userTimetables->lastItem() }}</span> dari <span
-                        class="font-medium">{{ $userTimetables->total() }}</span> hasil
+                    Menampilkan <span class="font-medium">{{ $userModuleQuestions->firstItem() }}</span> sampai <span
+                        class="font-medium">{{ $userModuleQuestions->lastItem() }}</span> dari <span
+                        class="font-medium">{{ $userModuleQuestions->total() }}</span> hasil
                 </div>
                 <div>
                     <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        {{ $userTimetables->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
+                        {{ $userModuleQuestions->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
                     </nav>
                 </div>
             </div>
