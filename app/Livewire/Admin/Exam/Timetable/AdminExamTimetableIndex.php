@@ -144,22 +144,6 @@ class AdminExamTimetableIndex extends Component
 
     public function render()
     {
-        // dd(Auth::id());
-
-        $userTimetableStatusDone = UserTimetable::query()
-            ->where('user_id', Auth::id())
-            ->where('status', 'done')
-            ->get()
-            ->pluck('timetable_id')
-            ->toArray();
-
-        $userTimetableStatus = UserTimetable::query()
-            ->where('user_id', Auth::id())
-            ->whereNotIn('status', ['done'])
-            ->get()
-            ->pluck('timetable_id')
-            ->toArray();
-
         $timetables = Timetable::query()
             ->when($this->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
@@ -172,14 +156,6 @@ class AdminExamTimetableIndex extends Component
                 $query->where('start_time', '<=', $now->copy()->addMinutes(5))
                     ->where('end_time', '>=', $now->copy()->subMinutes(5));
             });
-
-        if (!empty($userTimetableStatusDone)) {
-            $timetables->whereNotIn('id', $userTimetableStatusDone);
-        }
-
-        if (!empty($userTimetableStatus)) {
-            $timetables->whereIn('id', $userTimetableStatus);
-        }
 
         return view('livewire.admin.exam.timetable.admin-exam-timetable-index', [
             'timetables' => $timetables->paginate($this->perPage),
