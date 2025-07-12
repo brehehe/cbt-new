@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('user_module_questions', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('user_timetable_id');
+            $table->foreignUuid('timetable_id')->nullable();
             $table->foreignUuid('module_question_id')->nullable();
             $table->foreignUuid('answer_id')->nullable();
-            $table->enum('status', ['answer', 'mark', 'not'])->default('not');
+            $table->boolean('is_mark')->default(false);
+            $table->enum('status', ['default', 'wrong', 'correct', 'unanswered'])->default('default');
             $table->foreignUuid('company_id')->nullable();
             $table->bigInteger('order')->default(0);
             $table->softDeletes();

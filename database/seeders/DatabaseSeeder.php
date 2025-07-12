@@ -26,14 +26,14 @@ class DatabaseSeeder extends Seeder
             ServiceSeeder::class,
             ServiceMonthSeeder::class,
 
-            //Master
-            QuestionTypeSeeder::class,
-
             // Region
             CountrySeeder::class,
 
             // Company
             CompanySeeder::class,
+
+            //Master
+            QuestionTypeSeeder::class,
 
             // Question
             QuestionSeeder::class,

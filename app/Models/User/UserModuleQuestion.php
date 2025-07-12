@@ -3,11 +3,13 @@
 namespace App\Models\User;
 
 use App\Models\Company\Company;
+use App\Models\Master\Question\Answer;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Master\Question\ModuleQuestion;
 
 class UserModuleQuestion extends Model
 {
@@ -43,10 +45,20 @@ class UserModuleQuestion extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
-        $term = '%'. $term .'%';
+        $term = '%' . $term . '%';
 
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id'], 'ILIKE', $term);
         });
+    }
+
+    public function moduleQuestion()
+    {
+        return $this->belongsTo(ModuleQuestion::class, 'module_question_id', 'id');
+    }
+
+    public function answer()
+    {
+        return $this->belongsTo(Answer::class, 'answer_id', 'id');
     }
 }

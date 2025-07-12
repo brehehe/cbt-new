@@ -75,11 +75,11 @@
                     <div>
                         <a href="{{ $master['url'] }}"
                             class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
-            {{ Request::is(ltrim($master['url'], '/')) ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }}">
+            {{ Request::is(ltrim($master['url'] . '*', '/')) ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }}">
                             <div class="flex items-center gap-3">
                                 <i
                                     class="fa-solid {{ $master['icon'] }} text-lg mr-2
-                {{ Request::is(ltrim($master['url'], '/')) ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}">
+                {{ Request::is(ltrim($master['url'] . '*', '/')) ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}">
                                 </i>
                                 <span class="sidebar-text">{{ $master['label'] }}</span>
                             </div>

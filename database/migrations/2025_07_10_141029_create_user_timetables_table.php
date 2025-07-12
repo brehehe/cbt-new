@@ -18,6 +18,7 @@ return new class extends Migration
             $table->dateTime('start_process');
             $table->dateTime('start_exam')->nullable();
             $table->dateTime('end_exam')->nullable();
+            $table->integer('mark')->default(0);
             $table->enum('status', ['warning', 'exam', 'done'])->default('warning');
             $table->foreignUuid('company_id')->nullable();
             $table->bigInteger('order')->default(0);

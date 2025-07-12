@@ -20,7 +20,7 @@
                 <option value="50">50</option>
                 <option value="100">100</option>
             </select>
-            <span class="text-sm text-gray-700 ml-2">timetable</span>
+            <span class="text-sm text-gray-700 ml-2">data</span>
         </div>
 
         <div class="relative w-full sm:w-64">
