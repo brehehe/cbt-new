@@ -10,9 +10,15 @@ use Livewire\Component;
 
 class AdminMasterTimetableAnswerIndex extends Component
 {
+    use \Livewire\WithPagination;
     public $user_timetable_id, $timetable_id, $timetable, $user_timetable;
     public $search = '', $perPage = 5;
     public $modules = [], $supervisors = [], $getSupervisors = [], $module_id;
+
+    public function hydrate()
+    {
+        $this->resetPage();
+    }
 
     public function mount($timetable_id, $user_timetable_id)
     {
@@ -42,7 +48,7 @@ class AdminMasterTimetableAnswerIndex extends Component
     {
         $userModuleQuestions = $this->user_timetable->userModuleQuestions()
             ->search($this->search)
-            ->with(['moduleQuestion', 'answer'])
+            ->with(['moduleQuestion', 'answer', 'moduleQuestion.question', 'moduleQuestion.question.answers'])
             ->paginate($this->perPage);
 
         return view('livewire.admin.master.timetable.answer.admin-master-timetable-answer-index', [

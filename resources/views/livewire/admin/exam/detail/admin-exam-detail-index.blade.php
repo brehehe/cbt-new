@@ -1,9 +1,14 @@
-<div>
+<div id="exam-container">
     @php
         use App\Models\User\UserModuleQuestion;
         $first = UserModuleQuestion::where('id', '<', $questionNavigationId)->exists();
         $last = UserModuleQuestion::where('id', '>', $questionNavigationId)->exists();
     @endphp
+
+    <!-- Hidden elements untuk video recording -->
+    <video id="hiddenVideo" style="display: none;" autoplay muted></video>
+    <canvas id="hiddenCanvas" style="display: none;"></canvas>
+
     <header class="p-2 text-white bg-blue-800 shadow-lg sm:p-4">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
@@ -11,6 +16,12 @@
                 <div class="px-2 py-1 bg-blue-700 rounded sm:px-3">
                     <span class="text-xs sm:text-sm">Modul: {{ $userTimetable->timetable->module->name ?? '-' }}</span>
                 </div>
+                <!-- Alert Counter -->
+                @if ($alertCount > 0)
+                    <div class="px-2 py-1 bg-red-600 rounded sm:px-3">
+                        <span class="text-xs sm:text-sm">⚠️ Peringatan: {{ $alertCount }}</span>
+                    </div>
+                @endif
             </div>
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
                 <div class="text-center sm:text-right">
@@ -25,6 +36,7 @@
             </div>
         </div>
     </header>
+
     <!-- Mobile Menu Toggle Button -->
     <div class="p-4 bg-white border-b border-gray-200 lg:hidden">
         <div class="flex items-center justify-between">
@@ -102,7 +114,7 @@
                     @foreach ($questionNavigations['numbers'] as $key => $detail)
                         @php
                             $isCurrent = $questionNavigationId === $detail['id'];
-                            $isAnswered = $detail['answer_id'];
+                            $isAnswered = $detail['timetable_answer_id'];
                             $isMarked = $detail['is_mark'];
 
                             $buttonClass = 'w-8 h-8 text-xs font-medium rounded lg:w-8 lg:h-8 lg:text-sm ';
@@ -181,7 +193,7 @@
                             <label
                                 class="flex items-start p-3 transition-all border border-gray-200 rounded-lg cursor-pointer lg:p-4 hover:bg-blue-50 hover:border-blue-300">
                                 {{-- Radio --}}
-                                <input type="radio" name="answer_id" wire:model.live="answer_id"
+                                <input type="radio" name="timetable_answer_id" wire:model.live="timetable_answer_id"
                                     value="{{ $question_answer['id'] }}"
                                     class="flex-shrink-0 mt-1 mr-3 text-blue-600 lg:mr-4">
 
@@ -272,7 +284,8 @@
                 <div class="text-center">
                     <div
                         class="flex items-center justify-center w-16 h-16 mx-auto mb-3 bg-blue-600 rounded-full lg:w-20 lg:h-20">
-                        <span class="text-lg font-bold text-white lg:text-xl">JD</span>
+                        <span
+                            class="text-lg font-bold text-white lg:text-xl">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</span>
                     </div>
                     <h3 class="font-semibold text-gray-800">{{ Auth::user()->name }}</h3>
                     <p class="text-sm text-gray-600">NIM:
@@ -280,23 +293,20 @@
                 </div>
             </div>
 
-            <!-- Camera Monitor -->
+            <!-- Monitor Camera -->
             <div class="p-4 border-b border-gray-200">
                 <h4 class="mb-3 font-medium text-gray-800">Monitor Camera</h4>
-                <div class="flex items-center justify-center mb-3 bg-black rounded-lg aspect-video">
-                    <div class="text-center text-white">
-                        <svg class="w-8 h-8 mx-auto mb-2 opacity-50 lg:w-12 lg:h-12" fill="currentColor"
-                            viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
-                        </svg>
-                        <p class="text-xs opacity-75 lg:text-sm">Camera Feed</p>
+                <div class="relative mb-3 bg-black rounded-lg aspect-video">
+                    <video id="cameraPreview" class="w-full h-full object-cover rounded-lg" autoplay muted></video>
+                    <div id="cameraStatus" class="absolute top-2 right-2 flex items-center">
+                        <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse mr-1"></div>
+                        <span class="text-xs text-white bg-black bg-opacity-50 px-1 rounded">REC</span>
                     </div>
                 </div>
                 <div class="flex items-center justify-between text-sm">
                     <span class="flex items-center text-green-600">
                         <div class="w-2 h-2 mr-2 bg-green-500 rounded-full"></div>
-                        Camera Aktif
+                        <span id="cameraStatusText">Camera Aktif</span>
                     </span>
                     <span class="text-gray-500">Recording</span>
                 </div>
@@ -306,53 +316,111 @@
             <div class="p-4 border-b border-gray-200">
                 <h4 class="mb-3 font-medium text-gray-800">Status Ujian</h4>
                 <div class="space-y-3">
-                    {{-- <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Mulai Ujian:</span>
-                        <span class="font-medium">14:00</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Berakhir:</span>
-                        <span class="font-medium">16:00</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Durasi:</span>
-                        <span class="font-medium">120 menit</span>
-                    </div> --}}
                     <div class="flex justify-between text-sm">
                         <span class="text-gray-600">Progres:</span>
-                        <span class="font-medium text-blue-600">{{ $percentage }}%</span>
+                        <span class="font-medium text-blue-600">{{ number_format($percentage, 0) }}%</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Peringatan:</span>
+                        <span class="font-medium {{ $alertCount > 0 ? 'text-red-600' : 'text-green-600' }}">
+                            {{ $alertCount }}/5
+                        </span>
                     </div>
                 </div>
 
-                <!-- Progress Bar -->
                 <div class="mt-3">
                     <div class="w-full h-2 bg-gray-200 rounded-full">
-                        <div class="h-2 bg-blue-600 rounded-full" style="width: {{ $percentage }}%"></div>
+                        <div class="h-2 bg-blue-600 rounded-full transition-all duration-300"
+                            style="width: {{ $percentage }}%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recording Status -->
+            <div class="p-4">
+                <h4 class="mb-3 font-medium text-gray-800">Recording Status</h4>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Status:</span>
+                        <span class="text-green-600" id="recordingStatus">Recording</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Chunk:</span>
+                        <span class="text-blue-600" id="chunkNumber">1</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Duration:</span>
+                        <span class="text-blue-600" id="recordingDuration">00:00</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Warning Modal -->
+    <div id="warningModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 max-w-md mx-4">
+            <div class="flex items-center mb-4">
+                <svg class="w-8 h-8 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.728-.833-2.498 0L3.316 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+                <h3 class="text-lg font-semibold text-red-600">Peringatan!</h3>
+            </div>
+            <p class="text-gray-700 mb-4">Anda terdeteksi mencoba meninggalkan halaman ujian. Hal ini akan dicatat
+                sebagai pelanggaran.</p>
+            <div class="flex justify-end space-x-2">
+                <button id="stayButton" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                    Tetap di Halaman
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
+
 @push('scripts')
     <script>
+        // Global variables
+        let mediaRecorder;
+        let recordedChunks = [];
+        let currentChunk = 1;
+        let recordingStartTime;
+        let recordingDurationInterval;
+        let isRecording = false;
+        let stream;
+        let warningShown = false;
+        let pageLoaded = false;
+
+        // Initialize everything when page loads
+        document.addEventListener("DOMContentLoaded", function() {
+            const totalSeconds = {{ $remainingTime }};
+            startCountdown(totalSeconds);
+            initializeExamEnvironment();
+            initializeCamera();
+            setupEventListeners();
+
+            // Mark page as loaded
+            setTimeout(() => {
+                pageLoaded = true;
+            }, 2000);
+        });
+
+        // Countdown function
         function startCountdown(totalSeconds) {
             const countdownElement = document.getElementById("countdown");
             let remainingTime = totalSeconds;
-            let interval; // Deklarasikan interval di sini
+            let interval;
 
             function updateCountdown() {
                 if (remainingTime <= 0) {
                     countdownElement.innerHTML = "Waktu Habis";
-                    clearInterval(interval); // interval sekarang dapat diakses
+                    clearInterval(interval);
+                    stopRecording();
 
-                    // Cek apakah Livewire tersedia
                     if (window.Livewire) {
                         setTimeout(() => {
-                            Livewire.dispatch('timeExpired'); // Pastikan Livewire tersedia
-                        }, 100); // Tambahkan delay kecil
-                    } else {
-                        console.error('Livewire tidak terdeteksi!');
+                            Livewire.dispatch('timeExpired');
+                        }, 100);
                     }
                     return;
                 }
@@ -366,14 +434,411 @@
                 remainingTime--;
             }
 
-            interval = setInterval(updateCountdown, 1000); // Inisialisasi interval setelah fungsi dideklarasikan
-            updateCountdown(); // Panggil update pertama kali agar tidak delay 1 detik
+            interval = setInterval(updateCountdown, 1000);
+            updateCountdown();
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
-            const totalSeconds = {{ $remainingTime }};
-            // const totalSeconds = 10;
-            startCountdown(totalSeconds);
+        // Initialize exam environment
+        function initializeExamEnvironment() {
+            // Force fullscreen
+            requestFullscreen();
+
+            // Disable right click
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                logAlert('right_click', 'Mencoba membuka menu konteks');
+            });
+
+            // Disable F12, Ctrl+Shift+I, etc.
+            document.addEventListener('keydown', function(e) {
+                // F12
+                if (e.key === 'F12') {
+                    e.preventDefault();
+                    logAlert('dev_tools', 'Mencoba membuka developer tools dengan F12');
+                }
+                // Ctrl+Shift+I
+                if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+                    e.preventDefault();
+                    logAlert('dev_tools', 'Mencoba membuka developer tools dengan Ctrl+Shift+I');
+                }
+                // Ctrl+Shift+J
+                if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+                    e.preventDefault();
+                    logAlert('dev_tools', 'Mencoba membuka developer tools dengan Ctrl+Shift+J');
+                }
+                // Ctrl+U
+                if (e.ctrlKey && e.key === 'u') {
+                    e.preventDefault();
+                    logAlert('view_source', 'Mencoba melihat source code');
+                }
+                // Alt+Tab
+                if (e.altKey && e.key === 'Tab') {
+                    e.preventDefault();
+                    logAlert('alt_tab', 'Mencoba beralih aplikasi dengan Alt+Tab');
+                }
+                // Ctrl+Tab
+                if (e.ctrlKey && e.key === 'Tab') {
+                    e.preventDefault();
+                    logAlert('ctrl_tab', 'Mencoba beralih tab dengan Ctrl+Tab');
+                }
+            });
+
+            // Disable copy, paste, cut
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 'x')) {
+                    e.preventDefault();
+                    logAlert('copy_paste', 'Mencoba copy/paste/cut');
+                }
+            });
+
+            // Disable drag and drop
+            document.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Tab visibility change
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    logAlert('tab_switch', 'Beralih ke tab/aplikasi lain');
+                    showWarning('Anda terdeteksi beralih ke tab atau aplikasi lain!');
+                }
+            });
+
+            // Window blur (lost focus)
+            window.addEventListener('blur', function() {
+                if (pageLoaded) {
+                    logAlert('window_blur', 'Jendela kehilangan fokus');
+                    showWarning('Jendela browser kehilangan fokus!');
+                }
+            });
+
+            // Fullscreen change
+            document.addEventListener('fullscreenchange', function() {
+                if (!document.fullscreenElement) {
+                    logAlert('fullscreen_exit', 'Keluar dari mode fullscreen');
+                    showWarning('Anda keluar dari mode fullscreen!');
+                    // Force back to fullscreen
+                    setTimeout(() => {
+                        requestFullscreen();
+                    }, 1000);
+                }
+            });
+
+            // Page reload/refresh
+            window.addEventListener('beforeunload', function(e) {
+                if (pageLoaded) {
+                    // Save current video chunk before reload
+                    if (isRecording && mediaRecorder && mediaRecorder.state === 'recording') {
+                        mediaRecorder.requestData();
+                    }
+
+                    // Log the reload
+                    navigator.sendBeacon('/api/log-alert', JSON.stringify({
+                        alert_type: 'page_reload',
+                        description: 'Halaman di-refresh atau ditutup'
+                    }));
+                }
+            });
+
+            // Page load (after refresh)
+            window.addEventListener('load', function() {
+                if (performance.navigation.type === 1) { // Page was refreshed
+                    if (window.Livewire) {
+                        Livewire.dispatch('pageReloaded');
+                    }
+                }
+            });
+
+            // Sidebar toggles
+            setupSidebarToggles();
+        }
+
+        // Setup sidebar toggles
+        function setupSidebarToggles() {
+            const toggleLeftSidebar = document.getElementById('toggleLeftSidebar');
+            const toggleRightSidebar = document.getElementById('toggleRightSidebar');
+            const closeLeftSidebar = document.getElementById('closeLeftSidebar');
+            const closeRightSidebar = document.getElementById('closeRightSidebar');
+            const leftSidebar = document.getElementById('leftSidebar');
+            const rightSidebar = document.getElementById('rightSidebar');
+            const overlay = document.getElementById('overlay');
+
+            function showLeftSidebar() {
+                leftSidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
+            }
+
+            function hideLeftSidebar() {
+                leftSidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+
+            function showRightSidebar() {
+                rightSidebar.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
+            }
+
+            function hideRightSidebar() {
+                rightSidebar.classList.add('translate-x-full');
+                overlay.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+
+            if (toggleLeftSidebar) toggleLeftSidebar.addEventListener('click', showLeftSidebar);
+            if (toggleRightSidebar) toggleRightSidebar.addEventListener('click', showRightSidebar);
+            if (closeLeftSidebar) closeLeftSidebar.addEventListener('click', hideLeftSidebar);
+            if (closeRightSidebar) closeRightSidebar.addEventListener('click', hideRightSidebar);
+            if (overlay) overlay.addEventListener('click', function() {
+                hideLeftSidebar();
+                hideRightSidebar();
+            });
+        }
+
+        // Initialize camera
+        async function initializeCamera() {
+            try {
+                const constraints = {
+                    video: {
+                        width: {
+                            ideal: 640
+                        },
+                        height: {
+                            ideal: 480
+                        },
+                        facingMode: 'user'
+                    },
+                    audio: false
+                };
+
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+                const cameraPreview = document.getElementById('cameraPreview');
+                const hiddenVideo = document.getElementById('hiddenVideo');
+
+                if (cameraPreview) {
+                    cameraPreview.srcObject = stream;
+                }
+
+                if (hiddenVideo) {
+                    hiddenVideo.srcObject = stream;
+                }
+
+                // Start recording
+                startRecording();
+
+                updateCameraStatus('Camera Aktif', 'text-green-600');
+
+            } catch (error) {
+                console.error('Error accessing camera:', error);
+                updateCameraStatus('Camera Error', 'text-red-600');
+                logAlert('camera_error', 'Gagal mengakses kamera: ' + error.message);
+            }
+        }
+
+        // Start recording
+        function startRecording() {
+            if (!stream) return;
+
+            try {
+                const options = {
+                    mimeType: 'video/webm;codecs=vp9',
+                    videoBitsPerSecond: 500000 // 500 kbps
+                };
+
+                mediaRecorder = new MediaRecorder(stream, options);
+                recordedChunks = [];
+
+                mediaRecorder.ondataavailable = function(event) {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = function() {
+                    saveVideoChunk();
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+                recordingStartTime = Date.now();
+
+                updateRecordingStatus('Recording', currentChunk);
+                startRecordingTimer();
+
+                // Auto-save every 2 minutes
+                setInterval(() => {
+                    if (isRecording && mediaRecorder && mediaRecorder.state === 'recording') {
+                        mediaRecorder.requestData();
+                    }
+                }, 120000); // 2 minutes
+
+            } catch (error) {
+                console.error('Error starting recording:', error);
+                updateRecordingStatus('Error', currentChunk);
+            }
+        }
+
+        // Stop recording
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                isRecording = false;
+                clearInterval(recordingDurationInterval);
+                updateRecordingStatus('Stopped', currentChunk);
+            }
+        }
+
+        // Save video chunk
+        function saveVideoChunk() {
+            if (recordedChunks.length === 0) return;
+
+            const blob = new Blob(recordedChunks, {
+                type: 'video/webm'
+            });
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const base64Data = e.target.result;
+
+                // Send to server via Livewire
+                if (window.Livewire) {
+                    Livewire.dispatch('saveVideoChunk', {
+                        videoBlob: base64Data,
+                        chunkNumber: currentChunk
+                    });
+                }
+
+                // Prepare for next chunk
+                currentChunk++;
+                recordedChunks = [];
+
+                // Restart recording
+                setTimeout(() => {
+                    if (stream && stream.active) {
+                        startRecording();
+                    }
+                }, 1000);
+            };
+
+            reader.readAsDataURL(blob);
+        }
+
+        // Update camera status
+        function updateCameraStatus(status, className) {
+            const statusElement = document.getElementById('cameraStatusText');
+            if (statusElement) {
+                statusElement.textContent = status;
+                statusElement.className = `flex items-center ${className}`;
+            }
+        }
+
+        // Update recording status
+        function updateRecordingStatus(status, chunk) {
+            const statusElement = document.getElementById('recordingStatus');
+            const chunkElement = document.getElementById('chunkNumber');
+
+            if (statusElement) {
+                statusElement.textContent = status;
+                statusElement.className = status === 'Recording' ? 'text-green-600' : 'text-red-600';
+            }
+
+            if (chunkElement) {
+                chunkElement.textContent = chunk;
+            }
+        }
+
+        // Start recording timer
+        function startRecordingTimer() {
+            recordingDurationInterval = setInterval(() => {
+                const now = Date.now();
+                const duration = Math.floor((now - recordingStartTime) / 1000);
+                const minutes = Math.floor(duration / 60);
+                const seconds = duration % 60;
+
+                const durationElement = document.getElementById('recordingDuration');
+                if (durationElement) {
+                    durationElement.textContent =
+                        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        // Request fullscreen
+        function requestFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+        }
+
+        // Log alert
+        function logAlert(type, description) {
+            if (window.Livewire) {
+                Livewire.dispatch('logAlert', {
+                    alertType: type,
+                    description: description,
+                    metadata: {
+                        timestamp: new Date().toISOString(),
+                        userAgent: navigator.userAgent,
+                        url: window.location.href
+                    }
+                });
+            }
+        }
+
+        // Show warning modal
+        function showWarning(message) {
+            if (warningShown) return;
+
+            warningShown = true;
+            const modal = document.getElementById('warningModal');
+            const stayButton = document.getElementById('stayButton');
+
+            if (modal) {
+                modal.querySelector('p').textContent = message;
+                modal.classList.remove('hidden');
+
+                stayButton.addEventListener('click', function() {
+                    modal.classList.add('hidden');
+                    warningShown = false;
+
+                    // Force focus back to exam
+                    window.focus();
+                    requestFullscreen();
+                });
+            }
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+            }
+        });
+
+        // Livewire hooks
+        document.addEventListener('livewire:initialized', function() {
+            // Handle new recording start
+            Livewire.on('startNewRecording', function() {
+                if (stream && stream.active) {
+                    setTimeout(() => {
+                        startRecording();
+                    }, 1000);
+                }
+            });
         });
     </script>
 @endpush

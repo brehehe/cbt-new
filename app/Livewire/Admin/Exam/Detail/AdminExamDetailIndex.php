@@ -4,13 +4,18 @@ namespace App\Livewire\Admin\Exam\Detail;
 
 use App\Helpers\AlertHelper;
 use App\Helpers\AuthHelper;
+use App\Models\Exam\ExamAlert;
+use App\Models\Exam\ExamRecording;
 use App\Models\Master\Question\Answer;
+use App\Models\Timetable\TimetableAnswer;
 use App\Models\User\UserModuleQuestion;
 use App\Models\User\UserTimetable;
 use DB;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 
 class AdminExamDetailIndex extends Component
 {
@@ -21,18 +26,139 @@ class AdminExamDetailIndex extends Component
     public $questionNavigationId;
     public $isMark = false;
     public $percentage = 0;
-    public $answer_id;
+    public $timetable_answer_id;
     public $question;
     public $images = [];
     public $description;
     public $number;
     public $question_answers = [];
+    public $currentRecording = null;
+    public $alertCount = 0;
+
+    protected $listeners = [
+        'timeExpired',
+        'saveVideoChunk',
+        'logAlert',
+        'startNewRecording',
+        'pageReloaded'
+    ];
 
     public function mount()
     {
         $this->initializeExam();
         $this->setupFirstQuestion();
         $this->handleSessionMessages();
+        $this->initializeRecording();
+    }
+
+    private function initializeRecording()
+    {
+        // Buat recording entry baru
+        $this->currentRecording = ExamRecording::create([
+            'user_timetable_id' => $this->userTimetableId,
+            'start_time' => now(),
+            'chunk_number' => 1,
+            'status' => 'recording'
+        ]);
+    }
+
+    public function saveVideoChunk($videoBlob, $chunkNumber = null)
+    {
+        try {
+            // Decode base64 video data
+            $videoData = base64_decode(preg_replace('#^data:video/\w+;base64,#i', '', $videoBlob));
+
+            $filename = 'exam_recordings/' . $this->userTimetableId . '_chunk_' .
+                ($chunkNumber ?? $this->currentRecording->chunk_number) . '_' .
+                time() . '.webm';
+
+            // Simpan file ke storage
+            Storage::disk('public')->put($filename, $videoData);
+
+            // Update atau buat recording entry baru
+            if ($chunkNumber && $chunkNumber > $this->currentRecording->chunk_number) {
+                // Buat entry baru untuk chunk berikutnya
+                $this->currentRecording = ExamRecording::create([
+                    'user_timetable_id' => $this->userTimetableId,
+                    'video_path' => $filename,
+                    'chunk_number' => $chunkNumber,
+                    'file_size' => strlen($videoData),
+                    'start_time' => now(),
+                    'status' => 'recording'
+                ]);
+            } else {
+                // Update recording yang sedang berjalan
+                $this->currentRecording->update([
+                    'video_path' => $filename,
+                    'file_size' => strlen($videoData),
+                    'end_time' => now(),
+                    'status' => 'completed'
+                ]);
+            }
+
+            return response()->json(['success' => true, 'message' => 'Video chunk saved successfully']);
+        } catch (\Exception $e) {
+            \Log::error('Error saving video chunk: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Failed to save video chunk']);
+        }
+    }
+
+    public function startNewRecording()
+    {
+        // Tutup recording sebelumnya jika ada
+        if ($this->currentRecording && $this->currentRecording->status === 'recording') {
+            $this->currentRecording->update([
+                'end_time' => now(),
+                'status' => 'completed'
+            ]);
+        }
+
+        // Buat recording baru
+        $this->currentRecording = ExamRecording::create([
+            'user_timetable_id' => $this->userTimetableId,
+            'start_time' => now(),
+            'chunk_number' => $this->currentRecording ? $this->currentRecording->chunk_number + 1 : 1,
+            'status' => 'recording'
+        ]);
+    }
+
+    public function logAlert($alertType, $description, $metadata = [])
+    {
+        ExamAlert::create([
+            'user_timetable_id' => $this->userTimetableId,
+            'alert_type' => $alertType,
+            'description' => $description,
+            'metadata' => $metadata
+        ]);
+
+        $this->alertCount++;
+
+        // Jika terlalu banyak alert, ubah status menjadi warning
+        if ($this->alertCount >= 5) {
+            // $this->userTimetable->update([
+            //     'status' => 'done'
+            // ]);
+
+            // session()->flash('warning', [
+            //     'title' => 'Peringatan!',
+            //     'text' => 'Terlalu banyak pelanggaran terdeteksi. Ujian akan dihentikan.'
+            // ]);
+
+            AlertHelper::warning('warning', 'Terlalu banyak pelanggaran terdeteksi. Ujian akan dihentikan.');
+
+            // $this->finishExam();
+        } elseif ($this->alertCount >= 3) {
+            // Tampilkan peringatan jika sudah mencapai 3 alert
+            AlertHelper::warning('warning', 'Anda telah melakukan beberapa pelanggaran. Hati-hati!');
+        }
+    }
+
+    public function pageReloaded()
+    {
+        $this->logAlert('page_reload', 'Halaman ujian di-refresh', [
+            'timestamp' => now()->toISOString(),
+            'user_agent' => request()->header('User-Agent')
+        ]);
     }
 
     public function updateMark()
@@ -56,33 +182,32 @@ class AdminExamDetailIndex extends Component
             ->whereIn('status', ['exam', 'warning'])
             ->first();
 
-        // Teruskan redirect, bila ada
         if ($redirect = $this->validateExamStatus()) {
-            return $redirect;          // ⬅️ penting!
+            return $redirect;
         }
+
 
         $this->userTimetableId = $this->userTimetable->id;
         $this->calculateRemainingTime();
+
+        // Hitung jumlah alert yang sudah ada
+        $this->alertCount = ExamAlert::where('user_timetable_id', $this->userTimetableId)->count();
     }
 
     private function validateExamStatus()
     {
-        // 1) tidak ada timetable
         if (!$this->userTimetable) {
             return redirect()->route('admin.exam.timetable');
         }
 
-        // 2) sudah selesai
         if ($this->userTimetable->status === 'done') {
             return redirect()->route('admin.exam.timetable');
         }
 
-        // 3) status warning
         if ($this->userTimetable->status === 'warning') {
             return redirect()->route('admin.exam.warning');
         }
 
-        // tidak perlu redirect
         return null;
     }
 
@@ -93,22 +218,22 @@ class AdminExamDetailIndex extends Component
         if ($firstQuestion) {
             $this->questionNavigationId = $firstQuestion->id;
             $this->isMark = $firstQuestion->is_mark;
-            $this->question = $firstQuestion->first()->moduleQuestion->question->question;
-            $this->description = $firstQuestion->first()->moduleQuestion->question->description;
-            $this->images = $firstQuestion->first()->moduleQuestion->question->images;
+            $this->question = $firstQuestion->first()->timetableQuestion->question;
+            $this->description = $firstQuestion->first()->timetableQuestion->description;
+            $this->images = $firstQuestion->first()->timetableQuestion->images;
             $this->number = 1;
-            $this->answer_id = $firstQuestion->answer_id;
+            $this->timetable_answer_id = $firstQuestion->timetable_answer_id;
 
-            $answers = $firstQuestion->first()          // ambil record pertama
-                ->moduleQuestion->question      // telusuri relasi
-                ->answers()                     // ← perhatikan tanda kurung!
-                ->orderBy('order', 'asc')       // urutkan di query
-                ->get();                        // eksekusi query
+            $answers = $firstQuestion->first()
+                ->timetableQuestion
+                ->answers()
+                ->orderBy('order', 'asc')
+                ->get();
 
             foreach ($answers as $index => $answer) {
                 $this->question_answers[] = [
                     'id'       => $answer->id,
-                    'alphabet' => chr(64 + $index + 1), // A, B, C, …
+                    'alphabet' => chr(64 + $index + 1),
                     'context'  => $answer->context,
                     'images'   => $answer->images,
                 ];
@@ -120,11 +245,10 @@ class AdminExamDetailIndex extends Component
 
     private function calculateRemainingTime()
     {
-        $timetable = $this->userTimetable->load(['timetable.module:id,duration']);
+        $timetable = $this->userTimetable->load(['timetable.timetableModule:id,duration']);
 
         $startTime = Carbon::parse($this->userTimetable->start_exam);
         $duration = $timetable->timetable->module->duration;
-        // $duration = 999999999;
         $endTime = $startTime->addMinutes($duration);
 
         $this->remainingTime = max(0, $endTime->timestamp - now()->timestamp);
@@ -139,9 +263,9 @@ class AdminExamDetailIndex extends Component
         $this->questionNavigations = [
             'numbers' => $this->mapQuestionNumbers($questions),
             'total' => $questions->count(),
-            'answered' => $questions->whereNotNull('answer_id')->count(),
+            'answered' => $questions->whereNotNull('timetable_answer_id')->count(),
             'marked' => $questions->where('is_mark', true)->count(),
-            'unanswered' => $questions->whereNull('answer_id')->count(),
+            'unanswered' => $questions->whereNull('timetable_answer_id')->count(),
         ];
 
         $this->updateCurrentQuestionMark();
@@ -150,7 +274,8 @@ class AdminExamDetailIndex extends Component
 
     private function getUserQuestions()
     {
-        return UserModuleQuestion::select('id', 'is_mark', 'answer_id', 'module_question_id')
+        return UserModuleQuestion::select('id', 'is_mark', 'timetable_module_id', 'timetable_answer_id', 'timetable_question_id')
+            ->with('timetableModule', 'timetableQuestion', 'timetableAnswer')
             ->where('user_timetable_id', $this->userTimetableId)
             ->orderBy('order')
             ->get();
@@ -172,32 +297,28 @@ class AdminExamDetailIndex extends Component
             return [
                 'id' => $question->id,
                 'is_mark' => $question->is_mark,
-                'answer_id' => $question->answer_id,
+                'timetable_answer_id' => $question->timetable_answer_id,
             ];
         })->toArray();
     }
 
     private function updateCurrentQuestionMark()
     {
-        $currentQuestion = UserModuleQuestion::with('moduleQuestion.question')
+        $currentQuestion = UserModuleQuestion::with('timetableModule', 'timetableQuestion', 'timetableAnswer')
             ->find($this->questionNavigationId);
 
         if ($currentQuestion) {
-            // Status mark dan jawaban dari database
             $this->isMark = $currentQuestion->is_mark;
-            $this->answer_id = $currentQuestion->answer_id ? (string) $currentQuestion->answer_id : null;
+            $this->timetable_answer_id = $currentQuestion->timetable_answer_id ? (string) $currentQuestion->timetable_answer_id : null;
 
-            // Detail soal
-            $questionModel = $currentQuestion->moduleQuestion->question;
+            $questionModel = $currentQuestion->timetableQuestion;
             $this->question = $questionModel->question;
             $this->description = $questionModel->description;
             $this->images = $questionModel->images;
 
-            // Nomor soal
             $index = array_search($currentQuestion->id, $this->questionIds());
             $this->number = $index !== false ? $index + 1 : 1;
 
-            // Jawaban
             $answers = $questionModel->answers()
                 ->orderBy('order')
                 ->get();
@@ -229,11 +350,11 @@ class AdminExamDetailIndex extends Component
     {
         UserModuleQuestion::where('id', $this->questionNavigationId)
             ->update([
-                'answer_id' => $this->answer_id,
+                'timetable_answer_id' => $this->timetable_answer_id,
                 'is_mark' => $this->isMark,
             ]);
 
-        $this->reset('answer_id');
+        $this->reset('timetable_answer_id');
         $this->refreshQuestionData();
     }
 
@@ -263,8 +384,8 @@ class AdminExamDetailIndex extends Component
 
     private function updatePercentage()
     {
-        $answers =  $this->getUserQuestions()->whereNotNull('answer_id')->count();
-        $total =  $this->getUserQuestions()->count();
+        $answers = $this->getUserQuestions()->whereNotNull('timetable_answer_id')->count();
+        $total = $this->getUserQuestions()->count();
         $this->percentage = ($answers / $total) * 100;
     }
 
@@ -287,8 +408,6 @@ class AdminExamDetailIndex extends Component
         $this->updatePercentage();
     }
 
-    protected $listeners = ['timeExpired'];
-
     public function timeExpired()
     {
         $this->finishExam();
@@ -303,6 +422,14 @@ class AdminExamDetailIndex extends Component
     {
         $this->saveCurrentAnswer();
 
+        // Tutup recording yang sedang berjalan
+        if ($this->currentRecording && $this->currentRecording->status === 'recording') {
+            $this->currentRecording->update([
+                'end_time' => now(),
+                'status' => 'completed'
+            ]);
+        }
+
         $userTimetable = UserTimetable::whereIn('status', ['exam', 'warning'])
             ->where('user_id', Auth::id())
             ->first();
@@ -316,8 +443,8 @@ class AdminExamDetailIndex extends Component
         $unansweredQuestions = 0;
 
         foreach ($userTimetableQuestions as $question) {
-            if ($question->answer_id) {
-                $answer = Answer::find($question->answer_id);
+            if ($question->timetable_answer_id) {
+                $answer = TimetableAnswer::find($question->timetable_answer_id);
                 if ($answer && $answer->is_correct) {
                     $question->update([
                         'status' => 'correct',
@@ -337,10 +464,7 @@ class AdminExamDetailIndex extends Component
             }
         }
 
-        // Hitung nilai mark dengan maksimal 100
         $mark = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100, 2) : 0;
-
-        // Pastikan nilai tidak lebih dari 100
         $mark = min($mark, 100);
 
         $userTimetable->update([
