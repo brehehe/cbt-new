@@ -111,6 +111,7 @@ class AdminMasterQuestionIndex extends Component
             DB::beginTransaction();
                  $request = [
                     'id'                   => $this->data_id,
+                    'user_id'              => Auth::user()?->id,
                     'company_id'           => Auth::user()?->company?->id,
                     'topic_id'             => $this->topic_id,
                     'material_category_id' => $this->material_category_id,

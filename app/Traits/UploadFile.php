@@ -4,8 +4,10 @@ namespace App\Traits;
 
 use Illuminate\Support\Str;
 use Buglinjo\LaravelWebp\Facades\Webp;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 trait UploadFile
 {
@@ -112,5 +114,51 @@ trait UploadFile
         if (!File::isDirectory($path)) {
             File::makeDirectory($path, 0777, true, true);
         }
+    }
+
+    public function multipleFileUpload(array $old_images, array $new_images, $main_folder)
+    {
+        $images = $currentUrls = $newPaths = $uploadFiles =[];
+
+        foreach ($new_images as $item) {
+            if (is_string($item)) {
+                $relative = ltrim(Str::after(parse_url($item, PHP_URL_PATH), '/storage/'), '/');
+                $currentUrls[] = asset('storage/'. $relative);
+            }
+
+            if ($item instanceof TemporaryUploadedFile || $item instanceof UploadedFile) {
+                $url_image = $this->uploadFile($item, "/public/$main_folder");
+                $newPaths[] = "/$main_folder/". $url_image[1];
+            }
+        }
+
+        $toDelete = array_diff($old_images, $currentUrls);
+
+        foreach ($toDelete as $oldPath) {
+            $relativePath = ltrim(Str::after(parse_url($oldPath, PHP_URL_PATH), '/storage/'), '/');
+            Storage::disk('public')->delete($relativePath);
+        }
+
+        $uploadFiles = array_merge($currentUrls, $newPaths);
+
+        foreach ($uploadFiles as $key => $file) {
+            $images[] = '/'.ltrim(Str::after(parse_url($file, PHP_URL_PATH), '/storage/'), '/');
+        }
+
+        return $images;
+    }
+
+    public function singleFileUpload($old_image, $new_image, $main_folder)
+    {
+        $image = $currentUrl = $newPath = $uploadFile = null;
+
+        $url_image = $this->uploadFile($new_image, "/public/$main_folder");
+        $newPath = "/$main_folder/". $url_image[1];
+
+        $relativePath = ltrim(Str::after(parse_url($old_image, PHP_URL_PATH), '/storage/'), '/');
+        Storage::disk('public')->delete($relativePath);
+
+        $image = '/'.ltrim(Str::after(parse_url($newPath, PHP_URL_PATH), '/storage/'), '/');
+        return $image;
     }
 }

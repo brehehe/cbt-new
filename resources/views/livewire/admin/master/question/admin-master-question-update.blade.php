@@ -2,6 +2,7 @@
 <div>
     {{-- In work, do what you enjoy. --}}
     @include('livewire.admin.master.question.admin-master-question-update-modal-answer')
+    @include('livewire.admin.master.question.admin-master-question-update-modal-answer-images')
     @include('livewire.admin.master.question.admin-master-question-update-modal-images')
     <div class="mb-4">
         <div class="flex items-center justify-between">
@@ -176,7 +177,7 @@
                             <tr>
                                 <td class="center">{{ chr(64+ $loop->iteration) }} </td>
                                 <td>
-                                    <button class="btn btn-primary mt-1" wire:click=''>Gambar</button>
+                                    <button class="btn btn-primary mt-1" wire:click="modalAnswerImage('{{ $result?->id }}', '{{ chr(64+ $loop->iteration) }}')">Gambar</button>
                                 </td>
                                 <td>{{ $result?->context }}</td>
                                 <td>
@@ -235,5 +236,11 @@
             allowMultiple: true,
             acceptedFileTypes: ['image/png', 'image/jpeg', 'image/webp'],
         });
+
+        const pond = FilePond.create(document.querySelector('#answer_images'), {
+            allowMultiple: true,
+            acceptedFileTypes: ['image/png', 'image/jpeg', 'image/webp'],
+        });
+
     </script>
 @endpush

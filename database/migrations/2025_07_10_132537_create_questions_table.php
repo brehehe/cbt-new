@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('questions', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->foreignUuid('user_id')->nullable();
             $table->foreignUuid('company_id')->nullable();
             $table->foreignUuid('topic_id')->nullable();
             $table->foreignUuid('material_category_id')->nullable();

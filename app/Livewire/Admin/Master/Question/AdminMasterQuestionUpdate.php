@@ -2,24 +2,25 @@
 
 namespace App\Livewire\Admin\Master\Question;
 
+use Storage;
 use Exception;
+use Throwable;
 use Livewire\Component;
+use Illuminate\Support\Str;
 use App\Helpers\AlertHelper;
-use App\Models\Master\Question\Answer;
+use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Master\Question\Topic;
+use App\Models\Master\Question\Answer;
+use App\Services\Answer\AnswerService;
 use App\Models\Master\Question\Material;
 use App\Models\Master\Question\Question;
+use Spatie\LivewireFilepond\WithFilePond;
 use App\Services\Question\QuestionService;
 use App\Models\Master\Question\QuestionType;
 use App\Models\Master\Question\MaterialCategory;
-use App\Services\Answer\AnswerService;
-use Livewire\WithFileUploads;
-use Spatie\LivewireFilepond\WithFilePond;
-use Storage;
-use Throwable;
 
 class AdminMasterQuestionUpdate extends Component
 {
@@ -29,10 +30,10 @@ class AdminMasterQuestionUpdate extends Component
     public $get_question;
     public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id ,$question, $description, $weight_correct, $weight_incorrect;
     public $topics = [], $material_categories = [], $materials = [], $question_types = [];
-    public $images = [];
+    public $images = [], $old_images = [];
 
-    public $answer_id, $answer_context, $answer_description, $answer_correct;
-    public $answer_images = [];
+    public $answer_id, $answer_context, $answer_description, $answer_correct, $answer_alphabet;
+    public $answer_images = [], $old_answer_images = [];
 
     public function render()
     {
@@ -61,8 +62,11 @@ class AdminMasterQuestionUpdate extends Component
         $this->materials           = Material::select('id', 'material_category_id', 'name')->where('material_category_id', $this->get_question?->material_category_id)->get();
 
         foreach (json_decode($this->get_question?->images, true) ?? [] as $key => $image) {
-            $this->images[] = asset('storage'.$image);
+            $this->old_images[] = asset('storage'.$image);
+            $this->images[]     = asset('storage'.$image);
         }
+
+        // dd($this->old_images, $this->images);
     }
 
     public function updated()
@@ -98,7 +102,7 @@ class AdminMasterQuestionUpdate extends Component
                 'material_id'          => 'nullable|exists:materials,id',
                 'question_type_id'     => 'required|exists:question_types,id',
                 'question'             => 'required',
-                'images.*'             => 'nullable|image|mimes:jpg,jpeg,png',
+                // 'images.*'             => 'nullable|image|mimes:jpg,jpeg,png',
                 'description'          => 'nullable',
             ],
             [
@@ -147,6 +151,7 @@ class AdminMasterQuestionUpdate extends Component
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
         }
 
+        $this->closeModal();
         return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
     }
 
@@ -158,8 +163,9 @@ class AdminMasterQuestionUpdate extends Component
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['answer_id', 'answer_context', 'answer_description', 'answer_correct', 'answer_images']);
+        $this->reset(['answer_id', 'answer_context', 'answer_description', 'answer_correct', 'answer_images', 'old_answer_images', 'answer_alphabet']);
         $this->dispatch('close-modal', ['id' => 'modal-images']);
+        $this->dispatch('close-modal', ['id' => 'modal-answer-images']);
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
 
@@ -173,13 +179,13 @@ class AdminMasterQuestionUpdate extends Component
         $this->validate(
             [
                 'answer_context'     => 'required',
-                'answer_images.*'    => 'nullable|image|mimes:jpg,jpeg,png',
+                // 'answer_images.*'    => 'nullable|image|mimes:jpg,jpeg,png',
                 'answer_description' => 'nullable',
             ],
             [
                 'answer_context.required' => 'Konteks jawaban wajib diisi.',
-                'answer_images.*.image'   => 'Gambar jawaban wajib berupa gambar.',
-                'answer_images.*.mimes'   => 'Gambar jawaban hanya berformat : .jpg, .jpeg, .png.',
+                // 'answer_images.*.image'   => 'Gambar jawaban wajib berupa gambar.',
+                // 'answer_images.*.mimes'   => 'Gambar jawaban hanya berformat : .jpg, .jpeg, .png.',
             ]
         );
 
@@ -191,6 +197,7 @@ class AdminMasterQuestionUpdate extends Component
                     'alphabet'   => null,
                     'context'    => $this->answer_context,
                     'images'     => $this->answer_images,
+                    'old_images' => $this->old_answer_images,
                     'is_correct' => $this->answer_correct,
                 ];
 
@@ -231,5 +238,21 @@ class AdminMasterQuestionUpdate extends Component
         $this->answer_context = $result?->context;
         $this->answer_correct = true;
         $this->submitAnswer();
+    }
+
+    public function modalAnswerImage($id, $alphabet)
+    {
+        $result                = Answer::findOrFail($id);
+        $this->answer_alphabet = $alphabet;
+        $this->answer_id       = $result?->id;
+        $this->answer_context  = $result?->context;
+        $this->answer_correct  = $result?->is_correct;
+        foreach (json_decode($result?->images, true) ?? []as $key => $image) {
+            $this->answer_images[]     = asset('storage'.$image);
+            $this->old_answer_images[] = asset('storage'.$image);
+        }
+        // dd($this->answer_images, $this->old_answer_images);
+        // $this->dispatch('initFilepondWithImages', $this->answer_images);
+        return $this->dispatch('open-modal', ['id' => 'modal-answer-images']);
     }
 }
