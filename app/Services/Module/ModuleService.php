@@ -21,6 +21,7 @@ class ModuleService
                 'id' => $request['id'] ?? null
             ],
             [
+                'user_id'          => $request['user_id'] ?? null,
                 'company_id'       => $request['company_id'] ?? null,
                 'question_type_id' => $request['question_type_id'] ?? null,
                 'name'             => $request['name'] ?? null,

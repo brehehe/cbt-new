@@ -82,6 +82,7 @@ class AdminMasterModuleIndex extends Component
             DB::beginTransaction();
             $request = [
                 'id'               => $this->data_id,
+                'user_id'          => Auth::user()?->id,
                 'company_id'       => Auth::user()?->company?->id,
                 'question_type_id' => $this->question_type_id,
                 'name'             => $this->name,

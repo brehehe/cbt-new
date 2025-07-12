@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('modules', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->foreignUuid('user_id')->nullable();
             $table->foreignUuid('company_id')->nullable();
             $table->foreignUuid('question_type_id')->nullable();
             $table->string('name')->comment('Nama modul soal');
