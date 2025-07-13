@@ -11,7 +11,7 @@ use App\Livewire\Admin\Master\Question\AdminMasterQuestionUpdate;
 use App\Livewire\Admin\Master\QuestionType\AdminMasterQuestionTypeIndex;
 use App\Livewire\Admin\Master\Topic\AdminMasterTopicIndex;
 use App\Livewire\Admin\Report\Question\AdminReportQuestionIndex;
-use App\Livewire\Admin\Report\TimeTable\AdminReportTimetable;
+use App\Livewire\Admin\Report\Timetable\AdminReportTimetable;
 use App\Livewire\Admin\Report\Timetable\AdminReportTimetableDetail;
 use App\Livewire\Admin\Report\Timetable\AdminReportTimetableIndex;
 use App\Models\User;
@@ -82,12 +82,12 @@ if (config('app.env') === 'local' || config('app.env') === 'development') {
 }
 
 Route::get('logout', function () {
-    if (Auth::check()) {
-        $user = User::find(auth()->user()->id);
-        $user->update([
-            'company_id' => null,
-        ]);
-    }
+    // if (Auth::check()) {
+    //     $user = User::find(auth()->user()->id);
+    //     $user->update([
+    //         'company_id' => null,
+    //     ]);
+    // }
     auth()->logout();
 
     return redirect()->route('login');

@@ -27,10 +27,12 @@ class AdminMasterModuleIndex extends Component
 
     public function render()
     {
-        $modules = Module::search($this->search)->select('id', 'question_type_id', 'name', 'duration', 'description', 'random_question')
+        $modules = Module::withoutGlobalScope('user_scope')->search($this->search)->select('id', 'question_type_id', 'name', 'duration', 'description', 'random_question')
             ->with([
                 'questionType:id,name'
-            ])->orderBy('order', 'asc');
+            ])
+            ->where('company_id', Auth::user()?->company?->id)
+            ->orderBy('order', 'desc');
         return view('livewire.admin.master.module.admin-master-module-index', [
             'modules' => $modules->paginate($this->perPage)
         ])->extends('layout.app')->section('content');
