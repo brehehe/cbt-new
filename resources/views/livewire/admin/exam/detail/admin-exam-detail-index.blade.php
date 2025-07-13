@@ -602,7 +602,21 @@
 
         // Initialize camera
         async function initializeCamera() {
+            console.log('Starting camera initialization...');
+            console.log('Protocol:', window.location.protocol);
+            console.log('Host:', window.location.host);
+
             try {
+                // Check if getUserMedia is available
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    throw new Error('getUserMedia is not supported');
+                }
+
+                // Check if MediaRecorder is available
+                if (!window.MediaRecorder) {
+                    throw new Error('MediaRecorder is not supported');
+                }
+
                 const constraints = {
                     video: {
                         width: {
@@ -616,17 +630,21 @@
                     audio: false
                 };
 
+                console.log('Requesting camera access...');
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
+                console.log('Camera access granted');
 
                 const cameraPreview = document.getElementById('cameraPreview');
                 const hiddenVideo = document.getElementById('hiddenVideo');
 
                 if (cameraPreview) {
                     cameraPreview.srcObject = stream;
+                    console.log('Camera preview set');
                 }
 
                 if (hiddenVideo) {
                     hiddenVideo.srcObject = stream;
+                    console.log('Hidden video set');
                 }
 
                 // Start recording
@@ -636,8 +654,16 @@
 
             } catch (error) {
                 console.error('Error accessing camera:', error);
-                updateCameraStatus('Camera Error', 'text-red-600');
-                logAlert('camera_error', 'Gagal mengakses kamera: ' + error.message);
+                console.error('Error name:', error.name);
+                console.error('Error message:', error.message);
+
+                updateCameraStatus('Camera Error: ' + error.message, 'text-red-600');
+                logAlert('camera_error', 'Gagal mengakses kamera: ' + error.message + ' (Protocol: ' + window.location
+                    .protocol + ')');
+
+                // Show user-friendly error
+                alert('Kamera tidak dapat diakses: ' + error.message +
+                    '\nPastikan:\n1. Browser mendukung kamera\n2. Izin kamera diberikan\n3. Menggunakan HTTPS');
             }
         }
 
@@ -696,22 +722,35 @@
 
         // Save video chunk
         function saveVideoChunk() {
-            if (recordedChunks.length === 0) return;
+            console.log('saveVideoChunk called, chunks:', recordedChunks.length);
+
+            if (recordedChunks.length === 0) {
+                console.log('No chunks to save');
+                return;
+            }
 
             const blob = new Blob(recordedChunks, {
                 type: 'video/webm'
             });
+            console.log('Created blob, size:', blob.size);
+
             const reader = new FileReader();
 
             reader.onload = function(e) {
                 const base64Data = e.target.result;
+                console.log('Base64 data length:', base64Data.length);
+                console.log('Base64 header:', base64Data.substring(0, 50));
 
                 // Send to server via Livewire
                 if (window.Livewire) {
+                    console.log('Sending to Livewire, chunk:', currentChunk);
+
                     Livewire.dispatch('saveVideoChunk', {
                         videoBlob: base64Data,
                         chunkNumber: currentChunk
                     });
+                } else {
+                    console.error('Livewire not available');
                 }
 
                 // Prepare for next chunk
@@ -721,9 +760,16 @@
                 // Restart recording
                 setTimeout(() => {
                     if (stream && stream.active) {
+                        console.log('Restarting recording...');
                         startRecording();
+                    } else {
+                        console.log('Stream not active, cannot restart recording');
                     }
                 }, 1000);
+            };
+
+            reader.onerror = function() {
+                console.error('FileReader error');
             };
 
             reader.readAsDataURL(blob);
