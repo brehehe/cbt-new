@@ -3,9 +3,11 @@
 namespace App\Models\Timetable;
 
 use App\Models\Company\Company;
+use App\Models\Master\Question\Question;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
@@ -58,5 +60,15 @@ class TimetableQuestion extends Model
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id'], 'ILIKE', $term);
         });
+    }
+
+    /**
+     * Get the question that owns the TimetableQuestion
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function question(): BelongsTo
+    {
+        return $this->belongsTo(Question::class, 'question_id', 'id');
     }
 }

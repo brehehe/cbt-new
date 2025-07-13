@@ -1,10 +1,10 @@
-@section('title', 'Laporan Nilai Ujian')
+@section('title', 'Analisis Soal')
 <div>
-    {{-- Be like water. --}}
+    {{-- Care about people's approval and you will be their prisoner. --}}
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#1E3A8A]">Riwayat Jadwal Ujian</h1>
+                <h1 class="text-2xl font-bold text-[#1E3A8A]">Data Soal</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             {{-- <div>
@@ -46,28 +46,36 @@
     <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
         <div class="table-container">
             <table class="table">
+                @php
+                    $count_timetable = empty($timetables) ? 1 : count($timetables)
+                @endphp
                 <thead>
                     <tr>
-                        <th class="w-1 center">No</th>
-                        <th>Nama</th>
-                        <th>Modul</th>
-                        <th>Waktu Mulai</th>
-                        <th>Waktu Selesai</th>
-                        {{-- <th>Token</th> --}}
-                        <th class="w-1 center">Aksi</th>
+                        <th rowspan="3" class="w-1 center">No</th>
+                        <th rowspan="3">Soal</th>
+                        <th colspan="{{ $count_timetable }}" class="center">Daftar Jadwal</th>
+                        <th rowspan="3">Total</th>
+                    </tr>
+                    <tr>
+                        @foreach ($timetables as $key => $timetable)
+                            <th class="center">{{ $timetable?->name }}</th>
+                        @endforeach
+                    </tr>
+                    <tr>
+                        @foreach ($timetables as $key => $timetable)
+                            <th class="center">{{ $timetable?->userTimetables()->count() }}</th>
+                        @endforeach
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($timetables as $index => $result)
+                    @forelse ($questions as $index => $result)
                         <tr>
-                            <td class="center">{{ $timetables->firstItem() + $index }}</td>
-                            <td>{{ $result?->name ?? '-' }}</td>
-                            <td>{{ $result?->module->name ?? '-' }}</td>
-                            <td>{{ $result?->start_time?->format('d F Y H:i') }}</td>
-                            <td>{{ $result?->end_time?->format('d F Y H:i') }}</td>
-                            <td class="center">
-                                <a href="{{ route('admin.report.timetable-detail', $result?->id) }}" class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors delete-btn" data-bs-toggle="tooltip" title="Lihat data detail"><i class="fa-solid fa-eye"></i></a>
-                            </td>
+                            <td class="center ">{{ $questions->firstItem() + $index }}</td>
+                            <td>{{ $result?->question ?? '-' }}</td>
+                            @foreach ($timetables as $key => $timetable)
+                                <td class="center">{{ $this->getQuestionCorrect($result, $timetable) }}</td>
+                            @endforeach
+                            <td>{{ $this->getQuestionCorrect($result) }}</td>
                         </tr>
                     @empty
                         <tr>
@@ -82,13 +90,13 @@
         <div class="px-5 py-4 bg-gray-50/80 border-t border-gray-200">
             <div class="flex items-center justify-between">
                 <div class="text-sm text-gray-700">
-                    Menampilkan <span class="font-medium">{{ $timetables->firstItem() }}</span> sampai <span
-                        class="font-medium">{{ $timetables->lastItem() }}</span> dari <span
-                        class="font-medium">{{ $timetables->total() }}</span> hasil
+                    Menampilkan <span class="font-medium">{{ $questions->firstItem() }}</span> sampai <span
+                        class="font-medium">{{ $questions->lastItem() }}</span> dari <span
+                        class="font-medium">{{ $questions->total() }}</span> hasil
                 </div>
                 <div>
                     <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        {{ $timetables->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
+                        {{ $questions->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
                     </nav>
                 </div>
             </div>

@@ -3,11 +3,13 @@
 namespace App\Models\Master\Question;
 
 use App\Models\Company\Company;
+use App\Models\Timetable\TimetableQuestion;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
@@ -116,4 +118,13 @@ class Question extends Model
         return $this->hasMany(ModuleQuestion::class, 'question_id', 'id');
     }
 
+    /**
+     * Get the timetableQuestion associated with the Question
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function timetableQuestion(): HasOne
+    {
+        return $this->hasOne(TimetableQuestion::class, 'question_id', 'id');
+    }
 }

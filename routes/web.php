@@ -10,6 +10,7 @@ use App\Livewire\Admin\Master\Question\AdminMasterQuestionIndex;
 use App\Livewire\Admin\Master\Question\AdminMasterQuestionUpdate;
 use App\Livewire\Admin\Master\QuestionType\AdminMasterQuestionTypeIndex;
 use App\Livewire\Admin\Master\Topic\AdminMasterTopicIndex;
+use App\Livewire\Admin\Report\Question\AdminReportQuestionIndex;
 use App\Livewire\Admin\Report\TimeTable\AdminReportTimetable;
 use App\Livewire\Admin\Report\Timetable\AdminReportTimetableDetail;
 use App\Livewire\Admin\Report\TimeTable\AdminReportTimetableIndex;
@@ -72,6 +73,7 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
     Route::group(['namespace' => 'Report', 'prefix' => 'report'], function () {
         Route::get('/timetable', AdminReportTimetableIndex::class)->name('admin.report.timetable');
         Route::get('/timetable-detail/{id}', AdminReportTimetableDetail::class)->name('admin.report.timetable-detail');
+        Route::get('/question', AdminReportQuestionIndex::class)->name('admin.report.question');
     });
 });
 

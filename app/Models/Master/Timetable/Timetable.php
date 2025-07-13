@@ -88,7 +88,7 @@ class Timetable extends Model
                     $timetableQuestion = TimetableQuestion::updateOrCreate(
                         [
                             'timetable_module_id' => $timetableModule->id,
-                            'question_id' => $question->id,
+                            'question_id' => $question->question->id,
                         ],
                         [
                             'user_id' => $question->question->user_id,
