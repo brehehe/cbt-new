@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 12.19.3.
+ * Generated for Laravel 12.20.0.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -5532,6 +5532,20 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
+         * Get the specified array configuration value as a collection.
+         *
+         * @param string $key
+         * @param (\Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null $default
+         * @return Collection<array-key, mixed> 
+         * @static 
+         */
+        public static function collection($key, $default = null)
+        {
+            /** @var \Illuminate\Config\Repository $instance */
+            return $instance->collection($key, $default);
+        }
+
+        /**
          * Set a given configuration value.
          *
          * @param array|string $key
@@ -5906,6 +5920,34 @@ namespace Illuminate\Support\Facades {
         {
             /** @var \Illuminate\Log\Context\Repository $instance */
             return $instance->addHidden($key, $value);
+        }
+
+        /**
+         * Add a context value if it does not exist yet, and return the value.
+         *
+         * @param string $key
+         * @param mixed $value
+         * @return mixed 
+         * @static 
+         */
+        public static function remember($key, $value)
+        {
+            /** @var \Illuminate\Log\Context\Repository $instance */
+            return $instance->remember($key, $value);
+        }
+
+        /**
+         * Add a hidden context value if it does not exist yet, and return the value.
+         *
+         * @param string $key
+         * @param mixed $value
+         * @return mixed 
+         * @static 
+         */
+        public static function rememberHidden($key, $value)
+        {
+            /** @var \Illuminate\Log\Context\Repository $instance */
+            return $instance->rememberHidden($key, $value);
         }
 
         /**
@@ -6507,6 +6549,145 @@ namespace Illuminate\Support\Facades {
         public static function flushMacros()
         {
             \Illuminate\Cookie\CookieJar::flushMacros();
+        }
+
+            }
+    /**
+     * 
+     *
+     * @see \Illuminate\Encryption\Encrypter
+     */
+    class Crypt {
+        /**
+         * Determine if the given key and cipher combination is valid.
+         *
+         * @param string $key
+         * @param string $cipher
+         * @return bool 
+         * @static 
+         */
+        public static function supported($key, $cipher)
+        {
+            return \Illuminate\Encryption\Encrypter::supported($key, $cipher);
+        }
+
+        /**
+         * Create a new encryption key for the given cipher.
+         *
+         * @param string $cipher
+         * @return string 
+         * @static 
+         */
+        public static function generateKey($cipher)
+        {
+            return \Illuminate\Encryption\Encrypter::generateKey($cipher);
+        }
+
+        /**
+         * Encrypt the given value.
+         *
+         * @param mixed $value
+         * @param bool $serialize
+         * @return string 
+         * @throws \Illuminate\Contracts\Encryption\EncryptException
+         * @static 
+         */
+        public static function encrypt($value, $serialize = true)
+        {
+            /** @var \Illuminate\Encryption\Encrypter $instance */
+            return $instance->encrypt($value, $serialize);
+        }
+
+        /**
+         * Encrypt a string without serialization.
+         *
+         * @param string $value
+         * @return string 
+         * @throws \Illuminate\Contracts\Encryption\EncryptException
+         * @static 
+         */
+        public static function encryptString($value)
+        {
+            /** @var \Illuminate\Encryption\Encrypter $instance */
+            return $instance->encryptString($value);
+        }
+
+        /**
+         * Decrypt the given value.
+         *
+         * @param string $payload
+         * @param bool $unserialize
+         * @return mixed 
+         * @throws \Illuminate\Contracts\Encryption\DecryptException
+         * @static 
+         */
+        public static function decrypt($payload, $unserialize = true)
+        {
+            /** @var \Illuminate\Encryption\Encrypter $instance */
+            return $instance->decrypt($payload, $unserialize);
+        }
+
+        /**
+         * Decrypt the given string without unserialization.
+         *
+         * @param string $payload
+         * @return string 
+         * @throws \Illuminate\Contracts\Encryption\DecryptException
+         * @static 
+         */
+        public static function decryptString($payload)
+        {
+            /** @var \Illuminate\Encryption\Encrypter $instance */
+            return $instance->decryptString($payload);
+        }
+
+        /**
+         * Get the encryption key that the encrypter is currently using.
+         *
+         * @return string 
+         * @static 
+         */
+        public static function getKey()
+        {
+            /** @var \Illuminate\Encryption\Encrypter $instance */
+            return $instance->getKey();
+        }
+
+        /**
+         * Get the current encryption key and all previous encryption keys.
+         *
+         * @return array 
+         * @static 
+         */
+        public static function getAllKeys()
+        {
+            /** @var \Illuminate\Encryption\Encrypter $instance */
+            return $instance->getAllKeys();
+        }
+
+        /**
+         * Get the previous encryption keys.
+         *
+         * @return array 
+         * @static 
+         */
+        public static function getPreviousKeys()
+        {
+            /** @var \Illuminate\Encryption\Encrypter $instance */
+            return $instance->getPreviousKeys();
+        }
+
+        /**
+         * Set the previous / legacy encryption keys that should be utilized if decryption fails.
+         *
+         * @param array $keys
+         * @return \Illuminate\Encryption\Encrypter 
+         * @static 
+         */
+        public static function previousKeys($keys)
+        {
+            /** @var \Illuminate\Encryption\Encrypter $instance */
+            return $instance->previousKeys($keys);
         }
 
             }
@@ -13625,6 +13806,9 @@ namespace Illuminate\Support\Facades {
      * @method static array validate(array $rules, ...$params)
      * @method static array validateWithBag(string $errorBag, array $rules, ...$params)
      * @method static bool hasValidSignature(bool $absolute = true)
+     * @method static bool hasValidRelativeSignature()
+     * @method static bool hasValidSignatureWhileIgnoring($ignoreQuery = [], $absolute = true)
+     * @method static bool hasValidRelativeSignatureWhileIgnoring($ignoreQuery = [])
      * @see \Illuminate\Http\Request
      */
     class Request {
@@ -25216,6 +25400,24 @@ namespace App\Livewire\Admin\Report\Timetable {
         }
 
             }
+    /**
+     * 
+     *
+     */
+    class AdminReportTimetableDetail {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Report\Timetable\AdminReportTimetableDetail::modal($name);
+        }
+
+            }
     }
 
 
@@ -25232,6 +25434,7 @@ namespace  {
     class Config extends \Illuminate\Support\Facades\Config {}
     class Context extends \Illuminate\Support\Facades\Context {}
     class Cookie extends \Illuminate\Support\Facades\Cookie {}
+    class Crypt extends \Illuminate\Support\Facades\Crypt {}
     class Date extends \Illuminate\Support\Facades\Date {}
     class DB extends \Illuminate\Support\Facades\DB {}
 
@@ -29205,7 +29408,7 @@ namespace  {
          * Get the count of the total records for the paginator.
          *
          * @param array<string|\Illuminate\Contracts\Database\Query\Expression> $columns
-         * @return int 
+         * @return int<0, max> 
          * @static 
          */
         public static function getCountForPagination($columns = [])
@@ -29280,7 +29483,7 @@ namespace  {
          * Retrieve the "count" result of the query.
          *
          * @param \Illuminate\Contracts\Database\Query\Expression|string $columns
-         * @return int 
+         * @return int<0, max> 
          * @static 
          */
         public static function count($columns = '*')
@@ -29397,7 +29600,7 @@ namespace  {
         /**
          * Insert new records into the database while ignoring errors.
          *
-         * @return int 
+         * @return int<0, max> 
          * @static 
          */
         public static function insertOrIgnore($values)
@@ -29474,7 +29677,7 @@ namespace  {
          *
          * @param array<string, float|int|numeric-string> $columns
          * @param array<string, mixed> $extra
-         * @return int 
+         * @return int<0, max> 
          * @throws \InvalidArgumentException
          * @static 
          */
@@ -29489,7 +29692,7 @@ namespace  {
          *
          * @param array<string, float|int|numeric-string> $columns
          * @param array<string, mixed> $extra
-         * @return int 
+         * @return int<0, max> 
          * @throws \InvalidArgumentException
          * @static 
          */

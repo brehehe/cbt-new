@@ -65,43 +65,139 @@ class AdminExamDetailIndex extends Component
 
     public function saveVideoChunk($videoBlob, $chunkNumber = null)
     {
+        // Add extensive logging
+        \Log::info('saveVideoChunk called', [
+            'user_id' => Auth::id(),
+            'chunk_number' => $chunkNumber,
+            'data_length' => strlen($videoBlob),
+            'server_time' => now(),
+            'memory_usage' => memory_get_usage(true),
+            'server_info' => [
+                'php_version' => PHP_VERSION,
+                'upload_max' => ini_get('upload_max_filesize'),
+                'post_max' => ini_get('post_max_size'),
+                'memory_limit' => ini_get('memory_limit')
+            ]
+        ]);
+
         try {
+            // Validate input
+            if (empty($videoBlob)) {
+                throw new \Exception('Video blob is empty');
+            }
+
+            if (!$this->currentRecording) {
+                throw new \Exception('No current recording session');
+            }
+
+            // Check if we can decode the data
+            $headerCheck = substr($videoBlob, 0, 50);
+            \Log::info('Video blob header', ['header' => $headerCheck]);
+
+            if (!preg_match('/^data:video\/\w+;base64,/', $videoBlob)) {
+                throw new \Exception('Invalid video blob format');
+            }
+
             // Decode base64 video data
             $videoData = base64_decode(preg_replace('#^data:video/\w+;base64,#i', '', $videoBlob));
 
+            if ($videoData === false) {
+                throw new \Exception('Failed to decode base64 data');
+            }
+
+            $dataSize = strlen($videoData);
+            \Log::info('Video data decoded', ['size' => $dataSize]);
+
+            if ($dataSize === 0) {
+                throw new \Exception('Decoded video data is empty');
+            }
+
+            // Create filename
             $filename = 'exam_recordings/' . $this->userTimetableId . '_chunk_' .
                 ($chunkNumber ?? $this->currentRecording->chunk_number) . '_' .
                 time() . '.webm';
 
-            // Simpan file ke storage
-            Storage::disk('public')->put($filename, $videoData);
+            \Log::info('Attempting to save file', ['filename' => $filename]);
 
-            // Update atau buat recording entry baru
+            // Check storage disk configuration
+            $disk = Storage::disk('public');
+            $diskConfig = config('filesystems.disks.public');
+            \Log::info('Storage disk config', $diskConfig);
+
+            // Ensure directory exists
+            $directory = dirname($filename);
+            if (!$disk->exists($directory)) {
+                $disk->makeDirectory($directory);
+                \Log::info('Created directory', ['directory' => $directory]);
+            }
+
+            // Attempt to save file
+            $saveResult = $disk->put($filename, $videoData);
+
+            if (!$saveResult) {
+                throw new \Exception('Storage put operation returned false');
+            }
+
+            // Verify file was actually saved
+            if (!$disk->exists($filename)) {
+                throw new \Exception('File does not exist after save operation');
+            }
+
+            $fileSize = $disk->size($filename);
+            \Log::info('File saved successfully', [
+                'filename' => $filename,
+                'file_size' => $fileSize,
+                'full_path' => $disk->path($filename)
+            ]);
+
+            // Update database
             if ($chunkNumber && $chunkNumber > $this->currentRecording->chunk_number) {
-                // Buat entry baru untuk chunk berikutnya
                 $this->currentRecording = ExamRecording::create([
                     'timetable_id' => $this->userTimetable->timetable_id,
                     'user_timetable_id' => $this->userTimetableId,
                     'video_path' => $filename,
                     'chunk_number' => $chunkNumber,
-                    'file_size' => strlen($videoData),
+                    'file_size' => $fileSize,
                     'start_time' => now(),
                     'status' => 'recording'
                 ]);
+                \Log::info('Created new recording entry', ['id' => $this->currentRecording->id]);
             } else {
-                // Update recording yang sedang berjalan
                 $this->currentRecording->update([
                     'video_path' => $filename,
-                    'file_size' => strlen($videoData),
+                    'file_size' => $fileSize,
                     'end_time' => now(),
                     'status' => 'completed'
                 ]);
+                \Log::info('Updated recording entry', ['id' => $this->currentRecording->id]);
             }
 
-            return response()->json(['success' => true, 'message' => 'Video chunk saved successfully']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Video chunk saved successfully',
+                'debug' => [
+                    'filename' => $filename,
+                    'file_size' => $fileSize,
+                    'chunk_number' => $chunkNumber ?? $this->currentRecording->chunk_number
+                ]
+            ]);
         } catch (\Exception $e) {
-            \Log::error('Error saving video chunk: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Failed to save video chunk']);
+            \Log::error('Error saving video chunk', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'memory_usage' => memory_get_usage(true),
+                'server_info' => [
+                    'disk_free_space' => disk_free_space(storage_path()),
+                    'disk_total_space' => disk_total_space(storage_path())
+                ]
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to save video chunk',
+                'error' => $e->getMessage()
+            ]);
         }
     }
 

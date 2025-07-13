@@ -176,7 +176,7 @@ class AdminMasterTimetableIndex extends Component
                     ->orWhere('end_time', 'like', '%' . $search . '%')
                     ->orWhere('description', 'like', '%' . $search . '%');
             })
-            ->orderBy('order', 'asc')
+            ->orderBy('order', 'desc')
             ->paginate($this->perPage);
 
         return view('livewire.admin.master.timetable.admin-master-timetable-index', [

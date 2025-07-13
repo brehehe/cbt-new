@@ -10,10 +10,14 @@ use App\Livewire\Admin\Master\Question\AdminMasterQuestionIndex;
 use App\Livewire\Admin\Master\Question\AdminMasterQuestionUpdate;
 use App\Livewire\Admin\Master\QuestionType\AdminMasterQuestionTypeIndex;
 use App\Livewire\Admin\Master\Topic\AdminMasterTopicIndex;
+<<<<<<< HEAD
 use App\Livewire\Admin\Report\Question\AdminReportQuestionIndex;
 use App\Livewire\Admin\Report\TimeTable\AdminReportTimetable;
+=======
+use App\Livewire\Admin\Report\Timetable\AdminReportTimetable;
+>>>>>>> 68f74aca2fba29c07fca956f7018c8d7dc45d4d7
 use App\Livewire\Admin\Report\Timetable\AdminReportTimetableDetail;
-use App\Livewire\Admin\Report\TimeTable\AdminReportTimetableIndex;
+use App\Livewire\Admin\Report\Timetable\AdminReportTimetableIndex;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
