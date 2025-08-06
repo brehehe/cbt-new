@@ -25420,6 +25420,27 @@ namespace App\Livewire\Admin\Report\Timetable {
             }
     }
 
+namespace App\Livewire\Admin\Report\Question {
+    /**
+     * 
+     *
+     */
+    class AdminReportQuestionIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Report\Question\AdminReportQuestionIndex::modal($name);
+        }
+
+            }
+    }
+
 
 namespace  {
     class App extends \Illuminate\Support\Facades\App {}
