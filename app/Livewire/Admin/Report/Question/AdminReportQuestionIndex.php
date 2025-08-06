@@ -27,7 +27,8 @@ class AdminReportQuestionIndex extends Component
 
     public function mount()
     {
-        $this->timetables = Timetable::get();
+        // $this->timetables = Timetable::get();
+        $this->timetables = [];
     }
 
     public function getQuestionCorrect($question, $timetable = null)

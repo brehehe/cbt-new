@@ -30,10 +30,10 @@ class Module extends Model
             $user = Auth::user();
 
             if (!$user || !$user->hasRole('Anonymous')) {
-                $builder->where('company_id', optional($user?->company)?->id)->orderBy('order', 'asc');
+                $builder->where('company_id', optional($user?->company)?->id)->orderBy('order', 'desc');
             }
 
-            $builder->orderBy('order', 'asc');
+            $builder->orderBy('order', 'desc');
         });
 
         static::creating(function ($modelCreate) {
@@ -45,7 +45,7 @@ class Module extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
-        $term = '%'. $term .'%';
+        $term = '%' . $term . '%';
 
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id', 'name', 'duration', 'description', 'random_question'], 'ILIKE', $term);

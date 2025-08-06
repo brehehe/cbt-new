@@ -60,14 +60,96 @@
                 </div>
                 @php
                     $masters = [
-                        ['label' => 'Skala Penilaian', 'url' => '/admin/master/rating-scale', 'icon' => 'fa-chart-bar'],
-                        ['label' => 'Regulasi', 'url' => '/admin/master/regulation', 'icon' => 'fa-scroll'],
-                        ['label' => 'Jadwal', 'url' => '/admin/master/timetable', 'icon' => 'fa-clock'],
-                        ['label' => 'Admin', 'url' => '/admin/master/admin', 'icon' => 'fa-user-shield'],
-                        ['label' => 'Dosen', 'url' => '/admin/master/lecturer', 'icon' => 'fa-chalkboard-teacher'],
-                        ['label' => 'Pengawas', 'url' => '/admin/master/supervisor', 'icon' => 'fa-user-tie'],
-                        ['label' => 'Mahasiswa', 'url' => '/admin/master/student', 'icon' => 'fa-user-graduate'],
-                        ['label' => 'Pengaturan', 'url' => '/admin/master/setting', 'icon' => 'fa-cog'],
+                        [
+                            'label' => 'Skala Penilaian',
+                            'url' => '/admin/master/rating-scale',
+                            'pattern' => 'admin/master/rating-scale*',
+                            'icon' => 'fa-chart-bar',
+                        ],
+
+                        [
+                            'label' => 'Regulasi',
+                            'url' => '/admin/master/regulation',
+                            'pattern' => 'admin/master/regulation*',
+                            'icon' => 'fa-scroll',
+                        ],
+                        [
+                            'label' => 'Jadwal',
+                            'url' => '/admin/master/timetable',
+                            'pattern' => 'admin/master/timetable*',
+                            'icon' => 'fa-clock',
+                        ],
+
+                        [
+                            'label' => 'Admin',
+                            'url' => '/admin/master/admin',
+                            'pattern' => 'admin/master/admin*',
+                            'icon' => 'fa-user-shield',
+                        ],
+                        [
+                            'label' => 'Dosen',
+                            'url' => '/admin/master/lecturer',
+                            'pattern' => 'admin/master/lecturer*',
+                            'icon' => 'fa-chalkboard-teacher',
+                        ],
+                        [
+                            'label' => 'Pengawas',
+                            'url' => '/admin/master/supervisor',
+                            'pattern' => 'admin/master/supervisor*',
+                            'icon' => 'fa-user-tie',
+                        ],
+                        [
+                            'label' => 'Mahasiswa',
+                            'url' => '/admin/master/student',
+                            'pattern' => 'admin/master/student*',
+                            'icon' => 'fa-user-graduate',
+                        ],
+
+                        // —— tambahan lama yang tadi masih terpisah ——
+                        [
+                            'label' => 'Topik Ujian',
+                            'url' => route('admin.master.topic'),
+                            'pattern' => 'admin/master/topic-question*',
+                            'icon' => 'fa-tags',
+                        ],
+                        [
+                            'label' => 'Kategori Materi',
+                            'url' => route('admin.master.material-category'),
+                            'pattern' => 'admin/master/material-category',
+                            'icon' => 'fa-layer-group',
+                        ],
+                        [
+                            'label' => 'Materi',
+                            'url' => route('admin.master.material'),
+                            'pattern' => 'admin/master/material',
+                            'icon' => 'fa-book',
+                        ],
+
+                        [
+                            'label' => 'Tipe Soal',
+                            'url' => route('admin.master.question-type'),
+                            'pattern' => 'admin/master/question-type*',
+                            'icon' => 'fa-list-ol',
+                        ],
+                        [
+                            'label' => 'Modul Soal',
+                            'url' => route('admin.master.module'),
+                            'pattern' => 'admin/master/module*',
+                            'icon' => 'fa-folder-open',
+                        ],
+                        [
+                            'label' => 'Bank Soal',
+                            'url' => route('admin.master.question'),
+                            'pattern' => ['admin/master/question', 'admin/master/question/*'],
+                            'icon' => 'fa-database',
+                        ],
+
+                        [
+                            'label' => 'Pengaturan',
+                            'url' => '/admin/master/setting',
+                            'pattern' => 'admin/master/setting*',
+                            'icon' => 'fa-cog',
+                        ],
                     ];
                 @endphp
 
@@ -75,12 +157,13 @@
                     <div>
                         <a href="{{ $master['url'] }}"
                             class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
-            {{ Request::is(ltrim($master['url'] . '*', '/')) ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }}">
+               {{ Request::is($master['pattern'])
+                   ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu'
+                   : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }}">
                             <div class="flex items-center gap-3">
                                 <i
                                     class="fa-solid {{ $master['icon'] }} text-lg mr-2
-                {{ Request::is(ltrim($master['url'] . '*', '/')) ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}">
-                                </i>
+                       {{ Request::is($master['pattern']) ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
                                 <span class="sidebar-text">{{ $master['label'] }}</span>
                             </div>
                         </a>
@@ -88,99 +171,45 @@
                 @endforeach
 
                 <div>
-                    <a href="{{ route('admin.master.topic') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/topic-question') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
-                        <div class="flex items-center gap-3">
-                            <i
-                                class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/master/topic-question') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
-                            <span class="sidebar-text">Topik Ujian</span>
-                        </div>
-                    </a>
-                </div>
-                <div>
-                    <a href="{{ route('admin.master.material-category') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/material-category') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
-                        <div class="flex items-center gap-3">
-                            <i
-                                class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/master/material-category') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
-                            <span class="sidebar-text">Kategori Materi</span>
-                        </div>
-                    </a>
-                </div>
-                <div>
-                    <a href="{{ route('admin.master.material') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/material') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
-                        <div class="flex items-center gap-3">
-                            <i
-                                class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/master/material') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
-                            <span class="sidebar-text">Materi</span>
-                        </div>
-                    </a>
-                </div>
-                <div>
-                    <a href="{{ route('admin.master.question-type') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/question-type') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
-                        <div class="flex items-center gap-3">
-                            <i
-                                class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/master/question-type') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
-                            <span class="sidebar-text">Tipe Soal</span>
-                        </div>
-                    </a>
-                </div>
-                {{-- <div>
-                    <a href="{{ route('admin.master.exam-type') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/exam-type') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
-                        <div class="flex items-center gap-3">
-                            <i
-                                class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/master/exam-type') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
-                            <span class="sidebar-text">Tipe Ujian</span>
-                        </div>
-                    </a>
-                </div> --}}
-                <div>
-                    <a href="{{ route('admin.master.module') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/module*') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
-                        <div class="flex items-center gap-3">
-                            <i
-                                class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/master/module*') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
-                            <span class="sidebar-text">Modul Soal</span>
-                        </div>
-                    </a>
-                </div>
-                <div>
-                    <a href="{{ route('admin.master.question') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/master/question') || Request::is('admin/master/question/*') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
-                        <div class="flex items-center gap-3">
-                            <i
-                                class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/master/question') || Request::is('admin/master/question/*') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
-                            <span class="sidebar-text">Bank Soal</span>
-                        </div>
-                    </a>
-                </div>
-                <div>
                     <div
                         class="w-full group flex items-center justify-between custom-padding text-xs font-bold text-[#1E3A8A] uppercase tracking-wide">
                         Laporan
                     </div>
                 </div>
-                <div>
-                    <a href="{{ route('admin.report.timetable') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/report/timetable*') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
-                        <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/report/timetable*') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
-                            <span class="sidebar-text">Rapot Nilai</span>
-                        </div>
-                    </a>
-                </div>
-                <div>
-                    <a href="{{ route('admin.report.question') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ Request::is('admin/report/timetable*') ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }} transition-colors duration-200">
-                        <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-tag mr-2 text-lg {{ Request::is('admin/report/timetable*') ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}"></i>
-                            <span class="sidebar-text">Analisis Soal</span>
-                        </div>
-                    </a>
-                </div>
+
+                @php
+                    $reports = [
+                        [
+                            'label' => 'Rapot Nilai',
+                            'route' => route('admin.report.timetable'),
+                            'icon' => 'fa-file-alt',
+                            'match' => 'admin/report/timetable*',
+                        ],
+                        [
+                            'label' => 'Analisis Soal',
+                            'route' => route('admin.report.question'),
+                            'icon' => 'fa-chart-pie',
+                            'match' => 'admin/report/question*',
+                        ],
+                    ];
+                @endphp
+
+
+                @foreach ($reports as $report)
+                    <div>
+                        <a href="{{ $report['route'] }}"
+                            class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
+            {{ Request::is($report['match']) ? 'bg-[#C3D4EC]/50 text-[#1E3A8A] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A]' }}">
+                            <div class="flex items-center gap-3">
+                                <i
+                                    class="fa-solid {{ $report['icon'] }} mr-2 text-lg
+                    {{ Request::is($report['match']) ? 'text-[#1E3A8A]' : 'text-gray-400 group-hover:text-[#1E3A8A]' }}">
+                                </i>
+                                <span class="sidebar-text">{{ $report['label'] }}</span>
+                            </div>
+                        </a>
+                    </div>
+                @endforeach
             </nav>
         </div>
     </div>

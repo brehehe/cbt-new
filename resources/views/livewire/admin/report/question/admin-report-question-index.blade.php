@@ -72,9 +72,13 @@
                         <tr>
                             <td class="center ">{{ $questions->firstItem() + $index }}</td>
                             <td>{{ $result?->question ?? '-' }}</td>
-                            @foreach ($timetables as $key => $timetable)
-                                <td class="center">{{ $this->getQuestionCorrect($result, $timetable) }}</td>
-                            @endforeach
+                            @if (empty($timetables))
+                                <td class="center">-</td>
+                            @else
+                                @foreach ($timetables as $key => $timetable)
+                                    <td class="center">{{ $this->getQuestionCorrect($result, $timetable) }}</td>
+                                @endforeach
+                            @endif
                             <td>{{ $this->getQuestionCorrect($result) }}</td>
                         </tr>
                     @empty

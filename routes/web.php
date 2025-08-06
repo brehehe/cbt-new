@@ -82,12 +82,12 @@ if (config('app.env') === 'local' || config('app.env') === 'development') {
 }
 
 Route::get('logout', function () {
-    if (Auth::check()) {
-        $user = User::find(auth()->user()->id);
-        $user->update([
-            'company_id' => null,
-        ]);
-    }
+    // if (Auth::check()) {
+    //     $user = User::find(auth()->user()->id);
+    //     $user->update([
+    //         'company_id' => null,
+    //     ]);
+    // }
     auth()->logout();
 
     return redirect()->route('login');
