@@ -619,6 +619,7 @@ namespace App\Models\Master\Question{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Question\ModuleQuestion> $moduleQuestions
  * @property-read int|null $module_questions_count
  * @property-read \App\Models\Master\Question\QuestionType|null $questionType
+ * @property-read \App\Models\Timetable\TimetableQuestion|null $timetableQuestion
  * @property-read \App\Models\Master\Question\Topic|null $topic
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question newQuery()
@@ -1310,7 +1311,7 @@ namespace App\Models\Timetable{
  * @property string|null $material_category_id
  * @property string|null $material_id
  * @property string|null $question_type_id
- * @property string $question soal
+ * @property \App\Models\Master\Question\Question|null $question soal
  * @property string|null $images gambar soal
  * @property string|null $description keterangan soal
  * @property float|null $weight_correct score jika soal ini terjawab benar
@@ -1323,7 +1324,6 @@ namespace App\Models\Timetable{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Timetable\TimetableAnswer> $answers
  * @property-read int|null $answers_count
  * @property-read \App\Models\Company\Company|null $company
- * @property-read \App\Models\Master\Question\QuestionType|null $questionType
  * @property-read \App\Models\Timetable\TimetableModule|null $timetableModule
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion newQuery()
