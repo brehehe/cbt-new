@@ -91,7 +91,7 @@ class LecturerManagement extends Component
 
     public function render()
     {
-        $query = User::role('Lecturer')
+        $query = User::role('Dosen')
             ->with(['userDetail'])
             ->whereHas('userDetail', function ($q) {
                 if ($this->search) {
@@ -247,7 +247,7 @@ class LecturerManagement extends Component
                     'email_verified_at' => now()
                 ]);
 
-                $user->assignRole('Lecturer');
+                $user->assignRole('Dosen');
 
                 $user->userDetail()->create([
                     'lecturer_id' => $this->lecturer_id,

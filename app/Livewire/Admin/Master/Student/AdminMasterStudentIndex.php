@@ -9,12 +9,13 @@ use App\Models\User\UserDetail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\App;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
-use Log;
-use Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
@@ -41,15 +42,59 @@ class AdminMasterStudentIndex extends Component
     public $profile_old;
     public $phone;
 
-    // User Detail
+    // User Detail - Basic Information
     public $address;
-    public $identity_card;
     public $is_head = false;
     public $is_active = false;
 
+    // Student Specific Fields
+    public $student_id;
+    public $student_program;
+    public $student_faculty;
+    public $student_department;
+    public $student_class;
+    public $student_semester;
+    public $student_academic_year;
+    public $student_status = 'active';
+    public $student_gpa;
+    public $student_advisor_id;
+    public $student_entry_date;
+    public $student_graduation_date;
+
+    // Personal Information
+    public $birth_date;
+    public $birth_place;
+    public $gender;
+    public $religion;
+    public $nationality = 'Indonesian';
+    public $marital_status = 'single';
+    public $postal_code;
+    public $city;
+    public $province;
+    public $country = 'ID';
+    public $mobile_phone;
+    public $emergency_contact_name;
+    public $emergency_contact_phone;
+    public $emergency_contact_relation;
+    public $identity_type = 'KTP';
+    public $identity_number;
+    public $blood_group;
+
+    // Academic Performance
+    public $total_exams_taken = 0;
+    public $average_score;
+    public $exam_preference;
+    public $special_needs = false;
+    public $special_needs_description;
+
+    // System Settings
+    public $preferred_language = 'id';
+    public $verification_status = 'pending';
+    public $notes;
+
     public function openModal()
     {
-        return $this->dispatch('open-modal', ['id' => 'modal']);
+        $this->dispatch('open-modal', ['id' => 'modal']);
     }
 
     public function closeModal()
@@ -67,39 +112,145 @@ class AdminMasterStudentIndex extends Component
             'identity_number',
             'is_head',
             'is_active',
+            'student_id',
+            'student_program',
+            'student_faculty',
+            'student_department',
+            'student_class',
+            'student_semester',
+            'student_academic_year',
+            'student_status',
+            'student_gpa',
+            'student_advisor_id',
+            'student_entry_date',
+            'student_graduation_date',
+            'birth_date',
+            'birth_place',
+            'gender',
+            'religion',
+            'nationality',
+            'marital_status',
+            'postal_code',
+            'city',
+            'province',
+            'country',
+            'mobile_phone',
+            'emergency_contact_name',
+            'emergency_contact_phone',
+            'emergency_contact_relation',
+            'identity_type',
+            'identity_number',
+            'blood_group',
+            'total_exams_taken',
+            'average_score',
+            'exam_preference',
+            'special_needs',
+            'special_needs_description',
+            'preferred_language',
+            'verification_status',
+            'notes',
         ]);
         $this->resetErrorBag();
         $this->resetValidation();
-        return $this->dispatch('close-modal', ['id' => 'modal']);
+        $this->dispatch('close-modal', ['id' => 'modal']);
     }
 
 
     public function edit($id)
     {
-        $user = User::findOrFail($id);
-        $this->data_id = $user->id;
-        $this->name = $user->name;
-        $this->nim = $user->nim;
-        $this->email = $user->email;
-        $this->profile_old = $user->profile;
-        $this->phone = trim($user->phone ?? 0);
+        try {
+            $user = User::findOrFail($id);
+            $this->data_id = $user->id;
+            $this->name = $user->name;
+            $this->nim = $user->nim;
+            $this->email = $user->email;
+            $this->profile_old = $user->profile;
+            $this->phone = trim($user->phone ?? '');
 
-        if ($user->userDetail) {
-            $this->address = $user->userDetail->address;
-            $this->identity_card = $user->userDetail->identity_card ? Crypt::decryptString($user->userDetail->identity_card) : null;
-            $this->is_head =
-                $user
-                ->companyRoles()
-                ->where('company_id', Auth::user()->company_id)
-                ->first()->is_head ?? false;
-            $this->is_active =
-                $user
-                ->companyRoles()
-                ->where('company_id', Auth::user()->company_id)
-                ->first()->is_active ?? false;
+            if ($user->userDetail) {
+                $detail = $user->userDetail;
+
+                // Basic Information
+                $this->address = $detail->address;
+                
+                // Handle identity_number decryption safely
+                if ($detail->identity_number) {
+                    try {
+                        $this->identity_number = Crypt::decryptString($detail->identity_number);
+                    } catch (\Exception $e) {
+                        // If decryption fails, assume it's already plain text
+                        $this->identity_number = $detail->identity_number;
+                        Log::info('Identity number appears to be stored as plain text for user: ' . $user->id);
+                    }
+                } else {
+                    $this->identity_number = null;
+                }
+
+                // Student Specific Fields
+                $this->student_id = $detail->student_id;
+                $this->student_program = $detail->student_program;
+                $this->student_faculty = $detail->student_faculty;
+                $this->student_department = $detail->student_department;
+                $this->student_class = $detail->student_class;
+                $this->student_semester = $detail->student_semester;
+                $this->student_academic_year = $detail->student_academic_year;
+                $this->student_status = $detail->student_status ?? 'active';
+                $this->student_gpa = $detail->student_gpa;
+                $this->student_advisor_id = $detail->student_advisor_id;
+                $this->student_entry_date = $detail->student_entry_date;
+                $this->student_graduation_date = $detail->student_graduation_date;
+
+                // Personal Information
+                $this->birth_date = $detail->birth_date;
+                $this->birth_place = $detail->birth_place;
+                $this->gender = $detail->gender;
+                $this->religion = $detail->religion;
+                $this->nationality = $detail->nationality ?? 'Indonesian';
+                $this->marital_status = $detail->marital_status ?? 'single';
+                $this->postal_code = $detail->postal_code;
+                $this->city = $detail->city;
+                $this->province = $detail->province;
+                $this->country = $detail->country ?? 'ID';
+                $this->mobile_phone = $detail->mobile_phone;
+                $this->emergency_contact_name = $detail->emergency_contact_name;
+                $this->emergency_contact_phone = $detail->emergency_contact_phone;
+                $this->emergency_contact_relation = $detail->emergency_contact_relation;
+                $this->identity_type = $detail->identity_type ?? 'KTP';
+                $this->blood_group = $detail->blood_group;
+
+                // Academic Performance
+                $this->total_exams_taken = $detail->total_exams_taken ?? 0;
+                $this->average_score = $detail->average_score;
+                $this->exam_preference = $detail->exam_preference;
+                $this->special_needs = $detail->special_needs ?? false;
+                $this->special_needs_description = $detail->special_needs_description;
+
+                // System Settings
+                $this->preferred_language = $detail->preferred_language ?? 'id';
+                $this->verification_status = $detail->verification_status ?? 'pending';
+                $this->notes = $detail->notes;
+
+                // Company roles
+                $companyRole = $user
+                    ->companyRoles()
+                    ->where('company_id', Auth::user()->company_id)
+                    ->first();
+                
+                $this->is_head = $companyRole->is_head ?? false;
+                $this->is_active = $companyRole->is_active ?? false;
+            }
+
+            $this->openModal();
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error('User not found for edit: ' . $id);
+            AlertHelper::error('Error', 'Data mahasiswa tidak ditemukan.');
+        } catch (\Exception $e) {
+            Log::error('Error in edit method: ' . $e->getMessage(), [
+                'user_id' => $id,
+                'trace' => $e->getTraceAsString()
+            ]);
+            AlertHelper::error('Error', 'Gagal membuka data mahasiswa. Silakan coba lagi.');
         }
-
-        $this->openModal();
     }
 
     public function submit()
@@ -140,6 +291,50 @@ class AdminMasterStudentIndex extends Component
             ],
             'address' => 'required|string|max:500',
             'identity_number' => 'nullable|string|max:20',
+
+            // Student Specific Validation
+            'student_id' => 'nullable|string|max:20',
+            'student_program' => 'nullable|string|max:100',
+            'student_faculty' => 'nullable|string|max:100',
+            'student_department' => 'nullable|string|max:100',
+            'student_class' => 'nullable|string|max:10',
+            'student_semester' => 'nullable|string|max:10',
+            'student_academic_year' => 'nullable|string|max:20',
+            'student_status' => 'nullable|in:active,graduate,dropout,transfer,leave',
+            'student_gpa' => 'nullable|numeric|min:0|max:4',
+            'student_advisor_id' => 'nullable|string|max:50',
+            'student_entry_date' => 'nullable|date',
+            'student_graduation_date' => 'nullable|date|after_or_equal:student_entry_date',
+
+            // Personal Information Validation
+            'birth_date' => 'nullable|date|before:today',
+            'birth_place' => 'nullable|string|max:100',
+            'gender' => 'nullable|in:male,female',
+            'religion' => 'nullable|string|max:50',
+            'nationality' => 'nullable|string|max:50',
+            'marital_status' => 'nullable|in:single,married,divorced,widowed',
+            'postal_code' => 'nullable|string|max:10',
+            'city' => 'nullable|string|max:100',
+            'province' => 'nullable|string|max:100',
+            'country' => 'nullable|string|max:3',
+            'mobile_phone' => 'nullable|string|max:15',
+            'emergency_contact_name' => 'nullable|string|max:255',
+            'emergency_contact_phone' => 'nullable|string|max:15',
+            'emergency_contact_relation' => 'nullable|string|max:50',
+            'identity_type' => 'nullable|string|max:20',
+            'blood_group' => 'nullable|in:A,B,AB,O',
+
+            // Academic Performance Validation
+            'total_exams_taken' => 'nullable|integer|min:0',
+            'average_score' => 'nullable|numeric|min:0|max:100',
+            'exam_preference' => 'nullable|string|max:100',
+            'special_needs' => 'nullable|boolean',
+            'special_needs_description' => 'nullable|string|max:500',
+
+            // System Settings Validation
+            'preferred_language' => 'nullable|string|max:10',
+            'verification_status' => 'nullable|in:pending,verified,rejected',
+            'notes' => 'nullable|string|max:1000',
         ]);
 
         try {
@@ -197,7 +392,7 @@ class AdminMasterStudentIndex extends Component
             ]);
 
             // Show user-friendly error message
-            if (in_array(app()->environment(), ['local', 'development'])) {
+            if (in_array(App::environment(), ['local', 'development'])) {
                 $errorMessage .= ' Error: ' . $e->getMessage();
             }
 
@@ -324,11 +519,61 @@ class AdminMasterStudentIndex extends Component
     {
         $detailData = [
             'address' => $validatedData['address'],
+
+            // Student Specific Fields
+            'student_id' => $validatedData['student_id'] ?? null,
+            'student_program' => $validatedData['student_program'] ?? null,
+            'student_faculty' => $validatedData['student_faculty'] ?? null,
+            'student_department' => $validatedData['student_department'] ?? null,
+            'student_class' => $validatedData['student_class'] ?? null,
+            'student_semester' => $validatedData['student_semester'] ?? null,
+            'student_academic_year' => $validatedData['student_academic_year'] ?? null,
+            'student_status' => $validatedData['student_status'] ?? 'active',
+            'student_gpa' => $validatedData['student_gpa'] ?? null,
+            'student_advisor_id' => $validatedData['student_advisor_id'] ?? null,
+            'student_entry_date' => $validatedData['student_entry_date'] ?? null,
+            'student_graduation_date' => $validatedData['student_graduation_date'] ?? null,
+
+            // Personal Information
+            'birth_date' => $validatedData['birth_date'] ?? null,
+            'birth_place' => $validatedData['birth_place'] ?? null,
+            'gender' => $validatedData['gender'] ?? null,
+            'religion' => $validatedData['religion'] ?? null,
+            'nationality' => $validatedData['nationality'] ?? 'Indonesian',
+            'marital_status' => $validatedData['marital_status'] ?? 'single',
+            'postal_code' => $validatedData['postal_code'] ?? null,
+            'city' => $validatedData['city'] ?? null,
+            'province' => $validatedData['province'] ?? null,
+            'country' => $validatedData['country'] ?? 'ID',
+            'mobile_phone' => $validatedData['mobile_phone'] ?? null,
+            'emergency_contact_name' => $validatedData['emergency_contact_name'] ?? null,
+            'emergency_contact_phone' => $validatedData['emergency_contact_phone'] ?? null,
+            'emergency_contact_relation' => $validatedData['emergency_contact_relation'] ?? null,
+            'identity_type' => $validatedData['identity_type'] ?? 'KTP',
+            'blood_group' => $validatedData['blood_group'] ?? null,
+
+            // Academic Performance
+            'total_exams_taken' => $validatedData['total_exams_taken'] ?? 0,
+            'average_score' => $validatedData['average_score'] ?? null,
+            'exam_preference' => $validatedData['exam_preference'] ?? null,
+            'special_needs' => $validatedData['special_needs'] ?? false,
+            'special_needs_description' => $validatedData['special_needs_description'] ?? null,
+
+            // System Settings
+            'preferred_language' => $validatedData['preferred_language'] ?? 'id',
+            'verification_status' => $validatedData['verification_status'] ?? 'pending',
+            'notes' => $validatedData['notes'] ?? null,
         ];
 
-        // Handle identity card encryption
+        // Handle identity card encryption safely
         if (!empty($validatedData['identity_number'])) {
-            $detailData['identity_number'] = Crypt::encryptString($validatedData['identity_number']);
+            try {
+                $detailData['identity_number'] = Crypt::encryptString($validatedData['identity_number']);
+            } catch (\Exception $e) {
+                // If encryption fails, store as plain text for now
+                $detailData['identity_number'] = $validatedData['identity_number'];
+                Log::warning('Failed to encrypt identity_number, storing as plain text: ' . $e->getMessage());
+            }
         }
 
         UserDetail::updateOrCreate(

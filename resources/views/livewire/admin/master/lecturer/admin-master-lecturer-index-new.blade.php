@@ -1,5 +1,5 @@
 <div>
-    @include('livewire.admin.master.lecturer.admin-master-lecturer-modal-new')
+    @include('livewire.admin.master.lecturer.admin-master-lecturer-modal')
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
@@ -20,18 +20,19 @@
 
     <!-- Filters -->
     <div class="bg-white rounded-lg shadow mb-6 p-4">
-        <div class="grid grid-cols-5 md:grid-cols-5 gap-4 items-end">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
             <!-- Search -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Cari</label>
                 <input type="text" wire:model.live="search" placeholder="ID Dosen, NIDN, Nama, Email..."
-                    class="form-control mt-1">
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
 
             <!-- Faculty Filter -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Fakultas</label>
-                <select wire:model.live="facultyFilter" class="form-control mt-1">
+                <select wire:model.live="facultyFilter"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">Semua Fakultas</option>
                     @foreach ($faculties as $faculty)
                         <option value="{{ $faculty }}">{{ $faculty }}</option>
@@ -42,7 +43,8 @@
             <!-- Department Filter -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Jurusan</label>
-                <select wire:model.live="departmentFilter" class="form-control mt-1">
+                <select wire:model.live="departmentFilter"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">Semua Jurusan</option>
                     @foreach ($departments as $department)
                         <option value="{{ $department }}">{{ $department }}</option>
@@ -53,7 +55,8 @@
             <!-- Position Filter -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Jabatan</label>
-                <select wire:model.live="positionFilter" class="form-control mt-1">
+                <select wire:model.live="positionFilter"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">Semua Jabatan</option>
                     @foreach ($positions as $position)
                         <option value="{{ $position }}">{{ $position }}</option>
@@ -64,7 +67,8 @@
             <!-- Per Page -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Per Halaman</label>
-                <select wire:model.live="perPage" class="form-control mt-1">
+                <select wire:model.live="perPage"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="5">5</option>
                     <option value="10">10</option>
                     <option value="25">25</option>
@@ -139,21 +143,15 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ $lecturer->userDetail->lecturer_specialization ?? '-' }}
                             </td>
-                            <td class="center">
-                                <div class="flex items-center">
-                                    <button
-                                        class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn"
-                                        wire:click="edit('{{ $lecturer->id }}')">
-                                        <i class="fa-solid fa-pen-to-square"></i> <!-- atau fa-edit (versi lama) -->
-                                    </button>
-
-                                    <!-- Tombol Delete -->
-                                    <button
-                                        class="btn btn-icon text-red-600 hover:text-red-800 transition-colors delete-btn"
-                                        wire:click="confirmDelete('{{ $lecturer->id }}')">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </div>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button wire:click="edit({{ $lecturer->id }})"
+                                    class="text-indigo-600 hover:text-indigo-900 mr-3">
+                                    Edit
+                                </button>
+                                <button wire:click="confirmDelete({{ $lecturer->id }})"
+                                    class="text-red-600 hover:text-red-900">
+                                    Hapus
+                                </button>
                             </td>
                         </tr>
                     @empty
