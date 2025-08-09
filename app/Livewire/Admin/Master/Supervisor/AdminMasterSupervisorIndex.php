@@ -25,10 +25,13 @@ class AdminMasterSupervisorIndex extends Component
     protected $queryString = [
         // 'page' => ['except' => 1], // Ini akan menghapus ?page=1 dari URL
         'search' => ['except' => ''],
+        'statusFilter' => ['except' => ''],
+        'departmentFilter' => ['except' => ''],
     ];
 
     public $search = '';
     public $statusFilter = '';
+    public $departmentFilter = '';
 
     public $perPage = 10;
 
@@ -44,7 +47,6 @@ class AdminMasterSupervisorIndex extends Component
 
     // User Detail
     public $address;
-    public $employee_id;
     public $supervisor_id;
     public $supervisor_nip;
     public $supervisor_department;
@@ -78,7 +80,7 @@ class AdminMasterSupervisorIndex extends Component
             'profile_old',
             'phone',
             'address',
-            'employee_id',
+            'supervisor_id',
             'supervisor_id',
             'supervisor_nip',
             'supervisor_department',
@@ -113,7 +115,7 @@ class AdminMasterSupervisorIndex extends Component
 
         if ($user->userDetail) {
             $this->address = $user->userDetail->address;
-            $this->employee_id = $user->userDetail->employee_id;
+            $this->supervisor_id = $user->userDetail->supervisor_id;
             $this->supervisor_id = $user->userDetail->supervisor_id;
             $this->supervisor_nip = $user->userDetail->supervisor_nip;
             $this->supervisor_department = $user->userDetail->supervisor_department;
@@ -174,7 +176,7 @@ class AdminMasterSupervisorIndex extends Component
                     ->ignore($this->data_id),
             ],
             'address' => 'nullable|string|max:500',
-            'employee_id' => 'required|string|max:50|unique:user_details,employee_id,' . ($this->data_id ? $this->data_id : 'NULL') . ',user_id',
+            'supervisor_id' => 'required|string|max:50|unique:user_details,supervisor_id,' . ($this->data_id ? $this->data_id : 'NULL') . ',user_id',
         ]);
 
         try {
@@ -358,9 +360,9 @@ class AdminMasterSupervisorIndex extends Component
     {
         $detailData = [
             'address' => $validatedData['address'] ?? null,
-            'employee_id' => $validatedData['employee_id'] ?? null,
-            'supervisor_id' => $this->supervisor_id ?? $validatedData['employee_id'],
-            'supervisor_nip' => $this->supervisor_nip ?? $validatedData['employee_id'],
+            'supervisor_id' => $validatedData['supervisor_id'] ?? null,
+            'supervisor_id' => $this->supervisor_id ?? $validatedData['supervisor_id'],
+            'supervisor_nip' => $this->supervisor_nip ?? null,
             'supervisor_department' => $this->supervisor_department,
             'supervisor_unit' => $this->supervisor_unit,
             'supervisor_position' => $this->supervisor_position,
@@ -430,6 +432,13 @@ class AdminMasterSupervisorIndex extends Component
             $query->whereHas('companyRoles', function ($q) {
                 $q->where('company_id', Auth::user()->company_id)
                     ->where('is_active', $this->statusFilter === 'active');
+            });
+        }
+
+        // Filter by department if selected
+        if (!empty($this->departmentFilter)) {
+            $query->whereHas('userDetail', function ($q) {
+                $q->where('supervisor_department', $this->departmentFilter);
             });
         }
 

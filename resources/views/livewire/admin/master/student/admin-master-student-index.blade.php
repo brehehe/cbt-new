@@ -3,7 +3,8 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#1E3A8A]">Mahasiswa</h1>
+                <h1 class="text-2xl font-bold text-[#1E3A8A]">Manajemen Data Mahasiswa</h1>
+                <p class="text-gray-600">Kelola data mahasiswa dalam sistem CBT</p>
             </div>
             <div>
                 <button wire:click="openModal()" class="btn btn-primary">
@@ -17,95 +18,140 @@
         </div>
     </div>
 
-    <!-- Table Controls -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-        <div class="flex items-center">
-            <span class="text-sm text-gray-700 mr-2">Tampil</span>
-            <select class="mt-1 form-control" wire:model.live='perPage'>
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
-            <span class="text-sm text-gray-700 ml-2">data</span>
-        </div>
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow mb-6 p-4">
+        <div class="grid grid-cols-4 md:grid-cols-4 gap-4 items-end">
+            <!-- Search -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Cari</label>
+                <input type="text" wire:model.live="search" placeholder="NIM, Nama, Email..."
+                    class="form-control mt-1">
+            </div>
 
-        <div class="relative w-full sm:w-64">
-            <input type="text" class="mt-1 form-control-search" placeholder="Cari Sesuatu..."
-                wire:model.live='search'>
-            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <i class="fas fa-search h-3 w-3 text-gray-400"></i>
+            <!-- Program Filter -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Program Studi</label>
+                <select wire:model.live="programFilter" class="form-control mt-1">
+                    <option value="">Semua Program</option>
+                    <option value="Informatika">Informatika</option>
+                    <option value="Sistem Informasi">Sistem Informasi</option>
+                    <option value="Teknik Komputer">Teknik Komputer</option>
+                    <option value="Data Science">Data Science</option>
+                </select>
+            </div>
+
+            <!-- Status Filter -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select wire:model.live="statusFilter" class="form-control mt-1">
+                    <option value="">Semua Status</option>
+                    <option value="active">Aktif</option>
+                    <option value="graduate">Lulus</option>
+                    <option value="dropout">Dropout</option>
+                    <option value="transfer">Pindah</option>
+                    <option value="leave">Cuti</option>
+                </select>
+            </div>
+
+            <!-- Per Page -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Per Halaman</label>
+                <select wire:model.live="perPage" class="form-control mt-1">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                </select>
             </div>
         </div>
     </div>
 
     <!-- Table Section -->
-    <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
-        <div class="table-container">
-            <table class="table">
-                <thead>
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
                     <tr>
-                        <th class="w-1 center">No</th>
-                        <th>Nama</th>
-                        <th>Email</th>
-                        <th>NIM</th>
-                        <th>Program Studi</th>
-                        <th>Semester</th>
-                        <th>Status</th>
-                        <th class="w-1 center">Aksi</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Mahasiswa
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            NIM/ID
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Program Studi
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Semester/Angkatan
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Fakultas
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Aksi
+                        </th>
                     </tr>
                 </thead>
-                <tbody>
-                    @forelse ($admins as $index => $admin)
-                        <tr>
-                            <td class="center">{{ $admins->firstItem() + $index }}</td>
-                            <td>
-                                <div class="flex items-center space-x-3">
-                                    @if ($admin->profile)
-                                        <img class="w-8 h-8 rounded-full object-cover"
-                                            src="{{ asset('storage/' . $admin->profile) }}" alt="{{ $admin->name }}">
-                                    @else
-                                        <div
-                                            class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-medium">
-                                            {{ substr($admin->name, 0, 1) }}
-                                        </div>
-                                    @endif
-                                    <div>
-                                        <div class="font-medium text-gray-900">{{ $admin->name ?? '-' }}</div>
-                                        @if ($admin->userDetail && $admin->userDetail->student_id)
-                                            <div class="text-sm text-gray-500">ID: {{ $admin->userDetail->student_id }}
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse ($admins as $admin)
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10">
+                                        @if ($admin->profile)
+                                            <img src="{{ asset('storage/' . $admin->profile) }}"
+                                                alt="Foto {{ $admin->name }}"
+                                                class="h-10 w-10 rounded-full object-cover">
+                                        @else
+                                            <div
+                                                class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                                <span class="text-sm font-medium text-blue-700">
+                                                    {{ substr($admin->name, 0, 2) }}
+                                                </span>
                                             </div>
                                         @endif
                                     </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">{{ $admin->name }}</div>
+                                        <div class="text-sm text-gray-500">{{ $admin->email }}</div>
+                                    </div>
                                 </div>
                             </td>
-                            <td>{{ $admin->email ?? '-' }}</td>
-                            <td>
-                                <span class="font-mono text-sm">{{ $admin->nim ?? '-' }}</span>
-                            </td>
-                            <td>
-                                @if ($admin->userDetail)
-                                    <div>{{ $admin->userDetail->student_program ?? '-' }}</div>
-                                    @if ($admin->userDetail->student_faculty)
-                                        <div class="text-sm text-gray-500">{{ $admin->userDetail->student_faculty }}
-                                        </div>
-                                    @endif
-                                @else
-                                    -
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">
+                                    {{ $admin->nim ?? '-' }}
+                                </div>
+                                @if ($admin->userDetail && $admin->userDetail->student_id)
+                                    <div class="text-sm text-gray-500">ID: {{ $admin->userDetail->student_id }}</div>
                                 @endif
                             </td>
-                            <td class="center">
-                                @if ($admin->userDetail && $admin->userDetail->student_semester)
-                                    <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">
+                                    {{ $admin->userDetail->student_program ?? '-' }}
+                                </div>
+                                @if ($admin->userDetail && $admin->userDetail->student_major)
+                                    <div class="text-sm text-gray-500">{{ $admin->userDetail->student_major }}</div>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">
+                                    @if ($admin->userDetail && $admin->userDetail->student_semester)
                                         Semester {{ $admin->userDetail->student_semester }}
-                                    </span>
-                                @else
-                                    -
-                                @endif
+                                    @else
+                                        -
+                                    @endif
+                                </div>
+                                <div class="text-sm text-gray-500">
+                                    Angkatan: {{ $admin->userDetail->student_batch ?? '-' }}
+                                </div>
                             </td>
-                            <td class="center">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ $admin->userDetail->student_faculty ?? '-' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 @if ($admin->userDetail)
                                     @php
                                         $status = $admin->userDetail->student_status ?? 'active';
@@ -125,26 +171,24 @@
                                         ];
                                     @endphp
                                     <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusColors[$status] ?? 'bg-gray-100 text-gray-800' }}">
+                                        class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $statusColors[$status] ?? 'bg-gray-100 text-gray-800' }}">
                                         {{ $statusLabels[$status] ?? ucfirst($status) }}
                                     </span>
                                 @else
                                     <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
                                         -
                                     </span>
                                 @endif
                             </td>
-                            <td class="center">
-                                <div class="flex items-center justify-center space-x-1">
-                                    <!-- Tombol Edit -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
                                     <button
                                         class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn"
                                         wire:click="edit('{{ $admin->id }}')" title="Edit Data">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </button>
 
-                                    <!-- Tombol Delete -->
                                     <button
                                         class="btn btn-icon text-red-600 hover:text-red-800 transition-colors delete-btn"
                                         wire:click="confirmDelete('{{ $admin->id }}')" title="Hapus Data">
@@ -155,16 +199,8 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="no-data">
-                                <div class="text-center py-8">
-                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                    </svg>
-                                    <h3 class="mt-2 text-sm font-medium text-gray-900">Tidak ada data mahasiswa</h3>
-                                    <p class="mt-1 text-sm text-gray-500">Mulai dengan menambahkan mahasiswa baru.</p>
-                                </div>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                Tidak ada data mahasiswa ditemukan.
                             </td>
                         </tr>
                     @endforelse
@@ -173,20 +209,8 @@
         </div>
 
         <!-- Pagination -->
-        <div class="px-5 py-4 bg-gray-50/80 border-t border-gray-200">
-            <div class="flex items-center justify-between">
-                <div class="text-sm text-gray-700">
-                    Menampilkan <span class="font-medium">{{ $admins->firstItem() }}</span> sampai <span
-                        class="font-medium">{{ $admins->lastItem() }}</span> dari <span
-                        class="font-medium">{{ $admins->total() }}</span> hasil
-                </div>
-                <div>
-                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        {{ $admins->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
-                    </nav>
-                </div>
-            </div>
+        <div class="px-6 py-3 border-t border-gray-200">
+            {{ $admins->links() }}
         </div>
-
     </div>
 </div>

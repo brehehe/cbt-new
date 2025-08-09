@@ -26,9 +26,13 @@ class AdminMasterStudentIndex extends Component
     protected $queryString = [
         // 'page' => ['except' => 1], // Ini akan menghapus ?page=1 dari URL
         'search' => ['except' => ''],
+        'programFilter' => ['except' => ''],
+        'statusFilter' => ['except' => ''],
     ];
 
     public $search = '';
+    public $programFilter = '';
+    public $statusFilter = '';
 
     public $perPage = 5;
 
@@ -52,8 +56,10 @@ class AdminMasterStudentIndex extends Component
     public $student_program;
     public $student_faculty;
     public $student_department;
+    public $student_major;
     public $student_class;
     public $student_semester;
+    public $student_batch;
     public $student_academic_year;
     public $student_status = 'active';
     public $student_gpa;
@@ -172,7 +178,7 @@ class AdminMasterStudentIndex extends Component
 
                 // Basic Information
                 $this->address = $detail->address;
-                
+
                 // Handle identity_number decryption safely
                 if ($detail->identity_number) {
                     try {
@@ -235,7 +241,7 @@ class AdminMasterStudentIndex extends Component
                     ->companyRoles()
                     ->where('company_id', Auth::user()->company_id)
                     ->first();
-                
+
                 $this->is_head = $companyRole->is_head ?? false;
                 $this->is_active = $companyRole->is_active ?? false;
             }
@@ -623,6 +629,20 @@ class AdminMasterStudentIndex extends Component
             ->search($this->search)
             ->where('type_user', 'employee')
             ->orderBy('name', 'asc');
+
+        // Apply program filter
+        if (!empty($this->programFilter)) {
+            $user->whereHas('userDetail', function ($query) {
+                $query->where('student_program', $this->programFilter);
+            });
+        }
+
+        // Apply status filter
+        if (!empty($this->statusFilter)) {
+            $user->whereHas('userDetail', function ($query) {
+                $query->where('student_status', $this->statusFilter);
+            });
+        }
 
         return view('livewire.admin.master.student.admin-master-student-index', [
             'admins' => $user->paginate($this->perPage),

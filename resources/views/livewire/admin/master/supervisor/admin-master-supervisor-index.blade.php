@@ -20,12 +20,24 @@
 
     <!-- Filters -->
     <div class="bg-white rounded-lg shadow mb-6 p-4">
-        <div class="grid grid-cols-3 md:grid-cols-3 gap-4 items-end">
+        <div class="grid grid-cols-3 md:grid-cols-4 gap-4 items-end">
             <!-- Search -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Cari</label>
                 <input type="text" wire:model.live="search" placeholder="ID Pengawas, Nama, Email..."
                     class="form-control mt-1">
+            </div>
+
+            <!-- Departemen Filter -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Departemen</label>
+                <select wire:model.live="departmentFilter" class="form-control mt-1">
+                    <option value="">Semua Departemen</option>
+                    <option value="Fakultas Teknologi Informasi">Fakultas Teknologi Informasi</option>
+                    <option value="Fakultas Ekonomi">Fakultas Ekonomi</option>
+                    <option value="Fakultas Teknik">Fakultas Teknik</option>
+                    <option value="Fakultas Sains">Fakultas Sains</option>
+                </select>
             </div>
 
             <!-- Status Filter -->
