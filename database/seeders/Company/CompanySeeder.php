@@ -55,8 +55,8 @@ class CompanySeeder extends Seeder
         $company_datas = [
             [
                 'code'    => '1Br0ck',                                                      // Str::random(6)
-                'name'    => 'Burningroom Mediction',
-                'email'   => 'burningroommediction@gmail.com',
+                'name'    => 'Burningroom PRO CBT',
+                'email'   => 'burningroomPRO CBT@gmail.com',
                 'phone'   => '08' . Factory::create()->numberBetween(100000000, 999999999),
                 'website' => 'https://burningroom.co.id',
                 'service_id' => $serviceMonth->id,

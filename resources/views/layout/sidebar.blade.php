@@ -144,12 +144,12 @@
                             'icon' => 'fa-database',
                         ],
 
-                        [
-                            'label' => 'Pengaturan',
-                            'url' => '/admin/master/setting',
-                            'pattern' => 'admin/master/setting*',
-                            'icon' => 'fa-cog',
-                        ],
+                        // [
+                        //   'label' => 'Pengaturan',
+                        // 'url' => '/admin/master/setting',
+                        //'pattern' => 'admin/master/setting*',
+                        //'icon' => 'fa-cog',
+                        // ],
                     ];
                 @endphp
 
@@ -180,17 +180,17 @@
                 @php
                     $reports = [
                         [
-                            'label' => 'Rapot Nilai',
+                            'label' => 'Riwayat Jadwal Ujian',
                             'route' => route('admin.report.timetable'),
                             'icon' => 'fa-file-alt',
                             'match' => 'admin/report/timetable*',
                         ],
-                        [
-                            'label' => 'Analisis Soal',
-                            'route' => route('admin.report.question'),
-                            'icon' => 'fa-chart-pie',
-                            'match' => 'admin/report/question*',
-                        ],
+                        //[
+                        //  'label' => 'Analisis Soal',
+                        //'route' => route('admin.report.question'),
+                        //'icon' => 'fa-chart-pie',
+                        //'match' => 'admin/report/question*',
+                        //],
                     ];
                 @endphp
 

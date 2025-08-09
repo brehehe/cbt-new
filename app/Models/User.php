@@ -60,7 +60,7 @@ class User extends Authenticatable
     {
         return Str::of($this->name)
             ->explode(' ')
-            ->map(fn (string $name) => Str::of($name)->substr(0, 1))
+            ->map(fn(string $name) => Str::of($name)->substr(0, 1))
             ->implode('');
     }
 
@@ -72,16 +72,16 @@ class User extends Authenticatable
     public function companies()
     {
         return $this->belongsToMany(Company::class, 'company_user_role')
-                    ->withPivot('role_id')
-                    ->withTimestamps();
+            ->withPivot('role_id')
+            ->withTimestamps();
     }
 
     public function rolesInCompany($companyId)
     {
         return DB::table('company_user_role')
-                ->where('user_id', $this->id)
-                ->where('company_id', $companyId)
-                ->pluck('role_id');
+            ->where('user_id', $this->id)
+            ->where('company_id', $companyId)
+            ->pluck('role_id');
     }
 
     public function hasCompanyRole($roles, $companyId): bool
@@ -139,8 +139,8 @@ class User extends Authenticatable
     public function hasRoleInCompany($companyId, $roleId = null)
     {
         $query = $this->companyRoles()
-                     ->where('company_id', $companyId)
-                     ->where('is_active', true);
+            ->where('company_id', $companyId)
+            ->where('is_active', true);
 
         if ($roleId) {
             $query->where('role_id', $roleId);
@@ -212,18 +212,18 @@ class User extends Authenticatable
     {
         // Check main email/phone first
         $user = static::where('email', $emailOrPhone)
-                     ->orWhere('phone', $emailOrPhone)
-                     ->orWhere('username', $emailOrPhone)
-                     ->first();
+            ->orWhere('phone', $emailOrPhone)
+            ->orWhere('username', $emailOrPhone)
+            ->first();
 
         if ($user) {
             return $user;
         }
 
         // Check alternative contacts
-        return static::whereJsonContains('alternative_contacts', function($contact) use ($emailOrPhone) {
+        return static::whereJsonContains('alternative_contacts', function ($contact) use ($emailOrPhone) {
             return ($contact['type'] === 'email' && $contact['value'] === $emailOrPhone) ||
-                   ($contact['type'] === 'phone' && $contact['value'] === $emailOrPhone);
+                ($contact['type'] === 'phone' && $contact['value'] === $emailOrPhone);
         })->first();
     }
 
@@ -237,15 +237,16 @@ class User extends Authenticatable
     {
         return $query->where(function ($q) use ($search) {
             $q->where('name', 'ilike', "%{$search}%")
-              ->orWhere('email', 'ilike', "%{$search}%")
-              ->orWhere('phone', 'ilike', "%{$search}%")
-              ->orWhereHas('userDetail', function ($qd) use ($search) {
-                  $qd->where('identity_card', 'ilike', "%{$search}%")
-                     ->orWhere('address', 'ilike', "%{$search}%");
-              });
+                ->orWhere('email', 'ilike', "%{$search}%")
+                ->orWhere('phone', 'ilike', "%{$search}%")
+                ->orWhereHas('userDetail', function ($qd) use ($search) {
+                    $qd->where('identity_number', 'ilike', "%{$search}%")
+                        ->orWhere('address', 'ilike', "%{$search}%");
+                });
         });
     }
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

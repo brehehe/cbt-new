@@ -21,6 +21,7 @@ class MaterialService
                 'id' => $request['id'] ?? null
             ],
             [
+                'topic_id'             => $request['topic_id'] ?? null,
                 'company_id'           => $request['company_id'] ?? null,
                 'material_category_id' => $request['material_category_id'] ?? null,
                 'name'                 => $request['name'] ?? null,

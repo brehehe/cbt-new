@@ -128,7 +128,7 @@ class AdminMasterUserIndex extends Component
 
     public function closeModal()
     {
-        $this->reset(['data_id', 'name', 'username', 'email', 'password', 'profile', 'profile_old', 'phone', 'address', 'identity_card', 'blood_group', 'administrative_gender', 'birth_date', 'deceased_date', 'marital_status', 'role_id', 'is_head', 'is_active', 'sip_number', 'specialization', 'doctor_type', 'type', 'incentive_doctor', 'incentive_pharmacy', 'incentive_nurse', 'incentive_cashier', 'type_incentive_doctor', 'type_incentive_nurse', 'type_incentive_pharmacy', 'type_incentive_cashier', 'price_doctor', 'role_name', 'province_code', 'city_code', 'district_code', 'sub_district_code', 'provinces', 'cities', 'districts', 'subDistricts', 'rt_code', 'rw_code']);
+        $this->reset(['data_id', 'name', 'username', 'email', 'password', 'profile', 'profile_old', 'phone', 'address', 'identity_number', 'blood_group', 'administrative_gender', 'birth_date', 'deceased_date', 'marital_status', 'role_id', 'is_head', 'is_active', 'sip_number', 'specialization', 'doctor_type', 'type', 'incentive_doctor', 'incentive_pharmacy', 'incentive_nurse', 'incentive_cashier', 'type_incentive_doctor', 'type_incentive_nurse', 'type_incentive_pharmacy', 'type_incentive_cashier', 'price_doctor', 'role_name', 'province_code', 'city_code', 'district_code', 'sub_district_code', 'provinces', 'cities', 'districts', 'subDistricts', 'rt_code', 'rw_code']);
         $this->resetErrorBag();
         $this->resetValidation();
         return $this->dispatch('close-modal', ['id' => 'modal']);
@@ -342,7 +342,7 @@ class AdminMasterUserIndex extends Component
                 },
             ],
             'address' => 'required|string|max:500',
-            'identity_card' => 'nullable|string|max:20',
+            'identity_number' => 'nullable|string|max:20',
             'blood_group' => 'nullable|string|max:10',
             'administrative_gender' => 'required',
             'birth_date' => 'required|date',
@@ -358,7 +358,7 @@ class AdminMasterUserIndex extends Component
             'type' => $this->role_name == 'Dokter' ? 'required|in:in,out' : 'nullable',
         ]);
 
-        
+
 
         try {
             DB::beginTransaction();
@@ -542,7 +542,7 @@ class AdminMasterUserIndex extends Component
             ['user_id' => $user->id],
             [
                 'address' => $this->address,
-                'identity_card' => $this->identity_card,
+                'identity_number' => $this->identity_card,
                 'blood_group' => $this->blood_group,
                 'administrative_gender' => $this->administrative_gender,
                 'birth_date' => $this->birth_date,

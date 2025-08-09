@@ -38,6 +38,10 @@ Route::group(['namespace' => 'App\Livewire\Auth'], function () {
 Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middleware' => ['auth', 'verified', CheckUserTimetable::class]], function () {
     Route::get('/', 'Dashboard\AdminDashboardIndex')->name('admin.dashboard');
 
+    // User Management Routes
+    Route::get('/students', \App\Livewire\Admin\StudentManagement::class)->name('admin.students');
+    Route::get('/lecturers', \App\Livewire\Admin\LecturerManagement::class)->name('admin.lecturers');
+
     Route::group(['namespace' => 'Exam', 'prefix' => 'exam'], function () {
         Route::get('/timetable', 'Timetable\AdminExamTimetableIndex')->name('admin.exam.timetable');
         Route::get('/warning', 'Warning\AdminExamWarningIndex')->name('admin.exam.warning');

@@ -109,7 +109,7 @@
 
                 <!-- Footer -->
                 <footer class="p-4 bg-white border-t text-sm text-gray-500 text-center">
-                    © 2025 Your Mediction. All rights reserved.
+                    © 2025 Your PRO CBT. All rights reserved.
                 </footer>
 
             </div>

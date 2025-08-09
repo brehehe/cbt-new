@@ -37,6 +37,8 @@ class DatabaseSeeder extends Seeder
 
             // Question
             QuestionSeeder::class,
+
+            UserDetailSeeder::class,
         ]);
     }
 }

@@ -3,7 +3,7 @@
         <div class="flex justify-between h-16">
             <!-- Left Section: Logo & Sidebar Toggle -->
             <div class="flex items-center">
-                <img src="{{ asset('asset/img/LogoPROCBT-blue.png') }}" alt="Mediction Logo" class="h-7 w-auto mr-2">
+                <img src="{{ asset('asset/img/LogoPROCBT-blue.png') }}" alt="PRO CBT Logo" class="h-7 w-auto mr-2">
                 <button id="toggleSidebar"
                     class="p-2 rounded-xl text-[#1E3A8A] hover:bg-[#C3D4EC]/20 transition-all duration-200 cursor-pointer">
                     <i class="fas fa-bars text-lg"></i>

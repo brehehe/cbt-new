@@ -19,6 +19,8 @@ class RoleHelper
         // Cari role global dulu
         $role = Role::where('name', $roleName)->firstOrFail();
 
+        $user->syncRoles($roleName);
+
         // Cari mapping role_company sesuai role_id dan company_id
         $roleCompany = RoleCompany::where('role_id', $role->uuid)
             ->where('company_id', $companyId)

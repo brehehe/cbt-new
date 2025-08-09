@@ -40,14 +40,14 @@ class AdminMasterMaterialIndex extends Component
         $this->topics              = Topic::select('id', 'name')->get();
     }
 
-     public function updatedTopicId($value)
+    public function updatedTopicId($value)
     {
         $this->material_category_id = null;
         $this->material_categories = MaterialCategory::select('id', 'topic_id', 'name')
             ->where('topic_id', $value)->whereDoesntHave('childs')->get();
     }
 
-    public function hydrate ()
+    public function hydrate()
     {
         $this->resetPage();
     }
@@ -68,12 +68,14 @@ class AdminMasterMaterialIndex extends Component
     {
         $this->validate(
             [
+                'topic_id'             => 'required|exists:topics,id',
                 'material_category_id' => 'required|exists:material_categories,id',
                 'name'                 => 'required',
                 'level'                => 'required',
                 'description'          => 'nullable',
             ],
             [
+                'topic_id.required'             => 'Topik wajib diisi.',
                 'material_category_id.required' => 'kategori materi wajib diisi.',
                 'material_category_id.exists'   => 'Kategori materi tidak valid.',
                 'name.required'                 => 'Nama materi wajib diisi.',
@@ -83,19 +85,20 @@ class AdminMasterMaterialIndex extends Component
 
         try {
             DB::beginTransaction();
-                $request = [
-                    'id'                   => $this->data_id,
-                    'company_id'           => Auth::user()?->company?->id,
-                    'material_category_id' => $this->material_category_id,
-                    'name'                 => $this->name,
-                    'level'                => $this->level,
-                    'description'          => $this->description,
-                ];
+            $request = [
+                'id'                   => $this->data_id,
+                'company_id'           => Auth::user()?->company?->id,
+                'topic_id'             => $this->topic_id,
+                'material_category_id' => $this->material_category_id,
+                'name'                 => $this->name,
+                'level'                => $this->level,
+                'description'          => $this->description,
+            ];
 
-                $material = app(MaterialService::class)->updateOrCreate($request);
-                if (!$material) {
-                    throw new Exception("Ada kesalahaan saat MaterialService => updateOrCreate", 500);
-                }
+            $material = app(MaterialService::class)->updateOrCreate($request);
+            if (!$material) {
+                throw new Exception("Ada kesalahaan saat MaterialService => updateOrCreate", 500);
+            }
 
             DB::commit();
         } catch (Exception | Throwable $th) {
@@ -117,6 +120,7 @@ class AdminMasterMaterialIndex extends Component
     {
         $result                     = Material::findOrFail($id);
         $this->data_id              = $result?->id;
+        $this->topic_id             = $result?->topic_id;
         $this->material_category_id = $result?->material_category_id;
         $this->name                 = $result?->name;
         $this->level                = $result?->level;

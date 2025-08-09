@@ -64,7 +64,7 @@ class AdminMasterStudentIndex extends Component
             'profile_old',
             'phone',
             'address',
-            'identity_card',
+            'identity_number',
             'is_head',
             'is_active',
         ]);
@@ -139,7 +139,7 @@ class AdminMasterStudentIndex extends Component
                     ->ignore($this->data_id),
             ],
             'address' => 'required|string|max:500',
-            'identity_card' => 'nullable|string|max:20',
+            'identity_number' => 'nullable|string|max:20',
         ]);
 
         try {
@@ -327,8 +327,8 @@ class AdminMasterStudentIndex extends Component
         ];
 
         // Handle identity card encryption
-        if (!empty($validatedData['identity_card'])) {
-            $detailData['identity_card'] = Crypt::encryptString($validatedData['identity_card']);
+        if (!empty($validatedData['identity_number'])) {
+            $detailData['identity_number'] = Crypt::encryptString($validatedData['identity_number']);
         }
 
         UserDetail::updateOrCreate(

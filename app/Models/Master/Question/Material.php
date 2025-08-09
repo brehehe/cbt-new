@@ -45,13 +45,13 @@ class Material extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
-        $term = '%'. $term .'%';
+        $term = '%' . $term . '%';
 
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id', 'material_category_id', 'name', 'level', 'description'], 'ILIKE', $term)
-            ->orWhereHas('materialCategory', function ($query) use ($term) {
-                $query->whereAny(['company_id', 'name', 'description'], 'ILIKE', $term);
-            });
+                ->orWhereHas('materialCategory', function ($query) use ($term) {
+                    $query->whereAny(['company_id', 'name', 'description'], 'ILIKE', $term);
+                });
         });
     }
 
@@ -73,5 +73,10 @@ class Material extends Model
     public function questions(): HasMany
     {
         return $this->hasMany(Question::class, 'topic_id', 'id');
+    }
+
+    public function topic(): BelongsTo
+    {
+        return $this->belongsTo(Topic::class, 'topic_id', 'id');
     }
 }
