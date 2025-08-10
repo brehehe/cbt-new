@@ -18,7 +18,6 @@ return new class extends Migration
             $table->foreignUuid('user_id');
             $table->foreignUuid('company_id')->nullable();
             $table->string('session_token')->unique();
-            $table->string('peer_id')->nullable(); // PeerJS ID foer direct connection
             $table->string('camera_stream_url')->nullable();
             $table->string('screen_stream_url')->nullable();
             $table->integer('current_question_number')->default(1);
