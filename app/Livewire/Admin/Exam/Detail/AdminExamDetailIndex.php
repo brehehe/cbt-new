@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Exam\Detail;
 use App\Helpers\AlertHelper;
 use App\Helpers\AuthHelper;
 use App\Models\Exam\ExamAlert;
+use App\Models\Exam\ExamLiveSession;
 use App\Models\Exam\ExamRecording;
 use App\Models\Master\Question\Answer;
 use App\Models\Timetable\TimetableAnswer;
@@ -34,13 +35,19 @@ class AdminExamDetailIndex extends Component
     public $question_answers = [];
     public $currentRecording = null;
     public $alertCount = 0;
+    public $liveSession = null;
+    public $peerJSId = null;
 
     protected $listeners = [
         'timeExpired',
         'saveVideoChunk',
         'logAlert',
         'startNewRecording',
-        'pageReloaded'
+        'pageReloaded',
+        'updateLiveSessionData',
+        'saveScreenshot',
+        'initializePeerJS',
+        'updatePeerJSId'
     ];
 
     public function mount()
@@ -49,6 +56,98 @@ class AdminExamDetailIndex extends Component
         $this->setupFirstQuestion();
         $this->handleSessionMessages();
         $this->initializeRecording();
+        $this->initializeLiveSession();
+    }
+
+    private function initializeLiveSession()
+    {
+        // Buat atau update live session
+        $this->liveSession = ExamLiveSession::updateOrCreate(
+            [
+                'user_timetable_id' => $this->userTimetableId,
+                'user_id' => Auth::id()
+            ],
+            [
+                'timetable_id' => $this->userTimetable->timetable_id,
+                'company_id' => $this->userTimetable->company_id,
+                'is_active' => true,
+                'connection_status' => 'connected',
+                'camera_status' => 'pending',
+                'screen_status' => 'pending',
+                'last_activity' => Carbon::now(),
+                'session_metadata' => [
+                    'start_time' => Carbon::now()->toISOString(),
+                    'user_agent' => request()->header('User-Agent'),
+                    'ip_address' => request()->ip()
+                ],
+                'browser_info' => [
+                    'user_agent' => request()->header('User-Agent'),
+                    'platform' => $this->detectPlatform(request()->header('User-Agent'))
+                ],
+                'peer_id' => $this->peerJSId // Simpan PeerJS ID untuk koneksi langsung
+            ]
+        );
+
+        $this->updateLiveSessionProgress();
+    }
+
+    private function detectPlatform($userAgent)
+    {
+        if (str_contains($userAgent, 'Windows')) return 'Windows';
+        if (str_contains($userAgent, 'Mac')) return 'Mac';
+        if (str_contains($userAgent, 'Linux')) return 'Linux';
+        if (str_contains($userAgent, 'Android')) return 'Android';
+        if (str_contains($userAgent, 'iOS')) return 'iOS';
+        return 'Unknown';
+    }
+
+    private function updateLiveSessionProgress()
+    {
+        if (!$this->liveSession) return;
+
+        $questions = $this->getUserQuestions();
+
+        $this->liveSession->update([
+            'current_question_number' => $this->number ?? 1,
+            'total_questions' => $questions->count(),
+            'answered_questions' => $questions->whereNotNull('timetable_answer_id')->count(),
+            'marked_questions' => $questions->where('is_mark', true)->count(),
+            'warning_count' => $this->alertCount,
+            'alert_count' => ExamAlert::where('user_timetable_id', $this->userTimetableId)->count(),
+            'last_activity' => Carbon::now()
+        ]);
+    }
+
+    public function initializePeerJS()
+    {
+        // Method ini akan dipanggil dari JavaScript setelah PeerJS berhasil diinisialisasi
+        \Log::info('PeerJS initialization requested for user', [
+            'user_id' => Auth::id(),
+            'user_timetable_id' => $this->userTimetableId
+        ]);
+    }
+
+    public function updatePeerJSId($peerId)
+    {
+        $this->peerJSId = $peerId;
+
+        // Update live session dengan PeerJS ID
+        if ($this->liveSession) {
+            $this->liveSession->update([
+                'peer_id' => $peerId,
+                'camera_status' => 'active', // Anggap kamera aktif jika PeerJS berhasil
+                'last_activity' => Carbon::now()
+            ]);
+
+            \Log::info('PeerJS ID updated for live session', [
+                'peer_id' => $peerId,
+                'live_session_id' => $this->liveSession->id,
+                'user_id' => Auth::id()
+            ]);
+        }
+
+        // Emit event ke JavaScript untuk memberitahu bahwa PeerJS ID sudah disimpan
+        $this->dispatch('peerJSIdSaved', ['peer_id' => $peerId]);
     }
 
     private function initializeRecording()
@@ -63,7 +162,7 @@ class AdminExamDetailIndex extends Component
         ]);
     }
 
-    public function saveVideoChunk($videoBlob, $chunkNumber = null)
+    public function saveVideoChunk($videoBlob = '', $chunkNumber = null)
     {
         // Add extensive logging
         \Log::info('saveVideoChunk called', [
@@ -221,7 +320,7 @@ class AdminExamDetailIndex extends Component
         ]);
     }
 
-    public function logAlert($alertType, $description, $metadata = [])
+    public function logAlert($alertType = '', $description = '', $metadata = [])
     {
         ExamAlert::create([
             'timetable_id' => $this->userTimetable->timetable_id,
@@ -232,6 +331,12 @@ class AdminExamDetailIndex extends Component
         ]);
 
         $this->alertCount++;
+
+        // Update live session alert count
+        if ($this->liveSession) {
+            $this->liveSession->incrementAlert();
+            $this->liveSession->updateActivity();
+        }
 
         // Jika terlalu banyak alert, ubah status menjadi warning
         if ($this->alertCount >= 5) {
@@ -259,6 +364,80 @@ class AdminExamDetailIndex extends Component
             'timestamp' => now()->toISOString(),
             'user_agent' => request()->header('User-Agent')
         ]);
+    }
+
+    public function updateLiveSessionData($data = [])
+    {
+        if ($this->liveSession && is_array($data)) {
+            $updateData = [
+                'last_activity' => now()
+            ];
+
+            // Update connection status
+            if (isset($data['connection_status'])) {
+                $updateData['connection_status'] = $data['connection_status'];
+            }
+
+            // Update camera status
+            if (isset($data['camera_status'])) {
+                $updateData['camera_status'] = $data['camera_status'];
+            }
+
+            // Update browser info
+            if (isset($data['browser_info'])) {
+                $updateData['browser_info'] = $data['browser_info'];
+            }
+
+            $this->liveSession->update($updateData);
+            $this->updateLiveSessionProgress();
+        }
+    }
+
+    public function saveScreenshot($screenshotData = [])
+    {
+        try {
+            if (!$this->liveSession || empty($screenshotData['screenshot'])) {
+                return;
+            }
+
+            // Decode base64 screenshot
+            $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $screenshotData['screenshot']));
+
+            if ($imageData === false) {
+                throw new \Exception('Failed to decode screenshot data');
+            }
+
+            // Create filename
+            $filename = 'exam_screenshots/' . $this->userTimetableId . '_' .
+                now()->format('Y-m-d_H-i-s') . '_' .
+                time() . '.jpg';
+
+            // Save to storage
+            $disk = Storage::disk('public');
+            $directory = dirname($filename);
+
+            if (!$disk->exists($directory)) {
+                $disk->makeDirectory($directory);
+            }
+
+            $saved = $disk->put($filename, $imageData);
+
+            if ($saved) {
+                // Log screenshot save
+                \Log::info('Screenshot saved', [
+                    'user_id' => Auth::id(),
+                    'filename' => $filename,
+                    'size' => strlen($imageData),
+                    'timestamp' => $screenshotData['timestamp'] ?? now()
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error saving screenshot', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
     }
 
     public function updateMark()
@@ -506,6 +685,7 @@ class AdminExamDetailIndex extends Component
         $this->questionNavigationId = $id;
         $this->updateCurrentQuestionMark();
         $this->updatePercentage();
+        $this->updateLiveSessionProgress(); // Update live session
     }
 
     public function timeExpired()
@@ -527,6 +707,14 @@ class AdminExamDetailIndex extends Component
             $this->currentRecording->update([
                 'end_time' => now(),
                 'status' => 'completed'
+            ]);
+        }
+
+        // Tutup live session
+        if ($this->liveSession) {
+            $this->liveSession->update([
+                'is_active' => false,
+                'connection_status' => 'disconnected'
             ]);
         }
 
@@ -569,7 +757,7 @@ class AdminExamDetailIndex extends Component
 
         $userTimetable->update([
             'status' => 'done',
-            'end_exam' => Carbon::now(),
+            'end_exam' => now(),
             'mark' => $mark,
         ]);
 

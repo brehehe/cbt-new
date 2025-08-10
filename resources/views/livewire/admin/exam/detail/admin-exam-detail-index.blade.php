@@ -338,11 +338,15 @@
 
             <!-- Recording Status -->
             <div class="p-4">
-                <h4 class="mb-3 font-medium text-gray-800">Recording Status</h4>
+                <h4 class="mb-3 font-medium text-gray-800">Recording & Streaming</h4>
                 <div class="space-y-2 text-sm">
                     <div class="flex justify-between">
-                        <span class="text-gray-600">Status:</span>
+                        <span class="text-gray-600">Recording:</span>
                         <span class="text-green-600" id="recordingStatus">Recording</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Live Stream:</span>
+                        <span class="text-yellow-600" id="streamingStatus">Connecting</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600">Chunk:</span>
@@ -379,6 +383,22 @@
 </div>
 
 @push('scripts')
+    <!-- Include PeerJS for student side -->
+    <script src="https://unpkg.com/peerjs@1.5.0/dist/peerjs.min.js"></script>
+
+    <!-- Test PeerJS loading -->
+    <script>
+        console.log('Script loaded, testing PeerJS availability...');
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, PeerJS available:', typeof Peer !== 'undefined');
+            if (typeof Peer !== 'undefined') {
+                console.log('PeerJS loaded successfully!');
+            } else {
+                console.error('PeerJS failed to load!');
+            }
+        });
+    </script>
+
     <script>
         // Global variables
         let mediaRecorder;
@@ -390,14 +410,28 @@
         let stream;
         let warningShown = false;
         let pageLoaded = false;
+        let peerConnection;
+        let streamId = '{{ $liveSession->session_token ?? '' }}';
+        let isStreaming = false;
+
+        // PeerJS variables
+        let peer = null;
+        let supervisorPeerID = null;
+        let currentCall = null;
+        let cameraStream = null;
 
         // Initialize everything when page loads
         document.addEventListener("DOMContentLoaded", function() {
+            console.log('=== DOMContentLoaded fired ===');
             const totalSeconds = {{ $remainingTime }};
             startCountdown(totalSeconds);
             initializeExamEnvironment();
             initializeCamera();
+            console.log('About to call initializePeerJS...');
+            initializePeerJS(); // Initialize PeerJS
+            console.log('initializePeerJS called');
             setupEventListeners();
+            initializeLiveSessionMonitoring();
 
             // Mark page as loaded
             setTimeout(() => {
@@ -607,25 +641,38 @@
             console.log('Host:', window.location.host);
 
             try {
+                // Check if HTTPS is being used (required for camera access)
+                if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !==
+                    '127.0.0.1') {
+                    throw new Error(
+                        'Camera requires HTTPS connection. Please use https://cbt-test.test instead of http://');
+                }
+
                 // Check if getUserMedia is available
                 if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    throw new Error('getUserMedia is not supported');
+                    throw new Error('getUserMedia is not supported in this browser');
                 }
 
                 // Check if MediaRecorder is available
                 if (!window.MediaRecorder) {
-                    throw new Error('MediaRecorder is not supported');
+                    throw new Error('MediaRecorder is not supported in this browser');
                 }
 
                 const constraints = {
                     video: {
                         width: {
-                            ideal: 640
+                            ideal: 1280,
+                            min: 640
                         },
                         height: {
-                            ideal: 480
+                            ideal: 720,
+                            min: 480
                         },
-                        facingMode: 'user'
+                        facingMode: 'user',
+                        frameRate: {
+                            ideal: 30,
+                            min: 15
+                        }
                     },
                     audio: false
                 };
@@ -639,6 +686,12 @@
 
                 if (cameraPreview) {
                     cameraPreview.srcObject = stream;
+                    // Ensure video plays
+                    cameraPreview.onloadedmetadata = () => {
+                        cameraPreview.play().catch(e => {
+                            console.warn('Video autoplay prevented:', e);
+                        });
+                    };
                     console.log('Camera preview set');
                 }
 
@@ -650,20 +703,243 @@
                 // Start recording
                 startRecording();
 
+                // Start live streaming for supervisor monitoring
+                initializeLiveStreaming();
+
                 updateCameraStatus('Camera Aktif', 'text-green-600');
+
+                // Notify Livewire that camera is active
+                if (window.Livewire) {
+                    Livewire.dispatch('cameraStatusUpdated', {
+                        status: 'active',
+                        timestamp: new Date().toISOString()
+                    });
+                }
 
             } catch (error) {
                 console.error('Error accessing camera:', error);
                 console.error('Error name:', error.name);
                 console.error('Error message:', error.message);
 
-                updateCameraStatus('Camera Error: ' + error.message, 'text-red-600');
-                logAlert('camera_error', 'Gagal mengakses kamera: ' + error.message + ' (Protocol: ' + window.location
+                // More user-friendly error messages
+                let errorMessage = 'Camera tidak dapat diakses';
+                let suggestions = [];
+
+                if (error.name === 'NotAllowedError') {
+                    errorMessage = 'Akses camera ditolak';
+                    suggestions = [
+                        'Klik ikon camera/gembok di address bar',
+                        'Pilih "Allow" untuk camera access',
+                        'Refresh halaman setelah memberikan izin'
+                    ];
+                } else if (error.name === 'NotFoundError') {
+                    errorMessage = 'Camera tidak ditemukan';
+                    suggestions = [
+                        'Pastikan camera terhubung ke komputer',
+                        'Cek apakah camera digunakan aplikasi lain',
+                        'Restart browser dan coba lagi'
+                    ];
+                } else if (error.name === 'NotSupportedError') {
+                    errorMessage = 'Browser tidak mendukung camera';
+                    suggestions = [
+                        'Gunakan Chrome, Firefox, atau Edge terbaru',
+                        'Update browser ke versi terbaru'
+                    ];
+                } else if (error.message.includes('HTTPS')) {
+                    errorMessage = 'Camera memerlukan HTTPS';
+                    suggestions = [
+                        'Akses melalui https://cbt-test.test',
+                        'Jangan gunakan http:// untuk ujian',
+                        'Setup SSL certificate jika perlu'
+                    ];
+                }
+
+                updateCameraStatus('Camera Error: ' + errorMessage, 'text-red-600');
+                logAlert('camera_error', 'Gagal mengakses kamera: ' + errorMessage + ' (Protocol: ' + window.location
                     .protocol + ')');
 
-                // Show user-friendly error
-                alert('Kamera tidak dapat diakses: ' + error.message +
-                    '\nPastikan:\n1. Browser mendukung kamera\n2. Izin kamera diberikan\n3. Menggunakan HTTPS');
+                // Show detailed error with solutions
+                const suggestionText = suggestions.length > 0 ? '\n\nSolusi:\n' + suggestions.join('\n') : '';
+                alert('⚠️ ' + errorMessage + suggestionText);
+
+                // Notify Livewire about camera error
+                if (window.Livewire) {
+                    Livewire.dispatch('cameraStatusUpdated', {
+                        status: 'error',
+                        error: errorMessage,
+                        timestamp: new Date().toISOString()
+                    });
+                }
+            }
+        }
+
+        // Initialize PeerJS for live streaming to supervisor
+        async function initializePeerJS() {
+            try {
+                console.log('=== Starting PeerJS initialization ===');
+                console.log('PeerJS available:', typeof Peer !== 'undefined');
+                console.log('Livewire available:', typeof window.Livewire !== 'undefined');
+
+                // Check if PeerJS is loaded
+                if (typeof Peer === 'undefined') {
+                    console.error('PeerJS library not loaded!');
+                    return;
+                }
+
+                console.log('Initializing PeerJS for student...');
+
+                // Initialize PeerJS with auto-generated ID
+                peer = new Peer({
+                    host: 'localhost',
+                    port: 9000,
+                    path: '/peerjs',
+                    secure: false, // Use HTTP instead of HTTPS
+                    debug: 2, // Enable debug logs
+                    config: {
+                        'iceServers': [{
+                                urls: 'stun:stun.l.google.com:19302'
+                            },
+                            {
+                                urls: 'stun:stun1.l.google.com:19302'
+                            }
+                        ]
+                    }
+                });
+
+                console.log('PeerJS instance created, waiting for connection...');
+
+                peer.on('open', function(id) {
+                    console.log('PeerJS connected with ID:', id);
+                    console.log('Livewire available:', !!window.Livewire);
+
+                    // Send PeerJS ID to server for supervisor to connect
+                    if (window.Livewire) {
+                        console.log('Dispatching updatePeerJSId with ID:', id);
+                        try {
+                            Livewire.dispatch('updatePeerJSId', [id]);
+                            console.log('updatePeerJSId dispatched successfully');
+                        } catch (error) {
+                            console.error('Error dispatching updatePeerJSId:', error);
+                        }
+                    } else {
+                        console.error('Livewire is not available!');
+                    }
+
+                    // Update live session status
+                    updateLiveSessionData({
+                        camera_status: 'active',
+                        connection_status: 'connected'
+                    });
+                });
+
+                peer.on('call', function(call) {
+                    console.log('Incoming call from supervisor');
+
+                    // Answer the call with our camera stream
+                    if (cameraStream) {
+                        call.answer(cameraStream);
+                        currentCall = call;
+
+                        // Update connection status
+                        updateLiveSessionData({
+                            connection_status: 'streaming'
+                        });
+
+                        console.log('Answered call with camera stream');
+                    } else {
+                        console.log('No camera stream available to answer call');
+                        // Try to get camera stream first
+                        getCameraStreamForPeerJS().then(stream => {
+                            if (stream) {
+                                call.answer(stream);
+                                currentCall = call;
+                                cameraStream = stream;
+                            }
+                        });
+                    }
+
+                    call.on('close', function() {
+                        console.log('Call closed by supervisor');
+                        currentCall = null;
+                        updateLiveSessionData({
+                            connection_status: 'connected'
+                        });
+                    });
+                });
+
+                peer.on('disconnected', function() {
+                    console.log('PeerJS disconnected');
+                    updateLiveSessionData({
+                        connection_status: 'disconnected'
+                    });
+                });
+
+                peer.on('error', function(err) {
+                    console.log('PeerJS error:', err);
+                    updateLiveSessionData({
+                        connection_status: 'unstable'
+                    });
+                });
+
+                // Try to get camera stream for PeerJS
+                getCameraStreamForPeerJS();
+
+            } catch (error) {
+                console.log('Failed to initialize PeerJS:', error);
+                updateLiveSessionData({
+                    camera_status: 'error',
+                    connection_status: 'unstable'
+                });
+            }
+        }
+
+        // Get camera stream specifically for PeerJS
+        async function getCameraStreamForPeerJS() {
+            try {
+                // Use the same stream as recording or create new one
+                if (stream) {
+                    cameraStream = stream;
+                    console.log('Using existing camera stream for PeerJS');
+                    return stream;
+                }
+
+                // Create new stream for PeerJS
+                const constraints = {
+                    video: {
+                        width: {
+                            ideal: 1280,
+                            min: 640
+                        },
+                        height: {
+                            ideal: 720,
+                            min: 480
+                        },
+                        frameRate: {
+                            ideal: 30,
+                            min: 15
+                        }
+                    },
+                    audio: false
+                };
+
+                cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+                console.log('Created new camera stream for PeerJS');
+
+                return cameraStream;
+
+            } catch (error) {
+                console.error('Failed to get camera stream for PeerJS:', error);
+                updateLiveSessionData({
+                    camera_status: 'error'
+                });
+                return null;
+            }
+        }
+
+        // Update live session data
+        function updateLiveSessionData(data) {
+            if (window.Livewire) {
+                Livewire.dispatch('updateLiveSessionData', [data]);
             }
         }
 
@@ -873,6 +1149,94 @@
             if (mediaRecorder && mediaRecorder.state === 'recording') {
                 mediaRecorder.stop();
             }
+
+            // Notify server that session is ending
+            if (window.Livewire) {
+                navigator.sendBeacon('/api/end-live-session', JSON.stringify({
+                    session_token: '{{ $liveSession->session_token ?? '' }}'
+                }));
+            }
+        });
+
+        // Initialize live session monitoring
+        function initializeLiveSessionMonitoring() {
+            // Update session activity every 30 seconds
+            setInterval(() => {
+                updateLiveSessionActivity();
+            }, 30000);
+
+            // Monitor screen capture for screenshot
+            setInterval(() => {
+                captureScreenshot();
+            }, 60000); // Every minute
+
+            // Send initial session data
+            updateLiveSessionActivity();
+        }
+
+        // Update live session activity
+        function updateLiveSessionActivity() {
+            if (window.Livewire) {
+                const sessionData = {
+                    connection_status: navigator.onLine ? 'connected' : 'disconnected',
+                    camera_status: isRecording ? 'active' : 'inactive',
+                    last_activity: new Date().toISOString(),
+                    browser_info: {
+                        user_agent: navigator.userAgent,
+                        platform: navigator.platform,
+                        language: navigator.language,
+                        screen_resolution: `${screen.width}x${screen.height}`,
+                        window_size: `${window.innerWidth}x${window.innerHeight}`
+                    }
+                };
+
+                Livewire.dispatch('updateLiveSessionData', sessionData);
+            }
+        }
+
+        // Capture screenshot for monitoring
+        function captureScreenshot() {
+            if (!stream) return;
+
+            try {
+                const canvas = document.getElementById('hiddenCanvas');
+                const video = document.getElementById('hiddenVideo');
+
+                if (canvas && video) {
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+
+                    ctx.drawImage(video, 0, 0);
+
+                    canvas.toBlob((blob) => {
+                        if (blob) {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                if (window.Livewire) {
+                                    Livewire.dispatch('saveScreenshot', {
+                                        screenshot: e.target.result,
+                                        timestamp: new Date().toISOString()
+                                    });
+                                }
+                            };
+                            reader.readAsDataURL(blob);
+                        }
+                    }, 'image/jpeg', 0.7);
+                }
+            } catch (error) {
+                console.error('Error capturing screenshot:', error);
+            }
+        }
+
+        // Monitor connection status
+        window.addEventListener('online', function() {
+            updateLiveSessionActivity();
+            logAlert('connection_restored', 'Koneksi internet pulih');
+        });
+
+        window.addEventListener('offline', function() {
+            logAlert('connection_lost', 'Koneksi internet terputus');
         });
 
         // Livewire hooks
@@ -885,6 +1249,225 @@
                     }, 1000);
                 }
             });
+        });
+
+        // Live Streaming Functions for Supervisor Monitoring
+        async function initializeLiveStreaming() {
+            if (!stream || !streamId) {
+                console.log('Stream or streamId not available for live streaming');
+                return;
+            }
+
+            try {
+                console.log('Initializing live streaming with streamId:', streamId);
+
+                // Create peer connection for WebRTC
+                peerConnection = new RTCPeerConnection({
+                    iceServers: [{
+                            urls: 'stun:stun.l.google.com:19302'
+                        },
+                        {
+                            urls: 'stun:stun1.l.google.com:19302'
+                        }
+                    ]
+                });
+
+                // Add stream to peer connection
+                stream.getTracks().forEach(track => {
+                    peerConnection.addTrack(track, stream);
+                });
+
+                // Handle ice candidates
+                peerConnection.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        // Send ICE candidate to signaling server
+                        sendSignalingMessage('ice-candidate', {
+                            candidate: event.candidate,
+                            streamId: streamId
+                        });
+                    }
+                };
+
+                // Handle connection state changes
+                peerConnection.onconnectionstatechange = () => {
+                    console.log('Connection state:', peerConnection.connectionState);
+                    updateStreamingStatus(peerConnection.connectionState);
+                };
+
+                // Connect to signaling server (WebSocket)
+                initializeSignalingConnection();
+
+                isStreaming = true;
+                console.log('Live streaming initialized successfully');
+
+            } catch (error) {
+                console.error('Error initializing live streaming:', error);
+            }
+        }
+
+        // Initialize WebSocket connection for signaling
+        function initializeSignalingConnection() {
+            // In a real implementation, this would connect to your WebSocket server
+            // For now, we'll simulate the connection
+            console.log('Signaling connection initialized for stream:', streamId);
+
+            // Simulate supervisor connection request
+            setTimeout(() => {
+                handleSupervisorConnectionRequest();
+            }, 2000);
+        }
+
+        // Handle supervisor connection request
+        async function handleSupervisorConnectionRequest() {
+            if (!peerConnection) return;
+
+            try {
+                // Create offer for supervisor
+                const offer = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offer);
+
+                // Send offer to supervisor through signaling server
+                sendSignalingMessage('offer', {
+                    offer: offer,
+                    streamId: streamId
+                });
+
+                console.log('Offer sent to supervisor');
+
+            } catch (error) {
+                console.error('Error creating offer:', error);
+            }
+        }
+
+        // Send message through signaling server
+        function sendSignalingMessage(type, data) {
+            // In real implementation, this would send through WebSocket
+            console.log('Sending signaling message:', type, data);
+
+            // For now, we'll just log the message
+            // In production, you would implement:
+            // webSocket.send(JSON.stringify({ type, data }));
+        }
+
+        // Handle incoming signaling messages
+        function handleSignalingMessage(message) {
+            const {
+                type,
+                data
+            } = message;
+
+            switch (type) {
+                case 'answer':
+                    if (peerConnection && data.answer) {
+                        peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+                    }
+                    break;
+
+                case 'ice-candidate':
+                    if (peerConnection && data.candidate) {
+                        peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+                    }
+                    break;
+
+                case 'supervisor-disconnect':
+                    console.log('Supervisor disconnected from stream');
+                    break;
+            }
+        }
+
+        // Update streaming status
+        function updateStreamingStatus(status) {
+            const streamingElement = document.getElementById('streamingStatus');
+            if (streamingElement) {
+                streamingElement.textContent = status;
+                streamingElement.className = `text-${status === 'connected' ? 'green' : 'yellow'}-600`;
+            }
+
+            // Update live session data
+            if (window.Livewire) {
+                Livewire.dispatch('updateLiveSessionData', {
+                    streaming_status: status,
+                    last_activity: new Date().toISOString()
+                });
+            }
+        }
+
+        // Enhanced live session monitoring with streaming
+        function initializeLiveSessionMonitoring() {
+            // Update session activity every 30 seconds
+            setInterval(() => {
+                updateLiveSessionActivity();
+            }, 30000);
+
+            // Monitor screen capture for screenshot
+            setInterval(() => {
+                captureScreenshot();
+            }, 60000); // Every minute
+
+            // Monitor streaming health
+            setInterval(() => {
+                checkStreamingHealth();
+            }, 10000); // Every 10 seconds
+
+            // Send initial session data
+            updateLiveSessionActivity();
+        }
+
+        // Check streaming health
+        function checkStreamingHealth() {
+            if (peerConnection && isStreaming) {
+                peerConnection.getStats().then(stats => {
+                    stats.forEach(report => {
+                        if (report.type === 'outbound-rtp' && report.mediaType === 'video') {
+                            console.log('Video streaming stats:', {
+                                bytesSent: report.bytesSent,
+                                packetsSent: report.packetsSent,
+                                timestamp: report.timestamp
+                            });
+                        }
+                    });
+                });
+            }
+        }
+
+        // Enhanced cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            // Stop video stream
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+
+            // Stop camera stream for PeerJS
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+            }
+
+            // Close PeerJS connection
+            if (currentCall) {
+                currentCall.close();
+            }
+
+            if (peer) {
+                peer.destroy();
+            }
+
+            // Stop recording
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+            }
+
+            // Close peer connection
+            if (peerConnection) {
+                peerConnection.close();
+            }
+
+            // Notify server that session is ending
+            if (window.Livewire) {
+                navigator.sendBeacon('/api/end-live-session', JSON.stringify({
+                    session_token: streamId,
+                    streaming_ended: true
+                }));
+            }
         });
     </script>
 @endpush

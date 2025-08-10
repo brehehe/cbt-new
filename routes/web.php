@@ -45,7 +45,10 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
     Route::group(['namespace' => 'Exam', 'prefix' => 'exam'], function () {
         Route::get('/timetable', 'Timetable\AdminExamTimetableIndex')->name('admin.exam.timetable');
         Route::get('/warning', 'Warning\AdminExamWarningIndex')->name('admin.exam.warning');
-        Route::get('/detail', 'Detail\AdminExamDetailIndex')->name('admin.exam.detail');
+        Route::get('/detail', \App\Livewire\Admin\Exam\Detail\AdminExamDetailIndex::class)->name('admin.exam.detail');
+        Route::get('/monitor', \App\Livewire\Admin\Exam\Monitor\AdminExamMonitorIndex::class)->name('admin.exam.monitor');
+        Route::get('/monitor/{session}', \App\Livewire\Admin\Exam\Monitor\AdminExamMonitorDetailIndex::class)->name('admin.exam.monitor.detail');
+        Route::get('/live-stream', \App\Livewire\Admin\Exam\LiveStream\AdminExamLiveStreamIndex::class)->name('admin.exam.live-stream');
     });
 
     Route::group(['namespace' => 'Master', 'prefix' => 'master'], function () {
@@ -64,6 +67,7 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
         Route::get('/timetable/{timetable_id}/detail', 'Timetable\Detail\AdminMasterTimetableDetailIndex')->name('admin.master.timetable.detail');
         Route::get('/timetable/{timetable_id}/video', 'Timetable\Video\AdminMasterTimetableVideoIndex')->name('admin.master.timetable.video');
         Route::get('/timetable/{timetable_id}/alert', 'Timetable\Alert\AdminMasterTimetableAlertIndex')->name('admin.master.timetable.alert');
+        Route::get('/timetable/{timetable_id}/streaming', 'Timetable\Streaming\AdminMasterTimetableStreamingIndex')->name('admin.master.timetable.streaming');
         Route::get('/timetable/{timetable_id}/{user_timetable_id}/answer', 'Timetable\Answer\AdminMasterTimetableAnswerIndex')->name('admin.master.timetable.answer');
         Route::get('/material', AdminMasterMaterialIndex::class)->name('admin.master.material');
         Route::get('/question-type', AdminMasterQuestionTypeIndex::class)->name('admin.master.question-type');
