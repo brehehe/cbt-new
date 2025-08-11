@@ -100,12 +100,23 @@
         // Setup PeerJS connections
         function setupPeerJSConnections() {
             try {
-                // Initialize PeerJS with auto-generated ID
-                peer = new Peer({
+                // Get configuration based on environment
+                const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                const peerConfig = isDevelopment ? {
                     host: 'localhost',
                     port: 9000,
                     path: '/peerjs',
-                    secure: false, // Use HTTP instead of HTTPS
+                    secure: false
+                } : {
+                    host: 'cbt.mediction.id',
+                    port: 9000,
+                    path: '/peerjs',
+                    secure: true
+                };
+
+                // Initialize PeerJS with environment-specific config
+                peer = new Peer({
+                    ...peerConfig,
                     config: {
                         'iceServers': [{
                                 urls: 'stun:stun.l.google.com:19302'
