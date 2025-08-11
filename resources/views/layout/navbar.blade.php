@@ -62,63 +62,9 @@
             <!-- Right Section: Actions -->
             <div class="flex items-center gap-2 sm:gap-4">
                 <!-- Mobile Company Info Button -->
-                <div class="xl:hidden flex items-center">
-                    <div x-data="{ open: false }" class="relative" {{-- @mouseenter="if(window.innerWidth>=1280){ open = true }" --}}
-                        @mouseleave="if(window.innerWidth>=1280){ open = false }">
-                        <button @click="open = !open"
-                            class="p-2 rounded-xl text-[#1E3A8A] hover:bg-[#C3D4EC]/20 transition-all duration-200">
-                            <i class="fas fa-building text-lg"></i>
-                        </button>
-                        <!-- Mobile Company Info Dropdown -->
-                        <div x-show="open" x-transition @click.away="open = false"
-                            class="absolute right-0 mt-2 w-72 sm:w-80 bg-white border border-gray-200 rounded-xl shadow-lg z-50">
-                            <div class="p-4">
-                                <div class="flex items-center gap-2 mb-3">
-                                    <i class="fas fa-building text-blue-600"></i>
-                                    <div>
-                                        <p class="text-sm font-semibold text-gray-800">
-                                            {{ auth()->user()->company->name ?? 'Nama Perusahaan' }}
-                                        </p>
-                                    </div>
-                                </div>
-                                <hr class="mb-3 border-gray-100">
-                                <div class="flex items-center gap-2">
-                                    @if (Auth::user()->company->is_lifetime)
-                                        <i class="fas fa-infinity text-green-500"></i>
-                                        <div>
-                                            <p class="text-xs text-green-600 font-medium">Status: Seumur Hidup</p>
-                                        </div>
-                                    @else
-                                        @if ($isExpired)
-                                            <i class="fas fa-exclamation-triangle text-red-500"></i>
-                                            <div>
-                                                <p class="text-xs text-red-600 font-medium">Status: EXPIRED</p>
-                                                <p class="text-xs text-red-500">{{ abs($daysLeft) }} hari yang lalu</p>
-                                            </div>
-                                        @elseif($isExpiringSoon)
-                                            <i class="fas fa-clock text-orange-500"></i>
-                                            <div>
-                                                <p class="text-xs text-orange-600 font-medium">Berakhir Dalam</p>
-                                                <p class="text-xs text-orange-500">{{ $daysLeft }} hari lagi</p>
-                                            </div>
-                                        @else
-                                            <i class="fas fa-calendar-check text-green-500"></i>
-                                            <div>
-                                                <p class="text-xs text-green-600 font-medium">Aktif Hingga</p>
-                                                <p class="text-xs text-green-500">
-                                                    {{ \Carbon\Carbon::parse($expiredDate)->format('d M Y') }}</p>
-                                            </div>
-                                        @endif
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Notifications -->
-                <div x-data="{ open: false }" class="relative" {{-- @mouseenter="if(window.innerWidth>=1280){ open = true }" --}}
-                    @mouseleave="if(window.innerWidth>=1280){ open = false }">
+                <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open"
                         class="p-2 rounded-xl text-gray-500 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A] transition-all duration-200 relative">
                         <i class="fas fa-bell text-lg"></i>
@@ -150,8 +96,7 @@
                 </div>
 
                 <!-- Profile Dropdown -->
-                <div x-data="{ open: false }" class="relative cursor-pointer" {{-- @mouseenter="if(window.innerWidth>=1280){ open = true }" --}}
-                    @mouseleave="if(window.innerWidth>=1280){ open = false }">
+                <div x-data="{ open: false }" class="relative cursor-pointer">
                     <button @click="open = !open"
                         class="flex items-center gap-2 sm:gap-3 p-2 rounded-xl hover:bg-[#C3D4EC]/20 transition-all duration-200">
                         <!-- Profile Image -->

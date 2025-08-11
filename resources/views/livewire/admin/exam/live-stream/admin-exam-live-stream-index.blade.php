@@ -463,8 +463,8 @@
             try {
                 // Initialize PeerJS with auto-generated ID
                 peer = new Peer({
-                    host: '213.210.21.140',
-                    port: 9443,
+                    host: 'peer.toti.my.id',
+                    // port: 9443,
                     path: '/peerjs',
                     secure: true, // Use HTTP instead of HTTPS
                     config: {

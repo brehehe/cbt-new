@@ -3,7 +3,7 @@
 ## Summary
 
 ✅ **HTTPS PeerJS Server Active**
-- HTTP PeerJS: http://213.210.21.140:9000/peerjs  
+- HTTP PeerJS: http://213.210.21.140:9000/peerjs
 - HTTPS PeerJS: https://213.210.21.140:9443/peerjs
 - SSL Certificate: Self-signed (Development)
 - Auto-start: Enabled via systemd
@@ -37,7 +37,7 @@
 curl http://213.210.21.140:9000/peerjs
 # Returns: {"name":"PeerJS Server",...}
 
-# HTTPS server  
+# HTTPS server
 curl -k https://213.210.21.140:9443/peerjs
 # Returns: {"name":"PeerJS Server",...}
 ```
@@ -56,7 +56,7 @@ Since we're using a self-signed certificate, browsers will show security warning
 
 1. **Visit HTTPS PeerJS directly**: https://213.210.21.140:9443/peerjs
 2. **Accept certificate warning**:
-   - Click "Advanced" 
+   - Click "Advanced"
    - Click "Proceed to 213.210.21.140 (unsafe)"
 3. **Return to exam page** and refresh
 
@@ -67,7 +67,7 @@ Since we're using a self-signed certificate, browsers will show security warning
 - ⚠️ Browser may require SSL certificate acceptance first
 - 🔒 Secure connection maintained throughout
 
-### For HTTP Site (http://cbt-new.drshieldapp.com)  
+### For HTTP Site (http://cbt-new.drshieldapp.com)
 - ✅ Will connect to HTTP PeerJS server automatically
 - ✅ No SSL warnings
 - 📡 Standard HTTP connection
@@ -95,10 +95,10 @@ sudo certbot certonly --standalone -d peerjs.yourcompany.com
 server {
     listen 443 ssl;
     server_name peerjs.cbt-new.drshieldapp.com;
-    
+
     ssl_certificate /path/to/trusted/certificate.crt;
     ssl_certificate_key /path/to/private/key.key;
-    
+
     location /peerjs {
         proxy_pass http://127.0.0.1:9000;
         # WebSocket support
@@ -116,7 +116,7 @@ server {
 # Start service
 sudo systemctl start peerjs-dual
 
-# Stop service  
+# Stop service
 sudo systemctl stop peerjs-dual
 
 # Restart service
@@ -157,6 +157,6 @@ curl -k https://213.210.21.140:9443/peerjs
 
 ---
 
-🎉 **Setup Complete!** 
+🎉 **Setup Complete!**
 
 Your PeerJS server now supports both HTTP and HTTPS connections, solving the mixed content issue while maintaining your requirement to keep the main domain on HTTPS.

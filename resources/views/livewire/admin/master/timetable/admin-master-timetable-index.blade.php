@@ -105,11 +105,11 @@
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     @else
-                                        {{-- <button
+                                        <button
                                             class="btn btn-icon text-yellow-600 hover:text-yellow-800 transition-colors delete-btn"
                                             wire:click="liveSession('{{ $timetable->id }}')">
                                             <i class="fa-solid fa-camera-movie"></i>
-                                        </button> --}}
+                                        </button>
                                         <button
                                             class="btn btn-icon text-green-600 hover:text-green-800 transition-colors delete-btn"
                                             wire:click="confirmVideo('{{ $timetable->id }}')">
