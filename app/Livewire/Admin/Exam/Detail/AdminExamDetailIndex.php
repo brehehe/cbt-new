@@ -475,22 +475,31 @@ class AdminExamDetailIndex extends Component
         $this->alertCount = ExamAlert::where('user_timetable_id', $this->userTimetableId)->count();
     }
 
-    public function checkQuestion() {
-        $users = UserTimetable::whereHas('userModuleQuestions')->where('user_id', Auth::id())->whereIn('status',['exam','warning'])->get();
+    public function checkQuestion()
+    {
+        // Cek apakah user punya UserTimetable dengan relasi userModuleQuestions dan status exam/warning
+        $users = UserTimetable::where('user_id', Auth::id())
+            ->whereIn('status', ['exam', 'warning'])
+            ->whereHas('userModuleQuestions')
+            ->get();
 
         if ($users->isEmpty()) {
+            // Ambil UserTimetable yang aktif (exam/warning)
             $userTimetable = UserTimetable::where('user_id', Auth::id())
-            ->first();
+                ->whereIn('status', ['exam', 'warning'])
+                ->first();
 
-            $userTimetable->update([
-                'status' => 'done',
-                'end_exam' => now(),
-                'mark' => 0,
-            ]);
+            if ($userTimetable) {
+                $userTimetable->update([
+                    'status'   => 'done',
+                    'end_exam' => now(),
+                    'mark'     => 0,
+                ]);
+            }
 
             session()->flash('saved', [
                 'title' => 'Ujian Telah Selesai!',
-                'text' => "Terima kasih telah mengerjakan ujian. Nilai Anda: {0}/100",
+                'text'  => "Terima kasih telah mengerjakan ujian. Nilai Anda: 0/100",
             ]);
 
             return redirect()->route('admin.exam.timetable');
