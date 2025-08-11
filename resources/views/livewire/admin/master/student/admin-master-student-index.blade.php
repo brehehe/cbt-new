@@ -20,7 +20,7 @@
 
     <!-- Filters -->
     <div class="bg-white rounded-lg shadow mb-6 p-4">
-        <div class="grid grid-cols-4 md:grid-cols-4 gap-4 items-end">
+        <div class="grid grid-cols-3 md:grid-cols-3 gap-4 items-end">
             <!-- Search -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Cari</label>
@@ -54,7 +54,7 @@
             </div>
 
             <!-- Per Page -->
-            <div>
+            <!-- <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Per Halaman</label>
                 <select wire:model.live="perPage" class="form-control mt-1">
                     <option value="5">5</option>
@@ -62,7 +62,7 @@
                     <option value="25">25</option>
                     <option value="50">50</option>
                 </select>
-            </div>
+            </div> -->
         </div>
     </div>
 
