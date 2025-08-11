@@ -24,7 +24,7 @@
                 <label for="grade_letter" class="block text-sm font-medium text-gray-700">Nama Grade Letter <span
                         class="text-red-600">*</span></label>
                 <input type="text" id="grade_letter" wire:model.defer="grade_letter"
-                    placeholder="Contoh : A, B, C, D, E" class="mt-1 form-control">
+                    placeholder="Contoh : A" class="mt-1 form-control">
                 @error('grade_letter')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
