@@ -104,10 +104,10 @@ class AdminMasterRatingScaleIndex extends Component
     {
         $data = RatingScale::query()
             ->when($this->search, function ($query, $search) {
-                $query->where('grade_letter', 'like', '%' . $search . '%')
-                    ->orWhere('min_score', 'like', '%' . $search . '%')
-                    ->orWhere('max_score', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%');
+                $query->where('grade_letter', 'ilike', '%' . $search . '%')
+                    ->orWhere('min_score', 'ilike', '%' . $search . '%')
+                    ->orWhere('max_score', 'ilike', '%' . $search . '%')
+                    ->orWhere('description', 'ilike', '%' . $search . '%');
             })
             ->orderBy('order', 'asc')
             ->paginate($this->perPage);

@@ -178,10 +178,10 @@ class AdminMasterTimetableIndex extends Component
     {
         $timetable = Timetable::query()
             ->when($this->search, function ($query, $search) {
-                $query->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('start_time', 'like', '%' . $search . '%')
-                    ->orWhere('end_time', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%');
+                $query->where('name', 'ilike', '%' . $search . '%')
+                    ->orWhere('start_time', 'ilike', '%' . $search . '%')
+                    ->orWhere('end_time', 'ilike', '%' . $search . '%')
+                    ->orWhere('description', 'ilike', '%' . $search . '%');
             })
             ->orderBy('order', 'desc')
             ->paginate($this->perPage);

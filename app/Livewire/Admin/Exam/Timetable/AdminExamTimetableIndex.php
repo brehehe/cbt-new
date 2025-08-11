@@ -164,8 +164,8 @@ class AdminExamTimetableIndex extends Component
         $timetables = Timetable::query()
             ->when($this->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', '%' . $search . '%')
-                        ->orWhere('description', 'like', '%' . $search . '%');
+                    $q->where('name', 'ilike', '%' . $search . '%')
+                        ->orWhere('description', 'ilike', '%' . $search . '%');
                 });
             })
             ->where(function ($query) {

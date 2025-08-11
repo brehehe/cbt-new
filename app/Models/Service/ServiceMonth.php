@@ -15,8 +15,8 @@ class ServiceMonth extends Model
 
     public function scopeSearch($query, $search)
     {
-        return $query->where('name', 'like', '%' . $search . '%')
-            ->orWhere('description', 'like', '%' . $search . '%');
+        return $query->where('name', 'ilike', '%' . $search . '%')
+            ->orWhere('description', 'ilike', '%' . $search . '%');
     }
 
     protected static function boot()
