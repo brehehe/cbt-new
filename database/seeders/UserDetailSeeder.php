@@ -27,6 +27,12 @@ class UserDetailSeeder extends Seeder
                 'guard_name' => 'web'
             ]);
         }
+        if (!Role::where('name', 'Pengawas')->exists()) {
+            Role::create([
+                'name' => 'Pengawas',
+                'guard_name' => 'web'
+            ]);
+        }
 
         $companyId = Company::first()->id; // Assuming you have a company with ID 1
 
@@ -35,6 +41,9 @@ class UserDetailSeeder extends Seeder
 
         // Create sample lecturers
         $this->createSampleLecturers($companyId);
+
+        // Create sample supervisors
+        $this->createSampleSupervisors($companyId);
     }
 
     private function createSampleStudents($companyId)
@@ -291,6 +300,131 @@ class UserDetailSeeder extends Seeder
             ]);
 
             RoleHelper::assignRoleToUserInCompany($user, 'Dosen', $companyId);
+        }
+    }
+
+    private function createSampleSupervisors($companyId)
+    {
+        $supervisorsData = [
+            [
+                'name' => 'Dr. Ahmad Supervisor',
+                'email' => 'ahmad.supervisor@cbt.test',
+                'employee_id' => 'SUP001',
+                'phone' => '081234567890',
+                'department' => 'Academic Affairs',
+                'position' => 'Head of Academic Affairs',
+                'specialization' => 'Educational Administration',
+                'experience_years' => 15,
+                'hire_date' => '2010-01-15',
+            ],
+            [
+                'name' => 'Prof. Siti Monitoring',
+                'email' => 'siti.monitoring@cbt.test',
+                'employee_id' => 'SUP002',
+                'phone' => '081234567891',
+                'department' => 'Quality Assurance',
+                'position' => 'Quality Assurance Manager',
+                'specialization' => 'Educational Quality Management',
+                'experience_years' => 20,
+                'hire_date' => '2005-03-20',
+            ],
+            [
+                'name' => 'Dr. Budi Evaluator',
+                'email' => 'budi.evaluator@cbt.test',
+                'employee_id' => 'SUP003',
+                'phone' => '081234567892',
+                'department' => 'Assessment Center',
+                'position' => 'Senior Assessment Supervisor',
+                'specialization' => 'Educational Assessment',
+                'experience_years' => 12,
+                'hire_date' => '2012-08-10',
+            ],
+            [
+                'name' => 'Dra. Rina Controller',
+                'email' => 'rina.controller@cbt.test',
+                'employee_id' => 'SUP004',
+                'phone' => '081234567893',
+                'department' => 'Examination Unit',
+                'position' => 'Examination Controller',
+                'specialization' => 'Examination Management',
+                'experience_years' => 18,
+                'hire_date' => '2007-05-25',
+            ],
+            [
+                'name' => 'M.Pd. Hasan Observer',
+                'email' => 'hasan.observer@cbt.test',
+                'employee_id' => 'SUP005',
+                'phone' => '081234567894',
+                'department' => 'Student Affairs',
+                'position' => 'Student Affairs Supervisor',
+                'specialization' => 'Student Development',
+                'experience_years' => 10,
+                'hire_date' => '2014-11-30',
+            ]
+        ];
+
+        foreach ($supervisorsData as $data) {
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make('password123'),
+                'email_verified_at' => now()
+            ]);
+
+            $user->assignRole('Pengawas');
+
+            UserDetail::create([
+                'user_id' => $user->id,
+                'employee_id' => $data['employee_id'],
+                'supervisor_id' => $data['employee_id'], // Same as employee_id for supervisor
+                'supervisor_nip' => $data['employee_id'],
+                'phone' => $data['phone'],
+                'birth_date' => '1980-' . rand(1, 12) . '-' . rand(1, 28),
+                'birth_place' => ['Jakarta', 'Bandung', 'Surabaya', 'Medan', 'Semarang'][rand(0, 4)],
+                'gender' => rand(0, 1) ? 'male' : 'female',
+                'address' => 'Jl. Supervisor ' . rand(1, 100) . ', Jakarta',
+                'postal_code' => '1' . rand(1000, 9999),
+                'city' => 'Jakarta',
+                'province' => 'DKI Jakarta',
+                'country' => 'Indonesia',
+                'emergency_contact_name' => 'Emergency Contact ' . $data['name'],
+                'emergency_contact_phone' => '081' . rand(100000000, 999999999),
+                'emergency_contact_relation' => 'Spouse',
+                'verification_status' => 'verified',
+                'verified_at' => now(),
+                'status' => 'active',
+                'supervisor_department' => $data['department'],
+                'supervisor_unit' => $data['department'] . ' Unit',
+                'supervisor_position' => $data['position'],
+                'supervisor_level' => ['Junior', 'Senior', 'Lead', 'Principal'][rand(0, 3)],
+                'supervisor_area' => ['Academic', 'Administrative', 'Technical', 'General'][rand(0, 3)],
+                'supervisor_specialization' => $data['specialization'],
+                'supervisor_status' => 'active',
+                'supervisor_type' => ['internal', 'external'][rand(0, 1)],
+                'supervisor_start_date' => $data['hire_date'],
+                'supervisor_experience_years' => $data['experience_years'],
+                'notes' => 'Supervisor Role - ' . $data['department'],
+                'certifications' => json_encode([
+                    [
+                        'name' => 'Educational Supervision Certificate',
+                        'issuer' => 'Ministry of Education',
+                        'issue_date' => '2018-01-01',
+                        'credential_id' => 'SUP' . rand(100000, 999999),
+                        'added_at' => now()->toISOString()
+                    ]
+                ]),
+                'supervisor_certifications' => json_encode([
+                    [
+                        'name' => 'Supervisor Management Certification',
+                        'issuer' => 'Professional Supervisors Association',
+                        'issue_date' => '2020-01-01',
+                        'credential_id' => 'SMC' . rand(100000, 999999),
+                        'added_at' => now()->toISOString()
+                    ]
+                ])
+            ]);
+
+            RoleHelper::assignRoleToUserInCompany($user, 'Pengawas', $companyId);
         }
     }
 }

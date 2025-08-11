@@ -8,8 +8,10 @@ use App\Models\User;
 use App\Models\User\UserDetail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -23,11 +25,15 @@ class AdminMasterSupervisorIndex extends Component
     protected $queryString = [
         // 'page' => ['except' => 1], // Ini akan menghapus ?page=1 dari URL
         'search' => ['except' => ''],
+        'statusFilter' => ['except' => ''],
+        'departmentFilter' => ['except' => ''],
     ];
 
     public $search = '';
+    public $statusFilter = '';
+    public $departmentFilter = '';
 
-    public $perPage = 5;
+    public $perPage = 10;
 
     // User
     public $data_id;
@@ -41,6 +47,18 @@ class AdminMasterSupervisorIndex extends Component
 
     // User Detail
     public $address;
+    public $supervisor_id;
+    public $supervisor_nip;
+    public $supervisor_department;
+    public $supervisor_unit;
+    public $supervisor_position;
+    public $supervisor_level;
+    public $supervisor_area;
+    public $supervisor_specialization;
+    public $supervisor_status;
+    public $supervisor_type;
+    public $supervisor_start_date;
+    public $supervisor_experience_years;
     // public $identity_card;
     public $is_head = true;
     public $is_active = true;
@@ -62,6 +80,19 @@ class AdminMasterSupervisorIndex extends Component
             'profile_old',
             'phone',
             'address',
+            'supervisor_id',
+            'supervisor_id',
+            'supervisor_nip',
+            'supervisor_department',
+            'supervisor_unit',
+            'supervisor_position',
+            'supervisor_level',
+            'supervisor_area',
+            'supervisor_specialization',
+            'supervisor_status',
+            'supervisor_type',
+            'supervisor_start_date',
+            'supervisor_experience_years',
             // 'identity_number',
             'is_head',
             'is_active',
@@ -80,21 +111,31 @@ class AdminMasterSupervisorIndex extends Component
         $this->username = $user->username;
         $this->email = $user->email;
         $this->profile_old = $user->profile;
-        $this->phone = trim($user->phone ?? 0);
+        $this->phone = trim($user->phone ?? '');
 
         if ($user->userDetail) {
-            $this->is_head =
-                $user
-                ->companyRoles()
-                ->where('company_id', Auth::user()->company_id)
-                ->first()->is_head ?? true;
-            $this->is_active =
-                $user
-                ->companyRoles()
-                ->where('company_id', Auth::user()->company_id)
-                ->first()->is_active ?? true;
-        }
+            $this->address = $user->userDetail->address;
+            $this->supervisor_id = $user->userDetail->supervisor_id;
+            $this->supervisor_id = $user->userDetail->supervisor_id;
+            $this->supervisor_nip = $user->userDetail->supervisor_nip;
+            $this->supervisor_department = $user->userDetail->supervisor_department;
+            $this->supervisor_unit = $user->userDetail->supervisor_unit;
+            $this->supervisor_position = $user->userDetail->supervisor_position;
+            $this->supervisor_level = $user->userDetail->supervisor_level;
+            $this->supervisor_area = $user->userDetail->supervisor_area;
+            $this->supervisor_specialization = $user->userDetail->supervisor_specialization;
+            $this->supervisor_status = $user->userDetail->supervisor_status;
+            $this->supervisor_type = $user->userDetail->supervisor_type;
+            $this->supervisor_start_date = $user->userDetail->supervisor_start_date;
+            $this->supervisor_experience_years = $user->userDetail->supervisor_experience_years;
 
+            $companyRole = $user->companyRoles()
+                ->where('company_id', Auth::user()->company_id)
+                ->first();
+
+            $this->is_head = $companyRole ? $companyRole->is_head : true;
+            $this->is_active = $companyRole ? $companyRole->is_active : true;
+        }
         $this->openModal();
     }
 
@@ -134,8 +175,8 @@ class AdminMasterSupervisorIndex extends Component
                     ->where('company_id', $currentCompanyId)
                     ->ignore($this->data_id),
             ],
-            // 'address' => 'required|string|max:500',
-            // 'identity_number' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
+            'supervisor_id' => 'required|string|max:50|unique:user_details,supervisor_id,' . ($this->data_id ? $this->data_id : 'NULL') . ',user_id',
         ]);
 
         try {
@@ -154,7 +195,7 @@ class AdminMasterSupervisorIndex extends Component
             $user = $userResult['user'];
 
             // Update user detail
-            // $this->updateUserDetail($user, $validatedData);
+            $this->updateUserDetail($user, $validatedData);
 
             // Assign role (hanya untuk karyawan)
             $this->assignUserRole($user, $currentCompanyId);
@@ -318,7 +359,20 @@ class AdminMasterSupervisorIndex extends Component
     protected function updateUserDetail($user, $validatedData)
     {
         $detailData = [
-            'address' => $validatedData['address'],
+            'address' => $validatedData['address'] ?? null,
+            'supervisor_id' => $validatedData['supervisor_id'] ?? null,
+            'supervisor_id' => $this->supervisor_id ?? $validatedData['supervisor_id'],
+            'supervisor_nip' => $this->supervisor_nip ?? null,
+            'supervisor_department' => $this->supervisor_department,
+            'supervisor_unit' => $this->supervisor_unit,
+            'supervisor_position' => $this->supervisor_position,
+            'supervisor_level' => $this->supervisor_level,
+            'supervisor_area' => $this->supervisor_area,
+            'supervisor_specialization' => $this->supervisor_specialization,
+            'supervisor_status' => $this->supervisor_status ?? 'active',
+            'supervisor_type' => $this->supervisor_type ?? 'internal',
+            'supervisor_start_date' => $this->supervisor_start_date,
+            'supervisor_experience_years' => $this->supervisor_experience_years,
         ];
 
         // Handle identity card encryption
@@ -369,11 +423,26 @@ class AdminMasterSupervisorIndex extends Component
 
     public function render()
     {
-
-        $user = User::companyRole('Pengawas', Auth::user()->company_id)
+        $query = User::companyRole('Pengawas', Auth::user()->company_id)
             ->search($this->search)
-            ->where('type_user', 'employee')
-            ->orderBy('name', 'asc');
+            ->where('type_user', 'employee');
+
+        // Filter by status if selected
+        if ($this->statusFilter) {
+            $query->whereHas('companyRoles', function ($q) {
+                $q->where('company_id', Auth::user()->company_id)
+                    ->where('is_active', $this->statusFilter === 'active');
+            });
+        }
+
+        // Filter by department if selected
+        if (!empty($this->departmentFilter)) {
+            $query->whereHas('userDetail', function ($q) {
+                $q->where('supervisor_department', $this->departmentFilter);
+            });
+        }
+
+        $user = $query->orderBy('name', 'asc');
 
         return view('livewire.admin.master.supervisor.admin-master-supervisor-index', [
             'admins' => $user->paginate($this->perPage),

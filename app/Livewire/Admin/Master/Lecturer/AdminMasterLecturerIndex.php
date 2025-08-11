@@ -26,356 +26,390 @@ class AdminMasterLecturerIndex extends Component
     ];
 
     public $search = '';
+    public $facultyFilter = '';
+    public $departmentFilter = '';
+    public $positionFilter = '';
 
-    public $perPage = 5;
+    public $perPage = 10;
+    public $showModal = false;
+    public $editMode = false;
 
     // User
     public $data_id;
     public $name;
-    public $username;
     public $email;
     public $password;
-    public $profile;
-    public $profile_old;
-    public $phone;
 
-    // User Detail
+    // Lecturer Detail
+    public $lecturer_id;
+    public $lecturer_nidn;
+    public $lecturer_nip;
+    public $lecturer_department;
+    public $lecturer_faculty;
+    public $lecturer_position;
+    public $lecturer_functional_position;
+    public $lecturer_education_level;
+    public $lecturer_specialization;
+    public $lecturer_expertise;
+    public $lecturer_status = 'active';
+    public $lecturer_type = 'full_time';
+    public $lecturer_start_date;
+
+    // Personal Info
+    public $birth_place;
+    public $birth_date;
+    public $gender;
+    public $religion;
+    public $nationality = 'Indonesian';
+    public $marital_status = 'single';
     public $address;
-    // public $identity_card;
-    public $is_head = true;
-    public $is_active = true;
+    public $city;
+    public $province;
+    public $phone;
+    public $mobile_phone;
+    public $identity_type = 'KTP';
+    public $identity_number;
+
+    protected $rules = [
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email',
+        'lecturer_id' => 'required|string|unique:user_details,lecturer_id',
+        'lecturer_nidn' => 'required|string|unique:user_details,lecturer_nidn',
+        'lecturer_department' => 'required|string|max:255',
+        'lecturer_faculty' => 'required|string|max:255',
+        'lecturer_position' => 'required|string|max:255',
+        'lecturer_education_level' => 'required|string|max:255',
+        'lecturer_specialization' => 'required|string|max:255',
+        'birth_place' => 'required|string|max:255',
+        'birth_date' => 'required|date',
+        'gender' => 'required|in:male,female',
+        'phone' => 'nullable|string|max:20',
+        'mobile_phone' => 'nullable|string|max:20',
+        'address' => 'required|string|max:500',
+        'city' => 'required|string|max:255',
+        'province' => 'required|string|max:255',
+    ];
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFacultyFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingDepartmentFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPositionFilter()
+    {
+        $this->resetPage();
+    }
 
     public function openModal()
     {
-        return $this->dispatch('open-modal', ['id' => 'modal']);
+        $this->resetForm();
+        $this->dispatch('open-modal', ['id' => 'modal']);
     }
 
     public function closeModal()
     {
+        $this->dispatch('close-modal', ['id' => 'modal']);
+        $this->resetForm();
+    }
+
+    private function resetForm()
+    {
         $this->reset([
-            'data_id',
             'name',
-            'username',
             'email',
-            'password',
-            'profile',
-            'profile_old',
-            'phone',
+            'lecturer_id',
+            'lecturer_nidn',
+            'lecturer_nip',
+            'lecturer_department',
+            'lecturer_faculty',
+            'lecturer_position',
+            'lecturer_functional_position',
+            'lecturer_education_level',
+            'lecturer_specialization',
+            'lecturer_expertise',
+            'lecturer_status',
+            'lecturer_type',
+            'lecturer_start_date',
+            'birth_place',
+            'birth_date',
+            'gender',
+            'religion',
+            'nationality',
+            'marital_status',
             'address',
-            // 'identity_number',
-            'is_head',
-            'is_active',
+            'city',
+            'province',
+            'phone',
+            'mobile_phone',
+            'identity_type',
+            'identity_number',
+            'data_id',
+            'editMode',
+            'password'
         ]);
         $this->resetErrorBag();
         $this->resetValidation();
-        return $this->dispatch('close-modal', ['id' => 'modal']);
     }
 
 
     public function edit($id)
     {
-        $user = User::findOrFail($id);
-        $this->data_id = $user->id;
-        $this->name = $user->name;
-        $this->username = $user->username;
-        $this->email = $user->email;
-        $this->profile_old = $user->profile;
-        $this->phone = trim($user->phone ?? 0);
+        $user = User::with('userDetail')->findOrFail($id);
+        $detail = $user->userDetail;
 
-        if ($user->userDetail) {
-            $this->is_head =
-                $user
-                ->companyRoles()
-                ->where('company_id', Auth::user()->company_id)
-                ->first()->is_head ?? true;
-            $this->is_active =
-                $user
-                ->companyRoles()
-                ->where('company_id', Auth::user()->company_id)
-                ->first()->is_active ?? true;
+        $this->data_id = $id;
+        $this->editMode = true; // Set edit mode to true
+        $this->name = $user->name;
+        $this->email = $user->email;
+
+        if ($detail) {
+            $this->lecturer_id = $detail->lecturer_id ?? '';
+            $this->lecturer_nidn = $detail->lecturer_nidn ?? '';
+            $this->lecturer_nip = $detail->lecturer_nip ?? '';
+            $this->lecturer_department = $detail->lecturer_department ?? '';
+            $this->lecturer_faculty = $detail->lecturer_faculty ?? '';
+            $this->lecturer_position = $detail->lecturer_position ?? '';
+            $this->lecturer_functional_position = $detail->lecturer_functional_position ?? '';
+            $this->lecturer_education_level = $detail->lecturer_education_level ?? '';
+            $this->lecturer_specialization = $detail->lecturer_specialization ?? '';
+            $this->lecturer_expertise = $detail->lecturer_expertise ?? '';
+            $this->lecturer_status = $detail->lecturer_status ?? 'active';
+            $this->lecturer_type = $detail->lecturer_type ?? 'full_time';
+            $this->lecturer_start_date = $detail->lecturer_start_date ?? '';
+            $this->birth_place = $detail->birth_place ?? '';
+            $this->birth_date = $detail->birth_date ?? '';
+            $this->gender = $detail->gender ?? '';
+            $this->religion = $detail->religion ?? '';
+            $this->nationality = $detail->nationality ?? 'Indonesian';
+            $this->marital_status = $detail->marital_status ?? 'single';
+            $this->address = $detail->address ?? '';
+            $this->city = $detail->city ?? '';
+            $this->province = $detail->province ?? '';
+            $this->phone = $detail->phone ?? '';
+            $this->mobile_phone = $detail->mobile_phone ?? '';
+            $this->identity_type = $detail->identity_type ?? 'KTP';
+            $this->identity_number = $detail->identity_number ?? '';
         }
 
-        $this->openModal();
+        $this->dispatch('open-modal', ['id' => 'modal']);
     }
 
     public function submit()
     {
-        $currentCompanyId = Auth::user()->company_id;
-
-        $validatedData = $this->validate([
+        // Dynamic validation rules
+        $rules = [
             'name' => 'required|string|max:255',
-            'username' => [
-                'required',
-                'string',
-                'min:4',
-                'regex:/^\S*$/u', // tidak boleh ada spasi
-                Rule::unique('users', 'username')
-                    ->where('type_user', 'employee')
-                    ->where('company_id', $currentCompanyId)
-                    ->ignore($this->data_id),
-            ],
-            'email' => [
-                'required',
-                'email',
-                'max:255',
-                Rule::unique('users', 'email')
-                    ->where('type_user', 'employee')
-                    ->where('company_id', $currentCompanyId)
-                    ->ignore($this->data_id),
-            ],
-            'password' => $this->data_id ? 'nullable|string|min:8' : 'required|string|min:8',
-            'profile' => 'nullable|image|max:2048',
-            'phone' => [
-                'required',
-                'string',
-                'max:20',
-                Rule::unique('users', 'phone')
-                    ->where('type_user', 'employee')
-                    ->where('company_id', $currentCompanyId)
-                    ->ignore($this->data_id),
-            ],
-            // 'address' => 'required|string|max:500',
-            // 'identity_number' => 'nullable|string|max:20',
-        ]);
+            'lecturer_department' => 'required|string|max:255',
+            'lecturer_faculty' => 'required|string|max:255',
+            'lecturer_position' => 'required|string|max:255',
+            'lecturer_education_level' => 'required|string|max:255',
+            'lecturer_specialization' => 'required|string|max:255',
+            'birth_place' => 'required|string|max:255',
+            'birth_date' => 'required|date',
+            'gender' => 'required|in:male,female',
+            'phone' => 'nullable|string|max:20',
+            'mobile_phone' => 'nullable|string|max:20',
+            'address' => 'required|string|max:500',
+            'city' => 'required|string|max:255',
+            'province' => 'required|string|max:255',
+        ];
+
+        if ($this->editMode) {
+            $rules['email'] = 'required|email|unique:users,email,' . $this->data_id . ',id';
+            $rules['lecturer_id'] = 'required|string|unique:user_details,lecturer_id,' . $this->data_id . ',user_id';
+            $rules['lecturer_nidn'] = 'required|string|unique:user_details,lecturer_nidn,' . $this->data_id . ',user_id';
+        } else {
+            // For create mode: strict unique validation + password required
+            $rules['email'] = 'required|email|unique:users,email';
+            $rules['lecturer_id'] = 'required|string|unique:user_details,lecturer_id';
+            $rules['lecturer_nidn'] = 'required|string|unique:user_details,lecturer_nidn';
+            $rules['password'] = 'required|string|min:8';
+        }
+
+        $this->validate($rules);
 
         try {
-            // Mulai database transaction
             DB::beginTransaction();
 
-            // Handle user creation/update
-            $userResult = $this->handleUserIdentityResolution($currentCompanyId, $validatedData);
-
-            if (!$userResult['success']) {
-                DB::rollBack();
-                $this->addError('general', $userResult['message']);
-                return;
-            }
-
-            $user = $userResult['user'];
-
-            // Update user detail
-            // $this->updateUserDetail($user, $validatedData);
-
-            // Assign role (hanya untuk karyawan)
-            $this->assignUserRole($user, $currentCompanyId);
-
-            // Commit transaction jika semua berhasil
-            DB::commit();
-
-            // Reset form dan tutup modal
-            $this->reset();
-            $this->closeModal();
-
-            AlertHelper::success('Berhasil', 'Pengguna berhasil disimpan.');
-        } catch (ValidationException $e) {
-            // Handle validation errors
-            DB::rollBack();
-            $this->setErrorBag($e->validator->getMessageBag());
-            return;
-        } catch (\Exception $e) {
-            // Handle general errors
-            DB::rollBack();
-
-            $errorMessage = 'Pengguna gagal disimpan.';
-
-            // Log detailed error for debugging
-            Log::error('Error saving user: ' . $e->getMessage(), [
-                'user_id' => Auth::id(),
-                'company_id' => $currentCompanyId,
-                'data' => [
+            if ($this->editMode) {
+                $user = User::findOrFail($this->data_id);
+                $user->update([
                     'name' => $this->name,
                     'email' => $this->email,
-                    'username' => $this->username,
-                    'type_user' => 'employee',
-                ],
-                'trace' => $e->getTraceAsString(),
-            ]);
+                ]);
 
-            // Show user-friendly error message
-            if (app()->environment('local')) {
-                $errorMessage .= ' Error: ' . $e->getMessage();
+                $user->userDetail()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    [
+                        'lecturer_id' => $this->lecturer_id,
+                        'lecturer_nidn' => $this->lecturer_nidn,
+                        'lecturer_nip' => $this->lecturer_nip,
+                        'lecturer_department' => $this->lecturer_department,
+                        'lecturer_faculty' => $this->lecturer_faculty,
+                        'lecturer_position' => $this->lecturer_position,
+                        'lecturer_functional_position' => $this->lecturer_functional_position,
+                        'lecturer_education_level' => $this->lecturer_education_level,
+                        'lecturer_specialization' => $this->lecturer_specialization,
+                        'lecturer_expertise' => $this->lecturer_expertise,
+                        'lecturer_status' => $this->lecturer_status,
+                        'lecturer_type' => $this->lecturer_type,
+                        'lecturer_start_date' => $this->lecturer_start_date,
+                        'birth_place' => $this->birth_place,
+                        'birth_date' => $this->birth_date,
+                        'gender' => $this->gender,
+                        'religion' => $this->religion,
+                        'nationality' => $this->nationality,
+                        'marital_status' => $this->marital_status,
+                        'address' => $this->address,
+                        'city' => $this->city,
+                        'province' => $this->province,
+                        'phone' => $this->phone,
+                        'mobile_phone' => $this->mobile_phone,
+                        'identity_type' => $this->identity_type,
+                        'identity_number' => $this->identity_number,
+                    ]
+                );
+
+                RoleHelper::assignRoleToUserInCompany($user, 'Dosen', Auth::user()->company_id);
+
+                AlertHelper::success('Berhasil', 'Data dosen berhasil diperbarui.');
+            } else {
+                $user = User::create([
+                    'name' => $this->name,
+                    'email' => $this->email,
+                    'password' => Hash::make($this->password ?: 'password123'),
+                    'email_verified_at' => now()
+                ]);
+
+                $user->userDetail()->create([
+                    'lecturer_id' => $this->lecturer_id,
+                    'lecturer_nidn' => $this->lecturer_nidn,
+                    'lecturer_nip' => $this->lecturer_nip,
+                    'lecturer_department' => $this->lecturer_department,
+                    'lecturer_faculty' => $this->lecturer_faculty,
+                    'lecturer_position' => $this->lecturer_position,
+                    'lecturer_functional_position' => $this->lecturer_functional_position,
+                    'lecturer_education_level' => $this->lecturer_education_level,
+                    'lecturer_specialization' => $this->lecturer_specialization,
+                    'lecturer_expertise' => $this->lecturer_expertise,
+                    'lecturer_status' => $this->lecturer_status,
+                    'lecturer_type' => $this->lecturer_type,
+                    'lecturer_start_date' => $this->lecturer_start_date,
+                    'birth_place' => $this->birth_place,
+                    'birth_date' => $this->birth_date,
+                    'gender' => $this->gender,
+                    'religion' => $this->religion,
+                    'nationality' => $this->nationality,
+                    'marital_status' => $this->marital_status,
+                    'address' => $this->address,
+                    'city' => $this->city,
+                    'province' => $this->province,
+                    'phone' => $this->phone,
+                    'mobile_phone' => $this->mobile_phone,
+                    'identity_type' => $this->identity_type,
+                    'identity_number' => $this->identity_number,
+                    'verification_status' => 'pending',
+                    'status' => 'active'
+                ]);
+
+                RoleHelper::assignRoleToUserInCompany($user, 'Dosen', Auth::user()->company_id);
+
+                AlertHelper::success('Berhasil', 'Data dosen berhasil ditambahkan.');
             }
 
-            AlertHelper::error('Gagal', $errorMessage);
-            $this->addError('general', $errorMessage);
-        } catch (\Throwable $th) {
-            // Handle any other throwable errors
-            DB::rollBack();
-
-            Log::error('Critical error saving user: ' . $th->getMessage(), [
-                'user_id' => Auth::id(),
-                'company_id' => $currentCompanyId,
-                'trace' => $th->getTraceAsString(),
-            ]);
-
-            AlertHelper::error('Gagal', 'Terjadi kesalahan sistem. Silakan coba lagi.');
-            $this->addError('general', 'Terjadi kesalahan sistem. Silakan coba lagi.');
-        }
-    }
-
-    /**
-     * Handle user identity resolution with smart conflict handling
-     */
-    protected function handleUserIdentityResolution($companyId, $validatedData)
-    {
-        try {
-            if ($this->data_id) {
-                return $this->updateExistingUser($companyId, $validatedData);
-            }
-
-            // Untuk user baru, buat user baru
-            $user = $this->createNewUser($companyId, $validatedData);
-
-            return [
-                'success' => true,
-                'user' => $user,
-                'message' => 'New user created successfully',
-            ];
+            DB::commit();
+            $this->closeModal();
         } catch (\Exception $e) {
-            return [
-                'success' => false,
-                'user' => null,
-                'message' => $e->getMessage(),
-            ];
+            DB::rollBack();
+            AlertHelper::error('Gagal', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-    }
-
-    /**
-     * Update existing user
-     */
-    protected function updateExistingUser($companyId, $validatedData)
-    {
-        $user = User::find($this->data_id);
-        if (!$user) {
-            throw new \Exception('User tidak ditemukan');
-        }
-
-        // Verify user belongs to the same company
-        if ($user->company_id !== $companyId) {
-            throw new \Exception('User tidak ditemukan dalam perusahaan ini');
-        }
-
-        // Prepare update data
-        $updateData = [
-            'name' => $validatedData['name'],
-            'username' => $validatedData['username'],
-            'email' => $validatedData['email'],
-            'phone' => trim($validatedData['phone']),
-            'company_id' => $companyId,
-            'type_user' => 'employee',
-        ];
-
-        // Handle password update
-        if (!empty($validatedData['password'])) {
-            $updateData['password'] = Hash::make($validatedData['password']);
-        }
-
-        // Handle profile image
-        if ($this->profile && $this->profile instanceof \Illuminate\Http\UploadedFile) {
-            // Delete old profile if exists
-            if ($user->profile && Storage::disk('public')->exists($user->profile)) {
-                Storage::disk('public')->delete($user->profile);
-            }
-            $updateData['profile'] = $this->profile->store('profiles', 'public');
-        }
-
-        $user->update($updateData);
-
-        return [
-            'success' => true,
-            'user' => $user->fresh(),
-            'message' => 'User updated successfully',
-        ];
-    }
-
-    /**
-     * Create new user
-     */
-    protected function createNewUser($companyId, $validatedData)
-    {
-        // Prepare create data
-        $createData = [
-            'name' => $validatedData['name'],
-            'username' => $validatedData['username'],
-            'email' => $validatedData['email'],
-            'password' => Hash::make($validatedData['password']),
-            'phone' => trim($validatedData['phone']),
-            'company_id' => $companyId,
-            'type_user' => 'employee',
-        ];
-
-        // Handle profile image
-        if ($this->profile && $this->profile instanceof \Illuminate\Http\UploadedFile) {
-            $createData['profile'] = $this->profile->store('profiles', 'public');
-        }
-
-        return User::create($createData);
-    }
-
-    /**
-     * Update user detail
-     */
-    protected function updateUserDetail($user, $validatedData)
-    {
-        $detailData = [
-            'address' => $validatedData['address'],
-        ];
-
-        // Handle identity card encryption
-        // if (!empty($validatedData['identity_number'])) {
-        //     $detailData['identity_number'] = Crypt::encryptString($validatedData['identity_number']);
-        // }
-
-        UserDetail::updateOrCreate(
-            ['user_id' => $user->id],
-            $detailData
-        );
-    }
-
-    /**
-     * Assign user role
-     */
-    protected function assignUserRole($user, $companyId)
-    {
-        // Check if role assignment properties exist
-        $isHead = $this->is_head ?? true;
-        $isActive = $this->is_active ?? true;
-
-        RoleHelper::assignRoleToUserInCompany(
-            $user,
-            'Dosen',
-            $companyId,
-            null,
-            $isHead,
-            $isActive
-        );
-    }
-
-    public function confirmDelete($id)
-    {
-        return AlertHelper::confirmDelete('delete', 'Apakah Anda yakin ingin menghapus pengguna ini?', $id);
     }
 
     public function delete($id)
     {
-        $user = User::findOrFail($id[0]);
-        if ($user->id == Auth::id()) {
-            return AlertHelper::error('Gagal', 'Anda tidak dapat menghapus akun Anda sendiri.');
-        }
+        try {
+            $user = User::findOrFail($id[0]);
 
-        $user->delete();
-        AlertHelper::success('Pengguna Berhasil Dihapus');
+            if ($user->id == Auth::id()) {
+                return AlertHelper::error('Gagal', 'Anda tidak dapat menghapus akun Anda sendiri.');
+            }
+
+            $user->userDetail()->delete();
+            $user->delete();
+
+            AlertHelper::success('Berhasil', 'Data dosen berhasil dihapus.');
+        } catch (\Exception $e) {
+            AlertHelper::error('Gagal', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function confirmDelete($id)
+    {
+        return AlertHelper::confirmDelete('delete', 'Apakah Anda yakin ingin menghapus data dosen ini?', $id);
     }
 
     public function render()
     {
-        $user = User::companyRole('Dosen', Auth::user()->company_id)
-            ->search($this->search)
-            ->where('type_user', 'employee')
-            ->orderBy('name', 'asc');
+        $query = User::role('Dosen')
+            ->with(['userDetail'])
+            ->whereHas('userDetail', function ($q) {
+                if ($this->search) {
+                    $q->where('lecturer_id', 'like', '%' . $this->search . '%')
+                        ->orWhere('lecturer_nidn', 'like', '%' . $this->search . '%')
+                        ->orWhereHas('user', function ($userQuery) {
+                            $userQuery->where('name', 'like', '%' . $this->search . '%')
+                                ->orWhere('email', 'like', '%' . $this->search . '%');
+                        });
+                }
+
+                if ($this->facultyFilter) {
+                    $q->where('lecturer_faculty', $this->facultyFilter);
+                }
+
+                if ($this->departmentFilter) {
+                    $q->where('lecturer_department', $this->departmentFilter);
+                }
+
+                if ($this->positionFilter) {
+                    $q->where('lecturer_position', $this->positionFilter);
+                }
+            });
+
+        $lecturers = $query->paginate($this->perPage);
+
+        $faculties = UserDetail::whereNotNull('lecturer_faculty')
+            ->distinct()
+            ->pluck('lecturer_faculty')
+            ->filter()
+            ->sort();
+
+        $departments = UserDetail::whereNotNull('lecturer_department')
+            ->distinct()
+            ->pluck('lecturer_department')
+            ->filter()
+            ->sort();
+
+        $positions = UserDetail::whereNotNull('lecturer_position')
+            ->distinct()
+            ->pluck('lecturer_position')
+            ->filter()
+            ->sort();
 
         return view('livewire.admin.master.lecturer.admin-master-lecturer-index', [
-            'admins' => $user->paginate($this->perPage),
+            'lecturers' => $lecturers,
+            'faculties' => $faculties,
+            'departments' => $departments,
+            'positions' => $positions
         ])
             ->extends('layout.app')
             ->section('content');

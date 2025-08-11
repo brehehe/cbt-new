@@ -72,6 +72,21 @@ return new class extends Migration
             $table->date('lecturer_start_date')->nullable()->comment('Tanggal mulai mengajar');
             $table->date('lecturer_retirement_date')->nullable()->comment('Tanggal pensiun');
 
+            // Data Khusus untuk Pengawas/Supervisor
+            $table->string('supervisor_id')->nullable()->comment('ID khusus untuk pengawas');
+            $table->string('supervisor_nip')->nullable()->comment('NIP pengawas');
+            $table->string('supervisor_department')->nullable()->comment('Departemen pengawas');
+            $table->string('supervisor_unit')->nullable()->comment('Unit kerja pengawas');
+            $table->string('supervisor_position')->nullable()->comment('Jabatan pengawas');
+            $table->string('supervisor_level')->nullable()->comment('Level pengawas (Junior, Senior, Lead, Principal)');
+            $table->string('supervisor_area')->nullable()->comment('Area pengawasan (Academic, Administrative, Technical, General)');
+            $table->string('supervisor_specialization')->nullable()->comment('Spesialisasi pengawasan');
+            $table->enum('supervisor_status', ['active', 'inactive', 'leave', 'retired'])->nullable()->comment('Status pengawas');
+            $table->enum('supervisor_type', ['internal', 'external', 'contract'])->nullable()->comment('Tipe pengawas');
+            $table->date('supervisor_start_date')->nullable()->comment('Tanggal mulai bertugas sebagai pengawas');
+            $table->integer('supervisor_experience_years')->nullable()->comment('Pengalaman sebagai pengawas (tahun)');
+            $table->json('supervisor_certifications')->nullable()->comment('Sertifikasi pengawasan (JSON array)');
+
             // Data Sertifikasi dan Lisensi
             $table->json('certifications')->nullable()->comment('Sertifikasi yang dimiliki (JSON array)');
             $table->json('licenses')->nullable()->comment('Lisensi yang dimiliki (JSON array)');
@@ -111,6 +126,7 @@ return new class extends Migration
             $table->index(['user_id', 'company_id']);
             $table->index(['student_id']);
             $table->index(['lecturer_id']);
+            $table->index(['supervisor_id']);
             $table->index(['employee_id']);
             $table->index(['verification_status']);
             $table->index(['status']);

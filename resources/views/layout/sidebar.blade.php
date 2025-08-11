@@ -34,7 +34,11 @@
                     </div>
                 </div>
                 @php
-                    $exams = [['label' => 'Ujian', 'url' => '/admin/exam/timetable', 'icon' => 'fa-file-lines']];
+                    $exams = [
+                        ['label' => 'Ujian', 'url' => '/admin/exam/timetable', 'icon' => 'fa-file-lines'],
+                        ['label' => 'Monitor Ujian', 'url' => '/admin/exam/monitor', 'icon' => 'fa-desktop'],
+                        ['label' => 'Live Stream', 'url' => '/admin/exam/live-stream', 'icon' => 'fa-video'],
+                    ];
                 @endphp
                 @foreach ($exams as $exam)
                     <div>

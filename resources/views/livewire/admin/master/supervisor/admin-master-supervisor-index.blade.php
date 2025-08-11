@@ -1,9 +1,10 @@
 <div>
-    @include('livewire.admin.master.supervisor.admin-master-supervisor-modal')
+    @include('livewire.admin.master.supervisor.admin-master-supervisor-modal-new')
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#1E3A8A]">Pengawas</h1>
+                <h1 class="text-2xl font-bold text-[#1E3A8A]">Manajemen Data Pengawas</h1>
+                <p class="text-gray-600">Kelola data pengawas dalam sistem CBT</p>
             </div>
             <div>
                 <button wire:click="openModal()" class="btn btn-primary">
@@ -17,63 +18,159 @@
         </div>
     </div>
 
-    <!-- Table Controls -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-        <div class="flex items-center">
-            <span class="text-sm text-gray-700 mr-2">Tampil</span>
-            <select class="mt-1 form-control" wire:model.live='perPage'>
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
-            <span class="text-sm text-gray-700 ml-2">data</span>
-        </div>
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow mb-6 p-4">
+        <div class="grid grid-cols-3 md:grid-cols-4 gap-4 items-end">
+            <!-- Search -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Cari</label>
+                <input type="text" wire:model.live="search" placeholder="ID Pengawas, Nama, Email..."
+                    class="form-control mt-1">
+            </div>
 
-        <div class="relative w-full sm:w-64">
-            <input type="text" class="mt-1 form-control-search" placeholder="Cari Sesuatu..."
-                wire:model.live='search'>
-            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <i class="fas fa-search h-3 w-3 text-gray-400"></i>
+            <!-- Departemen Filter -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Departemen</label>
+                <select wire:model.live="departmentFilter" class="form-control mt-1">
+                    <option value="">Semua Departemen</option>
+                    <option value="Fakultas Teknologi Informasi">Fakultas Teknologi Informasi</option>
+                    <option value="Fakultas Ekonomi">Fakultas Ekonomi</option>
+                    <option value="Fakultas Teknik">Fakultas Teknik</option>
+                    <option value="Fakultas Sains">Fakultas Sains</option>
+                </select>
+            </div>
+
+            <!-- Status Filter -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select wire:model.live="statusFilter" class="form-control mt-1">
+                    <option value="">Semua Status</option>
+                    <option value="active">Aktif</option>
+                    <option value="inactive">Tidak Aktif</option>
+                </select>
+            </div>
+
+            <!-- Per Page -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Per Halaman</label>
+                <select wire:model.live="perPage" class="form-control mt-1">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                </select>
             </div>
         </div>
     </div>
 
     <!-- Table Section -->
-    <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
-        <div class="table-container">
-            <table class="table">
-                <thead>
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
                     <tr>
-                        <th class="w-1 center">No</th>
-                        <th>Nama</th>
-                        <th>Email</th>
-                        <th>Username</th>
-                        <th class="w-1 center">Aksi</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Pengawas
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            ID/NIP
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Departemen
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Area/Level
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Spesialisasi
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Aksi
+                        </th>
                     </tr>
                 </thead>
-                <tbody>
-                    @forelse ($admins as $index => $admin)
-                        <tr>
-                            <td class="center">{{ $admins->firstItem() + $index }}</td>
-                            <td>{{ $admin->name ?? '-' }}</td>
-                            <td>{{ $admin->email ?? '-' }}</td>
-                            <td>{{ $admin->username ?? '-' }}</td>
-                            {{-- <td>{{ $admin->phone ?? '-' }}</td> --}}
-                            <td class="center">
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse($admins as $supervisor)
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <!-- Tombol Edit -->
+                                    <div class="flex-shrink-0 h-10 w-10">
+                                        @if ($supervisor->profile)
+                                            <img src="{{ asset('storage/' . $supervisor->profile) }}"
+                                                alt="Foto {{ $supervisor->name }}"
+                                                class="h-10 w-10 rounded-full object-cover">
+                                        @else
+                                            <div
+                                                class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                                                <span class="text-sm font-medium text-purple-700">
+                                                    {{ substr($supervisor->name, 0, 2) }}
+                                                </span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">{{ $supervisor->name }}</div>
+                                        <div class="text-sm text-gray-500">{{ $supervisor->email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">
+                                    {{ $supervisor->userDetail->supervisor_id ?? ($supervisor->userDetail->employee_id ?? '-') }}
+                                </div>
+                                <div class="text-sm text-gray-500">NIP:
+                                    {{ $supervisor->userDetail->supervisor_nip ?? '-' }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">
+                                    {{ $supervisor->userDetail->supervisor_department ?? '-' }}</div>
+                                <div class="text-sm text-gray-500">{{ $supervisor->userDetail->supervisor_unit ?? '-' }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">
+                                    {{ $supervisor->userDetail->supervisor_area ?? '-' }}</div>
+                                <div class="text-sm text-gray-500">
+                                    Level: {{ $supervisor->userDetail->supervisor_level ?? '-' }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ $supervisor->userDetail->supervisor_specialization ?? '-' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @php
+                                    $companyRole = $supervisor
+                                        ->companyRoles()
+                                        ->where('company_id', Auth::user()->company_id)
+                                        ->first();
+                                    $isActive = $companyRole ? $companyRole->is_active : false;
+                                @endphp
+
+                                @if ($isActive)
+                                    <span
+                                        class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                        Aktif
+                                    </span>
+                                @else
+                                    <span
+                                        class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                        Tidak Aktif
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
                                     <button
                                         class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn"
-                                        wire:click="edit('{{ $admin->id }}')">
-                                        <i class="fa-solid fa-pen-to-square"></i> <!-- atau fa-edit (versi lama) -->
+                                        wire:click="edit('{{ $supervisor->id }}')">
+                                        <i class="fa-solid fa-pen-to-square"></i>
                                     </button>
 
-                                    <!-- Tombol Delete -->
                                     <button
                                         class="btn btn-icon text-red-600 hover:text-red-800 transition-colors delete-btn"
-                                        wire:click="confirmDelete('{{ $admin->id }}')">
+                                        wire:click="confirmDelete('{{ $supervisor->id }}')">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </div>
@@ -81,7 +178,9 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="no-data">Tidak ada data</td>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                Tidak ada data pengawas ditemukan.
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -89,20 +188,8 @@
         </div>
 
         <!-- Pagination -->
-        <div class="px-5 py-4 bg-gray-50/80 border-t border-gray-200">
-            <div class="flex items-center justify-between">
-                <div class="text-sm text-gray-700">
-                    Menampilkan <span class="font-medium">{{ $admins->firstItem() }}</span> sampai <span
-                        class="font-medium">{{ $admins->lastItem() }}</span> dari <span
-                        class="font-medium">{{ $admins->total() }}</span> hasil
-                </div>
-                <div>
-                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        {{ $admins->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
-                    </nav>
-                </div>
-            </div>
+        <div class="px-6 py-3 border-t border-gray-200">
+            {{ $admins->links() }}
         </div>
-
     </div>
 </div>

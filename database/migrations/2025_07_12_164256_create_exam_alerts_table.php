@@ -15,7 +15,8 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('timetable_id')->nullable();
             $table->foreignUuid('user_timetable_id');
-            $table->enum('alert_type', ['right_click', 'dev_tools', 'view_source', 'alt_tab', 'ctrl_tab', 'copy_paste', 'tab_switch', 'window_blur', 'fullscreen_exit', 'camera_error', 'page_reload']);
+            $table->enum('alert_type', ['right_click', 'dev_tools', 'view_source', 'alt_tab', 'ctrl_tab', 'copy_paste', 'tab_switch', 'window_blur', 'fullscreen_exit', 'camera_error', 'page_reload','recording_data_available','recording_auto_save_triggered','recording_started','recording_stopped','recording_paused','recording_resumed'])
+                ->comment('Jenis peringatan yang diterima oleh pengguna');
             $table->text('description');
             $table->json('metadata')->nullable(); // untuk menyimpan data tambahan
             $table->foreignUuid('company_id')->nullable();
