@@ -44,6 +44,7 @@ return new class extends Migration
             $table->enum('marital_status', ['single', 'married', 'divorced', 'widowed'])->nullable()->comment('Status pernikahan');
 
             // Data Akademik untuk Mahasiswa
+            $table->string('nim')->nullable()->comment('Nomor Induk Siswa');
             $table->string('student_program')->nullable()->comment('Program studi untuk mahasiswa');
             $table->string('student_faculty')->nullable()->comment('Fakultas untuk mahasiswa');
             $table->string('student_department')->nullable()->comment('Jurusan untuk mahasiswa');
@@ -84,6 +85,8 @@ return new class extends Migration
             $table->json('exam_history')->nullable()->comment('Riwayat ujian (JSON array)');
             $table->integer('total_exams_taken')->default(0)->comment('Total ujian yang telah diambil');
             $table->decimal('average_score', 5, 2)->nullable()->comment('Rata-rata nilai ujian');
+            $table->text('krs_file')->nullable()->comment('Upload KRS mahasiswa');
+            $table->text('payment_registration')->nullable()->comment('Upload pembayaran ');
 
             // Data Teknis
             $table->string('preferred_language')->default('id')->comment('Bahasa yang disukai');

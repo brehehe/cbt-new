@@ -279,7 +279,6 @@ namespace App\Models\Exam{
  * 
  *
  * @property string $id
- * @property string|null $timetable_id
  * @property string $user_timetable_id
  * @property string $alert_type
  * @property string $description
@@ -305,7 +304,6 @@ namespace App\Models\Exam{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamAlert whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamAlert whereMetadata($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamAlert whereOrder($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamAlert whereTimetableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamAlert whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamAlert whereUserTimetableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamAlert withTrashed()
@@ -319,7 +317,6 @@ namespace App\Models\Exam{
  * 
  *
  * @property string $id
- * @property string|null $timetable_id
  * @property string $user_timetable_id
  * @property string|null $video_path
  * @property int $chunk_number
@@ -350,7 +347,6 @@ namespace App\Models\Exam{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereStartTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereTimetableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereUserTimetableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereVideoPath($value)
@@ -449,6 +445,7 @@ namespace App\Models\Master\Question{
  * @property-read \App\Models\Master\Question\MaterialCategory|null $materialCategory
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Question\Question> $questions
  * @property-read int|null $questions_count
+ * @property-read \App\Models\Master\Question\Topic|null $topic
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Material newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Material newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Material onlyTrashed()
@@ -1493,10 +1490,26 @@ namespace App\Models\User{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Company\Company|null $company
+ * @property-read mixed $age
+ * @property-read mixed $formatted_phone
+ * @property-read mixed $full_name
+ * @property-read mixed $is_lecturer
+ * @property-read mixed $is_student
+ * @property-write mixed $mobile_phone
+ * @property-write mixed $phone
+ * @property-read \App\Models\User|null $studentAdvisor
+ * @property-read \App\Models\User|null $user
+ * @property-read \App\Models\User|null $verifiedBy
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail active()
+ * @method static \Database\Factories\User\UserDetailFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail lecturers()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail students()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail verified()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereAddress($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereAdministrativeGender($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereBirthDate($value)

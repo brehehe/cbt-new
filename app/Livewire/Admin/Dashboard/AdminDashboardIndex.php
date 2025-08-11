@@ -28,13 +28,13 @@ class AdminDashboardIndex extends Component
 
     public function mount()
     {
+
+        $this->loadDashboardData();
         if (Session::has('saved')) {
             AlertHelper::success(Session::get('saved.title'), Session::get('saved.text'));
             Session::forget('saved');
             return;
         }
-
-        $this->loadDashboardData();
     }
 
     public function loadDashboardData()

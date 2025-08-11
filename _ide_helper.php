@@ -24428,6 +24428,71 @@ namespace Spatie\SignalAwareCommand\Facades {
             }
     }
 
+namespace TallStackUi\Facades {
+    /**
+     * 
+     *
+     * @see \TallStackUi\TallStackUi
+     */
+    class TallStackUi {
+        /**
+         * Create an instance of the BladeSupport class.
+         *
+         * @static 
+         */
+        public static function blade($attributes = null, $livewire = false)
+        {
+            /** @var \TallStackUi\TallStackUi $instance */
+            return $instance->blade($attributes, $livewire);
+        }
+
+        /**
+         * Create an instance of the BladeDirectives class.
+         *
+         * @static 
+         */
+        public static function directives()
+        {
+            /** @var \TallStackUi\TallStackUi $instance */
+            return $instance->directives();
+        }
+
+        /**
+         * Get the internal icon path.
+         *
+         * @static 
+         */
+        public static function icon($key)
+        {
+            /** @var \TallStackUi\TallStackUi $instance */
+            return $instance->icon($key);
+        }
+
+        /**
+         * Create an instance of the Personalization class.
+         *
+         * @static 
+         */
+        public static function personalize($component = null, $scope = null)
+        {
+            /** @var \TallStackUi\TallStackUi $instance */
+            return $instance->personalize($component, $scope);
+        }
+
+        /**
+         * Set the component prefix or get the ComponentPrefix instance when $name is null.
+         *
+         * @static 
+         */
+        public static function prefix($name = null)
+        {
+            /** @var \TallStackUi\TallStackUi $instance */
+            return $instance->prefix($name);
+        }
+
+            }
+    }
+
 namespace Illuminate\Support {
     /**
      * 
@@ -24836,6 +24901,45 @@ namespace App\Livewire\Admin\Dashboard {
         public static function modal($name)
         {
             return \App\Livewire\Admin\Dashboard\AdminDashboardIndex::modal($name);
+        }
+
+            }
+    }
+
+namespace App\Livewire\Admin {
+    /**
+     * 
+     *
+     */
+    class StudentManagement {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\StudentManagement::modal($name);
+        }
+
+            }
+    /**
+     * 
+     *
+     */
+    class LecturerManagement {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\LecturerManagement::modal($name);
         }
 
             }
@@ -30311,6 +30415,7 @@ namespace  {
     class DNS2D extends \Milon\Barcode\Facades\DNS2DFacade {}
     class LogViewer extends \Opcodes\LogViewer\Facades\LogViewer {}
     class Signal extends \Spatie\SignalAwareCommand\Facades\Signal {}
+    class TallStackUi extends \TallStackUi\Facades\TallStackUi {}
 }
 
 

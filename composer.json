@@ -25,7 +25,8 @@
         "predis/predis": "^3.0",
         "spatie/laravel-backup": "^9.3",
         "spatie/laravel-permission": "^6.16",
-        "spatie/livewire-filepond": "^1.5"
+        "spatie/livewire-filepond": "^1.5",
+        "tallstackui/tallstackui": "^2.0.0"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.5",
