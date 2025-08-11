@@ -106,9 +106,9 @@
                                         </button>
                                     @else
                                         <button
-                                            class="btn btn-icon text-yellow-600 hover:text-yellow-800 transition-colors delete-btn"
+                                            class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors delete-btn"
                                             wire:click="liveSession('{{ $timetable->id }}')">
-                                            <i class="fa-solid fa-camera-movie"></i>
+                                            <i class="fa-solid fa-camera"></i>
                                         </button>
                                         <button
                                             class="btn btn-icon text-green-600 hover:text-green-800 transition-colors delete-btn"
