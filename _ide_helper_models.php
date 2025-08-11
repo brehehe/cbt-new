@@ -279,8 +279,9 @@ namespace App\Models\Exam{
  * 
  *
  * @property string $id
+ * @property string|null $timetable_id
  * @property string $user_timetable_id
- * @property string $alert_type
+ * @property string $alert_type Jenis peringatan yang diterima oleh pengguna
  * @property string $description
  * @property array<array-key, mixed>|null $metadata
  * @property string|null $company_id
@@ -304,6 +305,7 @@ namespace App\Models\Exam{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamAlert whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamAlert whereMetadata($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamAlert whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamAlert whereTimetableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamAlert whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamAlert whereUserTimetableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamAlert withTrashed()
@@ -317,6 +319,93 @@ namespace App\Models\Exam{
  * 
  *
  * @property string $id
+ * @property string|null $timetable_id
+ * @property string $user_timetable_id
+ * @property string $user_id
+ * @property string|null $company_id
+ * @property string $session_token
+ * @property string|null $camera_stream_url
+ * @property string|null $screen_stream_url
+ * @property int $current_question_number
+ * @property int $total_questions
+ * @property int $answered_questions
+ * @property int $marked_questions
+ * @property string $camera_status
+ * @property string $screen_status
+ * @property string $connection_status
+ * @property \Illuminate\Support\Carbon|null $last_activity
+ * @property int $warning_count
+ * @property int $alert_count
+ * @property bool $is_active
+ * @property array<array-key, mixed>|null $session_metadata
+ * @property array<array-key, mixed>|null $browser_info
+ * @property array<array-key, mixed>|null $device_info
+ * @property array<array-key, mixed>|null $location_info
+ * @property int $order
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $peer_id
+ * @property-read \App\Models\Company\Company|null $company
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Exam\ExamAlert> $examAlerts
+ * @property-read int|null $exam_alerts_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Exam\ExamRecording> $examRecordings
+ * @property-read int|null $exam_recordings_count
+ * @property-read mixed $camera_status_color
+ * @property-read mixed $progress_percentage
+ * @property-read mixed $risk_color
+ * @property-read mixed $risk_level
+ * @property-read mixed $status_color
+ * @property-read \App\Models\Master\Timetable\Timetable|null $timetable
+ * @property-read \App\Models\User|null $user
+ * @property-read \App\Models\User\UserTimetable|null $userTimetable
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession active()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession byTimetable($timetableId)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession recentActivity($minutes = 5)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereAlertCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereAnsweredQuestions($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereBrowserInfo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereCameraStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereCameraStreamUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereConnectionStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereCurrentQuestionNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereDeviceInfo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereLastActivity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereLocationInfo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereMarkedQuestions($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession wherePeerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereScreenStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereScreenStreamUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereSessionMetadata($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereSessionToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereTimetableId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereTotalQuestions($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereUserTimetableId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereWarningCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession withoutTrashed()
+ */
+	class ExamLiveSession extends \Eloquent {}
+}
+
+namespace App\Models\Exam{
+/**
+ * 
+ *
+ * @property string $id
+ * @property string|null $timetable_id
  * @property string $user_timetable_id
  * @property string|null $video_path
  * @property int $chunk_number
@@ -347,6 +436,7 @@ namespace App\Models\Exam{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereStartTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereTimetableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereUserTimetableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereVideoPath($value)
@@ -433,6 +523,7 @@ namespace App\Models\Master\Question{
  *
  * @property string $id
  * @property string|null $company_id
+ * @property string|null $topic_id
  * @property string|null $material_category_id
  * @property string $name nama materi ujian
  * @property string $level level materi ujian
@@ -460,6 +551,7 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Material whereMaterialCategoryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Material whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Material whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Material whereTopicId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Material whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Material withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Material withoutTrashed()
@@ -1472,21 +1564,88 @@ namespace App\Models\User{
  *
  * @property string $id
  * @property string $user_id
- * @property string|null $doctor_id ID dokter, jika pengguna adalah dokter
- * @property string|null $address Alamat lengkap pengguna
- * @property string $country
- * @property string|null $identity_card Foto / path file kartu identitas (KTP, BPJS, dll)
- * @property string|null $blood_group Golongan darah (jika tersedia)
- * @property string|null $administrative_gender Jenis kelamin administratif, mengacu pada terminologi AdministrativeGender
+ * @property string|null $company_id
+ * @property string|null $employee_id ID pegawai/NIP untuk dosen atau NIM untuk mahasiswa
+ * @property string|null $student_id NIM khusus untuk mahasiswa
+ * @property string|null $lecturer_id NIDN/NIP khusus untuk dosen
+ * @property string|null $address Alamat lengkap
+ * @property string|null $postal_code Kode pos
+ * @property string|null $city Kota
+ * @property string|null $province Provinsi
+ * @property string $country Kode negara
+ * @property string|null $phone Nomor telepon
+ * @property string|null $mobile_phone Nomor HP
+ * @property string|null $emergency_contact_name Nama kontak darurat
+ * @property string|null $emergency_contact_phone Nomor kontak darurat
+ * @property string|null $emergency_contact_relation Hubungan dengan kontak darurat
+ * @property string|null $identity_type Jenis identitas (KTP, Passport, dll)
+ * @property string|null $identity_number Nomor identitas
+ * @property string|null $identity_card_path Path file foto kartu identitas
+ * @property string|null $blood_group Golongan darah (A, B, AB, O)
+ * @property string|null $gender Jenis kelamin
+ * @property string|null $religion Agama
+ * @property string $nationality Kewarganegaraan
  * @property \Illuminate\Support\Carbon|null $birth_date Tanggal lahir
- * @property string|null $deceased_date Tanggal kematian (jika pasien sudah meninggal)
- * @property string|null $marital_status Status pernikahan sipil, mengacu pada terminologi Marital Status Codes
- * @property string $status Status akun pengguna
- * @property string|null $sip_number Nomor Surat Izin Praktik (hanya untuk dokter)
- * @property string|null $specialization Spesialisasi dokter
- * @property string $doctor_type Tipe dokter (umum atau spesialis)
- * @property string $type Tipe dokter (in house atau out house)
- * @property int $order
+ * @property string|null $birth_place Tempat lahir
+ * @property string|null $marital_status Status pernikahan
+ * @property string|null $student_program Program studi untuk mahasiswa
+ * @property string|null $student_faculty Fakultas untuk mahasiswa
+ * @property string|null $student_department Jurusan untuk mahasiswa
+ * @property string|null $student_class Kelas untuk mahasiswa
+ * @property string|null $student_semester Semester untuk mahasiswa
+ * @property string|null $student_academic_year Tahun akademik
+ * @property string|null $student_status Status mahasiswa
+ * @property numeric|null $student_gpa IPK mahasiswa
+ * @property string|null $student_advisor_id ID dosen pembimbing
+ * @property \Illuminate\Support\Carbon|null $student_entry_date Tanggal masuk mahasiswa
+ * @property \Illuminate\Support\Carbon|null $student_graduation_date Tanggal lulus mahasiswa
+ * @property string|null $lecturer_nidn NIDN dosen
+ * @property string|null $lecturer_nip NIP dosen
+ * @property string|null $lecturer_department Departemen dosen
+ * @property string|null $lecturer_faculty Fakultas dosen
+ * @property string|null $lecturer_position Jabatan akademik (Asisten Ahli, Lektor, dll)
+ * @property string|null $lecturer_functional_position Jabatan fungsional
+ * @property string|null $lecturer_education_level Tingkat pendidikan (S1, S2, S3)
+ * @property string|null $lecturer_specialization Bidang keahlian
+ * @property string|null $lecturer_expertise Kepakaran
+ * @property string|null $lecturer_status Status dosen
+ * @property string|null $lecturer_type Tipe dosen
+ * @property \Illuminate\Support\Carbon|null $lecturer_start_date Tanggal mulai mengajar
+ * @property \Illuminate\Support\Carbon|null $lecturer_retirement_date Tanggal pensiun
+ * @property string|null $supervisor_id ID khusus untuk pengawas
+ * @property string|null $supervisor_nip NIP pengawas
+ * @property string|null $supervisor_department Departemen pengawas
+ * @property string|null $supervisor_unit Unit kerja pengawas
+ * @property string|null $supervisor_position Jabatan pengawas
+ * @property string|null $supervisor_level Level pengawas (Junior, Senior, Lead, Principal)
+ * @property string|null $supervisor_area Area pengawasan (Academic, Administrative, Technical, General)
+ * @property string|null $supervisor_specialization Spesialisasi pengawasan
+ * @property string|null $supervisor_status Status pengawas
+ * @property string|null $supervisor_type Tipe pengawas
+ * @property string|null $supervisor_start_date Tanggal mulai bertugas sebagai pengawas
+ * @property int|null $supervisor_experience_years Pengalaman sebagai pengawas (tahun)
+ * @property string|null $supervisor_certifications Sertifikasi pengawasan (JSON array)
+ * @property array<array-key, mixed>|null $certifications Sertifikasi yang dimiliki (JSON array)
+ * @property array<array-key, mixed>|null $licenses Lisensi yang dimiliki (JSON array)
+ * @property array<array-key, mixed>|null $training_history Riwayat pelatihan (JSON array)
+ * @property array<array-key, mixed>|null $awards Penghargaan yang diterima (JSON array)
+ * @property string|null $exam_preference Preferensi ujian
+ * @property bool $special_needs Memerlukan akomodasi khusus
+ * @property string|null $special_needs_description Deskripsi kebutuhan khusus
+ * @property array<array-key, mixed>|null $exam_history Riwayat ujian (JSON array)
+ * @property int $total_exams_taken Total ujian yang telah diambil
+ * @property numeric|null $average_score Rata-rata nilai ujian
+ * @property string $preferred_language Bahasa yang disukai
+ * @property array<array-key, mixed>|null $system_preferences Preferensi sistem (JSON)
+ * @property \Illuminate\Support\Carbon|null $last_login_at Waktu login terakhir
+ * @property string|null $last_login_ip IP login terakhir
+ * @property string|null $notes Catatan tambahan
+ * @property string $verification_status Status verifikasi data
+ * @property \Illuminate\Support\Carbon|null $verified_at Waktu verifikasi
+ * @property string|null $verified_by
+ * @property string $status Status akun
+ * @property int $order Urutan tampilan
+ * @property array<array-key, mixed>|null $metadata Data tambahan dalam format JSON
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -1496,10 +1655,8 @@ namespace App\Models\User{
  * @property-read mixed $full_name
  * @property-read mixed $is_lecturer
  * @property-read mixed $is_student
- * @property-write mixed $mobile_phone
- * @property-write mixed $phone
  * @property-read \App\Models\User|null $studentAdvisor
- * @property-read \App\Models\User|null $user
+ * @property-read \App\Models\User $user
  * @property-read \App\Models\User|null $verifiedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail active()
  * @method static \Database\Factories\User\UserDetailFactory factory($count = null, $state = [])
@@ -1511,25 +1668,92 @@ namespace App\Models\User{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail students()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail verified()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereAddress($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereAdministrativeGender($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereAverageScore($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereAwards($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereBirthDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereBirthPlace($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereBloodGroup($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereCertifications($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereCity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereCompanyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereCountry($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereDeceasedDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereDoctorId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereDoctorType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereEmergencyContactName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereEmergencyContactPhone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereEmergencyContactRelation($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereEmployeeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereExamHistory($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereExamPreference($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereGender($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereIdentityCard($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereIdentityCardPath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereIdentityNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereIdentityType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereLastLoginAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereLastLoginIp($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereLecturerDepartment($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereLecturerEducationLevel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereLecturerExpertise($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereLecturerFaculty($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereLecturerFunctionalPosition($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereLecturerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereLecturerNidn($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereLecturerNip($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereLecturerPosition($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereLecturerRetirementDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereLecturerSpecialization($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereLecturerStartDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereLecturerStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereLecturerType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereLicenses($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereMaritalStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereMetadata($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereMobilePhone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereNationality($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereNotes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereOrder($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSipNumber($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSpecialization($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail wherePhone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail wherePostalCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail wherePreferredLanguage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereProvince($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereReligion($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSpecialNeeds($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSpecialNeedsDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereStudentAcademicYear($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereStudentAdvisorId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereStudentClass($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereStudentDepartment($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereStudentEntryDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereStudentFaculty($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereStudentGpa($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereStudentGraduationDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereStudentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereStudentProgram($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereStudentSemester($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereStudentStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSupervisorArea($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSupervisorCertifications($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSupervisorDepartment($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSupervisorExperienceYears($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSupervisorId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSupervisorLevel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSupervisorNip($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSupervisorPosition($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSupervisorSpecialization($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSupervisorStartDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSupervisorStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSupervisorType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSupervisorUnit($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSystemPreferences($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereTotalExamsTaken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereTrainingHistory($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereVerificationStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereVerifiedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereVerifiedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail withoutTrashed()
  */

@@ -52,14 +52,14 @@ class AuthLoginIndex extends Component
     public function rules()
     {
         return [
-            'code' => 'required',
+            // 'code' => 'required',
             'username_or_email' => 'required',
             'password' => 'required',
-            'captchaInput' => ['required', function ($attribute, $value, $fail) {
-                if ($value !== $this->captchaCode) {
-                    $fail('Kode captcha tidak sesuai.');
-                }
-            }],
+            // 'captchaInput' => ['required', function ($attribute, $value, $fail) {
+            //     if ($value !== $this->captchaCode) {
+            //         $fail('Kode captcha tidak sesuai.');
+            //     }
+            // }],
         ];
     }
 

@@ -25008,6 +25008,66 @@ namespace App\Livewire\Admin\Exam\Detail {
             }
     }
 
+namespace App\Livewire\Admin\Exam\Monitor {
+    /**
+     * 
+     *
+     */
+    class AdminExamMonitorIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Exam\Monitor\AdminExamMonitorIndex::modal($name);
+        }
+
+            }
+    /**
+     * 
+     *
+     */
+    class AdminExamMonitorDetailIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Exam\Monitor\AdminExamMonitorDetailIndex::modal($name);
+        }
+
+            }
+    }
+
+namespace App\Livewire\Admin\Exam\LiveStream {
+    /**
+     * 
+     *
+     */
+    class AdminExamLiveStreamIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Exam\LiveStream\AdminExamLiveStreamIndex::modal($name);
+        }
+
+            }
+    }
+
 namespace App\Livewire\Admin\Master\Role {
     /**
      * 
@@ -25318,6 +25378,27 @@ namespace App\Livewire\Admin\Master\Timetable\Alert {
         public static function modal($name)
         {
             return \App\Livewire\Admin\Master\Timetable\Alert\AdminMasterTimetableAlertIndex::modal($name);
+        }
+
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Timetable\Streaming {
+    /**
+     * 
+     *
+     */
+    class AdminMasterTimetableStreamingIndex {
+        /**
+         * 
+         *
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static 
+         */
+        public static function modal($name)
+        {
+            return \App\Livewire\Admin\Master\Timetable\Streaming\AdminMasterTimetableStreamingIndex::modal($name);
         }
 
             }
