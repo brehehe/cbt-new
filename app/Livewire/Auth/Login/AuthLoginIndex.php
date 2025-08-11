@@ -26,12 +26,12 @@ class AuthLoginIndex extends Component
     public function mount()
     {
         $this->generateCaptcha();
+        $this->code = '1Br0ck';
 
         if (config('app.env') === 'local' || config('app.env') === 'development') {
             $this->captchaInput = $this->captchaCode;
-            $this->code = '1Br0ck';
-            $this->username_or_email = 'burningroomtechnology';
-            $this->password = 12345678;
+            $this->username_or_email = 'hasan.observer@cbt.test';
+            $this->password = 'password123';
 
             // $this->login();
         }

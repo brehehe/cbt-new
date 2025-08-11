@@ -108,11 +108,13 @@
                     path: '/peerjs',
                     secure: false
                 } : {
-                    host: 'cbt.mediction.id',
-                    port: 9000,
+                    host: 'peer.toti.my.id',
+                    // port: 9443,
                     path: '/peerjs',
                     secure: true
                 };
+
+                console.log('Connecting to PeerJS with config:', peerConfig);
 
                 // Initialize PeerJS with environment-specific config
                 peer = new Peer({
@@ -127,6 +129,8 @@
                         ]
                     }
                 });
+
+                console.log('PeerJS initialized:', peer);
 
                 peer.on('open', function(id) {
                     console.log('PeerJS connected with ID:', id);
