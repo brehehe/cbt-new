@@ -476,7 +476,7 @@ class AdminExamDetailIndex extends Component
     }
 
     public function checkQuestion() {
-        $users = UserTimetable::where('user_id', Auth::id())->whereIn('status',['exam','warning'])->get();
+        $users = UserTimetable::whereHas('userModuleQuestions')->where('user_id', Auth::id())->whereIn('status',['exam','warning'])->get();
 
         if ($users->isEmpty()) {
             $userTimetable = UserTimetable::where('user_id', Auth::id())
