@@ -38,6 +38,11 @@ Route::group(['namespace' => 'App\Livewire\Auth'], function () {
 Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middleware' => ['auth', 'verified', CheckUserTimetable::class]], function () {
     Route::get('/', 'Dashboard\AdminDashboardIndex')->name('admin.dashboard');
 
+    // Debug route for video testing
+    Route::get('/debug-video', function () {
+        return view('debug_video_frontend');
+    })->name('admin.debug.video');
+
     // User Management Routes
     Route::get('/students', \App\Livewire\Admin\StudentManagement::class)->name('admin.students');
     Route::get('/lecturers', \App\Livewire\Admin\LecturerManagement::class)->name('admin.lecturers');

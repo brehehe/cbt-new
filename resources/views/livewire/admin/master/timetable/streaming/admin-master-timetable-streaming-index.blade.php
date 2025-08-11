@@ -13,7 +13,7 @@
         </div>
     </div>
     <div class="flex h-full">
-        <div class="grid grid-cols-6 gap-6">
+        <div class="grid grid-cols-3 gap-6">
             @foreach ($sessions as $session)
                 <div
                     class="bg-white rounded-lg shadow-sm overflow-hidden border {{ $selectedSessionId === $session->id ? 'ring-2 ring-blue-500' : '' }}">
@@ -42,6 +42,18 @@
                                     {{ $session->user->name }}</h3>
                                 <p class="text-xs text-gray-500 truncate">
                                     {{ $session->timetable->module->name ?? 'Unknown' }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="mt-2">
+                            <div class="flex items-center justify-between text-xs text-gray-600 mb-1">
+                                <span>Progress</span>
+                                <span>{{ $session->progress_percentage }}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                <div class="bg-blue-600 h-1.5 rounded-full transition-all duration-300"
+                                    style="width: {{ $session->progress_percentage }}%"></div>
                             </div>
                         </div>
                     </div>
@@ -97,12 +109,10 @@
                     secure: false
                 } : {
                     host: 'peer.toti.my.id',
-                    // port: 9443,
+                    // port: 9000,
                     path: '/peerjs',
                     secure: true
                 };
-
-                console.log('Connecting to PeerJS with config:', peerConfig);
 
                 // Initialize PeerJS with environment-specific config
                 peer = new Peer({
@@ -117,8 +127,6 @@
                         ]
                     }
                 });
-
-                console.log('PeerJS initialized:', peer);
 
                 peer.on('open', function(id) {
                     console.log('PeerJS connected with ID:', id);

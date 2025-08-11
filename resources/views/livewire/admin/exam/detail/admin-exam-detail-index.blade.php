@@ -342,7 +342,7 @@
                 <div class="space-y-2 text-sm">
                     <div class="flex justify-between">
                         <span class="text-gray-600">Recording:</span>
-                        <span class="text-green-600" id="recordingStatus">Initializing</span>
+                        <span class="text-green-600" id="recordingStatus">Recording</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600">Live Stream:</span>
@@ -414,17 +414,6 @@
         let streamId = '{{ $liveSession->session_token ?? '' }}';
         let isStreaming = false;
 
-        // Recording Management Variables
-        let examStarted = false;
-        let examEnded = false;
-        let autoSaveInterval;
-        let recordingHealthCheck;
-        let recordingRestartAttempts = 0;
-        let maxRestartAttempts = 5;
-        let lastSaveTime = null;
-        let isRecordingPaused = false;
-        let recordingRecoveryMode = false;
-
         // PeerJS variables
         let peer = null;
         let supervisorPeerID = null;
@@ -444,9 +433,6 @@
             setupEventListeners();
             initializeLiveSessionMonitoring();
 
-            // Start exam session and recording
-            startExamSession();
-
             // Mark page as loaded
             setTimeout(() => {
                 pageLoaded = true;
@@ -463,9 +449,7 @@
                 if (remainingTime <= 0) {
                     countdownElement.innerHTML = "Waktu Habis";
                     clearInterval(interval);
-
-                    // End exam session and stop recording
-                    endExamSession();
+                    stopRecording();
 
                     if (window.Livewire) {
                         setTimeout(() => {
@@ -488,349 +472,63 @@
             updateCountdown();
         }
 
-        // ===== EXAM SESSION MANAGEMENT =====
-
-        // Start exam session and begin recording
-        function startExamSession() {
-            console.log('🎯 Starting exam session...');
-            examStarted = true;
-            examEnded = false;
-
-            // Wait for camera to be ready before starting recording
-            const checkCameraReady = setInterval(() => {
-                if (stream && stream.active) {
-                    console.log('📷 Camera ready, starting continuous recording...');
-                    clearInterval(checkCameraReady);
-                    startContinuousRecording();
-                    setupRecordingHealthMonitoring();
-                    setupAutoSave();
-                } else {
-                    console.log('⏳ Waiting for camera to be ready...');
-                }
-            }, 500); // Check every 500ms for faster response
-
-            // Set timeout to force start recording even if camera not ready (fallback)
-            setTimeout(() => {
-                if (!isRecording && examStarted && !examEnded) {
-                    console.log('⚠️ Force starting recording (camera timeout)...');
-                    clearInterval(checkCameraReady);
-                    startContinuousRecording();
-                }
-            }, 5000); // Reduced timeout to 5 seconds
-        }        // End exam session and finalize recording
-        function endExamSession() {
-            console.log('🏁 Ending exam session...');
-            examEnded = true;
-            examStarted = false;
-
-            // Stop all recording processes
-            stopContinuousRecording();
-            clearAutoSave();
-            clearRecordingHealthMonitoring();
-
-            // Final save
-            if (recordedChunks.length > 0) {
-                console.log('💾 Final save of recording chunks...');
-                saveVideoChunk(true); // Mark as final save
-            }
-
-            console.log('✅ Exam session ended, recording finalized');
-        }
-
-        // Start continuous recording with auto-restart capability
-        function startContinuousRecording() {
-            if (examEnded) {
-                console.log('❌ Cannot start recording - exam has ended');
-                return;
-            }
-
-            if (!stream || !stream.active) {
-                console.log('⚠️ Stream not available, attempting to restart camera...');
-                restartCamera().then(() => {
-                    if (stream && stream.active) {
-                        startContinuousRecording();
-                    }
-                });
-                return;
-            }
-
-            console.log('🎬 Starting continuous recording immediately...');
-            recordingRecoveryMode = false;
-            recordingRestartAttempts = 0;
-            startRecording();
-        }
-
-        // Stop continuous recording
-        function stopContinuousRecording() {
-            console.log('⏹️ Stopping continuous recording...');
-            isRecordingPaused = true;
-
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                mediaRecorder.stop();
-            }
-
-            isRecording = false;
-            clearInterval(recordingDurationInterval);
-        }
-
-        // Setup auto-save mechanism
-        function setupAutoSave() {
-            console.log('💾 Setting up auto-save mechanism...');
-
-            // Auto-save every 30 seconds (reduced from 2 minutes for testing)
-            autoSaveInterval = setInterval(() => {
-                console.log('💾 Auto-save interval triggered...');
-                console.log('💾 Auto-save status check:', {
-                    isRecording,
-                    examEnded,
-                    mediaRecorderState: mediaRecorder ? mediaRecorder.state : 'null',
-                    chunksCount: recordedChunks.length,
-                    lastSaveTime: lastSaveTime ? new Date(lastSaveTime).toISOString() : 'never'
-                });
-                
-                if (isRecording && !examEnded && mediaRecorder && mediaRecorder.state === 'recording') {
-                    console.log('💾 Auto-save triggered - requesting data...');
-                    mediaRecorder.requestData();
-                    lastSaveTime = Date.now();
-                    logAlert('recording_auto_save_triggered', `Auto-save requested at chunk ${currentChunk}`);
-                } else {
-                    console.log('💾 Auto-save skipped - conditions not met:', {
-                        isRecording,
-                        examEnded,
-                        mediaRecorderState: mediaRecorder ? mediaRecorder.state : 'null'
-                    });
-                }
-            }, 30000); // 30 seconds for more frequent saves during testing
-            
-            console.log('💾 Auto-save mechanism set up with 30-second interval');
-        }
-
-        // Clear auto-save
-        function clearAutoSave() {
-            if (autoSaveInterval) {
-                clearInterval(autoSaveInterval);
-                autoSaveInterval = null;
-                console.log('💾 Auto-save cleared');
-            }
-        }
-
-        // Setup recording health monitoring
-        function setupRecordingHealthMonitoring() {
-            console.log('🔍 Setting up recording health monitoring...');
-
-            recordingHealthCheck = setInterval(() => {
-                checkRecordingHealth();
-            }, 30000); // Check every 30 seconds
-        }
-
-        // Clear recording health monitoring
-        function clearRecordingHealthMonitoring() {
-            if (recordingHealthCheck) {
-                clearInterval(recordingHealthCheck);
-                recordingHealthCheck = null;
-                console.log('🔍 Recording health monitoring cleared');
-            }
-        }
-
-        // Check recording health and restart if needed
-        function checkRecordingHealth() {
-            if (examEnded || isRecordingPaused) {
-                return;
-            }
-
-            console.log('🔍 Checking recording health...');
-            console.log('- Stream active:', stream ? stream.active : false);
-            console.log('- Recording status:', isRecording);
-            console.log('- MediaRecorder state:', mediaRecorder ? mediaRecorder.state : 'not created');
-            console.log('- Chunks recorded:', recordedChunks.length);
-
-            let needsRestart = false;
-            let restartReason = '';
-
-            // Check if stream is still active
-            if (!stream || !stream.active) {
-                needsRestart = true;
-                restartReason = 'Stream inactive';
-            }
-            // Check if MediaRecorder is in correct state
-            else if (!mediaRecorder || mediaRecorder.state === 'inactive') {
-                needsRestart = true;
-                restartReason = 'MediaRecorder inactive';
-            }
-            // Check if we should be recording but aren't
-            else if (examStarted && !examEnded && !isRecording) {
-                needsRestart = true;
-                restartReason = 'Recording stopped unexpectedly';
-            }
-            // Check if no data has been recorded for too long
-            else if (lastSaveTime && (Date.now() - lastSaveTime) > 300000) { // 5 minutes
-                needsRestart = true;
-                restartReason = 'No data recorded for too long';
-            }
-
-            if (needsRestart) {
-                console.log(`⚠️ Recording health check failed: ${restartReason}`);
-                attemptRecordingRestart(restartReason);
-            } else {
-                console.log('✅ Recording health check passed');
-                recordingRestartAttempts = 0; // Reset attempts on successful check
-            }
-        }
-
-        // Attempt to restart recording
-        function attemptRecordingRestart(reason) {
-            if (examEnded || recordingRestartAttempts >= maxRestartAttempts) {
-                if (recordingRestartAttempts >= maxRestartAttempts) {
-                    console.error(`❌ Maximum restart attempts (${maxRestartAttempts}) reached`);
-                    logAlert('recording_failed', `Recording gagal restart setelah ${maxRestartAttempts} percobaan`);
-                }
-                return;
-            }
-
-            recordingRestartAttempts++;
-            recordingRecoveryMode = true;
-
-            console.log(`🔄 Attempting recording restart ${recordingRestartAttempts}/${maxRestartAttempts} - Reason: ${reason}`);
-
-            // Save current chunks before restart
-            if (recordedChunks.length > 0) {
-                console.log('💾 Saving current chunks before restart...');
-                saveVideoChunk(false, true); // Mark as recovery save
-            }
-
-            // Stop current recording
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                try {
-                    mediaRecorder.stop();
-                } catch (e) {
-                    console.warn('Error stopping MediaRecorder:', e);
-                }
-            }
-
-            // Wait a moment then restart
-            setTimeout(() => {
-                console.log('🚀 Restarting recording...');
-
-                if (!stream || !stream.active) {
-                    console.log('📷 Restarting camera first...');
-                    restartCamera().then(() => {
-                        if (stream && stream.active) {
-                            startRecording();
-                        } else {
-                            console.error('❌ Failed to restart camera');
-                        }
-                    });
-                } else {
-                    startRecording();
-                }
-            }, 1000); // Reduced delay to 1 second            // Log the restart attempt
-            logAlert('recording_restart', `Recording restart attempt ${recordingRestartAttempts}: ${reason}`);
-        }
-
-        // Restart camera stream
-        async function restartCamera() {
-            console.log('📷 Restarting camera...');
-
-            try {
-                // Stop existing stream
-                if (stream) {
-                    stream.getTracks().forEach(track => track.stop());
-                }
-
-                // Get new stream
-                const constraints = {
-                    video: {
-                        width: { ideal: 1280, min: 640 },
-                        height: { ideal: 720, min: 480 },
-                        facingMode: 'user',
-                        frameRate: { ideal: 30, min: 15 }
-                    },
-                    audio: false
-                };
-
-                stream = await navigator.mediaDevices.getUserMedia(constraints);
-
-                // Update video elements
-                const cameraPreview = document.getElementById('cameraPreview');
-                const hiddenVideo = document.getElementById('hiddenVideo');
-
-                if (cameraPreview) {
-                    cameraPreview.srcObject = stream;
-                    cameraPreview.play().catch(e => console.warn('Video autoplay prevented:', e));
-                }
-
-                if (hiddenVideo) {
-                    hiddenVideo.srcObject = stream;
-                }
-
-                console.log('✅ Camera restarted successfully');
-                updateCameraStatus('Camera Restarted', 'text-green-600');
-
-                return true;
-            } catch (error) {
-                console.error('❌ Failed to restart camera:', error);
-                updateCameraStatus('Camera Restart Failed', 'text-red-600');
-                return false;
-            }
-        }
-
         // Initialize exam environment
         function initializeExamEnvironment() {
             // Force fullscreen
-            requestFullscreen();
+            // requestFullscreen();
 
-            // Disable right click
-            document.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                logAlert('right_click', 'Mencoba membuka menu konteks');
-            });
+            // // Disable right click
+            // document.addEventListener('contextmenu', function(e) {
+            //     e.preventDefault();
+            //     logAlert('right_click', 'Mencoba membuka menu konteks');
+            // });
 
-            // Disable F12, Ctrl+Shift+I, etc.
-            document.addEventListener('keydown', function(e) {
-                // F12
-                if (e.key === 'F12') {
-                    e.preventDefault();
-                    logAlert('dev_tools', 'Mencoba membuka developer tools dengan F12');
-                }
-                // Ctrl+Shift+I
-                if (e.ctrlKey && e.shiftKey && e.key === 'I') {
-                    e.preventDefault();
-                    logAlert('dev_tools', 'Mencoba membuka developer tools dengan Ctrl+Shift+I');
-                }
-                // Ctrl+Shift+J
-                if (e.ctrlKey && e.shiftKey && e.key === 'J') {
-                    e.preventDefault();
-                    logAlert('dev_tools', 'Mencoba membuka developer tools dengan Ctrl+Shift+J');
-                }
-                // Ctrl+U
-                if (e.ctrlKey && e.key === 'u') {
-                    e.preventDefault();
-                    logAlert('view_source', 'Mencoba melihat source code');
-                }
-                // Alt+Tab
-                if (e.altKey && e.key === 'Tab') {
-                    e.preventDefault();
-                    logAlert('alt_tab', 'Mencoba beralih aplikasi dengan Alt+Tab');
-                }
-                // Ctrl+Tab
-                if (e.ctrlKey && e.key === 'Tab') {
-                    e.preventDefault();
-                    logAlert('ctrl_tab', 'Mencoba beralih tab dengan Ctrl+Tab');
-                }
-            });
+            // // Disable F12, Ctrl+Shift+I, etc.
+            // document.addEventListener('keydown', function(e) {
+            //     // F12
+            //     if (e.key === 'F12') {
+            //         e.preventDefault();
+            //         logAlert('dev_tools', 'Mencoba membuka developer tools dengan F12');
+            //     }
+            //     // Ctrl+Shift+I
+            //     if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+            //         e.preventDefault();
+            //         logAlert('dev_tools', 'Mencoba membuka developer tools dengan Ctrl+Shift+I');
+            //     }
+            //     // Ctrl+Shift+J
+            //     if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+            //         e.preventDefault();
+            //         logAlert('dev_tools', 'Mencoba membuka developer tools dengan Ctrl+Shift+J');
+            //     }
+            //     // Ctrl+U
+            //     if (e.ctrlKey && e.key === 'u') {
+            //         e.preventDefault();
+            //         logAlert('view_source', 'Mencoba melihat source code');
+            //     }
+            //     // Alt+Tab
+            //     if (e.altKey && e.key === 'Tab') {
+            //         e.preventDefault();
+            //         logAlert('alt_tab', 'Mencoba beralih aplikasi dengan Alt+Tab');
+            //     }
+            //     // Ctrl+Tab
+            //     if (e.ctrlKey && e.key === 'Tab') {
+            //         e.preventDefault();
+            //         logAlert('ctrl_tab', 'Mencoba beralih tab dengan Ctrl+Tab');
+            //     }
+            // });
 
-            // Disable copy, paste, cut
-            document.addEventListener('keydown', function(e) {
-                if (e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 'x')) {
-                    e.preventDefault();
-                    logAlert('copy_paste', 'Mencoba copy/paste/cut');
-                }
-            });
+            // // Disable copy, paste, cut
+            // document.addEventListener('keydown', function(e) {
+            //     if (e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 'x')) {
+            //         e.preventDefault();
+            //         logAlert('copy_paste', 'Mencoba copy/paste/cut');
+            //     }
+            // });
 
-            // Disable drag and drop
-            document.addEventListener('dragstart', function(e) {
-                e.preventDefault();
-            });
+            // // Disable drag and drop
+            // document.addEventListener('dragstart', function(e) {
+            //     e.preventDefault();
+            // });
         }
 
         // Setup event listeners
@@ -1002,20 +700,8 @@
                     console.log('Hidden video set');
                 }
 
-                // Verify stream is ready before starting recording
-                console.log('📹 Camera stream ready, details:');
-                console.log('- Stream active:', stream.active);
-                console.log('- Video tracks:', stream.getVideoTracks().length);
-                console.log('- Audio tracks:', stream.getAudioTracks().length);
-
-                stream.getVideoTracks().forEach((track, index) => {
-                    console.log(`- Video track ${index}:`, {
-                        enabled: track.enabled,
-                        readyState: track.readyState,
-                        muted: track.muted,
-                        settings: track.getSettings()
-                    });
-                });
+                // Start recording
+                startRecording();
 
                 // Start live streaming for supervisor monitoring
                 initializeLiveStreaming();
@@ -1102,81 +788,22 @@
 
                 console.log('Initializing PeerJS for student...');
 
-                // Determine PeerJS configuration based on environment
-                const isProduction = window.location.host === 'cbt-new.drshieldapp.com';
-                const isSecure = window.location.protocol === 'https:';
-
-                let peerConfig = {};
-
-                if (isProduction && isSecure) {
-                    // Production HTTPS - Use HTTPS PeerJS server
-                    console.log('Production HTTPS environment detected');
-                    console.log('✅ Using HTTPS PeerJS server on port 9443');
-
-                    peerConfig = {
-                        host: 'peer.toti.my.id',
-                        // port: 9443, // HTTPS port
-                        path: '/peerjs',
-                        secure: true, // HTTPS connection
-                        debug: 2,
-                        config: {
-                            'iceServers': [{
-                                    urls: 'stun:stun.l.google.com:19302'
-                                },
-                                {
-                                    urls: 'stun:stun1.l.google.com:19302'
-                                }
-                            ]
-                        }
-                    };
-
-                    console.log('Using HTTPS PeerJS configuration:', peerConfig);
-                    console.log('✅ HTTPS to HTTPS connection - should work properly');
-
-                } else if (isProduction && !isSecure) {
-                    // Production HTTP
-                    console.log('Production HTTP environment detected');
-                    peerConfig = {
-                        host: '213.210.21.140',
-                        port: 9000,
-                        path: '/peerjs',
-                        secure: false,
-                        debug: 2,
-                        config: {
-                            'iceServers': [{
-                                    urls: 'stun:stun.l.google.com:19302'
-                                },
-                                {
-                                    urls: 'stun:stun1.l.google.com:19302'
-                                }
-                            ]
-                        }
-                    };
-                } else {
-                    // Local development - try our server first, fallback to external
-                    console.log('Local development environment detected');
-                    peerConfig = {
-                        host: 'localhost',
-                        port: 9000,
-                        path: '/peerjs',
-                        secure: false,
-                        debug: 2,
-                        config: {
-                            'iceServers': [{
-                                    urls: 'stun:stun.l.google.com:19302'
-                                },
-                                {
-                                    urls: 'stun:stun1.l.google.com:19302'
-                                }
-                            ]
-                        }
-                    };
-                }
-
-                console.log('PeerJS config:', peerConfig);
-
-                // Initialize PeerJS with environment-specific configuration
-                peer = new Peer(peerConfig);
+                // Initialize PeerJS with auto-generated ID
+                peer = new Peer({
+                    host: 'peer.toti.my.id',
+                    path: '/peerjs',
+                    secure: true, // Use HTTP instead of HTTPS
+                    debug: 2, // Enable debug logs
+                    config: {
+                        'iceServers': [{
+                                urls: 'stun:stun.l.google.com:19302'
+                            },
+                            {
+                                urls: 'stun:stun1.l.google.com:19302'
+                            }
+                        ]
+                    }
+                });
 
                 console.log('PeerJS instance created, waiting for connection...');
 
@@ -1317,200 +944,44 @@
 
         // Start recording
         function startRecording() {
-            console.log('🎥 Starting recording function...');
-
-            if (!stream) {
-                console.error('❌ No stream available for recording');
-                updateRecordingStatus('No Stream', currentChunk);
-
-                // Attempt to restart camera if exam is still active
-                if (examStarted && !examEnded) {
-                    setTimeout(() => {
-                        attemptRecordingRestart('No stream available');
-                    }, 2000); // Reduced delay
-                }
-                return;
-            }
-
-            console.log('✅ Stream available:', stream);
-            console.log('Stream tracks:', stream.getTracks().length);
-            stream.getTracks().forEach((track, index) => {
-                console.log(`Track ${index}:`, track.kind, track.enabled, track.readyState);
-            });
+            if (!stream) return;
 
             try {
-                // Test different codec options with fallback
-                const codecOptions = [
-                    { mimeType: 'video/webm;codecs=vp9', videoBitsPerSecond: 500000 },
-                    { mimeType: 'video/webm;codecs=vp8', videoBitsPerSecond: 500000 },
-                    { mimeType: 'video/webm', videoBitsPerSecond: 500000 },
-                    { mimeType: 'video/mp4', videoBitsPerSecond: 500000 },
-                    {} // No options - let browser choose
-                ];
+                const options = {
+                    mimeType: 'video/webm;codecs=vp9',
+                    videoBitsPerSecond: 500000 // 500 kbps
+                };
 
-                let options = null;
-                let selectedCodec = 'unknown';
-
-                // Try each codec option until one works
-                for (let i = 0; i < codecOptions.length; i++) {
-                    const testOptions = codecOptions[i];
-                    try {
-                        if (testOptions.mimeType && !MediaRecorder.isTypeSupported(testOptions.mimeType)) {
-                            console.log(`❌ Codec not supported: ${testOptions.mimeType}`);
-                            continue;
-                        }
-
-                        // Test if MediaRecorder can be created with these options
-                        const testRecorder = new MediaRecorder(stream, testOptions);
-                        testRecorder.stop(); // Immediately stop test
-
-                        options = testOptions;
-                        selectedCodec = testOptions.mimeType || 'browser-default';
-                        console.log(`✅ Using codec: ${selectedCodec}`);
-                        break;
-                    } catch (testError) {
-                        console.log(`❌ Failed to create MediaRecorder with ${testOptions.mimeType || 'default'}:`, testError.message);
-                    }
-                }
-
-                if (!options && codecOptions.length > 0) {
-                    // Use last option (empty object) as final fallback
-                    options = codecOptions[codecOptions.length - 1];
-                    selectedCodec = 'browser-fallback';
-                    console.log('🔄 Using browser fallback options');
-                }
-
-                console.log('🎬 Creating MediaRecorder with options:', options);
                 mediaRecorder = new MediaRecorder(stream, options);
                 recordedChunks = [];
 
-                // Enhanced event handlers with continuous recording support
                 mediaRecorder.ondataavailable = function(event) {
-                    console.log('📊 Data available:', event.data.size, 'bytes');
-                    console.log('📊 Data type:', event.data.type);
-                    console.log('📊 Event timestamp:', new Date().toISOString());
-                    
                     if (event.data.size > 0) {
                         recordedChunks.push(event.data);
-                        console.log('📦 Total chunks:', recordedChunks.length);
-                        console.log('📦 Chunk sizes:', recordedChunks.map(chunk => chunk.size));
-                        lastSaveTime = Date.now();
-                        
-                        // Log to server immediately when data is available
-                        logAlert('recording_data_available', `Data chunk received: ${event.data.size} bytes, total chunks: ${recordedChunks.length}`);
-                    } else {
-                        console.warn('⚠️ Empty data chunk received');
-                        logAlert('recording_empty_chunk', 'Received empty data chunk');
                     }
                 };
 
                 mediaRecorder.onstop = function() {
-                    console.log('⏹️ Recording stopped, processing chunk...');
-
-                    if (recordedChunks.length > 0) {
-                        const isManualStop = examEnded || isRecordingPaused;
-                        saveVideoChunk(isManualStop, recordingRecoveryMode);
-
-                        // Auto-restart recording if exam is still active and not manually stopped
-                        if (!isManualStop && examStarted && !examEnded) {
-                            setTimeout(() => {
-                                console.log('🔄 Auto-restarting recording...');
-                                startRecording();
-                            }, 500); // Reduced delay to 500ms
-                        }
-                    }
+                    saveVideoChunk();
                 };
 
-                mediaRecorder.onstart = function() {
-                    console.log('▶️ Recording started successfully');
-                    updateRecordingStatus('Recording', currentChunk);
-                    isRecordingPaused = false;
-
-                    // Reset restart attempts on successful start
-                    if (!recordingRecoveryMode) {
-                        recordingRestartAttempts = 0;
-                    }
-                };
-
-                mediaRecorder.onerror = function(event) {
-                    console.error('🚨 MediaRecorder error:', event.error);
-                    updateRecordingStatus('Error: ' + event.error.name, currentChunk);
-
-                    // Attempt restart on error if exam is still active
-                    if (examStarted && !examEnded) {
-                        setTimeout(() => {
-                            attemptRecordingRestart('MediaRecorder error: ' + event.error.name);
-                        }, 1000); // Reduced delay
-                    }
-                };
-
-                mediaRecorder.onpause = function() {
-                    console.log('⏸️ Recording paused');
-                };
-
-                mediaRecorder.onresume = function() {
-                    console.log('▶️ Recording resumed');
-                };
-
-                // Start recording
-                console.log('🚀 Starting MediaRecorder...');
-                console.log('🚀 MediaRecorder options:', options);
-                console.log('🚀 Stream details:', {
-                    active: stream.active,
-                    tracks: stream.getTracks().length,
-                    videoTracks: stream.getVideoTracks().length,
-                    audioTracks: stream.getAudioTracks().length
-                });
-                
-                mediaRecorder.start(5000); // Request data every 5 seconds
-                console.log('📝 MediaRecorder.start(5000) called');
-
+                mediaRecorder.start();
                 isRecording = true;
                 recordingStartTime = Date.now();
-                lastSaveTime = Date.now();
+
+                updateRecordingStatus('Recording', currentChunk);
                 startRecordingTimer();
 
-                console.log(`✅ Recording started with ${selectedCodec}`);
-                console.log('✅ MediaRecorder state:', mediaRecorder.state);
-                console.log('✅ Recording variables set:', {
-                    isRecording,
-                    recordingStartTime: new Date(recordingStartTime).toISOString(),
-                    lastSaveTime: new Date(lastSaveTime).toISOString(),
-                    currentChunk,
-                    examStarted,
-                    examEnded
-                });
-                
-                // Log successful recording start to server
-                logAlert('recording_started', `Recording started successfully with ${selectedCodec}, chunk: ${currentChunk}`);
+                // Auto-save every 2 minutes
+                setInterval(() => {
+                    if (isRecording && mediaRecorder && mediaRecorder.state === 'recording') {
+                        mediaRecorder.requestData();
+                    }
+                }, 120000); // 2 minutes
 
             } catch (error) {
-                console.error('🚨 Error starting recording:', error);
-                console.error('Error details:', {
-                    name: error.name,
-                    message: error.message,
-                    stack: error.stack
-                });
-                updateRecordingStatus('Error: ' + error.message, currentChunk);
-
-                // Attempt restart on error if exam is still active
-                if (examStarted && !examEnded) {
-                    setTimeout(() => {
-                        attemptRecordingRestart('Failed to start recording: ' + error.message);
-                    }, 1500); // Reduced delay
-                }
-
-                // Try to provide helpful error messages
-                if (error.name === 'NotSupportedError') {
-                    console.error('💡 MediaRecorder not supported. Try using Chrome/Firefox');
-                    logAlert('recording_not_supported', 'MediaRecorder tidak didukung browser');
-                } else if (error.name === 'InvalidStateError') {
-                    console.error('💡 Stream may be inactive or already in use');
-                    logAlert('recording_invalid_state', 'Stream tidak aktif atau sedang digunakan');
-                } else {
-                    console.error('💡 Unknown recording error. Check browser console for details.');
-                    logAlert('recording_unknown_error', 'Error recording tidak diketahui: ' + error.message);
-                }
+                console.error('Error starting recording:', error);
+                updateRecordingStatus('Error', currentChunk);
             }
         }
 
@@ -1525,160 +996,57 @@
         }
 
         // Save video chunk
-        function saveVideoChunk(isFinalSave = false, isRecovery = false) {
-            console.log('💾 ========== SAVE VIDEO CHUNK START ==========');
-            console.log('saveVideoChunk called', {
-                chunks: recordedChunks.length,
-                isFinalSave,
-                isRecovery,
-                currentChunk,
-                examStarted,
-                examEnded,
-                timestamp: new Date().toISOString()
-            });
+        function saveVideoChunk() {
+            console.log('saveVideoChunk called, chunks:', recordedChunks.length);
 
             if (recordedChunks.length === 0) {
-                console.warn('⚠️ No chunks to save - recordedChunks is empty');
-                logAlert('recording_no_chunks', 'Attempted to save but no chunks available');
+                console.log('No chunks to save');
                 return;
             }
-
-            // Log chunk details before creating blob
-            console.log('📊 Chunk details before blob creation:');
-            recordedChunks.forEach((chunk, index) => {
-                console.log(`  Chunk ${index}: ${chunk.size} bytes, type: ${chunk.type}`);
-            });
 
             const blob = new Blob(recordedChunks, {
                 type: 'video/webm'
             });
-            console.log('📦 Blob created successfully');
-            console.log('📦 Blob size:', blob.size, 'bytes');
-            console.log('📦 Blob type:', blob.type);
-            
-            if (blob.size === 0) {
-                console.error('❌ Blob is empty! Cannot save');
-                logAlert('recording_empty_blob', 'Created blob is empty');
-                return;
-            }
+            console.log('Created blob, size:', blob.size);
 
             const reader = new FileReader();
 
             reader.onload = function(e) {
-                console.log('📄 FileReader onload triggered');
                 const base64Data = e.target.result;
-                console.log('📄 Base64 data created');
-                console.log('📄 Base64 data length:', base64Data.length);
-                console.log('📄 Base64 header:', base64Data.substring(0, 100));
-
-                // Determine save type
-                let saveType = 'auto_save';
-                if (isFinalSave) {
-                    saveType = 'final_save';
-                } else if (isRecovery) {
-                    saveType = 'recovery_save';
-                }
-
-                console.log('💾 Preparing to send to Livewire with saveType:', saveType);
+                console.log('Base64 data length:', base64Data.length);
+                console.log('Base64 header:', base64Data.substring(0, 50));
 
                 // Send to server via Livewire
                 if (window.Livewire) {
-                    console.log('✅ Livewire is available');
-                    console.log(`📤 Sending to Livewire - Type: ${saveType}, Chunk: ${currentChunk}`);
+                    console.log('Sending to Livewire, chunk:', currentChunk);
 
-                    const saveData = {
+                    Livewire.dispatch('saveVideoChunk', {
                         videoBlob: base64Data,
-                        chunkNumber: currentChunk,
-                        saveType: saveType,
-                        timestamp: new Date().toISOString(),
-                        examStatus: {
-                            started: examStarted,
-                            ended: examEnded,
-                            recoveryMode: recordingRecoveryMode
-                        },
-                        recordingInfo: {
-                            duration: recordingStartTime ? Date.now() - recordingStartTime : 0,
-                            restartAttempts: recordingRestartAttempts,
-                            totalChunks: currentChunk,
-                            blobSize: blob.size,
-                            chunksCount: recordedChunks.length
-                        }
-                    };
-
-                    console.log('📋 Save data prepared:', {
-                        chunkNumber: saveData.chunkNumber,
-                        saveType: saveData.saveType,
-                        blobLength: saveData.videoBlob.length,
-                        examStatus: saveData.examStatus,
-                        recordingInfo: saveData.recordingInfo
+                        chunkNumber: currentChunk
                     });
+                } else {
+                    console.error('Livewire not available');
+                }
 
-                    try {
-                        console.log('🚀 Dispatching saveVideoChunk to Livewire...');
-                        Livewire.dispatch('saveVideoChunk', saveData);
-                        console.log(`✅ Chunk ${currentChunk} dispatched successfully (${saveType})`);
-                        
-                        // Additional success logging
-                        logAlert('recording_chunk_sent', `Chunk ${currentChunk} sent to server - Size: ${blob.size} bytes, Type: ${saveType}`);
+                // Prepare for next chunk
+                currentChunk++;
+                recordedChunks = [];
 
-                        // Log successful save
-                        if (isRecovery) {
-                            logAlert('recording_recovery_save', `Recovery save berhasil - chunk ${currentChunk}`);
-                        } else if (isFinalSave) {
-                            logAlert('recording_final_save', `Final save berhasil - total chunks ${currentChunk}`);
-                        }
-
-                    } catch (error) {
-                        console.error('❌ Error dispatching to Livewire:', error);
-                        console.error('❌ Error name:', error.name);
-                        console.error('❌ Error message:', error.message);
-                        console.error('❌ Error stack:', error.stack);
-                        logAlert('recording_dispatch_error', `Failed to dispatch chunk ${currentChunk}: ${error.message}`);
+                // Restart recording
+                setTimeout(() => {
+                    if (stream && stream.active) {
+                        console.log('Restarting recording...');
+                        startRecording();
+                    } else {
+                        console.log('Stream not active, cannot restart recording');
                     }
-                } else {
-                    console.error('❌ Livewire not available!');
-                    console.error('❌ window.Livewire:', typeof window.Livewire);
-                    logAlert('recording_livewire_unavailable', 'Livewire not available when trying to save chunk');
-                }
-
-                // Prepare for next chunk (unless it's final save)
-                if (!isFinalSave) {
-                    currentChunk++;
-                    recordedChunks = [];
-                    console.log(`📦 Prepared for next chunk: ${currentChunk}`);
-                    console.log('📦 Cleared recordedChunks array');
-                } else {
-                    console.log('🏁 Final save completed, not preparing next chunk');
-                }
-                
-                console.log('💾 ========== SAVE VIDEO CHUNK END ==========');
+                }, 1000);
             };
 
-            reader.onerror = function(error) {
-                console.error('❌ FileReader error:', error);
-                console.error('❌ FileReader error details:', {
-                    error: error,
-                    readyState: reader.readyState,
-                    result: reader.result
-                });
-                logAlert('recording_filereader_error', `FileReader error saat menyimpan chunk ${currentChunk}: ${error.message || 'Unknown error'}`);
+            reader.onerror = function() {
+                console.error('FileReader error');
             };
 
-            reader.onloadstart = function() {
-                console.log('📄 FileReader started reading blob');
-            };
-
-            reader.onprogress = function(e) {
-                if (e.lengthComputable) {
-                    console.log(`📄 FileReader progress: ${e.loaded}/${e.total} bytes (${Math.round(e.loaded/e.total*100)}%)`);
-                }
-            };
-
-            reader.onloadend = function() {
-                console.log('📄 FileReader finished reading blob');
-            };
-
-            console.log('📄 Starting FileReader.readAsDataURL...');
             reader.readAsDataURL(blob);
         }
 
@@ -1697,82 +1065,12 @@
             const chunkElement = document.getElementById('chunkNumber');
 
             if (statusElement) {
-                // Enhanced status display with additional info
-                let displayStatus = status;
-
-                if (recordingRecoveryMode) {
-                    displayStatus += ` (Recovery ${recordingRestartAttempts}/${maxRestartAttempts})`;
-                }
-
-                if (examEnded) {
-                    displayStatus += ' (Exam Ended)';
-                } else if (!examStarted) {
-                    displayStatus += ' (Waiting)';
-                }
-
-                statusElement.textContent = displayStatus;
-
-                // Color coding
-                if (status === 'Recording') {
-                    statusElement.className = 'text-green-600';
-                } else if (status.includes('Error')) {
-                    statusElement.className = 'text-red-600';
-                } else if (recordingRecoveryMode) {
-                    statusElement.className = 'text-yellow-600';
-                } else {
-                    statusElement.className = 'text-gray-600';
-                }
+                statusElement.textContent = status;
+                statusElement.className = status === 'Recording' ? 'text-green-600' : 'text-red-600';
             }
 
             if (chunkElement) {
                 chunkElement.textContent = chunk;
-            }
-
-            // Update exam session info
-            updateExamSessionInfo();
-        }
-
-        // Update exam session information display
-        function updateExamSessionInfo() {
-            const examStatusElement = document.getElementById('examStatus');
-            const recordingHealthElement = document.getElementById('recordingHealth');
-
-            if (examStatusElement) {
-                let examStatus = 'Unknown';
-                let statusClass = 'text-gray-600';
-
-                if (examEnded) {
-                    examStatus = 'Ended';
-                    statusClass = 'text-blue-600';
-                } else if (examStarted) {
-                    examStatus = 'Active';
-                    statusClass = 'text-green-600';
-                } else {
-                    examStatus = 'Waiting';
-                    statusClass = 'text-yellow-600';
-                }
-
-                examStatusElement.textContent = examStatus;
-                examStatusElement.className = statusClass;
-            }
-
-            if (recordingHealthElement) {
-                let healthStatus = 'Unknown';
-                let healthClass = 'text-gray-600';
-
-                if (recordingRestartAttempts === 0) {
-                    healthStatus = 'Stable';
-                    healthClass = 'text-green-600';
-                } else if (recordingRestartAttempts < maxRestartAttempts / 2) {
-                    healthStatus = `Recovering (${recordingRestartAttempts})`;
-                    healthClass = 'text-yellow-600';
-                } else {
-                    healthStatus = `Critical (${recordingRestartAttempts}/${maxRestartAttempts})`;
-                    healthClass = 'text-red-600';
-                }
-
-                recordingHealthElement.textContent = healthStatus;
-                recordingHealthElement.className = healthClass;
             }
         }
 
@@ -1948,40 +1246,6 @@
                     setTimeout(() => {
                         startRecording();
                     }, 1000);
-                }
-            });
-
-            // Handle exam submission (end exam session)
-            Livewire.on('examSubmitted', function() {
-                console.log('📝 Exam submitted, ending session...');
-                endExamSession();
-            });
-
-            // Handle forced exam end
-            Livewire.on('examEnded', function() {
-                console.log('🏁 Exam ended by system, ending session...');
-                endExamSession();
-            });
-
-            // Handle exam timeout
-            Livewire.on('examTimeout', function() {
-                console.log('⏰ Exam timeout, ending session...');
-                endExamSession();
-            });
-
-            // Handle recording restart request from server
-            Livewire.on('restartRecording', function() {
-                console.log('🔄 Recording restart requested by server...');
-                if (examStarted && !examEnded) {
-                    attemptRecordingRestart('Server restart request');
-                }
-            });
-
-            // Handle emergency save request
-            Livewire.on('emergencySave', function() {
-                console.log('🚨 Emergency save requested...');
-                if (recordedChunks.length > 0) {
-                    saveVideoChunk(false, true); // Recovery save
                 }
             });
         });
@@ -2166,42 +1430,10 @@
         }
 
         // Enhanced cleanup on page unload
-        window.addEventListener('beforeunload', function(e) {
-            console.log('🚪 Page unloading...');
-
-            // If exam is still active, this might be an unexpected exit
-            if (examStarted && !examEnded) {
-                console.log('⚠️ Unexpected page exit during active exam');
-
-                // Save current recording data
-                if (isRecording && recordedChunks.length > 0) {
-                    console.log('💾 Emergency save before page unload...');
-                    saveVideoChunk(false, true); // Emergency save
-                }
-
-                // Log the unexpected exit
-                logAlert('unexpected_exit', 'Keluar dari halaman ujian secara tidak terduga');
-
-                // Show warning to user
-                e.preventDefault();
-                e.returnValue = '⚠️ Ujian masih berlangsung! Meninggalkan halaman akan mencatat pelanggaran.';
-                return e.returnValue;
-            }
-
-            // Normal cleanup
-            performCleanup();
-        });
-
-        // Perform cleanup operations
-        function performCleanup() {
-            console.log('🧹 Performing cleanup...');
-
-            // Stop video streams
+        window.addEventListener('beforeunload', function() {
+            // Stop video stream
             if (stream) {
-                stream.getTracks().forEach(track => {
-                    track.stop();
-                    console.log('Stopped track:', track.kind);
-                });
+                stream.getTracks().forEach(track => track.stop());
             }
 
             // Stop camera stream for PeerJS
@@ -2209,7 +1441,7 @@
                 cameraStream.getTracks().forEach(track => track.stop());
             }
 
-            // Close PeerJS connections
+            // Close PeerJS connection
             if (currentCall) {
                 currentCall.close();
             }
@@ -2218,10 +1450,9 @@
                 peer.destroy();
             }
 
-            // Stop recording with final save
+            // Stop recording
             if (mediaRecorder && mediaRecorder.state === 'recording') {
-                console.log('🛑 Stopping recording for final save...');
-                mediaRecorder.stop(); // This will trigger final save
+                mediaRecorder.stop();
             }
 
             // Close peer connection
@@ -2229,176 +1460,13 @@
                 peerConnection.close();
             }
 
-            // Clear all intervals
-            clearAutoSave();
-            clearRecordingHealthMonitoring();
-
-            if (recordingDurationInterval) {
-                clearInterval(recordingDurationInterval);
-            }
-
             // Notify server that session is ending
             if (window.Livewire) {
-                const sessionEndData = {
+                navigator.sendBeacon('/api/end-live-session', JSON.stringify({
                     session_token: streamId,
-                    streaming_ended: true,
-                    exam_ended: examEnded,
-                    final_chunk: currentChunk,
-                    total_recording_time: recordingStartTime ? Date.now() - recordingStartTime : 0,
-                    restart_attempts: recordingRestartAttempts
-                };
-
-                navigator.sendBeacon('/api/end-live-session', JSON.stringify(sessionEndData));
+                    streaming_ended: true
+                }));
             }
-
-            console.log('✅ Cleanup completed');
-        }
-
-        window.testServerConnection = function() {
-            console.log('🔗 Testing server connection...');
-            @this.testConnection().then(response => {
-                console.log('✅ Server response:', response);
-                return response;
-            }).catch(error => {
-                console.log('❌ Server error:', error);
-                return error;
-            });
-        };
-
-        window.manualSaveTest = function() {
-            console.log('🧪 Starting manual save test...');
-            
-            if (recordedChunks.length === 0) {
-                console.log('⚠️ No chunks available, requesting data from MediaRecorder...');
-                if (mediaRecorder && mediaRecorder.state === 'recording') {
-                    mediaRecorder.requestData();
-                    setTimeout(() => {
-                        console.log('🔄 Retrying save after data request...');
-                        manualSaveTest();
-                    }, 1000);
-                    return;
-                } else {
-                    console.log('❌ MediaRecorder not available or not recording');
-                    return;
-                }
-            }
-
-            console.log('📦 Chunks available:', recordedChunks.length);
-            
-            // Create test blob
-            const blob = new Blob(recordedChunks, { type: 'video/webm' });
-            console.log('📊 Blob created:', {
-                size: blob.size,
-                type: blob.type
-            });
-
-            // Test FileReader
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const result = e.target.result;
-                console.log('📖 FileReader success:', {
-                    resultType: typeof result,
-                    resultLength: result.length,
-                    resultPreview: result.substring(0, 100)
-                });
-
-                // Test Livewire dispatch
-                console.log('📡 Dispatching to Livewire...');
-                @this.saveVideoChunk({
-                    videoBlob: result,
-                    chunkNumber: currentChunk,
-                    saveType: 'manual_test',
-                    examStatus: {
-                        started: examStarted,
-                        ended: examEnded,
-                        recording: isRecording
-                    },
-                    recordingInfo: {
-                        chunksCount: recordedChunks.length,
-                        blobSize: blob.size,
-                        startTime: recordingStartTime,
-                        testTime: Date.now()
-                    }
-                }).then(response => {
-                    console.log('✅ Livewire response:', response);
-                }).catch(error => {
-                    console.log('❌ Livewire error:', error);
-                });
-            };
-
-            reader.onerror = function(e) {
-                console.log('❌ FileReader error:', e);
-            };
-
-            reader.readAsDataURL(blob);
-        };
-
-        // Debug functions accessible from console
-        window.debugRecording = function() {
-            console.log('🔍 ========== RECORDING DEBUG INFO ==========');
-            console.log('Global variables:', {
-                isRecording,
-                examStarted,
-                examEnded,
-                currentChunk,
-                recordedChunks: recordedChunks.length,
-                lastSaveTime: lastSaveTime ? new Date(lastSaveTime).toISOString() : 'never',
-                recordingStartTime: recordingStartTime ? new Date(recordingStartTime).toISOString() : 'never'
-            });
-            console.log('Stream:', {
-                available: !!stream,
-                active: stream ? stream.active : false,
-                tracks: stream ? stream.getTracks().length : 0
-            });
-            console.log('MediaRecorder:', {
-                available: !!mediaRecorder,
-                state: mediaRecorder ? mediaRecorder.state : 'null',
-                mimeType: mediaRecorder ? mediaRecorder.mimeType : 'null'
-            });
-            console.log('Intervals:', {
-                autoSaveInterval: !!autoSaveInterval,
-                recordingHealthCheck: !!recordingHealthCheck,
-                recordingDurationInterval: !!recordingDurationInterval
-            });
-            console.log('Livewire:', {
-                available: !!window.Livewire,
-                type: typeof window.Livewire
-            });
-            
-            if (recordedChunks.length > 0) {
-                console.log('Recorded chunks:', recordedChunks.map((chunk, i) => ({
-                    index: i,
-                    size: chunk.size,
-                    type: chunk.type
-                })));
-            }
-            console.log('🔍 ========================================');
-        };
-
-        window.forceRecordingSave = function() {
-            console.log('🚀 Force saving current recording...');
-            if (recordedChunks.length > 0) {
-                saveVideoChunk(false, true);
-            } else {
-                console.log('❌ No chunks to save');
-            }
-        };
-
-        window.forceRequestData = function() {
-            console.log('🚀 Force requesting data from MediaRecorder...');
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                mediaRecorder.requestData();
-                console.log('✅ Data requested');
-            } else {
-                console.log('❌ MediaRecorder not recording');
-            }
-        };
-
-        // Make debug functions available globally
-        console.log('🔧 Debug functions available in console:');
-        console.log('- debugRecording() - Show current recording status');
-        console.log('- forceRecordingSave() - Force save current chunks');
-        console.log('- forceRequestData() - Force request data from MediaRecorder');
-
+        });
     </script>
 @endpush

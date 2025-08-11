@@ -162,46 +162,13 @@ class AdminExamDetailIndex extends Component
         ]);
     }
 
-    public function testConnection()
-    {
-        \Log::info('testConnection called', [
-            'user_id' => Auth::id(),
-            'timestamp' => now(),
-            'session_id' => session()->getId(),
-            'request_info' => [
-                'ip' => request()->ip(),
-                'user_agent' => request()->userAgent(),
-                'method' => request()->method()
-            ]
-        ]);
-
-        return [
-            'success' => true,
-            'message' => 'Connection successful',
-            'server_time' => now()->toISOString(),
-            'user_id' => Auth::id(),
-            'debug' => [
-                'php_version' => PHP_VERSION,
-                'laravel_version' => app()->version(),
-                'storage_path' => storage_path(),
-                'public_path' => public_path(),
-                'disk_free_space' => number_format(disk_free_space(storage_path()) / 1024 / 1024) . ' MB',
-                'memory_usage' => number_format(memory_get_usage(true) / 1024 / 1024, 2) . ' MB',
-                'current_recording' => $this->currentRecording ? $this->currentRecording->id : 'none'
-            ]
-        ];
-    }
-
-    public function saveVideoChunk($data = [])
+    public function saveVideoChunk($videoBlob = '', $chunkNumber = null)
     {
         // Add extensive logging
         \Log::info('saveVideoChunk called', [
             'user_id' => Auth::id(),
-            'received_data' => [
-                'type' => gettype($data),
-                'keys' => is_array($data) ? array_keys($data) : 'not_array',
-                'data_size' => is_array($data) && isset($data['videoBlob']) ? strlen($data['videoBlob']) : 'no_blob'
-            ],
+            'chunk_number' => $chunkNumber,
+            'data_length' => strlen($videoBlob),
             'server_time' => now(),
             'memory_usage' => memory_get_usage(true),
             'server_info' => [
@@ -213,38 +180,13 @@ class AdminExamDetailIndex extends Component
         ]);
 
         try {
-            // Handle both old and new parameter formats
-            if (is_array($data)) {
-                $videoBlob = $data['videoBlob'] ?? '';
-                $chunkNumber = $data['chunkNumber'] ?? null;
-                $saveType = $data['saveType'] ?? 'auto_save';
-                $examStatus = $data['examStatus'] ?? [];
-                $recordingInfo = $data['recordingInfo'] ?? [];
-            } else {
-                // Fallback for old format
-                $videoBlob = $data;
-                $chunkNumber = func_get_args()[1] ?? null;
-                $saveType = 'auto_save';
-                $examStatus = [];
-                $recordingInfo = [];
-            }
-
-            \Log::info('Parsed saveVideoChunk parameters', [
-                'chunk_number' => $chunkNumber,
-                'save_type' => $saveType,
-                'blob_length' => strlen($videoBlob),
-                'exam_status' => $examStatus,
-                'recording_info' => $recordingInfo
-            ]);
-
             // Validate input
             if (empty($videoBlob)) {
                 throw new \Exception('Video blob is empty');
             }
 
             if (!$this->currentRecording) {
-                \Log::warning('No current recording session, creating new one');
-                $this->initializeRecording();
+                throw new \Exception('No current recording session');
             }
 
             // Check if we can decode the data
@@ -269,10 +211,9 @@ class AdminExamDetailIndex extends Component
                 throw new \Exception('Decoded video data is empty');
             }
 
-            // Create filename with save type info
+            // Create filename
             $filename = 'exam_recordings/' . $this->userTimetableId . '_chunk_' .
                 ($chunkNumber ?? $this->currentRecording->chunk_number) . '_' .
-                $saveType . '_' .
                 time() . '.webm';
 
             \Log::info('Attempting to save file', ['filename' => $filename]);
@@ -302,13 +243,10 @@ class AdminExamDetailIndex extends Component
             }
 
             $fileSize = $disk->size($filename);
-            $fullPath = $disk->path($filename);
-            
             \Log::info('File saved successfully', [
                 'filename' => $filename,
                 'file_size' => $fileSize,
-                'full_path' => $fullPath,
-                'save_type' => $saveType
+                'full_path' => $disk->path($filename)
             ]);
 
             // Update database
@@ -320,12 +258,7 @@ class AdminExamDetailIndex extends Component
                     'chunk_number' => $chunkNumber,
                     'file_size' => $fileSize,
                     'start_time' => now(),
-                    'status' => 'recording',
-                    'metadata' => [
-                        'save_type' => $saveType,
-                        'exam_status' => $examStatus,
-                        'recording_info' => $recordingInfo
-                    ]
+                    'status' => 'recording'
                 ]);
                 \Log::info('Created new recording entry', ['id' => $this->currentRecording->id]);
             } else {
@@ -333,60 +266,37 @@ class AdminExamDetailIndex extends Component
                     'video_path' => $filename,
                     'file_size' => $fileSize,
                     'end_time' => now(),
-                    'status' => $saveType === 'final_save' ? 'completed' : 'recording',
-                    'metadata' => [
-                        'save_type' => $saveType,
-                        'exam_status' => $examStatus,
-                        'recording_info' => $recordingInfo
-                    ]
+                    'status' => 'completed'
                 ]);
                 \Log::info('Updated recording entry', ['id' => $this->currentRecording->id]);
             }
 
-            // Return success response
-            $response = [
+            return response()->json([
                 'success' => true,
                 'message' => 'Video chunk saved successfully',
                 'debug' => [
                     'filename' => $filename,
                     'file_size' => $fileSize,
-                    'chunk_number' => $chunkNumber ?? $this->currentRecording->chunk_number,
-                    'save_type' => $saveType,
-                    'full_path' => $fullPath
+                    'chunk_number' => $chunkNumber ?? $this->currentRecording->chunk_number
                 ]
-            ];
-            
-            \Log::info('saveVideoChunk success response', $response);
-            return $response;
-
+            ]);
         } catch (\Exception $e) {
             \Log::error('Error saving video chunk', [
                 'user_id' => Auth::id(),
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'memory_usage' => memory_get_usage(true),
-                'input_data' => [
-                    'data_type' => gettype($data),
-                    'blob_length' => is_array($data) && isset($data['videoBlob']) ? strlen($data['videoBlob']) : 'unknown'
-                ],
                 'server_info' => [
                     'disk_free_space' => disk_free_space(storage_path()),
                     'disk_total_space' => disk_total_space(storage_path())
                 ]
             ]);
 
-            $errorResponse = [
+            return response()->json([
                 'success' => false,
                 'message' => 'Failed to save video chunk',
-                'error' => $e->getMessage(),
-                'debug' => [
-                    'user_id' => Auth::id(),
-                    'timestamp' => now()->toISOString()
-                ]
-            ];
-            
-            \Log::info('saveVideoChunk error response', $errorResponse);
-            return $errorResponse;
+                'error' => $e->getMessage()
+            ]);
         }
     }
 

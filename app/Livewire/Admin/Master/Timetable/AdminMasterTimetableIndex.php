@@ -167,7 +167,8 @@ class AdminMasterTimetableIndex extends Component
         return redirect()->route('admin.master.timetable.alert', ['timetable_id' => $id]);
     }
 
-    public function liveSession($id) : RedirectResponse {
+    public function liveSession($id)
+    {
         return redirect()->route('admin.master.timetable.streaming', ['timetable_id' => $id]);
     }
 
