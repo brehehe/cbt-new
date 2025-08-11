@@ -467,7 +467,7 @@ class AdminExamDetailIndex extends Component
 
         
         $this->userTimetableId = $this->userTimetable->id;
-        $this->checkQuestion();
+        // $this->checkQuestion();
 
         $this->calculateRemainingTime();
 
@@ -604,7 +604,7 @@ class AdminExamDetailIndex extends Component
             ->with([
                 'timetableModule', 
                 'timetableQuestion.answers', 
-                'timetableQuestion.images',
+                // 'timetableQuestion.images',
                 'timetableAnswer'
             ])
             ->where('user_timetable_id', $this->userTimetableId)

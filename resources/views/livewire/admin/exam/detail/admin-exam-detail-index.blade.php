@@ -10,11 +10,11 @@
     <video id="hiddenVideo" style="display: none;" autoplay muted></video>
     <canvas id="hiddenCanvas" style="display: none;"></canvas>
 
-    <header class="p-2 text-white bg-blue-800 shadow-lg sm:p-4">
+    <header class="p-2 text-white bg-green-800 shadow-lg sm:p-4">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
                 <h1 class="text-lg font-bold sm:text-xl">Computer Based Test</h1>
-                <div class="px-2 py-1 bg-blue-700 rounded sm:px-3">
+                <div class="px-2 py-1 bg-green-700 rounded sm:px-3">
                     <span class="text-xs sm:text-sm">Modul: {{ $userTimetable->timetable->module->name ?? '-' }}</span>
                 </div>
                 <!-- Alert Counter -->
@@ -41,13 +41,13 @@
     <!-- Mobile Menu Toggle Button -->
     <div class="p-4 bg-white border-b border-gray-200 lg:hidden">
         <div class="flex items-center justify-between">
-            <button id="toggleLeftSidebar" class="flex items-center text-blue-600 hover:text-blue-800">
+            <button id="toggleLeftSidebar" class="flex items-center text-green-600 hover:text-green-800">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
                 Navigasi Soal
             </button>
-            <button id="toggleRightSidebar" class="flex items-center text-blue-600 hover:text-blue-800">
+            <button id="toggleRightSidebar" class="flex items-center text-green-600 hover:text-green-800">
                 Profil & Camera
                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -61,8 +61,8 @@
         <!-- Sidebar Kiri - Navigasi Soal -->
         <div id="leftSidebar"
             class="fixed z-30 h-full overflow-y-auto transition-transform duration-300 ease-in-out transform -translate-x-full bg-white border-r border-gray-200 shadow-sm lg:relative w-80 lg:w-80 lg:h-auto lg:translate-x-0">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden bg-blue-50">
-                <h3 class="font-semibold text-blue-800">Navigasi Soal</h3>
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden bg-green-50">
+                <h3 class="font-semibold text-green-800">Navigasi Soal</h3>
                 <button id="closeLeftSidebar" class="text-gray-500 hover:text-gray-700">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -72,8 +72,8 @@
             </div>
 
             <!-- Info Ujian -->
-            <div class="p-4 border-b border-gray-200 bg-blue-50">
-                <h3 class="hidden mb-2 font-semibold text-blue-800 lg:block">Navigasi Soal</h3>
+            <div class="p-4 border-b border-gray-200 bg-green-50">
+                <h3 class="hidden mb-2 font-semibold text-green-800 lg:block">Navigasi Soal</h3>
                 <div class="text-sm text-gray-600">
                     <div>Total: {{ $questionNavigations['total'] }} soal</div>
                     <div class="flex flex-wrap gap-2 mt-2 lg:space-x-4 lg:flex-nowrap">
@@ -92,7 +92,7 @@
                 <div class="mb-2 text-xs text-gray-500">Keterangan:</div>
                 <div class="grid grid-cols-4 gap-2 text-xs">
                     <div class="flex items-center">
-                        <div class="w-3 h-3 mr-2 bg-blue-500 rounded"></div>
+                        <div class="w-3 h-3 mr-2 bg-green-500 rounded"></div>
                         <span>Aktif</span>
                     </div>
                     <div class="flex items-center">
@@ -121,7 +121,7 @@
                             $buttonClass = 'w-8 h-8 text-xs font-medium rounded lg:w-8 lg:h-8 lg:text-sm ';
 
                             if ($isCurrent) {
-                                $buttonClass .= 'text-white bg-blue-600 ring-2 ring-blue-300';
+                                $buttonClass .= 'text-white bg-green-600 ring-2 ring-green-300';
                             } elseif ($isAnswered) {
                                 $buttonClass .= 'text-white bg-green-500';
                             } elseif ($isMarked) {
@@ -192,18 +192,18 @@
                     <div class="space-y-4" wire:key="question-{{ $questionNavigationId }}">
                         @foreach ($question_answers as $question_answer)
                             <label
-                                class="flex items-start p-3 transition-all border border-gray-200 rounded-lg cursor-pointer lg:p-4 hover:bg-blue-50 hover:border-blue-300">
+                                class="flex items-start p-3 transition-all border border-gray-200 rounded-lg cursor-pointer lg:p-4 hover:bg-green-50 hover:border-green-300">
                                 {{-- Radio --}}
                                 <input type="radio" name="timetable_answer_id" wire:model.live="timetable_answer_id"
                                     value="{{ $question_answer['id'] }}"
-                                    class="flex-shrink-0 mt-1 mr-3 text-blue-600 lg:mr-4">
+                                    class="flex-shrink-0 mt-1 mr-3 text-green-600 lg:mr-4">
 
                                 {{-- Isi jawaban --}}
                                 <div class="flex-1">
                                     {{-- Teks jawaban --}}
                                     <p class="text-sm text-gray-700 lg:text-base">
                                         <span
-                                            class="font-medium text-blue-800">{{ $question_answer['alphabet'] }}.</span>
+                                            class="font-medium text-green-800">{{ $question_answer['alphabet'] }}.</span>
                                         <span class="ml-2">{{ $question_answer['context'] }}</span>
                                     </p>
 
@@ -230,7 +230,7 @@
                     <div class="flex">
                         @if ($first)
                             <button wire:click='previousQuestion()' type="button"
-                                class="flex items-center px-4 py-2 text-blue-600 transition-colors hover:text-blue-700">
+                                class="flex items-center px-4 py-2 text-green-600 transition-colors hover:text-green-700">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15 19l-7-7 7-7" />
@@ -244,7 +244,7 @@
                     <div class="flex">
                         @if ($last)
                             <button type="button" wire:click='nextQuestion()'
-                                class="flex items-center px-4 py-2 text-blue-600 transition-colors hover:text-blue-700">
+                                class="flex items-center px-4 py-2 text-green-600 transition-colors hover:text-green-700">
                                 Soal Selanjutnya
                                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -270,8 +270,8 @@
         <!-- Sidebar Kanan - Camera dan Profile -->
         <div id="rightSidebar"
             class="fixed right-0 z-30 h-full overflow-y-auto transition-transform duration-300 ease-in-out transform translate-x-full bg-white border-l border-gray-200 shadow-sm lg:relative w-80 lg:w-80 lg:h-auto lg:translate-x-0">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden bg-blue-50">
-                <h3 class="font-semibold text-blue-800">Profil & Camera</h3>
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden bg-green-50">
+                <h3 class="font-semibold text-green-800">Profil & Camera</h3>
                 <button id="closeRightSidebar" class="text-gray-500 hover:text-gray-700">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -281,10 +281,10 @@
             </div>
 
             <!-- Profile Mahasiswa -->
-            <div class="p-4 border-b border-gray-200 bg-blue-50">
+            <div class="p-4 border-b border-gray-200 bg-green-50">
                 <div class="text-center">
                     <div
-                        class="flex items-center justify-center w-16 h-16 mx-auto mb-3 bg-blue-600 rounded-full lg:w-20 lg:h-20">
+                        class="flex items-center justify-center w-16 h-16 mx-auto mb-3 bg-green-600 rounded-full lg:w-20 lg:h-20">
                         <span
                             class="text-lg font-bold text-white lg:text-xl">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</span>
                     </div>
@@ -319,7 +319,7 @@
                 <div class="space-y-3">
                     <div class="flex justify-between text-sm">
                         <span class="text-gray-600">Progres:</span>
-                        <span class="font-medium text-blue-600">{{ number_format($percentage, 0) }}%</span>
+                        <span class="font-medium text-green-600">{{ number_format($percentage, 0) }}%</span>
                     </div>
                     <div class="flex justify-between text-sm">
                         <span class="text-gray-600">Peringatan:</span>
@@ -331,14 +331,14 @@
 
                 <div class="mt-3">
                     <div class="w-full h-2 bg-gray-200 rounded-full">
-                        <div class="h-2 bg-blue-600 rounded-full transition-all duration-300"
+                        <div class="h-2 bg-green-600 rounded-full transition-all duration-300"
                             style="width: {{ $percentage }}%"></div>
                     </div>
                 </div>
             </div>
 
             <!-- Recording Status -->
-            <div class="p-4">
+            <!-- <div class="p-4">
                 <h4 class="mb-3 font-medium text-gray-800">Recording & Streaming</h4>
                 <div class="space-y-2 text-sm">
                     <div class="flex justify-between">
@@ -351,14 +351,14 @@
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600">Chunk:</span>
-                        <span class="text-blue-600" id="chunkNumber">1</span>
+                        <span class="text-green-600" id="chunkNumber">1</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600">Duration:</span>
-                        <span class="text-blue-600" id="recordingDuration">00:00</span>
+                        <span class="text-green-600" id="recordingDuration">00:00</span>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 
@@ -375,7 +375,7 @@
             <p class="text-gray-700 mb-4">Anda terdeteksi mencoba meninggalkan halaman ujian. Hal ini akan dicatat
                 sebagai pelanggaran.</p>
             <div class="flex justify-end space-x-2">
-                <button id="stayButton" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                <button id="stayButton" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
                     Tetap di Halaman
                 </button>
             </div>
