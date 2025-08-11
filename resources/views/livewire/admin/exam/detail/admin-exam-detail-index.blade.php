@@ -791,7 +791,8 @@
                 // Initialize PeerJS with auto-generated ID
                 peer = new Peer({
                     host: 'localhost',
-                    host: '103.197.188.184'
+                    host: '103.197.188.184',
+                    host: '213.210.21.140',
                     port: 9000,
                     path: '/peerjs',
                     secure: false, // Use HTTP instead of HTTPS
