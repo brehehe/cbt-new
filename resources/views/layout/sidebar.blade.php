@@ -207,6 +207,8 @@
                                     'icon'    => 'fa-database',
                                 ],
                             ];
+                        } else {
+                            $masters = [];
                         }
                     }
                 @endphp

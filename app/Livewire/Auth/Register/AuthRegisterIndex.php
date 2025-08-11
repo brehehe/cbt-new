@@ -38,7 +38,6 @@ class AuthRegisterIndex extends Component
 
     }
 
-
     protected $messages = [
         'name.required'        => 'Nama lengkap wajib diisi',
         'birth_place.required' => 'Tempat lahir wajib diisi',
@@ -80,7 +79,7 @@ class AuthRegisterIndex extends Component
             ],
         ];
 
-        // $this->validate($validationRules[$this->step], $this->messages);
+        $this->validate($validationRules[$this->step], $this->messages);
         $this->step += 1;
         $this->progress_bar += 33.3;
     }
@@ -93,6 +92,7 @@ class AuthRegisterIndex extends Component
 
     public function registration()
     {
+        // $this->validate();
         // dd($this->krs_file);
         try {
             $main_folder = Carbon::now()->isoFormat('Y') . '/' . Carbon::now()->isoFormat('MM');
