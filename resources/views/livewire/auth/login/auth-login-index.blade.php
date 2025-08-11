@@ -406,7 +406,7 @@
                 <!-- Logo & Welcome -->
                 <div class="flex flex-col items-center mb-6">
                     <img src="{{ asset('asset/img/LogoPROCBT.png') }}" alt="Logo PRO CBT" class="h-12 drop-shadow-md mb-4">
-                    <h1 class="text-2xl font-bold text-[#1E3A8A]">Selamat Datang Kembali!</h1>
+                    <h1 class="text-2xl font-bold text-[#3BA172]">Selamat Datang Kembali!</h1>
                     <p class="text-gray-600 text-sm">Akses dashboard admin Anda dengan aman</p>
                 </div>
 
@@ -507,10 +507,10 @@
                     <div class="flex items-center justify-between">
                         <label class="flex items-center">
                             <input autocomplete="off" type="checkbox" name="remember"
-                                class="rounded border-gray-300 text-[#1E3A8A] focus:ring-[#1E3A8A]/20" wire:model='remember'>
+                                class="rounded border-gray-300 text-[#3BA172] focus:ring-[#1E3A8A]/20" wire:model='remember'>
                             <span class="ml-2 text-sm text-gray-600">Ingat saya</span>
                         </label>
-                        <a href="#" class="text-sm text-[#1E3A8A] hover:text-[#2563EB] transition-colors">Lupa kata
+                        <a href="#" class="text-sm text-[#3BA172] hover:text-[#2563EB] transition-colors">Lupa kata
                             sandi?</a>
                     </div>
 
@@ -524,7 +524,7 @@
                     <div class="mt-4 text-center">
                         <p class="text-sm text-gray-600">
                             Belum punya akun?
-                            <a href="{{ route('register') }}" class="text-[#1E3A8A] hover:underline font-semibold">Daftar di
+                            <a href="{{ route('register') }}" class="text-[#3BA172] hover:underline font-semibold">Daftar di
                                 sini</a>
                         </p>
                     </div>

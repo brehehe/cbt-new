@@ -2,10 +2,10 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#1E3A8A]">User</h1>
+                <h1 class="text-2xl font-bold text-[#3BA172]">User</h1>
             </div>
             <div>
-                <button wire:click="refreshStreamData" class="btn btn-primary">
+                <button wire:click="refreshStreamData" class="btn btn-success">
                     <i class="fas fa-sync-alt"></i>
                     Refresh
                 </button>

@@ -33,7 +33,7 @@ class AdminMasterSupervisorIndex extends Component
     public $statusFilter = '';
     public $departmentFilter = '';
 
-    public $perPage = 10;
+    public $perPage = 5;
 
     // User
     public $data_id;

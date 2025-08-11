@@ -30,7 +30,7 @@ class AdminMasterLecturerIndex extends Component
     public $departmentFilter = '';
     public $positionFilter = '';
 
-    public $perPage = 10;
+    public $perPage = 5;
     public $showModal = false;
     public $editMode = false;
 
