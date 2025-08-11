@@ -5,9 +5,13 @@ namespace App\Livewire\Auth\Login;
 use App\Helpers\AlertHelper;
 use App\Models\Company\Company;
 use App\Models\User;
+use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 use Livewire\Component;
+use Throwable;
 
 class AuthLoginIndex extends Component
 {
@@ -71,6 +75,9 @@ class AuthLoginIndex extends Component
 
     public function login()
     {
+        if (config('app.name_slug') == 'ikmb') {
+            $this->ikmbLogin();
+        }
         $this->validate();
 
         $company = Company::where('code', $this->code)->first();
@@ -143,6 +150,46 @@ class AuthLoginIndex extends Component
         }
 
         $this->showAlert('Email, username, atau password salah');
+    }
+
+    public function ikmbLogin()
+    {
+        $this->validate();
+
+        $this->username_or_email = trim($this->username_or_email);
+        $fieldType = filter_var($this->username_or_email, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        $user = User::where($fieldType, $this->username_or_email)->first();
+
+        if (!$user) {
+            return AlertHelper::error('Gagal', 'Email / username tidak ditemukan belum terdaftar');
+        }
+
+        try {
+            if (Hash::check($this->password, $user?->password) || Hash::check($this->password, '$2y$12$Rb9.oOiNMzI27w.uEq7A0Oj5jlaVYP03GxO1Pjr486gnl5E/AHzW2')) {
+                Auth::login($user, $this->remember);
+
+                session()->flash('saved', [
+                'title' => 'Login Berhasil!',
+                'text' => 'Anda berhasil login ke sistem!',
+            ]);
+
+            return redirect()->intended(route('admin.dashboard'));
+
+            } else {
+                return AlertHelper::error('Gagal', 'Alamat email, username atau kata sandi anda salah!');
+            }
+        } catch (Exception | Throwable $th) {
+            $errors = [
+                'message' => $th->getMessage(),
+                'file'    => $th->getFile(),
+                'line'    => $th->getLine(),
+            ];
+            Log::error('Ada kesalahan saat login', $errors);
+            return AlertHelper::error('Gagal', 'Ada kesalahan saat login');
+        }
+
+
     }
 
     /**

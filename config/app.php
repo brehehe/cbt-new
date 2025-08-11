@@ -123,11 +123,5 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
-    'one_health' => [
-        'url'             => env('ONE_HEALTH_URL'),
-        'organization_id' => env('ORGANIZATION_ID'),
-        'client_id'       => env('CLIENT_ID'),
-        'client_secret'   => env('CLIENT_SECRET'),
-    ]
-
+    'name_slug' => env('APP_SLUG_NAME')
 ];

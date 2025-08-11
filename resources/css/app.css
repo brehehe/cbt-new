@@ -1,5 +1,7 @@
 @import "tailwindcss";
-
+@import "../../vendor/tallstackui/tallstackui/css/v4.css";
+@plugin '@tailwindcss/forms';
+@source '../../vendor/tallstackui/tallstackui/**/*.php';
 @import "../../vendor/livewire/flux/dist/flux.css";
 
 @source '../views';
@@ -31,9 +33,32 @@
     --color-accent-foreground: var(--color-white);
 }
 
+@theme inline {
+    --color-primary: var(--primary-600);
+    --color-primary-100: var(--primary-100);
+    --color-primary-200: var(--primary-200);
+    --color-primary-300: var(--primary-300);
+    --color-primary-400: var(--primary-400);
+    --color-primary-500: var(--primary-500);
+    --color-primary-600: var(--primary-600);
+    --color-primary-700: var(--primary-700);
+    --color-primary-800: var(--primary-800);
+    --color-primary-900: var(--primary-900);
+}
 /* app.css or your main CSS file */
 
 :root {
+    --primary-50: #f0fdf4;
+    --primary-100: #dcfce7;
+    --primary-200: #bbf7d0;
+    --primary-300: #86efac;
+    --primary-400: #4ade80;
+    --primary-500: #22c55e;
+    --primary-600: #16a34a;
+    --primary-700: #15803d;
+    --primary-800: #166534;
+    --primary-900: #14532d;
+
     /* Yellow Palette */
     --yellow-100: #f6e05e;
     --yellow-200: #ecc94b;
