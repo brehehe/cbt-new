@@ -1,6 +1,7 @@
 <div id="exam-container">
     @php
         use App\Models\User\UserModuleQuestion;
+
         $first = UserModuleQuestion::where('id', '<', $questionNavigationId)->exists();
         $last = UserModuleQuestion::where('id', '>', $questionNavigationId)->exists();
     @endphp
