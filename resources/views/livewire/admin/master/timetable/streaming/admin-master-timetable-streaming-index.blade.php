@@ -13,7 +13,7 @@
         </div>
     </div>
     <div class="flex h-full">
-        <div class="grid grid-cols-3 gap-6">
+        <div class="grid grid-cols-6 gap-6">
             @foreach ($sessions as $session)
                 <div
                     class="bg-white rounded-lg shadow-sm overflow-hidden border {{ $selectedSessionId === $session->id ? 'ring-2 ring-blue-500' : '' }}">
@@ -38,10 +38,10 @@
                             Connecting
                         </div>
                         <!-- Manual Retry Button -->
-                        <button onclick="window.debugSupervisor?.retryConnection('{{ $session->id }}')"
+                        <!-- <button onclick="window.debugSupervisor?.retryConnection('{{ $session->id }}')"
                                 class="absolute bottom-2 right-2 bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded opacity-75 hover:opacity-100">
                             Retry
-                        </button>
+                        </button> -->
                     </div>
 
                     <!-- Student Info -->
