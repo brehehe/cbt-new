@@ -39,9 +39,9 @@ class RoleCompany extends Model
     {
         if ($search) {
             $query->whereHas('role', function ($q) use ($search) {
-                $q->where('name', 'like', '%' . $search . '%');
+                $q->where('name', 'ilike', '%' . $search . '%');
             })->orWhereHas('company', function ($q) use ($search) {
-                $q->where('name', 'like', '%' . $search . '%');
+                $q->where('name', 'ilike', '%' . $search . '%');
             });
         }
         return $query;
