@@ -465,12 +465,36 @@ class AdminExamDetailIndex extends Component
             return $redirect;
         }
 
-
+        
         $this->userTimetableId = $this->userTimetable->id;
+        $this->checkQuestion();
+
         $this->calculateRemainingTime();
 
         // Hitung jumlah alert yang sudah ada
         $this->alertCount = ExamAlert::where('user_timetable_id', $this->userTimetableId)->count();
+    }
+
+    public function checkQuestion() {
+        $users = UserTimetable::where('user_id', Auth::id())->whereIn('status',['exam','warning'])->get();
+
+        if ($users->isEmpty()) {
+            $userTimetable = UserTimetable::where('user_id', Auth::id())
+            ->first();
+
+            $userTimetable->update([
+                'status' => 'done',
+                'end_exam' => now(),
+                'mark' => 0,
+            ]);
+
+            session()->flash('saved', [
+                'title' => 'Ujian Telah Selesai!',
+                'text' => "Terima kasih telah mengerjakan ujian. Nilai Anda: {0}/100",
+            ]);
+
+            return redirect()->route('admin.exam.timetable');
+        }
     }
 
     private function validateExamStatus()
@@ -497,14 +521,13 @@ class AdminExamDetailIndex extends Component
         if ($firstQuestion) {
             $this->questionNavigationId = $firstQuestion->id;
             $this->isMark = $firstQuestion->is_mark;
-            $this->question = $firstQuestion->first()->timetableQuestion->question;
-            $this->description = $firstQuestion->first()->timetableQuestion->description;
-            $this->images = $firstQuestion->first()->timetableQuestion->images;
+            $this->question = $firstQuestion->timetableQuestion->question;
+            $this->description = $firstQuestion->timetableQuestion->description;
+            $this->images = $firstQuestion->timetableQuestion->images;
             $this->number = 1;
             $this->timetable_answer_id = $firstQuestion->timetable_answer_id;
 
-            $answers = $firstQuestion->first()
-                ->timetableQuestion
+            $answers = $firstQuestion->timetableQuestion
                 ->answers()
                 ->orderBy('order', 'asc')
                 ->get();
@@ -519,6 +542,21 @@ class AdminExamDetailIndex extends Component
             }
 
             $this->refreshQuestionData();
+        } else {
+            // Jika tidak ada soal, set default values dan log error
+            \Log::warning('No questions found for user timetable', [
+                'user_id' => Auth::id(),
+                'user_timetable_id' => $this->userTimetableId
+            ]);
+            
+            $this->questionNavigationId = null;
+            $this->question = 'Tidak ada soal yang tersedia.';
+            $this->description = '';
+            $this->images = collect();
+            $this->number = 0;
+            $this->question_answers = [];
+            
+            session()->flash('error', 'Tidak ada soal yang ditemukan untuk ujian ini.');
         }
     }
 
@@ -554,7 +592,12 @@ class AdminExamDetailIndex extends Component
     private function getUserQuestions()
     {
         return UserModuleQuestion::select('id', 'is_mark', 'timetable_module_id', 'timetable_answer_id', 'timetable_question_id')
-            ->with('timetableModule', 'timetableQuestion', 'timetableAnswer')
+            ->with([
+                'timetableModule', 
+                'timetableQuestion.answers', 
+                'timetableQuestion.images',
+                'timetableAnswer'
+            ])
             ->where('user_timetable_id', $this->userTimetableId)
             ->orderBy('order')
             ->get();
