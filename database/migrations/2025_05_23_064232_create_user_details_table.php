@@ -52,6 +52,7 @@ return new class extends Migration
             $table->string('student_semester')->nullable()->comment('Semester untuk mahasiswa');
             $table->string('student_academic_year')->nullable()->comment('Tahun akademik');
             $table->enum('student_status', ['active', 'graduate', 'dropout', 'transfer', 'leave'])->nullable()->comment('Status mahasiswa');
+            $table->enum('student_type', ['mb', 'm'])->default('mb')->comment('Tipe mahasiswa batu atau mahasiswa');
             $table->decimal('student_gpa', 3, 2)->nullable()->comment('IPK mahasiswa');
             $table->string('student_advisor_id')->nullable()->comment('ID dosen pembimbing');
             $table->date('student_entry_date')->nullable()->comment('Tanggal masuk mahasiswa');

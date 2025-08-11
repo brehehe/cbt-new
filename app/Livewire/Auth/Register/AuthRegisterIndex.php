@@ -114,6 +114,7 @@ class AuthRegisterIndex extends Component
                     'student_semester'     => $this->semester,
                     'krs_file'             => $result_krs_file[1],
                     'payment_registration' => $result_payment_registration_file[1],
+                    'student_type'         => 'mb',
                 ]);
             DB::commit();
         } catch (Exception | Throwable $th) {
