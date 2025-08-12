@@ -298,8 +298,8 @@
            <div x-data="{ showCamera: true }" class="p-4 border-b border-gray-200">
     <div class="flex items-center justify-between mb-3">
         <h4 class="font-medium text-gray-800">Monitor Camera</h4>
-        <button 
-            @click="showCamera = !showCamera" 
+        <button
+            @click="showCamera = !showCamera"
             class="px-2 py-1 text-xs text-white bg-blue-500 rounded hover:bg-blue-600"
         >
             <span x-text="showCamera ? 'Hide' : 'Show'"></span>
@@ -361,14 +361,14 @@
                         <span class="text-gray-600">Live Stream:</span>
                         <span class="text-yellow-600" id="streamingStatus">Connecting</span>
                     </div>
-                    <div class="flex justify-between">
+                    <!-- <div class="flex justify-between">
                         <span class="text-gray-600">Chunk:</span>
                         <span class="text-blue-600" id="chunkNumber">1</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600">Duration:</span>
                         <span class="text-blue-600" id="recordingDuration">00:00</span>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>

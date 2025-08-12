@@ -730,7 +730,7 @@
 
                             <!-- Footer -->
                             <p class="text-xs font-medium text-gray-500">
-                                © {{ date('Y') }} Institut Kesehatan Mitra Bunda
+                                © {{ date('Y') }} Fakultas Kesehatan
                             </p>
                         </div>
                     </div>
