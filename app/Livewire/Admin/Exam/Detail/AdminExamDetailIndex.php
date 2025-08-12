@@ -61,6 +61,10 @@ class AdminExamDetailIndex extends Component
 
     private function initializeLiveSession()
     {
+        if (!$this->userTimetable || !$this->userTimetable->timetable_id) {
+        return redirect()->route('admin.exam.timetable');
+    }
+
         // Buat atau update live session
         $this->liveSession = ExamLiveSession::updateOrCreate(
             [
@@ -152,6 +156,10 @@ class AdminExamDetailIndex extends Component
 
     private function initializeRecording()
     {
+        if (!$this->userTimetable || !$this->userTimetable->timetable_id) {
+        return redirect()->route('admin.exam.timetable');
+    }
+
         // Buat recording entry baru
         $this->currentRecording = ExamRecording::create([
             'timetable_id' => $this->userTimetable->timetable_id,
@@ -465,7 +473,7 @@ class AdminExamDetailIndex extends Component
             return $redirect;
         }
 
-        
+
         $this->userTimetableId = $this->userTimetable->id;
         // $this->checkQuestion();
 
@@ -557,14 +565,14 @@ class AdminExamDetailIndex extends Component
                 'user_id' => Auth::id(),
                 'user_timetable_id' => $this->userTimetableId
             ]);
-            
+
             $this->questionNavigationId = null;
             $this->question = 'Tidak ada soal yang tersedia.';
             $this->description = '';
             $this->images = collect();
             $this->number = 0;
             $this->question_answers = [];
-            
+
             session()->flash('error', 'Tidak ada soal yang ditemukan untuk ujian ini.');
         }
     }
@@ -602,8 +610,8 @@ class AdminExamDetailIndex extends Component
     {
         return UserModuleQuestion::select('id', 'is_mark', 'timetable_module_id', 'timetable_answer_id', 'timetable_question_id')
             ->with([
-                'timetableModule', 
-                'timetableQuestion.answers', 
+                'timetableModule',
+                'timetableQuestion.answers',
                 // 'timetableQuestion.images',
                 'timetableAnswer'
             ])
