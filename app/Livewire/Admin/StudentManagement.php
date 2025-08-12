@@ -89,10 +89,10 @@ class StudentManagement extends Component
             ->with(['userDetail'])
             ->whereHas('userDetail', function ($q) {
                 if ($this->search) {
-                    $q->where('student_id', 'like', '%' . $this->search . '%')
+                    $q->where('student_id', 'ilike', '%' . $this->search . '%')
                         ->orWhereHas('user', function ($userQuery) {
-                            $userQuery->where('name', 'like', '%' . $this->search . '%')
-                                ->orWhere('email', 'like', '%' . $this->search . '%');
+                            $userQuery->where('name', 'ilike', '%' . $this->search . '%')
+                                ->orWhere('email', 'ilike', '%' . $this->search . '%');
                         });
                 }
 
