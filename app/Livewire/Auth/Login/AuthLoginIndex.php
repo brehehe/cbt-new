@@ -75,7 +75,7 @@ class AuthLoginIndex extends Component
 
     public function login()
     {
-        if (config('app.name_slug') == 'ikmb') {
+        if (in_array(config('app.name_slug'), ['ikmb', 'medical_school'])) {
             $this->ikmbLogin();
         }
         $this->validate();
