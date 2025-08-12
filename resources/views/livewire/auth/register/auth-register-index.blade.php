@@ -1,5 +1,5 @@
 <div>
-    @if (config('app.name_slug') == 'ikmb')
+    @if (in_array(config('app.name_slug'), ['ikmb', 'medical_school']))
         <div class="h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             <div class="sm:mx-auto sm:w-full sm:max-w-md">
                 <div class="text-center">
