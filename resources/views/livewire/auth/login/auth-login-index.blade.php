@@ -332,8 +332,8 @@
                                 <form class="space-y-4 lg:space-y-6" wire:submit="login">
                                     <div class="space-y-4 lg:space-y-6">
                                         <x-ts-input class="text-sm lg:text-base" icon="user"
-                                            label="Username / Email / NIS"
-                                            placeholder="Masukkan username, email, atau NIS" required type="text"
+                                            label="Username / Email / NIM"
+                                            placeholder="Masukkan username, email, atau NIM" required type="text"
                                             wire:model="username_or_email" />
 
                                         <x-ts-password class="text-sm lg:text-base" icon="key" label="Password"
