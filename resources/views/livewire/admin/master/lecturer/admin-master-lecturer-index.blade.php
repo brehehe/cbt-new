@@ -3,11 +3,11 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#1E3A8A]">Manajemen Data Dosen</h1>
+                <h1 class="text-2xl font-bold text-[#3BA172]">Manajemen Data Dosen</h1>
                 <p class="text-gray-600">Kelola data dosen dalam sistem CBT</p>
             </div>
             <div>
-                <button wire:click="openModal()" class="btn btn-primary">
+                <button wire:click="openModal()" class="btn btn-success">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -20,7 +20,7 @@
 
     <!-- Filters -->
     <div class="bg-white rounded-lg shadow mb-6 p-4">
-        <div class="grid grid-cols-5 md:grid-cols-5 gap-4 items-end">
+        <div class="grid grid-cols-4 md:grid-cols-4 gap-4 items-end">
             <!-- Search -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Cari</label>
@@ -62,7 +62,7 @@
             </div>
 
             <!-- Per Page -->
-            <div>
+            <!-- <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Per Halaman</label>
                 <select wire:model.live="perPage" class="form-control mt-1">
                     <option value="5">5</option>
@@ -70,7 +70,7 @@
                     <option value="25">25</option>
                     <option value="50">50</option>
                 </select>
-            </div>
+            </div> -->
         </div>
     </div>
 
@@ -168,8 +168,19 @@
         </div>
 
         <!-- Pagination -->
-        <div class="px-6 py-3 border-t border-gray-200">
-            {{ $lecturers->links() }}
+        <div class="px-5 py-4 bg-gray-50/80 border-t border-gray-200">
+            <div class="flex items-center justify-between">
+                <div class="text-sm text-gray-700">
+                    Menampilkan <span class="font-medium">{{ $lecturers->firstItem() }}</span> sampai <span
+                        class="font-medium">{{ $lecturers->lastItem() }}</span> dari <span
+                        class="font-medium">{{ $lecturers->total() }}</span> hasil
+                </div>
+                <div>
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                        {{ $lecturers->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
+                    </nav>
+                </div>
+            </div>
         </div>
     </div>
 </div>

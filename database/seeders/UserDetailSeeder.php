@@ -115,6 +115,7 @@ class UserDetailSeeder extends Seeder
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
+                'username'=>Str::replace(' ','', strtolower($data['name'])),
                 'password' => Hash::make('password123'),
                 'email_verified_at' => now()
             ]);
@@ -246,6 +247,7 @@ class UserDetailSeeder extends Seeder
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
+                'username'=>Str::replace(' ','', strtolower($data['name'])),
                 'password' => Hash::make('password123'),
                 'email_verified_at' => now()
             ]);
@@ -366,6 +368,7 @@ class UserDetailSeeder extends Seeder
         foreach ($supervisorsData as $data) {
             $user = User::create([
                 'name' => $data['name'],
+                'username'=>Str::replace(' ','', strtolower($data['name'])),
                 'email' => $data['email'],
                 'password' => Hash::make('password123'),
                 'email_verified_at' => now()

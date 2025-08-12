@@ -90,7 +90,7 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
     });
 });
 
-if (config('app.env') === 'local' || config('app.env') === 'development') {
+if (config('app.env') === 'local' || config('app.env') === 'development' || config('app.env') === 'production') {
     Route::redirect('', '/admin');
 }
 

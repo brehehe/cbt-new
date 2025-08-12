@@ -2,7 +2,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#1E3A8A]">Pelanggaran</h1>
+                <h1 class="text-2xl font-bold text-[#3BA172]">Pelanggaran</h1>
             </div>
         </div>
     </div>

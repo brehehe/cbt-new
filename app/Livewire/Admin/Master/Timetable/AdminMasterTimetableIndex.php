@@ -33,7 +33,9 @@ class AdminMasterTimetableIndex extends Component
     public function mount()
     {
         Session::forget('timetable_id');
-        $this->modules = Module::select('id', 'name')->get()->pluck('name', 'id')->toArray();
+        $this->modules = Module::whereHas('moduleQuestions') // hanya yang punya relasi
+        ->pluck('name', 'id')
+        ->toArray();
         $this->getSupervisors = User::companyRole('Pengawas', Auth::user()->company_id)->select('name', 'id')->get()->pluck('name', 'id')->toArray();
     }
 
@@ -176,10 +178,10 @@ class AdminMasterTimetableIndex extends Component
     {
         $timetable = Timetable::query()
             ->when($this->search, function ($query, $search) {
-                $query->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('start_time', 'like', '%' . $search . '%')
-                    ->orWhere('end_time', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%');
+                $query->where('name', 'ilike', '%' . $search . '%')
+                    ->orWhere('start_time', 'ilike', '%' . $search . '%')
+                    ->orWhere('end_time', 'ilike', '%' . $search . '%')
+                    ->orWhere('description', 'ilike', '%' . $search . '%');
             })
             ->orderBy('order', 'desc')
             ->paginate($this->perPage);

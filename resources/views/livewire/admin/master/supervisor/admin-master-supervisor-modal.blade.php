@@ -30,6 +30,15 @@
                 @enderror
             </div>
             <div class="mb-4">
+                <label for="username" class="block text-sm font-medium text-gray-700">Userusername <span
+                        class="text-red-600">*</span></label>
+                <input id="username" type="username" wire:model.defer="username" placeholder="Contoh : Pengawas"
+                    class="mt-1 form-control">
+                @error('username')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+            <div class="mb-4">
                 <label for="username" class="block text-sm font-medium text-gray-700">Username <span
                         class="text-red-600">*</span></label>
                 <input id="username" type="name" wire:model.defer="username" placeholder="Contoh : pengawas"

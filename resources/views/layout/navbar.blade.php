@@ -3,9 +3,9 @@
         <div class="flex justify-between h-16">
             <!-- Left Section: Logo & Sidebar Toggle -->
             <div class="flex items-center">
-                <img src="{{ asset('asset/img/LogoPROCBT-blue.png') }}" alt="PRO CBT Logo" class="h-7 w-auto mr-2">
+                <img src="https://ikmb.ac.id/wp-content/uploads/2020/04/Screen-Shot-2020-04-14-at-13.16.27.png" alt="PRO CBT Logo" class="h-10 w-auto mr-2">
                 <button id="toggleSidebar"
-                    class="p-2 rounded-xl text-[#1E3A8A] hover:bg-[#C3D4EC]/20 transition-all duration-200 cursor-pointer">
+                    class="p-2 rounded-xl text-[#3BA172] hover:bg-[#C3D4EC]/20 transition-all duration-200 cursor-pointer">
                     <i class="fas fa-bars text-lg"></i>
                 </button>
             </div>
@@ -66,7 +66,7 @@
                 <!-- Notifications -->
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open"
-                        class="p-2 rounded-xl text-gray-500 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A] transition-all duration-200 relative">
+                        class="p-2 rounded-xl text-gray-500 hover:bg-[#C3D4EC]/20 hover:text-[#3BA172] transition-all duration-200 relative">
                         <i class="fas fa-bell text-lg"></i>
                         <span
                             class="absolute top-1 right-1 h-4 w-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center">3</span>
@@ -127,12 +127,12 @@
                         </div>
                         <div class="p-2">
                             <a href="#"
-                                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A] rounded-lg transition-all duration-200">
+                                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-[#3BA172] rounded-lg transition-all duration-200">
                                 <i class="fas fa-user w-4"></i>
                                 <span>Profile</span>
                             </a>
                             <a href="#"
-                                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-[#1E3A8A] rounded-lg transition-all duration-200">
+                                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-[#3BA172] rounded-lg transition-all duration-200">
                                 <i class="fas fa-cog w-4"></i>
                                 <span>Settings</span>
                             </a>

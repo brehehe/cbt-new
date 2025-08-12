@@ -39,8 +39,7 @@ class AdminDashboardIndex extends Component
 
     public function loadDashboardData()
     {
-        try {
-            // Total users
+         // Total users
             $this->totalUsers = User::count();
 
             // Total timetables/exams
@@ -69,23 +68,11 @@ class AdminDashboardIndex extends Component
                 ->get();
 
             // Exam statistics by status
-            $this->examStatistics = UserTimetable::select('status', DB::raw('count(*) as total'))
-                ->groupBy('status')
-                ->get()
-                ->pluck('total', 'status')
-                ->toArray();
-        } catch (\Exception $e) {
-            // Handle any database errors gracefully
-            $this->totalUsers = 0;
-            $this->totalExams = 0;
-            $this->totalExamTypes = 0;
-            $this->activeExams = 0;
-            $this->completedExams = 0;
-            $this->todayExams = 0;
-            $this->examAlerts = 0;
-            $this->recentExamResults = new Collection();
-            $this->examStatistics = [];
-        }
+            // $this->examStatistics = UserTimetable::select('status', DB::raw('count(*) as total'))
+            //     ->groupBy('status')
+            //     ->get()
+            //     ->pluck('total', 'status')
+            //     ->toArray();
     }
 
     public function refreshData()

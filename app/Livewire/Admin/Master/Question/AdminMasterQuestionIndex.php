@@ -32,7 +32,7 @@ class AdminMasterQuestionIndex extends Component
 
     public function render()
     {
-        $questions = Question::select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect');
+        $questions = Question::select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect')->search($this->search);
         return view('livewire.admin.master.question.admin-master-question-index', [
             'questions' => $questions->paginate($this->perPage)
         ])->extends('layout.app')->section('content');
