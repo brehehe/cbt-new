@@ -21,6 +21,7 @@ use Spatie\LivewireFilepond\WithFilePond;
 use App\Services\Question\QuestionService;
 use App\Models\Master\Question\QuestionType;
 use App\Models\Master\Question\MaterialCategory;
+use App\Models\Study\Study;
 
 class AdminMasterQuestionUpdate extends Component
 {
@@ -28,12 +29,13 @@ class AdminMasterQuestionUpdate extends Component
     protected $search;
 
     public $get_question;
-    public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id ,$question, $description, $weight_correct, $weight_incorrect;
+    public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id, $question, $description, $weight_correct, $weight_incorrect;
     public $topics = [], $material_categories = [], $materials = [], $question_types = [];
     public $images = [], $old_images = [];
 
     public $answer_id, $answer_context, $answer_description, $answer_correct, $answer_alphabet;
     public $answer_images = [], $old_answer_images = [];
+    public $studys = [], $study_id;
 
     public function render()
     {
@@ -62,9 +64,21 @@ class AdminMasterQuestionUpdate extends Component
         $this->materials           = Material::select('id', 'material_category_id', 'name')->where('material_category_id', $this->get_question?->material_category_id)->get();
 
         foreach (json_decode($this->get_question?->images, true) ?? [] as $key => $image) {
-            $this->old_images[] = asset('storage'.$image);
-            $this->images[]     = asset('storage'.$image);
+            $this->old_images[] = asset('storage' . $image);
+            $this->images[]     = asset('storage' . $image);
         }
+
+        if (Auth::user()?->hasRole('Dosen')) {
+            $studyIds = Auth::user()?->studys ?? []; // array dari JSON
+            $this->studys = Study::whereIn('id', $studyIds)
+                ->orderBy('name', 'asc')
+                ->pluck('name', 'id')
+                ->toArray();
+        } else {
+            $this->studys = Study::orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
+        }
+
+        $this->study_id = $this->get_question?->study_id;
 
         // dd($this->old_images, $this->images);
     }
@@ -102,10 +116,12 @@ class AdminMasterQuestionUpdate extends Component
                 'material_id'          => 'nullable|exists:materials,id',
                 'question_type_id'     => 'required|exists:question_types,id',
                 'question'             => 'required',
+                'study_id'             => 'required|exists:studies,id',
                 // 'images.*'             => 'nullable|image|mimes:jpg,jpeg,png',
                 'description'          => 'nullable',
             ],
             [
+                'study_id.required'           => 'Prodi wajib diisi.',
                 'topic_id.required'           => 'Topik soal wajib diisi.',
                 'material_category_id.exists' => 'Kategori materi soal tidak valid.',
                 'material_id.exists'          => 'Materi soal tidak valid.',
@@ -119,25 +135,26 @@ class AdminMasterQuestionUpdate extends Component
 
         try {
             DB::beginTransaction();
-                 $request = [
-                    'id'                   => $this->data_id,
-                    'company_id'           => Auth::user()?->company?->id,
-                    'topic_id'             => $this->topic_id,
-                    'material_category_id' => $this->material_category_id,
-                    'material_id'          => $this->material_id,
-                    'question_type_id'     => $this->question_type_id,
-                    'question'             => $this->question,
-                    'images'               => $this->images,
-                    'old_images'           => $this->old_images,
-                    'description'          => $this->description,
-                    'weight_correct'       => $this->weight_correct,
-                    'weight_incorrect'     => $this->weight_incorrect,
-                ];
+            $request = [
+                'id'                   => $this->data_id,
+                'company_id'           => Auth::user()?->company?->id,
+                'topic_id'             => $this->topic_id,
+                'material_category_id' => $this->material_category_id,
+                'material_id'          => $this->material_id,
+                'question_type_id'     => $this->question_type_id,
+                'question'             => $this->question,
+                'images'               => $this->images,
+                'study_id'             => $this->study_id,
+                'old_images'           => $this->old_images,
+                'description'          => $this->description,
+                'weight_correct'       => $this->weight_correct,
+                'weight_incorrect'     => $this->weight_incorrect,
+            ];
 
-                $question = app(QuestionService::class)->updateOrCreate($request);
-                if (!$question) {
-                    throw new Exception("Ada kesalahaan saat QuestionService => updateOrCreate", 500);
-                }
+            $question = app(QuestionService::class)->updateOrCreate($request);
+            if (!$question) {
+                throw new Exception("Ada kesalahaan saat QuestionService => updateOrCreate", 500);
+            }
 
             DB::commit();
         } catch (Exception | Throwable $th) {
@@ -191,20 +208,20 @@ class AdminMasterQuestionUpdate extends Component
 
         try {
             DB::beginTransaction();
-                 $request = [
-                    'id'         => $this->answer_id,
-                    'company_id' => Auth::user()?->company?->id,
-                    'alphabet'   => null,
-                    'context'    => $this->answer_context,
-                    'images'     => $this->answer_images,
-                    'old_images' => $this->old_answer_images,
-                    'is_correct' => $this->answer_correct,
-                ];
+            $request = [
+                'id'         => $this->answer_id,
+                'company_id' => Auth::user()?->company?->id,
+                'alphabet'   => null,
+                'context'    => $this->answer_context,
+                'images'     => $this->answer_images,
+                'old_images' => $this->old_answer_images,
+                'is_correct' => $this->answer_correct,
+            ];
 
-                $answer = app(AnswerService::class)->updateOrCreate($this->get_question, $request);
-                if (!$answer) {
-                    throw new Exception("Ada kesalahaan saat AnswerService => updateOrCreate", 500);
-                }
+            $answer = app(AnswerService::class)->updateOrCreate($this->get_question, $request);
+            if (!$answer) {
+                throw new Exception("Ada kesalahaan saat AnswerService => updateOrCreate", 500);
+            }
 
             DB::commit();
         } catch (Exception | Throwable $th) {
@@ -247,9 +264,9 @@ class AdminMasterQuestionUpdate extends Component
         $this->answer_id       = $result?->id;
         $this->answer_context  = $result?->context;
         $this->answer_correct  = $result?->is_correct;
-        foreach (json_decode($result?->images, true) ?? []as $key => $image) {
-            $this->answer_images[]     = asset('storage'.$image);
-            $this->old_answer_images[] = asset('storage'.$image);
+        foreach (json_decode($result?->images, true) ?? [] as $key => $image) {
+            $this->answer_images[]     = asset('storage' . $image);
+            $this->old_answer_images[] = asset('storage' . $image);
         }
         // dd($this->answer_images, $this->old_answer_images);
         // $this->dispatch('initFilepondWithImages', $this->answer_images);

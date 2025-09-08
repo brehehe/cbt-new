@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('username')->nullable();
             $table->char('phone', 15)->nullable();
             $table->timestamp('email_verified_at')->nullable();
+            $table->jsonb('studys')->nullable()->comment('Array of study programs or departments');
+            $table->foreignUuid('study_id')->nullable()->comment('Foreign key to studies table');
             $table->string('password');
             $table->longText('profile')->nullable();
             $table->foreignUuid('user_id')->nullable()->comment('User Referensi untuk relasi diri sendiri');

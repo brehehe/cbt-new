@@ -22,11 +22,6 @@
         <!-- Body -->
         <div class="px-6 py-4 text-gray-600 overflow-auto" style="max-height: 600px;">
             <div class="grid grid-cols-2 gap-4 mb-4">
-                <!-- Informasi Dasar Dosen -->
-                <div class="md:col-span-2 mb-4">
-                    <h4 class="text-md font-medium text-gray-900 border-b pb-2">Informasi Dasar Dosen</h4>
-                </div>
-
                 <div class="mb-4">
                     <label for="name" class="block text-sm font-medium text-gray-700">Nama Lengkap <span
                             class="text-red-600">*</span></label>
@@ -86,11 +81,6 @@
                     @enderror
                 </div>
 
-                <!-- Informasi Akademik -->
-                <div class="md:col-span-2 mb-4 mt-6">
-                    <h4 class="text-md font-medium text-gray-900 border-b pb-2">Informasi Akademik</h4>
-                </div>
-
                 <div class="mb-4">
                     <label for="lecturer_faculty" class="block text-sm font-medium text-gray-700">Fakultas <span
                             class="text-red-600">*</span></label>
@@ -102,11 +92,26 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="lecturer_department" class="block text-sm font-medium text-gray-700">Jurusan <span
-                            class="text-red-600">*</span></label>
-                    <input id="lecturer_department" type="text" wire:model.defer="lecturer_department"
-                        placeholder="Contoh : Teknik Informatika" class="mt-1 form-control">
-                    @error('lecturer_department')
+                    <label for="studys" class="block text-sm font-medium text-gray-700">
+                        Prodi <span class="text-red-600">*</span>
+                    </label>
+                    <div wire:key="select-{{ rand() }}">
+                        <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
+                            dropdownParent: 'body',
+                            allowClear: true,
+                            plugins: ['clear_button'],
+                            onChange: function(e) {
+                                @this.set('studys', e ? e : '');
+                            }
+                        });"
+                            wire:model.live="studys" id="studys" multiple>
+                            <option value="">Pilih Prodi</option>
+                            @foreach ($getStudys as $key_get_study => $getStudy)
+                                <option value="{{ $key_get_study }}">{{ $getStudy }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @error('studys')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -206,12 +211,6 @@
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-
-                <!-- Informasi Pribadi -->
-                <div class="md:col-span-2 mb-4 mt-6">
-                    <h4 class="text-md font-medium text-gray-900 border-b pb-2">Informasi Pribadi</h4>
-                </div>
-
                 <div class="mb-4">
                     <label for="birth_place" class="block text-sm font-medium text-gray-700">Tempat Lahir <span
                             class="text-red-600">*</span></label>
@@ -277,12 +276,6 @@
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-
-                <!-- Informasi Kontak -->
-                <div class="md:col-span-2 mb-4 mt-6">
-                    <h4 class="text-md font-medium text-gray-900 border-b pb-2">Informasi Kontak</h4>
-                </div>
-
                 <div class="md:col-span-2 mb-4">
                     <label for="address" class="block text-sm font-medium text-gray-700">Alamat <span
                             class="text-red-600">*</span></label>
@@ -333,10 +326,6 @@
 
                 <!-- Password (hanya untuk tambah) -->
                 @if (!$data_id)
-                    <div class="md:col-span-2 mb-4 mt-6">
-                        <h4 class="text-md font-medium text-gray-900 border-b pb-2">Password</h4>
-                    </div>
-
                     <div class="md:col-span-2 mb-4">
                         <label for="password" class="block text-sm font-medium text-gray-700">Password <span
                                 class="text-red-600">*</span></label>
@@ -355,30 +344,6 @@
                         @enderror
                     </div>
                 @endif
-
-                <!-- Status & Profile -->
-                <div class="md:col-span-2 mb-4 mt-6">
-                    <h4 class="text-md font-medium text-gray-900 border-b pb-2">Status & Profile</h4>
-                </div>
-
-                <div class="mb-4">
-                    <label for="verification_status" class="block text-sm font-medium text-gray-700">Status
-                        Verifikasi</label>
-                    <select id="verification_status" wire:model.defer="verification_status"
-                        class="mt-1 form-control">
-                        <option value="pending">Pending</option>
-                        <option value="verified">Terverifikasi</option>
-                        <option value="rejected">Ditolak</option>
-                    </select>
-                </div>
-
-                <div class="mb-4">
-                    <label for="status" class="block text-sm font-medium text-gray-700">Status Aktif</label>
-                    <select id="status" wire:model.defer="status" class="mt-1 form-control">
-                        <option value="active">Aktif</option>
-                        <option value="inactive">Non-Aktif</option>
-                    </select>
-                </div>
             </div>
         </div>
 

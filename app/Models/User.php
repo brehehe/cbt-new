@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Helpers\RoleHelper;
 use App\Models\Company\Company;
+use App\Models\Study\Study;
 use App\Models\User\UserCompanyRole;
 use App\Models\User\UserDetail;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -50,6 +51,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'studys' => 'array',
         ];
     }
 
@@ -225,6 +227,11 @@ class User extends Authenticatable
             return ($contact['type'] === 'email' && $contact['value'] === $emailOrPhone) ||
                 ($contact['type'] === 'phone' && $contact['value'] === $emailOrPhone);
         })->first();
+    }
+
+    public function study()
+    {
+        return $this->belongsTo(Study::class, 'study_id', 'id');
     }
 
     // Scopes

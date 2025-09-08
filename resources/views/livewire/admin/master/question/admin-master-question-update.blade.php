@@ -25,9 +25,23 @@
     <div class="space-y-6">
         <div class="p-4 bg-white shadow rounded-lg">
             <h2 class="text-lg font-semibold text-gray-800 mb-3">Detail Soal</h2>
+            <div class="mb-4">
+                <label for="study_id" class="block text-sm font-medium text-gray-700">Prodi <span
+                        class="text-red-600">*</span></label>
+                <select class="mt-1 form-control" wire:model.lazy='study_id'>
+                    <option value="">Pilih prodi</option>
+                    @foreach ($studys as $key_study => $study)
+                        <option value="{{ $key_study }}">{{ $study }}</option>
+                    @endforeach
+                </select>
+                @error('study_id')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                    <label for="topic_id" class="block text-sm font-medium text-gray-700">Topik Soal<span class="text-red-600">*</span></label>
+                    <label for="topic_id" class="block text-sm font-medium text-gray-700">Topik Soal<span
+                            class="text-red-600">*</span></label>
                     <div wire:key="select-{{ rand() }}">
                         <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
                             dropdownParent: 'body',
@@ -49,7 +63,8 @@
                     @enderror
                 </div>
                 <div>
-                    <label for="material_category_id" class="block text-sm font-medium text-gray-700">Kategori Materi</label>
+                    <label for="material_category_id" class="block text-sm font-medium text-gray-700">Kategori
+                        Materi</label>
                     <div wire:key="select-{{ rand() }}">
                         <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
                             dropdownParent: 'body',
@@ -93,7 +108,8 @@
                     @enderror
                 </div>
                 <div>
-                    <label for="question_type_id" class="block text-sm font-medium text-gray-700">Tipe Soal<span class="text-red-600">*</span></label>
+                    <label for="question_type_id" class="block text-sm font-medium text-gray-700">Tipe Soal<span
+                            class="text-red-600">*</span></label>
                     <div wire:key="select-{{ rand() }}">
                         <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
                             dropdownParent: 'body',
@@ -115,18 +131,21 @@
                     @enderror
                 </div>
                 <div class="md:col-span-2">
-                    <label for="question" class="block text-sm font-medium text-gray-700">Pertanyaan<span class="text-red-600">*</span></label>
+                    <label for="question" class="block text-sm font-medium text-gray-700">Pertanyaan<span
+                            class="text-red-600">*</span></label>
                     <textarea id="question" wire:model="question" placeholder="Pertanyaan..." class="mt-1 form-control"></textarea>
                     @error('question')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
                 <div class="md:col-span-2">
-                    <label for="question" class="block text-sm font-medium text-gray-700">Gambar<span class="text-red-600">*</span></label>
+                    <label for="question" class="block text-sm font-medium text-gray-700">Gambar<span
+                            class="text-red-600">*</span></label>
                     <button class="btn btn-success mt-1" wire:click='modalImages()'>Gambar</button>
                 </div>
                 <div class="md:col-span-2">
-                    <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi Pertanyaan</label>
+                    <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi
+                        Pertanyaan</label>
                     <textarea id="description" wire:model="description" placeholder="Deskripsi pertanyaan..." class="mt-1 form-control"></textarea>
                     @error('description')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
@@ -175,15 +194,17 @@
                     <tbody>
                         @forelse ($answers as $index => $result)
                             <tr>
-                                <td class="center">{{ chr(64+ $loop->iteration) }} </td>
+                                <td class="center">{{ chr(64 + $loop->iteration) }} </td>
                                 <td>
-                                    <button class="btn btn-success mt-1" wire:click="modalAnswerImage('{{ $result?->id }}', '{{ chr(64+ $loop->iteration) }}')">Gambar</button>
+                                    <button class="btn btn-success mt-1"
+                                        wire:click="modalAnswerImage('{{ $result?->id }}', '{{ chr(64 + $loop->iteration) }}')">Gambar</button>
                                 </td>
                                 <td>{{ $result?->context }}</td>
                                 <td>
                                     <div class="flex items-center mt-2" wire:key="{{ rand() }}">
                                         <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" wire:click="toggleAnswerCorrect('{{ $result->id }}')"
+                                            <input type="checkbox"
+                                                wire:click="toggleAnswerCorrect('{{ $result->id }}')"
                                                 class="sr-only peer" {{ $result->is_correct ? 'checked' : '' }}>
                                             <div
                                                 class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
@@ -241,6 +262,5 @@
             allowMultiple: true,
             acceptedFileTypes: ['image/png', 'image/jpeg', 'image/webp'],
         });
-
     </script>
 @endpush

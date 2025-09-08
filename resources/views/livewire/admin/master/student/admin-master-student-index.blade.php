@@ -30,13 +30,12 @@
 
             <!-- Program Filter -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Program Studi</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Prodi</label>
                 <select wire:model.live="programFilter" class="form-control mt-1">
-                    <option value="">Semua Program</option>
-                    <option value="Informatika">Informatika</option>
-                    <option value="Sistem Informasi">Sistem Informasi</option>
-                    <option value="Teknik Komputer">Teknik Komputer</option>
-                    <option value="Data Science">Data Science</option>
+                    <option value="">Semua Prodi</option>
+                    @foreach ($studys as $id => $name)
+                        <option value="{{ $id }}">{{ $name }}</option>
+                    @endforeach
                 </select>
             </div>
 
@@ -79,7 +78,7 @@
                             NIM/ID
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Program Studi
+                            Prodi
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Semester/Angkatan
@@ -130,7 +129,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">
-                                    {{ $admin->userDetail->student_program ?? '-' }}
+                                    {{ $admin?->study?->name ?? ($admin->userDetail->student_program ?? '-') }}
                                 </div>
                                 @if ($admin->userDetail && $admin->userDetail->student_major)
                                     <div class="text-sm text-gray-500">{{ $admin->userDetail->student_major }}</div>
@@ -208,7 +207,7 @@
             </table>
         </div>
 
-        <!-- Pagination --> 
+        <!-- Pagination -->
         <div class="px-5 py-4 bg-gray-50/80 border-t border-gray-200">
             <div class="flex items-center justify-between">
                 <div class="text-sm text-gray-700">

@@ -9,6 +9,7 @@ use App\Models\Master\Question\ModuleQuestion;
 use App\Models\Master\Question\Question;
 use App\Models\Master\Question\QuestionType;
 use App\Models\Master\Question\Topic;
+use App\Models\Study\Study;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -34,6 +35,17 @@ class QuestionSeeder extends Seeder
             ['name' => 'Sistem Imun']
         ];
         foreach ($companys as $company) {
+
+            Study::create([
+                'name' => 'Kedokteran',
+                'company_id' => $company->id,
+            ]);
+
+            Study::create([
+                'name' => 'Kebidanan',
+                'company_id' => $company->id,
+            ]);
+
             // Create topics for this company
             $companyTopics = [];
             foreach ($topics as $topic) {
@@ -52,12 +64,22 @@ class QuestionSeeder extends Seeder
                     $randomTopic = $companyTopics[array_rand($companyTopics)];
                     $randomQuestionType = $questionTypes->random();
 
+                    $study = Study::withoutGlobalScope('user_scope')
+                        ->where('company_id', $company->id)
+                        ->inRandomOrder()
+                        ->first();
+
+                    if (!$study) {
+                        throw new \Exception("Belum ada Study untuk company {$company->id}");
+                    }
+
                     $question = Question::create([
-                        'topic_id' => $randomTopic->id,
+                        'topic_id'         => $randomTopic->id,
                         'question_type_id' => $randomQuestionType->id,
-                        'question' => $faker->sentence,
-                        'description' => $faker->paragraph,
-                        'company_id' => $company->id,
+                        'question'         => $faker->sentence,
+                        'description'      => $faker->paragraph,
+                        'company_id'       => $company->id,
+                        'study_id'         => $study->id,
                     ]);
 
                     $correctIndex = rand(0, 4);   // pilih salah satu 0‑3 secara acak

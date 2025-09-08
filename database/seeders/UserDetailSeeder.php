@@ -246,9 +246,10 @@ class UserDetailSeeder extends Seeder
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'username'=>Str::replace(' ','', strtolower($data['name'])),
+                'username' => Str::replace(' ', '', strtolower($data['name'])),
                 'password' => Hash::make('password123'),
-                'email_verified_at' => now()
+                'email_verified_at' => now(),
+                'company_id' => $companyId,
             ]);
 
             $user->assignRole('Mahasiswa');
@@ -378,9 +379,10 @@ class UserDetailSeeder extends Seeder
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'username'=>Str::replace(' ','', strtolower($data['name'])),
+                'username' => Str::replace(' ', '', strtolower($data['name'])),
                 'password' => Hash::make('password123'),
-                'email_verified_at' => now()
+                'email_verified_at' => now(),
+                'company_id' => $companyId,
             ]);
 
             $user->assignRole('Dosen');
@@ -499,10 +501,11 @@ class UserDetailSeeder extends Seeder
         foreach ($supervisorsData as $data) {
             $user = User::create([
                 'name' => $data['name'],
-                'username'=>Str::replace(' ','', strtolower($data['name'])),
+                'username' => Str::replace(' ', '', strtolower($data['name'])),
                 'email' => $data['email'],
                 'password' => Hash::make('password123'),
-                'email_verified_at' => now()
+                'email_verified_at' => now(),
+                'company_id' => $companyId,
             ]);
 
             $user->assignRole('Pengawas');

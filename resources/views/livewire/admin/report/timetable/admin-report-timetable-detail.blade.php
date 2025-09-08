@@ -1,10 +1,10 @@
-@section('title', 'Rapor Nilai')
+@section('title', 'Detail Riwayat Jadwal Ujian')
 <div>
     {{-- Be like water. --}}
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#3BA172]">Rapor Nilai</h1>
+                <h1 class="text-2xl font-bold text-[#3BA172]">Detail Riwayat Jadwal Ujian</h1>
                 <p class="text-gray-600 my-2">Rekap Nilai dari "nama modul"</p>
             </div>
             {{-- <div>
@@ -56,7 +56,7 @@
                         <th rowspan="3">Nama Mahasiswa</th>
                         <th colspan="{{ $count_question }}">Daftar Soal</th>
                         <th rowspan="3">JB</th>
-                        <th rowspan="3" >Nilai</th>
+                        <th rowspan="3">Nilai</th>
                         {{-- <th>Waktu Selesai</th> --}}
                         {{-- <th>Token</th> --}}
                         {{-- <th class="w -1 center">Aksi</th> --}}
@@ -80,7 +80,10 @@
                             @foreach ($timetable_questions as $key => $timetable_question)
                                 @php
                                     $correct = false;
-                                    if ($this->getUserModuleQuestion($timetable_question?->id, $user_timetable?->id)->status == 'correct') {
+                                    if (
+                                        $this->getUserModuleQuestion($timetable_question?->id, $user_timetable?->id)
+                                            ->status == 'correct'
+                                    ) {
                                         $correct = true;
                                     }
                                 @endphp

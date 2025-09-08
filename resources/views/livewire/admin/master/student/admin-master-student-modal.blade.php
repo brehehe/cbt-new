@@ -113,10 +113,15 @@
                         @enderror
                     </div>
                     <div>
-                        <label for="student_department" class="block text-sm font-medium text-gray-700">Jurusan</label>
-                        <input id="student_department" type="text" wire:model.defer="student_department"
-                            placeholder="Contoh: Teknik Informatika" class="mt-1 form-control">
-                        @error('student_department')
+                        <label for="study_id" class="block text-sm font-medium text-gray-700">Prodi <span
+                                class="text-red-600">*</span></label>
+                        <select class="form-control" wire:model.defer="study_id">
+                            <option value="">Pilih Prodi</option>
+                            @foreach ($studys as $id => $name)
+                                <option value="{{ $id }}">{{ $name }}</option>
+                            @endforeach
+                        </select>
+                        @error('study_id')
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
@@ -188,7 +193,8 @@
                 <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Informasi Pribadi</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                        <label for="birth_place" class="block text-sm font-medium text-gray-700">Tempat Lahir</label>
+                        <label for="birth_place" class="block text-sm font-medium text-gray-700">Tempat
+                            Lahir</label>
                         <input id="birth_place" type="text" wire:model.defer="birth_place"
                             placeholder="Contoh: Jakarta" class="mt-1 form-control">
                         @error('birth_place')
@@ -196,7 +202,8 @@
                         @enderror
                     </div>
                     <div>
-                        <label for="birth_date" class="block text-sm font-medium text-gray-700">Tanggal Lahir</label>
+                        <label for="birth_date" class="block text-sm font-medium text-gray-700">Tanggal
+                            Lahir</label>
                         <input id="birth_date" type="date" wire:model.defer="birth_date"
                             class="mt-1 form-control">
                         @error('birth_date')
@@ -204,7 +211,8 @@
                         @enderror
                     </div>
                     <div>
-                        <label for="gender" class="block text-sm font-medium text-gray-700">Jenis Kelamin</label>
+                        <label for="gender" class="block text-sm font-medium text-gray-700">Jenis
+                            Kelamin</label>
                         <select id="gender" wire:model.defer="gender" class="mt-1 form-control">
                             <option value="">Pilih Jenis Kelamin</option>
                             <option value="male">Laki-laki</option>
