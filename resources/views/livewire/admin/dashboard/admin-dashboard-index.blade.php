@@ -210,9 +210,6 @@
             }
         }
 
-        transform-origin: 50% 50%;
-        }
-
         .fade-in {
             animation: fadeIn 0.5s ease-in;
         }
@@ -734,13 +731,53 @@
                 </div>
 
                 <!-- Uptime -->
-                <div class="text-center">
-                    <div class="text-2xl font-bold text-green-600 mb-2">
-                        {{ $systemPerformance['system_uptime'] ?? 'N/A' }}</div>
+                <div class="text-center relative">
+                    <div class="text-2xl font-bold text-green-600 mb-2 cursor-pointer" onclick="toggleUptimeModal()"
+                        title="Click for detailed uptime information">
+                        {{ $systemPerformance['system_uptime'] ?? 'N/A' }}
+                        <svg class="w-4 h-4 inline-block ml-1 text-gray-400" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
                     <div class="text-sm text-gray-600">System Uptime</div>
                     <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
-                        <div class="bg-green-600 h-2 rounded-full" style="width: 99%"></div>
+                        @if (isset($uptimeDetails))
+                            @php
+                                $uptimeValue = (float) str_replace('%', '', $systemPerformance['system_uptime']);
+                                $colorClass =
+                                    $uptimeValue >= 99
+                                        ? 'bg-green-600'
+                                        : ($uptimeValue >= 95
+                                            ? 'bg-yellow-500'
+                                            : 'bg-red-500');
+                            @endphp
+                            <div class="{{ $colorClass }} h-2 rounded-full transition-all duration-1000"
+                                style="width: {{ $uptimeValue }}%"></div>
+                        @else
+                            <div class="bg-green-600 h-2 rounded-full" style="width: 99%"></div>
+                        @endif
                     </div>
+
+                    <!-- Real-time status indicator -->
+                    @if (isset($uptimeDetails))
+                        <div class="mt-2 flex items-center justify-center">
+                            @php
+                                $status = $uptimeDetails['status'] ?? 'Operational';
+                                $statusColor =
+                                    $status === 'Operational'
+                                        ? 'green'
+                                        : ($status === 'Minor Issues'
+                                            ? 'yellow'
+                                            : 'red');
+                            @endphp
+                            <div
+                                class="w-2 h-2 rounded-full mr-2 {{ $statusColor === 'green' ? 'bg-green-500 pulse-dot' : ($statusColor === 'yellow' ? 'bg-yellow-500' : 'bg-red-500') }}">
+                            </div>
+                            <span class="text-xs text-{{ $statusColor }}-600">{{ $status }}</span>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Concurrent Users -->
@@ -768,100 +805,337 @@
                 </div>
             @endif
         </div>
+
+        <!-- Real-time Monitoring Button -->
+        <div class="mt-6 text-center">
+            <button onclick="openRealtimeModal()"
+                class="bg-gradient-to-r from-[#3BA172] to-[#2d8c5b] text-white px-6 py-3 rounded-lg hover:from-[#2d8c5b] hover:to-[#236647] transition-all duration-300 shadow-lg hover:shadow-xl">
+                <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                    </path>
+                </svg>
+                View Real-time Metrics
+            </button>
+        </div>
     </div>
-</div>
 
-@push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Weekly Chart
-            const ctx = document.getElementById('weeklyChart');
-            if (ctx) {
-                const weeklyData = @json($weeklyExamStats ?? []);
+    <!-- Real-time Performance Monitoring Modal -->
+    <div id="realtimeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl max-w-6xl w-full max-h-screen overflow-y-auto">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-semibold text-gray-800">Real-time Performance Monitoring</h3>
+                        <button onclick="closeRealtimeModal()" class="text-gray-500 hover:text-gray-700">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
 
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: weeklyData.map(item => item.date),
-                        datasets: [{
-                            label: 'Exams Started',
-                            data: weeklyData.map(item => item.count),
-                            borderColor: '#3BA172',
-                            backgroundColor: 'rgba(59, 161, 114, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
-                            pointBackgroundColor: '#3BA172',
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2,
-                            pointRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
+                <div class="p-6">
+                    @if (isset($systemPerformance['realtime_metrics']))
+                        @php $metrics = $systemPerformance['realtime_metrics']; @endphp
+
+                        <!-- Status Overview -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                            <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
+                                <div class="text-sm text-blue-600 mb-1">Database Response</div>
+                                <div class="text-xl font-bold text-blue-800">
+                                    {{ $metrics['database']['response_time'] ?? 'N/A' }}</div>
+                                <div class="text-xs text-blue-600">Success:
+                                    {{ $metrics['database']['success_rate'] ?? 'N/A' }}</div>
+                            </div>
+
+                            <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
+                                <div class="text-sm text-green-600 mb-1">Throughput</div>
+                                <div class="text-xl font-bold text-green-800">
+                                    {{ $metrics['system_health']['throughput'] ?? 'N/A' }}</div>
+                                <div class="text-xs text-green-600">Operations per minute</div>
+                            </div>
+
+                            <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-lg">
+                                <div class="text-sm text-yellow-600 mb-1">Error Rate</div>
+                                <div class="text-xl font-bold text-yellow-800">
+                                    {{ $metrics['system_health']['error_rate'] ?? 'N/A' }}</div>
+                                <div class="text-xs text-yellow-600">Last hour</div>
+                            </div>
+
+                            <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
+                                <div class="text-sm text-purple-600 mb-1">Memory Usage</div>
+                                <div class="text-xl font-bold text-purple-800">
+                                    {{ $metrics['system_health']['memory_usage_estimate'] ?? 'N/A' }}</div>
+                                <div class="text-xs text-purple-600">Estimated</div>
+                            </div>
+                        </div>
+
+                        <!-- User Activity Charts -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="text-lg font-semibold mb-4">User Activity Timeline</h4>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Last minute</span>
+                                        <span
+                                            class="font-semibold">{{ $metrics['user_activity']['last_minute'] ?? 0 }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Last 5 minutes</span>
+                                        <span
+                                            class="font-semibold">{{ $metrics['user_activity']['last_5_minutes'] ?? 0 }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Last 15 minutes</span>
+                                        <span
+                                            class="font-semibold">{{ $metrics['user_activity']['last_15_minutes'] ?? 0 }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center border-t pt-2">
+                                        <span class="text-sm font-medium text-gray-700">Active now</span>
+                                        <span
+                                            class="font-bold text-green-600">{{ $metrics['user_activity']['active_now'] ?? 0 }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="text-lg font-semibold mb-4">Exam Activity</h4>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Started (1min)</span>
+                                        <span
+                                            class="font-semibold">{{ $metrics['exam_activity']['started_last_minute'] ?? 0 }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Completed (1min)</span>
+                                        <span
+                                            class="font-semibold">{{ $metrics['exam_activity']['completed_last_minute'] ?? 0 }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Alerts (1min)</span>
+                                        <span
+                                            class="font-semibold text-red-600">{{ $metrics['exam_activity']['alerts_last_minute'] ?? 0 }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center border-t pt-2">
+                                        <span class="text-sm font-medium text-gray-700">Avg. Completion</span>
+                                        <span
+                                            class="font-bold">{{ $metrics['exam_activity']['average_completion_time'] ?? 'N/A' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Peak Performance Today -->
+                        <div class="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-lg mb-6">
+                            <h4 class="text-lg font-semibold mb-4 text-indigo-800">Peak Performance Today</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-indigo-600">
+                                        {{ $metrics['peak_metrics']['peak_concurrent_today'] ?? 'N/A' }}</div>
+                                    <div class="text-sm text-indigo-600">Peak Concurrent</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-purple-600">
+                                        {{ $metrics['peak_metrics']['peak_response_time_today'] ?? 'N/A' }}</div>
+                                    <div class="text-sm text-purple-600">Peak Response</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-pink-600">
+                                        {{ $metrics['peak_metrics']['total_requests_today'] ?? 'N/A' }}</div>
+                                    <div class="text-sm text-pink-600">Total Requests</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-green-600">
+                                        {{ $metrics['peak_metrics']['success_rate_today'] ?? 'N/A' }}</div>
+                                    <div class="text-sm text-green-600">Success Rate</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System Status Indicators -->
+                        @if (isset($metrics['status_indicators']))
+                            <div class="bg-white border border-gray-200 p-6 rounded-lg">
+                                <h4 class="text-lg font-semibold mb-4">System Health Status</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="flex items-center">
+                                        <div
+                                            class="w-4 h-4 rounded-full mr-3 {{ $metrics['status_indicators']['response_time_status'] === 'good' ? 'bg-green-500' : ($metrics['status_indicators']['response_time_status'] === 'fair' ? 'bg-yellow-500' : 'bg-red-500') }}">
+                                        </div>
+                                        <span class="text-sm">Response Time:
+                                            {{ ucfirst($metrics['status_indicators']['response_time_status']) }}</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div
+                                            class="w-4 h-4 rounded-full mr-3 {{ $metrics['status_indicators']['server_load_status'] === 'good' ? 'bg-green-500' : ($metrics['status_indicators']['server_load_status'] === 'fair' ? 'bg-yellow-500' : 'bg-red-500') }}">
+                                        </div>
+                                        <span class="text-sm">Server Load:
+                                            {{ ucfirst($metrics['status_indicators']['server_load_status']) }}</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div
+                                            class="w-4 h-4 rounded-full mr-3 {{ $metrics['status_indicators']['error_rate_status'] === 'good' ? 'bg-green-500' : ($metrics['status_indicators']['error_rate_status'] === 'fair' ? 'bg-yellow-500' : 'bg-red-500') }}">
+                                        </div>
+                                        <span class="text-sm">Error Rate:
+                                            {{ ucfirst($metrics['status_indicators']['error_rate_status']) }}</span>
+                                    </div>
+                                </div>
+                                <div class="mt-4 text-center">
+                                    <span
+                                        class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium
+                                    {{ $metrics['status_indicators']['overall_status'] === 'excellent'
+                                        ? 'bg-green-100 text-green-800'
+                                        : ($metrics['status_indicators']['overall_status'] === 'good'
+                                            ? 'bg-blue-100 text-blue-800'
+                                            : ($metrics['status_indicators']['overall_status'] === 'fair'
+                                                ? 'bg-yellow-100 text-yellow-800'
+                                                : 'bg-red-100 text-red-800')) }}">
+                                        Overall Status: {{ ucfirst($metrics['status_indicators']['overall_status']) }}
+                                    </span>
+                                </div>
+                            </div>
+                        @endif
+
+                        <div class="mt-6 text-center text-xs text-gray-500">
+                            Last updated: {{ $metrics['timestamp'] ?? 'Unknown' }}
+                        </div>
+                    @else
+                        <div class="text-center py-8">
+                            <p class="text-gray-500">Real-time metrics not available</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Weekly Chart
+                const ctx = document.getElementById('weeklyChart');
+                if (ctx) {
+                    const weeklyData = @json($weeklyExamStats ?? []);
+
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: weeklyData.map(item => item.date),
+                            datasets: [{
+                                label: 'Exams Started',
+                                data: weeklyData.map(item => item.count),
+                                borderColor: '#3BA172',
+                                backgroundColor: 'rgba(59, 161, 114, 0.1)',
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4,
+                                pointBackgroundColor: '#3BA172',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2,
+                                pointRadius: 6
+                            }]
                         },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.05)'
-                                },
-                                ticks: {
-                                    color: '#6B7280'
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
                                 }
                             },
-                            x: {
-                                grid: {
-                                    display: false
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: 'rgba(0, 0, 0, 0.05)'
+                                    },
+                                    ticks: {
+                                        color: '#6B7280'
+                                    }
                                 },
-                                ticks: {
-                                    color: '#6B7280'
+                                x: {
+                                    grid: {
+                                        display: false
+                                    },
+                                    ticks: {
+                                        color: '#6B7280'
+                                    }
                                 }
                             }
                         }
-                    }
-                });
-            }
-
-            // Auto refresh functionality
-            const autoRefreshToggle = document.getElementById('autoRefresh');
-            let refreshInterval;
-
-            function startAutoRefresh() {
-                refreshInterval = setInterval(() => {
-                    Livewire.dispatch('refreshData');
-                }, 30000); // Refresh every 30 seconds
-            }
-
-            function stopAutoRefresh() {
-                if (refreshInterval) {
-                    clearInterval(refreshInterval);
+                    });
                 }
-            }
 
-            if (autoRefreshToggle) {
-                autoRefreshToggle.addEventListener('change', function() {
-                    if (this.checked) {
+                // Auto refresh functionality
+                const autoRefreshToggle = document.getElementById('autoRefresh');
+                let refreshInterval;
+
+                function startAutoRefresh() {
+                    refreshInterval = setInterval(() => {
+                        Livewire.dispatch('refreshData');
+
+                        // If real-time modal is open, refresh its content too
+                        if (!document.getElementById('realtimeModal').classList.contains('hidden')) {
+                            // Add visual indicator of refresh
+                            const modal = document.getElementById('realtimeModal');
+                            modal.style.opacity = '0.8';
+                            setTimeout(() => {
+                                modal.style.opacity = '1';
+                            }, 500);
+                        }
+                    }, 30000); // Refresh every 30 seconds
+                }
+
+                function stopAutoRefresh() {
+                    if (refreshInterval) {
+                        clearInterval(refreshInterval);
+                    }
+                }
+
+                if (autoRefreshToggle) {
+                    autoRefreshToggle.addEventListener('change', function() {
+                        if (this.checked) {
+                            startAutoRefresh();
+                        } else {
+                            stopAutoRefresh();
+                        }
+                    });
+
+                    // Start auto refresh if enabled by default
+                    if (autoRefreshToggle.checked) {
                         startAutoRefresh();
-                    } else {
-                        stopAutoRefresh();
                     }
-                });
-
-                // Start auto refresh if enabled by default
-                if (autoRefreshToggle.checked) {
-                    startAutoRefresh();
                 }
+
+                // Cleanup on page unload
+                window.addEventListener('beforeunload', stopAutoRefresh);
+            });
+
+            // Real-time Modal Functions
+            function openRealtimeModal() {
+                document.getElementById('realtimeModal').classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
             }
 
-            // Cleanup on page unload
-            window.addEventListener('beforeunload', stopAutoRefresh);
-        });
-    </script>
-@endpush
+            function closeRealtimeModal() {
+                document.getElementById('realtimeModal').classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+
+            // Close modal when clicking outside
+            document.getElementById('realtimeModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeRealtimeModal();
+                }
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeRealtimeModal();
+                }
+            });
+        </script>
+    @endpush
