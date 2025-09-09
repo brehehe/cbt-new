@@ -30,11 +30,25 @@ class AdminMasterQuestionIndex extends Component
     public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id, $question, $description, $weight_correct, $weight_incorrect;
     public $topics = [], $material_categories = [], $materials = [], $question_types = [];
     public $images = [], $old_images = [], $studys = [], $study_id;
+    public $filterStudyId, $filterQuestionTypeId, $filterTopicId;
 
     public function render()
     {
         $questions = Question::select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect', 'study_id')
             ->search($this->search);
+
+        if ($this->filterStudyId) {
+            $questions->where('study_id', $this->filterStudyId);
+        }
+
+        if ($this->filterQuestionTypeId) {
+            $questions->where('question_type_id', $this->filterQuestionTypeId);
+        }
+
+        if ($this->filterTopicId) {
+            $questions->where('topic_id', $this->filterTopicId);
+        }
+
         return view('livewire.admin.master.question.admin-master-question-index', [
             'questions' => $questions->paginate($this->perPage)
         ])->extends('layout.app')->section('content');
