@@ -193,6 +193,8 @@ class AdminMasterModuleQuestionIndex extends Component
             app(ModuleQuestionService::class)->updateOrCreate($request);
 
             DB::commit();
+            $this->closeModal();
+            return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
         } catch (Exception | Throwable $th) {
             DB::rollBack();
             $error = [
