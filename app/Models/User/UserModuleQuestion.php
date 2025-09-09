@@ -79,4 +79,9 @@ class UserModuleQuestion extends Model
     {
         return $this->belongsTo(TimetableAnswer::class, 'timetable_answer_id', 'id');
     }
+
+    public function userTimetable()
+    {
+        return $this->belongsTo(UserTimetable::class, 'user_timetable_id', 'id');
+    }
 }

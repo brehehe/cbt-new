@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignUuid('material_category_id')->nullable();
             $table->foreignUuid('material_id')->nullable();
             $table->foreignUuid('question_type_id')->nullable();
+            $table->foreignUuid('study_id')->nullable();
             $table->longText('question')->comment('soal');
             $table->jsonb('images')->nullable()->comment('gambar soal');
             $table->longText('description')->nullable()->comment('keterangan soal');

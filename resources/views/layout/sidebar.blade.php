@@ -257,6 +257,12 @@
                                 'icon' => 'fa-chart-pie',
                                 'match' => 'admin/report/question*',
                             ],
+                            [
+                                'label' => 'Analisis Butir Soal',
+                                'route' => route('admin.report.item-analysis'),
+                                'icon' => 'fa-chart-line',
+                                'match' => 'admin/report/item-analysis*',
+                            ],
                         ];
                     @endphp
 

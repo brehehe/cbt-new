@@ -62,8 +62,8 @@ class AdminExamDetailIndex extends Component
     private function initializeLiveSession()
     {
         if (!$this->userTimetable || !$this->userTimetable->timetable_id) {
-        return redirect()->route('admin.exam.timetable');
-    }
+            return redirect()->route('admin.exam.timetable');
+        }
 
         // Buat atau update live session
         $this->liveSession = ExamLiveSession::updateOrCreate(
@@ -157,8 +157,8 @@ class AdminExamDetailIndex extends Component
     private function initializeRecording()
     {
         if (!$this->userTimetable || !$this->userTimetable->timetable_id) {
-        return redirect()->route('admin.exam.timetable');
-    }
+            return redirect()->route('admin.exam.timetable');
+        }
 
         // Buat recording entry baru
         $this->currentRecording = ExamRecording::create([
@@ -824,6 +824,7 @@ class AdminExamDetailIndex extends Component
         session()->flash('saved', [
             'title' => 'Ujian Telah Selesai!',
             'text' => "Terima kasih telah mengerjakan ujian. Nilai Anda: {$mark}/100",
+            // 'text' => "Terima kasih telah mengerjakan ujian",
         ]);
 
         return redirect()->route('admin.exam.timetable');

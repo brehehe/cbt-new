@@ -78,12 +78,12 @@ class AdminExamTimetableIndex extends Component
 
             $modulesQuestions = $transactionModule->random_question ?
                 TimetableQuestion::withoutGlobalScope('user_scope')
-                ->select('id')
+                ->select('id', 'study_id')
                 ->where('timetable_module_id', $transactionModule->id)
                 ->inRandomOrder()
                 ->get() :
                 TimetableQuestion::withoutGlobalScope('user_scope')
-                ->select('id')
+                ->select('id', 'study_id')
                 ->where('timetable_module_id', $transactionModule->id)
                 ->inRandomOrder()
                 ->get();
@@ -92,6 +92,7 @@ class AdminExamTimetableIndex extends Component
                 'user_id' => Auth::id(),
                 'timetable_id' => $timeTable->id,
                 'start_process' => Carbon::now(),
+                'studys' => $timeTable->studys,
             ]);
 
             foreach ($modulesQuestions as $moduleQuestion) {
@@ -99,6 +100,7 @@ class AdminExamTimetableIndex extends Component
                     'user_timetable_id' => $UserTimetable->id,
                     'timetable_module_id' => $transactionModule->id,
                     'timetable_question_id' => $moduleQuestion->id,
+                    'study_id' => $moduleQuestion->study_id,
                 ]);
             }
 

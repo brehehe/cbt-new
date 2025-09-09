@@ -75,6 +75,7 @@ class Timetable extends Model
                         'module_id' => $module->id,
                     ],
                     [
+                        'studys' => $module->studys,
                         'user_id' => $module->user_id,
                         'question_type_id' => $module->question_type_id,
                         'name' => $module->name,
@@ -91,6 +92,7 @@ class Timetable extends Model
                             'question_id' => $question->question->id,
                         ],
                         [
+                            'study_id' => $question->question->study_id,
                             'user_id' => $question->question->user_id,
                             'topic_id' => $question->question->topic_id,
                             'material_category_id' => $question->question->material_category_id,

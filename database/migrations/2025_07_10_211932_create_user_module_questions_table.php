@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignUuid('timetable_module_id')->nullable();
             $table->foreignUuid('timetable_question_id')->nullable();
             $table->foreignUuid('timetable_answer_id')->nullable();
+            $table->foreignUuid('study_id')->nullable();
             $table->boolean('is_mark')->default(false);
             $table->enum('status', ['default', 'wrong', 'correct', 'unanswered'])->default('default');
             $table->foreignUuid('company_id')->nullable();

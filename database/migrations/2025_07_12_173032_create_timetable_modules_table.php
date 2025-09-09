@@ -21,6 +21,8 @@ return new class extends Migration
             $table->bigInteger('duration')->default(0)->comment('durasi waktu pengerjaan');
             $table->longText('description')->nullable()->comment('keterangan modul');
             $table->boolean('random_question')->default(false)->comment('apakah soal dalam modul diacak atau urut');
+            $table->jsonb('studys')->nullable()->comment('prodi yang dapat mengakses modul ini');
+            $table->boolean('is_all_study')->default(false)->comment('apakah modul ini untuk semua prodi');
             $table->foreignUuid('company_id')->nullable();
             $table->bigInteger('order')->default(0);
             $table->softDeletes();
