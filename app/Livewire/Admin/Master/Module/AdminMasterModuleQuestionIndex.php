@@ -15,6 +15,7 @@ use App\Models\Master\Question\Question;
 use App\Services\Module\ModuleService;
 use Spatie\LivewireFilepond\WithFilePond;
 use App\Models\Master\Question\QuestionType;
+use App\Models\Master\Question\Topic;
 use App\Models\Study\Study;
 use App\Services\Module\ModuleQuestionService;
 use Throwable;
@@ -23,20 +24,39 @@ class AdminMasterModuleQuestionIndex extends Component
 {
     use WithPagination, WithFileUploads, WithFilePond;
     protected $paginationTheme = 'bootstrap';
-    public $perPage = 10, $search;
+    public $perPage = 8, $search;
 
     public $get_module, $question_types;
     public $data_id, $question_type_id, $name, $duration, $description, $random_question;
-    public $module_question_id, $question_id = [], $questions = [];
-    public $get_studys = [], $studys = [], $is_all_study = false;
+    public $module_question_id, $question_id = [];
+    public $get_studys = [], $studys = [], $is_all_study = false, $topics = [];
+    public $filterStudyId, $filterQuestionTypeId, $filterTopicId;
+    public $selected_all = [], $openQuestion = false;
 
     public function render()
     {
         $module_questions = $this->get_module?->moduleQuestions()->select('id', 'module_id', 'question_id', 'study_id')->get();
 
+        $questions = Question::select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect', 'study_id')
+            ->whereNotIn('id', $this->get_module?->moduleQuestions()->pluck('question_id')->toArray() ?? [])
+            ->whereIn('study_id', $this->get_studys ? array_keys($this->get_studys) : [])
+            ->search($this->search);
+
+        if ($this->filterStudyId) {
+            $questions->where('study_id', $this->filterStudyId);
+        }
+
+        if ($this->filterQuestionTypeId) {
+            $questions->where('question_type_id', $this->filterQuestionTypeId);
+        }
+
+        if ($this->filterTopicId) {
+            $questions->where('topic_id', $this->filterTopicId);
+        }
+
         return view('livewire.admin.master.module.admin-master-module-question-index', [
             'module_questions' => $module_questions,
-            'questions'        => $this->questions
+            'questions'        => $this->openQuestion ? $questions->orderBy('id', 'desc')->paginate($this->perPage) : [],
         ])->extends('layout.app')->section('content');
     }
 
@@ -50,6 +70,8 @@ class AdminMasterModuleQuestionIndex extends Component
         $this->description      = $this->get_module?->description;
         $this->random_question  = $this->get_module?->random_question;
 
+        $this->studys           = json_decode($this->get_module?->studys) ?? [];
+
         if (Auth::user()?->hasRole('Dosen')) {
             $studyIds = Auth::user()?->studys ?? []; // array dari JSON
             $this->get_studys = Study::whereIn('id', $studyIds)
@@ -57,16 +79,11 @@ class AdminMasterModuleQuestionIndex extends Component
                 ->pluck('name', 'id')
                 ->toArray();
         } else {
-            $this->get_studys = Study::orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
+            $this->get_studys = Study::whereIn('id', $this->studys)->orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
         }
 
-        $this->studys           = json_decode($this->get_module?->studys) ?? [];
-        $this->question_types = QuestionType::select('id', 'name')->get();
-    }
-
-    public function hydrate()
-    {
-        $this->resetPage();
+        $this->topics           = Topic::select('id', 'name')->get();
+        $this->question_types   = QuestionType::select('id', 'name')->get();
     }
 
     public function openModal()
@@ -77,9 +94,23 @@ class AdminMasterModuleQuestionIndex extends Component
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['module_question_id', 'question_id', 'questions']);
+        $this->reset(['module_question_id', 'question_id', 'selected_all', 'filterStudyId', 'filterQuestionTypeId', 'filterTopicId', 'search']);
+        $this->perPage = 8;
+        $this->openQuestion = false;
         $this->dispatch('close-modal', ['id' => 'modal-module-question']);
         return $this->dispatch('close-modal', ['id' => 'modal']);
+    }
+
+    public function choiceQuestion($question_id)
+    {
+        // Kalau id sudah ada → hapus (uncheck)
+        if (isset($this->selected_all[$question_id]) && $this->selected_all[$question_id]) {
+            unset($this->selected_all[$question_id]);
+        }
+        // Kalau id belum ada → tambahkan (check)
+        else {
+            $this->selected_all[$question_id] = true;
+        }
     }
 
     public function submitModule()
@@ -139,26 +170,15 @@ class AdminMasterModuleQuestionIndex extends Component
 
     public function modalModuleQuestion()
     {
-        $this->questions = Question::select('id', 'question_type_id', 'question', 'study_id')
-            ->whereIn('study_id', $this->studys)
-            ->with(['study:id,name'])
-            ->whereNotIn('id', $this->get_module?->moduleQuestions()->pluck('question_id')->toArray() ?? [])
-            ->where('question_type_id', $this->question_type_id)->whereHas('answers', function ($query) {
-                $query->where('is_correct', true);
-            })->get();
+        $this->openQuestion = true;
         return $this->dispatch('open-modal', ['id' => 'modal-module-question']);
     }
 
     public function submitModuleQuestion()
     {
-        $this->validate(
-            [
-                'question_id' => 'required',
-            ],
-            [
-                'question_id.required' => 'Data soal wajib diisi.',
-            ]
-        );
+        if (count($this->selected_all) == 0) {
+            return AlertHelper::error('Gagal', 'Pilih soal terlebih dahulu');
+        }
 
         try {
             DB::beginTransaction();
@@ -166,7 +186,7 @@ class AdminMasterModuleQuestionIndex extends Component
                 'id'          => $this->data_id,
                 'company_id'  => Auth::user()?->company?->id,
                 'module_id'   => $this->get_module?->id,
-                'question_id' => $this->question_id,
+                'question_id' => $this->selected_all ? array_keys($this->selected_all) : [],
                 'study_id'    => Question::whereIn('id', $this->question_id)->pluck('study_id')->first()->id ?? null,
             ];
 

@@ -173,7 +173,7 @@
                         <tr>
                             <th class="w-1 center">No</th>
                             <th>Prodi</th>
-                            <th>Tipe Soal</th>
+                            {{-- <th>Tipe Soal</th> --}}
                             <th>Pertanyaan</th>
                             <th>Deskripsi</th>
                             <th class="w-1 center">Aksi</th>
@@ -184,7 +184,7 @@
                             <tr>
                                 <td class="center">{{ $loop->iteration }}</td>
                                 <td>{{ $result?->question?->study?->name }}</td>
-                                <td>{{ $result?->question?->questionType?->name }}</td>
+                                {{-- <td>{{ $result?->question?->questionType?->name }}</td> --}}
                                 <td>{{ $result?->question?->question }}</td>
                                 <td>{{ $result?->question?->description }}</td>
                                 <td class="center">

@@ -32,6 +32,7 @@ class AdminMasterTimetableIndex extends Component
     public $getSupervisors = [];
     public $modules = [];
     public $studys = [];
+    public $study_id;
 
     public function mount()
     {

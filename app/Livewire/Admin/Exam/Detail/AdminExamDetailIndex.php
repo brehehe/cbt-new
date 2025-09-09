@@ -823,8 +823,8 @@ class AdminExamDetailIndex extends Component
 
         session()->flash('saved', [
             'title' => 'Ujian Telah Selesai!',
-            'text' => "Terima kasih telah mengerjakan ujian. Nilai Anda: {$mark}/100",
-            // 'text' => "Terima kasih telah mengerjakan ujian",
+            // 'text' => "Terima kasih telah mengerjakan ujian. Nilai Anda: {$mark}/100",
+            'text' => "Terima kasih telah mengerjakan ujian",
         ]);
 
         return redirect()->route('admin.exam.timetable');
