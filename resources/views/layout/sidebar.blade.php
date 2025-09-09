@@ -251,12 +251,12 @@
                                 'icon' => 'fa-file-alt',
                                 'match' => 'admin/report/timetable*',
                             ],
-                            [
-                                'label' => 'Analisis Soal',
-                                'route' => route('admin.report.question'),
-                                'icon' => 'fa-chart-pie',
-                                'match' => 'admin/report/question*',
-                            ],
+                            //[
+                            //  'label' => 'Analisis Soal',
+                            //'route' => route('admin.report.question'),
+                            //'icon' => 'fa-chart-pie',
+                            //'match' => 'admin/report/question*',
+                            //],
                             [
                                 'label' => 'Analisis Butir Soal',
                                 'route' => route('admin.report.item-analysis'),
