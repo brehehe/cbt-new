@@ -18,6 +18,7 @@ return new class extends Migration
             $table->jsonb('supervisors')->nullable();
             $table->datetime('start_time');
             $table->datetime('end_time');
+            $table->jsonb('studys')->nullable();
             $table->longText('description')->nullable();
             $table->char('code', 10)->nullable();
             $table->foreignUuid('company_id')->nullable();

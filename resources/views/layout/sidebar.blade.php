@@ -27,32 +27,32 @@
                     </a>
                 </div>
                 <!-- Divider: Ujian -->
-                @if (Auth::user()->hasRole(['Mahasiswa']))
-                    <div>
-                        <div
-                            class="w-full group flex items-center justify-between custom-padding text-xs font-bold text-[#3BA172] uppercase tracking-wide">
-                            Ujian
-                        </div>
+                {{-- @if (Auth::user()->hasRole(['Mahasiswa', ' Admin'])) --}}
+                <div>
+                    <div
+                        class="w-full group flex items-center justify-between custom-padding text-xs font-bold text-[#3BA172] uppercase tracking-wide">
+                        Ujian
                     </div>
-                    @php
-                        $exams = [['label' => 'Ujian', 'url' => '/admin/exam/timetable', 'icon' => 'fa-file-lines']];
-                    @endphp
-                    @foreach ($exams as $exam)
-                        <div>
-                            <a href="{{ $exam['url'] }}"
-                                class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
+                </div>
+                @php
+                    $exams = [['label' => 'Ujian', 'url' => '/admin/exam/timetable', 'icon' => 'fa-file-lines']];
+                @endphp
+                @foreach ($exams as $exam)
+                    <div>
+                        <a href="{{ $exam['url'] }}"
+                            class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
          {{ Request::is(ltrim($exam['url'], '/')) ? 'bg-[#C3D4EC]/50 text-[#3BA172] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#3BA172]' }}">
-                                <div class="flex items-center gap-3">
-                                    <i
-                                        class="fa-solid {{ $exam['icon'] }} text-lg mr-2
+                            <div class="flex items-center gap-3">
+                                <i
+                                    class="fa-solid {{ $exam['icon'] }} text-lg mr-2
              {{ Request::is(ltrim($exam['url'], '/')) ? 'text-[#3BA172]' : 'text-gray-400 group-hover:text-[#3BA172]' }}">
-                                    </i>
-                                    <span class="sidebar-text">{{ $exam['label'] }}</span>
-                                </div>
-                            </a>
-                        </div>
-                    @endforeach
-                @endif
+                                </i>
+                                <span class="sidebar-text">{{ $exam['label'] }}</span>
+                            </div>
+                        </a>
+                    </div>
+                @endforeach
+                {{-- @endif --}}
                 <!-- Divider: Master -->
                 @if (!Auth::user()->hasRole(['Mahasiswa']))
                     <div>

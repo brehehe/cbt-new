@@ -3,6 +3,7 @@
 namespace App\Models\Timetable;
 
 use App\Models\Company\Company;
+use App\Models\Master\Question\QuestionType;
 use App\Models\Master\Timetable\Timetable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -24,6 +25,11 @@ class TimetableModule extends Model
     public function timetable()
     {
         return $this->belongsTo(Timetable::class, 'timetable_id', 'id');
+    }
+
+    public function questionType()
+    {
+        return $this->belongsTo(QuestionType::class, 'question_type_id', 'id');
     }
 
     public function answers()

@@ -45,7 +45,7 @@
                         <th>Tipe</th>
                         <th>Modul</th>
                         <th>Durasi</th>
-                        <th style="width: 50%">Deskripsi</th>
+                        <th style="width: 500px">Deskripsi</th>
                         <th style="width: 15%" class="center">Aksi</th>
                     </tr>
                 </thead>

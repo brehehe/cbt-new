@@ -28,6 +28,7 @@ class ModuleService
                 'duration'         => $request['duration'] ?? null,
                 'random_question'  => $request['random_question'] ?? false,
                 'description'      => $request['description'] ?? null,
+                'studys'           => json_encode($request['studys']) ?? json_encode([]),
             ]
         );
 

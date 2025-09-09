@@ -120,7 +120,7 @@
                 Batal
             </button>
             <button wire:click='submit'
-                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition">
+                class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow transition">
                 Simpan
             </button>
         </div>

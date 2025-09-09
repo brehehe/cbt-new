@@ -105,7 +105,7 @@ class Timetable extends Model
                     );
 
                     foreach ($question->question->answers  as $key => $value) {
-                        $timeTableAnswer =  TimetableAnswer::updateOrCreate(
+                        TimetableAnswer::updateOrCreate(
                             [
                                 'timetable_question_id' => $timetableQuestion->id,
                                 'answer_id' => $value->id,

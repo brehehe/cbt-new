@@ -7,6 +7,7 @@ use App\Models\Company\Company;
 use App\Models\User;
 use App\Models\User\UserDetail;
 use App\Models\Spatie\Role;
+use App\Models\Study\Study;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -250,6 +251,10 @@ class UserDetailSeeder extends Seeder
                 'password' => Hash::make('password123'),
                 'email_verified_at' => now(),
                 'company_id' => $companyId,
+                'study_id' => Study::withoutGlobalScope('user_scope')
+                    ->where('company_id', $companyId)
+                    ->inRandomOrder()
+                    ->first()->id,
             ]);
 
             $user->assignRole('Mahasiswa');
@@ -383,6 +388,11 @@ class UserDetailSeeder extends Seeder
                 'password' => Hash::make('password123'),
                 'email_verified_at' => now(),
                 'company_id' => $companyId,
+                'studys' => json_encode(Study::withoutGlobalScope('user_scope')
+                    ->where('company_id', $companyId)
+                    ->inRandomOrder()
+                    ->take(rand(1, 2))
+                    ->pluck('id')),
             ]);
 
             $user->assignRole('Dosen');

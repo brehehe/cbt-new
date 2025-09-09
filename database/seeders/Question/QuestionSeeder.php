@@ -109,12 +109,23 @@ class QuestionSeeder extends Seeder
                     'duration' => 120,
                     'description' => $faker->paragraph,
                     'random_question' => $randomQuestion ? true : false,
+                    'studys' => json_encode(Study::withoutGlobalScope('user_scope')
+                        ->where('company_id', $company->id)
+                        ->inRandomOrder()
+                        ->take(rand(1, 2))
+                        ->pluck('id')),
                 ]);
 
-                // Get all questions for this question type
+                $studyId = 0;
+                if (!empty($module->studys)) {
+                    $decoded = json_decode($module->studys, true);
+                    $studyId = $decoded[0] ?? 0;
+                }
+
                 $questions = Question::withoutGlobalScope('user_scope')
                     ->where('question_type_id', $questionTypeCompany->id)
                     ->where('company_id', $company->id)
+                    ->where('study_id', $studyId)
                     ->inRandomOrder()
                     ->take(10)
                     ->get();
@@ -124,6 +135,7 @@ class QuestionSeeder extends Seeder
                         'module_id' => $module->id,
                         'question_id' => $question->id,
                         'company_id' => $company->id,
+                        'study_id' => $question->study_id,
                     ]);
                 }
             }

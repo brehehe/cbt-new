@@ -144,9 +144,6 @@ class AdminExamTimetableIndex extends Component
 
     public function render()
     {
-        // dd(Auth::user()->company);
-        // dd(Timetable::get());
-
         $userTimetableStatusDone = UserTimetable::query()
             ->where('user_id', Auth::id())
             ->where('status', 'done')
@@ -154,14 +151,10 @@ class AdminExamTimetableIndex extends Component
             ->pluck('timetable_id')
             ->toArray();
 
-        $userTimetableStatus = UserTimetable::query()
-            ->where('user_id', Auth::id())
-            ->whereNotIn('status', ['done'])
-            ->get()
-            ->pluck('timetable_id')
-            ->toArray();
+        $auth = Auth::user();
 
         $timetables = Timetable::query()
+            // ->whereNotNull('code')
             ->when($this->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'ilike', '%' . $search . '%')
@@ -173,6 +166,14 @@ class AdminExamTimetableIndex extends Component
                 $query->where('start_time', '<=', $now->copy()->addMinutes(5))
                     ->where('end_time', '>=', $now->copy()->subMinutes(5));
             });
+
+        // Filter berdasarkan study_id user
+        if ($auth->study_id) {
+            $timetables->where(function ($query) use ($auth) {
+                $query->whereNull('studys')
+                    ->orWhere('studys', 'ILIKE', '%\\\"' . $auth->study_id . '\\\"%');
+            });
+        }
 
         if (!empty($userTimetableStatusDone)) {
             $timetables->whereNotIn('id', $userTimetableStatusDone);

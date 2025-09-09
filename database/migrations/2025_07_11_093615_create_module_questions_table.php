@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignUuid('company_id')->nullable();
             $table->foreignUuid('module_id')->nullable();
             $table->foreignUuid('question_id')->nullable();
+            $table->foreignUuid('study_id')->nullable();
             $table->bigInteger('order')->default(0);
             $table->softDeletes();
             $table->timestamps();

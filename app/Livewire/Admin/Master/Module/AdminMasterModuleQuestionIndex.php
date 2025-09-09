@@ -15,6 +15,7 @@ use App\Models\Master\Question\Question;
 use App\Services\Module\ModuleService;
 use Spatie\LivewireFilepond\WithFilePond;
 use App\Models\Master\Question\QuestionType;
+use App\Models\Study\Study;
 use App\Services\Module\ModuleQuestionService;
 use Throwable;
 
@@ -27,10 +28,11 @@ class AdminMasterModuleQuestionIndex extends Component
     public $get_module, $question_types;
     public $data_id, $question_type_id, $name, $duration, $description, $random_question;
     public $module_question_id, $question_id = [], $questions = [];
+    public $get_studys = [], $studys = [], $is_all_study = false;
 
     public function render()
     {
-        $module_questions = $this->get_module?->moduleQuestions()->select('id', 'module_id', 'question_id')->get();
+        $module_questions = $this->get_module?->moduleQuestions()->select('id', 'module_id', 'question_id', 'study_id')->get();
 
         return view('livewire.admin.master.module.admin-master-module-question-index', [
             'module_questions' => $module_questions,
@@ -48,6 +50,17 @@ class AdminMasterModuleQuestionIndex extends Component
         $this->description      = $this->get_module?->description;
         $this->random_question  = $this->get_module?->random_question;
 
+        if (Auth::user()?->hasRole('Dosen')) {
+            $studyIds = Auth::user()?->studys ?? []; // array dari JSON
+            $this->get_studys = Study::whereIn('id', $studyIds)
+                ->orderBy('name', 'asc')
+                ->pluck('name', 'id')
+                ->toArray();
+        } else {
+            $this->get_studys = Study::orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
+        }
+
+        $this->studys           = json_decode($this->get_module?->studys) ?? [];
         $this->question_types = QuestionType::select('id', 'name')->get();
     }
 
@@ -77,6 +90,7 @@ class AdminMasterModuleQuestionIndex extends Component
                 'name'             => 'required',
                 'description'      => 'nullable',
                 'duration'         => 'required|numeric|min:1',
+                'studys'           => 'required|array',
             ],
             [
                 'question_type_id.required' => 'Tipe soal wajib diisi.',
@@ -85,6 +99,8 @@ class AdminMasterModuleQuestionIndex extends Component
                 'duration.required'         => 'Durasi pengerjaan modul wajib diisi.',
                 'duration.numeric'          => 'Durasi pengerjaan modul hanya bernilai angka.',
                 'duration.min'              => 'Durasi pengerjaan modul minimal 1 menit.',
+                'studys.required'           => 'Prodi wajib dipilih.',
+                'studys.array'              => 'Prodi tidak valid.',
             ]
         );
 
@@ -98,6 +114,7 @@ class AdminMasterModuleQuestionIndex extends Component
                 'duration'         => $this->duration,
                 'random_question'  => $this->random_question,
                 'description'      => $this->description,
+                'studys'           => $this->studys,
             ];
 
             $module = app(ModuleService::class)->updateOrCreate($request);
@@ -122,9 +139,13 @@ class AdminMasterModuleQuestionIndex extends Component
 
     public function modalModuleQuestion()
     {
-        $this->questions = Question::select('id', 'question_type_id', 'question')->where('question_type_id', $this->question_type_id)->whereHas('answers', function ($query) {
-            $query->where('is_correct', true);
-        })->get();
+        $this->questions = Question::select('id', 'question_type_id', 'question', 'study_id')
+            ->whereIn('study_id', $this->studys)
+            ->with(['study:id,name'])
+            ->whereNotIn('id', $this->get_module?->moduleQuestions()->pluck('question_id')->toArray() ?? [])
+            ->where('question_type_id', $this->question_type_id)->whereHas('answers', function ($query) {
+                $query->where('is_correct', true);
+            })->get();
         return $this->dispatch('open-modal', ['id' => 'modal-module-question']);
     }
 
@@ -146,6 +167,7 @@ class AdminMasterModuleQuestionIndex extends Component
                 'company_id'  => Auth::user()?->company?->id,
                 'module_id'   => $this->get_module?->id,
                 'question_id' => $this->question_id,
+                'study_id'    => Question::whereIn('id', $this->question_id)->pluck('study_id')->first()->id ?? null,
             ];
 
             app(ModuleQuestionService::class)->updateOrCreate($request);
@@ -184,6 +206,4 @@ class AdminMasterModuleQuestionIndex extends Component
 
         return AlertHelper::success('Berhasil', 'Data berhasil dihapus.');
     }
-
-
 }
