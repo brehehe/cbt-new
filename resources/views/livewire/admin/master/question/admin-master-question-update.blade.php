@@ -7,11 +7,11 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#3BA172]">Ubah Data Soal</h1>
+                <h1 class="text-2xl font-bold text-[#f58634]">Ubah Data Soal</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div>
-                <button wire:click="submitQuestion()" class="btn btn-success">
+                <button wire:click="submitQuestion()" class="btn btn-warning">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -141,7 +141,7 @@
                 <div class="md:col-span-2">
                     <label for="question" class="block text-sm font-medium text-gray-700">Gambar<span
                             class="text-red-600">*</span></label>
-                    <button class="btn btn-success mt-1" wire:click='modalImages()'>Gambar</button>
+                    <button class="btn btn-warning mt-1" wire:click='modalImages()'>Gambar</button>
                 </div>
                 <div class="md:col-span-2">
                     <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi
@@ -175,7 +175,7 @@
                             <i class="fas fa-search h-3 w-3 text-gray-400"></i>
                         </div>
                     </div>
-                    <button wire:click="openModal()" class="mt-1 px-3 py-2 btn btn-success">
+                    <button wire:click="openModal()" class="mt-1 px-3 py-2 btn btn-warning">
                         Tambah
                     </button>
                 </div>
@@ -196,7 +196,7 @@
                             <tr>
                                 <td class="center">{{ chr(64 + $loop->iteration) }} </td>
                                 <td>
-                                    <button class="btn btn-success mt-1"
+                                    <button class="btn btn-warning mt-1"
                                         wire:click="modalAnswerImage('{{ $result?->id }}', '{{ chr(64 + $loop->iteration) }}')">Gambar</button>
                                 </td>
                                 <td>{{ $result?->context }}</td>

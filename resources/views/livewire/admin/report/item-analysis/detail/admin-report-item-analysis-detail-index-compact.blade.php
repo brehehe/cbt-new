@@ -28,7 +28,7 @@
     <div class="mb-3 bg-white rounded-lg p-3 shadow-sm">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-lg font-bold text-[#3BA172] mb-1">Analisis Butir Soal</h1>
+                <h1 class="text-lg font-bold text-[#f58634] mb-1">Analisis Butir Soal</h1>
                 <div class="text-xs text-gray-600">
                     <span class="font-medium">{{ $timetable->name ?? 'N/A' }}</span> •
                     {{ $timetableModule->name ?? 'N/A' }} •

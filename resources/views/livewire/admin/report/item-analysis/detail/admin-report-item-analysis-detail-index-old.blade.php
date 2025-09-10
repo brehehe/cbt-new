@@ -14,7 +14,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#3BA172]">Detail Analisis Butir Soal</h1>
+                <h1 class="text-2xl font-bold text-[#f58634]">Detail Analisis Butir Soal</h1>
                 <p class="text-gray-600 mt-2">
                     Ujian: <strong>{{ $timetable->name ?? 'Tidak diketahui' }}</strong> |
                     Modul: <strong>{{ $timetableModule->name ?? 'Tidak diketahui' }}</strong>
@@ -343,7 +343,7 @@
                 <button class="btn btn-outline-primary" onclick="window.print()">
                     <i class="fas fa-print mr-2"></i>Cetak Laporan
                 </button>
-                <button class="btn btn-success" onclick="exportToExcel()">
+                <button class="btn btn-warning" onclick="exportToExcel()">
                     <i class="fas fa-file-excel mr-2"></i>Export Excel
                 </button>
             </div>

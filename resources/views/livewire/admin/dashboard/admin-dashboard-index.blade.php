@@ -184,7 +184,7 @@
         }
 
         input:checked+.toggle-slider {
-            background-color: #3BA172;
+            background-color: #f58634;
         }
 
         input:checked+.toggle-slider:before {
@@ -249,7 +249,7 @@
     <div class="mb-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-[#3BA172]">Welcome back, {{ Auth::user()->name ?? 'Admin' }}!</h1>
+                <h1 class="text-3xl font-bold text-[#f58634]">Welcome back, {{ Auth::user()->name ?? 'Admin' }}!</h1>
                 <p class="text-gray-600 mt-1">Here's what's happening in your CBT system today.</p>
                 {{-- <p class="text-sm text-gray-500">{{ \Carbon\Carbon::now()->format('l, F j, Y') }}</p> --}}
             </div>
@@ -258,14 +258,14 @@
                 <label class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" id="autoRefresh" class="sr-only peer" checked>
                     <div
-                        class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#3BA172]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#3BA172]">
+                        class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#f58634]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#f58634]">
                     </div>
                     <span class="ml-3 text-sm font-medium text-gray-600">Auto Refresh</span>
                 </label>
 
                 <!-- Refresh Button -->
                 <button wire:click="refreshData"
-                    class="inline-flex items-center px-4 py-2 bg-[#3BA172] hover:bg-[#2d8c5b] text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                    class="inline-flex items-center px-4 py-2 bg-[#f58634] hover:bg-[#2d8c5b] text-white text-sm font-medium rounded-lg transition-colors duration-200">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
@@ -285,7 +285,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Total Users</p>
-                    <h3 class="text-3xl font-bold text-[#3BA172]">{{ number_format($totalUsers) }}</h3>
+                    <h3 class="text-3xl font-bold text-[#f58634]">{{ number_format($totalUsers) }}</h3>
                     <div class="flex items-center mt-2">
                         <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
                             @if (isset($monthlyStats['new_users_this_month']) && $monthlyStats['new_users_this_month'] > 0)
@@ -296,8 +296,8 @@
                         </span>
                     </div>
                 </div>
-                <div class="bg-gradient-to-br from-[#3BA172]/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
-                    <svg class="w-8 h-8 text-[#3BA172]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-gradient-to-br from-[#f58634]/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
+                    <svg class="w-8 h-8 text-[#f58634]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
@@ -311,7 +311,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Today's Exams</p>
-                    <h3 class="text-3xl font-bold text-[#3BA172]">{{ $todayExams }}</h3>
+                    <h3 class="text-3xl font-bold text-[#f58634]">{{ $todayExams }}</h3>
                     <div class="flex items-center mt-2">
                         <div class="w-2 h-2 bg-blue-500 rounded-full pulse-dot mr-2"></div>
                         <span class="text-xs text-blue-600">Exams started today</span>
@@ -332,7 +332,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Active Exams</p>
-                    <h3 class="text-3xl font-bold text-[#3BA172]">{{ $activeExams }}</h3>
+                    <h3 class="text-3xl font-bold text-[#f58634]">{{ $activeExams }}</h3>
                     <div class="flex items-center mt-2">
                         @if ($activeExams > 0)
                             <div class="w-2 h-2 bg-orange-500 rounded-full pulse-dot mr-2"></div>
@@ -357,7 +357,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Security Alerts</p>
-                    <h3 class="text-3xl font-bold text-[#3BA172]">{{ $examAlerts }}</h3>
+                    <h3 class="text-3xl font-bold text-[#f58634]">{{ $examAlerts }}</h3>
                     <div class="flex items-center mt-2">
                         @if ($examAlerts > 0)
                             <div class="w-2 h-2 bg-red-500 rounded-full pulse-dot mr-2"></div>
@@ -466,7 +466,7 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-800">Weekly Exam Trends</h3>
                 <div class="flex items-center space-x-2">
-                    <div class="w-3 h-3 bg-[#3BA172] rounded-full"></div>
+                    <div class="w-3 h-3 bg-[#f58634] rounded-full"></div>
                     <span class="text-sm text-gray-600">Exams Started</span>
                 </div>
             </div>
@@ -533,7 +533,7 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-800">Live Session Monitoring</h3>
                 <a href="{{ route('admin.exam.live-stream') }}"
-                    class="text-[#3BA172] hover:text-[#2d8c5b] text-sm font-medium">
+                    class="text-[#f58634] hover:text-[#2d8c5b] text-sm font-medium">
                     View All →
                 </a>
             </div>
@@ -581,7 +581,7 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-800">Critical Alerts (24h)</h3>
                 <a href="{{ route('admin.exam.monitor') }}"
-                    class="text-[#3BA172] hover:text-[#2d8c5b] text-sm font-medium">
+                    class="text-[#f58634] hover:text-[#2d8c5b] text-sm font-medium">
                     View All →
                 </a>
             </div>
@@ -630,7 +630,7 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-800">Upcoming Exams</h3>
                 <a href="{{ route('admin.exam.timetable') }}"
-                    class="text-[#3BA172] hover:text-[#2d8c5b] text-sm font-medium">
+                    class="text-[#f58634] hover:text-[#2d8c5b] text-sm font-medium">
                     Manage →
                 </a>
             </div>
@@ -673,7 +673,7 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-800">Recent Results</h3>
                 <a href="{{ route('admin.report.item-analysis') }}"
-                    class="text-[#3BA172] hover:text-[#2d8c5b] text-sm font-medium">
+                    class="text-[#f58634] hover:text-[#2d8c5b] text-sm font-medium">
                     View Reports →
                 </a>
             </div>
@@ -809,7 +809,7 @@
         <!-- Real-time Monitoring Button -->
         <div class="mt-6 text-center">
             <button onclick="openRealtimeModal()"
-                class="bg-gradient-to-r from-[#3BA172] to-[#2d8c5b] text-white px-6 py-3 rounded-lg hover:from-[#2d8c5b] hover:to-[#236647] transition-all duration-300 shadow-lg hover:shadow-xl">
+                class="bg-gradient-to-r from-[#f58634] to-[#2d8c5b] text-white px-6 py-3 rounded-lg hover:from-[#2d8c5b] hover:to-[#236647] transition-all duration-300 shadow-lg hover:shadow-xl">
                 <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
@@ -1026,12 +1026,12 @@
                             datasets: [{
                                 label: 'Exams Started',
                                 data: weeklyData.map(item => item.count),
-                                borderColor: '#3BA172',
+                                borderColor: '#f58634',
                                 backgroundColor: 'rgba(59, 161, 114, 0.1)',
                                 borderWidth: 3,
                                 fill: true,
                                 tension: 0.4,
-                                pointBackgroundColor: '#3BA172',
+                                pointBackgroundColor: '#f58634',
                                 pointBorderColor: '#fff',
                                 pointBorderWidth: 2,
                                 pointRadius: 6

@@ -55,7 +55,8 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <h1 class="text-2xl font-extrabold tracking-tight text-white">Institut Kesehatan Mitra Bunda</h1>
+                                    <h1 class="text-2xl font-extrabold tracking-tight text-white">Institut Kesehatan
+                                        Mitra Bunda</h1>
                                     <p class="text-md text-white">insitutkmb@gmail.com</p>
                                 </div>
                             </div>
@@ -114,9 +115,12 @@
                                         <div class="flex items-start space-x-3">
                                             <div
                                                 class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
-                                                <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"  fill="none"  stroke="currentColor" class="icon icon-tabler icons-tabler-outline icon-tabler-school h-6 w-6">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                    <path d="M22 9l-10 -4l-10 4l10 4l10 -4v6" /><path d="M6 10.6v5.4a6 3 0 0 0 12 0v-5.4" />
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                    fill="none" stroke="currentColor"
+                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-school h-6 w-6">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                    <path d="M22 9l-10 -4l-10 4l10 4l10 -4v6" />
+                                                    <path d="M6 10.6v5.4a6 3 0 0 0 12 0v-5.4" />
                                                 </svg>
                                             </div>
                                             <div>
@@ -143,8 +147,25 @@
                                                         stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
                                                     </path>
                                                 </svg> -->
-                                                <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"  fill="none"  stroke="currentColor" class="icon icon-tabler icons-tabler-outline icon-tabler-laurel-wreath h-6 w-6">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6.436 8a8.6 8.6 0 0 0 -.436 2.727c0 4.017 2.686 7.273 6 7.273s6 -3.256 6 -7.273a8.6 8.6 0 0 0 -.436 -2.727" /><path d="M14.5 21s-.682 -3 -2.5 -3s-2.5 3 -2.5 3" /><path d="M18.52 5.23c.292 1.666 -1.02 2.77 -1.02 2.77s-1.603 -.563 -1.895 -2.23c-.292 -1.666 1.02 -2.77 1.02 -2.77s1.603 .563 1.895 2.23" /><path d="M21.094 12.14c-1.281 1.266 -3.016 .76 -3.016 .76s-.454 -1.772 .828 -3.04c1.28 -1.266 3.016 -.76 3.016 -.76s.454 1.772 -.828 3.04" /><path d="M17.734 18.826c-1.5 -.575 -1.734 -2.19 -1.734 -2.19s1.267 -1.038 2.767 -.462c1.5 .575 1.733 2.19 1.733 2.19s-1.267 1.038 -2.767 .462" /><path d="M6.267 18.826c1.5 -.575 1.733 -2.19 1.733 -2.19s-1.267 -1.038 -2.767 -.462c-1.5 .575 -1.733 2.19 -1.733 2.19s1.267 1.038 2.767 .462" /><path d="M2.906 12.14c1.281 1.266 3.016 .76 3.016 .76s.454 -1.772 -.828 -3.04c-1.281 -1.265 -3.016 -.76 -3.016 -.76s-.454 1.772 .828 3.04" /><path d="M5.48 5.23c-.292 1.666 1.02 2.77 1.02 2.77s1.603 -.563 1.895 -2.23c.292 -1.666 -1.02 -2.77 -1.02 -2.77s-1.603 .563 -1.895 2.23" />
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                    fill="none" stroke="currentColor"
+                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-laurel-wreath h-6 w-6">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                    <path
+                                                        d="M6.436 8a8.6 8.6 0 0 0 -.436 2.727c0 4.017 2.686 7.273 6 7.273s6 -3.256 6 -7.273a8.6 8.6 0 0 0 -.436 -2.727" />
+                                                    <path d="M14.5 21s-.682 -3 -2.5 -3s-2.5 3 -2.5 3" />
+                                                    <path
+                                                        d="M18.52 5.23c.292 1.666 -1.02 2.77 -1.02 2.77s-1.603 -.563 -1.895 -2.23c-.292 -1.666 1.02 -2.77 1.02 -2.77s1.603 .563 1.895 2.23" />
+                                                    <path
+                                                        d="M21.094 12.14c-1.281 1.266 -3.016 .76 -3.016 .76s-.454 -1.772 .828 -3.04c1.28 -1.266 3.016 -.76 3.016 -.76s.454 1.772 -.828 3.04" />
+                                                    <path
+                                                        d="M17.734 18.826c-1.5 -.575 -1.734 -2.19 -1.734 -2.19s1.267 -1.038 2.767 -.462c1.5 .575 1.733 2.19 1.733 2.19s-1.267 1.038 -2.767 .462" />
+                                                    <path
+                                                        d="M6.267 18.826c1.5 -.575 1.733 -2.19 1.733 -2.19s-1.267 -1.038 -2.767 -.462c-1.5 .575 -1.733 2.19 -1.733 2.19s1.267 1.038 2.767 .462" />
+                                                    <path
+                                                        d="M2.906 12.14c1.281 1.266 3.016 .76 3.016 .76s.454 -1.772 -.828 -3.04c-1.281 -1.265 -3.016 -.76 -3.016 -.76s-.454 1.772 .828 3.04" />
+                                                    <path
+                                                        d="M5.48 5.23c-.292 1.666 1.02 2.77 1.02 2.77s1.603 -.563 1.895 -2.23c.292 -1.666 -1.02 -2.77 -1.02 -2.77s-1.603 .563 -1.895 2.23" />
                                                 </svg>
                                             </div>
                                             <div>
@@ -179,8 +200,11 @@
                                         <h3
                                             class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
                                             Farmasi (S1)</h3>
-                                        <p class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white text-justify">
-                                            Prodi Sarjana Farmasi IKMB bersamaan dengan Prodi NERS (Profesi Keperawatan), sebagai bagian dari pengembangan institusi dari status Akademi ke STIKes
+                                        <p
+                                            class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white text-justify">
+                                            Prodi Sarjana Farmasi IKMB bersamaan dengan Prodi NERS (Profesi
+                                            Keperawatan), sebagai bagian dari pengembangan institusi dari status Akademi
+                                            ke STIKes
                                         </p>
                                     </div>
                                 </div>
@@ -195,15 +219,18 @@
                                             viewBox="0 0 24 24">
                                             <path
                                                 d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                            </path>
                                         </svg>
                                     </div>
                                     <div>
                                         <h3
                                             class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
                                             Kebidanan (D-III)</h3>
-                                        <p class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
-                                            Program Studi D-III Kebidanan memiliki akreditasi B dari Lembaga Akreditasi Mandiri Perguruan Tinggi Kesehatan (LAM-PTKes)
+                                        <p
+                                            class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
+                                            Program Studi D-III Kebidanan memiliki akreditasi B dari Lembaga Akreditasi
+                                            Mandiri Perguruan Tinggi Kesehatan (LAM-PTKes)
                                         </p>
                                     </div>
                                 </div>
@@ -218,15 +245,19 @@
                                             viewBox="0 0 24 24">
                                             <path
                                                 d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                            </path>
                                         </svg>
                                     </div>
                                     <div>
-                                        <h3 class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
+                                        <h3
+                                            class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
                                             Keperawatan (D-III)
                                         </h3>
-                                        <p class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
-                                            Salah satu yang mendasari berdirinya IKMB, dimulai sebagai Akademi Keperawatan Mitra Bunda Persada sejak 2002
+                                        <p
+                                            class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
+                                            Salah satu yang mendasari berdirinya IKMB, dimulai sebagai Akademi
+                                            Keperawatan Mitra Bunda Persada sejak 2002
                                         </p>
                                     </div>
                                 </div>
@@ -241,15 +272,19 @@
                                             viewBox="0 0 24 24">
                                             <path
                                                 d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                            </path>
                                         </svg>
                                     </div>
                                     <div>
-                                        <h3 class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
+                                        <h3
+                                            class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
                                             Keperawatan (S1)
                                         </h3>
-                                        <p class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
-                                            Program Studi Ilmu Keperawatan S1 telah memperoleh akreditasi B dari Lembaga Akreditasi Mandiri Perguruan Tinggi Kesehatan (LAM-PTKes)
+                                        <p
+                                            class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
+                                            Program Studi Ilmu Keperawatan S1 telah memperoleh akreditasi B dari Lembaga
+                                            Akreditasi Mandiri Perguruan Tinggi Kesehatan (LAM-PTKes)
                                         </p>
                                     </div>
                                 </div>
@@ -259,16 +294,29 @@
                                 <div class="flex items-start space-x-3">
                                     <div
                                         class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-yellow-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-yellow-400">
-                                        <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"  fill="none"  stroke="currentColor" class="icon icon-tabler icons-tabler-outline icon-tabler-list-details h-6 w-6">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 5h8" /><path d="M13 9h5" /><path d="M13 15h8" /><path d="M13 19h5" /><path d="M3 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /><path d="M3 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor"
+                                            class="icon icon-tabler icons-tabler-outline icon-tabler-list-details h-6 w-6">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M13 5h8" />
+                                            <path d="M13 9h5" />
+                                            <path d="M13 15h8" />
+                                            <path d="M13 19h5" />
+                                            <path
+                                                d="M3 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
+                                            <path
+                                                d="M3 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
                                         </svg>
                                     </div>
                                     <div>
-                                        <h3 class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
+                                        <h3
+                                            class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
                                             Profesi Ners (Nursing Professional)
                                         </h3>
-                                        <p class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
-                                            Termasuk dalam jalur penerimaan baru bersama Prodi Kedokteran, S1 Keperawatan & lainnya
+                                        <p
+                                            class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
+                                            Termasuk dalam jalur penerimaan baru bersama Prodi Kedokteran, S1
+                                            Keperawatan & lainnya
                                         </p>
                                     </div>
                                 </div>
@@ -281,10 +329,12 @@
                 <div class="relative flex min-h-screen w-full items-center justify-center p-4 lg:w-2/5 lg:p-8 xl:p-16">
                     <!-- Mobile Header - Only visible on mobile -->
                     <div class="absolute left-4 top-4 lg:hidden">
-                        <div class="inline-flex items-center space-x-3 rounded-2xl border border-gray-200/50 bg-white/90 px-4 py-2 shadow-xl backdrop-blur-xl">
+                        <div
+                            class="inline-flex items-center space-x-3 rounded-2xl border border-gray-200/50 bg-white/90 px-4 py-2 shadow-xl backdrop-blur-xl">
                             <div
                                 class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-green-600">
-                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
                                     <path d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11"
                                         stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
                                 </svg>
@@ -321,7 +371,8 @@
                                         </div>
                                     </div>
 
-                                    <h2 class="mb-1 text-xl font-bold text-gray-800 lg:mb-2 lg:text-2xl">Institut Kesehatan Mitra Bunda
+                                    <h2 class="mb-1 text-xl font-bold text-gray-800 lg:mb-2 lg:text-2xl">Institut
+                                        Kesehatan Mitra Bunda
                                     </h2>
                                     <p class="text-sm text-gray-600 lg:text-base">Masuk ke sistem CBT</p>
                                 </div>
@@ -336,13 +387,13 @@
                                             wire:model="username_or_email" />
 
                                         <x-ts-password class="text-sm lg:text-base" icon="key" label="Password"
-                                            placeholder="Masukkan password Anda" required wire:model="password"/>
+                                            placeholder="Masukkan password Anda" required wire:model="password" />
                                     </div>
 
                                     <div class="flex items-center justify-between pt-2">
                                         <x-ts-checkbox class="text-xs lg:text-sm" id="remember" label="Ingat saya"
                                             wire:model="remember" />
-                                        <a class="text-xs font-medium text-[#3BA172] hover:text-green-700 lg:text-sm"
+                                        <a class="text-xs font-medium text-[#f58634] hover:text-green-700 lg:text-sm"
                                             href="#">
                                             Lupa Password?
                                         </a>
@@ -354,13 +405,14 @@
                                             icon="arrow-right" position="right" type="submit" loading="login">
                                             <x-slot:text>Masuk</x-slot:text>
                                         </x-ts-button>
-                                        {{-- <button class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base text-black bg-[#3BA172]">
+                                        {{-- <button class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base text-black bg-[#f58634]">
                                             Masuk
                                         </button> --}}
                                     </div>
                                 </form>
                                 <div class="mt-4 text-center">
-                                    <a href="{{ route('register') }}" class="text-[#3BA172] hover:text-[#317354] text-sm">Buat Akun ?</a>
+                                    <a href="{{ route('register') }}"
+                                        class="text-[#f58634] hover:text-[#317354] text-sm">Buat Akun ?</a>
                                 </div>
                             </div>
                         </div>
@@ -381,7 +433,8 @@
                                             viewBox="0 0 24 24">
                                             <path
                                                 d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                            </path>
                                         </svg>
                                         <span class="text-xs font-medium text-gray-600">Secure</span>
                                     </div>
@@ -452,7 +505,8 @@
                                     </div>
                                 </div> --}}
                                 <div>
-                                    <h1 class="text-5xl font-extrabold tracking-tight text-gray-100">Fakultas Kedokteran</h1>
+                                    <h1 class="text-5xl font-extrabold tracking-tight text-gray-100">Fakultas
+                                        Kedokteran</h1>
                                     {{-- <p class="text-md text-gray-800/80">insitutkmb@gmail.com</p> --}}
                                 </div>
                             </div>
@@ -554,7 +608,8 @@
 
                         <!-- Features Grid -->
                         <div class="space-y-2 mt-[40%] max-w-xl">
-                            <div class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
+                            <div
+                                class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
                                 <div class="flex items-start space-x-3">
                                     <div
                                         class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
@@ -562,20 +617,25 @@
                                             viewBox="0 0 24 24">
                                             <path
                                                 d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                            </path>
                                         </svg>
                                     </div>
                                     <div>
-                                        <h3 class="mb-1 text-lg font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
+                                        <h3
+                                            class="mb-1 text-lg font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
                                             Visi
                                         </h3>
-                                        <p class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
-                                            Menjadi pusat pendidikan kedokteran yang unggul, berintegritas, dan berdaya saing global dalam mewujudkan pelayanan kesehatan yang berkualitas.
+                                        <p
+                                            class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
+                                            Menjadi pusat pendidikan kedokteran yang unggul, berintegritas, dan berdaya
+                                            saing global dalam mewujudkan pelayanan kesehatan yang berkualitas.
                                         </p>
                                     </div>
                                 </div>
                             </div>
-                            <div class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
+                            <div
+                                class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
                                 <div class="flex items-start space-x-3">
                                     <div
                                         class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
@@ -583,30 +643,37 @@
                                             viewBox="0 0 24 24">
                                             <path
                                                 d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                            </path>
                                         </svg>
                                     </div>
                                     <div>
-                                        <h3 class="mb-1 text-lg font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
+                                        <h3
+                                            class="mb-1 text-lg font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
                                             Misi
                                         </h3>
                                         <div class="space-y-2">
-                                            <ul class="space-y-1 text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
+                                            <ul
+                                                class="space-y-1 text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
                                                 <li class="flex items-center gap-2">
                                                     <span class="w-2 h-2 rounded-full bg-white"></span>
-                                                    <span>Menyelenggarakan pendidikan kedokteran yang inovatif, berbasis teknologi, dan berorientasi pada kebutuhan masyarakat.</span>
+                                                    <span>Menyelenggarakan pendidikan kedokteran yang inovatif, berbasis
+                                                        teknologi, dan berorientasi pada kebutuhan masyarakat.</span>
                                                 </li>
                                                 <li class="flex items-center gap-2">
                                                     <span class="w-2 h-2 rounded-full bg-white"></span>
-                                                    <span>Menghasilkan lulusan dokter yang kompeten, berempati, dan menjunjung etika profesi.</span>
+                                                    <span>Menghasilkan lulusan dokter yang kompeten, berempati, dan
+                                                        menjunjung etika profesi.</span>
                                                 </li>
                                                 <li class="flex items-center gap-2">
                                                     <span class="w-2 h-2 rounded-full bg-white"></span>
-                                                    <span>Mengembangkan penelitian yang bermanfaat bagi kemajuan ilmu kedokteran dan kesehatan publik.</span>
+                                                    <span>Mengembangkan penelitian yang bermanfaat bagi kemajuan ilmu
+                                                        kedokteran dan kesehatan publik.</span>
                                                 </li>
                                                 <li class="flex items-center gap-2">
                                                     <span class="w-2 h-2 rounded-full bg-white"></span>
-                                                    <span>Berperan aktif dalam pengabdian kepada masyarakat melalui program kesehatan berkelanjutan.</span>
+                                                    <span>Berperan aktif dalam pengabdian kepada masyarakat melalui
+                                                        program kesehatan berkelanjutan.</span>
                                                 </li>
                                             </ul>
                                         </div>
@@ -625,7 +692,8 @@
                             class="inline-flex items-center space-x-3 rounded-2xl border border-gray-200/50 bg-white/90 px-4 py-2 shadow-xl backdrop-blur-xl">
                             <div
                                 class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-green-600">
-                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
                                     <path d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11"
                                         stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
                                 </svg>
@@ -662,7 +730,8 @@
                                         </div>
                                     </div> --}}
 
-                                    <h2 class="mb-1 text-xl font-bold text-gray-800 lg:mb-2 lg:text-2xl">Fakultas Kedokteran</h2>
+                                    <h2 class="mb-1 text-xl font-bold text-gray-800 lg:mb-2 lg:text-2xl">Fakultas
+                                        Kedokteran</h2>
                                     {{-- <p class="text-sm text-gray-600 lg:text-base">Masuk ke sistem CBT</p> --}}
                                 </div>
 
@@ -676,13 +745,13 @@
                                             wire:model="username_or_email" />
 
                                         <x-ts-password class="text-sm lg:text-base" icon="key" label="Password"
-                                            placeholder="Masukkan password Anda" required wire:model="password"/>
+                                            placeholder="Masukkan password Anda" required wire:model="password" />
                                     </div>
 
                                     <div class="flex items-center justify-between pt-2">
                                         <x-ts-checkbox class="text-xs lg:text-sm" id="remember" label="Ingat saya"
                                             wire:model="remember" />
-                                        <a class="text-xs font-medium text-[#3BA172] hover:text-green-700 lg:text-sm"
+                                        <a class="text-xs font-medium text-[#f58634] hover:text-green-700 lg:text-sm"
                                             href="#">
                                             Lupa Password?
                                         </a>
@@ -694,13 +763,14 @@
                                             icon="arrow-right" position="right" type="submit" loading="login">
                                             <x-slot:text>Masuk</x-slot:text>
                                         </x-ts-button>
-                                        {{-- <button class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base text-black bg-[#3BA172]">
+                                        {{-- <button class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base text-black bg-[#f58634]">
                                             Masuk
                                         </button> --}}
                                     </div>
                                 </form>
                                 <div class="mt-4 text-center">
-                                    <a href="{{ route('register') }}" class="text-[#3BA172] hover:text-[#317354] text-sm">Buat Akun ?</a>
+                                    <a href="{{ route('register') }}"
+                                        class="text-[#f58634] hover:text-[#317354] text-sm">Buat Akun ?</a>
                                 </div>
                             </div>
                         </div>
@@ -721,7 +791,8 @@
                                             viewBox="0 0 24 24">
                                             <path
                                                 d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                            </path>
                                         </svg>
                                         <span class="text-xs font-medium text-gray-600">Secure</span>
                                     </div>
@@ -739,13 +810,15 @@
         </div>
     @else
         <div class="min-h-screen flex items-center justify-center p-4">
-            <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-lg p-6 relative overflow-hidden">
+            <div
+                class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-lg p-6 relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#1E3A8A] to-[#C3D4EC]"></div>
 
                 <!-- Logo & Welcome -->
                 <div class="flex flex-col items-center mb-6">
-                    <img src="{{ asset('asset/img/LogoPROCBT.png') }}" alt="Logo PRO CBT" class="h-12 drop-shadow-md mb-4">
-                    <h1 class="text-2xl font-bold text-[#3BA172]">Selamat Datang Kembali!</h1>
+                    <img src="{{ asset('asset/img/LogoPROCBT.png') }}" alt="Logo PRO CBT"
+                        class="h-12 drop-shadow-md mb-4">
+                    <h1 class="text-2xl font-bold text-[#f58634]">Selamat Datang Kembali!</h1>
                     <p class="text-gray-600 text-sm">Akses dashboard admin Anda dengan aman</p>
                 </div>
 
@@ -757,10 +830,13 @@
                     <!-- Login Key -->
                     <div class="group">
                         <div class="relative">
-                            <input autocomplete="off" type="text" name="code" class="input-style w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1E3A8A]/20 focus:border-[#1E3A8A] transition-all bg-white/50" placeholder="Login Key" wire:model='code'>
+                            <input autocomplete="off" type="text" name="code"
+                                class="input-style w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1E3A8A]/20 focus:border-[#1E3A8A] transition-all bg-white/50"
+                                placeholder="Login Key" wire:model='code'>
                             <div class="absolute inset-y-0 right-3 flex items-center text-gray-400">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z">
                                     </path>
                                 </svg>
                             </div>
@@ -773,7 +849,8 @@
                     <!-- Email -->
                     <div>
                         <div class="relative">
-                            <input autocomplete="off" type="text" name="username_or_email" wire:model='username_or_email'
+                            <input autocomplete="off" type="text" name="username_or_email"
+                                wire:model='username_or_email'
                                 class="input-style w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1E3A8A]/20 focus:border-[#1E3A8A] transition-all bg-white/50"
                                 placeholder="Username or Email">
                             <div class="absolute inset-y-0 right-3 flex items-center text-gray-400">
@@ -803,8 +880,9 @@
                                         d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    <path class="eye-line" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 3l18 18" :style="showPassword ? 'opacity: 0' : 'opacity: 1'" />
+                                    <path class="eye-line" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2" d="M3 3l18 18"
+                                        :style="showPassword ? 'opacity: 0' : 'opacity: 1'" />
                                 </svg>
                             </button>
                         </div>
@@ -832,8 +910,9 @@
                                             str_pad(dechex(rand(0, 255)), 2, '0', STR_PAD_LEFT) .
                                             str_pad(dechex(rand(0, 255)), 2, '0', STR_PAD_LEFT);
                                     @endphp
-                                    <span class="font-bold tracking-wider select-none" style="color: {{ $randomColor }};"
-                                        oncontextmenu="return false" onselectstart="return false">{{ $char }}</span>
+                                    <span class="font-bold tracking-wider select-none"
+                                        style="color: {{ $randomColor }};" oncontextmenu="return false"
+                                        onselectstart="return false">{{ $char }}</span>
                                 @endforeach
                             </div>
                         </div>
@@ -846,10 +925,12 @@
                     <div class="flex items-center justify-between">
                         <label class="flex items-center">
                             <input autocomplete="off" type="checkbox" name="remember"
-                                class="rounded border-gray-300 text-[#3BA172] focus:ring-[#1E3A8A]/20" wire:model='remember'>
+                                class="rounded border-gray-300 text-[#f58634] focus:ring-[#1E3A8A]/20"
+                                wire:model='remember'>
                             <span class="ml-2 text-sm text-gray-600">Ingat saya</span>
                         </label>
-                        <a href="#" class="text-sm text-[#3BA172] hover:text-[#2563EB] transition-colors">Lupa kata
+                        <a href="#" class="text-sm text-[#f58634] hover:text-[#2563EB] transition-colors">Lupa
+                            kata
                             sandi?</a>
                     </div>
 
@@ -863,7 +944,8 @@
                     <div class="mt-4 text-center">
                         <p class="text-sm text-gray-600">
                             Belum punya akun?
-                            <a href="{{ route('register') }}" class="text-[#3BA172] hover:underline font-semibold">Daftar di
+                            <a href="{{ route('register') }}"
+                                class="text-[#f58634] hover:underline font-semibold">Daftar di
                                 sini</a>
                         </p>
                     </div>

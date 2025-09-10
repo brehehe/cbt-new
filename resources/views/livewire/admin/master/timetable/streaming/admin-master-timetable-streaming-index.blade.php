@@ -2,10 +2,10 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#3BA172]">User</h1>
+                <h1 class="text-2xl font-bold text-[#f58634]">User</h1>
             </div>
             <div>
-                <button wire:click="refreshStreamData" class="btn btn-success">
+                <button wire:click="refreshStreamData" class="btn btn-warning">
                     <i class="fas fa-sync-alt"></i>
                     Refresh
                 </button>
@@ -125,7 +125,7 @@
                             const available = await checkPeerAvailability(session.peer_id);
                             console.log(
                                 `${session.user_name} (${session.peer_id}): ${available ? '✅ Available' : '❌ Not available'}`
-                                );
+                            );
                         }
                     }
                 }
@@ -395,7 +395,7 @@
                             if (streamInfo.has_real_camera && streamInfo.peer_id) {
                                 console.log(
                                     `Found student with camera: ${streamInfo.user_name} (Peer ID: ${streamInfo.peer_id})`
-                                    );
+                                );
 
                                 // Check if peer is actually available before attempting connection
                                 if (await checkPeerAvailability(streamInfo.peer_id)) {
@@ -428,7 +428,7 @@
                                 } else {
                                     console.log(
                                         `Peer ${streamInfo.peer_id} is not available, using demo mode for ${streamInfo.user_name}`
-                                        );
+                                    );
                                     createMockVideoStreamForSession(streamInfo, activeSessions.length);
 
                                     // Update session type to 'demo'
@@ -442,7 +442,7 @@
                             } else {
                                 console.log(
                                     `${streamInfo.user_name} - No camera or peer ID (camera: ${streamInfo.has_real_camera}, peer: ${streamInfo.peer_id})`
-                                    );
+                                );
                                 // No real camera or peer ID, use demo
                                 createMockVideoStreamForSession(streamInfo, activeSessions.length);
 
@@ -615,7 +615,7 @@
                 const timeoutId = setTimeout(() => {
                     if (!callAttempted) {
                         console.log(
-                        `Connection timeout for ${streamInfo.user_name} - no call response`);
+                            `Connection timeout for ${streamInfo.user_name} - no call response`);
                         reject(new Error('Connection timeout - student may not be online'));
                     }
                 }, 10000); // 10 seconds timeout
@@ -669,7 +669,7 @@
                                 cleanup: () => {
                                     console.log(
                                         `Cleaning up connection for ${streamInfo.user_name}`
-                                        );
+                                    );
                                     try {
                                         if (call && call.open) {
                                             call.close();
@@ -720,7 +720,7 @@
                             if (!streamReceived) {
                                 reject(new Error(
                                     'No video stream received - student camera may not be active'
-                                    ));
+                                ));
                             }
                         }
                     }, 8000); // 8 seconds for stream reception
@@ -859,7 +859,7 @@
                     video.addEventListener('loadeddata', () => {
                         console.log(
                             `✅ Video loaded successfully for session ${sessionId}: ${sessionData.user_name || sessionData.name}`
-                            );
+                        );
                     });
 
                     video.addEventListener('loadedmetadata', () => {
@@ -895,7 +895,7 @@
 
                     console.log(
                         `Stream displayed in container ${index} for session ${sessionId}: ${sessionData.user_name || sessionData.name}`
-                        );
+                    );
                 } else {
                     console.warn(`Container ${index} not found for session ${sessionId}`);
                 }

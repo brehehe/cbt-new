@@ -3,11 +3,11 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#3BA172]">Data Kelas Detail</h1>
+                <h1 class="text-2xl font-bold text-[#f58634]">Data Kelas Detail</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div>
-                <button wire:click="submit()" class="btn btn-success">
+                <button wire:click="submit()" class="btn btn-warning">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -49,7 +49,7 @@
                     </select>
                     <span class="text-sm text-gray-700 ml-2">data</span> --}}
                     <div>
-                        <h1 class="text-2xl font-bold text-[#3BA172]">Data Mahasiswa</h1>
+                        <h1 class="text-2xl font-bold text-[#f58634]">Data Mahasiswa</h1>
                         {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
                     </div>
                 </div>
@@ -61,7 +61,7 @@
                             <i class="fas fa-search h-3 w-3 text-gray-400"></i>
                         </div>
                     </div>
-                    <button wire:click="openModalStudent()" class="mt-1 px-3 py-2 btn btn-success">
+                    <button wire:click="openModalStudent()" class="mt-1 px-3 py-2 btn btn-warning">
                         Tambah
                     </button>
                 </div>

@@ -9,7 +9,8 @@
             </div>
 
             <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-2xl">
-                <div class="bg-white py-8 px-6 shadow-2xl sm:rounded-2xl sm:px-10 border border-gray-200 backdrop-blur-sm">
+                <div
+                    class="bg-white py-8 px-6 shadow-2xl sm:rounded-2xl sm:px-10 border border-gray-200 backdrop-blur-sm">
                     <!-- Enhanced Step Indicator -->
                     <div class="mb-10">
                         <!-- Progress Bar Background -->
@@ -31,11 +32,13 @@
                                     <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                                        </path>
                                     </svg>
                                 </div>
                                 <span id="step1-text"
-                                    class="mt-2 sm:mt-3 text-xs sm:text-sm font-bold text-green-600 text-center leading-tight px-1">Data Diri</span>
+                                    class="mt-2 sm:mt-3 text-xs sm:text-sm font-bold text-green-600 text-center leading-tight px-1">Data
+                                    Diri</span>
                             </div>
 
                             <div class="flex flex-col items-center group cursor-pointer min-w-0 flex-1">
@@ -49,7 +52,8 @@
                                     </svg>
                                 </div>
                                 <span id="step1-text"
-                                    class="mt-2 sm:mt-3 text-xs sm:text-sm font-bold {{ $step >= 2 ? 'text-green-600' : 'text-gray-500' }} text-center leading-tight px-1">Data Program Studi</span>
+                                    class="mt-2 sm:mt-3 text-xs sm:text-sm font-bold {{ $step >= 2 ? 'text-green-600' : 'text-gray-500' }} text-center leading-tight px-1">Data
+                                    Program Studi</span>
                             </div>
 
                             <div class="flex flex-col items-center group cursor-pointer min-w-0 flex-1">
@@ -60,7 +64,14 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                     </svg> --}}
-                                    <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"  fill="none"  stroke="currentColor" stroke-width="2"  class="icon icon-tabler icons-tabler-outline icon-tabler-files w-4 h-4 sm:w-5 sm:h-5"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 3v4a1 1 0 0 0 1 1h4" /><path d="M18 17h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h4l5 5v7a2 2 0 0 1 -2 2z" /><path d="M16 17v2a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h2" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2"
+                                        class="icon icon-tabler icons-tabler-outline icon-tabler-files w-4 h-4 sm:w-5 sm:h-5">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M15 3v4a1 1 0 0 0 1 1h4" />
+                                        <path
+                                            d="M18 17h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h4l5 5v7a2 2 0 0 1 -2 2z" />
+                                        <path d="M16 17v2a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h2" />
                                     </svg>
                                 </div>
                                 <span id="step2-text"
@@ -116,8 +127,7 @@
                                             class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
                                             <svg class="w-5 h-5 mr-2 text-green-400" fill="none"
                                                 stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    stroke-width="2"
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
                                                 </path>
                                             </svg>
@@ -134,8 +144,15 @@
                                         <div>
                                             <label for="birth_place"
                                                 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                                                <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-cake w-5 h-5 mr-2 text-green-400">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 20h18v-8a3 3 0 0 0 -3 -3h-12a3 3 0 0 0 -3 3v8z" /><path d="M3 14.803c.312 .135 .654 .204 1 .197a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1c.35 .007 .692 -.062 1 -.197" /><path d="M12 4l1.465 1.638a2 2 0 1 1 -3.015 .099l1.55 -1.737z" />
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                    fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-cake w-5 h-5 mr-2 text-green-400">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                    <path d="M3 20h18v-8a3 3 0 0 0 -3 -3h-12a3 3 0 0 0 -3 3v8z" />
+                                                    <path
+                                                        d="M3 14.803c.312 .135 .654 .204 1 .197a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1c.35 .007 .692 -.062 1 -.197" />
+                                                    <path d="M12 4l1.465 1.638a2 2 0 1 1 -3.015 .099l1.55 -1.737z" />
                                                 </svg>
                                                 Tempat, Tanggal Lahir <span class="text-red-500">*</span>
                                             </label>
@@ -147,7 +164,8 @@
                                             @enderror
                                         </div>
                                         <div>
-                                            <label for="birth_date" class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                                            <label for="birth_date"
+                                                class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
                                                 &nbsp;
                                             </label>
                                             <input type="date" id="birth_date" name="birth_date"
@@ -161,8 +179,14 @@
                                     <div>
                                         <label for="email"
                                             class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                                            <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-mail w-5 h-5 mr-2 text-green-400">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round"
+                                                class="icon icon-tabler icons-tabler-outline icon-tabler-mail w-5 h-5 mr-2 text-green-400">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path
+                                                    d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" />
+                                                <path d="M3 7l9 6l9 -6" />
                                             </svg>
                                             Email <span class="text-red-500">*</span>
                                         </label>
@@ -179,7 +203,7 @@
                                             <i class="ti ti-key text-xl mr-2 text-green-400"></i>
                                             Kata Sandi <span class="text-red-500">*</span>
                                         </label>
-                                        <x-ts-password placeholder='******' wire:model.defer="password"/>
+                                        <x-ts-password placeholder='******' wire:model.defer="password" />
                                     </div>
                                 </div>
                                 <button type="button" id="next-step1" wire:click="nextStep()"
@@ -216,17 +240,20 @@
                                         @enderror
                                     </div>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                         <div>
-                                            <label for="program_study" class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                                        <div>
+                                            <label for="program_study"
+                                                class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
                                                 <i class="ti ti-school mr-2 text-green-400 text-xl"></i>
                                                 Program Studi/Jurusan <span class="text-red-500">*</span>
                                             </label>
                                             <div wire:key="select-{{ rand() }}">
-                                                <select class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500-all duration-300 hover:border-green-300"
+                                                <select
+                                                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500-all duration-300 hover:border-green-300"
                                                     wire:model.lazy="program_study" id="program_study">
                                                     <option value="">-- Pilih program studi --</option>
                                                     @foreach ($program_studies as $value)
-                                                        <option value="{{ $value }}">{{ $value }}</option>
+                                                        <option value="{{ $value }}">{{ $value }}
+                                                        </option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -303,7 +330,8 @@
                                         </label>
                                         <input type="file" id="payment_registration" name="payment_registration"
                                             class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500-all duration-300 hover:border-green-300"
-                                            placeholder="Masukkan nama lengkap" wire:model.defer="payment_registration">
+                                            placeholder="Masukkan nama lengkap"
+                                            wire:model.defer="payment_registration">
                                         @error('payment_registration')
                                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                                         @enderror
@@ -347,13 +375,14 @@
         </div>
     @else
         <div class="min-h-screen flex items-center justify-center p-4">
-            <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-lg p-6 relative overflow-hidden">
+            <div
+                class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-lg p-6 relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#1E3A8A] to-[#C3D4EC]"></div>
 
                 <!-- Logo & Title -->
                 <div class="flex flex-col items-center mb-6">
                     <img src="{{ asset('asset/img/logo.png') }}" alt="PRO CBT Logo" class="h-12 drop-shadow-md">
-                    <h1 class="text-2xl font-bold text-[#3BA172]">Buat Akun Anda</h1>
+                    <h1 class="text-2xl font-bold text-[#f58634]">Buat Akun Anda</h1>
                     <p class="text-gray-600 text-sm">Daftar untuk mengakses dashboard Anda</p>
                 </div>
 
@@ -369,11 +398,11 @@
                     <div class="w-full mb-8">
                         <!-- Step Labels -->
                         <div class="flex justify-between text-sm text-gray-600 mb-2 font-medium">
-                            <span :class="step >= 1 ? 'text-[#3BA172] font-semibold' : ''">Step 1</span>
-                            <span :class="step >= 2 ? 'text-[#3BA172] font-semibold' : ''">Step 2</span>
-                            <span :class="step >= 3 ? 'text-[#3BA172] font-semibold' : ''">Step 3</span>
-                            <span :class="step >= 4 ? 'text-[#3BA172] font-semibold' : ''">Step 4</span>
-                            <span :class="step >= 5 ? 'text-[#3BA172] font-semibold' : ''">Step 5</span>
+                            <span :class="step >= 1 ? 'text-[#f58634] font-semibold' : ''">Step 1</span>
+                            <span :class="step >= 2 ? 'text-[#f58634] font-semibold' : ''">Step 2</span>
+                            <span :class="step >= 3 ? 'text-[#f58634] font-semibold' : ''">Step 3</span>
+                            <span :class="step >= 4 ? 'text-[#f58634] font-semibold' : ''">Step 4</span>
+                            <span :class="step >= 5 ? 'text-[#f58634] font-semibold' : ''">Step 5</span>
                         </div>
 
                         <!-- Progress Bar Track -->
@@ -459,7 +488,8 @@
                         </div>
 
                         <div class="flex justify-end mt-6">
-                            <button type="button" wire:click="nextStep" class="btn-primary cursor-pointer">Lanjut</button>
+                            <button type="button" wire:click="nextStep"
+                                class="btn-primary cursor-pointer">Lanjut</button>
                         </div>
                     </div>
 
@@ -555,7 +585,8 @@
 
                         <div class="flex justify-between mt-6">
                             <button type="button" wire:click="prevStep" class="btn-secondary">Kembali</button>
-                            <button type="button" wire:click="nextStep" class="btn-primary cursor-pointer">Lanjut</button>
+                            <button type="button" wire:click="nextStep"
+                                class="btn-primary cursor-pointer">Lanjut</button>
                         </div>
                     </div>
 
@@ -572,7 +603,8 @@
                                         class="inline-flex items-center px-4 py-2 bg-[#1E3A8A] text-white rounded-xl cursor-pointer hover:bg-[#1E3A8A] transition-all">
                                         Upload Logo
                                         <!-- Optional: Icon next to text -->
-                                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12v8m0-8l-3 3m3-3l3 3M12 4v4" />
                                         </svg>
@@ -600,7 +632,8 @@
                                         placeholder="NPWP / Tax ID">
                                     <div class="absolute inset-y-0 right-3 flex items-center text-gray-400">
                                         <!-- Icon document -->
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M9 12h6m-6 4h6M12 4v4m-4 4h8M4 6a2 2 0 012-2h8l4 4v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" />
                                         </svg>
@@ -616,7 +649,8 @@
                                         placeholder="Industri">
                                     <div class="absolute inset-y-0 right-3 flex items-center text-gray-400">
                                         <!-- Icon briefcase -->
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M10 9V7a2 2 0 012-2h0a2 2 0 012 2v2m-8 4h12m-12 0v6a2 2 0 002 2h8a2 2 0 002-2v-6M4 13h16" />
                                         </svg>
@@ -632,7 +666,8 @@
 
                         <div class="flex justify-between mt-6">
                             <button type="button" wire:click="prevStep" class="btn-secondary">Kembali</button>
-                            <button type="button" wire:click="nextStep" class="btn-primary cursor-pointer">Lanjut</button>
+                            <button type="button" wire:click="nextStep"
+                                class="btn-primary cursor-pointer">Lanjut</button>
                         </div>
                     </div>
 
@@ -691,7 +726,8 @@
                                         <i class="fas fa-phone text-lg"></i>
                                     </div>
                                 </div>
-                                <p class="text-xs text-gray-500 mt-1">Masukkan nomor HP/WA yang aktif dan bisa dihubungi
+                                <p class="text-xs text-gray-500 mt-1">Masukkan nomor HP/WA yang aktif dan bisa
+                                    dihubungi
                                     (contoh: 081234567890)</p>
                                 @error('pic_phone')
                                     <span class="text-sm text-red-500">{{ $message }}</span>
@@ -701,7 +737,8 @@
                         </div>
                         <div class="flex justify-between mt-6">
                             <button type="button" wire:click="prevStep" class="btn-secondary">Kembali</button>
-                            <button type="button" wire:click="nextStep" class="btn-primary cursor-pointer">Lanjut</button>
+                            <button type="button" wire:click="nextStep"
+                                class="btn-primary cursor-pointer">Lanjut</button>
                         </div>
                     </div>
 
@@ -730,7 +767,8 @@
                                         placeholder="Username">
                                     <div class="absolute inset-y-0 right-3 flex items-center text-gray-400">
                                         <!-- Icon user -->
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M5.121 17.804A9 9 0 1118.88 6.196 9 9 0 015.12 17.804zM12 12a3 3 0 100-6 3 3 0 000 6z" />
                                         </svg>
@@ -750,15 +788,17 @@
                                             class="input-style pr-10" placeholder="Password (min. 8 karakter)">
                                         <button type="button" @click="show = !show"
                                             class="absolute right-3 top-1/2 -translate-y-1/2 transform text-gray-500 focus:outline-none">
-                                            <svg x-show="show" x-cloak xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg x-show="show" x-cloak xmlns="http://www.w3.org/2000/svg"
+                                                class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
-                                            <svg x-show="!show" x-cloak xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg x-show="!show" x-cloak xmlns="http://www.w3.org/2000/svg"
+                                                class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.985 9.985 0 012.241-3.715M6.633 6.633A9.978 9.978 0 0112 5c4.477 0 8.268 2.943 9.542 7a9.978 9.978 0 01-1.348 2.708M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -784,14 +824,16 @@
                                         <button type="button" @click="showConfirm = !showConfirm"
                                             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 focus:outline-none">
                                             <svg x-show="showConfirm" x-cloak xmlns="http://www.w3.org/2000/svg"
-                                                class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
                                             <svg x-show="!showConfirm" x-cloak xmlns="http://www.w3.org/2000/svg"
-                                                class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.985 9.985 0 012.241-3.715M6.633 6.633A9.978 9.978 0 0112 5c4.477 0 8.268 2.943 9.542 7a9.978 9.978 0 01-1.348 2.708M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -814,8 +856,8 @@
                             <button type="submit" wire:loading.attr="disabled" class="btn-submit">
                                 <span wire:loading.remove>Daftar</span>
                                 <span wire:loading>
-                                    <svg class="animate-spin h-5 w-5 text-white mx-auto" xmlns="http://www.w3.org/2000/svg"
-                                        fill="none" viewBox="0 0 24 24">
+                                    <svg class="animate-spin h-5 w-5 text-white mx-auto"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10"
                                             stroke="currentColor" stroke-width="4"></circle>
                                         <path class="opacity-75" fill="currentColor"
@@ -832,7 +874,7 @@
                 <div class="mt-4 text-center">
                     <p class="text-sm text-gray-600">
                         Sudah punya akun?
-                        <a href="{{ route('login') }}" class="text-[#3BA172] hover:underline font-semibold">Login di
+                        <a href="{{ route('login') }}" class="text-[#f58634] hover:underline font-semibold">Login di
                             sini</a>
                     </p>
                 </div>
