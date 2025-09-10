@@ -191,6 +191,131 @@
             transform: translateX(20px);
         }
 
+        /* Real-time status indicators */
+        .status-indicator {
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.error {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            50% {
+                opacity: 1;
+            }
+
+            51%,
+            100% {
+                opacity: 0.3;
+            }
+        }
+
+        /* Enhanced progress bars */
+        .progress-bar-animated {
+            transition: width 2s ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar-animated::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        /* Modal animations */
+        .modal-enter {
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* Enhanced card hover effects */
+        .metric-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-left-color: #f58634;
+        }
+
+        /* Network status colors */
+        .network-excellent {
+            color: #10b981;
+        }
+
+        .network-good {
+            color: #3b82f6;
+        }
+
+        .network-fair {
+            color: #f59e0b;
+        }
+
+        .network-poor {
+            color: #ef4444;
+        }
+
+        /* Loading states */
+        .loading-state {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-state::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+            animation: loading-sweep 2s infinite;
+        }
+
+        @keyframes loading-sweep {
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 100%;
+            }
+        }
+
+        /* Responsive enhancements */
+        @media (max-width: 640px) {
+            .metric-card {
+                padding: 1rem;
+            }
+
+            .real-time-controls {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
         /* Dark mode support */
         @media (prefers-color-scheme: dark) {
             .glass-effect {
@@ -253,7 +378,7 @@
                 <p class="text-gray-600 mt-1">Here's what's happening in your CBT system today.</p>
                 {{-- <p class="text-sm text-gray-500">{{ \Carbon\Carbon::now()->format('l, F j, Y') }}</p> --}}
             </div>
-            {{-- <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3">
                 <!-- Auto Refresh Toggle -->
                 <label class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" id="autoRefresh" class="sr-only peer" checked>
@@ -263,8 +388,14 @@
                     <span class="ml-3 text-sm font-medium text-gray-600">Auto Refresh</span>
                 </label>
 
+                <!-- Real-time Status Indicator -->
+                <div class="flex items-center space-x-2">
+                    <div id="realtimeIndicator" class="w-3 h-3 rounded-full bg-green-500 pulse-dot"></div>
+                    <span class="text-sm text-gray-600">Live</span>
+                </div>
+
                 <!-- Refresh Button -->
-                <button wire:click="refreshData"
+                <button wire:click="refreshData" id="refreshButton"
                     class="inline-flex items-center px-4 py-2 bg-[#f58634] hover:bg-[#2d8c5b] text-white text-sm font-medium rounded-lg transition-colors duration-200">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -273,7 +404,12 @@
                     </svg>
                     Refresh
                 </button>
-            </div> --}}
+
+                <!-- Last Update Time -->
+                <div class="text-xs text-gray-500">
+                    Last update: <span id="lastUpdateTime">{{ date('H:i:s') }}</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -471,7 +607,7 @@
                 </div>
             </div>
 
-            <div class="chart-container">
+            <div class="chart-container" wire:ignore>
                 <canvas id="weeklyChart" width="400" height="200"></canvas>
             </div>
         </div>
@@ -726,7 +862,12 @@
                         {{ $systemPerformance['avg_response_time'] ?? 'N/A' }}</div>
                     <div class="text-sm text-gray-600">Avg Response Time</div>
                     <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
-                        <div class="bg-blue-600 h-2 rounded-full" style="width: 75%"></div>
+                        @php
+                            $responseMs = (int) str_replace('ms', '', $systemPerformance['avg_response_time'] ?? '0');
+                            $responseWidth = min(100, max(10, (500 - $responseMs) / 5)); // Better is narrower
+                        @endphp
+                        <div class="bg-blue-600 h-2 rounded-full transition-all duration-1000"
+                            style="width: {{ $responseWidth }}%"></div>
                     </div>
                 </div>
 
@@ -786,7 +927,12 @@
                         {{ $systemPerformance['concurrent_users'] ?? 0 }}</div>
                     <div class="text-sm text-gray-600">Concurrent Users</div>
                     <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
-                        <div class="bg-orange-600 h-2 rounded-full" style="width: 60%"></div>
+                        @php
+                            $concurrent = (int) ($systemPerformance['concurrent_users'] ?? 0);
+                            $concurrentWidth = min(100, max(5, ($concurrent / 100) * 100));
+                        @endphp
+                        <div class="bg-orange-600 h-2 rounded-full transition-all duration-1000"
+                            style="width: {{ $concurrentWidth }}%"></div>
                     </div>
                 </div>
 
@@ -796,7 +942,13 @@
                         {{ $systemPerformance['server_load'] ?? 'N/A' }}</div>
                     <div class="text-sm text-gray-600">Server Load</div>
                     <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
-                        <div class="bg-purple-600 h-2 rounded-full" style="width: 45%"></div>
+                        @php
+                            $load = (int) str_replace('%', '', $systemPerformance['server_load'] ?? '0');
+                            $loadColorClass =
+                                $load < 60 ? 'bg-green-600' : ($load < 80 ? 'bg-yellow-500' : 'bg-red-500');
+                        @endphp
+                        <div class="{{ $loadColorClass }} h-2 rounded-full transition-all duration-1000"
+                            style="width: {{ $load }}%"></div>
                     </div>
                 </div>
             @else
@@ -805,18 +957,186 @@
                 </div>
             @endif
         </div>
-
+        {{--
         <!-- Real-time Monitoring Button -->
         <div class="mt-6 text-center">
-            <button onclick="openRealtimeModal()"
-                class="bg-gradient-to-r from-[#f58634] to-[#2d8c5b] text-white px-6 py-3 rounded-lg hover:from-[#2d8c5b] hover:to-[#236647] transition-all duration-300 shadow-lg hover:shadow-xl">
-                <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-                    </path>
-                </svg>
-                View Real-time Metrics
-            </button>
+            <div class="flex justify-center space-x-4">
+                <button onclick="openRealtimeModal()"
+                    class="bg-gradient-to-r from-[#f58634] to-[#2d8c5b] text-white px-6 py-3 rounded-lg hover:from-[#2d8c5b] hover:to-[#236647] transition-all duration-300 shadow-lg hover:shadow-xl">
+                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                        </path>
+                    </svg>
+                    View Real-time Metrics
+                </button>
+
+                <button onclick="testRealtimeAPI()"
+                    class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-lg hover:from-indigo-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl">
+                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z">
+                        </path>
+                    </svg>
+                    Test API
+                </button>
+            </div>
+        </div> --}}
+    </div>
+
+    <!-- Advanced Real-time Monitoring Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Memory and CPU Usage -->
+        <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800 mb-6">System Resources</h3>
+
+            @if (isset($systemPerformance['memory_usage']) && isset($systemPerformance['cpu_usage']))
+                <div class="space-y-4">
+                    <!-- Memory Usage -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700">Memory Usage</span>
+                            <span class="text-sm text-blue-600">
+                                @if (is_array($systemPerformance['memory_usage']))
+                                    {{ $systemPerformance['memory_usage']['php_usage_percent'] ?? 'N/A' }}
+                                @else
+                                    {{ $systemPerformance['memory_usage'] }}
+                                @endif
+                            </span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            @php
+                                $memUsage = is_array($systemPerformance['memory_usage'])
+                                    ? (float) str_replace(
+                                        '%',
+                                        '',
+                                        $systemPerformance['memory_usage']['php_usage_percent'] ?? '0',
+                                    )
+                                    : (float) str_replace('%', '', $systemPerformance['memory_usage'] ?? '0');
+                                $memColorClass =
+                                    $memUsage < 60 ? 'bg-green-500' : ($memUsage < 80 ? 'bg-yellow-500' : 'bg-red-500');
+                            @endphp
+                            <div class="{{ $memColorClass }} h-3 rounded-full transition-all duration-1000"
+                                style="width: {{ min($memUsage, 100) }}%"></div>
+                        </div>
+                        @if (is_array($systemPerformance['memory_usage']))
+                            <div class="text-xs text-gray-500 mt-1">
+                                PHP: {{ $systemPerformance['memory_usage']['php_current'] ?? 'N/A' }} /
+                                {{ $systemPerformance['memory_usage']['php_limit'] ?? 'N/A' }}
+                            </div>
+                        @endif
+                    </div>
+
+                    <!-- CPU Usage -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700">CPU Usage</span>
+                            <span
+                                class="text-sm text-purple-600">{{ $systemPerformance['cpu_usage'] ?? 'N/A' }}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            @php
+                                $cpuUsage = (float) str_replace('%', '', $systemPerformance['cpu_usage'] ?? '0');
+                                $cpuColorClass =
+                                    $cpuUsage < 60 ? 'bg-green-500' : ($cpuUsage < 80 ? 'bg-yellow-500' : 'bg-red-500');
+                            @endphp
+                            <div class="{{ $cpuColorClass }} h-3 rounded-full transition-all duration-1000"
+                                style="width: {{ min($cpuUsage, 100) }}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Disk Usage -->
+                    @if (isset($systemPerformance['disk_usage']) && is_array($systemPerformance['disk_usage']))
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-medium text-gray-700">Disk Usage</span>
+                                <span
+                                    class="text-sm text-indigo-600">{{ $systemPerformance['disk_usage']['usage_percent'] ?? 'N/A' }}</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                @php
+                                    $diskUsage = (float) str_replace(
+                                        '%',
+                                        '',
+                                        $systemPerformance['disk_usage']['usage_percent'] ?? '0',
+                                    );
+                                    $diskColorClass =
+                                        $diskUsage < 70
+                                            ? 'bg-green-500'
+                                            : ($diskUsage < 85
+                                                ? 'bg-yellow-500'
+                                                : 'bg-red-500');
+                                @endphp
+                                <div class="{{ $diskColorClass }} h-3 rounded-full transition-all duration-1000"
+                                    style="width: {{ min($diskUsage, 100) }}%"></div>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">
+                                {{ $systemPerformance['disk_usage']['used'] ?? 'N/A' }} /
+                                {{ $systemPerformance['disk_usage']['total'] ?? 'N/A' }}
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            @else
+                <div class="text-center text-gray-500 py-8">
+                    <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z">
+                            </path>
+                        </svg>
+                    </div>
+                    <p class="text-sm">System resource data not available</p>
+                </div>
+            @endif
+        </div>
+
+        <!-- Network Status -->
+        <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800 mb-6">Network Performance</h3>
+
+            @if (isset($systemPerformance['network_status']))
+                @php $network = $systemPerformance['network_status']; @endphp
+                <div class="space-y-4">
+                    <!-- Overall Network Status -->
+                    <div
+                        class="text-center p-4 rounded-lg {{ $network['status'] === 'excellent' ? 'bg-green-50' : ($network['status'] === 'good' ? 'bg-blue-50' : 'bg-yellow-50') }}">
+                        <div
+                            class="text-lg font-semibold {{ $network['status'] === 'excellent' ? 'text-green-700' : ($network['status'] === 'good' ? 'text-blue-700' : 'text-yellow-700') }}">
+                            {{ ucfirst($network['status']) }}
+                        </div>
+                        <div class="text-sm text-gray-600">Average Latency: {{ $network['avg_latency'] ?? 'N/A' }}
+                        </div>
+                    </div>
+
+                    <!-- Network Tests -->
+                    @if (isset($network['tests']))
+                        <div class="space-y-3">
+                            @foreach ($network['tests'] as $test => $result)
+                                <div class="flex justify-between items-center">
+                                    <span
+                                        class="text-sm text-gray-600 capitalize">{{ str_replace('_', ' ', $test) }}</span>
+                                    <span
+                                        class="text-sm font-medium {{ is_numeric($result) && $result < 100 ? 'text-green-600' : 'text-gray-500' }}">
+                                        {{ is_numeric($result) ? $result . 'ms' : $result ?? 'N/A' }}
+                                    </span>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            @else
+                <div class="text-center text-gray-500 py-8">
+                    <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                            </path>
+                        </svg>
+                    </div>
+                    <p class="text-sm">Network status data not available</p>
+                </div>
+            @endif
         </div>
     </div>
 
@@ -1010,16 +1330,160 @@
         </div>
     </div>
 
-    @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Weekly Chart
-                const ctx = document.getElementById('weeklyChart');
-                if (ctx) {
-                    const weeklyData = @json($weeklyExamStats ?? []);
+    <!-- Uptime Details Modal -->
+    <div id="uptimeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl max-w-4xl w-full max-h-screen overflow-y-auto">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-semibold text-gray-800">System Uptime Details</h3>
+                        <button onclick="closeUptimeModal()" class="text-gray-500 hover:text-gray-700">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
 
-                    new Chart(ctx, {
+                <div class="p-6">
+                    @if (isset($uptimeDetails))
+                        <!-- Current Status Overview -->
+                        <div class="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-lg mb-6">
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-green-600 mb-2">
+                                    {{ $uptimeDetails['current'] ?? 'N/A' }}</div>
+                                <div class="text-lg text-gray-700 mb-4">Current System Uptime</div>
+                                <div
+                                    class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium
+                                    {{ ($uptimeDetails['status'] ?? '') === 'Operational'
+                                        ? 'bg-green-100 text-green-800'
+                                        : (($uptimeDetails['status'] ?? '') === 'Minor Issues'
+                                            ? 'bg-yellow-100 text-yellow-800'
+                                            : 'bg-red-100 text-red-800') }}">
+                                    {{ $uptimeDetails['status'] ?? 'Unknown' }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Time Period Breakdown -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div class="bg-blue-50 p-4 rounded-lg text-center">
+                                <div class="text-2xl font-bold text-blue-600">{{ $uptimeDetails['daily'] ?? 'N/A' }}
+                                </div>
+                                <div class="text-sm text-blue-700">Last 24 Hours</div>
+                            </div>
+                            <div class="bg-indigo-50 p-4 rounded-lg text-center">
+                                <div class="text-2xl font-bold text-indigo-600">
+                                    {{ $uptimeDetails['weekly'] ?? 'N/A' }}</div>
+                                <div class="text-sm text-indigo-700">Last 7 Days</div>
+                            </div>
+                            <div class="bg-purple-50 p-4 rounded-lg text-center">
+                                <div class="text-2xl font-bold text-purple-600">
+                                    {{ $uptimeDetails['monthly'] ?? 'N/A' }}</div>
+                                <div class="text-sm text-purple-700">Last 30 Days</div>
+                            </div>
+                        </div>
+
+                        <!-- Service Availability Windows -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="text-lg font-semibold mb-4">Business Hours (8 AM - 6 PM)</h4>
+                                <div class="text-2xl font-bold text-green-600">
+                                    {{ $uptimeDetails['business_hours'] ?? 'N/A' }}</div>
+                                <div class="text-sm text-gray-600">Monday - Friday availability</div>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="text-lg font-semibold mb-4">After Hours & Weekends</h4>
+                                <div class="text-2xl font-bold text-blue-600">
+                                    {{ $uptimeDetails['after_hours'] ?? 'N/A' }}</div>
+                                <div class="text-sm text-gray-600">Extended hours availability</div>
+                            </div>
+                        </div>
+
+                        <!-- Incident Summary -->
+                        @if (isset($uptimeDetails['incidents']))
+                            <div class="bg-white border border-gray-200 p-6 rounded-lg mb-6">
+                                <h4 class="text-lg font-semibold mb-4">Incident Summary</h4>
+                                <div class="grid grid-cols-3 gap-4">
+                                    <div class="text-center">
+                                        <div class="text-xl font-bold text-gray-800">
+                                            {{ $uptimeDetails['incidents']['today'] ?? 0 }}</div>
+                                        <div class="text-sm text-gray-600">Today</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-xl font-bold text-gray-800">
+                                            {{ $uptimeDetails['incidents']['week'] ?? 0 }}</div>
+                                        <div class="text-sm text-gray-600">This Week</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-xl font-bold text-gray-800">
+                                            {{ $uptimeDetails['incidents']['month'] ?? 0 }}</div>
+                                        <div class="text-sm text-gray-600">This Month</div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+                        <!-- Last Downtime & Maintenance -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-yellow-50 p-4 rounded-lg">
+                                <h4 class="text-lg font-semibold text-yellow-800 mb-2">Last Downtime</h4>
+                                <div class="text-sm text-yellow-700">
+                                    {{ $uptimeDetails['last_downtime'] ?? 'No recent incidents' }}</div>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h4 class="text-lg font-semibold text-blue-800 mb-2">Next Maintenance</h4>
+                                <div class="text-sm text-blue-700">{{ $uptimeDetails['next_maintenance'] ?? 'TBD' }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 text-center text-xs text-gray-500">
+                            Uptime calculated based on successful exam completions and system availability
+                        </div>
+                    @else
+                        <div class="text-center py-8">
+                            <p class="text-gray-500">Uptime details not available</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+    <!-- Real-time Monitoring Script -->
+    <script src="{{ asset('asset/js/realtime-monitor.js') }}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Global chart instance
+        let weeklyChart = null;
+
+        // Function to initialize or update chart
+        function initializeChart() {
+            // Check if Chart.js is loaded
+            if (typeof Chart === 'undefined') {
+                console.warn('Chart.js not loaded yet, retrying...');
+                setTimeout(initializeChart, 100);
+                return;
+            }
+
+            const ctx = document.getElementById('weeklyChart');
+            if (ctx) {
+                const weeklyData = @json($weeklyExamStats ?? []);
+
+                // Destroy existing chart if it exists
+                if (weeklyChart) {
+                    weeklyChart.destroy();
+                    weeklyChart = null;
+                }
+
+                try {
+                    // Create new chart
+                    weeklyChart = new Chart(ctx, {
                         type: 'line',
                         data: {
                             labels: weeklyData.map(item => item.date),
@@ -1027,7 +1491,7 @@
                                 label: 'Exams Started',
                                 data: weeklyData.map(item => item.count),
                                 borderColor: '#f58634',
-                                backgroundColor: 'rgba(59, 161, 114, 0.1)',
+                                backgroundColor: 'rgba(245, 134, 52, 0.1)',
                                 borderWidth: 3,
                                 fill: true,
                                 tension: 0.4,
@@ -1066,76 +1530,394 @@
                             }
                         }
                     });
+
+                    console.log('Chart initialized successfully');
+                } catch (error) {
+                    console.error('Error initializing chart:', error);
                 }
+            }
+        }
 
-                // Auto refresh functionality
-                const autoRefreshToggle = document.getElementById('autoRefresh');
-                let refreshInterval;
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Real-time Monitor
+            if (typeof RealTimeMonitor !== 'undefined') {
+                const monitor = new RealTimeMonitor();
+                monitor.start();
+            }
 
-                function startAutoRefresh() {
-                    refreshInterval = setInterval(() => {
+            // Initialize chart on page load
+            initializeChart();
+
+            // Auto refresh functionality
+            const autoRefreshToggle = document.getElementById('autoRefresh');
+            const refreshButton = document.getElementById('refreshButton');
+            const lastUpdateTime = document.getElementById('lastUpdateTime');
+            const realtimeIndicator = document.getElementById('realtimeIndicator');
+            let refreshInterval;
+
+            function updateLastRefreshTime() {
+                if (lastUpdateTime) {
+                    lastUpdateTime.textContent = new Date().toLocaleTimeString();
+                }
+            }
+
+            function setIndicatorStatus(status) {
+                if (realtimeIndicator) {
+                    realtimeIndicator.className = 'w-3 h-3 rounded-full ' +
+                        (status === 'active' ? 'bg-green-500 pulse-dot' :
+                            status === 'error' ? 'bg-red-500' : 'bg-gray-400');
+                }
+            }
+
+            function startAutoRefresh() {
+                refreshInterval = setInterval(() => {
+                    setIndicatorStatus('loading');
+
+                    try {
+                        // Trigger Livewire refresh
                         Livewire.dispatch('refreshData');
+
+                        // Update timestamp
+                        updateLastRefreshTime();
+
+                        // Set success status and re-initialize chart
+                        setTimeout(() => {
+                            setIndicatorStatus('active');
+                            initializeChart();
+                            animateProgressBars();
+                        }, 1000);
 
                         // If real-time modal is open, refresh its content too
                         if (!document.getElementById('realtimeModal').classList.contains('hidden')) {
-                            // Add visual indicator of refresh
                             const modal = document.getElementById('realtimeModal');
                             modal.style.opacity = '0.8';
                             setTimeout(() => {
                                 modal.style.opacity = '1';
                             }, 500);
                         }
-                    }, 30000); // Refresh every 30 seconds
-                }
-
-                function stopAutoRefresh() {
-                    if (refreshInterval) {
-                        clearInterval(refreshInterval);
+                    } catch (error) {
+                        console.error('Auto refresh error:', error);
+                        setIndicatorStatus('error');
                     }
+                }, 30000); // Refresh every 30 seconds
+            }
+
+            function stopAutoRefresh() {
+                if (refreshInterval) {
+                    clearInterval(refreshInterval);
+                    setIndicatorStatus('inactive');
                 }
+            }
 
-                if (autoRefreshToggle) {
-                    autoRefreshToggle.addEventListener('change', function() {
-                        if (this.checked) {
-                            startAutoRefresh();
-                        } else {
-                            stopAutoRefresh();
-                        }
-                    });
+            // Manual refresh button
+            if (refreshButton) {
+                refreshButton.addEventListener('click', function() {
+                    updateLastRefreshTime();
+                    setIndicatorStatus('active');
 
-                    // Start auto refresh if enabled by default
-                    if (autoRefreshToggle.checked) {
+                    // Add visual feedback
+                    this.classList.add('loading-state');
+
+                    // Re-initialize chart after manual refresh
+                    setTimeout(() => {
+                        initializeChart();
+                        animateProgressBars();
+                        this.classList.remove('loading-state');
+                    }, 500);
+                });
+            }
+
+            // Auto refresh toggle
+            if (autoRefreshToggle) {
+                autoRefreshToggle.addEventListener('change', function() {
+                    if (this.checked) {
                         startAutoRefresh();
+                        setIndicatorStatus('active');
+                    } else {
+                        stopAutoRefresh();
                     }
-                }
+                });
 
-                // Cleanup on page unload
-                window.addEventListener('beforeunload', stopAutoRefresh);
+                // Start auto refresh if enabled by default
+                if (autoRefreshToggle.checked) {
+                    startAutoRefresh();
+                    setIndicatorStatus('active');
+                }
+            }
+
+            // Update last refresh time on Livewire events
+            Livewire.on('dataRefreshed', function() {
+                updateLastRefreshTime();
+                setIndicatorStatus('active');
+
+                // Re-initialize chart after Livewire refresh
+                setTimeout(() => {
+                    initializeChart();
+                    animateProgressBars();
+                }, 100);
             });
 
-            // Real-time Modal Functions
-            function openRealtimeModal() {
-                document.getElementById('realtimeModal').classList.remove('hidden');
+            // Listen for Livewire component updates
+            document.addEventListener('livewire:updated', function() {
+                // Re-initialize chart after any Livewire update
+                setTimeout(() => {
+                    initializeChart();
+                    animateProgressBars();
+                }, 100);
+            });
+
+            // Listen for Livewire component loaded/mounted
+            document.addEventListener('livewire:load', function() {
+                initializeChart();
+            });
+
+            // Ensure chart is initialized when Livewire component navigates
+            document.addEventListener('livewire:navigated', function() {
+                setTimeout(() => {
+                    initializeChart();
+                }, 100);
+            });
+
+            // Cleanup on page unload
+            window.addEventListener('beforeunload', function() {
+                stopAutoRefresh();
+
+                // Destroy chart to prevent memory leaks
+                if (weeklyChart) {
+                    weeklyChart.destroy();
+                    weeklyChart = null;
+                }
+            });
+
+            // Update progress bars with animation
+            function animateProgressBars() {
+                const progressBars = document.querySelectorAll('[style*="width:"]');
+                progressBars.forEach(bar => {
+                    const width = bar.style.width;
+                    bar.style.width = '0%';
+                    setTimeout(() => {
+                        bar.style.width = width;
+                    }, 100);
+                });
+            }
+
+            // Animate progress bars on load
+            setTimeout(() => {
+                animateProgressBars();
+            }, 500);
+
+            // Re-animate on Livewire updates (removed duplicate since it's handled above)
+        });
+
+        // Real-time Modal Functions
+        function openRealtimeModal() {
+            document.getElementById('realtimeModal').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+
+            // Trigger a data refresh when opening modal
+            if (typeof RealTimeMonitor !== 'undefined') {
+                const monitor = new RealTimeMonitor();
+                monitor.fetchMetrics();
+            }
+        }
+
+        function closeRealtimeModal() {
+            document.getElementById('realtimeModal').classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        // Uptime Modal Functions
+        function toggleUptimeModal() {
+            const modal = document.getElementById('uptimeModal');
+            if (modal) {
+                if (modal.classList.contains('hidden')) {
+                    openUptimeModal();
+                } else {
+                    closeUptimeModal();
+                }
+            }
+        }
+
+        function openUptimeModal() {
+            const modal = document.getElementById('uptimeModal');
+            if (modal) {
+                modal.classList.remove('hidden');
                 document.body.classList.add('overflow-hidden');
             }
+        }
 
-            function closeRealtimeModal() {
-                document.getElementById('realtimeModal').classList.add('hidden');
+        function closeUptimeModal() {
+            const modal = document.getElementById('uptimeModal');
+            if (modal) {
+                modal.classList.add('hidden');
                 document.body.classList.remove('overflow-hidden');
             }
+        }
 
-            // Close modal when clicking outside
-            document.getElementById('realtimeModal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeRealtimeModal();
-                }
-            });
+        // Close modals when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target.id === 'realtimeModal') {
+                closeRealtimeModal();
+            }
+            if (e.target.id === 'uptimeModal') {
+                closeUptimeModal();
+            }
+        });
 
-            // Close modal with Escape key
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    closeRealtimeModal();
-                }
+        // Close modals with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeRealtimeModal();
+                closeUptimeModal();
+            }
+        });
+
+        // Add smooth transitions for stats cards
+        function addStatsCardAnimations() {
+            const statsCards = document.querySelectorAll('.stats-card, .hover-lift');
+            statsCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.classList.add('fade-in');
             });
-        </script>
-    @endpush
+        }
+
+        // Initialize animations
+        setTimeout(addStatsCardAnimations, 100);
+
+        // Heartbeat animation for live indicators
+        function startHeartbeat() {
+            const pulseElements = document.querySelectorAll('.pulse-dot');
+            pulseElements.forEach(element => {
+                element.style.animation = 'pulse 2s infinite';
+            });
+        }
+
+        setInterval(startHeartbeat, 1000);
+
+        // Network status monitoring
+        function monitorNetworkStatus() {
+            if (navigator.onLine) {
+                document.getElementById('realtimeIndicator')?.classList.remove('bg-red-500');
+                document.getElementById('realtimeIndicator')?.classList.add('bg-green-500');
+            } else {
+                document.getElementById('realtimeIndicator')?.classList.remove('bg-green-500');
+                document.getElementById('realtimeIndicator')?.classList.add('bg-red-500');
+            }
+        }
+
+        window.addEventListener('online', monitorNetworkStatus);
+        window.addEventListener('offline', monitorNetworkStatus);
+
+        // Handle window resize to ensure chart responsiveness
+        window.addEventListener('resize', function() {
+            if (weeklyChart) {
+                weeklyChart.resize();
+            }
+        });
+
+        // Initialize network monitoring
+        monitorNetworkStatus();
+
+        // Performance monitoring
+        if ('performance' in window) {
+            const navigationTiming = performance.getEntriesByType('navigation')[0];
+            if (navigationTiming) {
+                const loadTime = navigationTiming.loadEventEnd - navigationTiming.loadEventStart;
+                console.log(`Page load time: ${loadTime}ms`);
+            }
+        }
+
+        // Add visual feedback for loading states
+        function addLoadingState(element) {
+            element.style.opacity = '0.6';
+            element.style.pointerEvents = 'none';
+        }
+
+        function removeLoadingState(element) {
+            element.style.opacity = '1';
+            element.style.pointerEvents = 'auto';
+        }
+
+        // Error handling for failed requests
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled promise rejection:', event.reason);
+            document.getElementById('realtimeIndicator')?.classList.add('bg-red-500');
+        });
+
+        // Test Real-time API function
+        async function testRealtimeAPI() {
+            const button = event.target;
+            const originalText = button.innerHTML;
+
+            // Show loading state
+            button.innerHTML =
+                '<svg class="w-4 h-4 inline-block mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>Testing...';
+            button.disabled = true;
+
+            try {
+                // Test system metrics API
+                const systemResponse = await fetch('/api/metrics/system');
+                const systemData = await systemResponse.json();
+
+                // Test livestream metrics API
+                const streamResponse = await fetch('/api/metrics/livestream');
+                const streamData = await streamResponse.json();
+
+                // Show success notification
+                const notification = document.createElement('div');
+                notification.className =
+                    'fixed top-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg z-50 alert-enter';
+                notification.innerHTML = `
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <div>
+                            <div class="font-medium">API Test Successful!</div>
+                            <div class="text-sm">System: ${systemData.status || 'OK'} | Streams: ${streamData.active_sessions || 0} active</div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(notification);
+
+                // Auto remove notification
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
+
+                console.log('System Metrics:', systemData);
+                console.log('Stream Metrics:', streamData);
+
+            } catch (error) {
+                console.error('API Test Error:', error);
+
+                // Show error notification
+                const notification = document.createElement('div');
+                notification.className =
+                    'fixed top-4 right-4 bg-red-500 text-white p-4 rounded-lg shadow-lg z-50 alert-enter';
+                notification.innerHTML = `
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        <div>
+                            <div class="font-medium">API Test Failed!</div>
+                            <div class="text-sm">Check console for details</div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
+            } finally {
+                // Restore button
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }, 1000);
+            }
+        }
+    </script>
+@endpush

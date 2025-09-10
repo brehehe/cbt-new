@@ -14,6 +14,9 @@ use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Schema;
+use DateTime;
+use Carbon\Carbon;
 
 class AdminDashboardIndex extends Component
 {
@@ -39,6 +42,524 @@ class AdminDashboardIndex extends Component
     public function mount()
     {
         $this->loadDashboardData();
+        $this->pingGoogleDns();
+    }
+    public function pingGoogleDns()
+    {
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            // Windows
+            $ping = shell_exec("ping -n 1 8.8.8.8");
+            preg_match('/time[=<]\s?(\d+)\s?ms/i', $ping, $matches);
+        } else {
+            // Linux / macOS
+            $ping = shell_exec("ping -c 1 8.8.8.8 | grep 'time='");
+            preg_match('/time=([\d.]+)\s?ms/', $ping, $matches);
+        }
+
+        return $matches[1] ?? null;
+    }
+
+    // ===========================================
+    // REAL-TIME SERVER & NETWORK MONITORING
+    // ===========================================
+
+    private function getRealServerResponseTime()
+    {
+        try {
+            $measurements = [];
+
+            // Test 1: Database response time (real)
+            $start = microtime(true);
+            DB::select('SELECT 1');
+            $dbTime = (microtime(true) - $start) * 1000;
+            $measurements[] = $dbTime;
+
+            // Test 2: File system response time
+            $start = microtime(true);
+            file_exists(__DIR__);
+            $fsTime = (microtime(true) - $start) * 1000;
+            $measurements[] = $fsTime;
+
+            // Test 3: Memory allocation test
+            $start = microtime(true);
+            $temp = array_fill(0, 1000, 'test');
+            unset($temp);
+            $memTime = (microtime(true) - $start) * 1000;
+            $measurements[] = $memTime;
+
+            // Test 4: Real network latency to external server
+            $networkLatency = $this->pingGoogleDns();
+            if ($networkLatency) {
+                $measurements[] = (float)$networkLatency;
+            }
+
+            // Calculate weighted average
+            $avgResponse = array_sum($measurements) / count($measurements);
+
+            return round($avgResponse, 1) . 'ms';
+        } catch (\Exception $e) {
+            return 'Error: ' . $e->getMessage();
+        }
+    }
+
+    private function getRealSystemUptime()
+    {
+        try {
+            $uptime = null;
+
+            if (PHP_OS_FAMILY === 'Windows') {
+                // Windows uptime
+                $output = shell_exec('wmic os get lastbootuptime /value');
+                if ($output) {
+                    preg_match('/LastBootUpTime=(\d{14})/', $output, $matches);
+                    if (isset($matches[1])) {
+                        $bootTime = DateTime::createFromFormat('YmdHis', $matches[1]);
+                        $now = new DateTime();
+                        $diff = $now->diff($bootTime);
+                        $totalHours = ($diff->days * 24) + $diff->h;
+                        $uptimePercentage = min(($totalHours / (24 * 30)) * 100, 99.9);
+                        $uptime = number_format($uptimePercentage, 1) . '%';
+                    }
+                }
+            } else {
+                // Linux/Unix uptime
+                $uptimeData = shell_exec('cat /proc/uptime');
+                if ($uptimeData) {
+                    $upSeconds = floatval(explode(' ', trim($uptimeData))[0]);
+                    $upDays = $upSeconds / 86400;
+                    $uptimePercentage = min(($upDays / 30) * 100, 99.9);
+                    $uptime = number_format($uptimePercentage, 1) . '%';
+                }
+            }
+
+            return $uptime ?: $this->getBasicUptime();
+        } catch (\Exception $e) {
+            return $this->getBasicUptime();
+        }
+    }
+
+    private function getRealConcurrentUsers()
+    {
+        try {
+            // Real-time session tracking
+            $activeSessions = 0;
+
+            // Method 1: Check active sessions in database
+            $activeExams = UserTimetable::where('status', 'exam')->count();
+
+            // Method 2: Check recent activity (last 2 minutes)
+            $recentActivity = UserTimetable::where('updated_at', '>=', date('Y-m-d H:i:s', strtotime('-2 minutes')))->count();
+
+            // Method 3: Check logged in users (if using session table)
+            if (Schema::hasTable('sessions')) {
+                $activeSessions = DB::table('sessions')
+                    ->where('last_activity', '>=', time() - 300) // 5 minutes ago
+                    ->count();
+            }
+
+            // Method 4: Live streaming sessions
+            if (Schema::hasTable('exam_live_sessions')) {
+                $liveStreams = DB::table('exam_live_sessions')
+                    ->where('is_active', true)
+                    ->where('updated_at', '>=', date('Y-m-d H:i:s', strtotime('-2 minutes')))
+                    ->count();
+            } else {
+                $liveStreams = 0;
+            }
+
+            // Calculate real concurrent users
+            $realConcurrent = max($activeExams, $recentActivity, $activeSessions, $liveStreams);
+
+            return $realConcurrent;
+        } catch (\Exception $e) {
+            return UserTimetable::where('status', 'exam')->count();
+        }
+    }
+
+    private function getRealServerLoad()
+    {
+        try {
+            $loadMetrics = [];
+
+            if (PHP_OS_FAMILY === 'Windows') {
+                // Windows CPU usage
+                $cpuUsage = shell_exec('wmic cpu get loadpercentage /value');
+                if ($cpuUsage) {
+                    preg_match('/LoadPercentage=(\d+)/', $cpuUsage, $matches);
+                    if (isset($matches[1])) {
+                        $loadMetrics['cpu'] = (int)$matches[1];
+                    }
+                }
+
+                // Windows Memory usage
+                $memTotal = shell_exec('wmic OS get TotalVisibleMemorySize /value');
+                $memAvail = shell_exec('wmic OS get AvailableMemorySize /value');
+
+                if ($memTotal && $memAvail) {
+                    preg_match('/TotalVisibleMemorySize=(\d+)/', $memTotal, $totalMatches);
+                    preg_match('/AvailableMemorySize=(\d+)/', $memAvail, $availMatches);
+
+                    if (isset($totalMatches[1]) && isset($availMatches[1])) {
+                        $total = (int)$totalMatches[1];
+                        $available = (int)$availMatches[1];
+                        $used = $total - $available;
+                        $memUsage = ($used / $total) * 100;
+                        $loadMetrics['memory'] = round($memUsage);
+                    }
+                }
+            } else {
+                // Linux load average
+                if (function_exists('sys_getloadavg')) {
+                    $load = sys_getloadavg();
+                    $loadMetrics['cpu'] = round($load[0] * 100);
+                }
+
+                // Linux memory usage
+                $memInfo = file_get_contents('/proc/meminfo');
+                if ($memInfo) {
+                    preg_match('/MemTotal:\s+(\d+)/', $memInfo, $totalMatches);
+                    preg_match('/MemAvailable:\s+(\d+)/', $memInfo, $availMatches);
+
+                    if (isset($totalMatches[1]) && isset($availMatches[1])) {
+                        $total = (int)$totalMatches[1];
+                        $available = (int)$availMatches[1];
+                        $used = $total - $available;
+                        $memUsage = ($used / $total) * 100;
+                        $loadMetrics['memory'] = round($memUsage);
+                    }
+                }
+            }
+
+            // Database load testing
+            $start = microtime(true);
+            DB::select('SELECT COUNT(*) FROM users');
+            $dbLoadTime = (microtime(true) - $start) * 1000;
+            $dbLoad = min($dbLoadTime * 10, 50); // Convert to percentage
+            $loadMetrics['database'] = round($dbLoad);
+
+            // Calculate average load
+            $avgLoad = count($loadMetrics) > 0 ? array_sum($loadMetrics) / count($loadMetrics) : 25;
+
+            return round($avgLoad) . '%';
+        } catch (\Exception $e) {
+            return '25%'; // Fallback
+        }
+    }
+
+    private function getRealTimeSystemMetrics()
+    {
+        try {
+            return [
+                'timestamp' => date('Y-m-d H:i:s'),
+                'response_time_ms' => (float)str_replace('ms', '', $this->getRealServerResponseTime()),
+                'concurrent_users' => $this->getRealConcurrentUsers(),
+                'server_load_percent' => (int)str_replace('%', '', $this->getRealServerLoad()),
+                'network_latency' => $this->getRealNetworkLatency(),
+                'database_connections' => $this->getRealDatabaseConnections(),
+                'active_processes' => $this->getActiveProcesses(),
+                'system_temperature' => $this->getSystemTemperature(),
+                'bandwidth_usage' => $this->getBandwidthUsage()
+            ];
+        } catch (\Exception $e) {
+            return ['error' => $e->getMessage()];
+        }
+    }
+
+    private function getRealNetworkStatus()
+    {
+        try {
+            $networkTests = [
+                'google_dns' => $this->testNetworkLatency('8.8.8.8'),
+                'cloudflare_dns' => $this->testNetworkLatency('1.1.1.1'),
+                'local_gateway' => $this->testLocalGateway(),
+                'internet_speed' => $this->estimateInternetSpeed()
+            ];
+
+            $avgLatency = array_filter([$networkTests['google_dns'], $networkTests['cloudflare_dns']]);
+            $avgLatency = count($avgLatency) > 0 ? array_sum($avgLatency) / count($avgLatency) : null;
+
+            return [
+                'status' => $avgLatency < 100 ? 'excellent' : ($avgLatency < 200 ? 'good' : 'poor'),
+                'avg_latency' => $avgLatency ? round($avgLatency) . 'ms' : 'unavailable',
+                'tests' => $networkTests
+            ];
+        } catch (\Exception $e) {
+            return ['status' => 'error', 'message' => $e->getMessage()];
+        }
+    }
+
+    private function getRealMemoryUsage()
+    {
+        try {
+            // PHP memory usage
+            $phpMemory = memory_get_usage(true);
+            $phpMemoryPeak = memory_get_peak_usage(true);
+            $phpMemoryLimit = ini_get('memory_limit');
+
+            // Convert memory limit to bytes
+            $memoryLimitBytes = $this->convertToBytes($phpMemoryLimit);
+            $phpMemoryPercent = ($phpMemory / $memoryLimitBytes) * 100;
+
+            // System memory (if available)
+            $systemMemory = $this->getSystemMemoryUsage();
+
+            return [
+                'php_current' => $this->formatBytes($phpMemory),
+                'php_peak' => $this->formatBytes($phpMemoryPeak),
+                'php_limit' => $phpMemoryLimit,
+                'php_usage_percent' => round($phpMemoryPercent, 1) . '%',
+                'system_usage' => $systemMemory
+            ];
+        } catch (\Exception $e) {
+            return ['error' => $e->getMessage()];
+        }
+    }
+
+    private function getRealCpuUsage()
+    {
+        try {
+            if (PHP_OS_FAMILY === 'Windows') {
+                $output = shell_exec('wmic cpu get loadpercentage /value');
+                preg_match('/LoadPercentage=(\d+)/', $output, $matches);
+                return isset($matches[1]) ? $matches[1] . '%' : 'unavailable';
+            } else {
+                // Linux CPU usage
+                $load = sys_getloadavg();
+                return round($load[0] * 100) . '%';
+            }
+        } catch (\Exception $e) {
+            return 'unavailable';
+        }
+    }
+
+    private function getRealDiskUsage()
+    {
+        try {
+            $diskFree = disk_free_space('/');
+            $diskTotal = disk_total_space('/');
+
+            if ($diskFree && $diskTotal) {
+                $diskUsed = $diskTotal - $diskFree;
+                $diskUsagePercent = ($diskUsed / $diskTotal) * 100;
+
+                return [
+                    'used' => $this->formatBytes($diskUsed),
+                    'free' => $this->formatBytes($diskFree),
+                    'total' => $this->formatBytes($diskTotal),
+                    'usage_percent' => round($diskUsagePercent, 1) . '%'
+                ];
+            }
+
+            return 'unavailable';
+        } catch (\Exception $e) {
+            return 'error';
+        }
+    }
+
+    // Helper methods for real-time monitoring
+    private function testNetworkLatency($host)
+    {
+        try {
+            if (PHP_OS_FAMILY === 'Windows') {
+                $output = shell_exec("ping -n 1 $host");
+                preg_match('/time[=<]\s?(\d+)\s?ms/i', $output, $matches);
+            } else {
+                $output = shell_exec("ping -c 1 $host | grep 'time='");
+                preg_match('/time=([\d.]+)\s?ms/', $output, $matches);
+            }
+            return isset($matches[1]) ? (float)$matches[1] : null;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    private function testLocalGateway()
+    {
+        try {
+            if (PHP_OS_FAMILY === 'Windows') {
+                $gateway = shell_exec('ipconfig | findstr /i "default gateway"');
+                preg_match('/\d+\.\d+\.\d+\.\d+/', $gateway, $matches);
+            } else {
+                $gateway = shell_exec('ip route | grep default');
+                preg_match('/\d+\.\d+\.\d+\.\d+/', $gateway, $matches);
+            }
+
+            if (isset($matches[0])) {
+                return $this->testNetworkLatency($matches[0]);
+            }
+            return null;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    private function getRealNetworkLatency()
+    {
+        $latencies = [
+            $this->testNetworkLatency('8.8.8.8'),
+            $this->testNetworkLatency('1.1.1.1')
+        ];
+
+        $validLatencies = array_filter($latencies);
+        if (count($validLatencies) > 0) {
+            return round(array_sum($validLatencies) / count($validLatencies)) . 'ms';
+        }
+
+        return 'unavailable';
+    }
+
+    private function getRealDatabaseConnections()
+    {
+        try {
+            $connections = DB::select('SHOW STATUS LIKE "Threads_connected"');
+            return isset($connections[0]->Value) ? (int)$connections[0]->Value : 0;
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    private function getActiveProcesses()
+    {
+        try {
+            if (PHP_OS_FAMILY === 'Windows') {
+                $output = shell_exec('tasklist | find /c ""');
+                return (int)trim($output);
+            } else {
+                $output = shell_exec('ps aux | wc -l');
+                return (int)trim($output);
+            }
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    private function getSystemTemperature()
+    {
+        try {
+            if (PHP_OS_FAMILY !== 'Windows') {
+                $temp = shell_exec('cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null');
+                if ($temp) {
+                    return round((int)$temp / 1000) . '°C';
+                }
+            }
+            return 'unavailable';
+        } catch (\Exception $e) {
+            return 'unavailable';
+        }
+    }
+
+    private function getBandwidthUsage()
+    {
+        try {
+            // Estimate based on concurrent users and activity
+            $concurrent = $this->getRealConcurrentUsers();
+            $estimatedBandwidth = $concurrent * 0.5; // 0.5 Mbps per user estimate
+
+            return round($estimatedBandwidth, 1) . ' Mbps';
+        } catch (\Exception $e) {
+            return 'unavailable';
+        }
+    }
+
+    private function estimateInternetSpeed()
+    {
+        try {
+            // Simple speed test by downloading a small file
+            $start = microtime(true);
+            $data = file_get_contents('https://www.google.com/favicon.ico');
+            $time = microtime(true) - $start;
+
+            if ($data && $time > 0) {
+                $bytes = strlen($data);
+                $kbps = ($bytes / 1024) / $time;
+                return round($kbps) . ' KB/s';
+            }
+
+            return 'unavailable';
+        } catch (\Exception $e) {
+            return 'unavailable';
+        }
+    }
+
+    private function getSystemMemoryUsage()
+    {
+        try {
+            if (PHP_OS_FAMILY === 'Windows') {
+                $totalMem = shell_exec('wmic OS get TotalVisibleMemorySize /value');
+                $availMem = shell_exec('wmic OS get AvailableMemorySize /value');
+
+                preg_match('/TotalVisibleMemorySize=(\d+)/', $totalMem, $totalMatches);
+                preg_match('/AvailableMemorySize=(\d+)/', $availMem, $availMatches);
+
+                if (isset($totalMatches[1]) && isset($availMatches[1])) {
+                    $total = (int)$totalMatches[1] * 1024; // Convert KB to bytes
+                    $available = (int)$availMatches[1] * 1024;
+                    $used = $total - $available;
+                    $usagePercent = ($used / $total) * 100;
+
+                    return [
+                        'total' => $this->formatBytes($total),
+                        'used' => $this->formatBytes($used),
+                        'available' => $this->formatBytes($available),
+                        'usage_percent' => round($usagePercent, 1) . '%'
+                    ];
+                }
+            } else {
+                $memInfo = file_get_contents('/proc/meminfo');
+                if ($memInfo) {
+                    preg_match('/MemTotal:\s+(\d+)/', $memInfo, $totalMatches);
+                    preg_match('/MemAvailable:\s+(\d+)/', $memInfo, $availMatches);
+
+                    if (isset($totalMatches[1]) && isset($availMatches[1])) {
+                        $total = (int)$totalMatches[1] * 1024;
+                        $available = (int)$availMatches[1] * 1024;
+                        $used = $total - $available;
+                        $usagePercent = ($used / $total) * 100;
+
+                        return [
+                            'total' => $this->formatBytes($total),
+                            'used' => $this->formatBytes($used),
+                            'available' => $this->formatBytes($available),
+                            'usage_percent' => round($usagePercent, 1) . '%'
+                        ];
+                    }
+                }
+            }
+
+            return 'unavailable';
+        } catch (\Exception $e) {
+            return 'error';
+        }
+    }
+
+    private function convertToBytes($size)
+    {
+        $unit = strtolower(substr($size, -1));
+        $value = (int)$size;
+
+        switch ($unit) {
+            case 'g':
+                return $value * 1024 * 1024 * 1024;
+            case 'm':
+                return $value * 1024 * 1024;
+            case 'k':
+                return $value * 1024;
+            default:
+                return $value;
+        }
+    }
+
+    private function formatBytes($bytes)
+    {
+        if ($bytes >= 1024 * 1024 * 1024) {
+            return round($bytes / (1024 * 1024 * 1024), 2) . ' GB';
+        } elseif ($bytes >= 1024 * 1024) {
+            return round($bytes / (1024 * 1024), 2) . ' MB';
+        } elseif ($bytes >= 1024) {
+            return round($bytes / 1024, 2) . ' KB';
+        } else {
+            return $bytes . ' B';
+        }
     }
 
     public function loadDashboardData()
@@ -89,13 +610,17 @@ class AdminDashboardIndex extends Component
                 ->limit(5)
                 ->get();
 
-            // System performance metrics
+            // System performance metrics - REAL TIME
             $this->systemPerformance = [
-                'avg_response_time' => $this->calculateAvgResponseTime(),
-                'system_uptime' => $this->calculateSystemUptime(),
-                'concurrent_users' => $this->getConcurrentUsers(),
-                'server_load' => $this->getServerLoad(),
-                'realtime_metrics' => $this->getRealTimeMetrics()
+                'avg_response_time' => $this->getRealServerResponseTime(),
+                'system_uptime' => $this->getRealSystemUptime(),
+                'concurrent_users' => $this->getRealConcurrentUsers(),
+                'server_load' => $this->getRealServerLoad(),
+                'realtime_metrics' => $this->getRealTimeSystemMetrics(),
+                'network_status' => $this->getRealNetworkStatus(),
+                'memory_usage' => $this->getRealMemoryUsage(),
+                'cpu_usage' => $this->getRealCpuUsage(),
+                'disk_usage' => $this->getRealDiskUsage()
             ];
 
             // Detailed uptime information

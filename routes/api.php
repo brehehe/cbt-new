@@ -7,6 +7,7 @@ use App\Http\Controllers\API\OneHealth\MasterData\RegionController;
 use App\Http\Controllers\API\Onehealth\Organization\OrganizationController;
 use App\Http\Controllers\API\OneHealth\OutPatient\EncounterController;
 use App\Http\Controllers\API\TestingController;
+use App\Http\Controllers\Api\RealTimeMetricsController;
 use App\Models\Exam\ExamLiveSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -156,6 +157,13 @@ Route::get('/stream/connect/{sessionToken}', [App\Http\Controllers\Admin\Exam\Li
 // WebRTC signaling endpoint
 Route::post('/stream/signaling/{sessionToken}', [App\Http\Controllers\Admin\Exam\LiveStreamController::class, 'handleSignaling'])
     ->name('api.stream.signaling');
+
+// Real-time monitoring endpoints
+Route::get('/metrics/system', [RealTimeMetricsController::class, 'getSystemMetrics'])
+    ->name('api.metrics.system');
+
+Route::get('/metrics/livestream', [RealTimeMetricsController::class, 'getLiveStreamMetrics'])
+    ->name('api.metrics.livestream');
 
 Route::post('/access-token', [AuthController::class, 'accessToken']);
 
