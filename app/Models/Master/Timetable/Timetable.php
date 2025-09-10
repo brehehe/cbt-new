@@ -2,6 +2,7 @@
 
 namespace App\Models\Master\Timetable;
 
+use App\Models\Classmate\Classmate;
 use App\Models\Company\Company;
 use App\Models\User\UserTimetable;
 use Illuminate\Support\Facades\Auth;
@@ -75,6 +76,7 @@ class Timetable extends Model
                         'module_id' => $module->id,
                     ],
                     [
+                        'studys' => $module->studys,
                         'user_id' => $module->user_id,
                         'question_type_id' => $module->question_type_id,
                         'name' => $module->name,
@@ -91,6 +93,7 @@ class Timetable extends Model
                             'question_id' => $question->question->id,
                         ],
                         [
+                            'study_id' => $question->question->study_id,
                             'user_id' => $question->question->user_id,
                             'topic_id' => $question->question->topic_id,
                             'material_category_id' => $question->question->material_category_id,
@@ -105,7 +108,7 @@ class Timetable extends Model
                     );
 
                     foreach ($question->question->answers  as $key => $value) {
-                        $timeTableAnswer =  TimetableAnswer::updateOrCreate(
+                        TimetableAnswer::updateOrCreate(
                             [
                                 'timetable_question_id' => $timetableQuestion->id,
                                 'answer_id' => $value->id,
@@ -130,5 +133,10 @@ class Timetable extends Model
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id', 'name', 'start_time', 'end_time', 'description'], 'ILIKE', $term);
         });
+    }
+
+    public function classmate()
+    {
+        return $this->belongsTo(Classmate::class, 'classmate_id', 'id');
     }
 }

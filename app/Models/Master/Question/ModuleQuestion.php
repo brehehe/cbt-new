@@ -3,6 +3,7 @@
 namespace App\Models\Master\Question;
 
 use App\Models\Company\Company;
+use App\Models\Study\Study;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -44,7 +45,7 @@ class ModuleQuestion extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
-        $term = '%'. $term .'%';
+        $term = '%' . $term . '%';
 
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id'], 'ILIKE', $term);
@@ -69,5 +70,15 @@ class ModuleQuestion extends Model
     public function question(): BelongsTo
     {
         return $this->belongsTo(Question::class, 'question_id', 'id');
+    }
+
+    /**
+     * Get the study that owns the ModuleQuestion
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function study(): BelongsTo
+    {
+        return $this->belongsTo(Study::class, 'study_id', 'id');
     }
 }

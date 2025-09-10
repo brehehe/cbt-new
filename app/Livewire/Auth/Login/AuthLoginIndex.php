@@ -35,10 +35,10 @@ class AuthLoginIndex extends Component
 
         if (config('app.env') === 'local' || config('app.env') === 'development') {
             $this->captchaInput = $this->captchaCode;
-            $this->username_or_email = 'hasan.observer@cbt.test';
-            $this->password = 'password123';
+            $this->username_or_email = 'burningroomtechnology';
+            $this->password = '12345678';
 
-            // $this->login();
+            $this->login();
         }
     }
 
@@ -171,12 +171,11 @@ class AuthLoginIndex extends Component
                 Auth::login($user, $this->remember);
 
                 session()->flash('saved', [
-                'title' => 'Login Berhasil!',
-                'text' => 'Anda berhasil login ke sistem!',
-            ]);
+                    'title' => 'Login Berhasil!',
+                    'text' => 'Anda berhasil login ke sistem!',
+                ]);
 
-            return redirect()->intended(route('admin.dashboard'));
-
+                return redirect()->intended(route('admin.dashboard'));
             } else {
                 return AlertHelper::error('Gagal', 'Alamat email, username atau kata sandi anda salah!');
             }
@@ -189,8 +188,6 @@ class AuthLoginIndex extends Component
             Log::error('Ada kesalahan saat login', $errors);
             return AlertHelper::error('Gagal', 'Ada kesalahan saat login');
         }
-
-
     }
 
     /**

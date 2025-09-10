@@ -4,11 +4,11 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#3BA172]">Riwayat Jadwal Ujian</h1>
+                <h1 class="text-2xl font-bold text-[#f58634]">Riwayat Jadwal Ujian</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             {{-- <div>
-                <button wire:click="openModal()" class="btn btn-success">
+                <button wire:click="openModal()" class="btn btn-warning">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -66,7 +66,10 @@
                             <td>{{ $result?->start_time?->format('d F Y H:i') }}</td>
                             <td>{{ $result?->end_time?->format('d F Y H:i') }}</td>
                             <td class="center">
-                                <a href="{{ route('admin.report.timetable-detail', $result?->id) }}" class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors delete-btn" data-bs-toggle="tooltip" title="Lihat data detail"><i class="fa-solid fa-eye"></i></a>
+                                <a href="{{ route('admin.report.timetable-detail', $result?->id) }}"
+                                    class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors delete-btn"
+                                    data-bs-toggle="tooltip" title="Lihat data detail"><i
+                                        class="fa-solid fa-eye"></i></a>
                             </td>
                         </tr>
                     @empty

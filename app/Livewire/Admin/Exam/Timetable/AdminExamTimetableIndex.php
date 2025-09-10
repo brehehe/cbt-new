@@ -78,12 +78,12 @@ class AdminExamTimetableIndex extends Component
 
             $modulesQuestions = $transactionModule->random_question ?
                 TimetableQuestion::withoutGlobalScope('user_scope')
-                ->select('id')
+                ->select('id', 'study_id')
                 ->where('timetable_module_id', $transactionModule->id)
                 ->inRandomOrder()
                 ->get() :
                 TimetableQuestion::withoutGlobalScope('user_scope')
-                ->select('id')
+                ->select('id', 'study_id')
                 ->where('timetable_module_id', $transactionModule->id)
                 ->inRandomOrder()
                 ->get();
@@ -92,6 +92,7 @@ class AdminExamTimetableIndex extends Component
                 'user_id' => Auth::id(),
                 'timetable_id' => $timeTable->id,
                 'start_process' => Carbon::now(),
+                'studys' => $timeTable->studys,
             ]);
 
             foreach ($modulesQuestions as $moduleQuestion) {
@@ -99,6 +100,7 @@ class AdminExamTimetableIndex extends Component
                     'user_timetable_id' => $UserTimetable->id,
                     'timetable_module_id' => $transactionModule->id,
                     'timetable_question_id' => $moduleQuestion->id,
+                    'study_id' => $moduleQuestion->study_id,
                 ]);
             }
 
@@ -144,9 +146,6 @@ class AdminExamTimetableIndex extends Component
 
     public function render()
     {
-        // dd(Auth::user()->company);
-        // dd(Timetable::get());
-
         $userTimetableStatusDone = UserTimetable::query()
             ->where('user_id', Auth::id())
             ->where('status', 'done')
@@ -154,14 +153,10 @@ class AdminExamTimetableIndex extends Component
             ->pluck('timetable_id')
             ->toArray();
 
-        $userTimetableStatus = UserTimetable::query()
-            ->where('user_id', Auth::id())
-            ->whereNotIn('status', ['done'])
-            ->get()
-            ->pluck('timetable_id')
-            ->toArray();
+        $auth = Auth::user();
 
         $timetables = Timetable::query()
+            // ->whereNotNull('code')
             ->when($this->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'ilike', '%' . $search . '%')
@@ -173,6 +168,26 @@ class AdminExamTimetableIndex extends Component
                 $query->where('start_time', '<=', $now->copy()->addMinutes(5))
                     ->where('end_time', '>=', $now->copy()->subMinutes(5));
             });
+
+        // Filter berdasarkan study_id user
+        // if ($auth->study_id) {
+        //     // $timetables->where('study_id', $auth->study_id);
+
+        //     $timetables->where(function ($query) use ($auth) {
+        //         $query->whereNull('studys')
+        //             ->orWhere('studys', 'ILIKE', '%\\\"' . $auth->study_id . '\\\"%');
+        //     });
+        // }
+
+
+        if ($auth->hasRole(['Mahasiswa'])) {
+            // $timetables->where('study_id', $auth->study_id);
+            if ($auth->classmateStudent) {
+                $timetables->where('classmate_id', $auth->classmateStudent->classmate_id);
+            } else {
+                $timetables->whereNull('classmate_id');
+            }
+        }
 
         if (!empty($userTimetableStatusDone)) {
             $timetables->whereNotIn('id', $userTimetableStatusDone);

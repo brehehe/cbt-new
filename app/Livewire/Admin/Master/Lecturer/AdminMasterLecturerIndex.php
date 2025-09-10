@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Master\Lecturer;
 
 use App\Helpers\AlertHelper;
 use App\Helpers\RoleHelper;
+use App\Models\Study\Study;
 use App\Models\User;
 use App\Models\User\UserDetail;
 use Illuminate\Support\Facades\Auth;
@@ -69,13 +70,15 @@ class AdminMasterLecturerIndex extends Component
     public $mobile_phone;
     public $identity_type = 'KTP';
     public $identity_number;
+    public $studys = [];
+    public $getStudys = [];
 
     protected $rules = [
         'name' => 'required|string|max:255',
         'email' => 'required|email|unique:users,email',
         'lecturer_id' => 'required|string|unique:user_details,lecturer_id',
         'lecturer_nidn' => 'required|string|unique:user_details,lecturer_nidn',
-        'lecturer_department' => 'required|string|max:255',
+        'studys' => 'required',
         'lecturer_faculty' => 'required|string|max:255',
         'lecturer_position' => 'required|string|max:255',
         'lecturer_education_level' => 'required|string|max:255',
@@ -130,7 +133,7 @@ class AdminMasterLecturerIndex extends Component
             'lecturer_id',
             'lecturer_nidn',
             'lecturer_nip',
-            'lecturer_department',
+            'studys',
             'lecturer_faculty',
             'lecturer_position',
             'lecturer_functional_position',
@@ -161,6 +164,10 @@ class AdminMasterLecturerIndex extends Component
         $this->resetValidation();
     }
 
+    public function mount()
+    {
+        $this->getStudys = Study::select('id', 'name')->orderBy('name')->get()->pluck('name', 'id')->toArray();
+    }
 
     public function edit($id)
     {
@@ -171,12 +178,12 @@ class AdminMasterLecturerIndex extends Component
         $this->editMode = true; // Set edit mode to true
         $this->name = $user->name;
         $this->email = $user->email;
+        $this->studys = $user->studys ?? '';
 
         if ($detail) {
             $this->lecturer_id = $detail->lecturer_id ?? '';
             $this->lecturer_nidn = $detail->lecturer_nidn ?? '';
             $this->lecturer_nip = $detail->lecturer_nip ?? '';
-            $this->lecturer_department = $detail->lecturer_department ?? '';
             $this->lecturer_faculty = $detail->lecturer_faculty ?? '';
             $this->lecturer_position = $detail->lecturer_position ?? '';
             $this->lecturer_functional_position = $detail->lecturer_functional_position ?? '';
@@ -185,9 +192,9 @@ class AdminMasterLecturerIndex extends Component
             $this->lecturer_expertise = $detail->lecturer_expertise ?? '';
             $this->lecturer_status = $detail->lecturer_status ?? 'active';
             $this->lecturer_type = $detail->lecturer_type ?? 'full_time';
-            $this->lecturer_start_date = $detail->lecturer_start_date ?? '';
+            $this->lecturer_start_date = $detail->lecturer_start_date?->format('Y-m-d') ?? '';
             $this->birth_place = $detail->birth_place ?? '';
-            $this->birth_date = $detail->birth_date ?? '';
+            $this->birth_date = $detail->birth_date?->format('Y-m-d') ?? '';
             $this->gender = $detail->gender ?? '';
             $this->religion = $detail->religion ?? '';
             $this->nationality = $detail->nationality ?? 'Indonesian';
@@ -209,7 +216,7 @@ class AdminMasterLecturerIndex extends Component
         // Dynamic validation rules
         $rules = [
             'name' => 'required|string|max:255',
-            'lecturer_department' => 'required|string|max:255',
+            'studys' => 'required',
             'lecturer_faculty' => 'required|string|max:255',
             'lecturer_position' => 'required|string|max:255',
             'lecturer_education_level' => 'required|string|max:255',
@@ -246,6 +253,7 @@ class AdminMasterLecturerIndex extends Component
                 $user->update([
                     'name' => $this->name,
                     'email' => $this->email,
+                    'studys' => $this->studys,
                 ]);
 
                 $user->userDetail()->updateOrCreate(
@@ -254,7 +262,6 @@ class AdminMasterLecturerIndex extends Component
                         'lecturer_id' => $this->lecturer_id,
                         'lecturer_nidn' => $this->lecturer_nidn,
                         'lecturer_nip' => $this->lecturer_nip,
-                        'lecturer_department' => $this->lecturer_department,
                         'lecturer_faculty' => $this->lecturer_faculty,
                         'lecturer_position' => $this->lecturer_position,
                         'lecturer_functional_position' => $this->lecturer_functional_position,
@@ -263,9 +270,9 @@ class AdminMasterLecturerIndex extends Component
                         'lecturer_expertise' => $this->lecturer_expertise,
                         'lecturer_status' => $this->lecturer_status,
                         'lecturer_type' => $this->lecturer_type,
-                        'lecturer_start_date' => $this->lecturer_start_date,
+                        'lecturer_start_date' => $this->lecturer_start_date ?: null,
                         'birth_place' => $this->birth_place,
-                        'birth_date' => $this->birth_date,
+                        'birth_date' => $this->birth_date ?: null,
                         'gender' => $this->gender,
                         'religion' => $this->religion,
                         'nationality' => $this->nationality,
@@ -288,14 +295,14 @@ class AdminMasterLecturerIndex extends Component
                     'name' => $this->name,
                     'email' => $this->email,
                     'password' => Hash::make($this->password ?: 'password123'),
-                    'email_verified_at' => now()
+                    'email_verified_at' => now(),
+                    'studys' => $this->studys,
                 ]);
 
                 $user->userDetail()->create([
                     'lecturer_id' => $this->lecturer_id,
                     'lecturer_nidn' => $this->lecturer_nidn,
                     'lecturer_nip' => $this->lecturer_nip,
-                    'lecturer_department' => $this->lecturer_department,
                     'lecturer_faculty' => $this->lecturer_faculty,
                     'lecturer_position' => $this->lecturer_position,
                     'lecturer_functional_position' => $this->lecturer_functional_position,
@@ -304,9 +311,9 @@ class AdminMasterLecturerIndex extends Component
                     'lecturer_expertise' => $this->lecturer_expertise,
                     'lecturer_status' => $this->lecturer_status,
                     'lecturer_type' => $this->lecturer_type,
-                    'lecturer_start_date' => $this->lecturer_start_date,
+                    'lecturer_start_date' => $this->lecturer_start_date ?: null,
                     'birth_place' => $this->birth_place,
-                    'birth_date' => $this->birth_date,
+                    'birth_date' => $this->birth_date ?: null,
                     'gender' => $this->gender,
                     'religion' => $this->religion,
                     'nationality' => $this->nationality,
@@ -377,7 +384,7 @@ class AdminMasterLecturerIndex extends Component
                 }
 
                 if ($this->departmentFilter) {
-                    $q->where('lecturer_department', $this->departmentFilter);
+                    $q->where('studys', $this->departmentFilter);
                 }
 
                 if ($this->positionFilter) {

@@ -7,8 +7,10 @@ use App\Models\Company\Company;
 use App\Models\User;
 use App\Models\User\UserDetail;
 use App\Models\Spatie\Role;
+use App\Models\Study\Study;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserDetailSeeder extends Seeder
 {
@@ -108,21 +110,157 @@ class UserDetailSeeder extends Seeder
                 'birth_place' => 'Medan',
                 'birth_date' => '2003-09-18',
                 'gender' => 'male'
-            ]
+            ],
+            // [
+            //     'name' => 'Mahasiswa 1',
+            //     'email' => 'mahasiswa1@gmail.com',
+            //     'student_id' => '0001',
+            //     'student_program' => 'Kedokteran',
+            //     'student_faculty' => 'Fakultas Kedokteran',
+            //     'student_department' => 'Kedokteran',
+            //     'student_semester' => '3',
+            //     'birth_place' => 'Surabaya',
+            //     'birth_date' => '2003-09-18',
+            //     'gender' => 'male',
+            //     'password' => 'User1234',
+            // ],
+            // [
+            //     'name' => 'Mahasiswa 2',
+            //     'email' => 'mahasiswa2@gmail.com',
+            //     'student_id' => '0002',
+            //     'student_program' => 'Kedokteran',
+            //     'student_faculty' => 'Fakultas Kedokteran',
+            //     'student_department' => 'Kedokteran',
+            //     'student_semester' => '3',
+            //     'birth_place' => 'Surabaya',
+            //     'birth_date' => '2003-09-18',
+            //     'gender' => 'male',
+            //     'password' => 'User1234',
+            // ],
+            // [
+            //     'name' => 'Mahasiswa 3',
+            //     'email' => 'mahasiswa3@gmail.com',
+            //     'student_id' => '0003',
+            //     'student_program' => 'Kedokteran',
+            //     'student_faculty' => 'Fakultas Kedokteran',
+            //     'student_department' => 'Kedokteran',
+            //     'student_semester' => '3',
+            //     'birth_place' => 'Surabaya',
+            //     'birth_date' => '2003-09-18',
+            //     'gender' => 'male',
+            //     'password' => 'User1234',
+            // ],
+            // [
+            //     'name' => 'Mahasiswa 4',
+            //     'email' => 'mahasiswa4@gmail.com',
+            //     'student_id' => '0004',
+            //     'student_program' => 'Kedokteran',
+            //     'student_faculty' => 'Fakultas Kedokteran',
+            //     'student_department' => 'Kedokteran',
+            //     'student_semester' => '3',
+            //     'birth_place' => 'Surabaya',
+            //     'birth_date' => '2003-09-18',
+            //     'gender' => 'male',
+            //     'password' => 'User1234',
+            // ],
+            // [
+            //     'name' => 'Mahasiswa 5',
+            //     'email' => 'mahasiswa5@gmail.com',
+            //     'student_id' => '0005',
+            //     'student_program' => 'Kedokteran',
+            //     'student_faculty' => 'Fakultas Kedokteran',
+            //     'student_department' => 'Kedokteran',
+            //     'student_semester' => '3',
+            //     'birth_place' => 'Surabaya',
+            //     'birth_date' => '2003-09-18',
+            //     'gender' => 'male',
+            //     'password' => 'User1234',
+            // ],
+            // [
+            //     'name' => 'Mahasiswa 6',
+            //     'email' => 'mahasiswa6@gmail.com',
+            //     'student_id' => '0006',
+            //     'student_program' => 'Kedokteran',
+            //     'student_faculty' => 'Fakultas Kedokteran',
+            //     'student_department' => 'Kedokteran',
+            //     'student_semester' => '3',
+            //     'birth_place' => 'Surabaya',
+            //     'birth_date' => '2003-09-18',
+            //     'gender' => 'male',
+            //     'password' => 'User1234',
+            // ],
+            // [
+            //     'name' => 'Mahasiswa 7',
+            //     'email' => 'mahasiswa7@gmail.com',
+            //     'student_id' => '0007',
+            //     'student_program' => 'Kedokteran',
+            //     'student_faculty' => 'Fakultas Kedokteran',
+            //     'student_department' => 'Kedokteran',
+            //     'student_semester' => '3',
+            //     'birth_place' => 'Surabaya',
+            //     'birth_date' => '2003-09-18',
+            //     'gender' => 'male',
+            //     'password' => 'User1234',
+            // ],
+            // [
+            //     'name' => 'Mahasiswa 8',
+            //     'email' => 'mahasiswa8@gmail.com',
+            //     'student_id' => '0008',
+            //     'student_program' => 'Kedokteran',
+            //     'student_faculty' => 'Fakultas Kedokteran',
+            //     'student_department' => 'Kedokteran',
+            //     'student_semester' => '3',
+            //     'birth_place' => 'Surabaya',
+            //     'birth_date' => '2003-09-18',
+            //     'gender' => 'male',
+            //     'password' => 'User1234',
+            // ],
+            // [
+            //     'name' => 'Mahasiswa 9',
+            //     'email' => 'mahasiswa9@gmail.com',
+            //     'student_id' => '0009',
+            //     'student_program' => 'Kedokteran',
+            //     'student_faculty' => 'Fakultas Kedokteran',
+            //     'student_department' => 'Kedokteran',
+            //     'student_semester' => '3',
+            //     'birth_place' => 'Surabaya',
+            //     'birth_date' => '2003-09-18',
+            //     'gender' => 'male',
+            //     'password' => 'User1234',
+            // ],
+            // [
+            //     'name' => 'Mahasiswa 10',
+            //     'email' => 'mahasiswa10@gmail.com',
+            //     'student_id' => '00010',
+            //     'student_program' => 'Kedokteran',
+            //     'student_faculty' => 'Fakultas Kedokteran',
+            //     'student_department' => 'Kedokteran',
+            //     'student_semester' => '3',
+            //     'birth_place' => 'Surabaya',
+            //     'birth_date' => '2003-09-18',
+            //     'gender' => 'male',
+            //     'password' => 'User1234',
+            // ],
         ];
 
         foreach ($studentData as $data) {
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'username'=>Str::replace(' ','', strtolower($data['name'])),
+                'username' => Str::replace(' ', '', strtolower($data['name'])),
                 'password' => Hash::make('password123'),
-                'email_verified_at' => now()
+                'email_verified_at' => now(),
+                'company_id' => $companyId,
+                'study_id' => Study::withoutGlobalScope('user_scope')
+                    ->where('company_id', $companyId)
+                    ->inRandomOrder()
+                    ->first()->id,
             ]);
 
             $user->assignRole('Mahasiswa');
 
             UserDetail::create([
+                'nim' => $data['student_id'],
                 'user_id' => $user->id,
                 'student_id' => $data['student_id'],
                 'student_program' => $data['student_program'],
@@ -160,6 +298,63 @@ class UserDetailSeeder extends Seeder
             ]);
 
             RoleHelper::assignRoleToUserInCompany($user, 'Mahasiswa', $companyId);
+        }
+
+        for ($i = 0; $i < 10; $i++) {
+            $mahasiswa = User::create([
+                'name' => 'Mahasiswa ' . ($i + 1),
+                'email' => 'mahasiswa' . ($i + 1) . '@gmail.com',
+                'username' => Str::replace(' ', '', strtolower('Mahasiswa ' . ($i + 1))),
+                'password' => Hash::make('password123'),
+                'email_verified_at' => now(),
+                'company_id' => $companyId,
+                'study_id' => Study::withoutGlobalScope('user_scope')
+                    ->where('company_id', $companyId)
+                    ->inRandomOrder()
+                    ->first()->id,
+            ]);
+
+            $mahasiswa->assignRole('Mahasiswa');
+
+            UserDetail::create([
+                'nim' => '2024' . str_pad($i + 11, 4, '0', STR_PAD_LEFT),
+                'user_id' => $mahasiswa->id,
+                'student_id' => '2024' . str_pad($i + 11, 4, '0', STR_PAD_LEFT),
+                'student_program' => 'Kedokteran',
+                'student_faculty' => 'Fakultas Kedokteran',
+                'student_department' => 'Ilmu Kedokteran',
+                'student_class' => 'A',
+                'student_semester' => '3',
+                'student_academic_year' => '2024/2025',
+                'student_status' => 'active',
+                'student_entry_date' => '2024-09-01',
+                'student_gpa' => rand(300, 400) / 100,
+                'birth_place' => 'Jakarta',
+                'birth_date' => '2000-01-01',
+                'gender' => 'male',
+                'religion' => 'Islam',
+                'nationality' => 'Indonesian',
+                'marital_status' => 'single',
+                'address' => 'Jl. Contoh No. ' . rand(1, 100),
+                'city' => 'Jakarta',
+                'province' => 'DKI Jakarta',
+                'country' => 'ID',
+                'phone' => '021' . rand(10000000, 99999999),
+                'mobile_phone' => '08' . rand(1000000000, 9999999999),
+                'identity_type' => 'KTP',
+                'identity_number' => rand(1000000000000000, 9999999999999999),
+                'blood_group' => ['A', 'B', 'AB', 'O'][rand(0, 3)],
+                'emergency_contact_name' => 'Orang Tua',
+                'emergency_contact_phone' => '08' . rand(1000000000, 9999999999),
+                'emergency_contact_relation' => 'Parent',
+                'verification_status' => 'verified',
+                'verified_at' => now(),
+                'status' => 'active',
+                'total_exams_taken' => rand(5, 25),
+                'average_score' => rand(6500, 9500) / 100
+            ]);
+
+            RoleHelper::assignRoleToUserInCompany($mahasiswa, 'Mahasiswa', $companyId);
         }
     }
 
@@ -247,9 +442,15 @@ class UserDetailSeeder extends Seeder
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'username'=>Str::replace(' ','', strtolower($data['name'])),
+                'username' => Str::replace(' ', '', strtolower($data['name'])),
                 'password' => Hash::make('password123'),
-                'email_verified_at' => now()
+                'email_verified_at' => now(),
+                'company_id' => $companyId,
+                'studys' => json_encode(Study::withoutGlobalScope('user_scope')
+                    ->where('company_id', $companyId)
+                    ->inRandomOrder()
+                    ->take(rand(1, 2))
+                    ->pluck('id')),
             ]);
 
             $user->assignRole('Dosen');
@@ -368,10 +569,11 @@ class UserDetailSeeder extends Seeder
         foreach ($supervisorsData as $data) {
             $user = User::create([
                 'name' => $data['name'],
-                'username'=>Str::replace(' ','', strtolower($data['name'])),
+                'username' => Str::replace(' ', '', strtolower($data['name'])),
                 'email' => $data['email'],
                 'password' => Hash::make('password123'),
-                'email_verified_at' => now()
+                'email_verified_at' => now(),
+                'company_id' => $companyId,
             ]);
 
             $user->assignRole('Pengawas');

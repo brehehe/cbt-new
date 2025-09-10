@@ -9,6 +9,7 @@ use App\Models\Master\Question\ModuleQuestion;
 use App\Models\Master\Question\Question;
 use App\Models\Master\Question\QuestionType;
 use App\Models\Master\Question\Topic;
+use App\Models\Study\Study;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -34,6 +35,17 @@ class QuestionSeeder extends Seeder
             ['name' => 'Sistem Imun']
         ];
         foreach ($companys as $company) {
+
+            Study::create([
+                'name' => 'Kedokteran',
+                'company_id' => $company->id,
+            ]);
+
+            Study::create([
+                'name' => 'Kebidanan',
+                'company_id' => $company->id,
+            ]);
+
             // Create topics for this company
             $companyTopics = [];
             foreach ($topics as $topic) {
@@ -52,12 +64,22 @@ class QuestionSeeder extends Seeder
                     $randomTopic = $companyTopics[array_rand($companyTopics)];
                     $randomQuestionType = $questionTypes->random();
 
+                    $study = Study::withoutGlobalScope('user_scope')
+                        ->where('company_id', $company->id)
+                        ->inRandomOrder()
+                        ->first();
+
+                    if (!$study) {
+                        throw new \Exception("Belum ada Study untuk company {$company->id}");
+                    }
+
                     $question = Question::create([
-                        'topic_id' => $randomTopic->id,
+                        'topic_id'         => $randomTopic->id,
                         'question_type_id' => $randomQuestionType->id,
-                        'question' => $faker->sentence,
-                        'description' => $faker->paragraph,
-                        'company_id' => $company->id,
+                        'question'         => $faker->sentence,
+                        'description'      => $faker->paragraph,
+                        'company_id'       => $company->id,
+                        'study_id'         => $study->id,
                     ]);
 
                     $correctIndex = rand(0, 4);   // pilih salah satu 0‑3 secara acak
@@ -87,12 +109,23 @@ class QuestionSeeder extends Seeder
                     'duration' => 120,
                     'description' => $faker->paragraph,
                     'random_question' => $randomQuestion ? true : false,
+                    'studys' => json_encode(Study::withoutGlobalScope('user_scope')
+                        ->where('company_id', $company->id)
+                        ->inRandomOrder()
+                        ->take(rand(1, 2))
+                        ->pluck('id')),
                 ]);
 
-                // Get all questions for this question type
+                $studyId = 0;
+                if (!empty($module->studys)) {
+                    $decoded = json_decode($module->studys, true);
+                    $studyId = $decoded[0] ?? 0;
+                }
+
                 $questions = Question::withoutGlobalScope('user_scope')
                     ->where('question_type_id', $questionTypeCompany->id)
                     ->where('company_id', $company->id)
+                    ->where('study_id', $studyId)
                     ->inRandomOrder()
                     ->take(10)
                     ->get();
@@ -102,6 +135,7 @@ class QuestionSeeder extends Seeder
                         'module_id' => $module->id,
                         'question_id' => $question->id,
                         'company_id' => $company->id,
+                        'study_id' => $question->study_id,
                     ]);
                 }
             }

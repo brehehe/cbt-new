@@ -2,10 +2,10 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#3BA172]">User</h1>
+                <h1 class="text-2xl font-bold text-[#f58634]">User</h1>
             </div>
             <div>
-                <button wire:click="refreshStreamData" class="btn btn-success">
+                <button wire:click="refreshStreamData" class="btn btn-warning">
                     <i class="fas fa-sync-alt"></i>
                     Refresh
                 </button>
@@ -34,14 +34,14 @@
                         </div>
                         <!-- Connection Status Indicator -->
                         <div id="statusIndicator-{{ $session->id }}"
-                             class="absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium bg-yellow-500 text-white">
+                            class="absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium bg-yellow-500 text-white">
                             Connecting
                         </div>
                         <!-- Manual Retry Button -->
-                        <!-- <button onclick="window.debugSupervisor?.retryConnection('{{ $session->id }}')"
+                        <button onclick="window.debugSupervisor?.retryConnection('{{ $session->id }}')"
                                 class="absolute bottom-2 right-2 bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded opacity-75 hover:opacity-100">
                             Retry
-                        </button> -->
+                        </button>
                     </div>
 
                     <!-- Student Info -->
@@ -127,7 +127,9 @@
                     for (const session of activeSessions) {
                         if (session.peer_id) {
                             const available = await checkPeerAvailability(session.peer_id);
-                            console.log(`${session.user_name} (${session.peer_id}): ${available ? '✅ Available' : '❌ Not available'}`);
+                            console.log(
+                                `${session.user_name} (${session.peer_id}): ${available ? '✅ Available' : '❌ Not available'}`
+                            );
                         }
                     }
                 }
@@ -252,7 +254,7 @@
                     console.error('Error message:', err.message);
 
                     // Handle specific error types
-                    switch(err.type) {
+                    switch (err.type) {
                         case 'network':
                             console.log('Network error - check PeerJS server connection');
                             break;
@@ -395,7 +397,9 @@
                             activeSessions.push(streamInfo);
 
                             if (streamInfo.has_real_camera && streamInfo.peer_id) {
-                                console.log(`Found student with camera: ${streamInfo.user_name} (Peer ID: ${streamInfo.peer_id})`);
+                                console.log(
+                                    `Found student with camera: ${streamInfo.user_name} (Peer ID: ${streamInfo.peer_id})`
+                                );
 
                                 // Check if peer is actually available before attempting connection
                                 if (await checkPeerAvailability(streamInfo.peer_id)) {
@@ -405,41 +409,50 @@
                                         console.log(`✅ Successfully connected to ${streamInfo.user_name}`);
 
                                         // Update session type to 'real'
-                                        const sessionIndex = activeSessions.findIndex(s => s.session_id === streamInfo.session_id);
+                                        const sessionIndex = activeSessions.findIndex(s => s.session_id === streamInfo
+                                            .session_id);
                                         if (sessionIndex !== -1) {
                                             activeSessions[sessionIndex].type = 'real';
                                         }
                                     } catch (error) {
-                                        console.log(`❌ PeerJS connection failed for ${streamInfo.user_name}:`, error.message);
+                                        console.log(`❌ PeerJS connection failed for ${streamInfo.user_name}:`, error
+                                            .message);
                                         // Fall back to demo for this session
                                         console.log(`Using demo mode for ${streamInfo.user_name}`);
                                         createMockVideoStreamForSession(streamInfo, activeSessions.length);
 
                                         // Update session type to 'demo'
-                                        const sessionIndex = activeSessions.findIndex(s => s.session_id === streamInfo.session_id);
+                                        const sessionIndex = activeSessions.findIndex(s => s.session_id === streamInfo
+                                            .session_id);
                                         if (sessionIndex !== -1) {
                                             activeSessions[sessionIndex].type = 'demo';
                                             activeSessions[sessionIndex].error = error.message;
                                         }
                                     }
                                 } else {
-                                    console.log(`Peer ${streamInfo.peer_id} is not available, using demo mode for ${streamInfo.user_name}`);
+                                    console.log(
+                                        `Peer ${streamInfo.peer_id} is not available, using demo mode for ${streamInfo.user_name}`
+                                    );
                                     createMockVideoStreamForSession(streamInfo, activeSessions.length);
 
                                     // Update session type to 'demo'
-                                    const sessionIndex = activeSessions.findIndex(s => s.session_id === streamInfo.session_id);
+                                    const sessionIndex = activeSessions.findIndex(s => s.session_id === streamInfo
+                                        .session_id);
                                     if (sessionIndex !== -1) {
                                         activeSessions[sessionIndex].type = 'demo';
                                         activeSessions[sessionIndex].error = 'Peer not available';
                                     }
                                 }
                             } else {
-                                console.log(`${streamInfo.user_name} - No camera or peer ID (camera: ${streamInfo.has_real_camera}, peer: ${streamInfo.peer_id})`);
+                                console.log(
+                                    `${streamInfo.user_name} - No camera or peer ID (camera: ${streamInfo.has_real_camera}, peer: ${streamInfo.peer_id})`
+                                );
                                 // No real camera or peer ID, use demo
                                 createMockVideoStreamForSession(streamInfo, activeSessions.length);
 
                                 // Update session type to 'demo'
-                                const sessionIndex = activeSessions.findIndex(s => s.session_id === streamInfo.session_id);
+                                const sessionIndex = activeSessions.findIndex(s => s.session_id === streamInfo
+                                    .session_id);
                                 if (sessionIndex !== -1) {
                                     activeSessions[sessionIndex].type = 'demo';
                                 }
@@ -605,7 +618,8 @@
                 // Set a timeout for the entire connection process
                 const timeoutId = setTimeout(() => {
                     if (!callAttempted) {
-                        console.log(`Connection timeout for ${streamInfo.user_name} - no call response`);
+                        console.log(
+                            `Connection timeout for ${streamInfo.user_name} - no call response`);
                         reject(new Error('Connection timeout - student may not be online'));
                     }
                 }, 10000); // 10 seconds timeout
@@ -648,7 +662,8 @@
                         });
 
                         // Update the session in activeSessions
-                        const sessionIndex = activeSessions.findIndex(s => s.session_id === streamInfo.session_id);
+                        const sessionIndex = activeSessions.findIndex(s => s.session_id === streamInfo
+                            .session_id);
                         if (sessionIndex !== -1) {
                             activeSessions[sessionIndex] = {
                                 ...activeSessions[sessionIndex],
@@ -656,13 +671,16 @@
                                 call: call,
                                 stream: remoteStream,
                                 cleanup: () => {
-                                    console.log(`Cleaning up connection for ${streamInfo.user_name}`);
+                                    console.log(
+                                        `Cleaning up connection for ${streamInfo.user_name}`
+                                    );
                                     try {
                                         if (call && call.open) {
                                             call.close();
                                         }
                                         if (remoteStream && remoteStream.active) {
-                                            remoteStream.getTracks().forEach(track => track.stop());
+                                            remoteStream.getTracks().forEach(track => track
+                                                .stop());
                                         }
                                     } catch (cleanupError) {
                                         console.log('Cleanup error:', cleanupError);
@@ -700,10 +718,13 @@
                     // Additional timeout specifically for stream reception
                     setTimeout(() => {
                         if (!streamReceived && call && call.open) {
-                            console.log(`No stream received from ${streamInfo.user_name} within timeout`);
+                            console.log(
+                                `No stream received from ${streamInfo.user_name} within timeout`);
                             call.close();
                             if (!streamReceived) {
-                                reject(new Error('No video stream received - student camera may not be active'));
+                                reject(new Error(
+                                    'No video stream received - student camera may not be active'
+                                ));
                             }
                         }
                     }, 8000); // 8 seconds for stream reception
@@ -840,7 +861,9 @@
                     });
 
                     video.addEventListener('loadeddata', () => {
-                        console.log(`✅ Video loaded successfully for session ${sessionId}: ${sessionData.user_name || sessionData.name}`);
+                        console.log(
+                            `✅ Video loaded successfully for session ${sessionId}: ${sessionData.user_name || sessionData.name}`
+                        );
                     });
 
                     video.addEventListener('loadedmetadata', () => {
@@ -864,15 +887,19 @@
                     const statusIndicator = document.getElementById(`statusIndicator-${sessionId}`);
                     if (statusIndicator) {
                         if (sessionData.type === 'real') {
-                            statusIndicator.className = 'absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium bg-green-500 text-white';
+                            statusIndicator.className =
+                                'absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium bg-green-500 text-white';
                             statusIndicator.textContent = 'LIVE';
                         } else if (sessionData.type === 'demo') {
-                            statusIndicator.className = 'absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium bg-yellow-500 text-white';
+                            statusIndicator.className =
+                                'absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium bg-yellow-500 text-white';
                             statusIndicator.textContent = 'DEMO';
                         }
                     }
 
-                    console.log(`Stream displayed in container ${index} for session ${sessionId}: ${sessionData.user_name || sessionData.name}`);
+                    console.log(
+                        `Stream displayed in container ${index} for session ${sessionId}: ${sessionData.user_name || sessionData.name}`
+                    );
                 } else {
                     console.warn(`Container ${index} not found for session ${sessionId}`);
                 }
@@ -915,7 +942,8 @@
             const sessionId = sessionData.session_id || sessionData.id;
             const statusIndicator = document.getElementById(`statusIndicator-${sessionId}`);
             if (statusIndicator) {
-                statusIndicator.className = 'absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium bg-red-500 text-white';
+                statusIndicator.className =
+                    'absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium bg-red-500 text-white';
                 statusIndicator.textContent = 'ERROR';
             }
         }

@@ -3,6 +3,7 @@
 namespace App\Models\Master\Question;
 
 use App\Models\Company\Company;
+use App\Models\Study\Study;
 use App\Models\Timetable\TimetableQuestion;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -51,7 +52,7 @@ class Question extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
-        $term = '%'. $term .'%';
+        $term = '%' . $term . '%';
 
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id', 'question', 'description'], 'ILIKE', $term);
@@ -126,5 +127,10 @@ class Question extends Model
     public function timetableQuestion(): HasOne
     {
         return $this->hasOne(TimetableQuestion::class, 'question_id', 'id');
+    }
+
+    public function study()
+    {
+        return $this->belongsTo(Study::class, 'study_id', 'id');
     }
 }

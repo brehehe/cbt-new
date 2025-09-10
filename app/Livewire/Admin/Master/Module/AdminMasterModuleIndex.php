@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Master\Question\Module;
 use App\Models\Master\Question\QuestionType;
+use App\Models\Study\Study;
 use App\Services\Module\ModuleService;
 use App\Services\QuestionType\QuestionTypeService;
 use Throwable;
@@ -24,10 +25,11 @@ class AdminMasterModuleIndex extends Component
     public $question_types;
     public $data_id, $question_type_id, $name, $duration, $description, $random_question;
     public $updateRandomQuestion;
+    public $get_studys = [], $studys = [], $is_all_study = false;
 
     public function render()
     {
-        $modules = Module::withoutGlobalScope('user_scope')->search($this->search)->select('id', 'question_type_id', 'name', 'duration', 'description', 'random_question')
+        $modules = Module::withoutGlobalScope('user_scope')->search($this->search)->select('id', 'question_type_id', 'name', 'duration', 'description', 'random_question', 'studys')
             ->with([
                 'questionType:id,name'
             ])
@@ -42,6 +44,24 @@ class AdminMasterModuleIndex extends Component
     {
         // dd(Auth::user()?->company);
         $this->question_types = QuestionType::select('id', 'name')->get();
+        if (Auth::user()?->hasRole('Dosen')) {
+            $studyIds = Auth::user()?->studys ?? []; // array dari JSON
+            $this->get_studys = Study::whereIn('id', $studyIds)
+                ->orderBy('name', 'asc')
+                ->pluck('name', 'id')
+                ->toArray();
+        } else {
+            $this->get_studys = Study::orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
+        }
+    }
+
+    public function updatedIsAllStudy($value)
+    {
+        if ($value) {
+            $this->studys = array_keys($this->get_studys);
+        } else {
+            $this->studys = [];
+        }
     }
 
     public function hydrate()
@@ -57,7 +77,7 @@ class AdminMasterModuleIndex extends Component
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['data_id', 'question_type_id', 'name', 'duration', 'description', 'random_question']);
+        $this->reset(['data_id', 'question_type_id', 'name', 'duration', 'description', 'random_question', 'studys', 'is_all_study']);
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
 
@@ -69,6 +89,7 @@ class AdminMasterModuleIndex extends Component
                 'name'             => 'required',
                 'description'      => 'nullable',
                 'duration'         => 'required|numeric|min:1',
+                'studys'           => 'required|array',
             ],
             [
                 'question_type_id.required' => 'Tipe soal wajib diisi.',
@@ -77,6 +98,8 @@ class AdminMasterModuleIndex extends Component
                 'duration.required'         => 'Durasi pengerjaan modul wajib diisi.',
                 'duration.numeric'          => 'Durasi pengerjaan modul hanya bernilai angka.',
                 'duration.min'              => 'Durasi pengerjaan modul minimal 1 menit.',
+                'studys.required'           => 'Prodi wajib dipilih.',
+                'studys.array'              => 'Prodi tidak valid.',
             ]
         );
 
@@ -91,6 +114,7 @@ class AdminMasterModuleIndex extends Component
                 'duration'         => $this->duration,
                 'random_question'  => $this->random_question,
                 'description'      => $this->description,
+                'studys'           => $this->studys,
             ];
 
             $module = app(ModuleService::class)->updateOrCreate($request);

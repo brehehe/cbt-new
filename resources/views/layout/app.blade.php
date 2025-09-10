@@ -8,6 +8,8 @@
 
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
             rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
         <!-- Add Selectize CSS -->
         <link rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap5.min.css"
@@ -79,10 +81,10 @@
 
     <body class="bg-white">
         <!-- Watermark Logo (Background) -->
-        <div class="watermark-logo">
+        {{-- <div class="watermark-logo">
             <img src="https://ikmb.ac.id/wp-content/uploads/2020/04/Screen-Shot-2020-04-14-at-13.16.27.png" alt="Watermark Logo" style="width: 750px; height: 150px" />
             {{ Auth::user()->name . ' - ' . (Auth::user()->nim ?? (Auth::user()->username ?? '-')) }}
-        </div>
+        </div> --}}
 
         {{-- @auth
             <div class="watermark-user">

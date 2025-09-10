@@ -23,8 +23,8 @@
             <div class="mb-4">
                 <label for="grade_letter" class="block text-sm font-medium text-gray-700">Nama Grade Letter <span
                         class="text-red-600">*</span></label>
-                <input type="text" id="grade_letter" wire:model.defer="grade_letter"
-                    placeholder="Contoh : A" class="mt-1 form-control">
+                <input type="text" id="grade_letter" wire:model.defer="grade_letter" placeholder="Contoh : A"
+                    class="mt-1 form-control">
                 @error('grade_letter')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
@@ -65,7 +65,7 @@
                 Batal
             </button>
             <button wire:click='submit'
-                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition">
+                class="px-4 py-2 bg-[#f58634] hover:bg-[#f58634] text-white rounded-lg shadow transition">
                 Simpan
             </button>
         </div>

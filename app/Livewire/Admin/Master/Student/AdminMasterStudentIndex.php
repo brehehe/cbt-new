@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Master\Student;
 
 use App\Helpers\AlertHelper;
 use App\Helpers\RoleHelper;
+use App\Models\Study\Study;
 use App\Models\User;
 use App\Models\User\UserDetail;
 use Illuminate\Support\Facades\Auth;
@@ -97,10 +98,17 @@ class AdminMasterStudentIndex extends Component
     public $preferred_language = 'id';
     public $verification_status = 'pending';
     public $notes;
+    public $studys = [];
+    public $study_id;
 
     public function openModal()
     {
         $this->dispatch('open-modal', ['id' => 'modal']);
+    }
+
+    public function mount()
+    {
+        $this->studys = Study::select('id', 'name')->orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
     }
 
     public function closeModal()
@@ -140,6 +148,7 @@ class AdminMasterStudentIndex extends Component
             'city',
             'province',
             'country',
+            'study_id',
             'mobile_phone',
             'emergency_contact_name',
             'emergency_contact_phone',
@@ -171,6 +180,7 @@ class AdminMasterStudentIndex extends Component
             $this->nim = $user->nim;
             $this->email = $user->email;
             $this->profile_old = $user->profile;
+            $this->study_id = $user->study_id;
             $this->phone = trim($user->phone ?? '');
 
             if ($user->userDetail) {
@@ -297,7 +307,7 @@ class AdminMasterStudentIndex extends Component
             ],
             'address' => 'required|string|max:500',
             'identity_number' => 'nullable|string|max:20',
-
+            'study_id' => 'required|exists:studies,id',
             // Student Specific Validation
             'student_id' => 'nullable|string|max:20',
             'student_program' => 'nullable|string|max:100',
@@ -342,6 +352,7 @@ class AdminMasterStudentIndex extends Component
             'verification_status' => 'nullable|in:pending,verified,rejected',
             'notes' => 'nullable|string|max:1000',
         ]);
+
 
         try {
             // Mulai database transaction
@@ -452,6 +463,7 @@ class AdminMasterStudentIndex extends Component
     protected function updateExistingUser($companyId, $validatedData)
     {
         $user = User::find($this->data_id);
+
         if (!$user) {
             throw new \Exception('User tidak ditemukan');
         }
@@ -467,6 +479,7 @@ class AdminMasterStudentIndex extends Component
             'nim' => $validatedData['nim'],
             'email' => $validatedData['email'],
             'phone' => trim($validatedData['phone']),
+            'study_id' => $validatedData['study_id'],
             'company_id' => $companyId,
             'type_user' => 'employee',
         ];
@@ -506,6 +519,7 @@ class AdminMasterStudentIndex extends Component
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
             'phone' => trim($validatedData['phone']),
+            'study_id' => $validatedData['study_id'],
             'company_id' => $companyId,
             'type_user' => 'employee',
         ];
@@ -632,9 +646,7 @@ class AdminMasterStudentIndex extends Component
 
         // Apply program filter
         if (!empty($this->programFilter)) {
-            $user->whereHas('userDetail', function ($query) {
-                $query->where('student_program', $this->programFilter);
-            });
+            $user->where('study_id', $this->programFilter);
         }
 
         // Apply status filter

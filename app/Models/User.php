@@ -5,7 +5,9 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Helpers\RoleHelper;
+use App\Models\Classmate\ClassmateStudent;
 use App\Models\Company\Company;
+use App\Models\Study\Study;
 use App\Models\User\UserCompanyRole;
 use App\Models\User\UserDetail;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -50,6 +52,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'studys' => 'array',
         ];
     }
 
@@ -227,6 +230,11 @@ class User extends Authenticatable
         })->first();
     }
 
+    public function study()
+    {
+        return $this->belongsTo(Study::class, 'study_id', 'id');
+    }
+
     // Scopes
     public function scopeActive($query)
     {
@@ -248,5 +256,10 @@ class User extends Authenticatable
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function classmateStudent()
+    {
+        return $this->hasOne(ClassmateStudent::class, 'user_id', 'id');
     }
 }

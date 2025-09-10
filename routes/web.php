@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Middleware\CheckUserTimetable;
+use App\Livewire\Admin\Master\Classmate\AdminMasterClassmateIndex;
+use App\Livewire\Admin\Master\Classmate\Detail\AdminMasterClassmateDetailIndex;
 use App\Livewire\Admin\Master\ExamType\AdminMasterExamTypeIndex;
 use App\Livewire\Admin\Master\Material\AdminMasterMaterialIndex;
 use App\Livewire\Admin\Master\MaterialCategory\AdminMasterMaterialCategoryIndex;
@@ -10,6 +12,8 @@ use App\Livewire\Admin\Master\Question\AdminMasterQuestionIndex;
 use App\Livewire\Admin\Master\Question\AdminMasterQuestionUpdate;
 use App\Livewire\Admin\Master\QuestionType\AdminMasterQuestionTypeIndex;
 use App\Livewire\Admin\Master\Topic\AdminMasterTopicIndex;
+use App\Livewire\Admin\Report\ItemAnalysis\AdminReportItemAnalysisIndex;
+use App\Livewire\Admin\Report\ItemAnalysis\Detail\AdminReportItemAnalysisDetailIndex;
 use App\Livewire\Admin\Report\Question\AdminReportQuestionIndex;
 use App\Livewire\Admin\Report\Timetable\AdminReportTimetable;
 use App\Livewire\Admin\Report\Timetable\AdminReportTimetableDetail;
@@ -68,6 +72,7 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
         Route::get('/lecturer', 'Lecturer\AdminMasterLecturerIndex')->name('admin.master.lecturer');
         Route::get('/student', 'Student\AdminMasterStudentIndex')->name('admin.master.student');
         Route::get('/supervisor', 'Supervisor\AdminMasterSupervisorIndex')->name('admin.master.supervisor');
+        Route::get('/study', 'Study\AdminMasterStudyIndex')->name('admin.master.study');
         Route::get('/timetable', 'Timetable\AdminMasterTimetableIndex')->name('admin.master.timetable');
         Route::get('/timetable/{timetable_id}/detail', 'Timetable\Detail\AdminMasterTimetableDetailIndex')->name('admin.master.timetable.detail');
         Route::get('/timetable/{timetable_id}/video', 'Timetable\Video\AdminMasterTimetableVideoIndex')->name('admin.master.timetable.video');
@@ -81,12 +86,17 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
         Route::get('/module-question/{id}', AdminMasterModuleQuestionIndex::class)->name('admin.master.module-question');
         Route::get('/question', AdminMasterQuestionIndex::class)->name('admin.master.question');
         Route::get('/question/{id}', AdminMasterQuestionUpdate::class)->name('admin.master.question.update');
+
+        Route::get('/classmate', AdminMasterClassmateIndex::class)->name('admin.master.classmate');
+        Route::get('/classmate/{id}/detail', AdminMasterClassmateDetailIndex::class)->name('admin.master.classmate.detail');
     });
 
     Route::group(['namespace' => 'Report', 'prefix' => 'report'], function () {
         Route::get('/timetable', AdminReportTimetableIndex::class)->name('admin.report.timetable');
         Route::get('/timetable-detail/{id}', AdminReportTimetableDetail::class)->name('admin.report.timetable-detail');
         Route::get('/question', AdminReportQuestionIndex::class)->name('admin.report.question');
+        Route::get('/item-analysis', AdminReportItemAnalysisIndex::class)->name('admin.report.item-analysis');
+        Route::get('/item-analysis/{id}/detail', AdminReportItemAnalysisDetailIndex::class)->name('admin.report.item-analysis.detail');
     });
 });
 

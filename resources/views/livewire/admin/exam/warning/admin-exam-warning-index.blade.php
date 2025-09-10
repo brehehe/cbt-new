@@ -7,9 +7,9 @@
             </div>
 
             <div class="space-y-6">
-                <div class="p-4 rounded-lg bg-blue-50">
-                    <h2 class="mb-2 font-semibold text-blue-800">Informasi Ujian</h2>
-                    <div class="grid grid-cols-2 gap-4 text-sm text-blue-700">
+                <div class="p-4 rounded-lg bg-orange-50">
+                    <h2 class="mb-2 font-semibold text-orange-800">Informasi Ujian</h2>
+                    <div class="grid grid-cols-2 gap-4 text-sm text-orange-700">
                         <div>
                             <p><span class="font-medium">Modul:</span>
                                 {{ $userTimetable->timetable->module->name ?? '-' }}</p>
@@ -79,7 +79,7 @@
                 <!-- Action Button -->
                 <div class="flex justify-center mt-8">
                     <button id="startExam" disabled wire:click="confirmStartUjian()"
-                        class="px-6 py-3 font-medium text-white transition-colors bg-blue-500 rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed">
+                        class="px-6 py-3 font-medium text-white transition-colors bg-[#f58634] rounded-lg hover:bg-[#f58634] disabled:bg-gray-300 disabled:cursor-not-allowed">
                         Mulai Ujian
                     </button>
                 </div>

@@ -45,6 +45,7 @@
     --color-primary-800: var(--primary-800);
     --color-primary-900: var(--primary-900);
 }
+
 /* app.css or your main CSS file */
 
 :root {
@@ -747,6 +748,7 @@
 }
 
 @layer base {
+
     *,
     ::after,
     ::before,
@@ -761,7 +763,7 @@
 }
 
 [data-flux-label] {
-    @apply !mb-0 !leading-tight;
+    @apply  !mb-0 !leading-tight;
 }
 
 input:focus[data-flux-control],
@@ -811,7 +813,7 @@ select:focus[data-flux-control] {
 }
 
 .btn-warning {
-    @apply bg-[#F59E0B] text-white px-4 py-2.5 rounded-xl shadow hover:shadow-md transition;
+    @apply bg-[#f58634] text-white px-4 py-2.5 rounded-xl shadow hover:shadow-md transition;
 }
 
 .btn-success {
@@ -821,6 +823,7 @@ select:focus[data-flux-control] {
 .btn-danger {
     @apply bg-[#F44336] text-white px-4 py-2.5 rounded-xl shadow hover:shadow-md transition;
 }
+
 .btn-secondary {
     @apply bg-gray-300 text-gray-700 px-4 py-2.5 rounded-xl;
 }
@@ -950,8 +953,7 @@ body {
 }
 
 .custom-padding {
-    padding: calc(var(--spacing) * 2) calc(var(--spacing) * 2)
-        calc(var(--spacing) * 2) calc(var(--spacing) * 4);
+    padding: calc(var(--spacing) * 2) calc(var(--spacing) * 2) calc(var(--spacing) * 2) calc(var(--spacing) * 4);
 }
 
 .p-5 {
@@ -1264,6 +1266,7 @@ input[type="number"] {
     .md\:col-span-3 {
         grid-column: span 3 / span 3;
     }
+
     .md\:col-span-4 {
         grid-column: span 4 / span 4;
     }

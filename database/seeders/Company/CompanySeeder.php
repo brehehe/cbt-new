@@ -21,6 +21,7 @@ use App\Models\Master\CodeSystem\Patient\AdministrativeGender;
 use App\Models\PaymentMethod\PaymentMethod;
 use App\Models\Poly\Poly;
 use App\Models\Role\RoleCompany;
+use App\Models\Study\Study;
 use App\Models\User\UserDetail;
 use App\service\apiservice;
 use App\Services\System\Organization\OrganizationService;
@@ -30,7 +31,7 @@ class CompanySeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     */ 
+     */
     public function run(): void
     {
         $roles = [
@@ -122,7 +123,6 @@ class CompanySeeder extends Seeder
                 'start_date' => now(),
                 'duration_days' => $serviceMonth->is_lifetime ? 0 : $serviceMonth->duration_days,
             ]);
-
             $roles = Role::get();
 
             foreach ($roles as $role) {

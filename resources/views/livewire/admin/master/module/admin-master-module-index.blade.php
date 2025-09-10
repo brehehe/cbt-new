@@ -1,15 +1,18 @@
 @section('title', 'Modul Soal')
 <div>
+    @php
+        use App\Models\Study\Study;
+    @endphp
     {{-- Knowing others is intelligence; knowing yourself is true wisdom. --}}
     @include('livewire.admin.master.module.admin-master-module-modal')
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#3BA172]">Modul Soal</h1>
+                <h1 class="text-2xl font-bold text-[#f58634]">Modul Soal</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div>
-                <button wire:click="openModal()" class="btn btn-success">
+                <button wire:click="openModal()" class="btn btn-warning">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -55,6 +58,7 @@
                         <th>Durasi</th>
                         <th>Soal Acak</th>
                         <th>Deskripsi</th>
+                        <th>Prodi</th>
                         <th class="w-1 center">Aksi</th>
                     </tr>
                 </thead>
@@ -77,6 +81,11 @@
                                 </div>
                             </td>
                             <td>{{ $result?->description }}</td>
+                            <td style="width: 200px;">
+                                @foreach (json_decode($result?->studys ?? '[]') as $study)
+                                    - {{ Study::find($study)?->name }} <br>
+                                @endforeach
+                            </td>
                             <td class="center">
                                 <div class="flex items-center">
                                     {{-- <button
@@ -88,7 +97,8 @@
                                                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                     </button> --}}
-                                    <a class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn" href="{{ route('admin.master.module-question', $result?->id) }}">
+                                    <a class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn"
+                                        href="{{ route('admin.master.module-question', $result?->id) }}">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

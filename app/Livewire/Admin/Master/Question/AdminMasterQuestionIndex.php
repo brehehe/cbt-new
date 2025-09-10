@@ -14,6 +14,7 @@ use App\Models\Master\Question\Material;
 use App\Models\Master\Question\Question;
 use App\Models\Master\Question\MaterialCategory;
 use App\Models\Master\Question\QuestionType;
+use App\Models\Study\Study;
 use App\Services\Question\QuestionService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\WithFileUploads;
@@ -24,15 +25,16 @@ class AdminMasterQuestionIndex extends Component
 {
     use WithPagination, WithFileUploads, WithFilePond;
     protected $paginationTheme = 'bootstrap';
-    public $perPage = 10, $search;
+    public $perPage = 5, $search;
 
-    public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id ,$question, $description, $weight_correct, $weight_incorrect;
+    public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id, $question, $description, $weight_correct, $weight_incorrect;
     public $topics = [], $material_categories = [], $materials = [], $question_types = [];
-    public $images = [], $old_images = [];
+    public $images = [], $old_images = [], $studys = [], $study_id;
+    public $filterStudyId, $filterQuestionTypeId, $filterTopicId;
 
     public function render()
     {
-        $questions = Question::select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect')->search($this->search);
+        $questions = Question::select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect');
         return view('livewire.admin.master.question.admin-master-question-index', [
             'questions' => $questions->paginate($this->perPage)
         ])->extends('layout.app')->section('content');
@@ -42,6 +44,16 @@ class AdminMasterQuestionIndex extends Component
     {
         $this->topics         = Topic::select('id', 'name')->get();
         $this->question_types = QuestionType::select('id', 'name')->get();
+        if (Auth::user()?->hasRole('Dosen')) {
+            $studyIds = Auth::user()?->studys ?? []; // array dari JSON
+            $this->studys = Study::whereIn('id', $studyIds)
+                ->orderBy('name', 'asc')
+                ->pluck('name', 'id')
+                ->toArray();
+            $this->study_id = array_key_first($this->studys);
+        } else {
+            $this->studys = Study::orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
+        }
     }
 
     public function updated()
@@ -66,7 +78,7 @@ class AdminMasterQuestionIndex extends Component
             ->get();
     }
 
-    public function hydrate ()
+    public function hydrate()
     {
         $this->resetPage();
     }
@@ -94,6 +106,7 @@ class AdminMasterQuestionIndex extends Component
                 'question'             => 'required',
                 'images.*'             => 'nullable|file|mimetypes:image/jpg,image/jpeg,image/png',
                 'description'          => 'nullable',
+                'study_id'             => 'required|exists:studies,id',
             ],
             [
                 'topic_id.required'           => 'Topik soal wajib diisi.',
@@ -104,31 +117,33 @@ class AdminMasterQuestionIndex extends Component
                 'question.required'           => 'Pertanyaan wajib diisi.',
                 'images.*.file'               => 'Gambar wajib berupa file.',
                 'images.*.mimes'              => 'Gambar hanya berformat : .jpg, .jpeg, .png.',
+                'study_id.required'           => 'Prodi wajib diisi.',
             ]
         );
 
         try {
             DB::beginTransaction();
-                 $request = [
-                    'id'                   => $this->data_id,
-                    'user_id'              => Auth::user()?->id,
-                    'company_id'           => Auth::user()?->company?->id,
-                    'topic_id'             => $this->topic_id,
-                    'material_category_id' => $this->material_category_id,
-                    'material_id'          => $this->material_id,
-                    'question_type_id'     => $this->question_type_id,
-                    'question'             => $this->question,
-                    'images'               => $this->images,
-                    'old_images'           => $this->old_images,
-                    'description'          => $this->description,
-                    'weight_correct'       => $this->weight_correct,
-                    'weight_incorrect'     => $this->weight_incorrect,
-                ];
+            $request = [
+                'id'                   => $this->data_id,
+                'user_id'              => Auth::user()?->id,
+                'company_id'           => Auth::user()?->company?->id,
+                'topic_id'             => $this->topic_id,
+                'material_category_id' => $this->material_category_id,
+                'material_id'          => $this->material_id,
+                'question_type_id'     => $this->question_type_id,
+                'question'             => $this->question,
+                'images'               => $this->images,
+                'study_id'             => $this->study_id,
+                'old_images'           => $this->old_images,
+                'description'          => $this->description,
+                'weight_correct'       => $this->weight_correct,
+                'weight_incorrect'     => $this->weight_incorrect,
+            ];
 
-                $question = app(QuestionService::class)->updateOrCreate($request);
-                if (!$question) {
-                    throw new Exception("Ada kesalahaan saat QuestionService => updateOrCreate", 500);
-                }
+            $question = app(QuestionService::class)->updateOrCreate($request);
+            if (!$question) {
+                throw new Exception("Ada kesalahaan saat QuestionService => updateOrCreate", 500);
+            }
 
             DB::commit();
         } catch (Exception | Throwable $th) {

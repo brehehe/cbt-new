@@ -3,7 +3,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#3BA172]">Ujian</h1>
+                <h1 class="text-2xl font-bold text-[#f58634]">Ujian</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
         </div>
@@ -45,7 +45,7 @@
                         <th>Tipe</th>
                         <th>Modul</th>
                         <th>Durasi</th>
-                        <th style="width: 50%">Deskripsi</th>
+                        <th style="width: 500px">Deskripsi</th>
                         <th style="width: 15%" class="center">Aksi</th>
                     </tr>
                 </thead>

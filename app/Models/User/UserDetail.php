@@ -401,4 +401,14 @@ class UserDetail extends Model
             ]);
         }
     }
+
+    public function setLecturerStartDateAttribute($value)
+    {
+        $this->attributes['lecturer_start_date'] = $value ?: null;
+    }
+
+    public function setBirthDateAttribute($value)
+    {
+        $this->attributes['birth_date'] = $value ?: null;
+    }
 }

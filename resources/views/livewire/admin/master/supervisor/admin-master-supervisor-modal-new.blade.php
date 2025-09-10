@@ -30,11 +30,11 @@
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-                 <div>
+                <div>
                     <label for="username" class="block text-sm font-medium text-gray-700">Username <span
                             class="text-red-600">*</span></label>
-                    <input id="username" type="text" wire:model.defer="username"
-                        placeholder="Contoh : admin123" class="mt-1 form-control">
+                    <input id="username" type="text" wire:model.defer="username" placeholder="Contoh : admin123"
+                        class="mt-1 form-control">
                     @error('username')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -116,7 +116,7 @@
                 Batal
             </button>
             <button wire:click='submit'
-                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition">
+                class="px-4 py-2 bg-[#f58634] hover:bg-[#f58634] text-white rounded-lg shadow transition">
                 Simpan
             </button>
         </div>

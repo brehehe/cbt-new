@@ -1588,6 +1588,7 @@ namespace App\Models\User{
  * @property \Illuminate\Support\Carbon|null $birth_date Tanggal lahir
  * @property string|null $birth_place Tempat lahir
  * @property string|null $marital_status Status pernikahan
+ * @property string|null $nim Nomor Induk Siswa
  * @property string|null $student_program Program studi untuk mahasiswa
  * @property string|null $student_faculty Fakultas untuk mahasiswa
  * @property string|null $student_department Jurusan untuk mahasiswa
@@ -1635,6 +1636,8 @@ namespace App\Models\User{
  * @property array<array-key, mixed>|null $exam_history Riwayat ujian (JSON array)
  * @property int $total_exams_taken Total ujian yang telah diambil
  * @property numeric|null $average_score Rata-rata nilai ujian
+ * @property string|null $krs_file Upload KRS mahasiswa
+ * @property string|null $payment_registration Upload pembayaran
  * @property string $preferred_language Bahasa yang disukai
  * @property array<array-key, mixed>|null $system_preferences Preferensi sistem (JSON)
  * @property \Illuminate\Support\Carbon|null $last_login_at Waktu login terakhir
@@ -1690,6 +1693,7 @@ namespace App\Models\User{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereIdentityCardPath($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereIdentityNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereIdentityType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereKrsFile($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereLastLoginAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereLastLoginIp($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereLecturerDepartment($value)
@@ -1711,8 +1715,10 @@ namespace App\Models\User{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereMetadata($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereMobilePhone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereNationality($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereNim($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereNotes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail wherePaymentRegistration($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail wherePhone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail wherePostalCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail wherePreferredLanguage($value)
