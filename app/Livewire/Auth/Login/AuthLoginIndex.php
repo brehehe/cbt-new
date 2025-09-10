@@ -38,7 +38,7 @@ class AuthLoginIndex extends Component
             $this->username_or_email = 'burningroomtechnology';
             $this->password = '12345678';
 
-            $this->login();
+            // $this->login();
         }
     }
 

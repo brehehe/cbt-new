@@ -862,8 +862,10 @@
                                         <img alt="Logo" class="w-full object-contain" loading="lazy" src="{{ asset('asset/img/logo-ikmb.png') }}">
                                     </div>
                                 </div> --}}
-                                <div>
-                                    <h1 class="text-5xl font-extrabold tracking-tight text-gray-100">PRO CBT</h1>
+                                <div class="">
+
+                                    <img src="{{ asset('asset/img/logo-procbt.png') }}" alt="" srcset="" class="w-56 bg-gray-300 rounded-2xl">
+                                    {{-- <h1 class="text-5xl font-extrabold tracking-tight text-gray-100">PRO CBT</h1> --}}
                                     {{-- <p class="text-md text-gray-800/80">insitutkmb@gmail.com</p> --}}
                                 </div>
                             </div>
@@ -1073,7 +1075,10 @@
                                         </div>
                                     </div> --}}
 
-                                    <h2 class="mb-1 text-xl font-bold text-gray-800 lg:mb-2 lg:text-2xl">PRO CBT</h2>
+                                    {{-- <h2 class="mb-1 text-xl font-bold text-gray-800 lg:mb-2 lg:text-2xl">PRO CBT</h2> --}}
+                                    <div class="flex justify-center">
+                                        <img src="{{ asset('asset/img/logo-procbt.png') }}" alt="" srcset="" class="w-48">
+                                    </div>
                                     {{-- <p class="text-sm text-gray-600 lg:text-base">Masuk ke sistem CBT</p> --}}
                                 </div>
 
@@ -1123,12 +1128,12 @@
                                 <div
                                     class="inline-flex items-center gap-3 rounded-full border border-gray-200/40 bg-white/80 px-4 py-2 shadow-lg backdrop-blur-xl">
                                     <div class="flex items-center gap-1">
-                                        <div class="h-2 w-2 animate-pulse rounded-full bg-green-500"></div>
+                                        <div class="h-2 w-2 animate-pulse rounded-full bg-orange-500"></div>
                                         <span class="text-xs font-medium text-gray-600">Online</span>
                                     </div>
                                     <div class="h-3 w-px bg-gray-300/50"></div>
                                     <div class="flex items-center gap-1">
-                                        <svg class="h-3 w-3 text-green-500" fill="none" stroke="currentColor"
+                                        <svg class="h-3 w-3 text-orange-500" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path
                                                 d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
