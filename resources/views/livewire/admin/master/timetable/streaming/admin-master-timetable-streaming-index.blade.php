@@ -50,6 +50,18 @@
                                     {{ $session->timetable->module->name ?? 'Unknown' }}</p>
                             </div>
                         </div>
+
+                        <!-- Progress Bar -->
+                        <!-- <div class="mt-2">
+                            <div class="flex items-center justify-between text-xs text-gray-600 mb-1">
+                                <span>Progress</span>
+                                <span>{{ $session->progress_percentage }}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                <div class="bg-blue-600 h-1.5 rounded-full transition-all duration-300"
+                                    style="width: {{ $session->progress_percentage }}%"></div>
+                            </div>
+                        </div> -->
                     </div>
                 </div>
             @endforeach
@@ -202,10 +214,14 @@
                 peer.on('call', function(call) {
                     console.log('📞 Incoming call from student:', call.peer);
 
-                    // Answer the call WITHOUT sending supervisor video back
-                    // Supervisor hanya menerima, tidak mengirim video
-                    call.answer(); // Answer without any media stream
-                    console.log('✅ Answered call without supervisor camera (receive-only mode)');
+                    // Answer the call - supervisor doesn't need to send video back
+                    if (localStream) {
+                        call.answer(localStream);
+                        console.log('Answered call with supervisor camera');
+                    } else {
+                        call.answer(); // Answer without video
+                        console.log('Answered call without supervisor camera');
+                    }
 
                     // Listen for remote stream from student
                     call.on('stream', function(remoteStream) {
@@ -224,23 +240,6 @@
 
                     call.on('close', function() {
                         console.log('Call closed by student:', call.peer);
-                        delete connections[call.peer];
-
-                        // Update UI to show disconnected status
-                        const sessionData = activeSessions.find(s => s.peer_id === call.peer);
-                        if (sessionData) {
-                            const statusIndicator = document.getElementById(
-                                `statusIndicator-${sessionData.session_id}`);
-                            if (statusIndicator) {
-                                statusIndicator.className =
-                                    'absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium bg-red-500 text-white';
-                                statusIndicator.textContent = 'OFFLINE';
-                            }
-                        }
-                    });
-
-                    call.on('error', function(err) {
-                        console.error('Call error:', err);
                         delete connections[call.peer];
                     });
                 });
@@ -327,15 +326,13 @@
         // Setup supervisor camera (optional - for two-way communication)
         async function setupSupervisorCamera() {
             try {
-                // Supervisor tidak perlu kamera, hanya untuk receive streams
-                console.log('Supervisor mode: Camera not required, only receiving streams');
-                localStream = null;
-
-                // Create empty media stream for compatibility
-                localStream = new MediaStream();
-                console.log('Empty media stream created for supervisor');
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: false
+                });
+                console.log('Supervisor camera ready');
             } catch (error) {
-                console.log('Supervisor camera setup completed:', error.message);
+                console.log('Supervisor camera not required:', error.message);
                 localStream = null;
             }
         }
@@ -624,9 +621,8 @@
                 }, 10000); // 10 seconds timeout
 
                 try {
-                    // Call the student WITHOUT sending any media (supervisor only receives)
-                    // Kirim empty MediaStream atau null untuk supervisor yang hanya menerima
-                    const call = peer.call(streamInfo.peer_id);
+                    // Call the student - supervisor calls student to get their video
+                    const call = peer.call(streamInfo.peer_id, localStream || new MediaStream());
 
                     if (!call) {
                         clearTimeout(timeoutId);
@@ -634,9 +630,7 @@
                         return;
                     }
 
-                    console.log(
-                        `✅ Call created for ${streamInfo.user_name} (receive-only mode), waiting for stream...`
-                        );
+                    console.log(`Call created for ${streamInfo.user_name}, waiting for stream...`);
                     callAttempted = true;
 
                     // Track if we received a stream
