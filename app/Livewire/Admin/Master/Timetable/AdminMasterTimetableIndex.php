@@ -40,7 +40,9 @@ class AdminMasterTimetableIndex extends Component
     public function mount()
     {
         Session::forget('timetable_id');
-        $this->modules = Module::select('id', 'name')->get()->pluck('name', 'id')->toArray();
+        $this->modules = Module::whereHas('moduleQuestions') // hanya yang punya relasi
+            ->pluck('name', 'id')
+            ->toArray();
         $this->getSupervisors = User::companyRole('Pengawas', Auth::user()->company_id)->select('name', 'id')->get()->pluck('name', 'id')->toArray();
         $this->classmates = Classmate::where('company_id', Auth::user()->company_id)->pluck('name', 'id')->toArray();
     }

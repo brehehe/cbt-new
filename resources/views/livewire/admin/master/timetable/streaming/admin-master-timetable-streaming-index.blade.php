@@ -5,7 +5,7 @@
                 <h1 class="text-2xl font-bold text-[#f58634]">User</h1>
             </div>
             <div>
-                <button wire:click="refreshStreamData" class="btn btn-warning">
+                <button wire:click="refreshStreamData" class="btn btn-success">
                     <i class="fas fa-sync-alt"></i>
                     Refresh
                 </button>
@@ -38,10 +38,6 @@
                             Connecting
                         </div>
                         <!-- Manual Retry Button -->
-                        <button onclick="window.debugSupervisor?.retryConnection('{{ $session->id }}')"
-                                class="absolute bottom-2 right-2 bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded opacity-75 hover:opacity-100">
-                            Retry
-                        </button>
                     </div>
 
                     <!-- Student Info -->

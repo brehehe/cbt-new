@@ -2,7 +2,6 @@
     @php
         use App\Models\User\UserModuleQuestion;
 
-
         $first = UserModuleQuestion::where('id', '<', $questionNavigationId)->exists();
         $last = UserModuleQuestion::where('id', '>', $questionNavigationId)->exists();
     @endphp
@@ -296,34 +295,33 @@
             </div>
 
             <!-- Monitor Camera -->
-           <div x-data="{ showCamera: true }" class="p-4 border-b border-gray-200">
-    <div class="flex items-center justify-between mb-3">
-        <h4 class="font-medium text-gray-800">Monitor Camera</h4>
-        <button
-            @click="showCamera = !showCamera"
-            class="px-2 py-1 text-xs text-white bg-blue-500 rounded hover:bg-blue-600"
-        >
-            <span x-text="showCamera ? 'Hide' : 'Show'"></span>
-        </button>
-    </div>
+            <div x-data="{ showCamera: true }" class="p-4 border-b border-gray-200">
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="font-medium text-gray-800">Monitor Camera</h4>
+                    <button @click="showCamera = !showCamera"
+                        class="px-2 py-1 text-xs text-white bg-orange-500 rounded hover:bg-orange-600">
+                        <span x-text="showCamera ? 'Hide' : 'Show'"></span>
+                    </button>
+                </div>
 
-    <div x-show="showCamera" x-transition>
-        <div class="relative mb-3 bg-black rounded-lg aspect-video">
-            <video id="cameraPreview" class="w-full h-full object-cover rounded-lg" autoplay muted></video>
-            <div id="cameraStatus" class="absolute top-2 right-2 flex items-center">
-                <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse mr-1"></div>
-                <span class="text-xs text-white bg-black bg-opacity-50 px-1 rounded">REC</span>
+                <div x-show="showCamera" x-transition>
+                    <div class="relative mb-3 bg-black rounded-lg aspect-video">
+                        <video id="cameraPreview" class="w-full h-full object-cover rounded-lg" autoplay
+                            muted></video>
+                        <div id="cameraStatus" class="absolute top-2 right-2 flex items-center">
+                            <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse mr-1"></div>
+                            <span class="text-xs text-white bg-black bg-opacity-50 px-1 rounded">REC</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="flex items-center text-green-600">
+                            <div class="w-2 h-2 mr-2 bg-green-500 rounded-full"></div>
+                            <span id="cameraStatusText">Camera Aktif</span>
+                        </span>
+                        <span class="text-gray-500">Recording</span>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="flex items-center justify-between text-sm">
-            <span class="flex items-center text-green-600">
-                <div class="w-2 h-2 mr-2 bg-green-500 rounded-full"></div>
-                <span id="cameraStatusText">Camera Aktif</span>
-            </span>
-            <span class="text-gray-500">Recording</span>
-        </div>
-    </div>
-</div>
 
 
             <!-- Status Ujian -->

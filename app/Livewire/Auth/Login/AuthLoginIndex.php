@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Log;
 use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 use Livewire\Component;
 use Throwable;
-use Illuminate\Support\Str;
 
 class AuthLoginIndex extends Component
 {
@@ -38,7 +37,7 @@ class AuthLoginIndex extends Component
             $this->username_or_email = 'burningroomtechnology';
             $this->password = '12345678';
 
-            // $this->login();
+            $this->login();
         }
     }
 
