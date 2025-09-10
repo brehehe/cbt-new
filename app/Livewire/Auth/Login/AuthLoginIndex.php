@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 use Livewire\Component;
 use Throwable;
+use Illuminate\Support\Str;
 
 class AuthLoginIndex extends Component
 {
