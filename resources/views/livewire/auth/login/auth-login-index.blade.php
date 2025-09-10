@@ -864,10 +864,14 @@
                                 </div> --}}
                                 <div class="">
 
-                                    <img src="{{ asset('asset/img/logo-procbt.png') }}" alt="" srcset=""
-                                        class="w-56 bg-gray-300 rounded-2xl">
-                                    {{-- <h1 class="text-5xl font-extrabold tracking-tight text-gray-100">PRO CBT</h1> --}}
-                                    {{-- <p class="text-md text-gray-800/80">insitutkmb@gmail.com</p> --}}
+                                    <<<<<<< HEAD <img src="{{ asset('asset/img/logo-procbt.png') }}" alt=""
+                                        srcset="" class="w-56 bg-gray-300 rounded-2xl">
+                                        =======
+                                        <img src="{{ asset('asset/img/logo-procbt.png') }}" alt=""
+                                            srcset="" class="w-56 bg-gray-300 rounded-2xl">
+                                        >>>>>>> 010bbe71c8abccaf3c7e9d8b51d5905f2f9b1794
+                                        {{-- <h1 class="text-5xl font-extrabold tracking-tight text-gray-100">PRO CBT</h1> --}}
+                                        {{-- <p class="text-md text-gray-800/80">insitutkmb@gmail.com</p> --}}
                                 </div>
                             </div>
 
@@ -968,116 +972,189 @@
 
                         <!-- Features Grid -->
                         <div class="space-y-2 mt-[40%] max-w-xl">
-                            <div
+                            <<<<<<< HEAD <div
                                 class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
-                                <div class="flex items-start space-x-3">
-                                    <div
-                                        class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
-                                        <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
+                                =======
+                                <div
+                                    class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
+                                    >>>>>>> 010bbe71c8abccaf3c7e9d8b51d5905f2f9b1794
+                                    <div class="flex items-start space-x-3">
+                                        <div
+                                            class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
+                                            <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path
+                                                    d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
+                                                    <<<<<<< HEAD stroke-linecap="round" stroke-linejoin="round"
+                                                    stroke-width="2">
+                                                </path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3
+                                                class="mb-1 text-lg font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
+                                                Visi
+                                            </h3>
+                                            <p
+                                                class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
+                                                Menjadi pusat pendidikan kedokteran yang unggul, berintegritas, dan
+                                                berdaya
+                                                saing global dalam mewujudkan pelayanan kesehatan yang berkualitas.
+                                                =======
                                                 stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3
-                                            class="mb-1 text-lg font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
-                                            Visi
-                                        </h3>
-                                        <p
-                                            class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
-                                            Menjadi pusat pendidikan kedokteran yang unggul, berintegritas, dan berdaya
-                                            saing global dalam mewujudkan pelayanan kesehatan yang berkualitas.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div
-                                class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
-                                <div class="flex items-start space-x-3">
-                                    <div
-                                        class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
-                                        <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3
-                                            class="mb-1 text-lg font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
-                                            Misi
-                                        </h3>
-                                        <div class="space-y-2">
-                                            <ul
-                                                class="space-y-1 text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
-                                                <li class="flex items-center gap-2">
-                                                    <span class="w-2 h-2 rounded-full bg-white"></span>
-                                                    <span>Menyelenggarakan pendidikan kedokteran yang inovatif, berbasis
-                                                        teknologi, dan berorientasi pada kebutuhan masyarakat.</span>
-                                                </li>
-                                                <li class="flex items-center gap-2">
-                                                    <span class="w-2 h-2 rounded-full bg-white"></span>
-                                                    <span>Menghasilkan lulusan dokter yang kompeten, berempati, dan
-                                                        menjunjung etika profesi.</span>
-                                                </li>
-                                                <li class="flex items-center gap-2">
-                                                    <span class="w-2 h-2 rounded-full bg-white"></span>
-                                                    <span>Mengembangkan penelitian yang bermanfaat bagi kemajuan ilmu
-                                                        kedokteran dan kesehatan publik.</span>
-                                                </li>
-                                                <li class="flex items-center gap-2">
-                                                    <span class="w-2 h-2 rounded-full bg-white"></span>
-                                                    <span>Berperan aktif dalam pengabdian kepada masyarakat melalui
-                                                        program kesehatan berkelanjutan.</span>
-                                                </li>
-                                            </ul>
+                                                </path>
+                                                </svg>
+                                        </div>
+                                        <div>
+                                            <h3
+                                                class="mb-1 text-lg font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
+                                                Visi
+                                            </h3>
+                                            <p
+                                                class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
+                                                Menjadi pusat pendidikan kedokteran yang unggul, berintegritas, dan
+                                                berdaya saing global dalam mewujudkan pelayanan kesehatan yang
+                                                berkualitas.
+                                                >>>>>>> 010bbe71c8abccaf3c7e9d8b51d5905f2f9b1794
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                                <<<<<<< HEAD <div
+                                    class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
+                                    =======
+                                    <div
+                                        class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
+                                        >>>>>>> 010bbe71c8abccaf3c7e9d8b51d5905f2f9b1794
+                                        <div class="flex items-start space-x-3">
+                                            <div
+                                                class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
+                                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path
+                                                        d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
+                                                        <<<<<<< HEAD stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2">
+                                                    </path>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <h3
+                                                    class="mb-1 text-lg font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
+                                                    Misi
+                                                </h3>
+                                                <div class="space-y-2">
+                                                    <ul
+                                                        class="space-y-1 text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
+                                                        <li class="flex items-center gap-2">
+                                                            <span class="w-2 h-2 rounded-full bg-white"></span>
+                                                            <span>Menyelenggarakan pendidikan kedokteran yang inovatif,
+                                                                berbasis
+                                                                teknologi, dan berorientasi pada kebutuhan
+                                                                masyarakat.</span>
+                                                        </li>
+                                                        <li class="flex items-center gap-2">
+                                                            <span class="w-2 h-2 rounded-full bg-white"></span>
+                                                            <span>Menghasilkan lulusan dokter yang kompeten, berempati,
+                                                                dan
+                                                                menjunjung etika profesi.</span>
+                                                        </li>
+                                                        <li class="flex items-center gap-2">
+                                                            <span class="w-2 h-2 rounded-full bg-white"></span>
+                                                            <span>Mengembangkan penelitian yang bermanfaat bagi kemajuan
+                                                                ilmu
+                                                                kedokteran dan kesehatan publik.</span>
+                                                        </li>
+                                                        <li class="flex items-center gap-2">
+                                                            <span class="w-2 h-2 rounded-full bg-white"></span>
+                                                            <span>Berperan aktif dalam pengabdian kepada masyarakat
+                                                                melalui
+                                                                program kesehatan berkelanjutan.</span>
+                                                            =======
+                                                            stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"></path>
+                                                            </svg>
+                                                </div>
+                                                <div>
+                                                    <h3
+                                                        class="mb-1 text-lg font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
+                                                        Misi
+                                                    </h3>
+                                                    <div class="space-y-2">
+                                                        <ul
+                                                            class="space-y-1 text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
+                                                            <li class="flex items-center gap-2">
+                                                                <span class="w-2 h-2 rounded-full bg-white"></span>
+                                                                <span>Menyelenggarakan pendidikan kedokteran yang
+                                                                    inovatif, berbasis teknologi, dan berorientasi pada
+                                                                    kebutuhan masyarakat.</span>
+                                                            </li>
+                                                            <li class="flex items-center gap-2">
+                                                                <span class="w-2 h-2 rounded-full bg-white"></span>
+                                                                <span>Menghasilkan lulusan dokter yang kompeten,
+                                                                    berempati, dan menjunjung etika profesi.</span>
+                                                            </li>
+                                                            <li class="flex items-center gap-2">
+                                                                <span class="w-2 h-2 rounded-full bg-white"></span>
+                                                                <span>Mengembangkan penelitian yang bermanfaat bagi
+                                                                    kemajuan ilmu kedokteran dan kesehatan
+                                                                    publik.</span>
+                                                            </li>
+                                                            <li class="flex items-center gap-2">
+                                                                <span class="w-2 h-2 rounded-full bg-white"></span>
+                                                                <span>Berperan aktif dalam pengabdian kepada masyarakat
+                                                                    melalui program kesehatan berkelanjutan.</span>
+                                                                >>>>>>> 010bbe71c8abccaf3c7e9d8b51d5905f2f9b1794
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Right Panel: Login Form - Full width on mobile, partial on desktop -->
-                <div class="relative flex min-h-screen w-full items-center justify-center p-4 lg:w-2/5 lg:p-8 xl:p-16">
-                    <!-- Mobile Header - Only visible on mobile -->
-                    <div class="absolute left-4 top-4 lg:hidden">
-                        <div
-                            class="inline-flex items-center space-x-3 rounded-2xl border border-gray-200/50 bg-white/90 px-4 py-2 shadow-xl backdrop-blur-xl">
+                    <!-- Right Panel: Login Form - Full width on mobile, partial on desktop -->
+                    <div
+                        class="relative flex min-h-screen w-full items-center justify-center p-4 lg:w-2/5 lg:p-8 xl:p-16">
+                        <!-- Mobile Header - Only visible on mobile -->
+                        <div class="absolute left-4 top-4 lg:hidden">
                             <div
-                                class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-green-600">
-                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11"
-                                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
-                                </svg>
-                            </div>
-                            <div>
+                                class="inline-flex items-center space-x-3 rounded-2xl border border-gray-200/50 bg-white/90 px-4 py-2 shadow-xl backdrop-blur-xl">
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-green-600">
+                                    <<<<<<< HEAD <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        =======
+                                        <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            >>>>>>> 010bbe71c8abccaf3c7e9d8b51d5905f2f9b1794
+                                            <path d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11"
+                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                            </path>
+                                        </svg>
+                                </div>
+                                <div>
 
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Login Card - Properly centered -->
-                    <div class="w-full max-w-md">
-                        <!-- Glassmorphism backdrop -->
-                        <div class="relative">
-                            <div
-                                class="absolute -inset-1 rounded-3xl bg-gradient-to-r from-green-500/10 via-indigo-500/10 to-cyan-500/10 opacity-60 blur-xl filter">
-                            </div>
+                        <!-- Login Card - Properly centered -->
+                        <div class="w-full max-w-md">
+                            <!-- Glassmorphism backdrop -->
+                            <div class="relative">
+                                <div
+                                    class="absolute -inset-1 rounded-3xl bg-gradient-to-r from-green-500/10 via-indigo-500/10 to-cyan-500/10 opacity-60 blur-xl filter">
+                                </div>
 
-                            <!-- Main card -->
-                            <div
-                                class="relative rounded-3xl border border-gray-200/50 bg-white/95 p-6 shadow-2xl backdrop-blur-2xl lg:p-8">
-                                <!-- Header -->
-                                <div class="mb-6 text-center lg:mb-8">
-                                    {{-- <div class="relative mb-4 inline-block lg:mb-6">
+                                <!-- Main card -->
+                                <div
+                                    class="relative rounded-3xl border border-gray-200/50 bg-white/95 p-6 shadow-2xl backdrop-blur-2xl lg:p-8">
+                                    <!-- Header -->
+                                    <div class="mb-6 text-center lg:mb-8">
+                                        {{-- <div class="relative mb-4 inline-block lg:mb-6">
                                         <div
                                             class="mx-auto flex h-16 w-16 items-center justify-center rounded-full shadow-xl lg:h-20 lg:w-20">
                                             <!-- <svg class="h-8 w-8 text-white lg:h-10 lg:w-10" fill="none"
@@ -1090,237 +1167,257 @@
                                         </div>
                                     </div> --}}
 
-                                    {{-- <h2 class="mb-1 text-xl font-bold text-gray-800 lg:mb-2 lg:text-2xl">PRO CBT</h2> --}}
-                                    <div class="flex justify-center">
-                                        <img src="{{ asset('asset/img/logo-procbt.png') }}" alt=""
-                                            srcset="" class="w-48">
-                                    </div>
-                                    {{-- <p class="text-sm text-gray-600 lg:text-base">Masuk ke sistem CBT</p> --}}
-                                </div>
-
-
-                                <!-- Login Form -->
-                                <form class="space-y-4 lg:space-y-6" wire:submit="login">
-                                    <div class="space-y-4 lg:space-y-6">
-                                        <x-ts-input class="text-sm lg:text-base" icon="user"
-                                            label="Username / Email / NIM"
-                                            placeholder="Masukkan username, email, atau NIM" required type="text"
-                                            wire:model="username_or_email" />
-
-                                        <x-ts-password class="text-sm lg:text-base" icon="key" label="Password"
-                                            placeholder="Masukkan password Anda" required wire:model="password" />
+                                        {{-- <h2 class="mb-1 text-xl font-bold text-gray-800 lg:mb-2 lg:text-2xl">PRO CBT</h2> --}}
+                                        <div class="flex justify-center">
+                                            <<<<<<< HEAD <img src="{{ asset('asset/img/logo-procbt.png') }}"
+                                                alt="" srcset="" class="w-48">
+                                                =======
+                                                <img src="{{ asset('asset/img/logo-procbt.png') }}" alt=""
+                                                    srcset="" class="w-48">
+                                                >>>>>>> 010bbe71c8abccaf3c7e9d8b51d5905f2f9b1794
+                                        </div>
+                                        {{-- <p class="text-sm text-gray-600 lg:text-base">Masuk ke sistem CBT</p> --}}
                                     </div>
 
-                                    <div class="flex items-center justify-between pt-2">
-                                        <x-ts-checkbox class="text-xs lg:text-sm" id="remember" label="Ingat saya"
-                                            wire:model="remember" />
-                                        <a class="text-xs font-medium text-orange-500 hover:text-orange-700 lg:text-sm"
-                                            href="#">
-                                            Lupa Password?
-                                        </a>
-                                    </div>
 
-                                    <div class="pt-4">
-                                        <x-ts-button
-                                            class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base !bg-orange-500"
-                                            icon="arrow-right" position="right" type="submit" loading="login">
-                                            <x-slot:text>Masuk</x-slot:text>
-                                        </x-ts-button>
-                                        {{-- <button class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base text-black bg-[#3BA172]">
+                                    <!-- Login Form -->
+                                    <form class="space-y-4 lg:space-y-6" wire:submit="login">
+                                        <div class="space-y-4 lg:space-y-6">
+                                            <x-ts-input class="text-sm lg:text-base" icon="user"
+                                                label="Username / Email / NIM"
+                                                placeholder="Masukkan username, email, atau NIM" required
+                                                type="text" wire:model="username_or_email" />
+
+                                            <x-ts-password class="text-sm lg:text-base" icon="key"
+                                                label="Password" <<<<<<< HEAD placeholder="Masukkan password Anda"
+                                                required wire:model="password" />
+                                            =======
+                                            placeholder="Masukkan password Anda" required wire:model="password"/>
+                                            >>>>>>> 010bbe71c8abccaf3c7e9d8b51d5905f2f9b1794
+                                        </div>
+
+                                        <div class="flex items-center justify-between pt-2">
+                                            <x-ts-checkbox class="text-xs lg:text-sm" id="remember"
+                                                label="Ingat saya" wire:model="remember" />
+                                            <a class="text-xs font-medium text-orange-500 hover:text-orange-700 lg:text-sm"
+                                                href="#">
+                                                Lupa Password?
+                                            </a>
+                                        </div>
+
+                                        <div class="pt-4">
+                                            <x-ts-button
+                                                class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base !bg-orange-500"
+                                                icon="arrow-right" position="right" type="submit" loading="login">
+                                                <x-slot:text>Masuk</x-slot:text>
+                                            </x-ts-button>
+                                            {{-- <button class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base text-black bg-[#3BA172]">
                                             Masuk
                                         </button> --}}
+                                        </div>
+                                    </form>
+                                    <div class="mt-4 text-center">
+                                        <<<<<<< HEAD <a href="{{ route('register') }}"
+                                            class="text-orange-500 hover:text-orange-700 text-sm">Buat Akun ?</a>
+                                            =======
+                                            <a href="{{ route('register') }}"
+                                                class="text-orange-500 hover:text-orange-700 text-sm">Buat Akun ?</a>
+                                            >>>>>>> 010bbe71c8abccaf3c7e9d8b51d5905f2f9b1794
                                     </div>
-                                </form>
-                                <div class="mt-4 text-center">
-                                    <a href="{{ route('register') }}"
-                                        class="text-orange-500 hover:text-orange-700 text-sm">Buat Akun ?</a>
                                 </div>
+                            </div>
+
+                            <!-- Status & Footer -->
+                            <div class="mt-6 space-y-4 text-center">
+                                <!-- Status -->
+                                <div class="flex justify-center">
+                                    <div
+                                        class="inline-flex items-center gap-3 rounded-full border border-gray-200/40 bg-white/80 px-4 py-2 shadow-lg backdrop-blur-xl">
+                                        <div class="flex items-center gap-1">
+                                            <div class="h-2 w-2 animate-pulse rounded-full bg-orange-500"></div>
+                                            <span class="text-xs font-medium text-gray-600">Online</span>
+                                        </div>
+                                        <div class="h-3 w-px bg-gray-300/50"></div>
+                                        <div class="flex items-center gap-1">
+                                            <svg class="h-3 w-3 text-orange-500" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path
+                                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                                                    <<<<<<< HEAD stroke-linecap="round" stroke-linejoin="round"
+                                                    stroke-width="2">
+                                                </path>
+                                                =======
+                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                                </path>
+                                                >>>>>>> 010bbe71c8abccaf3c7e9d8b51d5905f2f9b1794
+                                            </svg>
+                                            <span class="text-xs font-medium text-gray-600">Secure</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Footer -->
+                                <p class="text-xs font-medium text-gray-500">
+                                    © {{ date('Y') }} Institut Kesehatan Mitra Bunda
+                                </p>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        @else
+            <div class="min-h-screen flex items-center justify-center p-4">
+                <div
+                    class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-lg p-6 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#1E3A8A] to-[#C3D4EC]"></div>
 
-                        <!-- Status & Footer -->
-                        <div class="mt-6 space-y-4 text-center">
-                            <!-- Status -->
-                            <div class="flex justify-center">
-                                <div
-                                    class="inline-flex items-center gap-3 rounded-full border border-gray-200/40 bg-white/80 px-4 py-2 shadow-lg backdrop-blur-xl">
-                                    <div class="flex items-center gap-1">
-                                        <div class="h-2 w-2 animate-pulse rounded-full bg-orange-500"></div>
-                                        <span class="text-xs font-medium text-gray-600">Online</span>
-                                    </div>
-                                    <div class="h-3 w-px bg-gray-300/50"></div>
-                                    <div class="flex items-center gap-1">
-                                        <svg class="h-3 w-3 text-orange-500" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                            </path>
-                                        </svg>
-                                        <span class="text-xs font-medium text-gray-600">Secure</span>
-                                    </div>
+                    <!-- Logo & Welcome -->
+                    <div class="flex flex-col items-center mb-6">
+                        <img src="{{ asset('asset/img/LogoPROCBT.png') }}" alt="Logo PRO CBT"
+                            class="h-12 drop-shadow-md mb-4">
+                        <h1 class="text-2xl font-bold text-[#f58634]">Selamat Datang Kembali!</h1>
+                        <p class="text-gray-600 text-sm">Akses dashboard admin Anda dengan aman</p>
+                    </div>
+
+                    <!-- Login Form -->
+                    <!-- Form Login -->
+                    <form wire:submit.prevent="login" id="loginForm" class="space-y-4">
+                        @csrf
+
+                        <!-- Login Key -->
+                        <div class="group">
+                            <div class="relative">
+                                <input autocomplete="off" type="text" name="code"
+                                    class="input-style w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1E3A8A]/20 focus:border-[#1E3A8A] transition-all bg-white/50"
+                                    placeholder="Login Key" wire:model='code'>
+                                <div class="absolute inset-y-0 right-3 flex items-center text-gray-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z">
+                                        </path>
+                                    </svg>
                                 </div>
                             </div>
+                            @error('code')
+                                <span class="text-sm text-red-500">{{ $message }}</span>
+                            @enderror
+                        </div>
 
-                            <!-- Footer -->
-                            <p class="text-xs font-medium text-gray-500">
-                                © {{ date('Y') }} Institut Kesehatan Mitra Bunda
+                        <!-- Email -->
+                        <div>
+                            <div class="relative">
+                                <input autocomplete="off" type="text" name="username_or_email"
+                                    wire:model='username_or_email'
+                                    class="input-style w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1E3A8A]/20 focus:border-[#1E3A8A] transition-all bg-white/50"
+                                    placeholder="Username or Email">
+                                <div class="absolute inset-y-0 right-3 flex items-center text-gray-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                                        </path>
+                                    </svg>
+                                </div>
+                            </div>
+                            @error('username_or_email')
+                                <span class="text-sm text-red-500">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Password dengan Toggle -->
+                        <div x-data="{ showPassword: false }">
+                            <div class="relative">
+                                <input :type="showPassword ? 'text' : 'password'" name="password"
+                                    wire:model="password"
+                                    class="input-style w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1E3A8A]/20 focus:border-[#1E3A8A] transition-all bg-white/50"
+                                    placeholder="kata sandi">
+                                <button type="button" @click="showPassword = !showPassword"
+                                    class="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none transition-colors duration-200">
+                                    <svg class="w-5 h-5 eye-icon-show"
+                                        :class="{ 'visible-password': showPassword, 'hidden-password': !showPassword }"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        <path class="eye-line" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="M3 3l18 18"
+                                            :style="showPassword ? 'opacity: 0' : 'opacity: 1'" />
+                                    </svg>
+                                </button>
+                            </div>
+                            @error('password')
+                                <span class="text-sm text-red-500">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Captcha -->
+                        <div>
+                            <div class="flex gap-3">
+                                <!-- Input Captcha -->
+                                <input autocomplete="off" type="text" name="captcha" wire:model='captchaInput'
+                                    class="input-style flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1E3A8A]/20 focus:border-[#1E3A8A] transition-all bg-white/50"
+                                    placeholder="Captcha">
+
+                                <!-- Captcha Display with Refresh -->
+                                <div class="flex items-center px-3 py-2 border border-[#1E3A8A]/30 rounded-xl bg-white shadow-sm"
+                                    wire:ignore>
+                                    @foreach (str_split($captchaCode) as $char)
+                                        @php
+                                            $randomColor =
+                                                '#' .
+                                                str_pad(dechex(rand(0, 255)), 2, '0', STR_PAD_LEFT) .
+                                                str_pad(dechex(rand(0, 255)), 2, '0', STR_PAD_LEFT) .
+                                                str_pad(dechex(rand(0, 255)), 2, '0', STR_PAD_LEFT);
+                                        @endphp
+                                        <span class="font-bold tracking-wider select-none"
+                                            style="color: {{ $randomColor }};" oncontextmenu="return false"
+                                            onselectstart="return false">{{ $char }}</span>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @error('captchaInput')
+                                <span class="text-sm text-red-500">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Ingat Saya -->
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center">
+                                <input autocomplete="off" type="checkbox" name="remember"
+                                    class="rounded border-gray-300 text-[#f58634] focus:ring-[#1E3A8A]/20"
+                                    wire:model='remember'>
+                                <span class="ml-2 text-sm text-gray-600">Ingat saya</span>
+                            </label>
+                            <a href="#"
+                                class="text-sm text-[#f58634] hover:text-[#2563EB] transition-colors">Lupa
+                                kata
+                                sandi?</a>
+                        </div>
+
+                        <!-- Tombol Login -->
+                        <button type="submit"
+                            class="w-full bg-gradient-to-r from-[#1E3A8A] to-[#2563EB] hover:from-[#1E3A8A] hover:to-[#1E3A8A] text-white font-semibold py-2.5 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl mt-2 cursor-pointer">
+                            Masuk
+                        </button>
+
+                        <!-- Tombol ke Register -->
+                        <div class="mt-4 text-center">
+                            <p class="text-sm text-gray-600">
+                                Belum punya akun?
+                                <a href="{{ route('register') }}"
+                                    class="text-[#f58634] hover:underline font-semibold">Daftar di
+                                    sini</a>
                             </p>
                         </div>
+                    </form>
+
+
+                    <!-- Footer -->
+                    <div class="mt-6 text-center text-xs text-gray-500">
+                        <p>© 2024 PRO CBT. All rights reserved.</p>
+                        <p class="mt-0.5">Secure login • Admin Portal</p>
                     </div>
                 </div>
             </div>
-        </div>
-    @else
-        <div class="min-h-screen flex items-center justify-center p-4">
-            <div
-                class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-lg p-6 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#1E3A8A] to-[#C3D4EC]"></div>
-
-                <!-- Logo & Welcome -->
-                <div class="flex flex-col items-center mb-6">
-                    <img src="{{ asset('asset/img/LogoPROCBT.png') }}" alt="Logo PRO CBT"
-                        class="h-12 drop-shadow-md mb-4">
-                    <h1 class="text-2xl font-bold text-[#f58634]">Selamat Datang Kembali!</h1>
-                    <p class="text-gray-600 text-sm">Akses dashboard admin Anda dengan aman</p>
-                </div>
-
-                <!-- Login Form -->
-                <!-- Form Login -->
-                <form wire:submit.prevent="login" id="loginForm" class="space-y-4">
-                    @csrf
-
-                    <!-- Login Key -->
-                    <div class="group">
-                        <div class="relative">
-                            <input autocomplete="off" type="text" name="code"
-                                class="input-style w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1E3A8A]/20 focus:border-[#1E3A8A] transition-all bg-white/50"
-                                placeholder="Login Key" wire:model='code'>
-                            <div class="absolute inset-y-0 right-3 flex items-center text-gray-400">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z">
-                                    </path>
-                                </svg>
-                            </div>
-                        </div>
-                        @error('code')
-                            <span class="text-sm text-red-500">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <!-- Email -->
-                    <div>
-                        <div class="relative">
-                            <input autocomplete="off" type="text" name="username_or_email"
-                                wire:model='username_or_email'
-                                class="input-style w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1E3A8A]/20 focus:border-[#1E3A8A] transition-all bg-white/50"
-                                placeholder="Username or Email">
-                            <div class="absolute inset-y-0 right-3 flex items-center text-gray-400">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                </svg>
-                            </div>
-                        </div>
-                        @error('username_or_email')
-                            <span class="text-sm text-red-500">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <!-- Password dengan Toggle -->
-                    <div x-data="{ showPassword: false }">
-                        <div class="relative">
-                            <input :type="showPassword ? 'text' : 'password'" name="password" wire:model="password"
-                                class="input-style w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1E3A8A]/20 focus:border-[#1E3A8A] transition-all bg-white/50"
-                                placeholder="kata sandi">
-                            <button type="button" @click="showPassword = !showPassword"
-                                class="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none transition-colors duration-200">
-                                <svg class="w-5 h-5 eye-icon-show"
-                                    :class="{ 'visible-password': showPassword, 'hidden-password': !showPassword }"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    <path class="eye-line" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2" d="M3 3l18 18"
-                                        :style="showPassword ? 'opacity: 0' : 'opacity: 1'" />
-                                </svg>
-                            </button>
-                        </div>
-                        @error('password')
-                            <span class="text-sm text-red-500">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <!-- Captcha -->
-                    <div>
-                        <div class="flex gap-3">
-                            <!-- Input Captcha -->
-                            <input autocomplete="off" type="text" name="captcha" wire:model='captchaInput'
-                                class="input-style flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1E3A8A]/20 focus:border-[#1E3A8A] transition-all bg-white/50"
-                                placeholder="Captcha">
-
-                            <!-- Captcha Display with Refresh -->
-                            <div class="flex items-center px-3 py-2 border border-[#1E3A8A]/30 rounded-xl bg-white shadow-sm"
-                                wire:ignore>
-                                @foreach (str_split($captchaCode) as $char)
-                                    @php
-                                        $randomColor =
-                                            '#' .
-                                            str_pad(dechex(rand(0, 255)), 2, '0', STR_PAD_LEFT) .
-                                            str_pad(dechex(rand(0, 255)), 2, '0', STR_PAD_LEFT) .
-                                            str_pad(dechex(rand(0, 255)), 2, '0', STR_PAD_LEFT);
-                                    @endphp
-                                    <span class="font-bold tracking-wider select-none"
-                                        style="color: {{ $randomColor }};" oncontextmenu="return false"
-                                        onselectstart="return false">{{ $char }}</span>
-                                @endforeach
-                            </div>
-                        </div>
-                        @error('captchaInput')
-                            <span class="text-sm text-red-500">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <!-- Ingat Saya -->
-                    <div class="flex items-center justify-between">
-                        <label class="flex items-center">
-                            <input autocomplete="off" type="checkbox" name="remember"
-                                class="rounded border-gray-300 text-[#f58634] focus:ring-[#1E3A8A]/20"
-                                wire:model='remember'>
-                            <span class="ml-2 text-sm text-gray-600">Ingat saya</span>
-                        </label>
-                        <a href="#" class="text-sm text-[#f58634] hover:text-[#2563EB] transition-colors">Lupa
-                            kata
-                            sandi?</a>
-                    </div>
-
-                    <!-- Tombol Login -->
-                    <button type="submit"
-                        class="w-full bg-gradient-to-r from-[#1E3A8A] to-[#2563EB] hover:from-[#1E3A8A] hover:to-[#1E3A8A] text-white font-semibold py-2.5 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl mt-2 cursor-pointer">
-                        Masuk
-                    </button>
-
-                    <!-- Tombol ke Register -->
-                    <div class="mt-4 text-center">
-                        <p class="text-sm text-gray-600">
-                            Belum punya akun?
-                            <a href="{{ route('register') }}"
-                                class="text-[#f58634] hover:underline font-semibold">Daftar di
-                                sini</a>
-                        </p>
-                    </div>
-                </form>
-
-
-                <!-- Footer -->
-                <div class="mt-6 text-center text-xs text-gray-500">
-                    <p>© 2024 PRO CBT. All rights reserved.</p>
-                    <p class="mt-0.5">Secure login • Admin Portal</p>
-                </div>
-            </div>
-        </div>
     @endif
 </div>
