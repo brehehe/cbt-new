@@ -5,7 +5,7 @@
                 <h1 class="text-2xl font-bold text-[#f58634]">User</h1>
             </div>
             <div>
-                <button wire:click="refreshStreamData" class="btn btn-warning">
+                <button wire:click="refreshStreamData" class="btn btn-success">
                     <i class="fas fa-sync-alt"></i>
                     Refresh
                 </button>
@@ -50,18 +50,6 @@
                                     {{ $session->timetable->module->name ?? 'Unknown' }}</p>
                             </div>
                         </div>
-
-                        <!-- Progress Bar -->
-                        <!-- <div class="mt-2">
-                            <div class="flex items-center justify-between text-xs text-gray-600 mb-1">
-                                <span>Progress</span>
-                                <span>{{ $session->progress_percentage }}%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-1.5">
-                                <div class="bg-blue-600 h-1.5 rounded-full transition-all duration-300"
-                                    style="width: {{ $session->progress_percentage }}%"></div>
-                            </div>
-                        </div> -->
                     </div>
                 </div>
             @endforeach
