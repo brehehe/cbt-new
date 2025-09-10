@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Middleware\CheckUserTimetable;
+use App\Livewire\Admin\Master\Classmate\AdminMasterClassmateIndex;
+use App\Livewire\Admin\Master\Classmate\Detail\AdminMasterClassmateDetailIndex;
 use App\Livewire\Admin\Master\ExamType\AdminMasterExamTypeIndex;
 use App\Livewire\Admin\Master\Material\AdminMasterMaterialIndex;
 use App\Livewire\Admin\Master\MaterialCategory\AdminMasterMaterialCategoryIndex;
@@ -84,6 +86,9 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
         Route::get('/module-question/{id}', AdminMasterModuleQuestionIndex::class)->name('admin.master.module-question');
         Route::get('/question', AdminMasterQuestionIndex::class)->name('admin.master.question');
         Route::get('/question/{id}', AdminMasterQuestionUpdate::class)->name('admin.master.question.update');
+
+        Route::get('/classmate', AdminMasterClassmateIndex::class)->name('admin.master.classmate');
+        Route::get('/classmate/{id}/detail', AdminMasterClassmateDetailIndex::class)->name('admin.master.classmate.detail');
     });
 
     Route::group(['namespace' => 'Report', 'prefix' => 'report'], function () {

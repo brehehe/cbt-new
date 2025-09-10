@@ -1,0 +1,111 @@
+<div>
+    @include('livewire.admin.master.classmate.detail.admin-master-classmate-detail-modal')
+    <div class="mb-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-[#3BA172]">Data Kelas Detail</h1>
+                {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
+            </div>
+            <div>
+                <button wire:click="submit()" class="btn btn-success">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Simpan Perubahan
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="space-y-6">
+        <div class="p-5 bg-white shadow rounded-lg">
+            <div class="mb-4">
+                <label for="name" class="block text-sm font-medium text-gray-700">Nama <span
+                        class="text-red-500">*</span></label>
+                <input type="text" id="name" wire:model.defer="name" class="mt-1 form-control"
+                    placeholder="Nama Kelas" />
+                @error('name')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+            <div class="mb-4">
+                <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                <textarea id="description" wire:model.defer="description" placeholder="Deskripsi Kelas" class="mt-1 form-control"></textarea>
+                @error('description')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
+        <div class="p-5 bg-white shadow rounded-lg">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+                <div class="flex items-center">
+                    {{-- <span class="text-sm text-gray-700 mr-2">Tampil</span>
+                    <select class="mt-1 form-control" wire:model.live='perPage'>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span class="text-sm text-gray-700 ml-2">data</span> --}}
+                    <div>
+                        <h1 class="text-2xl font-bold text-[#3BA172]">Data Mahasiswa</h1>
+                        {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
+                    </div>
+                </div>
+                <div class="flex items-center w-full sm:w-auto gap-2">
+                    <div class="relative w-full sm:w-64">
+                        <input type="text" class="mt-1 form-control-search" placeholder="Cari Sesuatu..."
+                            wire:model.live='search'>
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <i class="fas fa-search h-3 w-3 text-gray-400"></i>
+                        </div>
+                    </div>
+                    <button wire:click="openModalStudent()" class="mt-1 px-3 py-2 btn btn-success">
+                        Tambah
+                    </button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="w-1 center">No</th>
+                            <th>NIM</th>
+                            <th>Nama</th>
+                            <th>Email</th>
+                            <th class="w-1 center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($classmateStudents as $index => $result)
+                            <tr>
+                                <td class="center">{{ $loop->iteration }}</td>
+                                <td>{{ $result?->user?->userDetail?->nim }}</td>
+                                <td>{{ $result?->user?->name }}</td>
+                                <td>{{ $result?->user?->email }}</td>
+                                <td class="center">
+                                    <div class="flex items-center">
+                                        <button
+                                            class="btn btn-icon text-red-600 hover:text-red-800 transition-colors delete-btn"
+                                            wire:click="confirmDelete('{{ $result->id }}')">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="10" class="no-data">Tidak ada data</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

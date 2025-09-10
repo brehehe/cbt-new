@@ -260,6 +260,7 @@ class UserDetailSeeder extends Seeder
             $user->assignRole('Mahasiswa');
 
             UserDetail::create([
+                'nim' => $data['student_id'],
                 'user_id' => $user->id,
                 'student_id' => $data['student_id'],
                 'student_program' => $data['student_program'],
@@ -316,6 +317,7 @@ class UserDetailSeeder extends Seeder
             $mahasiswa->assignRole('Mahasiswa');
 
             UserDetail::create([
+                'nim' => '2024' . str_pad($i + 11, 4, '0', STR_PAD_LEFT),
                 'user_id' => $mahasiswa->id,
                 'student_id' => '2024' . str_pad($i + 11, 4, '0', STR_PAD_LEFT),
                 'student_program' => 'Kedokteran',

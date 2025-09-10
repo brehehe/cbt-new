@@ -81,6 +81,29 @@
                         @enderror
                     </div>
                     <div>
+                        <label for="classmate_id" class="block text-sm font-medium text-gray-700">Kelas <span
+                                class="text-red-600">*</span></label>
+                        <div wire:key="select-{{ rand() }}">
+                            <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
+                                dropdownParent: 'body',
+                                allowClear: true,
+                                plugins: ['clear_button'],
+                                onChange: function(e) {
+                                    @this.set('classmate_id', e ? e : '');
+                                }
+                            });"
+                                wire:model.lazy="classmate_id" id="classmate_id">
+                                <option value="">-- Pilih Kelas --</option>
+                                @foreach ($classmates as $key_cl => $classmate)
+                                    <option value="{{ $key_cl }}">{{ $classmate }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @error('classmate_id')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
                         <label for="supervisors" class="block text-sm font-medium text-gray-700">Pengawas <span
                                 class="text-red-600">*</span></label>
                         <div wire:key="select-{{ rand() }}">

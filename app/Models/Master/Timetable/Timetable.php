@@ -2,6 +2,7 @@
 
 namespace App\Models\Master\Timetable;
 
+use App\Models\Classmate\Classmate;
 use App\Models\Company\Company;
 use App\Models\User\UserTimetable;
 use Illuminate\Support\Facades\Auth;
@@ -132,5 +133,10 @@ class Timetable extends Model
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id', 'name', 'start_time', 'end_time', 'description'], 'ILIKE', $term);
         });
+    }
+
+    public function classmate()
+    {
+        return $this->belongsTo(Classmate::class, 'classmate_id', 'id');
     }
 }

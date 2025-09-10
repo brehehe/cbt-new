@@ -170,13 +170,23 @@ class AdminExamTimetableIndex extends Component
             });
 
         // Filter berdasarkan study_id user
-        if ($auth->study_id) {
-            // $timetables->where('study_id', $auth->study_id);
+        // if ($auth->study_id) {
+        //     // $timetables->where('study_id', $auth->study_id);
 
-            $timetables->where(function ($query) use ($auth) {
-                $query->whereNull('studys')
-                    ->orWhere('studys', 'ILIKE', '%\\\"' . $auth->study_id . '\\\"%');
-            });
+        //     $timetables->where(function ($query) use ($auth) {
+        //         $query->whereNull('studys')
+        //             ->orWhere('studys', 'ILIKE', '%\\\"' . $auth->study_id . '\\\"%');
+        //     });
+        // }
+
+
+        if ($auth->hasRole(['Mahasiswa'])) {
+            // $timetables->where('study_id', $auth->study_id);
+            if ($auth->classmateStudent) {
+                $timetables->where('classmate_id', $auth->classmateStudent->classmate_id);
+            } else {
+                $timetables->whereNull('classmate_id');
+            }
         }
 
         if (!empty($userTimetableStatusDone)) {

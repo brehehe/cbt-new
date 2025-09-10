@@ -50,6 +50,7 @@
                 <thead>
                     <tr>
                         <th class="w-1 center">No</th>
+                        <th>Kelas</th>
                         <th>Nama</th>
                         <th>Modul</th>
                         <th>Waktu Mulai</th>
@@ -62,6 +63,7 @@
                     @forelse ($timetables as $index => $timetable)
                         <tr>
                             <td class="center">{{ $timetables->firstItem() + $index }}</td>
+                            <td>{{ $timetable->classmate->name ?? '-' }}</td>
                             <td>{{ $timetable->name ?? '-' }}</td>
                             <td>{{ $timetable->module->name ?? '-' }}</td>
                             <td>{{ $timetable->start_time }}</td>

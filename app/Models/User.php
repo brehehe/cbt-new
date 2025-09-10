@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Helpers\RoleHelper;
+use App\Models\Classmate\ClassmateStudent;
 use App\Models\Company\Company;
 use App\Models\Study\Study;
 use App\Models\User\UserCompanyRole;
@@ -255,5 +256,10 @@ class User extends Authenticatable
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function classmateStudent()
+    {
+        return $this->hasOne(ClassmateStudent::class, 'user_id', 'id');
     }
 }

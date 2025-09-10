@@ -89,6 +89,12 @@
                                     'icon' => 'fa-clock',
                                 ],
                                 [
+                                    'label' => 'Kelas',
+                                    'url' => '/admin/master/classmate',
+                                    'pattern' => 'admin/master/classmate*',
+                                    'icon' => 'fa-users',
+                                ],
+                                [
                                     'label' => 'Admin',
                                     'url' => '/admin/master/admin',
                                     'pattern' => 'admin/master/admin*',
