@@ -30,10 +30,18 @@
                     <div class="font-mono text-base font-bold text-yellow-300 sm:text-lg" id="countdown"> 00:00:00
                     </div>
                 </div>
-                <button wire:click='confirmFinishExam'
-                    class="px-3 py-2 text-xs font-medium transition-colors bg-red-600 rounded sm:px-4 sm:text-sm hover:bg-red-700">
-                    Selesai Ujian
-                </button>
+                <div class="flex gap-2">
+                    <button wire:click='confirmFinishExam'
+                        class="px-3 py-2 text-xs font-medium transition-colors bg-red-600 rounded sm:px-4 sm:text-sm hover:bg-red-700">
+                        Selesai Ujian
+                    </button>
+
+                    <!-- Manual Save Recording Button for Testing -->
+                    <button onclick="manualSaveRecording()"
+                        class="px-3 py-2 text-xs font-medium transition-colors bg-blue-600 rounded sm:px-4 sm:text-sm hover:bg-blue-700">
+                        💾 Save Video
+                    </button>
+                </div>
             </div>
         </div>
     </header>
@@ -194,8 +202,8 @@
                             <label
                                 class="flex items-start p-3 transition-all border border-gray-200 rounded-lg cursor-pointer lg:p-4 hover:bg-orange-50 hover:border-orange-300">
                                 {{-- Radio --}}
-                                <input type="radio" name="timetable_answer_id" wire:model.live="timetable_answer_id"
-                                    value="{{ $question_answer['id'] }}"
+                                <input type="radio" name="timetable_answer_id"
+                                    wire:model.live="timetable_answer_id" value="{{ $question_answer['id'] }}"
                                     class="flex-shrink-0 mt-1 mr-3 text-orange-600 lg:mr-4">
 
                                 {{-- Isi jawaban --}}
@@ -354,20 +362,20 @@
                 <div class="space-y-2 text-sm">
                     <div class="flex justify-between">
                         <span class="text-gray-600">Recording:</span>
-                        <span class="text-green-600" id="recordingStatus">Recording</span>
+                        <span class="text-yellow-600" id="recordingStatus">Initializing</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600">Live Stream:</span>
                         <span class="text-yellow-600" id="streamingStatus">Connecting</span>
                     </div>
-                    <!-- <div class="flex justify-between">
-                        <span class="text-gray-600">Chunk:</span>
-                        <span class="text-green-600" id="chunkNumber">1</span>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Info:</span>
+                        <span class="text-gray-600" id="recordingInfo">Starting...</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600">Duration:</span>
                         <span class="text-green-600" id="recordingDuration">00:00</span>
-                    </div> -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -415,7 +423,6 @@
         // Global variables
         let mediaRecorder;
         let recordedChunks = [];
-        let currentChunk = 1;
         let recordingStartTime;
         let recordingDurationInterval;
         let isRecording = false;
@@ -954,112 +961,229 @@
             }
         }
 
-        // Start recording
+        // Start recording - continuous recording from start to finish
         function startRecording() {
-            if (!stream) return;
+            if (!stream) {
+                console.error('No camera stream available for recording');
+                return;
+            }
 
             try {
+                console.log('Starting continuous exam recording...');
+
+                // Check MediaRecorder support
+                if (!MediaRecorder.isTypeSupported('video/webm')) {
+                    console.warn('webm not supported, trying mp4');
+                    if (!MediaRecorder.isTypeSupported('video/mp4')) {
+                        console.error('No supported video format found');
+                        return;
+                    }
+                }
+
                 const options = {
-                    mimeType: 'video/webm;codecs=vp9',
-                    videoBitsPerSecond: 500000 // 500 kbps
+                    mimeType: MediaRecorder.isTypeSupported('video/webm') ? 'video/webm' : 'video/mp4',
+                    videoBitsPerSecond: 400000 // 400 kbps for longer recording
                 };
 
                 mediaRecorder = new MediaRecorder(stream, options);
                 recordedChunks = [];
 
+                // Collect all data during the exam
                 mediaRecorder.ondataavailable = function(event) {
                     if (event.data.size > 0) {
                         recordedChunks.push(event.data);
+                        console.log('Recording chunk collected, size:', event.data.size);
                     }
                 };
 
+                // Only save when recording is completely stopped (at exam end)
                 mediaRecorder.onstop = function() {
-                    saveVideoChunk();
+                    console.log('Recording stopped, saving final video...');
+                    saveFinalVideo();
                 };
 
+                mediaRecorder.onerror = function(event) {
+                    console.error('MediaRecorder error:', event.error);
+                    updateRecordingStatus('Error', 'Recording failed');
+                };
+
+                // Start continuous recording
                 mediaRecorder.start();
                 isRecording = true;
                 recordingStartTime = Date.now();
 
-                updateRecordingStatus('Recording', currentChunk);
+                updateRecordingStatus('Recording', 'Continuous');
                 startRecordingTimer();
 
-                // Auto-save every 2 minutes
-                setInterval(() => {
-                    if (isRecording && mediaRecorder && mediaRecorder.state === 'recording') {
-                        mediaRecorder.requestData();
-                    }
-                }, 120000); // 2 minutes
+                console.log('Continuous recording started successfully');
 
             } catch (error) {
                 console.error('Error starting recording:', error);
-                updateRecordingStatus('Error', currentChunk);
+                updateRecordingStatus('Error', 'Failed to start');
+                updateCameraStatus('Recording Error: ' + error.message, 'text-red-600');
             }
         }
 
-        // Stop recording
+        // Stop recording and save final video
         function stopRecording() {
+            console.log('=== STOPPING RECORDING ===');
+            console.log('MediaRecorder state:', mediaRecorder?.state);
+            console.log('IsRecording flag:', isRecording);
+            console.log('Recorded chunks length:', recordedChunks?.length || 0);
+
             if (mediaRecorder && mediaRecorder.state === 'recording') {
+                console.log('Stopping MediaRecorder...');
+
+                // Set a timeout fallback in case onstop doesn't fire
+                const fallbackTimeout = setTimeout(() => {
+                    console.warn('MediaRecorder onstop did not fire, manually saving video');
+                    saveFinalVideo();
+                }, 3000); // 3 second fallback
+
+                mediaRecorder.onstop = function() {
+                    console.log('MediaRecorder onstop event fired');
+                    clearTimeout(fallbackTimeout);
+                    saveFinalVideo();
+                };
+
                 mediaRecorder.stop();
                 isRecording = false;
                 clearInterval(recordingDurationInterval);
-                updateRecordingStatus('Stopped', currentChunk);
+                updateRecordingStatus('Stopping', 'Saving video...');
+                console.log('MediaRecorder.stop() called');
+
+            } else if (recordedChunks && recordedChunks.length > 0) {
+                console.log('No active MediaRecorder but we have chunks, saving directly...');
+                saveFinalVideo();
+            } else {
+                console.warn('No active recording and no chunks to save');
+                updateRecordingStatus('Completed', 'No data');
             }
         }
 
-        // Save video chunk
-        function saveVideoChunk() {
-            console.log('saveVideoChunk called, chunks:', recordedChunks.length);
+        // Save final video when exam ends
+        function saveFinalVideo() {
+            console.log('=== SAVING FINAL VIDEO ===');
+            console.log('Total chunks:', recordedChunks.length);
+            console.log('MediaRecorder mimeType:', mediaRecorder?.mimeType);
 
             if (recordedChunks.length === 0) {
-                console.log('No chunks to save');
+                console.warn('⚠️ NO VIDEO DATA TO SAVE');
+                updateRecordingStatus('Completed', 'No data');
+                alert('❌ Tidak ada data video untuk disimpan!');
                 return;
             }
 
-            const blob = new Blob(recordedChunks, {
-                type: 'video/webm'
+            // Combine all chunks into final video
+            const finalBlob = new Blob(recordedChunks, {
+                type: mediaRecorder?.mimeType || 'video/webm'
             });
-            console.log('Created blob, size:', blob.size);
+
+            const sizeInMB = (finalBlob.size / 1024 / 1024).toFixed(2);
+            console.log('✅ Final video blob created!');
+            console.log('Size:', finalBlob.size, 'bytes');
+            console.log('Size in MB:', sizeInMB);
+            console.log('Type:', finalBlob.type);
+
+            if (finalBlob.size === 0) {
+                console.warn('⚠️ FINAL VIDEO SIZE IS 0');
+                updateRecordingStatus('Completed', 'Empty file');
+                alert('❌ Video kosong, tidak ada data!');
+                return;
+            }
+
+            updateRecordingStatus('Saving', `Processing ${sizeInMB}MB...`);
+            console.log('📤 Converting to base64...');
 
             const reader = new FileReader();
 
             reader.onload = function(e) {
                 const base64Data = e.target.result;
-                console.log('Base64 data length:', base64Data.length);
+                const base64Length = base64Data.length;
+                console.log('✅ Base64 conversion complete');
+                console.log('Base64 length:', base64Length);
                 console.log('Base64 header:', base64Data.substring(0, 50));
 
-                // Send to server via Livewire
+                // Send final video to server
                 if (window.Livewire) {
-                    console.log('Sending to Livewire, chunk:', currentChunk);
+                    console.log('📡 Sending final exam video to server...');
+                    updateRecordingStatus('Saving', 'Uploading...');
 
-                    Livewire.dispatch('saveVideoChunk', {
-                        videoBlob: base64Data,
-                        chunkNumber: currentChunk
-                    });
+                    try {
+                        console.log('📡 Calling saveRecordingVideo using Livewire.dispatch...');
+
+                        // Method 1: Direct Livewire dispatch (most reliable)
+                        Livewire.dispatch('saveRecordingVideo', {
+                            videoBlob: base64Data
+                        });
+
+                        // Method 2: Try component.call as fallback
+                        const component = document.querySelector('[wire\\:id]');
+                        if (component) {
+                            const componentId = component.getAttribute('wire:id');
+                            const livewireComponent = Livewire.find(componentId);
+
+                            if (livewireComponent) {
+                                console.log('📡 Found Livewire component, calling method...');
+
+                                livewireComponent.call('saveRecordingVideo', base64Data)
+                                    .then((result) => {
+                                        console.log('✅ Server response:', result);
+                                        if (result) {
+                                            updateRecordingStatus('Completed', `Saved ${sizeInMB}MB`);
+                                            console.log('✅ FINAL EXAM VIDEO SENT SUCCESSFULLY!');
+                                            alert(`✅ Video ujian berhasil disimpan! (${sizeInMB}MB)`);
+                                        } else {
+                                            console.error('❌ Server returned false');
+                                            updateRecordingStatus('Error', 'Save failed');
+                                            alert('❌ Server gagal menyimpan video!');
+                                        }
+                                    })
+                                    .catch((error) => {
+                                        console.error('❌ Error sending final video:', error);
+                                        updateRecordingStatus('Error', 'Upload failed');
+                                        alert('❌ Gagal mengirim video ke server: ' + error.message);
+                                    });
+                            } else {
+                                console.error('❌ Livewire component not found, using dispatch only');
+                                updateRecordingStatus('Saving', 'Using dispatch method...');
+                            }
+                        } else {
+                            console.error('❌ Wire element not found, using dispatch only');
+                            updateRecordingStatus('Saving', 'Using dispatch method...');
+                        }
+
+                        // Add success feedback for dispatch method
+                        setTimeout(() => {
+                            updateRecordingStatus('Completed', 'Video sent via dispatch');
+                            console.log('📡 Video dispatched successfully');
+                        }, 2000);
+
+                    } catch (error) {
+                        console.error('❌ Error calling saveRecordingVideo:', error);
+                        updateRecordingStatus('Error', 'Call failed');
+                        alert('❌ Gagal memanggil method server: ' + error.message);
+                    }
                 } else {
-                    console.error('Livewire not available');
+                    console.error('❌ Livewire not available');
+                    updateRecordingStatus('Error', 'No connection');
+                    alert('❌ Tidak ada koneksi Livewire!');
                 }
 
-                // Prepare for next chunk
-                currentChunk++;
+                // Clear chunks after save attempt
                 recordedChunks = [];
-
-                // Restart recording
-                setTimeout(() => {
-                    if (stream && stream.active) {
-                        console.log('Restarting recording...');
-                        startRecording();
-                    } else {
-                        console.log('Stream not active, cannot restart recording');
-                    }
-                }, 1000);
+                console.log('🗑️ Chunks cleared from memory');
             };
 
-            reader.onerror = function() {
-                console.error('FileReader error');
+            reader.onerror = function(error) {
+                console.error('❌ FileReader error:', error);
+                updateRecordingStatus('Error', 'Read failed');
+                alert('❌ Gagal membaca file video: ' + error);
+                recordedChunks = []; // Clear chunks even on error
             };
 
-            reader.readAsDataURL(blob);
+            console.log('🔄 Starting base64 conversion...');
+            reader.readAsDataURL(finalBlob);
         }
 
         // Update camera status
@@ -1072,17 +1196,18 @@
         }
 
         // Update recording status
-        function updateRecordingStatus(status, chunk) {
+        function updateRecordingStatus(status, info) {
             const statusElement = document.getElementById('recordingStatus');
-            const chunkElement = document.getElementById('chunkNumber');
+            const infoElement = document.getElementById('recordingInfo');
 
             if (statusElement) {
                 statusElement.textContent = status;
-                statusElement.className = status === 'Recording' ? 'text-green-600' : 'text-red-600';
+                statusElement.className = status === 'Recording' ? 'text-green-600' :
+                    status === 'Error' ? 'text-red-600' : 'text-yellow-600';
             }
 
-            if (chunkElement) {
-                chunkElement.textContent = chunk;
+            if (infoElement) {
+                infoElement.textContent = info;
             }
         }
 
@@ -1152,22 +1277,7 @@
             }
         }
 
-        // Cleanup on page unload
-        window.addEventListener('beforeunload', function() {
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                mediaRecorder.stop();
-            }
 
-            // Notify server that session is ending
-            if (window.Livewire) {
-                navigator.sendBeacon('/api/end-live-session', JSON.stringify({
-                    session_token: '{{ $liveSession->session_token ?? '' }}'
-                }));
-            }
-        });
 
         // Initialize live session monitoring
         function initializeLiveSessionMonitoring() {
@@ -1252,13 +1362,18 @@
 
         // Livewire hooks
         document.addEventListener('livewire:initialized', function() {
-            // Handle new recording start
-            Livewire.on('startNewRecording', function() {
-                if (stream && stream.active) {
-                    setTimeout(() => {
-                        startRecording();
-                    }, 1000);
-                }
+            console.log('Livewire initialized');
+
+            // Listen for stop recording events
+            Livewire.on('stopRecording', function() {
+                console.log('Received stopRecording event from server');
+                stopRecording();
+            });
+
+            // Listen for time expired events
+            Livewire.on('timeExpired', function() {
+                console.log('Received timeExpired event from server');
+                stopRecording();
             });
         });
 
@@ -1441,43 +1556,146 @@
             }
         }
 
+        // Listen for exam completion event from Livewire
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('stopRecording', (event) => {
+                console.log('🔔 Received stopRecording event from PHP:', event);
+                alert('🎬 Ujian selesai! Menyimpan video recording...');
+                stopRecording();
+            });
+        });
+
+        // Alternative event listener for older Livewire versions
+        window.addEventListener('livewire:load', () => {
+            Livewire.on('stopRecording', (event) => {
+                console.log('🔔 [FALLBACK] Received stopRecording event from PHP:', event);
+                alert('🎬 [FALLBACK] Ujian selesai! Menyimpan video recording...');
+                stopRecording();
+            });
+        });
+
+        // Global event listener as additional fallback
+        document.addEventListener('DOMContentLoaded', () => {
+            window.addEventListener('stopRecording', (event) => {
+                console.log('🔔 [GLOBAL] Received stopRecording event:', event);
+                alert('🎬 [GLOBAL] Ujian selesai! Menyimpan video recording...');
+                stopRecording();
+            });
+        });
+
+        // Manual save recording function for testing
+        function manualSaveRecording() {
+            console.log('🧪 Manual save recording triggered');
+
+            // Test Livewire connection first
+            if (!window.Livewire) {
+                alert('❌ window.Livewire not available - Livewire not loaded!');
+                console.error('❌ window.Livewire not available');
+                return;
+            }
+
+            console.log('✅ window.Livewire available');
+
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                console.log('🧪 MediaRecorder is active, stopping and saving...');
+                alert('🧪 Stopping active recording and saving...');
+                stopRecording();
+            } else if (recordedChunks && recordedChunks.length > 0) {
+                console.log('🧪 Found recorded chunks, saving existing recording...');
+                alert('🧪 Found ' + recordedChunks.length + ' chunks, saving...');
+                saveFinalVideo();
+            } else {
+                console.log('🧪 No recording found, creating test video...');
+                alert('🧪 No recording found, testing with dummy data...');
+
+                // Test dengan dummy data yang lebih realistis
+                const testVideoData = 'data:video/webm;codecs=vp8;base64,' + btoa('test video data with proper format');
+                console.log('🧪 Testing with dummy video data:', testVideoData.substring(0, 50) + '...');
+
+                try {
+                    // Test dispatch method first
+                    console.log('🧪 Testing Livewire.dispatch method...');
+                    Livewire.dispatch('saveRecordingVideo', {
+                        videoBlob: testVideoData
+                    });
+                    alert('✅ Dispatch method berhasil! Cek console log dan server log.');
+
+                    // Also test component.call method
+                    const component = document.querySelector('[wire\\:id]');
+                    if (component) {
+                        const componentId = component.getAttribute('wire:id');
+                        const livewireComponent = Livewire.find(componentId);
+
+                        if (livewireComponent) {
+                            console.log('🧪 Testing component.call method...');
+
+                            livewireComponent.call('saveRecordingVideo', testVideoData)
+                                .then((result) => {
+                                    console.log('✅ Component call successful:', result);
+                                    alert('✅ Component call berhasil! Result: ' + result);
+                                })
+                                .catch((error) => {
+                                    console.error('❌ Component call failed:', error);
+                                    alert('❌ Component call gagal: ' + error.message);
+                                });
+                        }
+                    }
+
+                } catch (error) {
+                    console.error('❌ Exception during test call:', error);
+                    alert('❌ Exception: ' + error.message);
+                }
+            }
+        } // Make function globally accessible
+        window.manualSaveRecording = manualSaveRecording;
+
         // Enhanced cleanup on page unload
         window.addEventListener('beforeunload', function() {
-            // Stop video stream
+            console.log('Page unloading, cleaning up...');
+
+            // Stop recording first
+            stopRecording();
+
+            // Stop video streams
             if (stream) {
-                stream.getTracks().forEach(track => track.stop());
+                stream.getTracks().forEach(track => {
+                    track.stop();
+                    console.log('Stopped camera track');
+                });
             }
 
-            // Stop camera stream for PeerJS
             if (cameraStream) {
-                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream.getTracks().forEach(track => {
+                    track.stop();
+                    console.log('Stopped PeerJS camera track');
+                });
             }
 
-            // Close PeerJS connection
+            // Close PeerJS connections
             if (currentCall) {
                 currentCall.close();
+                console.log('Closed PeerJS call');
             }
 
             if (peer) {
                 peer.destroy();
-            }
-
-            // Stop recording
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                mediaRecorder.stop();
+                console.log('Destroyed PeerJS peer');
             }
 
             // Close peer connection
             if (peerConnection) {
                 peerConnection.close();
+                console.log('Closed peer connection');
             }
 
             // Notify server that session is ending
             if (window.Livewire) {
-                navigator.sendBeacon('/api/end-live-session', JSON.stringify({
-                    session_token: streamId,
-                    streaming_ended: true
-                }));
+                try {
+                    Livewire.dispatch('stopRecording');
+                    console.log('Notified server about session end');
+                } catch (error) {
+                    console.error('Error notifying server:', error);
+                }
             }
         });
     </script>

@@ -40,9 +40,9 @@ class AdminExamDetailIndex extends Component
 
     protected $listeners = [
         'timeExpired',
-        'saveVideoChunk',
+        'saveRecordingVideo' => 'saveRecordingVideo',
         'logAlert',
-        'startNewRecording',
+        'stopRecording',
         'pageReloaded',
         'updateLiveSessionData',
         'saveScreenshot',
@@ -165,167 +165,214 @@ class AdminExamDetailIndex extends Component
             'timetable_id' => $this->userTimetable->timetable_id,
             'user_timetable_id' => $this->userTimetableId,
             'start_time' => now(),
-            'chunk_number' => 1,
             'status' => 'recording'
+        ]);
+
+        \Log::info('Recording initialized', [
+            'user_id' => Auth::id(),
+            'recording_id' => $this->currentRecording->id
         ]);
     }
 
-    public function saveVideoChunk($videoBlob = '', $chunkNumber = null)
+    public function saveRecordingVideo($videoBlob = '', $data = [])
     {
-        // Add extensive logging
-        \Log::info('saveVideoChunk called', [
+        // Handle different parameter formats from different calling methods
+        if (is_array($videoBlob) && isset($videoBlob['videoBlob'])) {
+            $actualVideoBlob = $videoBlob['videoBlob'];
+        } elseif (is_array($data) && isset($data['videoBlob'])) {
+            $actualVideoBlob = $data['videoBlob'];
+        } else {
+            $actualVideoBlob = $videoBlob;
+        }
+
+        \Log::info('🚀 saveRecordingVideo METHOD CALLED!', [
+            'called_at' => Carbon::now()->toISOString(),
             'user_id' => Auth::id(),
-            'chunk_number' => $chunkNumber,
-            'data_length' => strlen($videoBlob),
-            'server_time' => now(),
-            'memory_usage' => memory_get_usage(true),
-            'server_info' => [
-                'php_version' => PHP_VERSION,
-                'upload_max' => ini_get('upload_max_filesize'),
-                'post_max' => ini_get('post_max_size'),
-                'memory_limit' => ini_get('memory_limit')
-            ]
+            'raw_parameters' => func_get_args(),
+            'video_blob_type' => gettype($videoBlob),
+            'video_blob_received' => !empty($actualVideoBlob),
+            'video_blob_length' => is_string($actualVideoBlob) ? strlen($actualVideoBlob) : 'not_string',
+            'data_parameter' => $data
         ]);
 
+        // Use the actual video blob for processing
+        $videoBlob = $actualVideoBlob;
+
+        // Debug output to browser console
+        $this->js('console.log("🚀 PHP METHOD saveRecordingVideo CALLED! Video length: ' . strlen($videoBlob) . '");');
+        $this->js('alert("🚀 PHP METHOD CALLED! Video data: ' . strlen($videoBlob) . ' chars, First 50: ' . substr($videoBlob, 0, 50) . '");');
+
         try {
-            // Validate input
-            if (empty($videoBlob)) {
-                throw new \Exception('Video blob is empty');
-            }
-
-            if (!$this->currentRecording) {
-                throw new \Exception('No current recording session');
-            }
-
-            // Check if we can decode the data
-            $headerCheck = substr($videoBlob, 0, 50);
-            \Log::info('Video blob header', ['header' => $headerCheck]);
-
-            if (!preg_match('/^data:video\/\w+;base64,/', $videoBlob)) {
-                throw new \Exception('Invalid video blob format');
-            }
-
-            // Decode base64 video data
-            $videoData = base64_decode(preg_replace('#^data:video/\w+;base64,#i', '', $videoBlob));
-
-            if ($videoData === false) {
-                throw new \Exception('Failed to decode base64 data');
-            }
-
-            $dataSize = strlen($videoData);
-            \Log::info('Video data decoded', ['size' => $dataSize]);
-
-            if ($dataSize === 0) {
-                throw new \Exception('Decoded video data is empty');
-            }
-
-            // Create filename
-            $filename = 'exam_recordings/' . $this->userTimetableId . '_chunk_' .
-                ($chunkNumber ?? $this->currentRecording->chunk_number) . '_' .
-                time() . '.webm';
-
-            \Log::info('Attempting to save file', ['filename' => $filename]);
-
-            // Check storage disk configuration
-            $disk = Storage::disk('public');
-            $diskConfig = config('filesystems.disks.public');
-            \Log::info('Storage disk config', $diskConfig);
-
-            // Ensure directory exists
-            $directory = dirname($filename);
-            if (!$disk->exists($directory)) {
-                $disk->makeDirectory($directory);
-                \Log::info('Created directory', ['directory' => $directory]);
-            }
-
-            // Attempt to save file
-            $saveResult = $disk->put($filename, $videoData);
-
-            if (!$saveResult) {
-                throw new \Exception('Storage put operation returned false');
-            }
-
-            // Verify file was actually saved
-            if (!$disk->exists($filename)) {
-                throw new \Exception('File does not exist after save operation');
-            }
-
-            $fileSize = $disk->size($filename);
-            \Log::info('File saved successfully', [
-                'filename' => $filename,
-                'file_size' => $fileSize,
-                'full_path' => $disk->path($filename)
+            \Log::info('🎬 saveRecordingVideo processing', [
+                'user_id' => Auth::id(),
+                'user_timetable_id' => $this->userTimetableId,
+                'has_current_recording' => !is_null($this->currentRecording),
+                'video_blob_length' => strlen($videoBlob),
+                'video_blob_preview' => substr($videoBlob, 0, 100)
             ]);
 
-            // Update database
-            if ($chunkNumber && $chunkNumber > $this->currentRecording->chunk_number) {
-                $this->currentRecording = ExamRecording::create([
-                    'timetable_id' => $this->userTimetable->timetable_id,
-                    'user_timetable_id' => $this->userTimetableId,
-                    'video_path' => $filename,
-                    'chunk_number' => $chunkNumber,
-                    'file_size' => $fileSize,
-                    'start_time' => now(),
-                    'status' => 'recording'
+            if (empty($videoBlob) || !$this->currentRecording) {
+                \Log::warning('❌ No video data or recording session', [
+                    'user_id' => Auth::id(),
+                    'has_video_blob' => !empty($videoBlob),
+                    'has_current_recording' => !is_null($this->currentRecording)
                 ]);
-                \Log::info('Created new recording entry', ['id' => $this->currentRecording->id]);
-            } else {
-                $this->currentRecording->update([
+
+                $this->js('alert("❌ STEP 1 FAIL: ' .
+                    (empty($videoBlob) ? 'Video blob empty' : 'No recording session') . '");');
+
+                return false;
+            }
+
+            $this->js('alert("✅ STEP 1 OK: Video data and recording session valid");');
+
+            // Check video blob format - improved regex to handle codecs parameter
+            if (!preg_match('/^data:video\/[^;]+;.*base64,/', $videoBlob)) {
+                \Log::error('❌ Invalid video blob format', [
+                    'user_id' => Auth::id(),
+                    'blob_start' => substr($videoBlob, 0, 100)
+                ]);
+
+                $this->js('alert("❌ STEP 2 FAIL: Invalid video format - ' .
+                    substr($videoBlob, 0, 50) . '...");');
+
+                return false;
+            }
+
+            $this->js('alert("✅ STEP 2 OK: Video format valid");');
+            \Log::info('✅ Video blob format valid, decoding...');
+
+            // Decode base64 video data - improved regex to handle codecs parameter
+            $videoData = base64_decode(preg_replace('#^data:video/[^;]+;.*base64,#i', '', $videoBlob));
+
+            if ($videoData === false || strlen($videoData) === 0) {
+                \Log::error('❌ Failed to decode video data', [
+                    'user_id' => Auth::id(),
+                    'decode_result' => $videoData === false ? 'false' : 'empty'
+                ]);
+
+                $this->js('alert("❌ STEP 3 FAIL: Cannot decode base64 data");');
+                return false;
+            }
+
+            $this->js('alert("✅ STEP 3 OK: Video decoded - ' . strlen($videoData) . ' bytes");');
+
+            \Log::info('✅ Video data decoded successfully', [
+                'original_size' => strlen($videoBlob),
+                'decoded_size' => strlen($videoData)
+            ]);
+
+            // Create final filename
+            $filename = 'exam_recordings/' . $this->userTimetableId . '_exam_' .
+                now()->format('Y-m-d_H-i-s') . '.webm';
+
+            \Log::info('💾 Saving to file: ' . $filename);
+            $this->js('alert("📁 STEP 4: Creating file: ' . $filename . '");');
+
+            // Save to storage
+            $disk = Storage::disk('public');
+            $directory = dirname($filename);
+
+            if (!$disk->exists($directory)) {
+                $disk->makeDirectory($directory);
+                \Log::info('📁 Created directory: ' . $directory);
+            }
+
+            $saveResult = $disk->put($filename, $videoData);
+
+            \Log::info('💾 Save result: ' . ($saveResult ? 'SUCCESS' : 'FAILED'));
+            $this->js('alert("💾 STEP 5: File save result: ' . ($saveResult ? 'SUCCESS' : 'FAILED') . '");');
+
+            if ($saveResult) {
+                $fileSize = $disk->size($filename);
+                $fullPath = $disk->path($filename);
+
+                \Log::info('✅ File saved successfully', [
+                    'filename' => $filename,
+                    'file_size' => $fileSize,
+                    'full_path' => $fullPath,
+                    'file_exists' => file_exists($fullPath)
+                ]);
+
+                // Update recording with final file info - this completes the recording
+                $updateResult = $this->currentRecording->update([
                     'video_path' => $filename,
                     'file_size' => $fileSize,
                     'end_time' => now(),
-                    'status' => 'completed'
+                    'status' => 'completed'  // NOW we set it to completed after successful save
                 ]);
-                \Log::info('Updated recording entry', ['id' => $this->currentRecording->id]);
-            }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Video chunk saved successfully',
-                'debug' => [
+                \Log::info('📝 Recording record updated', [
+                    'update_result' => $updateResult,
+                    'recording_id' => $this->currentRecording->id
+                ]);
+
+                \Log::info('🎉 Exam recording saved successfully', [
+                    'user_id' => Auth::id(),
                     'filename' => $filename,
-                    'file_size' => $fileSize,
-                    'chunk_number' => $chunkNumber ?? $this->currentRecording->chunk_number
-                ]
-            ]);
+                    'size' => $fileSize,
+                    'recording_id' => $this->currentRecording->id
+                ]);
+
+                $this->js('alert("🎉 SUCCESS! Video ujian berhasil disimpan! File: ' . $filename . ', Size: ' . round($fileSize / 1024 / 1024, 2) . 'MB");');
+
+                return true;
+            } else {
+                \Log::error('❌ Failed to save video file', [
+                    'filename' => $filename,
+                    'directory' => $directory,
+                    'disk_root' => $disk->path(''),
+                    'save_result' => $saveResult
+                ]);
+            }
         } catch (\Exception $e) {
-            \Log::error('Error saving video chunk', [
+            \Log::error('💥 Error saving exam recording', [
                 'user_id' => Auth::id(),
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'memory_usage' => memory_get_usage(true),
-                'server_info' => [
-                    'disk_free_space' => disk_free_space(storage_path()),
-                    'disk_total_space' => disk_total_space(storage_path())
-                ]
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to save video chunk',
-                'error' => $e->getMessage()
+                'trace' => $e->getTraceAsString()
             ]);
         }
+
+        return false;
     }
 
-    public function startNewRecording()
+    public function stopRecording()
     {
-        // Tutup recording sebelumnya jika ada
+        \Log::info('🛑 stopRecording() method called from PHP', [
+            'user_id' => Auth::id(),
+            'has_current_recording' => !is_null($this->currentRecording),
+            'current_recording_status' => $this->currentRecording->status ?? 'no_recording'
+        ]);
+
+        // Trigger JavaScript to stop recording and save video first
+        $this->js('
+            console.log("🛑 PHP stopRecording() called - triggering JavaScript");
+            if (typeof stopRecording === "function") {
+                console.log("🎬 Calling JavaScript stopRecording()...");
+                stopRecording();
+            } else {
+                console.log("❌ stopRecording function not found, trying manual save...");
+                if (typeof saveFinalVideo === "function") {
+                    saveFinalVideo();
+                } else if (typeof manualSaveRecording === "function") {
+                    manualSaveRecording();
+                } else {
+                    alert("❌ Tidak ada function untuk menyimpan video!");
+                }
+            }
+        ');
+
+        // Update recording status in database
         if ($this->currentRecording && $this->currentRecording->status === 'recording') {
-            $this->currentRecording->update([
-                'end_time' => now(),
-                'status' => 'completed'
+            // Don't set to completed yet - let JavaScript save the video first
+            // We'll update to completed in saveRecordingVideo() method
+
+            \Log::info('🛑 Recording stop triggered, waiting for video save...', [
+                'user_id' => Auth::id(),
+                'recording_id' => $this->currentRecording->id,
+                'note' => 'Status will be updated to completed after video is saved'
             ]);
         }
-
-        // Buat recording baru
-        $this->currentRecording = ExamRecording::create([
-            'timetable_id' => $this->userTimetable->timetable_id,
-            'user_timetable_id' => $this->userTimetableId,
-            'start_time' => now(),
-            'chunk_number' => $this->currentRecording ? $this->currentRecording->chunk_number + 1 : 1,
-            'status' => 'recording'
-        ]);
     }
 
     public function logAlert($alertType = '', $description = '', $metadata = [])
@@ -762,19 +809,48 @@ class AdminExamDetailIndex extends Component
     {
         $this->saveCurrentAnswer();
 
-        // Tutup recording yang sedang berjalan
-        if ($this->currentRecording && $this->currentRecording->status === 'recording') {
-            $this->currentRecording->update([
-                'end_time' => now(),
-                'status' => 'completed'
-            ]);
+        \Log::info('🏁 finishExam() called', [
+            'user_id' => Auth::id(),
+            'user_timetable_id' => $this->userTimetableId,
+            'has_current_recording' => !is_null($this->currentRecording)
+        ]);
+
+        // Multiple dispatch methods to ensure event reaches JavaScript
+        try {
+            \Log::info('📡 Dispatching stopRecording event...');
+            $this->dispatch('stopRecording');
+            \Log::info('✅ Livewire dispatch successful');
+
+            $this->js('
+                console.log("🔔 PHP JavaScript dispatch - stopRecording event");
+                window.dispatchEvent(new CustomEvent("stopRecording", {detail: {source: "finishExam"}}));
+                if (typeof stopRecording === "function") {
+                    console.log("🎬 Calling stopRecording() directly from PHP");
+                    stopRecording();
+                } else {
+                    console.log("❌ stopRecording function not found");
+                }
+            ');
+            \Log::info('✅ JavaScript dispatch successful');
+        } catch (\Exception $e) {
+            \Log::error('❌ Error dispatching events: ' . $e->getMessage());
         }
+
+        // Also stop recording on server side
+        $this->stopRecording();
+
+        \Log::info('📡 Exam finished, recording stop events dispatched', [
+            'user_id' => Auth::id(),
+            'user_timetable_id' => $this->userTimetableId,
+            'dispatched_events' => ['livewire:stopRecording', 'window:stopRecording']
+        ]);
 
         // Tutup live session
         if ($this->liveSession) {
             $this->liveSession->update([
                 'is_active' => false,
-                'connection_status' => 'disconnected'
+                'connection_status' => 'disconnected',
+                'end_time' => now()
             ]);
         }
 
@@ -821,13 +897,25 @@ class AdminExamDetailIndex extends Component
             'mark' => $mark,
         ]);
 
+        // Give JavaScript time to save video before redirecting
+        $this->js('
+            console.log("🏁 Exam finished, waiting for video save...");
+            alert("🏁 Ujian selesai! Menyimpan video recording...");
+
+            // Delay redirect to allow video saving
+            setTimeout(function() {
+                console.log("⏰ Redirecting after video save delay...");
+                window.location.href = "/admin/exam/timetable";
+            }, 5000); // 5 second delay for video processing
+        ');
+
         session()->flash('saved', [
             'title' => 'Ujian Telah Selesai!',
-            // 'text' => "Terima kasih telah mengerjakan ujian. Nilai Anda: {$mark}/100",
             'text' => "Terima kasih telah mengerjakan ujian",
         ]);
 
-        return redirect()->route('admin.exam.timetable');
+        // Don't redirect immediately - let JavaScript handle it after video save
+        // return redirect()->route('admin.exam.timetable');
     }
 
     public function render()
