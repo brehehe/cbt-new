@@ -1,11 +1,11 @@
-@section('title', 'Bank Soal')
+@section('title', 'Kelas')
 <div>
     {{-- Stop trying to control. --}}
     @include('livewire.admin.master.classmate.admin-master-classmate-modal')
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#f58634]">Data Bank Soal</h1>
+                <h1 class="text-2xl font-bold text-[#f58634]">Data Kelas</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div>
