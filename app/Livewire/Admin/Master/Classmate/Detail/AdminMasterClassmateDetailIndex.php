@@ -8,6 +8,7 @@ use App\Models\Classmate\ClassmateStudent;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\User;
+use Auth;
 
 class AdminMasterClassmateDetailIndex extends Component
 {
@@ -19,15 +20,19 @@ class AdminMasterClassmateDetailIndex extends Component
     public $description;
     public $selectedStudents = [];
     public $openStudentModal = false;
+    public $users = [];
+    public $user_id;
 
     public function mount($id)
     {
+        $this->users = User::role(['Dosen'])->where('company_id', Auth::user()?->company?->id)->select('id', 'name')->get()->pluck('name', 'id')->toArray();
         $this->classmate_id = $id;
 
         // Load classmate details from the database
         $classmate = Classmate::findOrFail($this->classmate_id);
         if ($classmate) {
             $this->name = $classmate->name;
+            $this->user_id = $classmate->user_id;
             $this->description = $classmate->description;
         }
     }
@@ -36,12 +41,14 @@ class AdminMasterClassmateDetailIndex extends Component
     {
         $this->validate([
             'name' => 'required|string|max:255',
+            'user_id' => 'required|exists:users,id',
             'description' => 'nullable|string',
         ]);
 
         $classmate = Classmate::findOrFail($this->classmate_id);
         if ($classmate) {
             $classmate->name = $this->name;
+            $classmate->user_id = $this->user_id;
             $classmate->description = $this->description;
             $classmate->save();
         }

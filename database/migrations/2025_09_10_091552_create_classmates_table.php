@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('classmates', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
+            $table->foreignUuid('user_id')->nullable();
             $table->text('description')->nullable();
             $table->foreignUuid('company_id')->nullable();
             $table->bigInteger('order')->default(0);

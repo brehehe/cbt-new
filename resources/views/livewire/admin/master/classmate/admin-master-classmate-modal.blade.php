@@ -30,6 +30,29 @@
                 @enderror
             </div>
             <div class="mb-4">
+                <label for="user_id" class="block text-sm font-medium text-gray-700">Dosen <span
+                        class="text-red-600">*</span></label>
+                <div wire:key="select-{{ rand() }}">
+                    <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
+                        dropdownParent: 'body',
+                        allowClear: true,
+                        plugins: ['clear_button'],
+                        onChange: function(e) {
+                            @this.set('user_id', e ? e : '');
+                        }
+                    });"
+                        wire:model.lazy="user_id" id="user_id">
+                        <option value="">-- Pilih Dosen --</option>
+                        @foreach ($users as $key_user => $user)
+                            <option value="{{ $key_user }}">{{ $user }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                @error('user_id')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+            <div class="mb-4">
                 <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
                 <textarea id="description" wire:model.defer="description" placeholder="Deskripsi Kelas" class="mt-1 form-control"></textarea>
                 @error('description')

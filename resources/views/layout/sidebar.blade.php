@@ -89,6 +89,12 @@
                                     'icon' => 'fa-clock',
                                 ],
                                 [
+                                    'label' => 'Prodi',
+                                    'url' => route('admin.master.study'),
+                                    'pattern' => ['admin/master/study', 'admin/master/study/*'],
+                                    'icon' => 'fa-building-columns',
+                                ],
+                                [
                                     'label' => 'Kelas',
                                     'url' => '/admin/master/classmate',
                                     'pattern' => 'admin/master/classmate*',
@@ -155,12 +161,6 @@
                                     'url' => route('admin.master.question'),
                                     'pattern' => ['admin/master/question', 'admin/master/question/*'],
                                     'icon' => 'fa-database',
-                                ],
-                                [
-                                    'label' => 'Prodi',
-                                    'url' => route('admin.master.study'),
-                                    'pattern' => ['admin/master/study', 'admin/master/study/*'],
-                                    'icon' => 'fa-building-columns',
                                 ],
                             ];
                         } elseif (Auth::user()->hasRole(['Pengawas'])) {
