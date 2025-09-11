@@ -6,6 +6,7 @@ use App\Models\Classmate\Classmate;
 use Livewire\Component;
 use App\Helpers\AlertHelper;
 use App\Models\Classmate\ClassmateStudent;
+use App\Models\User;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -20,7 +21,12 @@ class AdminMasterClassmateIndex extends Component
     protected $paginationTheme = 'bootstrap';
     public $perPage = 10, $search;
 
-    public $data_id, $name, $description;
+    public $data_id, $name, $description, $user_id, $users = [];
+
+    public function mount()
+    {
+        $this->users = User::role(['Dosen'])->where('company_id', Auth::user()?->company?->id)->select('id', 'name')->get()->pluck('name', 'id')->toArray();
+    }
 
     public function render()
     {
@@ -54,9 +60,11 @@ class AdminMasterClassmateIndex extends Component
         $this->validate(
             [
                 'name'             => 'required',
+                'user_id'         => 'required|exists:users,id',
                 'description'      => 'nullable',
             ],
             [
+                'user_id.required'        => 'Dosen wajib diisi.',
                 'name.required'             => 'Nama Kelas wajib diisi.',
             ]
         );
@@ -69,6 +77,7 @@ class AdminMasterClassmateIndex extends Component
                     'id' => $this->data_id ?? null
                 ],
                 [
+                    'user_id'     => $this->user_id ?? null,
                     'company_id'  => Auth::user()?->company_id,
                     'name'        => $this->name ?? null,
                     'description' => $this->description ?? null,
