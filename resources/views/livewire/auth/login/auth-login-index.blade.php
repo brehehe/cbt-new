@@ -821,7 +821,7 @@
                 </div>
 
                 <!-- Floating elements -->
-               <div
+                <div
                     class="absolute left-[10%] top-[10%] h-[2vw] w-[2vw] animate-bounce cursor-pointer rounded-full bg-green-500/50 transition-all duration-500 hover:scale-150 hover:bg-green-400">
                 </div>
 
@@ -829,8 +829,7 @@
                     class="absolute right-[12%] top-1/3 h-[5vh] w-[1vw] animate-pulse cursor-pointer bg-indigo-500/50 transition-all hover:h-[10vh] hover:bg-indigo-400">
                 </div>
 
-                <div
-                    class="absolute bottom-1/4 left-1/4 h-[2.5vw] w-[2.5vw] rotate-45 animate-spin cursor-pointer bg-cyan-500/50 transition-all hover:scale-150"
+                <div class="absolute bottom-1/4 left-1/4 h-[2.5vw] w-[2.5vw] rotate-45 animate-spin cursor-pointer bg-cyan-500/50 transition-all hover:scale-150"
                     style="animation-duration: 15s;">
                 </div>
 
@@ -869,7 +868,8 @@
                                 </div> --}}
                                 <div class="">
 
-                                    <img src="{{ asset('asset/img/logo-procbt.png') }}" alt="" class="w-32 sm:w-40 md:w-48 lg:w-56 bg-gray-300 rounded-2xl">
+                                    <img src="{{ asset('asset/img/logo-procbt.png') }}" alt=""
+                                        class="w-32 sm:w-40 md:w-48 lg:w-56 bg-gray-300 rounded-2xl">
                                     {{-- <h1 class="text-5xl font-extrabold tracking-tight text-gray-100">PRO CBT</h1> --}}
                                     {{-- <p class="text-md text-gray-800/80">insitutkmb@gmail.com</p> --}}
                                 </div>
@@ -971,7 +971,7 @@
                         </div>
 
                         <!-- Features Grid -->
-                        <div class="space-y-2 mt-[35%] max-w-xl">
+                        <div class="space-y-2 mt-[30%] max-w-xl">
                             <div
                                 class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-gray-300 xl:p-4">
                                 <div class="flex items-start space-x-3">
