@@ -840,7 +840,7 @@
                 <div class="group relative hidden w-0 overflow-hidden lg:block lg:w-3/5">
                     <!-- Background with modern clip-path -->
                     <div class="absolute inset-0 bg-gradient-to-br from-orange-600 via-orange-700 to-orange-800 transition-all duration-1000 hover:from-orange-500 hover:via-orange-600 hover:to-orange-800"
-                        style="clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); background-size: cover; background-position: center;">
+                        style="clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); background-image: url('{{ asset('asset/img/auth-pro-cbt.webp') }}'); background-size: cover; background-position: center;">
                     </div>
 
                     <!-- Subtle pattern overlay -->
@@ -969,7 +969,7 @@
                         <!-- Features Grid -->
                         <div class="space-y-2 mt-[40%] max-w-xl">
                             <div
-                                class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
+                                class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-gray-300 xl:p-4">
                                 <div class="flex items-start space-x-3">
                                     <div
                                         class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
@@ -987,7 +987,7 @@
                                             Visi
                                         </h3>
                                         <p
-                                            class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
+                                            class="text-sm text-white transition-colors duration-300 group-hover/card:text-white">
                                             Menjadi pusat pendidikan kedokteran yang unggul, berintegritas, dan berdaya
                                             saing global dalam mewujudkan pelayanan kesehatan yang berkualitas.
                                         </p>
@@ -995,7 +995,7 @@
                                 </div>
                             </div>
                             <div
-                                class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
+                                class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-gray-300 xl:p-4">
                                 <div class="flex items-start space-x-3">
                                     <div
                                         class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
@@ -1014,7 +1014,7 @@
                                         </h3>
                                         <div class="space-y-2">
                                             <ul
-                                                class="space-y-1 text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
+                                                class="space-y-1 text-sm text-white/80 transition-colors duration-300 group-hover/card:text-white">
                                                 <li class="flex items-center gap-2">
                                                     <span class="w-2 h-2 rounded-full bg-white"></span>
                                                     <span>Menyelenggarakan pendidikan kedokteran yang inovatif, berbasis
