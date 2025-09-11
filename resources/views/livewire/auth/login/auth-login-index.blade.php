@@ -821,23 +821,28 @@
                 </div>
 
                 <!-- Floating elements -->
-                <div
-                    class="absolute left-20 top-20 h-3 w-3 animate-bounce cursor-pointer rounded-full bg-green-500/50 transition-all duration-500 hover:scale-150 hover:bg-green-400">
+               <div
+                    class="absolute left-[10%] top-[10%] h-[2vw] w-[2vw] animate-bounce cursor-pointer rounded-full bg-green-500/50 transition-all duration-500 hover:scale-150 hover:bg-green-400">
                 </div>
+
                 <div
-                    class="duration-400 absolute right-24 top-1/3 h-8 w-2 animate-pulse cursor-pointer bg-indigo-500/50 transition-all hover:h-16 hover:bg-indigo-400">
+                    class="absolute right-[12%] top-1/3 h-[5vh] w-[1vw] animate-pulse cursor-pointer bg-indigo-500/50 transition-all hover:h-[10vh] hover:bg-indigo-400">
                 </div>
-                <div class="hover:scale-200 duration-600 absolute bottom-1/4 left-1/4 h-4 w-4 rotate-45 animate-spin cursor-pointer bg-cyan-500/50 transition-all"
-                    style="animation-duration: 15s;"></div>
+
                 <div
-                    class="absolute bottom-20 right-20 h-1 w-12 animate-pulse cursor-pointer bg-green-600/50 transition-all duration-500 hover:w-20">
+                    class="absolute bottom-1/4 left-1/4 h-[2.5vw] w-[2.5vw] rotate-45 animate-spin cursor-pointer bg-cyan-500/50 transition-all hover:scale-150"
+                    style="animation-duration: 15s;">
+                </div>
+
+                <div
+                    class="absolute bottom-[12%] right-[8%] h-[0.6vw] w-[7vw] animate-pulse cursor-pointer bg-green-600/50 transition-all duration-500 hover:w-[10vw]">
                 </div>
             </div>
 
             <!-- Main Container -->
             <div class="relative flex h-screen">
                 <!-- Left Panel: Company Showcase - Hidden on mobile -->
-                <div class="group relative hidden w-0 overflow-hidden lg:block lg:w-3/5">
+                <div class="group relative hidden w-0 overflow-hidden md:block md:w-2/5 lg:w-3/5">
                     <!-- Background with modern clip-path -->
                     <div class="absolute inset-0 bg-gradient-to-br from-orange-600 via-orange-700 to-orange-800 transition-all duration-1000 hover:from-orange-500 hover:via-orange-600 hover:to-orange-800"
                         style="clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); background-image: url('{{ asset('asset/img/auth-pro-cbt.webp') }}'); background-size: cover; background-position: center;">
@@ -864,8 +869,7 @@
                                 </div> --}}
                                 <div class="">
 
-                                    <img src="{{ asset('asset/img/logo-procbt.png') }}" alt="" srcset=""
-                                        class="w-56 bg-gray-300 rounded-2xl">
+                                    <img src="{{ asset('asset/img/logo-procbt.png') }}" alt="" class="w-32 sm:w-40 md:w-48 lg:w-56 bg-gray-300 rounded-2xl">
                                     {{-- <h1 class="text-5xl font-extrabold tracking-tight text-gray-100">PRO CBT</h1> --}}
                                     {{-- <p class="text-md text-gray-800/80">insitutkmb@gmail.com</p> --}}
                                 </div>
