@@ -1050,23 +1050,6 @@
 
                 <!-- Right Panel: Login Form - Full width on mobile, partial on desktop -->
                 <div class="relative flex min-h-screen w-full items-center justify-center p-4 lg:w-2/5 lg:p-8 xl:p-16">
-                    <!-- Mobile Header - Only visible on mobile -->
-                    <div class="absolute left-4 top-4 lg:hidden">
-                        <div
-                            class="inline-flex items-center space-x-3 rounded-2xl border border-gray-200/50 bg-white/90 px-4 py-2 shadow-xl backdrop-blur-xl">
-                            <div
-                                class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-green-600">
-                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11"
-                                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
-                                </svg>
-                            </div>
-                            <div>
-
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Login Card - Properly centered -->
                     <div class="w-full max-w-md">
@@ -1168,7 +1151,7 @@
 
                             <!-- Footer -->
                             <p class="text-xs font-medium text-gray-500">
-                                © {{ date('Y') }} Institut Kesehatan Mitra Bunda
+                                © {{ date('Y') }} PRO CBT
                             </p>
                         </div>
                     </div>
