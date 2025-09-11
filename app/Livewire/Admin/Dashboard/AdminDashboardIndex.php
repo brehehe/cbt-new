@@ -794,86 +794,34 @@ class AdminDashboardIndex extends Component
     private function getServerLoad()
     {
         try {
-            // Method 1: Calculate based on database load
-            $start = microtime(true);
+            // Ambil load average (1, 5, 15 menit terakhir)
+            $load = sys_getloadavg(); // [1min, 5min, 15min]
 
-            // Perform several database operations to test load
-            $userCount = User::count();
-            $examCount = UserTimetable::where('status', 'exam')->count();
-            $alertCount = ExamAlert::where('created_at', '>=', date('Y-m-d H:i:s', strtotime('-1 hour')))->count();
+            // Hitung jumlah core
+            $cpuCores = (int) shell_exec("nproc") ?: 1;
 
-            $dbLoadTime = (microtime(true) - $start) * 1000; // Convert to ms
+            // Estimasi CPU usage (load 1 min dibanding jumlah core)
+            $cpuPercent = ($load[0] / $cpuCores) * 100;
 
-            // Method 2: Calculate based on concurrent operations
-            $concurrentUsers = $this->getConcurrentUsers();
-            $concurrentExams = UserTimetable::where('status', 'exam')->count();
+            // Ambil info memory
+            $meminfo = file_get_contents("/proc/meminfo");
+            preg_match('/MemTotal:\s+(\d+)/', $meminfo, $matchesTotal);
+            preg_match('/MemAvailable:\s+(\d+)/', $meminfo, $matchesAvailable);
 
-            // Calculate CPU load estimation
-            $cpuLoadPercentage = 0;
+            $memTotal = (int) ($matchesTotal[1] ?? 1);
+            $memAvailable = (int) ($matchesAvailable[1] ?? 0);
+            $memUsed = $memTotal - $memAvailable;
+            $memPercent = ($memUsed / $memTotal) * 100;
 
-            // Base load calculation
-            $cpuLoadPercentage += min(($concurrentUsers / 100) * 10, 30); // Up to 30% for users
-            $cpuLoadPercentage += min(($concurrentExams / 50) * 15, 40);  // Up to 40% for active exams
-
-            // Database load factor
-            if ($dbLoadTime > 100) {
-                $cpuLoadPercentage += min(($dbLoadTime - 100) / 10, 20); // Up to 20% for slow DB
-            }
-
-            // Memory usage estimation (based on active sessions)
-            $memoryLoadPercentage = min(($concurrentUsers / 200) * 50, 70); // Up to 70% memory usage
-
-            // Recent alerts indicate system stress
-            $recentAlerts = ExamAlert::where('created_at', '>=', date('Y-m-d H:i:s', strtotime('-10 minutes')))->count();
-            if ($recentAlerts > 5) {
-                $cpuLoadPercentage += 15; // Add stress for frequent alerts
-            }
-
-            // Time-based load variations
-            $hour = (int) date('H');
-            $timeLoadFactor = 1.0;
-
-            if ($hour >= 9 && $hour <= 17) {
-                $timeLoadFactor = 1.4; // Higher load during business hours
-            } elseif ($hour >= 7 && $hour <= 9 || $hour >= 17 && $hour <= 21) {
-                $timeLoadFactor = 1.2; // Medium load during transition hours
-            } else {
-                $timeLoadFactor = 0.7; // Lower load during off hours
-            }
-
-            $finalCpuLoad = $cpuLoadPercentage * $timeLoadFactor;
-            $finalMemoryLoad = $memoryLoadPercentage * $timeLoadFactor;
-
-            // Average CPU and Memory load
-            $serverLoad = ($finalCpuLoad + $finalMemoryLoad) / 2;
-
-            // Cap the load between 5% and 95%
-            $serverLoad = max(5, min($serverLoad, 95));
+            // Gabungkan rata-rata CPU + Memory
+            $serverLoad = ($cpuPercent + $memPercent) / 2;
 
             return round($serverLoad) . '%';
         } catch (\Exception $e) {
-            // Fallback calculation
-            $activeExams = UserTimetable::where('status', 'exam')->count();
-            $hour = (int) date('H');
-
-            $baseLoad = 25; // Base 25% load
-
-            // Add load based on active exams
-            $baseLoad += min($activeExams * 2, 40); // Up to 40% additional load
-
-            // Time-based adjustments
-            if ($hour >= 9 && $hour <= 17) {
-                $baseLoad += 15; // Business hours load
-            } elseif ($hour >= 0 && $hour <= 6) {
-                $baseLoad -= 10; // Night time reduction
-            }
-
-            // Add some realistic variation
-            $baseLoad += rand(-5, 10);
-
-            return max(10, min($baseLoad, 85)) . '%';
+            return 'N/A';
         }
     }
+
 
     private function calculateSystemUptime()
     {

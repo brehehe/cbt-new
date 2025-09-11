@@ -25,7 +25,7 @@
             <h2 class="text-lg font-semibold text-gray-800 mb-3">Detail Modul</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                 <div>
-                    <label for="question_type_id" class="block text-sm font-medium text-gray-700">Tipe Soal<span
+                    <label for="question_type_id" class="block text-sm font-medium text-gray-700">Tipe Ujian<span
                             class="text-red-600">*</span></label>
                     <div wire:key="select-{{ rand() }}">
                         <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
@@ -173,7 +173,7 @@
                         <tr>
                             <th class="w-1 center">No</th>
                             <th>Prodi</th>
-                            {{-- <th>Tipe Soal</th> --}}
+                            {{-- <th>Tipe Ujian</th> --}}
                             <th>Pertanyaan</th>
                             <th>Deskripsi</th>
                             <th class="w-1 center">Aksi</th>

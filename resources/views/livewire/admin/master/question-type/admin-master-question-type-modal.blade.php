@@ -10,7 +10,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M13 16h-1v-4h-1m1-4h.01M12 20.5C6.753 20.5 2.5 16.247 2.5 11S6.753 1.5 12 1.5 21.5 5.753 21.5 11 17.247 20.5 12 20.5z" />
                 </svg>
-                <h2 class="text-xl font-semibold text-gray-800">Modal Tipe Soal</h2>
+                <h2 class="text-xl font-semibold text-gray-800">Modal Tipe Ujian</h2>
             </div>
             <button wire:click="closeModal()"
                 class="text-gray-500 hover:text-red-500 transition-colors text-2xl leading-none cursor-pointer">
@@ -21,16 +21,16 @@
         <!-- Body -->
         <div class="px-6 py-4 text-gray-600">
             <div class="mb-4">
-                <label for="name" class="block text-sm font-medium text-gray-700">Nama Tipe Soal <span
+                <label for="name" class="block text-sm font-medium text-gray-700">Nama Tipe Ujian <span
                         class="text-red-600">*</span></label>
-                <input type="text" id="name" wire:model.defer="name" placeholder="Nama Tipe Soal"
+                <input type="text" id="name" wire:model.defer="name" placeholder="Nama Tipe Ujian"
                     class="mt-1 form-control">
                 @error('name')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
             </div>
             <div class="mb-4">
-                <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi Tipe Soal</label>
+                <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi Tipe Ujian</label>
                 {{-- <input type="text" id="description" wire:model.defer="description" placeholder="Deskripsi Kategori Materi" class="mt-1 form-control"> --}}
                 <textarea id="description" wire:model.defer="description" placeholder="" class="mt-1 form-control"></textarea>
                 @error('description')

@@ -145,7 +145,7 @@
                                     'icon' => 'fa-book',
                                 ],
                                 [
-                                    'label' => 'Tipe Soal',
+                                    'label' => 'Tipe Ujian',
                                     'url' => route('admin.master.question-type'),
                                     'pattern' => 'admin/master/question-type*',
                                     'icon' => 'fa-list-ol',
@@ -199,7 +199,7 @@
                                     'icon' => 'fa-book',
                                 ],
                                 [
-                                    'label' => 'Tipe Soal',
+                                    'label' => 'Tipe Ujian',
                                     'url' => route('admin.master.question-type'),
                                     'pattern' => 'admin/master/question-type*',
                                     'icon' => 'fa-list-ol',

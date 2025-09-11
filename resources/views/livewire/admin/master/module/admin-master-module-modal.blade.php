@@ -21,10 +21,10 @@
         <!-- Body -->
         <div class="px-6 py-4 text-gray-600">
             <div class="mb-4">
-                <label for="question_type_id" class="block text-sm font-medium text-gray-700">Tipe Soal <span
+                <label for="question_type_id" class="block text-sm font-medium text-gray-700">Tipe Ujian <span
                         class="text-red-600">*</span></label>
                 <select class="mt-1 form-control" wire:model='question_type_id'>
-                    <option value="">Pilih tipe soal</option>
+                    <option value="">Pilih Tipe Ujian</option>
                     @foreach ($question_types as $question_type)
                         <option {{ $question_type?->id == $question_type_id ? 'selected' : '' }}
                             value="{{ $question_type?->id }}">{{ $question_type?->name }}</option>

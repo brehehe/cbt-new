@@ -13,7 +13,7 @@
 
 namespace App\Models\Company{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string|null $company_id
@@ -86,7 +86,7 @@ namespace App\Models\Company{
 
 namespace App\Models\Company{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string|null $company_id
@@ -151,7 +151,7 @@ namespace App\Models\Company{
 
 namespace App\Models\Company{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $company_id
@@ -194,7 +194,7 @@ namespace App\Models\Company{
 
 namespace App\Models\Company{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $company_service_id
@@ -233,7 +233,7 @@ namespace App\Models\Company{
 
 namespace App\Models\Company{
 /**
- * 
+ *
  *
  * @property-read \App\Models\Company\Company|null $company
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OneHealthy newModelQuery()
@@ -248,7 +248,7 @@ namespace App\Models\Company{
 
 namespace App\Models\Country{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $name
@@ -276,7 +276,7 @@ namespace App\Models\Country{
 
 namespace App\Models\Exam{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string|null $timetable_id
@@ -316,7 +316,7 @@ namespace App\Models\Exam{
 
 namespace App\Models\Exam{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string|null $timetable_id
@@ -402,7 +402,7 @@ namespace App\Models\Exam{
 
 namespace App\Models\Exam{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string|null $timetable_id
@@ -448,7 +448,7 @@ namespace App\Models\Exam{
 
 namespace App\Models\Master\Exam{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string|null $company_id
@@ -480,7 +480,7 @@ namespace App\Models\Master\Exam{
 
 namespace App\Models\Master\Question{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string|null $company_id
@@ -519,7 +519,7 @@ namespace App\Models\Master\Question{
 
 namespace App\Models\Master\Question{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string|null $company_id
@@ -561,7 +561,7 @@ namespace App\Models\Master\Question{
 
 namespace App\Models\Master\Question{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string|null $company_id
@@ -605,7 +605,7 @@ namespace App\Models\Master\Question{
 
 namespace App\Models\Master\Question{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string|null $user_id
@@ -648,7 +648,7 @@ namespace App\Models\Master\Question{
 
 namespace App\Models\Master\Question{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string|null $company_id
@@ -682,7 +682,7 @@ namespace App\Models\Master\Question{
 
 namespace App\Models\Master\Question{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string|null $user_id
@@ -739,12 +739,12 @@ namespace App\Models\Master\Question{
 
 namespace App\Models\Master\Question{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string|null $company_id
- * @property string $name nama tipe soal
- * @property string $description keteranagan tipe soal
+ * @property string $name nama Tipe Ujian
+ * @property string $description keteranagan Tipe Ujian
  * @property int $order
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -775,7 +775,7 @@ namespace App\Models\Master\Question{
 
 namespace App\Models\Master\Question{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string|null $company_id
@@ -811,7 +811,7 @@ namespace App\Models\Master\Question{
 
 namespace App\Models\Master\RatingScale{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $grade_letter
@@ -846,7 +846,7 @@ namespace App\Models\Master\RatingScale{
 
 namespace App\Models\Master\Region{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $code
@@ -878,7 +878,7 @@ namespace App\Models\Master\Region{
 
 namespace App\Models\Master\Region{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $code
@@ -910,7 +910,7 @@ namespace App\Models\Master\Region{
 
 namespace App\Models\Master\Region{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $code
@@ -941,7 +941,7 @@ namespace App\Models\Master\Region{
 
 namespace App\Models\Master\Region{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $code
@@ -971,7 +971,7 @@ namespace App\Models\Master\Region{
 
 namespace App\Models\Master\Regulation{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string|null $description
@@ -1003,7 +1003,7 @@ namespace App\Models\Master\Regulation{
 
 namespace App\Models\Master\Timetable{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $name
@@ -1049,7 +1049,7 @@ namespace App\Models\Master\Timetable{
 
 namespace App\Models\Notification{
 /**
- * 
+ *
  *
  * @property-read \App\Models\Company\Company|null $company
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Notification newModelQuery()
@@ -1064,7 +1064,7 @@ namespace App\Models\Notification{
 
 namespace App\Models\Role{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $role_id
@@ -1095,7 +1095,7 @@ namespace App\Models\Role{
 
 namespace App\Models\Service{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $name
@@ -1125,7 +1125,7 @@ namespace App\Models\Service{
 
 namespace App\Models\Service{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $name
@@ -1166,7 +1166,7 @@ namespace App\Models\Service{
 
 namespace App\Models\Service{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $service_month_id
@@ -1197,7 +1197,7 @@ namespace App\Models\Service{
 
 namespace App\Models\Spatie{
 /**
- * 
+ *
  *
  * @property string $uuid
  * @property string $name
@@ -1235,7 +1235,7 @@ namespace App\Models\Spatie{
 
 namespace App\Models\Spatie{
 /**
- * 
+ *
  *
  * @property string $uuid
  * @property string $name
@@ -1271,7 +1271,7 @@ namespace App\Models\Spatie{
 
 namespace App\Models\SystemSetting{
 /**
- * 
+ *
  *
  * @property string $id
  * @property int $tax
@@ -1299,7 +1299,7 @@ namespace App\Models\SystemSetting{
 
 namespace App\Models\Timetable{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $answer_id
@@ -1341,7 +1341,7 @@ namespace App\Models\Timetable{
 
 namespace App\Models\Timetable{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $timetable_id
@@ -1390,7 +1390,7 @@ namespace App\Models\Timetable{
 
 namespace App\Models\Timetable{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $question_id
@@ -1445,7 +1445,7 @@ namespace App\Models\Timetable{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $name
@@ -1518,7 +1518,7 @@ namespace App\Models{
 
 namespace App\Models\User{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $user_id
@@ -1560,7 +1560,7 @@ namespace App\Models\User{
 
 namespace App\Models\User{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $user_id
@@ -1768,7 +1768,7 @@ namespace App\Models\User{
 
 namespace App\Models\User{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $user_timetable_id
@@ -1813,7 +1813,7 @@ namespace App\Models\User{
 
 namespace App\Models\User{
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $user_id
@@ -1856,4 +1856,3 @@ namespace App\Models\User{
  */
 	class UserTimetable extends \Eloquent {}
 }
-

@@ -53,7 +53,7 @@
                 <thead>
                     <tr>
                         <th class="w-1 center">No</th>
-                        <th>Tipe Soal</th>
+                        <th>Tipe Ujian</th>
                         <th>Modul</th>
                         <th>Durasi</th>
                         <th>Soal Acak</th>

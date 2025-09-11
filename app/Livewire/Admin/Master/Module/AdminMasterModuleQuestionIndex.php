@@ -124,8 +124,8 @@ class AdminMasterModuleQuestionIndex extends Component
                 'studys'           => 'required|array',
             ],
             [
-                'question_type_id.required' => 'Tipe soal wajib diisi.',
-                'question_type_id.exists'   => 'Tipe soal tidak valid.',
+                'question_type_id.required' => 'Tipe Ujian wajib diisi.',
+                'question_type_id.exists'   => 'Tipe Ujian tidak valid.',
                 'name.required'             => 'Nama modul wajib diisi.',
                 'duration.required'         => 'Durasi pengerjaan modul wajib diisi.',
                 'duration.numeric'          => 'Durasi pengerjaan modul hanya bernilai angka.',
