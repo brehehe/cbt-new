@@ -177,17 +177,21 @@ class AdminExamDetailIndex extends Component
     public function saveRecordingVideo($videoBlob = '', $data = [])
     {
         // Handle different parameter formats from different calling methods
+        $isEmergencyRecovery = false;
         if (is_array($videoBlob) && isset($videoBlob['videoBlob'])) {
             $actualVideoBlob = $videoBlob['videoBlob'];
+            $isEmergencyRecovery = $videoBlob['isEmergencyRecovery'] ?? false;
         } elseif (is_array($data) && isset($data['videoBlob'])) {
             $actualVideoBlob = $data['videoBlob'];
+            $isEmergencyRecovery = $data['isEmergencyRecovery'] ?? false;
         } else {
             $actualVideoBlob = $videoBlob;
         }
 
         \Log::info('🚀 saveRecordingVideo METHOD CALLED!', [
-            'called_at' => Carbon::now()->toISOString(),
+            'called_at' => now()->toISOString(),
             'user_id' => Auth::id(),
+            'is_emergency_recovery' => $isEmergencyRecovery,
             'raw_parameters' => func_get_args(),
             'video_blob_type' => gettype($videoBlob),
             'video_blob_received' => !empty($actualVideoBlob),
@@ -200,7 +204,6 @@ class AdminExamDetailIndex extends Component
 
         // Debug output to browser console
         $this->js('console.log("🚀 PHP METHOD saveRecordingVideo CALLED! Video length: ' . strlen($videoBlob) . '");');
-        $this->js('alert("🚀 PHP METHOD CALLED! Video data: ' . strlen($videoBlob) . ' chars, First 50: ' . substr($videoBlob, 0, 50) . '");');
 
         try {
             \Log::info('🎬 saveRecordingVideo processing', [
@@ -218,13 +221,8 @@ class AdminExamDetailIndex extends Component
                     'has_current_recording' => !is_null($this->currentRecording)
                 ]);
 
-                $this->js('alert("❌ STEP 1 FAIL: ' .
-                    (empty($videoBlob) ? 'Video blob empty' : 'No recording session') . '");');
-
                 return false;
             }
-
-            $this->js('alert("✅ STEP 1 OK: Video data and recording session valid");');
 
             // Check video blob format - improved regex to handle codecs parameter
             if (!preg_match('/^data:video\/[^;]+;.*base64,/', $videoBlob)) {
@@ -233,13 +231,8 @@ class AdminExamDetailIndex extends Component
                     'blob_start' => substr($videoBlob, 0, 100)
                 ]);
 
-                $this->js('alert("❌ STEP 2 FAIL: Invalid video format - ' .
-                    substr($videoBlob, 0, 50) . '...");');
-
                 return false;
             }
-
-            $this->js('alert("✅ STEP 2 OK: Video format valid");');
             \Log::info('✅ Video blob format valid, decoding...');
 
             // Decode base64 video data - improved regex to handle codecs parameter
@@ -251,11 +244,8 @@ class AdminExamDetailIndex extends Component
                     'decode_result' => $videoData === false ? 'false' : 'empty'
                 ]);
 
-                $this->js('alert("❌ STEP 3 FAIL: Cannot decode base64 data");');
                 return false;
             }
-
-            $this->js('alert("✅ STEP 3 OK: Video decoded - ' . strlen($videoData) . ' bytes");');
 
             \Log::info('✅ Video data decoded successfully', [
                 'original_size' => strlen($videoBlob),
@@ -263,11 +253,11 @@ class AdminExamDetailIndex extends Component
             ]);
 
             // Create final filename
-            $filename = 'exam_recordings/' . $this->userTimetableId . '_exam_' .
+            $recoveryPrefix = $isEmergencyRecovery ? 'RECOVERY_' : '';
+            $filename = 'exam_recordings/' . $recoveryPrefix . $this->userTimetableId . '_exam_' .
                 now()->format('Y-m-d_H-i-s') . '.webm';
 
             \Log::info('💾 Saving to file: ' . $filename);
-            $this->js('alert("📁 STEP 4: Creating file: ' . $filename . '");');
 
             // Save to storage
             $disk = Storage::disk('public');
@@ -281,7 +271,6 @@ class AdminExamDetailIndex extends Component
             $saveResult = $disk->put($filename, $videoData);
 
             \Log::info('💾 Save result: ' . ($saveResult ? 'SUCCESS' : 'FAILED'));
-            $this->js('alert("💾 STEP 5: File save result: ' . ($saveResult ? 'SUCCESS' : 'FAILED') . '");');
 
             if ($saveResult) {
                 $fileSize = $disk->size($filename);
@@ -314,7 +303,7 @@ class AdminExamDetailIndex extends Component
                     'recording_id' => $this->currentRecording->id
                 ]);
 
-                $this->js('alert("🎉 SUCCESS! Video ujian berhasil disimpan! File: ' . $filename . ', Size: ' . round($fileSize / 1024 / 1024, 2) . 'MB");');
+                // Video saved successfully - no alert needed
 
                 return true;
             } else {
@@ -404,13 +393,15 @@ class AdminExamDetailIndex extends Component
             //     'text' => 'Terlalu banyak pelanggaran terdeteksi. Ujian akan dihentikan.'
             // ]);
 
-            AlertHelper::warning('warning', 'Terlalu banyak pelanggaran terdeteksi. Ujian akan dihentikan.');
+            AlertHelper::warning('warning', 'Terlalu banyak pelanggaran terdeteksi');
 
             // $this->finishExam();
         } elseif ($this->alertCount >= 3) {
             // Tampilkan peringatan jika sudah mencapai 3 alert
             AlertHelper::warning('warning', 'Anda telah melakukan beberapa pelanggaran. Hati-hati!');
         }
+
+        return;
     }
 
     public function pageReloaded()
@@ -815,20 +806,18 @@ class AdminExamDetailIndex extends Component
             'has_current_recording' => !is_null($this->currentRecording)
         ]);
 
-        // Multiple dispatch methods to ensure event reaches JavaScript
+        // Single dispatch method to prevent multiple calls
         try {
-            \Log::info('📡 Dispatching stopRecording event...');
-            $this->dispatch('stopRecording');
-            \Log::info('✅ Livewire dispatch successful');
+            \Log::info('📡 Dispatching single stopRecording event...');
 
             $this->js('
-                console.log("🔔 PHP JavaScript dispatch - stopRecording event");
-                window.dispatchEvent(new CustomEvent("stopRecording", {detail: {source: "finishExam"}}));
-                if (typeof stopRecording === "function") {
-                    console.log("🎬 Calling stopRecording() directly from PHP");
+                console.log("🔔 finishExam() - Single stopRecording call");
+                if (typeof stopRecording === "function" && !window.isRecordingStopping) {
+                    window.isRecordingStopping = true;
+                    console.log("🎬 Calling stopRecording() once from finishExam");
                     stopRecording();
                 } else {
-                    console.log("❌ stopRecording function not found");
+                    console.log("❌ stopRecording already in progress or function not found");
                 }
             ');
             \Log::info('✅ JavaScript dispatch successful');
@@ -836,8 +825,7 @@ class AdminExamDetailIndex extends Component
             \Log::error('❌ Error dispatching events: ' . $e->getMessage());
         }
 
-        // Also stop recording on server side
-        $this->stopRecording();
+        $this->dispatch('stopRecording');
 
         \Log::info('📡 Exam finished, recording stop events dispatched', [
             'user_id' => Auth::id(),
@@ -899,14 +887,13 @@ class AdminExamDetailIndex extends Component
 
         // Give JavaScript time to save video before redirecting
         $this->js('
-            console.log("🏁 Exam finished, waiting for video save...");
-            alert("🏁 Ujian selesai! Menyimpan video recording...");
+            console.log("🏁 Exam finished, saving video in background...");
 
             // Delay redirect to allow video saving
             setTimeout(function() {
                 console.log("⏰ Redirecting after video save delay...");
                 window.location.href = "/admin/exam/timetable";
-            }, 5000); // 5 second delay for video processing
+            }, 3000); // 3 second delay for video processing
         ');
 
         session()->flash('saved', [

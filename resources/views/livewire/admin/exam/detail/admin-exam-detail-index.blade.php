@@ -25,7 +25,7 @@
                 @endif
             </div>
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-                <div class="text-center sm:text-right">
+                <div class="text-center sm:text-right" wire:ignore>
                     <div class="text-xs sm:text-sm opacity-90">Waktu Tersisa</div>
                     <div class="font-mono text-base font-bold text-yellow-300 sm:text-lg" id="countdown"> 00:00:00
                     </div>
@@ -425,7 +425,10 @@
         let recordedChunks = [];
         let recordingStartTime;
         let recordingDurationInterval;
+        let periodicSaveInterval;
         let isRecording = false;
+        let recordingSegmentCount = 0;
+        let totalRecordingSize = 0;
         let stream;
         let warningShown = false;
         let pageLoaded = false;
@@ -446,6 +449,7 @@
             startCountdown(totalSeconds);
             initializeExamEnvironment();
             initializeCamera();
+            checkForEmergencyRecording(); // Check for any emergency backup
             console.log('About to call initializePeerJS...');
             initializePeerJS(); // Initialize PeerJS
             console.log('initializePeerJS called');
@@ -982,17 +986,33 @@
 
                 const options = {
                     mimeType: MediaRecorder.isTypeSupported('video/webm') ? 'video/webm' : 'video/mp4',
-                    videoBitsPerSecond: 400000 // 400 kbps for longer recording
+                    videoBitsPerSecond: 250000 // 250 kbps - optimized for long recording (2-3 hours)
                 };
 
                 mediaRecorder = new MediaRecorder(stream, options);
                 recordedChunks = [];
+                let chunkCount = 0;
+                let totalSize = 0;
 
-                // Collect all data during the exam
+                // Collect all data during the exam with detailed logging
                 mediaRecorder.ondataavailable = function(event) {
                     if (event.data.size > 0) {
                         recordedChunks.push(event.data);
-                        console.log('Recording chunk collected, size:', event.data.size);
+                        chunkCount++;
+                        totalSize += event.data.size;
+
+                        const sizeInMB = (event.data.size / (1024 * 1024)).toFixed(2);
+                        const totalSizeInMB = (totalSize / (1024 * 1024)).toFixed(2);
+
+                        console.log(`📦 Chunk ${chunkCount}: ${sizeInMB}MB (Total: ${totalSizeInMB}MB)`);
+
+                        // Update recording info in UI
+                        updateRecordingInfo(`Chunks: ${chunkCount}, Size: ${totalSizeInMB}MB`);
+
+                        // Memory management for very long recordings (>100MB)
+                        if (totalSize > 100 * 1024 * 1024) { // 100MB threshold
+                            console.warn('⚠️ Large recording detected, consider periodic saving');
+                        }
                     }
                 };
 
@@ -1007,15 +1027,20 @@
                     updateRecordingStatus('Error', 'Recording failed');
                 };
 
-                // Start continuous recording
-                mediaRecorder.start();
+                // Start continuous recording with timeslice for long exams
+                // Use 30 second intervals to prevent memory overflow
+                const timesliceInterval = 30000; // 30 seconds
+                mediaRecorder.start(timesliceInterval);
                 isRecording = true;
                 recordingStartTime = Date.now();
 
-                updateRecordingStatus('Recording', 'Continuous');
+                updateRecordingStatus('Recording', 'Long-duration mode');
                 startRecordingTimer();
+                startPeriodicBackup();
 
-                console.log('Continuous recording started successfully');
+                console.log('🎬 Long-duration recording started with', timesliceInterval / 1000, 'second intervals');
+                console.log('📊 Recording configured for 2-3 hour exams with memory optimization');
+                console.log('💾 Periodic backup enabled for recording safety');
 
             } catch (error) {
                 console.error('Error starting recording:', error);
@@ -1026,6 +1051,13 @@
 
         // Stop recording and save final video
         function stopRecording() {
+            // Prevent multiple calls
+            if (window.isRecordingStopping) {
+                console.log('🛑 stopRecording already in progress, skipping...');
+                return;
+            }
+
+            window.isRecordingStopping = true;
             console.log('=== STOPPING RECORDING ===');
             console.log('MediaRecorder state:', mediaRecorder?.state);
             console.log('IsRecording flag:', isRecording);
@@ -1049,6 +1081,7 @@
                 mediaRecorder.stop();
                 isRecording = false;
                 clearInterval(recordingDurationInterval);
+                stopPeriodicBackup();
                 updateRecordingStatus('Stopping', 'Saving video...');
                 console.log('MediaRecorder.stop() called');
 
@@ -1063,6 +1096,13 @@
 
         // Save final video when exam ends
         function saveFinalVideo() {
+            // Prevent multiple calls
+            if (window.isSavingVideo) {
+                console.log('💾 saveFinalVideo already in progress, skipping...');
+                return;
+            }
+
+            window.isSavingVideo = true;
             console.log('=== SAVING FINAL VIDEO ===');
             console.log('Total chunks:', recordedChunks.length);
             console.log('MediaRecorder mimeType:', mediaRecorder?.mimeType);
@@ -1070,7 +1110,6 @@
             if (recordedChunks.length === 0) {
                 console.warn('⚠️ NO VIDEO DATA TO SAVE');
                 updateRecordingStatus('Completed', 'No data');
-                alert('❌ Tidak ada data video untuk disimpan!');
                 return;
             }
 
@@ -1088,7 +1127,6 @@
             if (finalBlob.size === 0) {
                 console.warn('⚠️ FINAL VIDEO SIZE IS 0');
                 updateRecordingStatus('Completed', 'Empty file');
-                alert('❌ Video kosong, tidak ada data!');
                 return;
             }
 
@@ -1162,24 +1200,29 @@
                     } catch (error) {
                         console.error('❌ Error calling saveRecordingVideo:', error);
                         updateRecordingStatus('Error', 'Call failed');
-                        alert('❌ Gagal memanggil method server: ' + error.message);
                     }
                 } else {
                     console.error('❌ Livewire not available');
                     updateRecordingStatus('Error', 'No connection');
-                    alert('❌ Tidak ada koneksi Livewire!');
                 }
 
                 // Clear chunks after save attempt
                 recordedChunks = [];
                 console.log('🗑️ Chunks cleared from memory');
+
+                // Reset flags after save
+                window.isRecordingStopping = false;
+                window.isSavingVideo = false;
             };
 
             reader.onerror = function(error) {
                 console.error('❌ FileReader error:', error);
                 updateRecordingStatus('Error', 'Read failed');
-                alert('❌ Gagal membaca file video: ' + error);
                 recordedChunks = []; // Clear chunks even on error
+
+                // Reset flags on error too
+                window.isRecordingStopping = false;
+                window.isSavingVideo = false;
             };
 
             console.log('🔄 Starting base64 conversion...');
@@ -1211,6 +1254,14 @@
             }
         }
 
+        // Update recording information with detailed stats
+        function updateRecordingInfo(info) {
+            const infoElement = document.getElementById('recordingInfo');
+            if (infoElement) {
+                infoElement.textContent = info;
+            }
+        }
+
         // Start recording timer
         function startRecordingTimer() {
             recordingDurationInterval = setInterval(() => {
@@ -1225,6 +1276,108 @@
                         `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
                 }
             }, 1000);
+        }
+
+        // Start periodic backup for long recordings
+        function startPeriodicBackup() {
+            // Save recording progress every 10 minutes for safety
+            periodicSaveInterval = setInterval(() => {
+                if (isRecording && recordedChunks.length > 0) {
+                    const currentTime = Date.now();
+                    const recordingDuration = (currentTime - recordingStartTime) / 1000 / 60; // minutes
+
+                    console.log(`💾 Periodic backup check at ${recordingDuration.toFixed(1)} minutes`);
+
+                    // Only backup if we have significant data (>5MB) and recording >10 mins
+                    if (totalRecordingSize > 5 * 1024 * 1024 && recordingDuration >= 10) {
+                        console.log('📦 Creating periodic backup...');
+                        createRecordingBackup();
+                    }
+                }
+            }, 600000); // Every 10 minutes (600,000ms)
+        }
+
+        // Create backup of current recording state
+        function createRecordingBackup() {
+            if (!recordedChunks || recordedChunks.length === 0) {
+                console.log('⚠️ No chunks to backup');
+                return;
+            }
+
+            try {
+                const backupBlob = new Blob(recordedChunks, {
+                    type: 'video/webm'
+                });
+                const backupSize = (backupBlob.size / (1024 * 1024)).toFixed(2);
+
+                console.log(`💾 Creating backup of ${backupSize}MB recording`);
+
+                // Store backup reference (but don't upload yet to avoid conflicts)
+                window.recordingBackup = {
+                    blob: backupBlob,
+                    timestamp: Date.now(),
+                    size: backupBlob.size,
+                    segmentCount: recordingSegmentCount
+                };
+
+                console.log('✅ Recording backup created successfully');
+                updateRecordingInfo(`Backup: ${backupSize}MB (${recordingSegmentCount} segments)`);
+
+            } catch (error) {
+                console.error('❌ Failed to create recording backup:', error);
+            }
+        }
+
+        // Stop periodic backup
+        function stopPeriodicBackup() {
+            if (periodicSaveInterval) {
+                clearInterval(periodicSaveInterval);
+                periodicSaveInterval = null;
+                console.log('🛑 Periodic backup stopped');
+            }
+        }
+
+        // Check for emergency recording on page load
+        function checkForEmergencyRecording() {
+            try {
+                const emergencyData = sessionStorage.getItem('emergencyRecording');
+                const emergencyTime = sessionStorage.getItem('emergencyRecordingTime');
+
+                if (emergencyData && emergencyTime) {
+                    const timeAgo = Date.now() - parseInt(emergencyTime);
+                    const minutesAgo = Math.floor(timeAgo / (1000 * 60));
+
+                    console.log(`🚨 Found emergency recording from ${minutesAgo} minutes ago`);
+
+                    // Only recover if it's within the last 30 minutes
+                    if (minutesAgo <= 30) {
+                        console.log('📦 Attempting to recover emergency recording...');
+
+                        // Automatically save the emergency recording
+                        if (window.Livewire) {
+                            Livewire.dispatch('saveRecordingVideo', {
+                                videoBlob: emergencyData,
+                                isEmergencyRecovery: true
+                            });
+
+                            console.log('✅ Emergency recording sent to server for recovery');
+
+                            // Clear the emergency data after successful dispatch
+                            sessionStorage.removeItem('emergencyRecording');
+                            sessionStorage.removeItem('emergencyRecordingTime');
+                        }
+                    } else {
+                        console.log('⚠️ Emergency recording too old, cleaning up');
+                        sessionStorage.removeItem('emergencyRecording');
+                        sessionStorage.removeItem('emergencyRecordingTime');
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error checking emergency recording:', error);
+                // Clean up on error
+                sessionStorage.removeItem('emergencyRecording');
+                sessionStorage.removeItem('emergencyRecordingTime');
+            }
         }
 
         // Request fullscreen
@@ -1364,9 +1517,9 @@
         document.addEventListener('livewire:initialized', function() {
             console.log('Livewire initialized');
 
-            // Listen for stop recording events
+            // Main stop recording event listener
             Livewire.on('stopRecording', function() {
-                console.log('Received stopRecording event from server');
+                console.log('🔔 Received stopRecording event from server');
                 stopRecording();
             });
 
@@ -1556,31 +1709,17 @@
             }
         }
 
-        // Listen for exam completion event from Livewire
-        document.addEventListener('livewire:initialized', () => {
-            Livewire.on('stopRecording', (event) => {
-                console.log('🔔 Received stopRecording event from PHP:', event);
-                alert('🎬 Ujian selesai! Menyimpan video recording...');
-                stopRecording();
-            });
-        });
-
-        // Alternative event listener for older Livewire versions
-        window.addEventListener('livewire:load', () => {
-            Livewire.on('stopRecording', (event) => {
-                console.log('🔔 [FALLBACK] Received stopRecording event from PHP:', event);
-                alert('🎬 [FALLBACK] Ujian selesai! Menyimpan video recording...');
-                stopRecording();
-            });
-        });
+        // These duplicate event listeners were causing multiple alerts
+        // Removed to prevent duplicate execution
 
         // Global event listener as additional fallback
         document.addEventListener('DOMContentLoaded', () => {
             window.addEventListener('stopRecording', (event) => {
                 console.log('🔔 [GLOBAL] Received stopRecording event:', event);
-                alert('🎬 [GLOBAL] Ujian selesai! Menyimpan video recording...');
                 stopRecording();
-            });
+            }, {
+                once: true
+            }); // Ensure this only runs once
         });
 
         // Manual save recording function for testing
@@ -1589,7 +1728,6 @@
 
             // Test Livewire connection first
             if (!window.Livewire) {
-                alert('❌ window.Livewire not available - Livewire not loaded!');
                 console.error('❌ window.Livewire not available');
                 return;
             }
@@ -1652,6 +1790,33 @@
         // Enhanced cleanup on page unload
         window.addEventListener('beforeunload', function() {
             console.log('Page unloading, cleaning up...');
+
+            // Emergency save if we have recording data
+            if (recordedChunks && recordedChunks.length > 0) {
+                console.log('🚨 Emergency save: Found recorded data on page unload');
+                try {
+                    const emergencyBlob = new Blob(recordedChunks, {
+                        type: 'video/webm'
+                    });
+                    const emergencySize = (emergencyBlob.size / (1024 * 1024)).toFixed(2);
+                    console.log(`💾 Emergency saving ${emergencySize}MB video`);
+
+                    // Store in sessionStorage as backup
+                    const reader = new FileReader();
+                    reader.onload = function() {
+                        try {
+                            sessionStorage.setItem('emergencyRecording', reader.result);
+                            sessionStorage.setItem('emergencyRecordingTime', Date.now().toString());
+                            console.log('✅ Emergency backup stored in sessionStorage');
+                        } catch (e) {
+                            console.warn('⚠️ Could not store emergency backup:', e.message);
+                        }
+                    };
+                    reader.readAsDataURL(emergencyBlob);
+                } catch (error) {
+                    console.error('❌ Emergency save failed:', error);
+                }
+            }
 
             // Stop recording first
             stopRecording();

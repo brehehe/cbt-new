@@ -70,7 +70,7 @@
                                 @else
                                     <div class="flex justify-end items-center">
                                         <button
-                                            class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn"
+                                            class="btn btn-icon text-orange-600 hover:text-orange-800 transition-colors edit-btn"
                                             wire:click="confirmBackExam('{{ $timetable->userTimetable->id }}')">
                                             <i class="fa-regular fa-book-open-cover"></i> Kembali Ujian
                                         </button>
