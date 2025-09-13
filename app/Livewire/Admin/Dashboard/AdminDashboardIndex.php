@@ -41,7 +41,7 @@ class AdminDashboardIndex extends Component
 
     public function mount()
     {
-        $this->loadDashboardData();
+        // $this->loadDashboardData();
         $this->pingGoogleDns();
     }
     public function pingGoogleDns()

@@ -1150,52 +1150,90 @@
                     try {
                         console.log('📡 Calling saveRecordingVideo using Livewire.dispatch...');
 
-                        // Method 1: Direct Livewire dispatch (most reliable)
-                        Livewire.dispatch('saveRecordingVideo', {
-                            videoBlob: base64Data
-                        });
+                        console.log('📡 Calling saveRecordingVideo using multiple methods for reliability...');
 
-                        // Method 2: Try component.call as fallback
+                        let saveSuccess = false;
+
+                        // Method 1: Try component.call first (most reliable for large data)
                         const component = document.querySelector('[wire\\:id]');
                         if (component) {
                             const componentId = component.getAttribute('wire:id');
                             const livewireComponent = Livewire.find(componentId);
 
                             if (livewireComponent) {
-                                console.log('📡 Found Livewire component, calling method...');
+                                console.log('📡 Found Livewire component, calling method directly...');
+                                updateRecordingStatus('Saving', 'Using component call...');
 
                                 livewireComponent.call('saveRecordingVideo', base64Data)
                                     .then((result) => {
-                                        console.log('✅ Server response:', result);
+                                        console.log('✅ Component call response:', result);
                                         if (result) {
                                             updateRecordingStatus('Completed', `Saved ${sizeInMB}MB`);
-                                            console.log('✅ FINAL EXAM VIDEO SENT SUCCESSFULLY!');
+                                            console.log('✅ FINAL EXAM VIDEO SENT SUCCESSFULLY via component call!');
                                             alert(`✅ Video ujian berhasil disimpan! (${sizeInMB}MB)`);
+                                            saveSuccess = true;
                                         } else {
-                                            console.error('❌ Server returned false');
-                                            updateRecordingStatus('Error', 'Save failed');
-                                            alert('❌ Server gagal menyimpan video!');
+                                            console.error('❌ Component call returned false, trying dispatch...');
+                                            fallbackToDispatch();
                                         }
                                     })
                                     .catch((error) => {
-                                        console.error('❌ Error sending final video:', error);
-                                        updateRecordingStatus('Error', 'Upload failed');
-                                        alert('❌ Gagal mengirim video ke server: ' + error.message);
+                                        console.error('❌ Component call failed, trying dispatch...', error);
+                                        fallbackToDispatch();
                                     });
                             } else {
-                                console.error('❌ Livewire component not found, using dispatch only');
-                                updateRecordingStatus('Saving', 'Using dispatch method...');
+                                console.error('❌ Livewire component not found, using dispatch...');
+                                fallbackToDispatch();
                             }
                         } else {
-                            console.error('❌ Wire element not found, using dispatch only');
-                            updateRecordingStatus('Saving', 'Using dispatch method...');
+                            console.error('❌ Wire element not found, using dispatch...');
+                            fallbackToDispatch();
                         }
 
-                        // Add success feedback for dispatch method
+                        // Method 2: Fallback to dispatch (backup method)
+                        function fallbackToDispatch() {
+                            if (saveSuccess) return; // Already saved via component call
+
+                            console.log('📡 Using fallback dispatch method...');
+                            updateRecordingStatus('Saving', 'Using dispatch method...');
+
+                            try {
+                                Livewire.dispatch('saveRecordingVideo', {
+                                    videoBlob: base64Data
+                                });
+
+                                console.log('📡 Dispatch sent successfully');
+
+                                // Give dispatch time to process
+                                setTimeout(() => {
+                                    updateRecordingStatus('Completed', 'Video dispatched');
+                                    console.log('📡 Dispatch method completed');
+                                    if (!saveSuccess) {
+                                        alert(`📡 Video dispatched ke server (${sizeInMB}MB) - cek server logs untuk konfirmasi`);
+                                    }
+                                }, 2000);
+
+                            } catch (dispatchError) {
+                                console.error('❌ Dispatch also failed:', dispatchError);
+                                updateRecordingStatus('Error', 'All methods failed');
+                                alert('❌ GAGAL total mengirim video: ' + dispatchError.message);
+                            }
+                        }
+
+                        // Emergency method: Also try dispatch immediately (parallel)
                         setTimeout(() => {
-                            updateRecordingStatus('Completed', 'Video sent via dispatch');
-                            console.log('📡 Video dispatched successfully');
-                        }, 2000);
+                            if (!saveSuccess) {
+                                console.log('📡 Emergency dispatch backup...');
+                                try {
+                                    Livewire.dispatch('saveRecordingVideo', {
+                                        videoBlob: base64Data
+                                    });
+                                    console.log('📡 Emergency dispatch sent');
+                                } catch (e) {
+                                    console.error('❌ Emergency dispatch failed:', e);
+                                }
+                            }
+                        }, 500);
 
                     } catch (error) {
                         console.error('❌ Error calling saveRecordingVideo:', error);

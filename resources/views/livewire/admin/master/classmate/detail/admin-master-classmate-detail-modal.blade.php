@@ -51,11 +51,11 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                @forelse($users as $index => $result)
+                                @forelse($mahasiswas as $index => $result)
                                     <tr class="hover:bg-gray-50 cursor-pointer {{ $selectedStudents[$result->id] ?? false ? 'bg-yellow-100' : '' }}"
                                         wire:click="choiceQuestion('{{ $result->id }}')">
                                         <td class="px-4 py-3 text-sm text-gray-900">
-                                            {{ $users->firstItem() + $index }}
+                                            {{ $mahasiswas->firstItem() + $index }}
                                         </td>
                                         <td class="px-4 py-3 text-sm text-gray-900">{{ $result?->userDetail?->nim }}
                                         </td>
@@ -74,7 +74,7 @@
 
                     <!-- Pagination -->
                     <div class="px-5 py-4 bg-gray-50/80 border-t border-gray-200">
-                        {{ $users->links('vendor.livewire.custom') }}
+                        {{ $mahasiswas->links('vendor.livewire.custom') }}
                     </div>
                 </div>
             </div>

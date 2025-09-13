@@ -120,7 +120,7 @@ class AdminMasterClassmateDetailIndex extends Component
         $classmateStudents = ClassmateStudent::search($this->search)->where('classmate_id', $this->classmate_id)->select('id', 'user_id', 'classmate_id')->with(['user:id,name,email', 'user.userDetail'])->get();
 
         return view('livewire.admin.master.classmate.detail.admin-master-classmate-detail-index', [
-            'users' => $this->openStudentModal ? User::role(['Mahasiswa'])
+            'mahasiswas' => $this->openStudentModal ? User::role(['Mahasiswa'])
                 ->search($this->search)
                 ->whereNotIn('id', ClassmateStudent::select('user_id')->get()->pluck('user_id')->toArray() ?? [])
                 ->paginate($this->perPage) : [],

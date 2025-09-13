@@ -604,3 +604,165 @@ Press Ctrl+C to stop servers
 2025-08-11T17:51:10: 🔴 HTTP Client disconnected: 8def37a4-a1f4-4728-b6c7-0d8a316890a6
 2025-08-11T17:51:34: 🔴 HTTP Client disconnected: bc3443b1-9c33-4a77-918d-ec73d6b95e63
 2025-08-11T17:55:48: 🔴 HTTP Client disconnected: 1e30c0e9-101b-4b35-ab66-63c8f987af43
+2025-09-11T16:34:28: 🚀 Starting HTTP PeerJS Server...
+2025-09-11T16:34:28: 🔒 SSL certificates found, starting HTTPS PeerJS Server...
+2025-09-11T16:34:28: ✅ HTTPS PeerJS Server enabled
+2025-09-11T16:34:28: 
+📡 PeerJS Servers Status:
+2025-09-11T16:34:28: ═══════════════════════════════
+2025-09-11T16:34:28: 
+📄 HTTP PeerJS Server (for backward compatibility):
+2025-09-11T16:34:28:    Port: 9000
+2025-09-11T16:34:28:    Protocol: HTTP
+2025-09-11T16:34:28:    🔗 http://213.210.21.140:9000/peerjs
+2025-09-11T16:34:28: 
+🔒 HTTPS PeerJS Server (for HTTPS websites):
+2025-09-11T16:34:28:    Port: 9443
+2025-09-11T16:34:28:    Protocol: HTTPS
+2025-09-11T16:34:28:    🔗 https://213.210.21.140:9443/peerjs
+2025-09-11T16:34:28: 
+🌐 Client Configuration:
+2025-09-11T16:34:28: ════════════════════════════
+2025-09-11T16:34:28: For HTTPS websites (https://cbt-new.drshieldapp.com):
+2025-09-11T16:34:28:    ✅ Will use: https://213.210.21.140:9443/peerjs
+2025-09-11T16:34:28: 
+For HTTP websites:
+2025-09-11T16:34:28:    ✅ Will use: http://213.210.21.140:9000/peerjs
+2025-09-11T16:34:28: 
+🔍 Health Check URLs:
+2025-09-11T16:34:28: ═══════════════════════
+2025-09-11T16:34:28: HTTP:  http://213.210.21.140:9000/peerjs
+2025-09-11T16:34:28: HTTPS: https://213.210.21.140:9443/peerjs
+2025-09-11T16:34:29: 
+🎉 PeerJS Servers Ready!
+2025-09-11T16:34:29: ═══════════════════════════
+2025-09-11T16:34:29: ✅ Both HTTP and HTTPS servers running
+2025-09-11T16:34:29: ✅ HTTPS websites can now connect
+2025-09-11T16:34:29: 
+Press Ctrl+C to stop servers
+2025-09-11T16:38:49: 🚀 Starting HTTP PeerJS Server...
+2025-09-11T16:38:49: 🔒 SSL certificates found, starting HTTPS PeerJS Server...
+2025-09-11T16:38:49: ✅ HTTPS PeerJS Server enabled
+2025-09-11T16:38:49: 
+📡 PeerJS Servers Status:
+2025-09-11T16:38:49: ═══════════════════════════════
+2025-09-11T16:38:49: 
+📄 HTTP PeerJS Server (for backward compatibility):
+2025-09-11T16:38:49:    Port: 9000
+2025-09-11T16:38:49:    Protocol: HTTP
+2025-09-11T16:38:49:    🔗 http://213.210.21.140:9000/peerjs
+2025-09-11T16:38:49: 
+🔒 HTTPS PeerJS Server (for HTTPS websites):
+2025-09-11T16:38:49:    Port: 9443
+2025-09-11T16:38:49:    Protocol: HTTPS
+2025-09-11T16:38:49:    🔗 https://213.210.21.140:9443/peerjs
+2025-09-11T16:38:49: 
+🌐 Client Configuration:
+2025-09-11T16:38:49: ════════════════════════════
+2025-09-11T16:38:49: For HTTPS websites (https://cbt-new.drshieldapp.com):
+2025-09-11T16:38:49:    ✅ Will use: https://213.210.21.140:9443/peerjs
+2025-09-11T16:38:49: 
+For HTTP websites:
+2025-09-11T16:38:49:    ✅ Will use: http://213.210.21.140:9000/peerjs
+2025-09-11T16:38:49: 
+🔍 Health Check URLs:
+2025-09-11T16:38:49: ═══════════════════════
+2025-09-11T16:38:49: HTTP:  http://213.210.21.140:9000/peerjs
+2025-09-11T16:38:49: HTTPS: https://213.210.21.140:9443/peerjs
+2025-09-11T16:38:50: 
+🎉 PeerJS Servers Ready!
+2025-09-11T16:38:50: ═══════════════════════════
+2025-09-11T16:38:50: ✅ Both HTTP and HTTPS servers running
+2025-09-11T16:38:50: ✅ HTTPS websites can now connect
+2025-09-11T16:38:50: 
+Press Ctrl+C to stop servers
+2025-09-11T19:52:33: 🟢 HTTP Client connected: 084b6439-362c-4af9-b303-7b6dd9b2eeb8
+2025-09-11T19:59:45: 🔴 HTTP Client disconnected: 084b6439-362c-4af9-b303-7b6dd9b2eeb8
+2025-09-11T20:15:11: 🟢 HTTP Client connected: b5691ecc-861d-46b0-9cb4-2be4511657b4
+2025-09-11T20:41:23: 🔴 HTTP Client disconnected: b5691ecc-861d-46b0-9cb4-2be4511657b4
+2025-09-11T21:16:53: 🟢 HTTP Client connected: 1fe9c2d0-0e05-418c-9e96-cb6560569e6c
+2025-09-11T21:25:05: 🔴 HTTP Client disconnected: 1fe9c2d0-0e05-418c-9e96-cb6560569e6c
+2025-09-11T21:25:13: 🟢 HTTP Client connected: 3286bdf6-199e-4f1b-851b-a047d6610f50
+2025-09-11T21:32:35: 🔴 HTTP Client disconnected: 3286bdf6-199e-4f1b-851b-a047d6610f50
+2025-09-11T21:32:41: 🟢 HTTP Client connected: f3950230-688f-448a-8b53-07a1bb7d9733
+2025-09-11T21:32:56: 🔴 HTTP Client disconnected: f3950230-688f-448a-8b53-07a1bb7d9733
+2025-09-12T05:18:02: 🟢 HTTP Client connected: bc3a8843-fba1-41ef-b2fc-a4af9978ddbe
+2025-09-12T05:18:48: 🔴 HTTP Client disconnected: bc3a8843-fba1-41ef-b2fc-a4af9978ddbe
+2025-09-12T05:18:54: 🟢 HTTP Client connected: b36379ef-62aa-4a16-aa7b-e797f45b3365
+2025-09-12T05:19:12: 🔴 HTTP Client disconnected: b36379ef-62aa-4a16-aa7b-e797f45b3365
+2025-09-12T05:30:40: 🟢 HTTP Client connected: d1eb9bf2-6dc9-4f5d-a68b-8a9ca51e70ba
+2025-09-12T05:31:29: 🔴 HTTP Client disconnected: d1eb9bf2-6dc9-4f5d-a68b-8a9ca51e70ba
+2025-09-12T05:33:41: 🟢 HTTP Client connected: 3168ff96-abb1-41af-b55a-bffd307156cf
+2025-09-12T05:34:19: 🔴 HTTP Client disconnected: 3168ff96-abb1-41af-b55a-bffd307156cf
+2025-09-12T05:43:30: 🟢 HTTP Client connected: 3e176f7c-ce0b-4c0e-88f7-06f3ba659fa6
+2025-09-12T05:46:17: 🔴 HTTP Client disconnected: 3e176f7c-ce0b-4c0e-88f7-06f3ba659fa6
+2025-09-12T05:46:22: 🟢 HTTP Client connected: 0d9068b0-6c1e-41c7-8980-6f30b13ae612
+2025-09-12T05:48:45: 🔴 HTTP Client disconnected: 0d9068b0-6c1e-41c7-8980-6f30b13ae612
+2025-09-12T05:48:49: 🟢 HTTP Client connected: 23c6628a-2042-41ff-af5e-e234a8ad0a1c
+2025-09-12T05:50:51: 🔴 HTTP Client disconnected: 23c6628a-2042-41ff-af5e-e234a8ad0a1c
+2025-09-12T05:50:55: 🟢 HTTP Client connected: a49b801c-e3a9-4fcb-a1d0-1957131aa072
+2025-09-12T05:53:46: 🔴 HTTP Client disconnected: a49b801c-e3a9-4fcb-a1d0-1957131aa072
+2025-09-12T05:53:49: 🟢 HTTP Client connected: d8fb4795-0392-41ea-ad44-a908c85c7356
+2025-09-12T05:54:45: 🔴 HTTP Client disconnected: d8fb4795-0392-41ea-ad44-a908c85c7356
+2025-09-12T05:57:18: 🟢 HTTP Client connected: 632ae12c-ca13-4eb7-90a2-05b6a8fb72e8
+2025-09-12T05:57:45: 🔴 HTTP Client disconnected: 632ae12c-ca13-4eb7-90a2-05b6a8fb72e8
+2025-09-12T06:33:23: 🟢 HTTP Client connected: 0419552c-cd5f-4587-8141-e009e907a9ae
+2025-09-12T06:37:23: 🔴 HTTP Client disconnected: 0419552c-cd5f-4587-8141-e009e907a9ae
+2025-09-12T06:40:41: 🟢 HTTP Client connected: 7c11d525-be99-49e8-82ae-080094337a33
+2025-09-12T06:40:51: 🔴 HTTP Client disconnected: 7c11d525-be99-49e8-82ae-080094337a33
+2025-09-12T06:48:02: 🟢 HTTP Client connected: 4d9b5daf-99a2-4a79-b9b6-385a933b7a9c
+2025-09-12T06:48:51: 🔴 HTTP Client disconnected: 4d9b5daf-99a2-4a79-b9b6-385a933b7a9c
+2025-09-12T09:03:46: 🟢 HTTP Client connected: 3c294c8d-7d66-46d9-8e92-5cf4c3e34066
+2025-09-12T09:04:42: 🔴 HTTP Client disconnected: 3c294c8d-7d66-46d9-8e92-5cf4c3e34066
+2025-09-12T09:10:41: 🟢 HTTP Client connected: 8385f181-53cc-44c9-9faa-1af66618c85e
+2025-09-12T09:11:52: 🔴 HTTP Client disconnected: 8385f181-53cc-44c9-9faa-1af66618c85e
+2025-09-12T09:11:54: 🟢 HTTP Client connected: acccf75f-fa03-42f9-84b7-c13280dcc198
+2025-09-12T09:12:28: 🔴 HTTP Client disconnected: acccf75f-fa03-42f9-84b7-c13280dcc198
+2025-09-12T09:12:29: 🟢 HTTP Client connected: 8a37fcf1-8147-40a6-adbf-32f6fd3acbaf
+2025-09-12T09:13:52: 🔴 HTTP Client disconnected: 8a37fcf1-8147-40a6-adbf-32f6fd3acbaf
+2025-09-12T09:17:39: 🟢 HTTP Client connected: c86a11a1-9cdf-4644-b913-47344f646fac
+2025-09-12T09:18:31: 🔴 HTTP Client disconnected: c86a11a1-9cdf-4644-b913-47344f646fac
+2025-09-12T09:18:33: 🟢 HTTP Client connected: e12a9336-4e52-43dd-9be3-1e2a41fe9894
+2025-09-12T09:18:55: 🔴 HTTP Client disconnected: e12a9336-4e52-43dd-9be3-1e2a41fe9894
+2025-09-12T09:23:26: 🟢 HTTP Client connected: 7b03393c-2d19-41d0-835f-5e0b7cc30988
+2025-09-12T09:26:15: 🔴 HTTP Client disconnected: 7b03393c-2d19-41d0-835f-5e0b7cc30988
+2025-09-12T09:27:16: 🟢 HTTP Client connected: 49a15947-bc3a-4381-a045-a4956dd8044c
+2025-09-12T09:28:46: 🔴 HTTP Client disconnected: 49a15947-bc3a-4381-a045-a4956dd8044c
+2025-09-12T09:42:16: 🟢 HTTP Client connected: 18520370-f9d4-498b-8096-8b77e0d94fb4
+2025-09-12T09:44:52: 🔴 HTTP Client disconnected: 18520370-f9d4-498b-8096-8b77e0d94fb4
+2025-09-12T09:53:57: 🟢 HTTP Client connected: d2014877-2258-46cc-a857-897bcd0072dc
+2025-09-12T09:55:01: 🔴 HTTP Client disconnected: d2014877-2258-46cc-a857-897bcd0072dc
+2025-09-12T10:10:57: 🟢 HTTP Client connected: eb171727-2b9a-4f83-a3f0-c9fdf17435d8
+2025-09-12T10:12:08: 🔴 HTTP Client disconnected: eb171727-2b9a-4f83-a3f0-c9fdf17435d8
+2025-09-12T10:17:51: 🟢 HTTP Client connected: b19cdaf9-cf6e-4de4-b7be-7700088642a7
+2025-09-12T10:35:58: 🔴 HTTP Client disconnected: b19cdaf9-cf6e-4de4-b7be-7700088642a7
+2025-09-12T10:46:57: 🟢 HTTP Client connected: 55d7cb32-b5c4-4b93-8f39-3a2c8d180edf
+2025-09-12T10:48:33: 🔴 HTTP Client disconnected: 55d7cb32-b5c4-4b93-8f39-3a2c8d180edf
+2025-09-12T10:55:05: 🟢 HTTP Client connected: 80029969-bb98-4f61-b223-88c70cd9129d
+2025-09-12T10:58:08: 🔴 HTTP Client disconnected: 80029969-bb98-4f61-b223-88c70cd9129d
+2025-09-12T11:04:28: 🟢 HTTP Client connected: 68800248-5015-44d4-94cd-f63999bd7f57
+2025-09-12T11:08:08: 🔴 HTTP Client disconnected: 68800248-5015-44d4-94cd-f63999bd7f57
+2025-09-12T12:51:32: 🟢 HTTP Client connected: 5581d74b-de57-4bc0-8671-30380c8a9cd5
+2025-09-12T12:51:49: 🔴 HTTP Client disconnected: 5581d74b-de57-4bc0-8671-30380c8a9cd5
+2025-09-12T12:51:58: 🟢 HTTP Client connected: 7b72ab82-9748-420b-83f6-fb41c3a56669
+2025-09-12T12:51:58: 🔴 HTTP Client disconnected: 7b72ab82-9748-420b-83f6-fb41c3a56669
+2025-09-12T13:25:21: 🟢 HTTP Client connected: 7e181aae-cb01-4d3c-995c-40610614cd96
+2025-09-12T13:28:42: 🔴 HTTP Client disconnected: 7e181aae-cb01-4d3c-995c-40610614cd96
+2025-09-12T13:58:44: 🟢 HTTP Client connected: 3b0ee1d8-0507-4ef6-983e-a5401d440d0a
+2025-09-12T14:02:45: 🔴 HTTP Client disconnected: 3b0ee1d8-0507-4ef6-983e-a5401d440d0a
+2025-09-12T15:05:12: 🟢 HTTP Client connected: 826fdd13-2ea7-4316-9cf1-ebef59ace01c
+2025-09-12T15:12:10: 🔴 HTTP Client disconnected: 826fdd13-2ea7-4316-9cf1-ebef59ace01c
+2025-09-12T16:13:22: 🟢 HTTP Client connected: 1fd0fe3f-7a98-42e6-9892-edd0e9862297
+2025-09-12T16:20:42: 🔴 HTTP Client disconnected: 1fd0fe3f-7a98-42e6-9892-edd0e9862297
+2025-09-13T20:09:47: 🟢 HTTP Client connected: a1f88edc-57a3-49f4-b9df-fad224930da6
+2025-09-13T20:16:17: 🔴 HTTP Client disconnected: a1f88edc-57a3-49f4-b9df-fad224930da6
+2025-09-13T20:17:14: 🟢 HTTP Client connected: 49da5c1c-4380-4641-87eb-ea2e86c5555b
+2025-09-13T20:18:03: 🟢 HTTP Client connected: f1253183-9fe4-407f-8092-2faeebe22c1f
+2025-09-13T20:18:24: 🔴 HTTP Client disconnected: f1253183-9fe4-407f-8092-2faeebe22c1f
+2025-09-13T20:18:26: 🟢 HTTP Client connected: 081e5074-0b0f-49b9-9091-70eeb90f1ec8
+2025-09-13T20:25:18: 🔴 HTTP Client disconnected: 081e5074-0b0f-49b9-9091-70eeb90f1ec8
+2025-09-13T20:28:40: 🔴 HTTP Client disconnected: 49da5c1c-4380-4641-87eb-ea2e86c5555b
+2025-09-13T20:50:54: 🟢 HTTP Client connected: 3a11f6e6-5db0-4dc8-95df-f0a73e741f9c
+2025-09-13T20:51:00: 🟢 HTTP Client connected: 12e4fbb9-8c3f-4044-9ffc-01a2d6ef3593
+2025-09-13T20:56:59: 🔴 HTTP Client disconnected: 12e4fbb9-8c3f-4044-9ffc-01a2d6ef3593
+2025-09-13T20:58:19: 🔴 HTTP Client disconnected: 3a11f6e6-5db0-4dc8-95df-f0a73e741f9c
