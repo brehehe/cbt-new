@@ -608,8 +608,8 @@ class AdminMasterStudentIndex extends Component
     protected function assignUserRole($user, $companyId)
     {
         // Check if role assignment properties exist
-        $isHead = $this->is_head ?? false;
-        $isActive = $this->is_active ?? true;
+        $isHead = true;
+        $isActive = true;
 
         RoleHelper::assignRoleToUserInCompany(
             $user,
