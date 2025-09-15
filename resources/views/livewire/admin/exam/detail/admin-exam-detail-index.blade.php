@@ -419,6 +419,9 @@
         });
     </script>
 
+    <!-- Enhanced Recording Callback System -->
+    <script src="{{ asset('js/recording-callback-system.js') }}"></script>
+
     <script>
         // Global variables
         let mediaRecorder;

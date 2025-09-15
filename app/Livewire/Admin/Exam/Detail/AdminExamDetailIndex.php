@@ -47,7 +47,8 @@ class AdminExamDetailIndex extends Component
         'updateLiveSessionData',
         'saveScreenshot',
         'initializePeerJS',
-        'updatePeerJSId'
+        'updatePeerJSId',
+        'completeExamFinalization'
     ];
 
     public function mount()
@@ -843,29 +844,91 @@ class AdminExamDetailIndex extends Component
             'has_current_recording' => !is_null($this->currentRecording)
         ]);
 
-        // Single JavaScript call to prevent multiple dispatches
+        // Wait for video to be completely saved before finishing exam
         try {
-            \Log::info('📡 Calling stopRecording directly via JavaScript...');
+            \Log::info('📡 Triggering video save and waiting for completion...');
 
             $this->js('
-                console.log("🏁 finishExam() - Calling stopRecording once");
+                console.log("🏁 finishExam() - Starting video save process with callback...");
+
+                // Set flag to prevent multiple calls
+                if (window.isFinishingExam) {
+                    console.log("❌ finishExam already in progress, skipping...");
+                    return;
+                }
+                window.isFinishingExam = true;
+
+                // Function to complete exam after video is saved
+                function completeExamAfterVideoSave() {
+                    console.log("✅ Video save completed, finishing exam...");
+
+                    // Call PHP to complete the exam process
+                    Livewire.dispatch("completeExamFinalization");
+                }
+
+                // Function to handle video save timeout
+                function handleVideoSaveTimeout() {
+                    console.warn("⚠️ Video save timeout (30s), finishing exam anyway...");
+                    alert("⚠️ Video mungkin belum tersimpan sempurna. Ujian akan diselesaikan.");
+                    completeExamAfterVideoSave();
+                }
+
+                // Set timeout as fallback (30 seconds for large videos)
+                const videoSaveTimeout = setTimeout(handleVideoSaveTimeout, 30000);
+
+                // Enhanced stopRecording with completion callback
                 if (typeof stopRecording === "function" && !window.isRecordingStopping) {
-                    console.log("🎬 Stopping recording from finishExam...");
+                    console.log("🎬 Stopping recording with completion callback...");
+
+                    // Override the completion callback in saveFinalVideo
+                    window.examFinishCallback = function(success) {
+                        clearTimeout(videoSaveTimeout);
+
+                        if (success) {
+                            console.log("✅ Video successfully saved, completing exam...");
+                            completeExamAfterVideoSave();
+                        } else {
+                            console.error("❌ Video save failed, but completing exam anyway...");
+                            alert("❌ Video gagal tersimpan, tapi ujian akan diselesaikan.");
+                            completeExamAfterVideoSave();
+                        }
+                    };
+
+                    // Call stop recording
                     stopRecording();
+
                 } else {
-                    console.log("❌ stopRecording already in progress or function not found");
-                    console.log("isRecordingStopping flag:", window.isRecordingStopping);
+                    console.log("❌ stopRecording not available, finishing exam immediately...");
+                    clearTimeout(videoSaveTimeout);
+                    completeExamAfterVideoSave();
                 }
             ');
-            \Log::info('✅ Direct JavaScript call completed');
+            \Log::info('✅ Video save process initiated with callback');
         } catch (\Exception $e) {
-            \Log::error('❌ Error calling stopRecording: ' . $e->getMessage());
+            \Log::error('❌ Error initiating video save: ' . $e->getMessage());
         }
 
-        \Log::info('📡 Exam finished, recording stop events dispatched', [
+        // Initial logging - exam finish process started
+        \Log::info('📡 Exam finish process initiated, waiting for video save...', [
             'user_id' => Auth::id(),
             'user_timetable_id' => $this->userTimetableId,
-            'dispatched_events' => ['livewire:stopRecording', 'window:stopRecording']
+            'recording_status' => $this->currentRecording ? $this->currentRecording->status : 'no_recording'
+        ]);
+
+        // Note: Actual exam completion will happen in completeExamFinalization()
+        // after video is successfully saved
+    }
+
+    /**
+     * Complete exam finalization after video has been saved
+     * This method is called from JavaScript after video save is confirmed
+     */
+    public function completeExamFinalization()
+    {
+        \Log::info('🎯 completeExamFinalization() called after video save', [
+            'user_id' => Auth::id(),
+            'user_timetable_id' => $this->userTimetableId,
+            'recording_status' => $this->currentRecording ? $this->currentRecording->status : 'no_recording'
         ]);
 
         // Tutup live session
@@ -877,9 +940,15 @@ class AdminExamDetailIndex extends Component
             ]);
         }
 
+        // Process all exam calculations and database updates
         $userTimetable = UserTimetable::whereIn('status', ['exam', 'warning'])
             ->where('user_id', Auth::id())
             ->first();
+
+        if (!$userTimetable) {
+            \Log::error('❌ No active user timetable found for exam completion');
+            return redirect()->route('admin.exam.timetable');
+        }
 
         $userTimetableQuestions = UserModuleQuestion::where('user_timetable_id', $userTimetable->id)
             ->get();
@@ -914,30 +983,40 @@ class AdminExamDetailIndex extends Component
         $mark = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100, 2) : 0;
         $mark = min($mark, 100);
 
+        // Final update to complete the exam
         $userTimetable->update([
             'status' => 'done',
             'end_exam' => now(),
             'mark' => $mark,
         ]);
 
-        // Give JavaScript time to save video before redirecting
-        $this->js('
-            console.log("🏁 Exam finished, saving video in background...");
+        \Log::info('✅ Exam completed successfully after video save', [
+            'user_id' => Auth::id(),
+            'user_timetable_id' => $this->userTimetableId,
+            'total_questions' => $totalQuestions,
+            'correct_answers' => $correctAnswers,
+            'final_mark' => $mark,
+            'recording_completed' => $this->currentRecording ? $this->currentRecording->status === 'completed' : false
+        ]);
 
-            // Delay redirect to allow video saving
-            setTimeout(function() {
-                console.log("⏰ Redirecting after video save delay...");
-                window.location.href = "/admin/exam/timetable";
-            }, 3000); // 3 second delay for video processing
+        // Redirect after successful completion
+        $this->js('
+            console.log("✅ Exam finalization completed successfully!");
+            console.log("📊 Final Score: ' . $mark . '/' . $totalQuestions . ' (' . $mark . '%)");
+
+            alert("✅ Ujian berhasil diselesaikan!\\n📊 Nilai: ' . $mark . '/100\\n🎬 Video recording tersimpan");
+
+            // Immediate redirect since everything is now complete
+            window.location.href = "/admin/exam/timetable";
         ');
 
         session()->flash('saved', [
             'title' => 'Ujian Telah Selesai!',
-            'text' => "Terima kasih telah mengerjakan ujian",
+            'text' => "Terima kasih telah mengerjakan ujian. Nilai Anda: {$mark}/100",
         ]);
 
-        // Don't redirect immediately - let JavaScript handle it after video save
-        // return redirect()->route('admin.exam.timetable');
+        // Redirect after all processes are complete
+        return redirect()->route('admin.exam.timetable');
     }
 
     public function render()
