@@ -39,6 +39,25 @@ Route::group(['namespace' => 'App\Livewire\Auth'], function () {
     Route::get('register', 'Register\AuthRegisterIndex')->name('register');
 });
 
+// Generic dashboard route - will redirect to role-specific dashboard
+Route::get('/dashboard', function () {
+    $user = Auth::user();
+
+    if ($user->hasRole('admin')) {
+        return redirect()->route('admin.dashboard');
+    } elseif ($user->hasRole('dosen')) {
+        return redirect()->route('dosen.dashboard');
+    } elseif ($user->hasRole('mahasiswa')) {
+        return redirect()->route('mahasiswa.dashboard');
+    } elseif ($user->hasRole('pengawas')) {
+        return redirect()->route('pengawas.dashboard');
+    }
+
+    // Default fallback
+    return redirect()->route('login');
+})->middleware(['auth'])->name('dashboard');
+
+// Admin Dashboard Routes
 Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middleware' => ['auth', 'verified', CheckUserTimetable::class]], function () {
     Route::get('/', 'Dashboard\AdminDashboardIndex')->name('admin.dashboard');
 
@@ -100,8 +119,61 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
     });
 });
 
+// Dosen Dashboard Routes
+Route::group(['namespace' => 'App\Livewire\Dosen', 'prefix' => 'dosen', 'middleware' => ['auth', 'verified', CheckUserTimetable::class]], function () {
+    Route::get('/', 'Dashboard\DosenDashboardIndex')->name('dosen.dashboard');
+
+    // Route::group(['prefix' => 'exam'], function () {
+    //     Route::get('/create', 'Exam\DosenExamCreate')->name('dosen.exam.create');
+    //     Route::get('/manage', 'Exam\DosenExamManage')->name('dosen.exam.manage');
+    //     Route::get('/monitor', 'Exam\DosenExamMonitor')->name('dosen.exam.monitor');
+    //     Route::get('/results', 'Exam\DosenExamResults')->name('dosen.exam.results');
+    // });
+
+    // Route::group(['prefix' => 'question'], function () {
+    //     Route::get('/', 'Question\DosenQuestionIndex')->name('dosen.question.index');
+    //     Route::get('/create', 'Question\DosenQuestionCreate')->name('dosen.question.create');
+    // });
+
+    // Route::group(['prefix' => 'report'], function () {
+    //     Route::get('/analysis', 'Report\DosenReportAnalysis')->name('dosen.report.analysis');
+    //     Route::get('/grades', 'Report\DosenReportGrades')->name('dosen.report.grades');
+    // });
+});
+
+// Mahasiswa Dashboard Routes
+Route::group(['namespace' => 'App\Livewire\Mahasiswa', 'prefix' => 'mahasiswa', 'middleware' => ['auth', 'verified', CheckUserTimetable::class]], function () {
+    Route::get('/', 'Dashboard\MahasiswaDashboardIndex')->name('mahasiswa.dashboard');
+
+    // Route::group(['prefix' => 'exam'], function () {
+    //     Route::get('/schedule', 'Exam\MahasiswaExamSchedule')->name('mahasiswa.exam.schedule');
+    //     Route::get('/take/{id}', 'Exam\MahasiswaExamTake')->name('mahasiswa.exam.take');
+    //     Route::get('/results', 'Exam\MahasiswaExamResults')->name('mahasiswa.exam.results');
+    // });
+
+    // Route::get('/results', 'Result\MahasiswaResultIndex')->name('mahasiswa.results');
+    // Route::get('/profile', 'Profile\MahasiswaProfileIndex')->name('mahasiswa.profile');
+    // Route::get('/help', 'Help\MahasiswaHelpIndex')->name('mahasiswa.help');
+});
+
+// Pengawas Dashboard Routes
+Route::group(['namespace' => 'App\Livewire\Pengawas', 'prefix' => 'pengawas', 'middleware' => ['auth', 'verified', CheckUserTimetable::class]], function () {
+    Route::get('/', 'Dashboard\PengawasDashboardIndex')->name('pengawas.dashboard');
+
+    // Route::group(['prefix' => 'monitor'], function () {
+    //     Route::get('/real-time', 'Monitor\PengawasMonitorRealTime')->name('pengawas.monitor.realtime');
+    //     Route::get('/camera', 'Monitor\PengawasMonitorCamera')->name('pengawas.monitor.camera');
+    //     Route::get('/alerts', 'Monitor\PengawasMonitorAlerts')->name('pengawas.monitor.alerts');
+    // });
+
+    // Route::group(['prefix' => 'report'], function () {
+    //     Route::get('/violations', 'Report\PengawasReportViolations')->name('pengawas.report.violations');
+    //     Route::get('/incidents', 'Report\PengawasReportIncidents')->name('pengawas.report.incidents');
+    // });
+});
+
 if (config('app.env') === 'local' || config('app.env') === 'development' || config('app.env') === 'production') {
-    Route::redirect('', '/admin');
+    Route::redirect('', '/dashboard');
 }
 
 Route::get('logout', function () {
