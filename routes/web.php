@@ -72,6 +72,8 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
 
     Route::group(['namespace' => 'Exam', 'prefix' => 'exam'], function () {
         Route::get('/timetable', 'Timetable\AdminExamTimetableIndex')->name('admin.exam.timetable');
+        Route::get('/history-timetable', 'HistoryTimetable\AdminExamHistoryTimetableIndex')->name('admin.exam.history-timetable');
+        Route::get('/history-timetable/{timetable_id}/{user_timetable_id}', 'HistoryTimetable\Detail\AdminExamHistoryTimetableDetailIndex')->name('admin.exam.history-timetable.detail');
         Route::get('/warning', 'Warning\AdminExamWarningIndex')->name('admin.exam.warning');
         Route::get('/detail', \App\Livewire\Admin\Exam\Detail\AdminExamDetailIndex::class)->name('admin.exam.detail');
         Route::get('/monitor', \App\Livewire\Admin\Exam\Monitor\AdminExamMonitorIndex::class)->name('admin.exam.monitor');

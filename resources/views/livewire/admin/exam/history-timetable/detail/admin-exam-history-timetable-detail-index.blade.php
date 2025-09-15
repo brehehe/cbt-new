@@ -59,7 +59,7 @@
             </div>
         </div>
     </div>
-    <div class="grid grid-cols-5 gap-4 mb-4">
+    {{-- <div class="grid grid-cols-5 gap-4 mb-4">
         <div>
             <label for="total_soal" class="block text-sm font-medium text-gray-700">Total Soal</label>
             <input disabled type="number" id="total_soal" value="{{ $user_timetable->userModuleQuestions->count() }}"
@@ -94,7 +94,7 @@
             <input disabled type="number" id="nilai" value="{{ $user_timetable->mark }}" placeholder="Masukkan"
                 class="mt-1 form-control">
         </div>
-    </div>
+    </div> --}}
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
         <div class="flex items-center">
             <span class="text-sm text-gray-700 mr-2">Tampil</span>
