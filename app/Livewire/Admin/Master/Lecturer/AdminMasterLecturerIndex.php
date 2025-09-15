@@ -72,6 +72,7 @@ class AdminMasterLecturerIndex extends Component
     public $identity_number;
     public $studys = [];
     public $getStudys = [];
+    public $filterStudy;
 
     protected $rules = [
         'name' => 'required|string|max:255',
@@ -79,8 +80,8 @@ class AdminMasterLecturerIndex extends Component
         'lecturer_id' => 'required|string|unique:user_details,lecturer_id',
         'lecturer_nidn' => 'required|string|unique:user_details,lecturer_nidn',
         'studys' => 'required',
-        'lecturer_faculty' => 'required|string|max:255',
-        'lecturer_position' => 'required|string|max:255',
+        'lecturer_faculty' => 'nullable|string|max:255',
+        'lecturer_position' => 'nullable|string|max:255',
         'lecturer_education_level' => 'required|string|max:255',
         'lecturer_specialization' => 'required|string|max:255',
         'birth_place' => 'required|string|max:255',
@@ -217,10 +218,10 @@ class AdminMasterLecturerIndex extends Component
         $rules = [
             'name' => 'required|string|max:255',
             'studys' => 'required',
-            'lecturer_faculty' => 'required|string|max:255',
-            'lecturer_position' => 'required|string|max:255',
+            'lecturer_faculty' => 'nullable|string|max:255',
+            'lecturer_position' => 'nullable|string|max:255',
             'lecturer_education_level' => 'required|string|max:255',
-            'lecturer_specialization' => 'required|string|max:255',
+            'lecturer_specialization' => 'nullable|string|max:255',
             'birth_place' => 'required|string|max:255',
             'birth_date' => 'required|date',
             'gender' => 'required|in:male,female',
@@ -229,6 +230,13 @@ class AdminMasterLecturerIndex extends Component
             'address' => 'required|string|max:500',
             'city' => 'required|string|max:255',
             'province' => 'required|string|max:255',
+            'studys' => 'required|array|min:1',
+        ];
+
+        $messages = [
+            'studys.required' => 'Prodi wajib diisi.',
+            'studys.array' => 'Prodi harus berupa array.',
+            'studys.min' => 'Pilih minimal satu Prodi.',
         ];
 
         if ($this->editMode) {
@@ -368,6 +376,7 @@ class AdminMasterLecturerIndex extends Component
     public function render()
     {
         $query = User::role('Dosen')
+            ->orderBy('name', 'asc')
             ->with(['userDetail'])
             ->whereHas('userDetail', function ($q) {
                 if ($this->search) {
@@ -391,6 +400,10 @@ class AdminMasterLecturerIndex extends Component
                     $q->where('lecturer_position', $this->positionFilter);
                 }
             });
+
+        if ($this->filterStudy) {
+            $query->whereJsonContains('studys', $this->filterStudy);
+        }
 
         $lecturers = $query->paginate($this->perPage);
 
@@ -416,7 +429,7 @@ class AdminMasterLecturerIndex extends Component
             'lecturers' => $lecturers,
             'faculties' => $faculties,
             'departments' => $departments,
-            'positions' => $positions
+            'positions' => $positions,
         ])
             ->extends('layout.app')
             ->section('content');

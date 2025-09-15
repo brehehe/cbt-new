@@ -96,23 +96,6 @@
                 <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Informasi Akademik</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                        <label for="student_program" class="block text-sm font-medium text-gray-700">Program
-                            Studi</label>
-                        <input id="student_program" type="text" wire:model.defer="student_program"
-                            placeholder="Contoh: Teknik Informatika" class="mt-1 form-control">
-                        @error('student_program')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label for="student_faculty" class="block text-sm font-medium text-gray-700">Fakultas</label>
-                        <input id="student_faculty" type="text" wire:model.defer="student_faculty"
-                            placeholder="Contoh: Fakultas Teknik" class="mt-1 form-control">
-                        @error('student_faculty')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
                         <label for="study_id" class="block text-sm font-medium text-gray-700">Prodi <span
                                 class="text-red-600">*</span></label>
                         <select class="form-control" wire:model.defer="study_id">
@@ -122,35 +105,6 @@
                             @endforeach
                         </select>
                         @error('study_id')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label for="student_class" class="block text-sm font-medium text-gray-700">Kelas</label>
-                        <input id="student_class" type="text" wire:model.defer="student_class"
-                            placeholder="Contoh: A" class="mt-1 form-control">
-                        @error('student_class')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label for="student_semester" class="block text-sm font-medium text-gray-700">Semester</label>
-                        <select id="student_semester" wire:model.defer="student_semester" class="mt-1 form-control">
-                            <option value="">Pilih Semester</option>
-                            @for ($i = 1; $i <= 14; $i++)
-                                <option value="{{ $i }}">Semester {{ $i }}</option>
-                            @endfor
-                        </select>
-                        @error('student_semester')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label for="student_academic_year" class="block text-sm font-medium text-gray-700">Tahun
-                            Akademik</label>
-                        <input id="student_academic_year" type="text" wire:model.defer="student_academic_year"
-                            placeholder="Contoh: 2024/2025" class="mt-1 form-control">
-                        @error('student_academic_year')
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
@@ -165,14 +119,6 @@
                             <option value="leave">Cuti</option>
                         </select>
                         @error('student_status')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label for="student_gpa" class="block text-sm font-medium text-gray-700">IPK</label>
-                        <input id="student_gpa" type="number" step="0.01" min="0" max="4"
-                            wire:model.defer="student_gpa" placeholder="Contoh: 3.75" class="mt-1 form-control">
-                        @error('student_gpa')
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>

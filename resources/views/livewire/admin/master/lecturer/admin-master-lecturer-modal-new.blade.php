@@ -82,16 +82,6 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="lecturer_faculty" class="block text-sm font-medium text-gray-700">Fakultas <span
-                            class="text-red-600">*</span></label>
-                    <input id="lecturer_faculty" type="text" wire:model.defer="lecturer_faculty"
-                        placeholder="Contoh : Fakultas Teknik" class="mt-1 form-control">
-                    @error('lecturer_faculty')
-                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="mb-4">
                     <label for="studys" class="block text-sm font-medium text-gray-700">
                         Prodi <span class="text-red-600">*</span>
                     </label>
@@ -115,23 +105,6 @@
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-
-                <div class="mb-4">
-                    <label for="lecturer_position" class="block text-sm font-medium text-gray-700">Jabatan Akademik
-                        <span class="text-red-600">*</span></label>
-                    <select id="lecturer_position" wire:model.defer="lecturer_position" class="mt-1 form-control">
-                        <option value="">Pilih Jabatan</option>
-                        <option value="Asisten Ahli">Asisten Ahli</option>
-                        <option value="Lektor">Lektor</option>
-                        <option value="Lektor Kepala">Lektor Kepala</option>
-                        <option value="Profesor">Profesor</option>
-                        <option value="Tenaga Pengajar">Tenaga Pengajar</option>
-                    </select>
-                    @error('lecturer_position')
-                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
                 <div class="mb-4">
                     <label for="lecturer_functional_position" class="block text-sm font-medium text-gray-700">Jabatan
                         Fungsional</label>

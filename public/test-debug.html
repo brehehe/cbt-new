@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>CBT Debug Test</title>
+    </head>
+
+    <body>
+        <h1>CBT System Debug Test</h1>
+
+        <div>
+            <h2>Countdown Test</h2>
+            <div id="countdown">00:00:00</div>
+            <button onclick="testCountdown()">Start Test Countdown (60 seconds)</button>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <h2>Camera Test</h2>
+            <video id="cameraPreview" width="320" height="240" autoplay style="border: 1px solid black;"></video>
+            <br>
+            <button onclick="testCamera()">Test Camera Access</button>
+            <div id="cameraStatus">Not started</div>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <h2>Recording Test</h2>
+            <div id="recordingStatus">Not started</div>
+            <div id="recordingInfo">-</div>
+        </div>
+
+        <script>
+            function testCountdown() {
+                console.log('🕐 Testing countdown...');
+                const countdownElement = document.getElementById("countdown");
+                let remainingTime = 60; // 60 seconds test
+
+                const interval = setInterval(() => {
+                    if (remainingTime <= 0) {
+                        countdownElement.innerHTML = "Time Up!";
+                        clearInterval(interval);
+                        return;
+                    }
+
+                    const minutes = Math.floor(remainingTime / 60);
+                    const seconds = remainingTime % 60;
+
+                    countdownElement.innerHTML = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    remainingTime--;
+                }, 1000);
+            }
+
+            async function testCamera() {
+                console.log('📹 Testing camera access...');
+                const video = document.getElementById('cameraPreview');
+                const status = document.getElementById('cameraStatus');
+
+                try {
+                    status.textContent = 'Requesting camera...';
+
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: { width: 640, height: 480 },
+                        audio: false
+                    });
+
+                    video.srcObject = stream;
+                    status.textContent = 'Camera active!';
+                    status.style.color = 'green';
+
+                    console.log('✅ Camera test successful');
+
+                    // Test recording
+                    testRecording(stream);
+
+                } catch (error) {
+                    console.error('❌ Camera test failed:', error);
+                    status.textContent = `Camera error: ${error.message}`;
+                    status.style.color = 'red';
+                }
+            }
+
+            function testRecording(stream) {
+                console.log('🎬 Testing recording...');
+                const recordingStatus = document.getElementById('recordingStatus');
+                const recordingInfo = document.getElementById('recordingInfo');
+
+                try {
+                    const mediaRecorder = new MediaRecorder(stream, {
+                        mimeType: 'video/webm',
+                        videoBitsPerSecond: 250000
+                    });
+
+                    recordingStatus.textContent = 'Recording started';
+                    recordingStatus.style.color = 'green';
+
+                    let chunks = [];
+
+                    mediaRecorder.ondataavailable = function (event) {
+                        if (event.data.size > 0) {
+                            chunks.push(event.data);
+                            recordingInfo.textContent = `Chunks: ${chunks.length}`;
+                        }
+                    };
+
+                    mediaRecorder.start(1000); // 1 second chunks for testing
+
+                    // Stop after 5 seconds for testing
+                    setTimeout(() => {
+                        mediaRecorder.stop();
+                        recordingStatus.textContent = 'Recording stopped';
+                        recordingInfo.textContent = `Final chunks: ${chunks.length}`;
+                    }, 5000);
+
+                } catch (error) {
+                    console.error('❌ Recording test failed:', error);
+                    recordingStatus.textContent = `Recording error: ${error.message}`;
+                    recordingStatus.style.color = 'red';
+                }
+            }
+        </script>
+    </body>
+
+</html>

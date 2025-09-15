@@ -90,15 +90,6 @@
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Fakultas <span
-                                        class="text-red-500">*</span></label>
-                                <input type="text" wire:model="lecturer_faculty" class="form-control mt-1">
-                                @error('lecturer_faculty')
-                                    <span class="text-red-500 text-xs">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Jurusan <span
                                         class="text-red-500">*</span></label>
                                 <input type="text" wire:model="lecturer_department" class="form-control mt-1">
@@ -106,23 +97,6 @@
                                     <span class="text-red-500 text-xs">{{ $message }}</span>
                                 @enderror
                             </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Jabatan Akademik <span
-                                        class="text-red-500">*</span></label>
-                                <select wire:model="lecturer_position" class="form-control mt-1">
-                                    <option value="">Pilih Jabatan</option>
-                                    <option value="Asisten Ahli">Asisten Ahli</option>
-                                    <option value="Lektor">Lektor</option>
-                                    <option value="Lektor Kepala">Lektor Kepala</option>
-                                    <option value="Profesor">Profesor</option>
-                                    <option value="Tenaga Pengajar">Tenaga Pengajar</option>
-                                </select>
-                                @error('lecturer_position')
-                                    <span class="text-red-500 text-xs">{{ $message }}</span>
-                                @enderror
-                            </div>
-
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Jabatan Fungsional</label>
                                 <input type="text" wire:model="lecturer_functional_position"

@@ -188,10 +188,21 @@ class AdminExamDetailIndex extends Component
             $actualVideoBlob = $videoBlob;
         }
 
+        // Extract compression info if available
+        $compressionInfo = null;
+        if (is_array($videoBlob) && isset($videoBlob['compressionInfo'])) {
+            $compressionInfo = $videoBlob['compressionInfo'];
+        } elseif (is_array($data) && isset($data['compressionInfo'])) {
+            $compressionInfo = $data['compressionInfo'];
+        }
+
         \Log::info('🚀 saveRecordingVideo METHOD CALLED!', [
             'called_at' => now()->toISOString(),
             'user_id' => Auth::id(),
             'is_emergency_recovery' => $isEmergencyRecovery,
+            'video_optimized' => $compressionInfo['optimized'] ?? false,
+            'compression_savings' => $compressionInfo['compressionSavings'] ?? '0%',
+            'original_size_mb' => $compressionInfo['originalSize'] ?? 'unknown',
             'raw_parameters' => func_get_args(),
             'video_blob_type' => gettype($videoBlob),
             'video_blob_received' => !empty($actualVideoBlob),
@@ -283,23 +294,37 @@ class AdminExamDetailIndex extends Component
                     'file_exists' => file_exists($fullPath)
                 ]);
 
-                // Update recording with final file info - this completes the recording
+                // Prepare metadata for recording
+                $metadata = [
+                    'compression_applied' => $compressionInfo['optimized'] ?? false,
+                    'compression_savings' => $compressionInfo['compressionSavings'] ?? '0%',
+                    'original_size_mb' => $compressionInfo['originalSize'] ?? 'unknown',
+                    'final_size_mb' => number_format($fileSize / (1024 * 1024), 2) . 'MB',
+                    'optimization_timestamp' => now()->toISOString()
+                ];
+
+                // Update recording with final file info and compression metadata
                 $updateResult = $this->currentRecording->update([
                     'video_path' => $filename,
                     'file_size' => $fileSize,
                     'end_time' => now(),
-                    'status' => 'completed'  // NOW we set it to completed after successful save
+                    'status' => 'completed',
+                    'metadata' => $metadata  // Store compression info
                 ]);
 
-                \Log::info('📝 Recording record updated', [
+                \Log::info('📝 Recording record updated with compression info', [
                     'update_result' => $updateResult,
-                    'recording_id' => $this->currentRecording->id
+                    'recording_id' => $this->currentRecording->id,
+                    'compression_applied' => $metadata['compression_applied'],
+                    'compression_savings' => $metadata['compression_savings']
                 ]);
 
-                \Log::info('🎉 Exam recording saved successfully', [
+                \Log::info('🎉 Optimized exam recording saved successfully', [
                     'user_id' => Auth::id(),
                     'filename' => $filename,
-                    'size' => $fileSize,
+                    'original_size_mb' => $metadata['original_size_mb'],
+                    'final_size_mb' => $metadata['final_size_mb'],
+                    'compression_savings' => $metadata['compression_savings'],
                     'recording_id' => $this->currentRecording->id
                 ]);
 
@@ -619,11 +644,23 @@ class AdminExamDetailIndex extends Component
     {
         $timetable = $this->userTimetable->load(['timetable.timetableModule:id,duration']);
 
+
+        // Check if start_exam is set, otherwise set it to now
+        if (!$this->userTimetable->start_exam) {
+            $this->userTimetable->update(['start_exam' => now()]);
+            $this->userTimetable->refresh();
+        }
+
         $startTime = Carbon::parse($this->userTimetable->start_exam);
-        $duration = $timetable->timetable->module->duration;
+        $duration = $timetable->timetable->module->duration ?? 60; // Default 60 minutes if not set
         $endTime = $startTime->addMinutes($duration);
 
         $this->remainingTime = max(0, $endTime->timestamp - now()->timestamp);
+        \Log::info('Countdown calculated', [
+            'start_exam' => $this->userTimetable->start_exam,
+            'duration' => $duration,
+            'remaining_seconds' => $this->remainingTime
+        ]);
     }
 
     private function refreshQuestionData()
@@ -806,26 +843,24 @@ class AdminExamDetailIndex extends Component
             'has_current_recording' => !is_null($this->currentRecording)
         ]);
 
-        // Single dispatch method to prevent multiple calls
+        // Single JavaScript call to prevent multiple dispatches
         try {
-            \Log::info('📡 Dispatching single stopRecording event...');
+            \Log::info('📡 Calling stopRecording directly via JavaScript...');
 
             $this->js('
-                console.log("🔔 finishExam() - Single stopRecording call");
+                console.log("🏁 finishExam() - Calling stopRecording once");
                 if (typeof stopRecording === "function" && !window.isRecordingStopping) {
-                    window.isRecordingStopping = true;
-                    console.log("🎬 Calling stopRecording() once from finishExam");
+                    console.log("🎬 Stopping recording from finishExam...");
                     stopRecording();
                 } else {
                     console.log("❌ stopRecording already in progress or function not found");
+                    console.log("isRecordingStopping flag:", window.isRecordingStopping);
                 }
             ');
-            \Log::info('✅ JavaScript dispatch successful');
+            \Log::info('✅ Direct JavaScript call completed');
         } catch (\Exception $e) {
-            \Log::error('❌ Error dispatching events: ' . $e->getMessage());
+            \Log::error('❌ Error calling stopRecording: ' . $e->getMessage());
         }
-
-        $this->dispatch('stopRecording');
 
         \Log::info('📡 Exam finished, recording stop events dispatched', [
             'user_id' => Auth::id(),
