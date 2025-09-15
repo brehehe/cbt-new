@@ -37,10 +37,10 @@
                     </button>
 
                     <!-- Manual Save Recording Button for Testing -->
-                    <button onclick="manualSaveRecording()"
+                    {{-- <button onclick="manualSaveRecording()"
                         class="px-3 py-2 text-xs font-medium transition-colors bg-blue-600 rounded sm:px-4 sm:text-sm hover:bg-blue-700">
                         💾 Save Video
-                    </button>
+                    </button> --}}
                 </div>
             </div>
         </div>
@@ -1662,7 +1662,8 @@
                             console.log('📡 Dispatch method completed');
                             if (!saveSuccess) {
                                 alert(
-                                    `📡 Video dispatched ke server (${sizeInMB}MB) - cek server logs untuk konfirmasi`);
+                                    `📡 Video dispatched ke server (${sizeInMB}MB) - cek server logs untuk konfirmasi`
+                                    );
                             }
                         }, 2000);
 
