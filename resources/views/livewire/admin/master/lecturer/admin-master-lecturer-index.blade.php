@@ -61,16 +61,13 @@
                             Dosen
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            ID/NIDN
+                            ID
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Jurusan
+                            NIDN
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Jabatan
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Spesialisasi
+                            NIP
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Aksi
@@ -98,23 +95,15 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">{{ $lecturer->userDetail->lecturer_id ?? '-' }}</div>
-                                <div class="text-sm text-gray-500">NIDN:
-                                    {{ $lecturer->userDetail->lecturer_nidn ?? '-' }}</div>
+
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    {{ $lecturer->userDetail->lecturer_department ?? '-' }}</div>
-                                <div class="text-sm text-gray-500">{{ $lecturer->userDetail->lecturer_faculty ?? '-' }}
+                                <div class="text-sm text-gray-900">{{ $lecturer->userDetail->lecturer_nidn ?? '-' }}
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    {{ $lecturer->userDetail->lecturer_position ?? '-' }}</div>
-                                <div class="text-sm text-gray-500">
-                                    {{ $lecturer->userDetail->lecturer_education_level ?? '-' }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $lecturer->userDetail->lecturer_specialization ?? '-' }}
+                                <div class="text-sm text-gray-900">{{ $lecturer->userDetail->lecturer_nip ?? '-' }}
+                                </div>
                             </td>
                             <td class="center">
                                 <div class="flex items-center">

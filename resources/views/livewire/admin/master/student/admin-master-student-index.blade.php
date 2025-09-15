@@ -81,12 +81,6 @@
                             Prodi
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Semester/Angkatan
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Fakultas
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Status
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -134,21 +128,6 @@
                                 @if ($admin->userDetail && $admin->userDetail->student_major)
                                     <div class="text-sm text-gray-500">{{ $admin->userDetail->student_major }}</div>
                                 @endif
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    @if ($admin->userDetail && $admin->userDetail->student_semester)
-                                        Semester {{ $admin->userDetail->student_semester }}
-                                    @else
-                                        -
-                                    @endif
-                                </div>
-                                <div class="text-sm text-gray-500">
-                                    Angkatan: {{ $admin->userDetail->student_batch ?? '-' }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $admin->userDetail->student_faculty ?? '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if ($admin->userDetail)
