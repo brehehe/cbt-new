@@ -28,6 +28,7 @@ return new class extends Migration
             $table->bigInteger('order')->default(0);
             $table->jsonb('alternative_contacts')->nullable()->after('phone')->comment('Alternative emails/phones for different contexts');
             $table->enum('type_user', ['employee', 'patient'])->default('employee')->comment('Type of user: employee, or patient');
+            $table->boolean('is_student')->default(false)->comment('Flag to indicate if the user is a student');
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

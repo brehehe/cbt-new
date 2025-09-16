@@ -255,6 +255,7 @@ class UserDetailSeeder extends Seeder
                     ->where('company_id', $companyId)
                     ->inRandomOrder()
                     ->first()->id,
+                'is_student'=> rand(0,1),
             ]);
 
             $user->assignRole('Mahasiswa');
@@ -312,6 +313,7 @@ class UserDetailSeeder extends Seeder
                     ->where('company_id', $companyId)
                     ->inRandomOrder()
                     ->first()->id,
+                'is_student'=> rand(0,1),
             ]);
 
             $mahasiswa->assignRole('Mahasiswa');

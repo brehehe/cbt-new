@@ -64,14 +64,13 @@
                 <!-- Mobile Company Info Button -->
 
                 <!-- Notifications -->
-                <div x-data="{ open: false }" class="relative">
+                <!-- <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open"
                         class="p-2 rounded-xl text-gray-500 hover:bg-[#C3D4EC]/20 hover:text-[#f58634] transition-all duration-200 relative">
                         <i class="fas fa-bell text-lg"></i>
                         <span
                             class="absolute top-1 right-1 h-4 w-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center">3</span>
                     </button>
-                    <!-- Notifications Dropdown -->
                     <div x-show="open" x-transition @click.away="open = false"
                         class="absolute right-0 mt-2 w-72 sm:w-80 bg-white border border-gray-200 rounded-xl shadow-lg z-50">
                         <div class="p-4 font-semibold text-gray-700 border-b">Notifikasi</div>
@@ -93,7 +92,7 @@
                             Lihat semua notifikasi
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Profile Dropdown -->
                 <div x-data="{ open: false }" class="relative cursor-pointer">
@@ -126,15 +125,15 @@
                             </p>
                         </div>
                         <div class="p-2">
-                            <a href="#"
+                            <a href="/admin/profile/profile"
                                 class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-[#f58634] rounded-lg transition-all duration-200">
                                 <i class="fas fa-user w-4"></i>
                                 <span>Profile</span>
                             </a>
-                            <a href="#"
+                            <a href="/admin/change-password/change-password"
                                 class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-[#f58634] rounded-lg transition-all duration-200">
-                                <i class="fas fa-cog w-4"></i>
-                                <span>Settings</span>
+                                <i class="fas fa-lock w-4"></i>
+                                <span>Rubah Password</span>
                             </a>
                             <hr class="my-1 border-gray-100">
                             <a href="/logout"

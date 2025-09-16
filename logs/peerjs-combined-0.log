@@ -806,3 +806,77 @@ Press Ctrl+C to stop servers
 2025-09-15T16:34:34: 🔴 HTTP Client disconnected: 5caf705a-f747-4dc9-8152-2ecf4772a88e
 2025-09-15T16:34:37: 🟢 HTTP Client connected: 54a8b200-e1d6-40df-afa1-99c5fc203cb2
 2025-09-15T16:38:06: 🔴 HTTP Client disconnected: 54a8b200-e1d6-40df-afa1-99c5fc203cb2
+2025-09-15T16:56:11: 🟢 HTTP Client connected: 61c76101-44d4-4ed4-a5c8-4cf6376e60e1
+2025-09-15T16:59:11: 🔴 HTTP Client disconnected: 61c76101-44d4-4ed4-a5c8-4cf6376e60e1
+2025-09-16T09:14:34: 🚀 Starting HTTP PeerJS Server...
+2025-09-16T09:14:34: 🔒 SSL certificates found, starting HTTPS PeerJS Server...
+2025-09-16T09:14:35: ✅ HTTPS PeerJS Server enabled
+2025-09-16T09:14:35: 
+📡 PeerJS Servers Status:
+2025-09-16T09:14:35: ═══════════════════════════════
+2025-09-16T09:14:35: 
+📄 HTTP PeerJS Server (for backward compatibility):
+2025-09-16T09:14:35:    Port: 9000
+2025-09-16T09:14:35:    Protocol: HTTP
+2025-09-16T09:14:35:    🔗 http://213.210.21.140:9000/peerjs
+2025-09-16T09:14:35: 
+🔒 HTTPS PeerJS Server (for HTTPS websites):
+2025-09-16T09:14:35:    Port: 9443
+2025-09-16T09:14:35:    Protocol: HTTPS
+2025-09-16T09:14:35:    🔗 https://213.210.21.140:9443/peerjs
+2025-09-16T09:14:35: 
+🌐 Client Configuration:
+2025-09-16T09:14:35: ════════════════════════════
+2025-09-16T09:14:35: For HTTPS websites (https://cbt-new.drshieldapp.com):
+2025-09-16T09:14:35:    ✅ Will use: https://213.210.21.140:9443/peerjs
+2025-09-16T09:14:35: 
+For HTTP websites:
+2025-09-16T09:14:35:    ✅ Will use: http://213.210.21.140:9000/peerjs
+2025-09-16T09:14:35: 
+🔍 Health Check URLs:
+2025-09-16T09:14:35: ═══════════════════════
+2025-09-16T09:14:35: HTTP:  http://213.210.21.140:9000/peerjs
+2025-09-16T09:14:35: HTTPS: https://213.210.21.140:9443/peerjs
+2025-09-16T09:14:36: 
+🎉 PeerJS Servers Ready!
+2025-09-16T09:14:36: ═══════════════════════════
+2025-09-16T09:14:36: ✅ Both HTTP and HTTPS servers running
+2025-09-16T09:14:36: ✅ HTTPS websites can now connect
+2025-09-16T09:14:36: 
+Press Ctrl+C to stop servers
+2025-09-16T10:52:45: 🚀 Starting HTTP PeerJS Server...
+2025-09-16T10:52:45: 🔒 SSL certificates found, starting HTTPS PeerJS Server...
+2025-09-16T10:52:47: ✅ HTTPS PeerJS Server enabled
+2025-09-16T10:52:47: 
+📡 PeerJS Servers Status:
+2025-09-16T10:52:47: ═══════════════════════════════
+2025-09-16T10:52:47: 
+📄 HTTP PeerJS Server (for backward compatibility):
+2025-09-16T10:52:47:    Port: 9000
+2025-09-16T10:52:47:    Protocol: HTTP
+2025-09-16T10:52:47:    🔗 http://213.210.21.140:9000/peerjs
+2025-09-16T10:52:47: 
+🔒 HTTPS PeerJS Server (for HTTPS websites):
+2025-09-16T10:52:47:    Port: 9443
+2025-09-16T10:52:47:    Protocol: HTTPS
+2025-09-16T10:52:47:    🔗 https://213.210.21.140:9443/peerjs
+2025-09-16T10:52:47: 
+🌐 Client Configuration:
+2025-09-16T10:52:47: ════════════════════════════
+2025-09-16T10:52:47: For HTTPS websites (https://cbt-new.drshieldapp.com):
+2025-09-16T10:52:47:    ✅ Will use: https://213.210.21.140:9443/peerjs
+2025-09-16T10:52:47: 
+For HTTP websites:
+2025-09-16T10:52:47:    ✅ Will use: http://213.210.21.140:9000/peerjs
+2025-09-16T10:52:47: 
+🔍 Health Check URLs:
+2025-09-16T10:52:47: ═══════════════════════
+2025-09-16T10:52:47: HTTP:  http://213.210.21.140:9000/peerjs
+2025-09-16T10:52:47: HTTPS: https://213.210.21.140:9443/peerjs
+2025-09-16T10:52:48: 
+🎉 PeerJS Servers Ready!
+2025-09-16T10:52:48: ═══════════════════════════
+2025-09-16T10:52:48: ✅ Both HTTP and HTTPS servers running
+2025-09-16T10:52:48: ✅ HTTPS websites can now connect
+2025-09-16T10:52:48: 
+Press Ctrl+C to stop servers

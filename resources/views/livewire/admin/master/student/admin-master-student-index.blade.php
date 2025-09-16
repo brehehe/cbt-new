@@ -41,15 +41,31 @@
 
             <!-- Status Filter -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select wire:model.live="statusFilter" class="form-control mt-1">
-                    <option value="">Semua Status</option>
-                    <option value="active">Aktif</option>
-                    <option value="graduate">Lulus</option>
-                    <option value="dropout">Dropout</option>
-                    <option value="transfer">Pindah</option>
-                    <option value="leave">Cuti</option>
-                </select>
+                <div class="flex items-center gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <select wire:model.live="statusFilter" class="form-control mt-1">
+                            <option value="">Semua Status</option>
+                            <option value="active">Aktif</option>
+                            <option value="graduate">Lulus</option>
+                            <option value="dropout">Dropout</option>
+                            <option value="transfer">Pindah</option>
+                            <option value="leave">Cuti</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Mahasiswa</label>
+                        <div class="flex items-center mt-2" wire:key="{{ rand() }}">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" wire:model.live="isStudent"
+                                    class="sr-only peer">
+                                <div
+                                    class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Per Page -->
@@ -82,6 +98,9 @@
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Status
+                        </th>
+                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Tipe
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Aksi
@@ -158,6 +177,18 @@
                                         -
                                     </span>
                                 @endif
+                            </td>
+                            <td>
+                                @php
+                                    $status = $admin->is_student;
+                                    $isStudentColors = $status == true ? 'bg-green-100 text-green-800' : 'bg-danger-100 text-danger-800';
+                                    $isStudentLabels = $status == true ? 'Mahasiswa' : 'PMB';
+                                @endphp
+
+                                <span
+                                    class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $isStudentColors }}">
+                                    {{ $isStudentLabels }}
+                                </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">

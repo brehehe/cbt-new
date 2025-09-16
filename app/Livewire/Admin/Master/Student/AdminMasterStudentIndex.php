@@ -100,6 +100,7 @@ class AdminMasterStudentIndex extends Component
     public $notes;
     public $studys = [];
     public $study_id;
+    public $isStudent;
 
     public function openModal()
     {
@@ -654,6 +655,10 @@ class AdminMasterStudentIndex extends Component
             $user->whereHas('userDetail', function ($query) {
                 $query->where('student_status', $this->statusFilter);
             });
+        }
+
+        if ($this->isStudent) {
+            $user->where('is_student', $this->isStudent);
         }
 
         return view('livewire.admin.master.student.admin-master-student-index', [

@@ -70,6 +70,14 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
     Route::get('/students', \App\Livewire\Admin\StudentManagement::class)->name('admin.students');
     Route::get('/lecturers', \App\Livewire\Admin\LecturerManagement::class)->name('admin.lecturers');
 
+    Route::group(['namespace' => 'Profile', 'prefix' => 'profile'], function () {
+        Route::get('/profile', 'AdminProfileIndex')->name('user.profile.profile');
+    });
+
+    Route::group(['namespace' => 'ChangePassword', 'prefix' => 'change-password'], function () {
+        Route::get('/change-password', 'AdminChangePasswordIndex')->name('user.change-password.change-password');
+    });
+
     Route::group(['namespace' => 'Exam', 'prefix' => 'exam'], function () {
         Route::get('/timetable', 'Timetable\AdminExamTimetableIndex')->name('admin.exam.timetable');
         Route::get('/history-timetable', 'HistoryTimetable\AdminExamHistoryTimetableIndex')->name('admin.exam.history-timetable');

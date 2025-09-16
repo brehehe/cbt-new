@@ -98,7 +98,7 @@
                     <div>
                         <label for="study_id" class="block text-sm font-medium text-gray-700">Prodi <span
                                 class="text-red-600">*</span></label>
-                        <select class="form-control" wire:model.defer="study_id">
+                        <select class="mt-1 form-control" wire:model.defer="study_id">
                             <option value="">Pilih Prodi</option>
                             @foreach ($studys as $id => $name)
                                 <option value="{{ $id }}">{{ $name }}</option>
