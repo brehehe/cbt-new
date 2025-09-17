@@ -67,6 +67,7 @@ class AdminMasterStudentIndex extends Component
     public $student_advisor_id;
     public $student_entry_date;
     public $student_graduation_date;
+    public $username;
 
     // Personal Information
     public $birth_date;
@@ -101,6 +102,8 @@ class AdminMasterStudentIndex extends Component
     public $studys = [];
     public $study_id;
     public $isStudent;
+    public $isStudentFilter;
+    public $type_study;
 
     public function openModal()
     {
@@ -142,6 +145,7 @@ class AdminMasterStudentIndex extends Component
             'birth_date',
             'birth_place',
             'gender',
+            'type_study',
             'religion',
             'nationality',
             'marital_status',
@@ -183,6 +187,8 @@ class AdminMasterStudentIndex extends Component
             $this->profile_old = $user->profile;
             $this->study_id = $user->study_id;
             $this->phone = trim($user->phone ?? '');
+            $this->type_study = $user->type_study;
+            $this->username = $user->username;
 
             if ($user->userDetail) {
                 $detail = $user->userDetail;
@@ -274,93 +280,151 @@ class AdminMasterStudentIndex extends Component
     {
         $currentCompanyId = Auth::user()->company_id;
 
-        $validatedData = $this->validate([
-            'name' => 'required|string|max:255',
-            'nim' => [
-                'required',
-                'string',
-                'min:4',
-                'regex:/^\S*$/u', // tidak boleh ada spasi
-                Rule::unique('users', 'nim')
-                    ->where('type_user', 'employee')
-                    ->where('company_id', $currentCompanyId)
-                    ->ignore($this->data_id),
-            ],
-            'email' => [
-                'required',
-                'email',
-                'max:255',
-                Rule::unique('users', 'email')
-                    ->where('type_user', 'employee')
-                    ->where('company_id', $currentCompanyId)
-                    ->ignore($this->data_id),
-            ],
-            'password' => $this->data_id ? 'nullable|string|min:8' : 'required|string|min:8',
-            'profile' => 'nullable|image|max:2048',
-            'phone' => [
-                'required',
-                'string',
-                'max:15',
-                Rule::unique('users', 'phone')
-                    ->where('type_user', 'employee')
-                    ->where('company_id', $currentCompanyId)
-                    ->ignore($this->data_id),
-            ],
-            'address' => 'required|string|max:500',
-            'identity_number' => 'nullable|string|max:20',
-            'study_id' => 'required|exists:studies,id',
-            // Student Specific Validation
-            'student_id' => 'nullable|string|max:20',
-            'student_program' => 'nullable|string|max:100',
-            'student_faculty' => 'nullable|string|max:100',
-            'student_department' => 'nullable|string|max:100',
-            'student_class' => 'nullable|string|max:10',
-            'student_semester' => 'nullable|string|max:10',
-            'student_academic_year' => 'nullable|string|max:20',
-            'student_status' => 'nullable|in:active,graduate,dropout,transfer,leave',
-            'student_gpa' => 'nullable|numeric|min:0|max:4',
-            'student_advisor_id' => 'nullable|string|max:50',
-            'student_entry_date' => 'nullable|date',
-            'student_graduation_date' => 'nullable|date|after_or_equal:student_entry_date',
+        if($this->type_study == 'mahasiswa') {
+            $validatedData = $this->validate([
+                'name' => 'required|string|max:255',
+                'nim' => [
+                    'required',
+                    'string',
+                    'min:4',
+                    'regex:/^\S*$/u', // tidak boleh ada spasi
+                    Rule::unique('users', 'nim')
+                        ->where('type_user', 'employee')
+                        ->where('company_id', $currentCompanyId)
+                        ->ignore($this->data_id),
+                ],
+                'email' => [
+                    'required',
+                    'email',
+                    'max:255',
+                    Rule::unique('users', 'email')
+                        ->where('type_user', 'employee')
+                        ->where('company_id', $currentCompanyId)
+                        ->ignore($this->data_id),
+                ],
+                'password' => $this->data_id ? 'nullable|string|min:8' : 'required|string|min:8',
+                'profile' => 'nullable|image|max:2048',
+                'phone' => [
+                    'required',
+                    'string',
+                    'max:15',
+                    Rule::unique('users', 'phone')
+                        ->where('type_user', 'employee')
+                        ->where('company_id', $currentCompanyId)
+                        ->ignore($this->data_id),
+                ],
+                'username' => [
+                    'nullable',
+                    'string',
+                    'regex:/^\S*$/u', // tidak boleh ada spasi
+                    'max:255',
+                    Rule::unique('users', 'username')
+                        ->where('type_user', 'employee')
+                        ->where('company_id', $currentCompanyId)
+                        ->ignore($this->data_id),
+                ],
+                'address' => 'required|string|max:500',
+                'identity_number' => 'nullable|string|max:20',
+                'study_id' => 'required|exists:studies,id',
+                // Student Specific Validation
+                'student_id' => 'nullable|string|max:20',
+                'student_program' => 'nullable|string|max:100',
+                'student_faculty' => 'nullable|string|max:100',
+                'student_department' => 'nullable|string|max:100',
+                'student_class' => 'nullable|string|max:10',
+                'student_semester' => 'nullable|string|max:10',
+                'student_academic_year' => 'nullable|string|max:20',
+                'student_status' => 'nullable|in:active,graduate,dropout,transfer,leave',
+                'student_gpa' => 'nullable|numeric|min:0|max:4',
+                'student_advisor_id' => 'nullable|string|max:50',
+                'student_entry_date' => 'nullable|date',
+                'student_graduation_date' => 'nullable|date|after_or_equal:student_entry_date',
 
-            // Personal Information Validation
-            'birth_date' => 'nullable|date|before:today',
-            'birth_place' => 'nullable|string|max:100',
-            'gender' => 'nullable|in:male,female',
-            'religion' => 'nullable|string|max:50',
-            'nationality' => 'nullable|string|max:50',
-            'marital_status' => 'nullable|in:single,married,divorced,widowed',
-            'postal_code' => 'nullable|string|max:10',
-            'city' => 'nullable|string|max:100',
-            'province' => 'nullable|string|max:100',
-            'country' => 'nullable|string|max:3',
-            'mobile_phone' => 'nullable|string|max:15',
-            'emergency_contact_name' => 'nullable|string|max:255',
-            'emergency_contact_phone' => 'nullable|string|max:15',
-            'emergency_contact_relation' => 'nullable|string|max:50',
-            'identity_type' => 'nullable|string|max:20',
-            'blood_group' => 'nullable|in:A,B,AB,O',
+                // Personal Information Validation
+                'birth_date' => 'nullable|date|before:today',
+                'birth_place' => 'nullable|string|max:100',
+                'gender' => 'nullable|in:male,female',
+                'religion' => 'nullable|string|max:50',
+                'nationality' => 'nullable|string|max:50',
+                'marital_status' => 'nullable|in:single,married,divorced,widowed',
+                'postal_code' => 'nullable|string|max:10',
+                'city' => 'nullable|string|max:100',
+                'province' => 'nullable|string|max:100',
+                'country' => 'nullable|string|max:3',
+                'mobile_phone' => 'nullable|string|max:15',
+                'emergency_contact_name' => 'nullable|string|max:255',
+                'emergency_contact_phone' => 'nullable|string|max:15',
+                'emergency_contact_relation' => 'nullable|string|max:50',
+                'identity_type' => 'nullable|string|max:20',
+                'blood_group' => 'nullable|in:A,B,AB,O',
 
-            // Academic Performance Validation
-            'total_exams_taken' => 'nullable|integer|min:0',
-            'average_score' => 'nullable|numeric|min:0|max:100',
-            'exam_preference' => 'nullable|string|max:100',
-            'special_needs' => 'nullable|boolean',
-            'special_needs_description' => 'nullable|string|max:500',
+                // Academic Performance Validation
+                'total_exams_taken' => 'nullable|integer|min:0',
+                'average_score' => 'nullable|numeric|min:0|max:100',
+                'exam_preference' => 'nullable|string|max:100',
+                'special_needs' => 'nullable|boolean',
+                'special_needs_description' => 'nullable|string|max:500',
 
-            // System Settings Validation
-            'preferred_language' => 'nullable|string|max:10',
-            'verification_status' => 'nullable|in:pending,verified,rejected',
-            'notes' => 'nullable|string|max:1000',
-        ]);
-
+                // System Settings Validation
+                'preferred_language' => 'nullable|string|max:10',
+                'verification_status' => 'nullable|in:pending,verified,rejected',
+                'notes' => 'nullable|string|max:1000',
+            ],[
+                'study_id.required' => 'Program studi wajib diisi.',
+            ]);
+        } elseif ($this->type_study == 'general') {
+            $this->validate([
+                'name' => 'required|string|max:255',
+                'phone' => [
+                    'required',
+                    'string',
+                    'max:15',
+                    Rule::unique('users', 'phone')
+                        ->where('type_user', 'employee')
+                        ->where('company_id', $currentCompanyId)
+                        ->ignore($this->data_id),
+                ],
+                 'nim' => [
+                    'nullable',
+                    'string',
+                    'regex:/^\S*$/u', // tidak boleh ada spasi
+                    'max:255',
+                    Rule::unique('users', 'nim')
+                        ->where('type_user', 'employee')
+                        ->where('company_id', $currentCompanyId)
+                        ->ignore($this->data_id),
+                ],
+                'username' => [
+                    'required',
+                    'string',
+                    'regex:/^\S*$/u', // tidak boleh ada spasi
+                    'max:255',
+                    Rule::unique('users', 'username')
+                        ->where('type_user', 'employee')
+                        ->where('company_id', $currentCompanyId)
+                        ->ignore($this->data_id),
+                ],
+                'email' => [
+                    'required',
+                    'email',
+                    'max:255',
+                    Rule::unique('users', 'email')
+                        ->where('type_user', 'employee')
+                        ->where('company_id', $currentCompanyId)
+                        ->ignore($this->data_id),
+                ],
+                'study_id' => 'nullable|exists:studies,id',
+                'password' => $this->data_id ? 'nullable|string|min:8' : 'required|string|min:8',
+                'address' => 'required|string|max:500',
+            ]);
+        }
 
         try {
             // Mulai database transaction
             DB::beginTransaction();
-
             // Handle user creation/update
-            $userResult = $this->handleUserIdentityResolution($currentCompanyId, $validatedData);
+            if ($this->type_study == 'mahasiswa') {
+                $userResult = $this->handleUserIdentityResolution($currentCompanyId, $validatedData);
 
             if (!$userResult['success']) {
                 DB::rollBack();
@@ -372,6 +436,32 @@ class AdminMasterStudentIndex extends Component
 
             // Update user detail
             $this->updateUserDetail($user, $validatedData);
+            } else {
+                $user = User::updateOrCreate(
+                    ['id' => $this->data_id],
+                    [
+                        'name' => $this->name,
+                        'nim' => $this->nim,
+                        'username' => $this->username,
+                        'email' => $this->email,
+                        'password' => $this->password ? Hash::make($this->password) : ($this->data_id ? User::find($this->data_id)->password : null),
+                        'phone' => trim($this->phone),
+                        'study_id' => $this->study_id,
+                        'company_id' => $currentCompanyId,
+                        'type_user' => 'employee',
+                        'type_study' => $this->type_study ?? 'general',
+                    ]
+                );
+
+                $userDetailData = [
+                    'address' => $this->address,
+                ];
+
+                UserDetail::updateOrCreate(
+                    ['user_id' => $user->id],
+                    $userDetailData
+                );
+            }
 
             // Assign role (hanya untuk karyawan)
             $this->assignUserRole($user, $currentCompanyId);
@@ -402,6 +492,7 @@ class AdminMasterStudentIndex extends Component
                 'company_id' => $currentCompanyId,
                 'data' => [
                     'name' => $this->name,
+                    'username' => $this->username,
                     'email' => $this->email,
                     'nim' => $this->nim,
                     'type_user' => 'employee',
@@ -440,7 +531,6 @@ class AdminMasterStudentIndex extends Component
             if ($this->data_id) {
                 return $this->updateExistingUser($companyId, $validatedData);
             }
-
             // Untuk user baru, buat user baru
             $user = $this->createNewUser($companyId, $validatedData);
 
@@ -477,12 +567,14 @@ class AdminMasterStudentIndex extends Component
         // Prepare update data
         $updateData = [
             'name' => $validatedData['name'],
+            'username' => $validatedData['username'] ?? null,
             'nim' => $validatedData['nim'],
             'email' => $validatedData['email'],
             'phone' => trim($validatedData['phone']),
             'study_id' => $validatedData['study_id'],
             'company_id' => $companyId,
             'type_user' => 'employee',
+            'type_study' => $this->type_study ?? 'general',
         ];
 
         // Handle password update
@@ -517,12 +609,14 @@ class AdminMasterStudentIndex extends Component
         $createData = [
             'name' => $validatedData['name'],
             'nim' => $validatedData['nim'],
+            'username' => $validatedData['username'] ?? null,
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
             'phone' => trim($validatedData['phone']),
             'study_id' => $validatedData['study_id'],
             'company_id' => $companyId,
             'type_user' => 'employee',
+            'type_study' => $this->type_study ?? 'general',
         ];
 
         // Handle profile image
@@ -657,8 +751,8 @@ class AdminMasterStudentIndex extends Component
             });
         }
 
-        if ($this->isStudent) {
-            $user->where('is_student', $this->isStudent);
+        if ($this->isStudentFilter) {
+            $user->where('type_study', $this->isStudentFilter);
         }
 
         return view('livewire.admin.master.student.admin-master-student-index', [

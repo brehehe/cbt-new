@@ -20,7 +20,7 @@
 
     <!-- Filters -->
     <div class="bg-white rounded-lg shadow mb-6 p-4">
-        <div class="grid grid-cols-3 md:grid-cols-3 gap-4 items-end">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <!-- Search -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Cari</label>
@@ -39,45 +39,26 @@
                 </select>
             </div>
 
-            <!-- Status Filter -->
-            <div>
-                <div class="flex items-center gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                            <select wire:model.live="statusFilter" class="form-control mt-1">
-                            <option value="">Semua Status</option>
-                            <option value="active">Aktif</option>
-                            <option value="graduate">Lulus</option>
-                            <option value="dropout">Dropout</option>
-                            <option value="transfer">Pindah</option>
-                            <option value="leave">Cuti</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Mahasiswa</label>
-                        <div class="flex items-center mt-2" wire:key="{{ rand() }}">
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" wire:model.live="isStudent"
-                                    class="sr-only peer">
-                                <div
-                                    class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
+             <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select wire:model.live="statusFilter" class="form-control mt-1">
+                    <option value="">Semua Status</option>
+                    <option value="active">Aktif</option>
+                    <option value="graduate">Lulus</option>
+                    <option value="dropout">Dropout</option>
+                    <option value="transfer">Pindah</option>
+                    <option value="leave">Cuti</option>
+                </select>
             </div>
 
-            <!-- Per Page -->
-            <!-- <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Per Halaman</label>
-                <select wire:model.live="perPage" class="form-control mt-1">
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
+             <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tipe</label>
+                    <select wire:model.live="isStudentFilter" class="form-control mt-1">
+                    <option value="">Semua Tipe</option>
+                    <option value="mahasiswa">Mahasiswa</option>
+                    <option value="general">General</option>
                 </select>
-            </div> -->
+            </div>
         </div>
     </div>
 
@@ -91,7 +72,7 @@
                             Mahasiswa
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            NIM/ID
+                            NIM/Username
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Prodi
@@ -134,7 +115,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">
-                                    {{ $admin->nim ?? '-' }}
+                                    {{ $admin->nim ?? $admin->username ?? '-' }}
                                 </div>
                                 @if ($admin->userDetail && $admin->userDetail->student_id)
                                     <div class="text-sm text-gray-500">ID: {{ $admin->userDetail->student_id }}</div>
@@ -180,9 +161,9 @@
                             </td>
                             <td>
                                 @php
-                                    $status = $admin->is_student;
-                                    $isStudentColors = $status == true ? 'bg-green-100 text-green-800' : 'bg-danger-100 text-danger-800';
-                                    $isStudentLabels = $status == true ? 'Mahasiswa' : 'PMB';
+                                    $typeStudy = $admin->type_study;
+                                    $isStudentColors = $typeStudy == 'mahasiswa' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800';
+                                    $isStudentLabels = $typeStudy == 'mahasiswa' ? 'Mahasiswa' : 'General';
                                 @endphp
 
                                 <span

@@ -28,7 +28,9 @@ return new class extends Migration
             $table->bigInteger('order')->default(0);
             $table->jsonb('alternative_contacts')->nullable()->after('phone')->comment('Alternative emails/phones for different contexts');
             $table->enum('type_user', ['employee', 'patient'])->default('employee')->comment('Type of user: employee, or patient');
-            $table->boolean('is_student')->default(false)->comment('Flag to indicate if the user is a student');
+            $table->enum('type_study',['default','mahasiswa','general'])->default('default')->comment('Type of study: default, mahasiswa, or general');
+            $table->boolean('is_head')->default(true)->comment('Apakah role ini adalah kepala dari perusahaan atau tidak');
+            $table->boolean('is_active')->default(true)->comment('Status aktif dari role ini');
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

@@ -15,6 +15,9 @@ class RoleHelper
     {
         $is_head   = $is_head ?? false;
         $is_active = $is_active ?? true;
+        $user->is_head = $is_head;
+        $user->is_active = $is_active;
+        $user->save();
 
         // Cari role global dulu
         $role = Role::where('name', $roleName)->firstOrFail();

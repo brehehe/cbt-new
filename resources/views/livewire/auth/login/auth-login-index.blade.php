@@ -1118,10 +1118,10 @@
                                         </button> --}}
                                     </div>
                                 </form>
-                                <div class="mt-4 text-center">
+                                <!-- <div class="mt-4 text-center">
                                     <a href="{{ route('register') }}"
                                         class="text-orange-500 hover:text-orange-700 text-sm">Buat Akun ?</a>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
 
