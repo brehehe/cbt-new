@@ -232,12 +232,12 @@
             </div>
         </div>
 
-        <!-- Peringkat Kelas -->
+        <!-- Peringkat Peserta -->
         <div
             class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 fade-in">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm text-gray-600 mb-1">Peringkat Kelas</p>
+                    <p class="text-sm text-gray-600 mb-1">Peringkat Peserta</p>
                     <h3 class="text-3xl font-bold text-[#f58634]">#{{ $classRank ?? '-' }}</h3>
                     <div class="flex items-center mt-2">
                         <span class="text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded-full">

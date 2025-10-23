@@ -1,11 +1,11 @@
-@section('title', 'Kelas')
+@section('title', 'Data Peserta')
 <div>
     {{-- Stop trying to control. --}}
     @include('livewire.admin.master.classmate.admin-master-classmate-modal')
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#f58634]">Data Kelas</h1>
+                <h1 class="text-2xl font-bold text-[#f58634]">Data Peserta</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div>
@@ -51,6 +51,8 @@
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama
                         </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipe Peserta
+                        </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Deskripsi</th>
                         <th style="width: 10px;"
@@ -63,8 +65,10 @@
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ $classmates->firstItem() + $index }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $result?->name }}
-                            </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $result?->name }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $result?->type_study == 'general' ? 'General' : 'Kelas' }}
+                                </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $result?->description }}
                             </td>
                             <td class="text-right">
@@ -92,7 +96,7 @@
                     @empty
                         <tr>
                             <td colspan="7" class="px-6 py-4 text-center text-gray-500">
-                                Tidak ada data Kelas ditemukan.
+                                Tidak ada data Peserta ditemukan.
                             </td>
                         </tr>
                     @endforelse

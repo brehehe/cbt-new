@@ -611,17 +611,17 @@ class AdminDashboardIndex extends Component
                 ->get();
 
             // System performance metrics - REAL TIME
-            $this->systemPerformance = [
-                'avg_response_time' => $this->getRealServerResponseTime(),
-                'system_uptime' => $this->getRealSystemUptime(),
-                'concurrent_users' => $this->getRealConcurrentUsers(),
-                'server_load' => $this->getRealServerLoad(),
-                'realtime_metrics' => $this->getRealTimeSystemMetrics(),
-                'network_status' => $this->getRealNetworkStatus(),
-                'memory_usage' => $this->getRealMemoryUsage(),
-                'cpu_usage' => $this->getRealCpuUsage(),
-                'disk_usage' => $this->getRealDiskUsage()
-            ];
+            // $this->systemPerformance = [
+            //     'avg_response_time' => $this->getRealServerResponseTime(),
+            //     'system_uptime' => $this->getRealSystemUptime(),
+            //     'concurrent_users' => $this->getRealConcurrentUsers(),
+            //     'server_load' => $this->getRealServerLoad(),
+            //     'realtime_metrics' => $this->getRealTimeSystemMetrics(),
+            //     'network_status' => $this->getRealNetworkStatus(),
+            //     'memory_usage' => $this->getRealMemoryUsage(),
+            //     'cpu_usage' => $this->getRealCpuUsage(),
+            //     'disk_usage' => $this->getRealDiskUsage()
+            // ];
 
             // Detailed uptime information
             $this->uptimeDetails = $this->getUptimeDetails();

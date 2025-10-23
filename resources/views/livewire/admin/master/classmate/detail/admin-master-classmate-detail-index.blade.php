@@ -3,7 +3,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#f58634]">Data Kelas Detail</h1>
+                <h1 class="text-2xl font-bold text-[#f58634]">Data Peserta Detail</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div>
@@ -20,10 +20,38 @@
     <div class="space-y-6">
         <div class="p-5 bg-white shadow rounded-lg">
             <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">
+                    Tipe <span class="text-red-600">*</span>
+                </label>
+
+                <div class="mt-2 flex space-x-2">
+                    <button
+                        type="button"
+                        wire:click="$set('type_study', 'mahasiswa')"
+                        class="px-4 py-2 rounded-md border
+                            {{ $type_study === 'mahasiswa' ? 'bg-orange-600 text-white border-orange-600' : 'bg-white text-gray-700 border-gray-300' }}">
+                        Kelas
+                    </button>
+
+                    <button
+                        type="button"
+                        wire:click="$set('type_study', 'general')"
+                        class="px-4 py-2 rounded-md border
+                            {{ $type_study === 'general' ? 'bg-orange-600 text-white border-orange-600' : 'bg-white text-gray-700 border-gray-300' }}">
+                        General
+                    </button>
+                </div>
+
+                @error('type_study')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+            @if($type_study == 'mahasiswa')
+            <div class="mb-4">
                 <label for="name" class="block text-sm font-medium text-gray-700">Nama <span
                         class="text-red-500">*</span></label>
                 <input type="text" id="name" wire:model.defer="name" class="mt-1 form-control"
-                    placeholder="Nama Kelas" />
+                    placeholder="Nama Peserta" />
                 @error('name')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
@@ -53,11 +81,29 @@
             </div>
             <div class="mb-4">
                 <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
-                <textarea id="description" wire:model.defer="description" placeholder="Deskripsi Kelas" class="mt-1 form-control"></textarea>
+                <textarea id="description" wire:model.defer="description" placeholder="Deskripsi Peserta" class="mt-1 form-control"></textarea>
                 @error('description')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
             </div>
+            @elseif($type_study == 'general')
+            <div class="mb-4">
+                <label for="name" class="block text-sm font-medium text-gray-700">Nama <span
+                        class="text-red-500">*</span></label>
+                <input type="text" id="name" wire:model.defer="name" class="mt-1 form-control"
+                    placeholder="Nama Peserta" />
+                @error('name')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+            <div class="mb-4">
+                <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                <textarea id="description" wire:model.defer="description" placeholder="Deskripsi Peserta" class="mt-1 form-control"></textarea>
+                @error('description')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+            @endif
         </div>
         <div class="p-5 bg-white shadow rounded-lg">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">

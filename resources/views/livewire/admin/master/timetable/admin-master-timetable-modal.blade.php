@@ -32,7 +32,7 @@
                         @enderror
                     </div>
                     <div>
-                        <label for="classmate_id" class="block text-sm font-medium text-gray-700">Kelas <span
+                        <label for="classmate_id" class="block text-sm font-medium text-gray-700">Peserta <span
                                 class="text-red-600">*</span></label>
                         <div wire:key="select-{{ rand() }}">
                             <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
@@ -44,7 +44,7 @@
                                 }
                             });"
                                 wire:model.lazy="classmate_id" id="classmate_id">
-                                <option value="">-- Pilih Kelas --</option>
+                                <option value="">-- Pilih Peserta --</option>
                                 @foreach ($classmates as $key_cl => $classmate)
                                     <option value="{{ $key_cl }}">{{ $classmate }}</option>
                                 @endforeach

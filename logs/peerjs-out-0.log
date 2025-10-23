@@ -856,3 +856,87 @@ For HTTP websites:
 2025-09-16T10:52:48: ✅ HTTPS websites can now connect
 2025-09-16T10:52:48: 
 Press Ctrl+C to stop servers
+2025-09-25T14:21:03: 🚀 Starting HTTP PeerJS Server...
+2025-09-25T14:21:03: 🔒 SSL certificates found, starting HTTPS PeerJS Server...
+2025-09-25T14:21:03: ✅ HTTPS PeerJS Server enabled
+2025-09-25T14:21:03: 
+📡 PeerJS Servers Status:
+2025-09-25T14:21:03: ═══════════════════════════════
+2025-09-25T14:21:03: 
+📄 HTTP PeerJS Server (for backward compatibility):
+2025-09-25T14:21:03:    Port: 9000
+2025-09-25T14:21:03:    Protocol: HTTP
+2025-09-25T14:21:03:    🔗 http://213.210.21.140:9000/peerjs
+2025-09-25T14:21:03: 
+🔒 HTTPS PeerJS Server (for HTTPS websites):
+2025-09-25T14:21:03:    Port: 9443
+2025-09-25T14:21:03:    Protocol: HTTPS
+2025-09-25T14:21:03:    🔗 https://213.210.21.140:9443/peerjs
+2025-09-25T14:21:03: 
+🌐 Client Configuration:
+2025-09-25T14:21:03: ════════════════════════════
+2025-09-25T14:21:03: For HTTPS websites (https://cbt-new.drshieldapp.com):
+2025-09-25T14:21:03:    ✅ Will use: https://213.210.21.140:9443/peerjs
+2025-09-25T14:21:03: 
+For HTTP websites:
+2025-09-25T14:21:03:    ✅ Will use: http://213.210.21.140:9000/peerjs
+2025-09-25T14:21:03: 
+🔍 Health Check URLs:
+2025-09-25T14:21:03: ═══════════════════════
+2025-09-25T14:21:03: HTTP:  http://213.210.21.140:9000/peerjs
+2025-09-25T14:21:03: HTTPS: https://213.210.21.140:9443/peerjs
+2025-09-25T14:21:04: 
+🎉 PeerJS Servers Ready!
+2025-09-25T14:21:04: ═══════════════════════════
+2025-09-25T14:21:04: ✅ Both HTTP and HTTPS servers running
+2025-09-25T14:21:04: ✅ HTTPS websites can now connect
+2025-09-25T14:21:04: 
+Press Ctrl+C to stop servers
+2025-09-25T14:30:10: 🚀 Starting HTTP PeerJS Server...
+2025-09-25T14:30:10: 🔒 SSL certificates found, starting HTTPS PeerJS Server...
+2025-09-25T14:30:11: ✅ HTTPS PeerJS Server enabled
+2025-09-25T14:30:11: 
+📡 PeerJS Servers Status:
+2025-09-25T14:30:11: ═══════════════════════════════
+2025-09-25T14:30:11: 
+📄 HTTP PeerJS Server (for backward compatibility):
+2025-09-25T14:30:11:    Port: 9000
+2025-09-25T14:30:11:    Protocol: HTTP
+2025-09-25T14:30:11:    🔗 http://213.210.21.140:9000/peerjs
+2025-09-25T14:30:11: 
+🔒 HTTPS PeerJS Server (for HTTPS websites):
+2025-09-25T14:30:11:    Port: 9443
+2025-09-25T14:30:11:    Protocol: HTTPS
+2025-09-25T14:30:11:    🔗 https://213.210.21.140:9443/peerjs
+2025-09-25T14:30:11: 
+🌐 Client Configuration:
+2025-09-25T14:30:11: ════════════════════════════
+2025-09-25T14:30:11: For HTTPS websites (https://cbt-new.drshieldapp.com):
+2025-09-25T14:30:11:    ✅ Will use: https://213.210.21.140:9443/peerjs
+2025-09-25T14:30:11: 
+For HTTP websites:
+2025-09-25T14:30:11:    ✅ Will use: http://213.210.21.140:9000/peerjs
+2025-09-25T14:30:11: 
+🔍 Health Check URLs:
+2025-09-25T14:30:11: ═══════════════════════
+2025-09-25T14:30:11: HTTP:  http://213.210.21.140:9000/peerjs
+2025-09-25T14:30:11: HTTPS: https://213.210.21.140:9443/peerjs
+2025-09-25T14:30:12: 
+🎉 PeerJS Servers Ready!
+2025-09-25T14:30:12: ═══════════════════════════
+2025-09-25T14:30:12: ✅ Both HTTP and HTTPS servers running
+2025-09-25T14:30:12: ✅ HTTPS websites can now connect
+2025-09-25T14:30:12: 
+Press Ctrl+C to stop servers
+2025-09-26T15:24:28: 🟢 HTTP Client connected: 4d95e478-f1aa-4490-bf83-163766001a5c
+2025-09-26T15:25:04: 🔴 HTTP Client disconnected: 4d95e478-f1aa-4490-bf83-163766001a5c
+2025-09-26T15:25:06: 🟢 HTTP Client connected: 7158e66c-17a5-488f-9eef-5d55871a0cd2
+2025-09-26T15:25:14: 🔴 HTTP Client disconnected: 7158e66c-17a5-488f-9eef-5d55871a0cd2
+2025-09-26T15:25:16: 🟢 HTTP Client connected: 426df7c7-b6ef-4dcd-8cf4-421f5784ce4b
+2025-09-26T15:25:17: 🔴 HTTP Client disconnected: 426df7c7-b6ef-4dcd-8cf4-421f5784ce4b
+2025-09-26T15:25:26: 🟢 HTTP Client connected: 32186393-f6d8-478b-bdb4-9f6f12fcb28b
+2025-09-26T15:25:34: 🔴 HTTP Client disconnected: 32186393-f6d8-478b-bdb4-9f6f12fcb28b
+2025-09-26T15:25:40: 🟢 HTTP Client connected: f229dd70-962a-4ec3-b280-148376442d9f
+2025-09-26T15:25:43: 🔴 HTTP Client disconnected: f229dd70-962a-4ec3-b280-148376442d9f
+2025-09-26T15:26:39: 🟢 HTTP Client connected: c2f73bc5-1e4e-488f-bb35-8b7cdb26f932
+2025-09-26T15:27:06: 🔴 HTTP Client disconnected: c2f73bc5-1e4e-488f-bb35-8b7cdb26f932

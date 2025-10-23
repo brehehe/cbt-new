@@ -174,7 +174,7 @@ class AdminMasterTimetableIndex extends Component
             'classmate_id' => 'required',
             'end_time' => 'required',
         ], [
-            'classmate_id.required' => 'Kelas wajib diisi',
+            'classmate_id.required' => 'Peserta wajib diisi',
             'name.required' => 'Nama Jadwal wajib diisi',
             'module_id.required' => 'Modul wajib diisi',
             'supervisors.required' => 'Pengawas wajib diisi',

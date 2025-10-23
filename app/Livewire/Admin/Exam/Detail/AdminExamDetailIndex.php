@@ -868,13 +868,13 @@ class AdminExamDetailIndex extends Component
 
                 // Function to handle video save timeout
                 function handleVideoSaveTimeout() {
-                    console.warn("⚠️ Video save timeout (30s), finishing exam anyway...");
-                    alert("⚠️ Video mungkin belum tersimpan sempurna. Ujian akan diselesaikan.");
+                    console.warn("⚠️ Video save timeout (5s), finishing exam anyway...");
+                    // Non-blocking notification; avoid alert to prevent UI freeze
                     completeExamAfterVideoSave();
                 }
 
-                // Set timeout as fallback (30 seconds for large videos)
-                const videoSaveTimeout = setTimeout(handleVideoSaveTimeout, 30000);
+                // Set timeout as fallback (reduced to 5 seconds)
+                const videoSaveTimeout = setTimeout(handleVideoSaveTimeout, 5000);
 
                 // Enhanced stopRecording with completion callback
                 if (typeof stopRecording === "function" && !window.isRecordingStopping) {
@@ -889,7 +889,7 @@ class AdminExamDetailIndex extends Component
                             completeExamAfterVideoSave();
                         } else {
                             console.error("❌ Video save failed, but completing exam anyway...");
-                            alert("❌ Video gagal tersimpan, tapi ujian akan diselesaikan.");
+                            // Non-blocking notification; avoid alert to prevent UI freeze
                             completeExamAfterVideoSave();
                         }
                     };
@@ -1004,7 +1004,7 @@ class AdminExamDetailIndex extends Component
             console.log("✅ Exam finalization completed successfully!");
             console.log("📊 Final Score: ' . $mark . '/' . $totalQuestions . ' (' . $mark . '%)");
 
-            alert("✅ Ujian berhasil diselesaikan!\\n📊 Nilai: ' . $mark . '/100\\n🎬 Video recording tersimpan");
+            // alert("✅ Ujian berhasil diselesaikan!\\n📊 Nilai: ' . $mark . '/100\\n🎬 Video recording tersimpan");
 
             // Immediate redirect since everything is now complete
             window.location.href = "/admin/exam/timetable";

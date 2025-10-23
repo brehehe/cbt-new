@@ -32,7 +32,7 @@
                         type="button"
                         wire:click="$set('type_study', 'mahasiswa')"
                         class="px-4 py-2 rounded-md border
-                            {{ $type_study === 'mahasiswa' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300' }}">
+                            {{ $type_study === 'mahasiswa' ? 'bg-orange-600 text-white border-orange-600' : 'bg-white text-gray-700 border-gray-300' }}">
                         Mahasiswa
                     </button>
 
@@ -40,7 +40,7 @@
                         type="button"
                         wire:click="$set('type_study', 'general')"
                         class="px-4 py-2 rounded-md border
-                            {{ $type_study === 'general' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300' }}">
+                            {{ $type_study === 'general' ? 'bg-orange-600 text-white border-orange-600' : 'bg-white text-gray-700 border-gray-300' }}">
                         General
                     </button>
                 </div>

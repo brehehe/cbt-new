@@ -1,1 +1,0 @@
-<?php echo 'Memory Limit: ' . ini_get('memory_limit') . PHP_EOL; echo 'Post Max Size: ' . ini_get('post_max_size') . PHP_EOL; echo 'Max Execution Time: ' . ini_get('max_execution_time') . PHP_EOL; echo 'Max Input Vars: ' . ini_get('max_input_vars') . PHP_EOL; echo 'Upload Max Size: ' . ini_get('upload_max_filesize') . PHP_EOL; ?>

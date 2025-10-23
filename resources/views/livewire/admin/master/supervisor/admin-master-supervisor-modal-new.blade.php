@@ -89,7 +89,7 @@
                 <div>
                     <label for="supervisor_nip" class="block text-sm font-medium text-gray-700">NIP Pengawas </label>
                     <input id="supervisor_nip" type="text" wire:model.defer="supervisor_nip"
-                        placeholder="Contoh : 199001012020031001" class="mt-1 form-control">
+                        placeholder="Contoh : 199000012020031001" class="mt-1 form-control">
                     @error('supervisor_nip')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror

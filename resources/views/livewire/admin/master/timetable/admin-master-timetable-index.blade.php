@@ -50,7 +50,7 @@
                 <thead>
                     <tr>
                         <th class="w-1 center">No</th>
-                        <th>Kelas</th>
+                        <th>Peserta</th>
                         <th>Nama</th>
                         <th>Modul</th>
                         <th>Waktu Mulai</th>

@@ -13,7 +13,7 @@ const peerConfig = {
   cors: {
     origin: [
       // Allow HTTPS domain
-      'https://cbt-new.drshieldapp.com',
+      'https://procbt.id',
       'https://www.cbt-new.drshieldapp.com',
       // Allow HTTP for backward compatibility
       'http://cbt-new.drshieldapp.com',
@@ -70,7 +70,7 @@ try {
     console.log(`   Private Key: ${sslKeyPath}`);
     console.log('');
     console.log('💡 To enable HTTPS PeerJS server:');
-    console.log('   1. Get SSL certificate for 213.210.21.140');
+    console.log('   1. Get SSL certificate for 148.230.97.234');
     console.log('   2. Place files at the paths above');
     console.log('   3. Or set SSL_CERT_PATH and SSL_KEY_PATH environment variables');
     console.log('   4. Restart this server');
@@ -131,16 +131,16 @@ if (httpsPeerServer) {
 
 console.log('\n🌐 Client Configuration:');
 console.log('════════════════════════════');
-console.log('For HTTPS websites (https://cbt-new.drshieldapp.com):');
+console.log('For HTTPS websites (https://procbt.id):');
 if (httpsPeerServer) {
-  console.log(`   ✅ Will use: https://${serverIPs[0] || '213.210.21.140'}:${httpsPort}/peerjs`);
+  console.log(`   ✅ Will use: https://${serverIPs[0] || '148.230.97.234'}:${httpsPort}/peerjs`);
 } else {
   console.log(`   ❌ Will fail: mixed content blocked`);
   console.log(`   💡 Need HTTPS PeerJS server on port ${httpsPort}`);
 }
 
 console.log('\nFor HTTP websites:');
-console.log(`   ✅ Will use: http://${serverIPs[0] || '213.210.21.140'}:${httpPort}/peerjs`);
+console.log(`   ✅ Will use: http://${serverIPs[0] || '148.230.97.234'}:${httpPort}/peerjs`);
 
 // Event handlers for HTTP server
 httpPeerServer.on('connection', (client) => {
@@ -165,9 +165,9 @@ if (httpsPeerServer) {
 // Health check info
 console.log('\n🔍 Health Check URLs:');
 console.log('═══════════════════════');
-console.log(`HTTP:  http://${serverIPs[0] || '213.210.21.140'}:${httpPort}/peerjs`);
+console.log(`HTTP:  http://${serverIPs[0] || '148.230.97.234'}:${httpPort}/peerjs`);
 if (httpsPeerServer) {
-  console.log(`HTTPS: https://${serverIPs[0] || '213.210.21.140'}:${httpsPort}/peerjs`);
+  console.log(`HTTPS: https://${serverIPs[0] || '148.230.97.234'}:${httpsPort}/peerjs`);
 }
 
 // Keep the servers running

@@ -82,9 +82,9 @@
 
         <!-- Footer -->
         <div class="flex justify-between items-center gap-4 px-6 py-4 border-t">
-            <!-- Info total soal terpilih (kiri) -->
+            <!-- Info total mahasiswa terpilih (kiri) -->
             <span class="text-sm font-medium text-gray-700">
-                Total soal terpilih:
+                Total mahasiswa terpilih:
                 <span class="text-blue-600 font-semibold">
                     {{ count($selectedStudents) }}
                 </span>

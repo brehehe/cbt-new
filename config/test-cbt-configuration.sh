@@ -14,7 +14,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # Configuration
-APP_DIR="/var/www/html/drshieldapp/cbt-new.drshieldapp.com"
+APP_DIR="/var/www/html/drshieldapp/procbt.id"
 TEST_SIZE_MB=50  # Test with 50MB file first
 PHP_VERSION="8.3"
 
@@ -185,7 +185,7 @@ test_upload_via_curl() {
     fi
 
     # Test upload to a test endpoint (you may need to create this)
-    TEST_URL="https://cbt-new.drshieldapp.com/api/test-upload"
+    TEST_URL="https://procbt.id/api/test-upload"
 
     echo -e "  Testing upload to: $TEST_URL"
 

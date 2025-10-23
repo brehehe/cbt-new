@@ -108,7 +108,7 @@
                                     'icon' => 'fa-building-columns',
                                 ],
                                 [
-                                    'label' => 'Kelas',
+                                    'label' => 'Peserta',
                                     'url' => '/admin/master/classmate',
                                     'pattern' => 'admin/master/classmate*',
                                     'icon' => 'fa-users',

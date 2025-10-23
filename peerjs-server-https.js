@@ -22,7 +22,7 @@ const peerConfig = {
     origin: process.env.NODE_ENV === 'production' ? [
       'https://cbt.mediction.id',
       'https://www.cbt.mediction.id',
-      'https://cbt-new.drshieldapp.com',
+      'https://procbt.id',
       'https://www.cbt-new.drshieldapp.com',
       'http://cbt-new.drshieldapp.com',
       'http://www.cbt-new.drshieldapp.com',
