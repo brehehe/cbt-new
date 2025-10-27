@@ -11,10 +11,72 @@
  */
 
 
+namespace App\Models\Classmate{
+/**
+ * @property string $id
+ * @property string $name
+ * @property string|null $description
+ * @property string|null $company_id
+ * @property int $order
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Classmate\ClassmateStudent> $classmateStudents
+ * @property-read int|null $classmate_students_count
+ * @property-read \App\Models\Company\Company|null $company
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate search($term)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate withoutTrashed()
+ */
+	class Classmate extends \Eloquent {}
+}
+
+namespace App\Models\Classmate{
+/**
+ * @property string $id
+ * @property string $classmate_id
+ * @property string $user_id
+ * @property string|null $company_id
+ * @property int $order
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Classmate\Classmate|null $classmate
+ * @property-read \App\Models\Company\Company|null $company
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClassmateStudent newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClassmateStudent newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClassmateStudent onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClassmateStudent query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClassmateStudent search($term)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClassmateStudent whereClassmateId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClassmateStudent whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClassmateStudent whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClassmateStudent whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClassmateStudent whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClassmateStudent whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClassmateStudent whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClassmateStudent whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClassmateStudent withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClassmateStudent withoutTrashed()
+ */
+	class ClassmateStudent extends \Eloquent {}
+}
+
 namespace App\Models\Company{
 /**
- * 
- *
  * @property string $id
  * @property string|null $company_id
  * @property string|null $service_id
@@ -78,7 +140,7 @@ namespace App\Models\Company{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereTaxId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereWebsite($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Company withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company withoutTrashed()
  */
 	class Company extends \Eloquent {}
@@ -86,8 +148,6 @@ namespace App\Models\Company{
 
 namespace App\Models\Company{
 /**
- * 
- *
  * @property string $id
  * @property string|null $company_id
  * @property string|null $one_health_code Kode satusehat
@@ -143,7 +203,7 @@ namespace App\Models\Company{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyDetail whereSubDistrict($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyDetail whereSubDistrictCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyDetail whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyDetail withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyDetail withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyDetail withoutTrashed()
  */
 	class CompanyDetail extends \Eloquent {}
@@ -151,8 +211,6 @@ namespace App\Models\Company{
 
 namespace App\Models\Company{
 /**
- * 
- *
  * @property string $id
  * @property string $company_id
  * @property string $service_month_id
@@ -186,7 +244,7 @@ namespace App\Models\Company{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyService whereServiceMonthId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyService whereStartDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyService whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyService withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyService withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyService withoutTrashed()
  */
 	class CompanyService extends \Eloquent {}
@@ -194,8 +252,6 @@ namespace App\Models\Company{
 
 namespace App\Models\Company{
 /**
- * 
- *
  * @property string $id
  * @property string $company_service_id
  * @property string $service_month_id
@@ -225,7 +281,7 @@ namespace App\Models\Company{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyServiceMonth whereServiceMonthId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyServiceMonth whereStartDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyServiceMonth whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyServiceMonth withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyServiceMonth withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyServiceMonth withoutTrashed()
  */
 	class CompanyServiceMonth extends \Eloquent {}
@@ -233,14 +289,12 @@ namespace App\Models\Company{
 
 namespace App\Models\Company{
 /**
- * 
- *
  * @property-read \App\Models\Company\Company|null $company
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OneHealthy newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OneHealthy newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OneHealthy onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OneHealthy query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OneHealthy withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OneHealthy withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OneHealthy withoutTrashed()
  */
 	class OneHealthy extends \Eloquent {}
@@ -248,8 +302,6 @@ namespace App\Models\Company{
 
 namespace App\Models\Country{
 /**
- * 
- *
  * @property string $id
  * @property string $name
  * @property string $code
@@ -268,7 +320,7 @@ namespace App\Models\Country{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Country withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Country withoutTrashed()
  */
 	class Country extends \Eloquent {}
@@ -276,8 +328,6 @@ namespace App\Models\Country{
 
 namespace App\Models\Exam{
 /**
- * 
- *
  * @property string $id
  * @property string|null $timetable_id
  * @property string $user_timetable_id
@@ -308,7 +358,7 @@ namespace App\Models\Exam{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamAlert whereTimetableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamAlert whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamAlert whereUserTimetableId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamAlert withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamAlert withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamAlert withoutTrashed()
  */
 	class ExamAlert extends \Eloquent {}
@@ -316,8 +366,6 @@ namespace App\Models\Exam{
 
 namespace App\Models\Exam{
 /**
- * 
- *
  * @property string $id
  * @property string|null $timetable_id
  * @property string $user_timetable_id
@@ -394,7 +442,7 @@ namespace App\Models\Exam{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereUserTimetableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereWarningCount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession withoutTrashed()
  */
 	class ExamLiveSession extends \Eloquent {}
@@ -402,8 +450,6 @@ namespace App\Models\Exam{
 
 namespace App\Models\Exam{
 /**
- * 
- *
  * @property string $id
  * @property string|null $timetable_id
  * @property string $user_timetable_id
@@ -440,7 +486,7 @@ namespace App\Models\Exam{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereUserTimetableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereVideoPath($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording withoutTrashed()
  */
 	class ExamRecording extends \Eloquent {}
@@ -448,8 +494,6 @@ namespace App\Models\Exam{
 
 namespace App\Models\Master\Exam{
 /**
- * 
- *
  * @property string $id
  * @property string|null $company_id
  * @property string $name nama tipe ujian
@@ -472,7 +516,7 @@ namespace App\Models\Master\Exam{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamType whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamType whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamType whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamType withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamType withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamType withoutTrashed()
  */
 	class ExamType extends \Eloquent {}
@@ -480,8 +524,6 @@ namespace App\Models\Master\Exam{
 
 namespace App\Models\Master\Question{
 /**
- * 
- *
  * @property string $id
  * @property string|null $company_id
  * @property string|null $question_id
@@ -511,7 +553,7 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Answer whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Answer whereQuestionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Answer whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Answer withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Answer withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Answer withoutTrashed()
  */
 	class Answer extends \Eloquent {}
@@ -519,8 +561,6 @@ namespace App\Models\Master\Question{
 
 namespace App\Models\Master\Question{
 /**
- * 
- *
  * @property string $id
  * @property string|null $company_id
  * @property string|null $topic_id
@@ -553,7 +593,7 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Material whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Material whereTopicId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Material whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Material withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Material withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Material withoutTrashed()
  */
 	class Material extends \Eloquent {}
@@ -561,8 +601,6 @@ namespace App\Models\Master\Question{
 
 namespace App\Models\Master\Question{
 /**
- * 
- *
  * @property string $id
  * @property string|null $company_id
  * @property string|null $topic_id
@@ -597,7 +635,7 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MaterialCategory whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MaterialCategory whereTopicId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MaterialCategory whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|MaterialCategory withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MaterialCategory withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MaterialCategory withoutTrashed()
  */
 	class MaterialCategory extends \Eloquent {}
@@ -605,8 +643,6 @@ namespace App\Models\Master\Question{
 
 namespace App\Models\Master\Question{
 /**
- * 
- *
  * @property string $id
  * @property string|null $user_id
  * @property string|null $company_id
@@ -615,6 +651,8 @@ namespace App\Models\Master\Question{
  * @property int $duration durasi waktu pengerjaan
  * @property string|null $description keterangan modul
  * @property bool $random_question apakah soal dalam modul diacak atau urut
+ * @property string|null $studys prodi yang dapat mengakses modul ini
+ * @property bool $is_all_study apakah modul ini untuk semua prodi
  * @property int $order
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -634,13 +672,15 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereDuration($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereIsAllStudy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereQuestionTypeId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereRandomQuestion($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereStudys($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Module withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Module withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module withoutTrashed()
  */
 	class Module extends \Eloquent {}
@@ -648,12 +688,11 @@ namespace App\Models\Master\Question{
 
 namespace App\Models\Master\Question{
 /**
- * 
- *
  * @property string $id
  * @property string|null $company_id
  * @property string|null $module_id
  * @property string|null $question_id
+ * @property string|null $study_id
  * @property int $order
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -661,6 +700,7 @@ namespace App\Models\Master\Question{
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Master\Question\Module|null $module
  * @property-read \App\Models\Master\Question\Question|null $question
+ * @property-read \App\Models\Study\Study|null $study
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion onlyTrashed()
@@ -673,8 +713,9 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion whereModuleId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion whereQuestionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion whereStudyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion withoutTrashed()
  */
 	class ModuleQuestion extends \Eloquent {}
@@ -682,10 +723,9 @@ namespace App\Models\Master\Question{
 
 namespace App\Models\Master\Question{
 /**
- * 
- *
  * @property string $id
  * @property string|null $user_id
+ * @property string|null $study_id
  * @property string|null $company_id
  * @property string|null $topic_id
  * @property string|null $material_category_id
@@ -708,6 +748,7 @@ namespace App\Models\Master\Question{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Question\ModuleQuestion> $moduleQuestions
  * @property-read int|null $module_questions_count
  * @property-read \App\Models\Master\Question\QuestionType|null $questionType
+ * @property-read \App\Models\Study\Study|null $study
  * @property-read \App\Models\Timetable\TimetableQuestion|null $timetableQuestion
  * @property-read \App\Models\Master\Question\Topic|null $topic
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question newModelQuery()
@@ -726,12 +767,13 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereQuestion($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereQuestionTypeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereStudyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereTopicId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereWeightCorrect($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereWeightIncorrect($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Question withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Question withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question withoutTrashed()
  */
 	class Question extends \Eloquent {}
@@ -739,8 +781,6 @@ namespace App\Models\Master\Question{
 
 namespace App\Models\Master\Question{
 /**
- * 
- *
  * @property string $id
  * @property string|null $company_id
  * @property string $name nama tipe soal
@@ -767,7 +807,7 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionType whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionType whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionType whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionType withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionType withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionType withoutTrashed()
  */
 	class QuestionType extends \Eloquent {}
@@ -775,8 +815,6 @@ namespace App\Models\Master\Question{
 
 namespace App\Models\Master\Question{
 /**
- * 
- *
  * @property string $id
  * @property string|null $company_id
  * @property string $name Nama topik ujian
@@ -803,7 +841,7 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic withoutTrashed()
  */
 	class Topic extends \Eloquent {}
@@ -811,8 +849,6 @@ namespace App\Models\Master\Question{
 
 namespace App\Models\Master\RatingScale{
 /**
- * 
- *
  * @property string $id
  * @property string $grade_letter
  * @property int $min_score
@@ -838,7 +874,7 @@ namespace App\Models\Master\RatingScale{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RatingScale whereMinScore($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RatingScale whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RatingScale whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|RatingScale withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RatingScale withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RatingScale withoutTrashed()
  */
 	class RatingScale extends \Eloquent {}
@@ -846,8 +882,6 @@ namespace App\Models\Master\RatingScale{
 
 namespace App\Models\Master\Region{
 /**
- * 
- *
  * @property string $id
  * @property string $code
  * @property string|null $parent_code
@@ -878,8 +912,6 @@ namespace App\Models\Master\Region{
 
 namespace App\Models\Master\Region{
 /**
- * 
- *
  * @property string $id
  * @property string $code
  * @property string|null $parent_code
@@ -910,8 +942,6 @@ namespace App\Models\Master\Region{
 
 namespace App\Models\Master\Region{
 /**
- * 
- *
  * @property string $id
  * @property string $code
  * @property string|null $parent_code
@@ -941,8 +971,6 @@ namespace App\Models\Master\Region{
 
 namespace App\Models\Master\Region{
 /**
- * 
- *
  * @property string $id
  * @property string $code
  * @property string|null $parent_code
@@ -971,8 +999,6 @@ namespace App\Models\Master\Region{
 
 namespace App\Models\Master\Regulation{
 /**
- * 
- *
  * @property string $id
  * @property string|null $description
  * @property string $type
@@ -995,7 +1021,7 @@ namespace App\Models\Master\Regulation{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Regulation whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Regulation whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Regulation whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Regulation withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Regulation withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Regulation withoutTrashed()
  */
 	class Regulation extends \Eloquent {}
@@ -1003,14 +1029,15 @@ namespace App\Models\Master\Regulation{
 
 namespace App\Models\Master\Timetable{
 /**
- * 
- *
  * @property string $id
  * @property string $name
+ * @property string|null $classmate_id
  * @property string|null $module_id
  * @property array<array-key, mixed>|null $supervisors
  * @property \Illuminate\Support\Carbon $start_time
  * @property \Illuminate\Support\Carbon $end_time
+ * @property string|null $study_id
+ * @property string|null $studys
  * @property string|null $description
  * @property string|null $code
  * @property string|null $company_id
@@ -1018,6 +1045,7 @@ namespace App\Models\Master\Timetable{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Classmate\Classmate|null $classmate
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Master\Question\Module|null $module
  * @property-read \App\Models\Timetable\TimetableModule|null $timetableModule
@@ -1028,6 +1056,7 @@ namespace App\Models\Master\Timetable{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable search($term)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereClassmateId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereCompanyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereCreatedAt($value)
@@ -1039,9 +1068,11 @@ namespace App\Models\Master\Timetable{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereStartTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereStudyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereStudys($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereSupervisors($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable withoutTrashed()
  */
 	class Timetable extends \Eloquent {}
@@ -1049,14 +1080,12 @@ namespace App\Models\Master\Timetable{
 
 namespace App\Models\Notification{
 /**
- * 
- *
  * @property-read \App\Models\Company\Company|null $company
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Notification newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Notification newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Notification onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Notification query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Notification withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Notification withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Notification withoutTrashed()
  */
 	class Notification extends \Eloquent {}
@@ -1064,8 +1093,6 @@ namespace App\Models\Notification{
 
 namespace App\Models\Role{
 /**
- * 
- *
  * @property string $id
  * @property string $role_id
  * @property string|null $company_id
@@ -1087,7 +1114,7 @@ namespace App\Models\Role{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RoleCompany whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RoleCompany whereRoleId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RoleCompany whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|RoleCompany withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoleCompany withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RoleCompany withoutTrashed()
  */
 	class RoleCompany extends \Eloquent {}
@@ -1095,8 +1122,6 @@ namespace App\Models\Role{
 
 namespace App\Models\Service{
 /**
- * 
- *
  * @property string $id
  * @property string $name
  * @property string $description
@@ -1117,7 +1142,7 @@ namespace App\Models\Service{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Service withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Service withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service withoutTrashed()
  */
 	class Service extends \Eloquent {}
@@ -1125,8 +1150,6 @@ namespace App\Models\Service{
 
 namespace App\Models\Service{
 /**
- * 
- *
  * @property string $id
  * @property string $name
  * @property string $description
@@ -1158,7 +1181,7 @@ namespace App\Models\Service{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceMonth whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceMonth wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceMonth whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceMonth withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceMonth withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceMonth withoutTrashed()
  */
 	class ServiceMonth extends \Eloquent {}
@@ -1166,8 +1189,6 @@ namespace App\Models\Service{
 
 namespace App\Models\Service{
 /**
- * 
- *
  * @property string $id
  * @property string $service_month_id
  * @property string $service_id
@@ -1189,7 +1210,7 @@ namespace App\Models\Service{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceMonthDetail whereServiceMonthId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceMonthDetail whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceMonthDetail whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceMonthDetail withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceMonthDetail withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceMonthDetail withoutTrashed()
  */
 	class ServiceMonthDetail extends \Eloquent {}
@@ -1197,8 +1218,6 @@ namespace App\Models\Service{
 
 namespace App\Models\Spatie{
 /**
- * 
- *
  * @property string $uuid
  * @property string $name
  * @property string $guard_name
@@ -1225,7 +1244,7 @@ namespace App\Models\Spatie{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission whereUuid($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission withoutPermission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission withoutRole($roles, $guard = null)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission withoutTrashed()
@@ -1235,8 +1254,6 @@ namespace App\Models\Spatie{
 
 namespace App\Models\Spatie{
 /**
- * 
- *
  * @property string $uuid
  * @property string $name
  * @property string|null $company_id
@@ -1262,17 +1279,45 @@ namespace App\Models\Spatie{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role whereUuid($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Role withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Role withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role withoutPermission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role withoutTrashed()
  */
 	class Role extends \Eloquent {}
 }
 
+namespace App\Models\Study{
+/**
+ * @property string $id
+ * @property string|null $company_id
+ * @property string $name
+ * @property string|null $description
+ * @property int $order
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Company\Company|null $company
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Study newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Study newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Study onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Study query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Study search($term)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Study whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Study whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Study whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Study whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Study whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Study whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Study whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Study whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Study withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Study withoutTrashed()
+ */
+	class Study extends \Eloquent {}
+}
+
 namespace App\Models\SystemSetting{
 /**
- * 
- *
  * @property string $id
  * @property int $tax
  * @property string|null $company_id
@@ -1291,7 +1336,7 @@ namespace App\Models\SystemSetting{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SystemSetting whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SystemSetting whereTax($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SystemSetting whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SystemSetting withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SystemSetting withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SystemSetting withoutTrashed()
  */
 	class SystemSetting extends \Eloquent {}
@@ -1299,8 +1344,6 @@ namespace App\Models\SystemSetting{
 
 namespace App\Models\Timetable{
 /**
- * 
- *
  * @property string $id
  * @property string $answer_id
  * @property string $timetable_question_id
@@ -1333,7 +1376,7 @@ namespace App\Models\Timetable{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAnswer whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAnswer whereTimetableQuestionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAnswer whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAnswer withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAnswer withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAnswer withoutTrashed()
  */
 	class TimetableAnswer extends \Eloquent {}
@@ -1341,8 +1384,6 @@ namespace App\Models\Timetable{
 
 namespace App\Models\Timetable{
 /**
- * 
- *
  * @property string $id
  * @property string $timetable_id
  * @property string|null $module_id
@@ -1352,6 +1393,8 @@ namespace App\Models\Timetable{
  * @property int $duration durasi waktu pengerjaan
  * @property string|null $description keterangan modul
  * @property bool $random_question apakah soal dalam modul diacak atau urut
+ * @property string|null $studys prodi yang dapat mengakses modul ini
+ * @property bool $is_all_study apakah modul ini untuk semua prodi
  * @property string|null $company_id
  * @property int $order
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -1360,6 +1403,7 @@ namespace App\Models\Timetable{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Timetable\TimetableAnswer> $answers
  * @property-read int|null $answers_count
  * @property-read \App\Models\Company\Company|null $company
+ * @property-read \App\Models\Master\Question\QuestionType|null $questionType
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Timetable\TimetableQuestion> $questions
  * @property-read int|null $questions_count
  * @property-read \App\Models\Master\Timetable\Timetable|null $timetable
@@ -1374,15 +1418,17 @@ namespace App\Models\Timetable{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereDuration($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereIsAllStudy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereModuleId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereQuestionTypeId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereRandomQuestion($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereStudys($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereTimetableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule withoutTrashed()
  */
 	class TimetableModule extends \Eloquent {}
@@ -1390,8 +1436,6 @@ namespace App\Models\Timetable{
 
 namespace App\Models\Timetable{
 /**
- * 
- *
  * @property string $id
  * @property string $question_id
  * @property string $timetable_module_id
@@ -1400,6 +1444,7 @@ namespace App\Models\Timetable{
  * @property string|null $material_category_id
  * @property string|null $material_id
  * @property string|null $question_type_id
+ * @property string|null $study_id
  * @property \App\Models\Master\Question\Question|null $question soal
  * @property string|null $images gambar soal
  * @property string|null $description keterangan soal
@@ -1431,13 +1476,14 @@ namespace App\Models\Timetable{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereQuestion($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereQuestionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereQuestionTypeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereStudyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereTimetableModuleId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereTopicId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereWeightCorrect($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereWeightIncorrect($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion withoutTrashed()
  */
 	class TimetableQuestion extends \Eloquent {}
@@ -1445,8 +1491,6 @@ namespace App\Models\Timetable{
 
 namespace App\Models{
 /**
- * 
- *
  * @property string $id
  * @property string $name
  * @property string|null $email
@@ -1454,6 +1498,8 @@ namespace App\Models{
  * @property string|null $username
  * @property string|null $phone
  * @property \Illuminate\Support\Carbon|null $email_verified_at
+ * @property array<array-key, mixed>|null $studys Array of study programs or departments
+ * @property string|null $study_id Foreign key to studies table
  * @property string $password
  * @property string|null $profile
  * @property string|null $user_id User Referensi untuk relasi diri sendiri
@@ -1465,6 +1511,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\Classmate\ClassmateStudent|null $classmateStudent
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Company\Company> $companies
  * @property-read int|null $companies_count
  * @property-read \App\Models\Company\Company|null $company
@@ -1476,6 +1523,7 @@ namespace App\Models{
  * @property-read int|null $permissions_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Spatie\Role> $roles
  * @property-read int|null $roles_count
+ * @property-read \App\Models\Study\Study|null $study
  * @property-read User|null $user
  * @property-read \App\Models\User\UserDetail|null $userDetail
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User active()
@@ -1504,11 +1552,13 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePhone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereProfile($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereStudyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereStudys($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereTypeUser($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUsername($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutPermission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutRole($roles, $guard = null)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutTrashed()
@@ -1518,8 +1568,6 @@ namespace App\Models{
 
 namespace App\Models\User{
 /**
- * 
- *
  * @property string $id
  * @property string $user_id
  * @property string $role_id
@@ -1552,7 +1600,7 @@ namespace App\Models\User{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserCompanyRole whereRoleId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserCompanyRole whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserCompanyRole whereUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserCompanyRole withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserCompanyRole withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserCompanyRole withoutTrashed()
  */
 	class UserCompanyRole extends \Eloquent {}
@@ -1560,8 +1608,6 @@ namespace App\Models\User{
 
 namespace App\Models\User{
 /**
- * 
- *
  * @property string $id
  * @property string $user_id
  * @property string|null $company_id
@@ -1596,6 +1642,7 @@ namespace App\Models\User{
  * @property string|null $student_semester Semester untuk mahasiswa
  * @property string|null $student_academic_year Tahun akademik
  * @property string|null $student_status Status mahasiswa
+ * @property string $student_type Tipe mahasiswa batu atau mahasiswa
  * @property numeric|null $student_gpa IPK mahasiswa
  * @property string|null $student_advisor_id ID dosen pembimbing
  * @property \Illuminate\Support\Carbon|null $student_entry_date Tanggal masuk mahasiswa
@@ -1739,6 +1786,7 @@ namespace App\Models\User{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereStudentProgram($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereStudentSemester($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereStudentStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereStudentType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSupervisorArea($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSupervisorCertifications($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereSupervisorDepartment($value)
@@ -1760,7 +1808,7 @@ namespace App\Models\User{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereVerificationStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereVerifiedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereVerifiedBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail withoutTrashed()
  */
 	class UserDetail extends \Eloquent {}
@@ -1768,13 +1816,12 @@ namespace App\Models\User{
 
 namespace App\Models\User{
 /**
- * 
- *
  * @property string $id
  * @property string $user_timetable_id
  * @property string|null $timetable_module_id
  * @property string|null $timetable_question_id
  * @property string|null $timetable_answer_id
+ * @property string|null $study_id
  * @property bool $is_mark
  * @property string $status
  * @property string|null $company_id
@@ -1788,6 +1835,7 @@ namespace App\Models\User{
  * @property-read \App\Models\Timetable\TimetableAnswer|null $timetableAnswer
  * @property-read \App\Models\Timetable\TimetableModule|null $timetableModule
  * @property-read \App\Models\Timetable\TimetableQuestion|null $timetableQuestion
+ * @property-read \App\Models\User\UserTimetable|null $userTimetable
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion onlyTrashed()
@@ -1800,12 +1848,13 @@ namespace App\Models\User{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion whereIsMark($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion whereStudyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion whereTimetableAnswerId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion whereTimetableModuleId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion whereTimetableQuestionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion whereUserTimetableId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion withoutTrashed()
  */
 	class UserModuleQuestion extends \Eloquent {}
@@ -1813,8 +1862,6 @@ namespace App\Models\User{
 
 namespace App\Models\User{
 /**
- * 
- *
  * @property string $id
  * @property string $user_id
  * @property string $timetable_id
@@ -1822,6 +1869,7 @@ namespace App\Models\User{
  * @property string|null $start_exam
  * @property string|null $end_exam
  * @property int $mark
+ * @property string|null $study_id
  * @property string $status
  * @property string|null $company_id
  * @property int $order
@@ -1848,10 +1896,11 @@ namespace App\Models\User{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereStartExam($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereStartProcess($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereStudyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereTimetableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable withoutTrashed()
  */
 	class UserTimetable extends \Eloquent {}

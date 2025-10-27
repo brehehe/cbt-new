@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Master\Question;
 use Exception;
 use Livewire\Component;
 use App\Helpers\AlertHelper;
+use App\Imports\Question\QuestionImport;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -18,6 +19,7 @@ use App\Models\Study\Study;
 use App\Services\Question\QuestionService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\WithFileUploads;
+use Maatwebsite\Excel\Facades\Excel;
 use Spatie\LivewireFilepond\WithFilePond;
 use Throwable;
 
@@ -31,6 +33,7 @@ class AdminMasterQuestionIndex extends Component
     public $topics = [], $material_categories = [], $materials = [], $question_types = [];
     public $images = [], $old_images = [], $studys = [], $study_id;
     public $filterStudyId, $filterQuestionTypeId, $filterTopicId;
+    public $study_id_import, $file_import;
 
     public function render()
     {
@@ -105,7 +108,8 @@ class AdminMasterQuestionIndex extends Component
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['data_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'images', 'weight_correct', 'weight_incorrect']);
+        $this->reset(['data_id', 'study_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'images', 'weight_correct', 'weight_incorrect', 'study_id_import', 'file_import']);
+        $this->dispatch('close-modal', ['id' => 'modal-import-question']);
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
 
@@ -113,6 +117,7 @@ class AdminMasterQuestionIndex extends Component
     {
         $this->validate(
             [
+                'study_id'             => 'required|exists:studies,id',
                 'topic_id'             => 'required|exists:topics,id',
                 'material_category_id' => 'nullable|exists:material_categories,id',
                 'material_id'          => 'nullable|exists:materials,id',
@@ -120,10 +125,10 @@ class AdminMasterQuestionIndex extends Component
                 'question'             => 'required',
                 'images.*'             => 'nullable|file|mimetypes:image/jpg,image/jpeg,image/png',
                 'description'          => 'nullable',
-                'study_id'             => 'required|exists:studies,id',
             ],
             [
                 'topic_id.required'           => 'Topik soal wajib diisi.',
+                'study_id.required'           => 'Prodi wajib diisi.',
                 'material_category_id.exists' => 'Kategori materi soal tidak valid.',
                 'material_id.exists'          => 'Materi soal tidak valid.',
                 'question_type_id.required'   => 'Tipe soal wajib diisi.',
@@ -131,7 +136,6 @@ class AdminMasterQuestionIndex extends Component
                 'question.required'           => 'Pertanyaan wajib diisi.',
                 'images.*.file'               => 'Gambar wajib berupa file.',
                 'images.*.mimes'              => 'Gambar hanya berformat : .jpg, .jpeg, .png.',
-                'study_id.required'           => 'Prodi wajib diisi.',
             ]
         );
 
@@ -142,12 +146,12 @@ class AdminMasterQuestionIndex extends Component
                 'user_id'              => Auth::user()?->id,
                 'company_id'           => Auth::user()?->company?->id,
                 'topic_id'             => $this->topic_id,
+                'study_id'             => $this->study_id,
                 'material_category_id' => $this->material_category_id,
                 'material_id'          => $this->material_id,
                 'question_type_id'     => $this->question_type_id,
                 'question'             => $this->question,
                 'images'               => $this->images,
-                'study_id'             => $this->study_id,
                 'old_images'           => $this->old_images,
                 'description'          => $this->description,
                 'weight_correct'       => $this->weight_correct,
@@ -173,5 +177,48 @@ class AdminMasterQuestionIndex extends Component
 
         $this->closeModal();
         return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
+    }
+
+    public function openModalImport()
+    {
+        return $this->dispatch('open-modal', ['id' => 'modal-import-question']);
+    }
+
+    public function importQuestion()
+    {
+        // dd($this->study_id_import, $this->file_import);
+        $this->validate(
+            [
+                'study_id_import' => 'required|exists:studies,id',
+                'file_import'     => 'required|file|mimes:xls,xlsx|max:10240',   // 10 MB
+            ],
+            [
+                'study_id_import.required' => 'Prodi wajib diisi.',
+                'study_id_import.exists'   => 'Prodi tidak valid.',
+                'file_import.file'         => 'File import soal wajib berupa file.',
+                'file_import.mimes'        => 'File import soal hanya berformat Excel: .xls atau .xlsx.',
+                'file_import.max'          => 'Ukuran file maksimal 10 MB.',
+            ]
+        );
+
+        try {
+            // dd($this->study_id_import, $this->file_import);
+            Excel::import(
+                new QuestionImport((string) $this->study_id_import),
+                $this->file_import // <- TemporaryUploadedFile OK
+            );
+
+        } catch (Exception | Throwable $th) {
+            $error = [
+                'message' => $th->getMessage(),
+                'file'    => $th->getFile(),
+                'line'    => $th->getLine(),
+            ];
+            Log::error('Ada Kesalahaan saat AdminMasterModuleIndex => importQuestion', $error);
+            return AlertHelper::error('Gagal', 'Ada kesalahan saat import data soal');
+        }
+
+        $this->closeModal();
+        return AlertHelper::success('Berhasil', 'Data berhasil diimport, silahkan tunggu beberapa saat.');
     }
 }
