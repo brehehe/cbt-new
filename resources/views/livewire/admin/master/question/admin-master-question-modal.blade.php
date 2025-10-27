@@ -98,7 +98,6 @@
             </div>
             <div class="mb-4">
                 <label for="images" class="block text-sm font-medium text-gray-700">Gambar</label>
-                {{-- <input type="file" id="images" wire:model.defer="images" placeholder="" class="mt-1 form-control" multiple> --}}
                 <x-filepond::upload wire:model="images" multiple accept=".jpg,.jpeg,.png" />
                 @error('images')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>

@@ -14,9 +14,7 @@
 namespace App\Models\Classmate{
 /**
  * @property string $id
- * @property string $type_study Type of study: default, mahasiswa, or general
  * @property string $name
- * @property string|null $user_id
  * @property string|null $description
  * @property string|null $company_id
  * @property int $order
@@ -38,9 +36,13 @@ namespace App\Models\Classmate{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereOrder($value)
+<<<<<<< HEAD
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereUpdatedAt($value)
+=======
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereTypeStudy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereUserId($value)
+>>>>>>> e5429d9a66a0afe856cefba5f08da309445ff349
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate withoutTrashed()
  */
@@ -1563,7 +1565,10 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereStudyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereStudys($value)
+<<<<<<< HEAD
+=======
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereTypeStudy($value)
+>>>>>>> e5429d9a66a0afe856cefba5f08da309445ff349
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereTypeUser($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUserId($value)

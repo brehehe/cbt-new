@@ -1,6 +1,7 @@
 @section('title', 'Bank Soal')
 <div>
     {{-- Stop trying to control. --}}
+    @include('livewire.admin.master.question.admin-master-question-index-modal-import')
     @include('livewire.admin.master.question.admin-master-question-modal')
     <div class="mb-4">
         <div class="flex items-center justify-between">
@@ -9,6 +10,16 @@
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div>
+                <button wire:click="openModalImport()" class="btn btn-primary">
+                    {{-- <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg> --}}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-file-import h-4 w-4"">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M5 13v-8a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-5.5m-9.5 -2h7m-3 -3l3 3l-3 3" />
+                    </svg>
+                    Import
+                </button>
                 <button wire:click="openModal()" class="btn btn-warning">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">

@@ -28,7 +28,7 @@ class QuestionService
     {
         $images = [];
 
-        $images = $this->multipleFileUpload($request['old_images'], $request['images'], "question/$this->main_folder");
+        $images = $request['old_images'] != null ? $this->multipleFileUpload($request['old_images'], $request['images'], "question/$this->main_folder") : [];
 
         $question = Question::updateOrCreate(
             [
@@ -36,6 +36,7 @@ class QuestionService
             ],
             [
                 'user_id'              => $request['user_id'] ?? null,
+                'study_id'             => $request['study_id'] ?? null,
                 'company_id'           => $request['company_id'] ?? null,
                 'topic_id'             => $request['topic_id'] ?? null,
                 'material_category_id' => $request['material_category_id'] ?? null,
@@ -43,8 +44,8 @@ class QuestionService
                 'question_type_id'     => $request['question_type_id'] ?? null,
                 'question'             => $request['question'] ?? null,
                 'images'               => json_encode($images),
-                'weight_correct'       => $request['weight_correct'] ?? false,
-                'weight_incorrect'     => $request['weight_incorrect'] ?? false,
+                'weight_correct'       => $request['weight_correct'] ?? null,
+                'weight_incorrect'     => $request['weight_incorrect'] ?? null,
                 'description'          => $request['description'] ?? null,
             ]
         );

@@ -24,7 +24,7 @@ class AnswerService
     {
         $images = [];
 
-        $images = $this->multipleFileUpload($request['old_images'], $request['images'], "answer/$this->main_folder");
+        $images = $request['old_images'] != null ? $this->multipleFileUpload($request['old_images'], $request['images'], "answer/$this->main_folder") : [];
 
         $answer = $question->answers()->updateOrCreate(
             [
