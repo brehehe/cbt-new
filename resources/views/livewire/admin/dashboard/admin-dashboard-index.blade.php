@@ -374,8 +374,8 @@
     <div class="mb-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-[#f58634]">Welcome back, {{ Auth::user()->name ?? 'Admin' }}!</h1>
-                <p class="text-gray-600 mt-1">Here's what's happening in your CBT system today.</p>
+                <h1 class="text-3xl font-bold text-[#f58634]">Selamat datang kembali, {{ Auth::user()->name ?? 'Admin' }}!</h1>
+                <p class="text-gray-600 mt-1">Berikut aktivitas sistem CBT Anda hari ini.</p>
                 {{-- <p class="text-sm text-gray-500">{{ \Carbon\Carbon::now()->format('l, F j, Y') }}</p> --}}
             </div>
             <div class="flex items-center gap-3">
@@ -385,13 +385,13 @@
                     <div
                         class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#f58634]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#f58634]">
                     </div>
-                    <span class="ml-3 text-sm font-medium text-gray-600">Auto Refresh</span>
+                    <span class="ml-3 text-sm font-medium text-gray-600">Segarkan Otomatis</span>
                 </label>
 
                 <!-- Real-time Status Indicator -->
                 <div class="flex items-center space-x-2">
                     <div id="realtimeIndicator" class="w-3 h-3 rounded-full bg-green-500 pulse-dot"></div>
-                    <span class="text-sm text-gray-600">Live</span>
+                    <span class="text-sm text-gray-600">Langsung</span>
                 </div>
 
                 <!-- Refresh Button -->
@@ -402,12 +402,12 @@
                             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
                         </path>
                     </svg>
-                    Refresh
+                    Segarkan
                 </button>
 
                 <!-- Last Update Time -->
                 <div class="text-xs text-gray-500">
-                    Last update: <span id="lastUpdateTime">{{ date('H:i:s') }}</span>
+                    Pembaruan terakhir: <span id="lastUpdateTime">{{ date('H:i:s') }}</span>
                 </div>
             </div>
         </div>
@@ -420,14 +420,14 @@
             class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 fade-in">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm text-gray-600 mb-1">Total Users</p>
+                    <p class="text-sm text-gray-600 mb-1">Total Pengguna</p>
                     <h3 class="text-3xl font-bold text-[#f58634]">{{ number_format($totalUsers) }}</h3>
                     <div class="flex items-center mt-2">
                         <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
                             @if (isset($monthlyStats['new_users_this_month']) && $monthlyStats['new_users_this_month'] > 0)
-                                +{{ $monthlyStats['new_users_this_month'] }} this month
+                                +{{ $monthlyStats['new_users_this_month'] }} bulan ini
                             @else
-                                Registered users
+                                Pengguna terdaftar
                             @endif
                         </span>
                     </div>
@@ -446,11 +446,11 @@
             class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 fade-in">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm text-gray-600 mb-1">Today's Exams</p>
+                    <p class="text-sm text-gray-600 mb-1">Ujian Hari Ini</p>
                     <h3 class="text-3xl font-bold text-[#f58634]">{{ $todayExams }}</h3>
                     <div class="flex items-center mt-2">
                         <div class="w-2 h-2 bg-blue-500 rounded-full pulse-dot mr-2"></div>
-                        <span class="text-xs text-blue-600">Exams started today</span>
+                        <span class="text-xs text-blue-600">Ujian dimulai hari ini</span>
                     </div>
                 </div>
                 <div class="bg-gradient-to-br from-blue-500/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
@@ -467,14 +467,14 @@
             class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 fade-in">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm text-gray-600 mb-1">Active Exams</p>
+                    <p class="text-sm text-gray-600 mb-1">Ujian Aktif</p>
                     <h3 class="text-3xl font-bold text-[#f58634]">{{ $activeExams }}</h3>
                     <div class="flex items-center mt-2">
                         @if ($activeExams > 0)
                             <div class="w-2 h-2 bg-orange-500 rounded-full pulse-dot mr-2"></div>
-                            <span class="text-xs text-orange-600">Currently in progress</span>
+                            <span class="text-xs text-orange-600">Sedang berlangsung</span>
                         @else
-                            <span class="text-xs text-gray-500">No active exams</span>
+                            <span class="text-xs text-gray-500">Tidak ada ujian aktif</span>
                         @endif
                     </div>
                 </div>
@@ -492,14 +492,14 @@
             class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 fade-in">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm text-gray-600 mb-1">Security Alerts</p>
+                    <p class="text-sm text-gray-600 mb-1">Peringatan Keamanan</p>
                     <h3 class="text-3xl font-bold text-[#f58634]">{{ $examAlerts }}</h3>
                     <div class="flex items-center mt-2">
                         @if ($examAlerts > 0)
                             <div class="w-2 h-2 bg-red-500 rounded-full pulse-dot mr-2"></div>
-                            <span class="text-xs text-red-600">Security violations</span>
+                            <span class="text-xs text-red-600">Pelanggaran keamanan</span>
                         @else
-                            <span class="text-xs text-green-600">All secure</span>
+                            <span class="text-xs text-green-600">Semua aman</span>
                         @endif
                     </div>
                 </div>
@@ -526,9 +526,9 @@
                 </div>
                 <span class="text-2xl font-bold text-green-600">{{ number_format($completedExams) }}</span>
             </div>
-            <p class="text-sm text-gray-600">Completed Exams</p>
+            <p class="text-sm text-gray-600">Ujian Selesai</p>
             @if (isset($monthlyStats['completed_this_month']))
-                <p class="text-xs text-green-600 mt-1">{{ $monthlyStats['completed_this_month'] }} this month</p>
+                <p class="text-xs text-green-600 mt-1">{{ $monthlyStats['completed_this_month'] }} bulan ini</p>
             @endif
         </div>
 
@@ -544,8 +544,8 @@
                 </div>
                 <span class="text-2xl font-bold text-purple-600">{{ number_format($totalExamTypes) }}</span>
             </div>
-            <p class="text-sm text-gray-600">Exam Categories</p>
-            <p class="text-xs text-purple-600 mt-1">Available types</p>
+            <p class="text-sm text-gray-600">Kategori Ujian</p>
+            <p class="text-xs text-purple-600 mt-1">Jenis tersedia</p>
         </div>
 
         <!-- Completion Rate -->
@@ -565,8 +565,8 @@
                     @endif
                 </span>
             </div>
-            <p class="text-sm text-gray-600">Completion Rate</p>
-            <p class="text-xs text-indigo-600 mt-1">This month average</p>
+            <p class="text-sm text-gray-600">Tingkat Penyelesaian</p>
+            <p class="text-xs text-indigo-600 mt-1">Rata-rata bulan ini</p>
         </div>
 
         <!-- Live Sessions -->
@@ -587,10 +587,10 @@
                     @endif
                 </span>
             </div>
-            <p class="text-sm text-gray-600">Live Sessions</p>
+            <p class="text-sm text-gray-600">Sesi Langsung</p>
             <div class="flex items-center mt-1">
                 <div class="w-2 h-2 bg-yellow-500 rounded-full pulse-dot mr-2"></div>
-                <span class="text-xs text-yellow-600">Active now</span>
+                <span class="text-xs text-yellow-600">Aktif sekarang</span>
             </div>
         </div>
     </div>
@@ -600,10 +600,10 @@
         <!-- Weekly Exam Trends -->
         <div class="lg:col-span-2 bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold text-gray-800">Weekly Exam Trends</h3>
+                <h3 class="text-lg font-semibold text-gray-800">Tren Ujian Mingguan</h3>
                 <div class="flex items-center space-x-2">
                     <div class="w-3 h-3 bg-[#f58634] rounded-full"></div>
-                    <span class="text-sm text-gray-600">Exams Started</span>
+                    <span class="text-sm text-gray-600">Ujian Dimulai</span>
                 </div>
             </div>
 
@@ -614,7 +614,7 @@
 
         <!-- Exam Status Distribution -->
         <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-800 mb-6">Exam Status Distribution</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-6">Distribusi Status Ujian</h3>
 
             <!-- Status Items -->
             <div class="space-y-4">
@@ -664,7 +664,7 @@
                                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
                             </path>
                         </svg>
-                        <p class="text-sm">No exam data available</p>
+                        <p class="text-sm">Tidak ada data ujian</p>
                     </div>
                 @endif
             </div>
@@ -676,10 +676,10 @@
         <!-- Live Session Monitoring -->
         <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold text-gray-800">Live Session Monitoring</h3>
+                <h3 class="text-lg font-semibold text-gray-800">Pemantauan Sesi Langsung</h3>
                 <a href="{{ route('admin.exam.live-stream') }}"
                     class="text-[#f58634] hover:text-[#2d8c5b] text-sm font-medium">
-                    View All →
+                    Lihat Semua →
                 </a>
             </div>
 
@@ -688,21 +688,21 @@
                     <div class="text-center p-4 bg-blue-50 rounded-lg">
                         <div class="text-2xl font-bold text-blue-600">{{ $liveSessionStats['active_sessions'] ?? 0 }}
                         </div>
-                        <div class="text-sm text-blue-600">Active Sessions</div>
+                        <div class="text-sm text-blue-600">Sesi Aktif</div>
                     </div>
                     <div class="text-center p-4 bg-red-50 rounded-lg">
                         <div class="text-2xl font-bold text-red-600">{{ $liveSessionStats['high_risk'] ?? 0 }}</div>
-                        <div class="text-sm text-red-600">High Risk</div>
+                        <div class="text-sm text-red-600">Risiko Tinggi</div>
                     </div>
                 </div>
 
                 <div class="space-y-3">
                     <div class="flex items-center justify-between text-sm">
-                        <span class="text-gray-600">Camera Issues</span>
+                        <span class="text-gray-600">Masalah Kamera</span>
                         <span class="font-medium text-orange-600">{{ $liveSessionStats['camera_issues'] ?? 0 }}</span>
                     </div>
                     <div class="flex items-center justify-between text-sm">
-                        <span class="text-gray-600">Connection Issues</span>
+                        <span class="text-gray-600">Masalah Koneksi</span>
                         <span
                             class="font-medium text-red-600">{{ $liveSessionStats['connection_issues'] ?? 0 }}</span>
                     </div>
@@ -716,7 +716,7 @@
                             </path>
                         </svg>
                     </div>
-                    <p class="text-sm">No active sessions</p>
+                    <p class="text-sm">Tidak ada sesi aktif</p>
                 </div>
             @endif
         </div>
@@ -724,7 +724,7 @@
         <!-- Critical Alerts -->
         <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold text-gray-800">Critical Alerts (24h)</h3>
+                <h3 class="text-lg font-semibold text-gray-800">Peringatan Kritis (24 Jam Terakhir)</h3>
                 <a href="{{ route('admin.exam.monitor') }}"
                     class="text-[#f58634] hover:text-[#2d8c5b] text-sm font-medium">
                     View All →
@@ -743,7 +743,7 @@
                                     {{ $alert->userTimetable->user->name ?? 'Unknown User' }}
                                 </div>
                                 <div class="text-xs text-red-600 mt-1">
-                                    Alert Type: {{ $alert->alert_type ?? 'Security Violation' }}
+                                    Jenis Peringatan: {{ $alert->alert_type ?? 'Pelanggaran Keamanan' }}
                                 </div>
                                 <div class="text-xs text-gray-500 mt-1">
                                     {{ $alert->created_at->diffForHumans() }}
@@ -761,8 +761,8 @@
                                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                     </div>
-                    <p class="text-sm">No critical alerts</p>
-                    <p class="text-xs text-gray-400 mt-1">All systems secure</p>
+                    <p class="text-sm">Tidak ada peringatan kritis</p>
+                    <p class="text-xs text-gray-400 mt-1">Semua sistem aman</p>
                 </div>
             @endif
         </div>
@@ -773,10 +773,10 @@
         <!-- Upcoming Exams -->
         <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold text-gray-800">Upcoming Exams</h3>
+                <h3 class="text-lg font-semibold text-gray-800">Ujian Mendatang</h3>
                 <a href="{{ route('admin.exam.timetable') }}"
                     class="text-[#f58634] hover:text-[#2d8c5b] text-sm font-medium">
-                    Manage →
+                    Kelola →
                 </a>
             </div>
 
@@ -808,7 +808,7 @@
                             </path>
                         </svg>
                     </div>
-                    <p class="text-sm">No upcoming exams</p>
+                    <p class="text-sm">Tidak ada ujian mendatang</p>
                 </div>
             @endif
         </div>
@@ -816,10 +816,10 @@
         <!-- Recent Exam Results -->
         <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold text-gray-800">Recent Results</h3>
+                <h3 class="text-lg font-semibold text-gray-800">Hasil Ujian Terbaru</h3>
                 <a href="{{ route('admin.report.item-analysis') }}"
                     class="text-[#f58634] hover:text-[#2d8c5b] text-sm font-medium">
-                    View Reports →
+                    Lihat Laporan →
                 </a>
             </div>
 
@@ -853,7 +853,7 @@
                             </path>
                         </svg>
                     </div>
-                    <p class="text-sm">No recent results</p>
+                    <p class="text-sm">Tidak ada hasil terbaru</p>
                 </div>
             @endif
         </div>
