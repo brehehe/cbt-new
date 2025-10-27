@@ -1,4 +1,22 @@
 <div>
+    @php
+        // app/Helpers/FormatHelper.php
+        if (!function_exists('formatBytes')) {
+            function formatBytes($bytes, $precision = 2)
+            {
+                $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+
+                $bytes = max($bytes, 0);
+                $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+                $pow = min($pow, count($units) - 1);
+
+                $bytes /= pow(1024, $pow);
+
+                return round($bytes, $precision) . ' ' . $units[$pow];
+            }
+        }
+
+    @endphp
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
@@ -107,6 +125,7 @@
                         <th class="w-1 center">No</th>
                         <th>NIM</th>
                         <th>Nama</th>
+                        <th>File Size</th>
                         <th>Status</th>
                         <th class="w-1 center">Aksi</th>
                     </tr>
@@ -118,6 +137,7 @@
                             <td>{{ $examRecording->userTimetable->user->nim ?? ($examRecording->userTimetable->user->username ?? '-') }}
                             </td>
                             <td>{{ $examRecording->userTimetable->user->name ?? '-' }}</td>
+                            <td>{{ $examRecording->file_size ? formatBytes($examRecording->file_size) : '-' }}</td>
                             <td>{{ $examRecording->status ?? '-' }}</td>
                             <td>
                                 <div class="flex items-center">

@@ -27,32 +27,45 @@
                     </a>
                 </div>
                 <!-- Divider: Ujian -->
-                {{-- @if (Auth::user()->hasRole(['Mahasiswa', ' Admin'])) --}}
-                <div>
-                    <div
-                        class="w-full group flex items-center justify-between custom-padding text-xs font-bold text-[#f58634] uppercase tracking-wide">
-                        Ujian
-                    </div>
-                </div>
-                @php
-                    $exams = [['label' => 'Ujian', 'url' => '/admin/exam/timetable', 'icon' => 'fa-file-lines']];
-                @endphp
-                @foreach ($exams as $exam)
+                @if (Auth::user()->hasRole(['Mahasiswa', 'Admin']))
                     <div>
-                        <a href="{{ $exam['url'] }}"
-                            class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
-         {{ Request::is(ltrim($exam['url'], '/')) ? 'bg-[#C3D4EC]/50 text-[#f58634] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#f58634]' }}">
-                            <div class="flex items-center gap-3">
-                                <i
-                                    class="fa-solid {{ $exam['icon'] }} text-lg mr-2
-             {{ Request::is(ltrim($exam['url'], '/')) ? 'text-[#f58634]' : 'text-gray-400 group-hover:text-[#f58634]' }}">
-                                </i>
-                                <span class="sidebar-text">{{ $exam['label'] }}</span>
-                            </div>
-                        </a>
+                        <div
+                            class="w-full group flex items-center justify-between custom-padding text-xs font-bold text-[#f58634] uppercase tracking-wide">
+                            Ujian
+                        </div>
                     </div>
-                @endforeach
-                {{-- @endif --}}
+                    @php
+                        $exams = [
+                            [
+                                'label' => 'Ujian',
+                                'url' => '/admin/exam/timetable',
+                                'icon' => 'fa-file-lines',
+                                'pattern' => 'admin/exam/timetable*',
+                            ],
+                            [
+                                'label' => 'Riwayat Ujian',
+                                'url' => '/admin/exam/history-timetable',
+                                'pattern' => 'admin/exam/history-timetable*',
+                                'icon' => 'fa-clock-rotate-left',
+                            ],
+                        ];
+                    @endphp
+                    @foreach ($exams as $exam)
+                        <div>
+                            <a href="{{ $exam['url'] }}"
+                                class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
+         {{ Request::is(ltrim($exam['pattern'], '/')) ? 'bg-[#C3D4EC]/50 text-[#f58634] active-menu' : 'text-gray-600 hover:bg-[#C3D4EC]/20 hover:text-[#f58634]' }}">
+                                <div class="flex items-center gap-3">
+                                    <i
+                                        class="fa-solid {{ $exam['icon'] }} text-lg mr-2
+             {{ Request::is(ltrim($exam['pattern'], '/')) ? 'text-[#f58634]' : 'text-gray-400 group-hover:text-[#f58634]' }}">
+                                    </i>
+                                    <span class="sidebar-text">{{ $exam['label'] }}</span>
+                                </div>
+                            </a>
+                        </div>
+                    @endforeach
+                @endif
                 <!-- Divider: Master -->
                 @if (!Auth::user()->hasRole(['Mahasiswa']))
                     <div>
@@ -95,7 +108,7 @@
                                     'icon' => 'fa-building-columns',
                                 ],
                                 [
-                                    'label' => 'Kelas',
+                                    'label' => 'Peserta',
                                     'url' => '/admin/master/classmate',
                                     'pattern' => 'admin/master/classmate*',
                                     'icon' => 'fa-users',
@@ -145,7 +158,7 @@
                                     'icon' => 'fa-book',
                                 ],
                                 [
-                                    'label' => 'Tipe Soal',
+                                    'label' => 'Tipe Ujian',
                                     'url' => route('admin.master.question-type'),
                                     'pattern' => 'admin/master/question-type*',
                                     'icon' => 'fa-list-ol',
@@ -199,7 +212,7 @@
                                     'icon' => 'fa-book',
                                 ],
                                 [
-                                    'label' => 'Tipe Soal',
+                                    'label' => 'Tipe Ujian',
                                     'url' => route('admin.master.question-type'),
                                     'pattern' => 'admin/master/question-type*',
                                     'icon' => 'fa-list-ol',

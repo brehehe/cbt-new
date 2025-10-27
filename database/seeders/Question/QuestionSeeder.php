@@ -60,7 +60,7 @@ class QuestionSeeder extends Seeder
             if ($companyTopics && $questionTypes->count() > 0) {
                 $faker = \Faker\Factory::create('id_ID');
 
-                for ($i = 0; $i < 100; $i++) {
+                for ($i = 0; $i < 500; $i++) {
                     $randomTopic = $companyTopics[array_rand($companyTopics)];
                     $randomQuestionType = $questionTypes->random();
 
@@ -98,7 +98,7 @@ class QuestionSeeder extends Seeder
 
             $faker = \Faker\Factory::create('id_ID');
 
-            for ($a = 0; $a < 10; $a++) {
+            for ($a = 0; $a < 50; $a++) {
                 $randomQuestion = rand(0, 1);
                 $questionTypeCompany = QuestionType::withoutGlobalScope('user_scope')->where('company_id', $company->id)->inRandomOrder()->first();
 

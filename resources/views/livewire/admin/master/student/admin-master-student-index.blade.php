@@ -20,7 +20,7 @@
 
     <!-- Filters -->
     <div class="bg-white rounded-lg shadow mb-6 p-4">
-        <div class="grid grid-cols-3 md:grid-cols-3 gap-4 items-end">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <!-- Search -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Cari</label>
@@ -39,10 +39,9 @@
                 </select>
             </div>
 
-            <!-- Status Filter -->
-            <div>
+             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select wire:model.live="statusFilter" class="form-control mt-1">
+                    <select wire:model.live="statusFilter" class="form-control mt-1">
                     <option value="">Semua Status</option>
                     <option value="active">Aktif</option>
                     <option value="graduate">Lulus</option>
@@ -52,16 +51,14 @@
                 </select>
             </div>
 
-            <!-- Per Page -->
-            <!-- <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Per Halaman</label>
-                <select wire:model.live="perPage" class="form-control mt-1">
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
+             <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tipe</label>
+                    <select wire:model.live="isStudentFilter" class="form-control mt-1">
+                    <option value="">Semua Tipe</option>
+                    <option value="mahasiswa">Mahasiswa</option>
+                    <option value="general">General</option>
                 </select>
-            </div> -->
+            </div>
         </div>
     </div>
 
@@ -75,19 +72,16 @@
                             Mahasiswa
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            NIM/ID
+                            NIM/Username
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Prodi
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Semester/Angkatan
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Fakultas
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Status
+                        </th>
+                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Tipe
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Aksi
@@ -121,7 +115,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">
-                                    {{ $admin->nim ?? '-' }}
+                                    {{ $admin->nim ?? $admin->username ?? '-' }}
                                 </div>
                                 @if ($admin->userDetail && $admin->userDetail->student_id)
                                     <div class="text-sm text-gray-500">ID: {{ $admin->userDetail->student_id }}</div>
@@ -134,21 +128,6 @@
                                 @if ($admin->userDetail && $admin->userDetail->student_major)
                                     <div class="text-sm text-gray-500">{{ $admin->userDetail->student_major }}</div>
                                 @endif
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    @if ($admin->userDetail && $admin->userDetail->student_semester)
-                                        Semester {{ $admin->userDetail->student_semester }}
-                                    @else
-                                        -
-                                    @endif
-                                </div>
-                                <div class="text-sm text-gray-500">
-                                    Angkatan: {{ $admin->userDetail->student_batch ?? '-' }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $admin->userDetail->student_faculty ?? '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if ($admin->userDetail)
@@ -179,6 +158,18 @@
                                         -
                                     </span>
                                 @endif
+                            </td>
+                            <td>
+                                @php
+                                    $typeStudy = $admin->type_study;
+                                    $isStudentColors = $typeStudy == 'mahasiswa' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800';
+                                    $isStudentLabels = $typeStudy == 'mahasiswa' ? 'Mahasiswa' : 'General';
+                                @endphp
+
+                                <span
+                                    class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $isStudentColors }}">
+                                    {{ $isStudentLabels }}
+                                </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">

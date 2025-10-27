@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('question_types', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('company_id')->nullable();
-             $table->string('name')->comment('nama tipe soal');
-            $table->text('description')->comment('keteranagan tipe soal');
+            $table->string('name')->comment('nama Tipe Ujian');
+            $table->text('description')->comment('keteranagan Tipe Ujian');
             $table->bigInteger('order')->default(0);
             $table->softDeletes();
             $table->timestamps();

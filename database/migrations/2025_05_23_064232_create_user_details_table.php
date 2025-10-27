@@ -48,7 +48,7 @@ return new class extends Migration
             $table->string('student_program')->nullable()->comment('Program studi untuk mahasiswa');
             $table->string('student_faculty')->nullable()->comment('Fakultas untuk mahasiswa');
             $table->string('student_department')->nullable()->comment('Jurusan untuk mahasiswa');
-            $table->string('student_class')->nullable()->comment('Kelas untuk mahasiswa');
+            $table->string('student_class')->nullable()->comment('Peserta untuk mahasiswa');
             $table->string('student_semester')->nullable()->comment('Semester untuk mahasiswa');
             $table->string('student_academic_year')->nullable()->comment('Tahun akademik');
             $table->enum('student_status', ['active', 'graduate', 'dropout', 'transfer', 'leave'])->nullable()->comment('Status mahasiswa');

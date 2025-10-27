@@ -22,6 +22,7 @@ class AdminMasterClassmateIndex extends Component
     public $perPage = 10, $search;
 
     public $data_id, $name, $description, $user_id, $users = [];
+    public $type_study;
 
     public function mount()
     {
@@ -30,7 +31,7 @@ class AdminMasterClassmateIndex extends Component
 
     public function render()
     {
-        $classmates = Classmate::withoutGlobalScope('user_scope')->search($this->search)->select('id', 'name', 'description')
+        $classmates = Classmate::withoutGlobalScope('user_scope')->search($this->search)->select('id', 'name', 'description','type_study')
             ->where('company_id', Auth::user()?->company?->id)
             ->orderBy('order', 'desc');
         return view('livewire.admin.master.classmate.admin-master-classmate-index', [
@@ -51,21 +52,27 @@ class AdminMasterClassmateIndex extends Component
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['data_id', 'name', 'description']);
+        $this->reset(['data_id', 'name', 'description','type_study']);
         return $this->dispatch('close-modal', ['id' => 'modal']);
+    }
+
+    public function setType($type) : void {
+        $this->type_study = $type;
     }
 
     public function submit()
     {
         $this->validate(
             [
+                'type_study'       => 'required|in:default,mahasiswa,general',
                 'name'             => 'required',
-                'user_id'         => 'required|exists:users,id',
+                'user_id'         => $this->type_study == 'mahasiswa' ? 'required|exists:users,id' : 'nullable',
                 'description'      => 'nullable',
             ],
             [
+                'type_study.required'      => 'Tipe studi wajib diisi.',
                 'user_id.required'        => 'Dosen wajib diisi.',
-                'name.required'             => 'Nama Kelas wajib diisi.',
+                'name.required'             => 'Nama Peserta wajib diisi.',
             ]
         );
 
@@ -77,7 +84,8 @@ class AdminMasterClassmateIndex extends Component
                     'id' => $this->data_id ?? null
                 ],
                 [
-                    'user_id'     => $this->user_id ?? null,
+                    'type_study'  => $this->type_study,
+                    'user_id'     => $this->type_study == 'mahasiswa' ? $this->user_id ?? null : null,
                     'company_id'  => Auth::user()?->company_id,
                     'name'        => $this->name ?? null,
                     'description' => $this->description ?? null,

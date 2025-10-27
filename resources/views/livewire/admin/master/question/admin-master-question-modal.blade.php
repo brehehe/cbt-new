@@ -75,10 +75,10 @@
                     @enderror
                 </div>
                 <div class="mb-4">
-                    <label for="question_type_id" class="block text-sm font-medium text-gray-700">Tipe Soal <span
+                    <label for="question_type_id" class="block text-sm font-medium text-gray-700">Tipe Ujian <span
                             class="text-red-600">*</span></label>
                     <select class="mt-1 form-control" wire:model.lazy='question_type_id'>
-                        <option value="">Pilih tipe soal</option>
+                        <option value="">Pilih Tipe Ujian</option>
                         @foreach ($question_types as $question_type)
                             <option value="{{ $question_type?->id }}">{{ $question_type?->name }}</option>
                         @endforeach

@@ -36,7 +36,13 @@ namespace App\Models\Classmate{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereOrder($value)
+<<<<<<< HEAD
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereUpdatedAt($value)
+=======
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereTypeStudy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereUserId($value)
+>>>>>>> e5429d9a66a0afe856cefba5f08da309445ff349
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate withoutTrashed()
  */
@@ -783,8 +789,8 @@ namespace App\Models\Master\Question{
 /**
  * @property string $id
  * @property string|null $company_id
- * @property string $name nama tipe soal
- * @property string $description keteranagan tipe soal
+ * @property string $name nama Tipe Ujian
+ * @property string $description keteranagan Tipe Ujian
  * @property int $order
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -1507,6 +1513,9 @@ namespace App\Models{
  * @property int $order
  * @property string|null $alternative_contacts Alternative emails/phones for different contexts
  * @property string $type_user Type of user: employee, or patient
+ * @property string $type_study Type of study: default, mahasiswa, or general
+ * @property bool $is_head Apakah role ini adalah kepala dari perusahaan atau tidak
+ * @property bool $is_active Status aktif dari role ini
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -1545,6 +1554,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmailVerifiedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereIsHead($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereNim($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereOrder($value)
@@ -1554,6 +1565,10 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereStudyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereStudys($value)
+<<<<<<< HEAD
+=======
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereTypeStudy($value)
+>>>>>>> e5429d9a66a0afe856cefba5f08da309445ff349
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereTypeUser($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUserId($value)
@@ -1638,7 +1653,7 @@ namespace App\Models\User{
  * @property string|null $student_program Program studi untuk mahasiswa
  * @property string|null $student_faculty Fakultas untuk mahasiswa
  * @property string|null $student_department Jurusan untuk mahasiswa
- * @property string|null $student_class Kelas untuk mahasiswa
+ * @property string|null $student_class Peserta untuk mahasiswa
  * @property string|null $student_semester Semester untuk mahasiswa
  * @property string|null $student_academic_year Tahun akademik
  * @property string|null $student_status Status mahasiswa
@@ -1905,4 +1920,3 @@ namespace App\Models\User{
  */
 	class UserTimetable extends \Eloquent {}
 }
-

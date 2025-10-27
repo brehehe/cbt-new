@@ -821,7 +821,7 @@
                 </div>
 
                 <!-- Floating elements -->
-               <div
+                <div
                     class="absolute left-[10%] top-[10%] h-[2vw] w-[2vw] animate-bounce cursor-pointer rounded-full bg-green-500/50 transition-all duration-500 hover:scale-150 hover:bg-green-400">
                 </div>
 
@@ -829,8 +829,7 @@
                     class="absolute right-[12%] top-1/3 h-[5vh] w-[1vw] animate-pulse cursor-pointer bg-indigo-500/50 transition-all hover:h-[10vh] hover:bg-indigo-400">
                 </div>
 
-                <div
-                    class="absolute bottom-1/4 left-1/4 h-[2.5vw] w-[2.5vw] rotate-45 animate-spin cursor-pointer bg-cyan-500/50 transition-all hover:scale-150"
+                <div class="absolute bottom-1/4 left-1/4 h-[2.5vw] w-[2.5vw] rotate-45 animate-spin cursor-pointer bg-cyan-500/50 transition-all hover:scale-150"
                     style="animation-duration: 15s;">
                 </div>
 
@@ -869,7 +868,8 @@
                                 </div> --}}
                                 <div class="">
 
-                                    <img src="{{ asset('asset/img/logo-procbt.png') }}" alt="" class="w-32 sm:w-40 md:w-48 lg:w-56 bg-gray-300 rounded-2xl">
+                                    <img src="{{ asset('asset/img/logo-procbt.png') }}" alt=""
+                                        class="w-32 sm:w-40 md:w-48 lg:w-56 bg-gray-300 rounded-2xl">
                                     {{-- <h1 class="text-5xl font-extrabold tracking-tight text-gray-100">PRO CBT</h1> --}}
                                     {{-- <p class="text-md text-gray-800/80">insitutkmb@gmail.com</p> --}}
                                 </div>
@@ -971,7 +971,7 @@
                         </div>
 
                         <!-- Features Grid -->
-                        <div class="space-y-2 mt-[35%] max-w-xl">
+                        <div class="space-y-2 mt-[30%] max-w-xl">
                             <div
                                 class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-gray-300 xl:p-4">
                                 <div class="flex items-start space-x-3">
@@ -1050,23 +1050,6 @@
 
                 <!-- Right Panel: Login Form - Full width on mobile, partial on desktop -->
                 <div class="relative flex min-h-screen w-full items-center justify-center p-4 lg:w-2/5 lg:p-8 xl:p-16">
-                    <!-- Mobile Header - Only visible on mobile -->
-                    <div class="absolute left-4 top-4 lg:hidden">
-                        <div
-                            class="inline-flex items-center space-x-3 rounded-2xl border border-gray-200/50 bg-white/90 px-4 py-2 shadow-xl backdrop-blur-xl">
-                            <div
-                                class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-green-600">
-                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11"
-                                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
-                                </svg>
-                            </div>
-                            <div>
-
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Login Card - Properly centered -->
                     <div class="w-full max-w-md">
@@ -1135,10 +1118,10 @@
                                         </button> --}}
                                     </div>
                                 </form>
-                                <div class="mt-4 text-center">
+                                <!-- <div class="mt-4 text-center">
                                     <a href="{{ route('register') }}"
                                         class="text-orange-500 hover:text-orange-700 text-sm">Buat Akun ?</a>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
 
@@ -1168,7 +1151,7 @@
 
                             <!-- Footer -->
                             <p class="text-xs font-medium text-gray-500">
-                                © {{ date('Y') }} Institut Kesehatan Mitra Bunda
+                                © {{ date('Y') }} PRO CBT
                             </p>
                         </div>
                     </div>

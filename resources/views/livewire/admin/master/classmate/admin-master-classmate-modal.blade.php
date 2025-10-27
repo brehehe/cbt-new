@@ -10,7 +10,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M13 16h-1v-4h-1m1-4h.01M12 20.5C6.753 20.5 2.5 16.247 2.5 11S6.753 1.5 12 1.5 21.5 5.753 21.5 11 17.247 20.5 12 20.5z" />
                 </svg>
-                <h2 class="text-xl font-semibold text-gray-800">Modal Kelas</h2>
+                <h2 class="text-xl font-semibold text-gray-800">Modal Peserta</h2>
             </div>
             <button wire:click="closeModal()"
                 class="text-gray-500 hover:text-red-500 transition-colors text-2xl leading-none cursor-pointer">
@@ -21,10 +21,38 @@
         <!-- Body -->
         <div class="px-6 py-4 text-gray-600 overflow-auto" style="max-height: 80vh">
             <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">
+                    Tipe <span class="text-red-600">*</span>
+                </label>
+
+                <div class="mt-2 flex space-x-2">
+                    <button
+                        type="button"
+                        wire:click="setType('mahasiswa')"
+                        class="px-4 py-2 rounded-md border
+                            {{ $type_study === 'mahasiswa' ? 'bg-orange-600 text-white border-orange-600' : 'bg-white text-gray-700 border-gray-300' }}">
+                        Kelas
+                    </button>
+
+                    <button
+                        type="button"
+                        wire:click="setType('general')"
+                        class="px-4 py-2 rounded-md border
+                            {{ $type_study === 'general' ? 'bg-orange-600 text-white border-orange-600' : 'bg-white text-gray-700 border-gray-300' }}">
+                        General
+                    </button>
+                </div>
+
+                @error('type_study')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+            @if($type_study == 'mahasiswa')
+            <div class="mb-4">
                 <label for="name" class="block text-sm font-medium text-gray-700">Nama <span
                         class="text-red-500">*</span></label>
                 <input type="text" id="name" wire:model.defer="name" class="mt-1 form-control"
-                    placeholder="Nama Kelas" />
+                    placeholder="Nama Peserta" />
                 @error('name')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
@@ -54,11 +82,29 @@
             </div>
             <div class="mb-4">
                 <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
-                <textarea id="description" wire:model.defer="description" placeholder="Deskripsi Kelas" class="mt-1 form-control"></textarea>
+                <textarea id="description" wire:model.defer="description" placeholder="Deskripsi Peserta" class="mt-1 form-control"></textarea>
                 @error('description')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
             </div>
+            @elseif($type_study == 'general')
+            <div class="mb-4">
+                <label for="name" class="block text-sm font-medium text-gray-700">Nama <span
+                        class="text-red-500">*</span></label>
+                <input type="text" id="name" wire:model.defer="name" class="mt-1 form-control"
+                    placeholder="Nama Peserta" />
+                @error('name')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+            <div class="mb-4">
+                <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                <textarea id="description" wire:model.defer="description" placeholder="Deskripsi Peserta" class="mt-1 form-control"></textarea>
+                @error('description')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+            @endif
         </div>
 
         <!-- Footer -->

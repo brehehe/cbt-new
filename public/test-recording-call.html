@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Video Recording Call</title>
+</head>
+<body>
+    <h1>Test Video Recording Method Call</h1>
+
+    <div id="status">Testing...</div>
+
+    <script>
+        // Simulate JavaScript method call test
+        console.log('🧪 Testing saveRecordingVideo method call...');
+
+        // Test data
+        const testVideoData = 'data:video/webm;base64,dGVzdCB2aWRlbyBkYXRh'; // "test video data" dalam base64
+
+        console.log('Test video data:', testVideoData);
+        console.log('Test data length:', testVideoData.length);
+
+        // Simulate Livewire call
+        console.log('🔄 Simulating @this.call("saveRecordingVideo", testVideoData)');
+
+        document.getElementById('status').innerHTML = `
+            <p>✅ Test video data prepared</p>
+            <p>📝 Data length: ${testVideoData.length} characters</p>
+            <p>🎬 Ready to test in actual exam page</p>
+            <p><strong>Next steps:</strong></p>
+            <ol>
+                <li>Open exam page</li>
+                <li>Start recording</li>
+                <li>Click "💾 Save Video" button</li>
+                <li>Check browser console for method call</li>
+                <li>Check Laravel logs for method execution</li>
+            </ol>
+        `;
+    </script>
+</body>
+</html>

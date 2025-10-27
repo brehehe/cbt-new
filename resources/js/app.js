@@ -1,8 +1,14 @@
+// =====================
+// SIDEBAR HANDLER
+// =====================
 document.addEventListener('DOMContentLoaded', function () {
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('main-content');
     const innerMainContent = document.querySelector('#main-content .main-content');
     const toggleButton = document.getElementById('toggleSidebar');
+
+    // Jika halaman tidak memiliki sidebar (misal login page), hentikan eksekusi
+    if (!sidebar || !mainContent) return;
 
     function isMobile() {
         return window.innerWidth < 768;
@@ -13,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
         sidebar.classList.remove('translate-x-0');
         mainContent.classList.remove('ml-64');
         mainContent.classList.add('ml-0');
-        // innerMainContent.classList.remove('mr-64');
+        // innerMainContent?.classList.remove('mr-64');
     }
 
     function showSidebar() {
@@ -22,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!isMobile()) {
             mainContent.classList.remove('ml-0');
             mainContent.classList.add('ml-64');
-            // innerMainContent.classList.add('mr-64');
+            // innerMainContent?.classList.add('mr-64');
         }
     }
 
@@ -37,6 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Toggle button
     if (toggleButton) {
         toggleButton.addEventListener('click', function () {
             const isHidden = sidebar.classList.contains('-translate-x-full');
@@ -54,6 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Resize behavior
     window.addEventListener('resize', function () {
         if (isMobile()) {
             hideSidebar();
@@ -68,25 +76,12 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-window.addEventListener('resize', function () {
-    const isMobileNow = window.innerWidth < 768;
-    if (isMobileNow) {
-        hideSidebar();
-    } else {
-        if (localStorage.getItem('sidebarHidden') === 'true') {
-            hideSidebar();
-        } else {
-            showSidebar();
-        }
-    }
-});
-
-
-
-// Keep track of the currently open submenu
+// =====================
+// MENU TOGGLE (MAIN MENU)
+// =====================
 let currentOpenmenu = null;
 
-window.togglemenu = function(id) {
+window.togglemenu = function (id) {
     const submenu = document.getElementById(id);
     const arrow = document.getElementById(id + '-arrow');
 
@@ -94,56 +89,43 @@ window.togglemenu = function(id) {
     if (currentOpenmenu && currentOpenmenu !== submenu) {
         currentOpenmenu.classList.remove('open');
         const currentOpenArrow = document.getElementById(currentOpenmenu.id + '-arrow');
-        if (currentOpenArrow) {
-            currentOpenArrow.classList.remove('rotate');
-        }
+        if (currentOpenArrow) currentOpenArrow.classList.remove('rotate');
     }
 
-    // Toggle the submenu
-    if (submenu) {
-        submenu.classList.toggle('open');
-    }
+    if (submenu) submenu.classList.toggle('open');
+    if (arrow) arrow.classList.toggle('rotate');
 
-    // Toggle the arrow
-    if (arrow) {
-        arrow.classList.toggle('rotate');
-    }
-
-    // Update the currently open submenu
-    currentOpenmenu = submenu.classList.contains('open') ? submenu : null;
-}
+    currentOpenmenu = submenu && submenu.classList.contains('open') ? submenu : null;
+};
 
 
+// =====================
+// MENU TOGGLE (SUBMENU)
+// =====================
 let currentOpenSubmenu = null;
 
-window.toggleSubmenu = function(id) {
+window.toggleSubmenu = function (id) {
     const submenu = document.getElementById(id);
     const arrow = document.getElementById(id + '-arrow');
 
-    // Close the currently open submenu if it's not the one being clicked
     if (currentOpenSubmenu && currentOpenSubmenu !== submenu) {
         currentOpenSubmenu.classList.remove('open');
         const currentOpenArrow = document.getElementById(currentOpenSubmenu.id + '-arrow');
-        if (currentOpenArrow) {
-            currentOpenArrow.classList.remove('rotate');
-        }
+        if (currentOpenArrow) currentOpenArrow.classList.remove('rotate');
     }
 
-    // Toggle the submenu
-    if (submenu) {
-        submenu.classList.toggle('open');
-    }
+    if (submenu) submenu.classList.toggle('open');
+    if (arrow) arrow.classList.toggle('rotate');
 
-    // Toggle the arrow
-    if (arrow) {
-        arrow.classList.toggle('rotate');
-    }
+    currentOpenSubmenu = submenu && submenu.classList.contains('open') ? submenu : null;
+};
 
-    // Update the currently open submenu
-    currentOpenSubmenu = submenu.classList.contains('open') ? submenu : null;
-}
 
+// =====================
+// FORMAT RUPIAH
+// =====================
 function convertToRupiah(input) {
+    if (!input || !input.value) return;
     let angka = input.value.replace(/[^,\d]/g, "");
     let split = angka.split(",");
     let sisa = split[0].length % 3;
@@ -156,64 +138,71 @@ function convertToRupiah(input) {
     }
 
     rupiah = split[1] !== undefined ? rupiah + "," + split[1] : rupiah;
-
     input.value = rupiah;
 }
-
-// Ini penting! Daftarkan ke global scope
 window.convertToRupiah = convertToRupiah;
 
+
+// =====================
+// MODAL HANDLER
+// =====================
 window.addEventListener('open-modal', event => {
-    const modal = document.getElementById(event.detail[0].id);
+    const modal = document.getElementById(event.detail[0]?.id);
     if (modal) {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
     }
 });
 
-
-// Dengar event dari Livewire untuk tutup modal berdasarkan ID yang dikirimkan
 window.addEventListener('close-modal', event => {
-    const modal = document.getElementById(event.detail[0].id);
+    const modal = document.getElementById(event.detail[0]?.id);
     if (modal) {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
     }
 });
 
-// Tutup modal jika klik luar konten
-document.addEventListener('click', function(e) {
+// Klik luar modal
+document.addEventListener('click', function (e) {
     const modals = document.querySelectorAll('.modal');
     modals.forEach(modal => {
         if (!modal.classList.contains('hidden') && e.target === modal) {
-            window.livewire.emit('closeModal', modal.id); // Kirim event untuk menutup modal tertentu
+            window.livewire?.emit('closeModal', modal.id);
         }
     });
 });
 
 
-// Saat DOM sudah siap
+// =====================
+// DISABLE AUTOCOMPLETE
+// =====================
 document.addEventListener('DOMContentLoaded', function () {
     const allElements = document.querySelectorAll('input, textarea, select');
-    allElements.forEach(el => {
-        el.setAttribute('autocomplete', 'off');
-    });
+    allElements.forEach(el => el.setAttribute('autocomplete', 'off'));
 });
 
+
+// =====================
+// SIDEBAR ACTIVE SCROLL
+// =====================
 document.addEventListener('DOMContentLoaded', function () {
     const sidebar = document.getElementById('sidebar-menu');
-    const activeMenu = sidebar.querySelector('.active-menu'); // pakai class, bukan id
-    if (sidebar && activeMenu) {
-        sidebar.scrollTop = activeMenu.offsetTop - 100; // scroll ke menu aktif
-    }
+    if (!sidebar) return;
+
+    const activeMenu = sidebar.querySelector('.active-menu');
+    if (activeMenu) sidebar.scrollTop = activeMenu.offsetTop - 100;
 });
 
+
+// =====================
+// CALL PASIEN ALERT
+// =====================
 document.addEventListener('callPasienAlert', event => {
     const text = event.detail[0];
     let count = 0;
 
     function playAudioAndSpeak() {
-        let audioContext = new(window.AudioContext || window.webkitAudioContext)();
+        let audioContext = new (window.AudioContext || window.webkitAudioContext)();
         let audio = new Audio('/asset/music/nada-suara.mp3');
         let source = audioContext.createMediaElementSource(audio);
         let gainNode = audioContext.createGain();
@@ -227,7 +216,7 @@ document.addEventListener('callPasienAlert', event => {
 
         audio.play().catch(e => console.error('Audio play failed:', e));
 
-        audio.onended = function() {
+        audio.onended = function () {
             setTimeout(() => {
                 let speech = new SpeechSynthesisUtterance(text);
                 speech.lang = 'id-ID';
@@ -240,55 +229,29 @@ document.addEventListener('callPasienAlert', event => {
                     let voices = window.speechSynthesis.getVoices();
                     let femaleVoice = null;
 
-                    // Cari Microsoft Andika (biasanya lebih natural dan bisa female)
-                    let microsoftVoice = voices.find(voice =>
-                        voice.name.includes('Microsoft Andika')
-                    );
-
-                    let googleVoice = voices.find(voice =>
-                        voice.name.includes('Google Bahasa Indonesia')
-                    );
+                    let microsoftVoice = voices.find(voice => voice.name.includes('Microsoft Andika'));
+                    let googleVoice = voices.find(voice => voice.name.includes('Google Bahasa Indonesia'));
 
                     console.log('=== VOICE COMPARISON ===');
-                    console.log('Microsoft Andika found:', microsoftVoice ? 'Yes' : 'No');
-                    console.log('Google Bahasa found:', googleVoice ? 'Yes' : 'No');
+                    console.log('Microsoft Andika found:', !!microsoftVoice);
+                    console.log('Google Bahasa found:', !!googleVoice);
 
-                    // Prioritas: Microsoft Andika dengan pitch tinggi (lebih natural)
                     if (microsoftVoice) {
                         femaleVoice = microsoftVoice;
-                        speech.pitch = 1.4; // Pitch lebih tinggi untuk efek female
-                        console.log('✅ Using Microsoft Andika with high pitch for female effect');
+                        speech.pitch = 1.4;
                     } else if (googleVoice) {
                         femaleVoice = googleVoice;
-                        speech.pitch = 1.6; // Pitch sangat tinggi untuk Google voice
-                        console.log('✅ Using Google Bahasa Indonesia with very high pitch');
+                        speech.pitch = 1.6;
                     } else {
-                        speech.pitch = 1.8; // Fallback dengan pitch maksimal
-                        console.log('⚠️ Using default voice with maximum pitch');
+                        speech.pitch = 1.8;
                     }
 
-                    if (femaleVoice) {
-                        speech.voice = femaleVoice;
-                        console.log('=== FINAL SETTINGS ===');
-                        console.log('Selected Voice:', femaleVoice.name);
-                        console.log('Pitch:', speech.pitch);
-                        console.log('Rate:', speech.rate);
-                    }
+                    if (femaleVoice) speech.voice = femaleVoice;
 
-                    speech.onstart = function() {
-                        console.log('🔊 Speech started with voice:', speech.voice ? speech.voice.name : 'default');
-                    };
-
-                    speech.onerror = function(event) {
-                        console.error('❌ Speech error:', event.error);
-                    };
-
-                    speech.onend = function() {
+                    speech.onend = function () {
                         console.log('✅ Speech completed');
                         count++;
-                        if (count < 2) {
-                            setTimeout(() => playAudioAndSpeak(), 500);
-                        }
+                        if (count < 2) setTimeout(playAudioAndSpeak, 500);
                     };
 
                     try {

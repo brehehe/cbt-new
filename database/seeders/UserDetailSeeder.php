@@ -255,6 +255,7 @@ class UserDetailSeeder extends Seeder
                     ->where('company_id', $companyId)
                     ->inRandomOrder()
                     ->first()->id,
+                'type_study'=> rand(0,1) ? 'mahasiswa' : 'general',
             ]);
 
             $user->assignRole('Mahasiswa');
@@ -300,7 +301,7 @@ class UserDetailSeeder extends Seeder
             RoleHelper::assignRoleToUserInCompany($user, 'Mahasiswa', $companyId);
         }
 
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 50; $i++) {
             $mahasiswa = User::create([
                 'name' => 'Mahasiswa ' . ($i + 1),
                 'email' => 'mahasiswa' . ($i + 1) . '@gmail.com',
@@ -312,6 +313,7 @@ class UserDetailSeeder extends Seeder
                     ->where('company_id', $companyId)
                     ->inRandomOrder()
                     ->first()->id,
+                'type_study'=> rand(0,1) ? 'mahasiswa' : 'general',
             ]);
 
             $mahasiswa->assignRole('Mahasiswa');

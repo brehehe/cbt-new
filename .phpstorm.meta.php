@@ -80,6 +80,7 @@ namespace PHPSTORM_META {
             'queue.worker' => \Illuminate\Queue\Worker::class,
             'redirect' => \Illuminate\Routing\Redirector::class,
             'redis' => \Illuminate\Redis\RedisManager::class,
+            'redis.connection' => \Illuminate\Redis\Connections\PhpRedisConnection::class,
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
@@ -222,6 +223,7 @@ namespace PHPSTORM_META {
             'queue.worker' => \Illuminate\Queue\Worker::class,
             'redirect' => \Illuminate\Routing\Redirector::class,
             'redis' => \Illuminate\Redis\RedisManager::class,
+            'redis.connection' => \Illuminate\Redis\Connections\PhpRedisConnection::class,
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
@@ -364,6 +366,7 @@ namespace PHPSTORM_META {
             'queue.worker' => \Illuminate\Queue\Worker::class,
             'redirect' => \Illuminate\Routing\Redirector::class,
             'redis' => \Illuminate\Redis\RedisManager::class,
+            'redis.connection' => \Illuminate\Redis\Connections\PhpRedisConnection::class,
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
@@ -506,6 +509,7 @@ namespace PHPSTORM_META {
             'queue.worker' => \Illuminate\Queue\Worker::class,
             'redirect' => \Illuminate\Routing\Redirector::class,
             'redis' => \Illuminate\Redis\RedisManager::class,
+            'redis.connection' => \Illuminate\Redis\Connections\PhpRedisConnection::class,
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
@@ -648,6 +652,7 @@ namespace PHPSTORM_META {
             'queue.worker' => \Illuminate\Queue\Worker::class,
             'redirect' => \Illuminate\Routing\Redirector::class,
             'redis' => \Illuminate\Redis\RedisManager::class,
+            'redis.connection' => \Illuminate\Redis\Connections\PhpRedisConnection::class,
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
@@ -790,6 +795,7 @@ namespace PHPSTORM_META {
             'queue.worker' => \Illuminate\Queue\Worker::class,
             'redirect' => \Illuminate\Routing\Redirector::class,
             'redis' => \Illuminate\Redis\RedisManager::class,
+            'redis.connection' => \Illuminate\Redis\Connections\PhpRedisConnection::class,
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
@@ -932,6 +938,7 @@ namespace PHPSTORM_META {
             'queue.worker' => \Illuminate\Queue\Worker::class,
             'redirect' => \Illuminate\Routing\Redirector::class,
             'redis' => \Illuminate\Redis\RedisManager::class,
+            'redis.connection' => \Illuminate\Redis\Connections\PhpRedisConnection::class,
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
@@ -1074,6 +1081,7 @@ namespace PHPSTORM_META {
             'queue.worker' => \Illuminate\Queue\Worker::class,
             'redirect' => \Illuminate\Routing\Redirector::class,
             'redis' => \Illuminate\Redis\RedisManager::class,
+            'redis.connection' => \Illuminate\Redis\Connections\PhpRedisConnection::class,
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
@@ -1216,6 +1224,7 @@ namespace PHPSTORM_META {
             'queue.worker' => \Illuminate\Queue\Worker::class,
             'redirect' => \Illuminate\Routing\Redirector::class,
             'redis' => \Illuminate\Redis\RedisManager::class,
+            'redis.connection' => \Illuminate\Redis\Connections\PhpRedisConnection::class,
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
@@ -1358,6 +1367,7 @@ namespace PHPSTORM_META {
             'queue.worker' => \Illuminate\Queue\Worker::class,
             'redirect' => \Illuminate\Routing\Redirector::class,
             'redis' => \Illuminate\Redis\RedisManager::class,
+            'redis.connection' => \Illuminate\Redis\Connections\PhpRedisConnection::class,
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
@@ -1500,6 +1510,7 @@ namespace PHPSTORM_META {
             'queue.worker' => \Illuminate\Queue\Worker::class,
             'redirect' => \Illuminate\Routing\Redirector::class,
             'redis' => \Illuminate\Redis\RedisManager::class,
+            'redis.connection' => \Illuminate\Redis\Connections\PhpRedisConnection::class,
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
@@ -3529,9 +3540,9 @@ namespace PHPSTORM_META {
     override(\tap(0), type(0));
     override(\optional(0), type(0));
 
-            registerArgumentsSet('auth', 
+            registerArgumentsSet('auth',
 'downloadLogFile','downloadLogFolder','deleteLogFile','deleteLogFolder',);
-        registerArgumentsSet('configs', 
+        registerArgumentsSet('configs',
 'hashing.driver','hashing.bcrypt.rounds','hashing.bcrypt.verify','hashing.bcrypt.limit','hashing.argon.memory',
 'hashing.argon.threads','hashing.argon.time','hashing.argon.verify','hashing.rehash_on_login','concurrency.default',
 'broadcasting.default','broadcasting.connections.reverb.driver','broadcasting.connections.reverb.key','broadcasting.connections.reverb.secret','broadcasting.connections.reverb.app_id',
@@ -3659,11 +3670,11 @@ namespace PHPSTORM_META {
 'ide-helper.include_class_docblocks','ide-helper.force_fqn','ide-helper.use_generics_annotations','ide-helper.macro_default_return_types.Illuminate\\Http\\Client\\Factory','ide-helper.additional_relation_types',
 'ide-helper.additional_relation_return_types','ide-helper.enforce_nullable_relationships','ide-helper.post_migrate','tinker.commands','tinker.alias',
 'tinker.dont_alias',);
-        registerArgumentsSet('middleware', 
+        registerArgumentsSet('middleware',
 'web','api','auth','auth.basic','auth.session',
 'cache.headers','can','guest','password.confirm','precognitive',
 'signed','throttle','verified',);
-        registerArgumentsSet('routes', 
+        registerArgumentsSet('routes',
 'tallstackui.script','tallstackui.style','sanctum.csrf-cookie','livewire.update','livewire.upload-file','livewire.preview-file','log-viewer.hosts','log-viewer.folders',
 'log-viewer.folders.request-download','log-viewer.folders.clear-cache','log-viewer.folders.delete','log-viewer.files','log-viewer.files.request-download',
 'log-viewer.files.clear-cache','log-viewer.files.delete','log-viewer.files.clear-cache-all','log-viewer.files.delete-multiple-files','log-viewer.logs',
@@ -3679,16 +3690,17 @@ namespace PHPSTORM_META {
 'admin.master.exam-type','admin.master.module','admin.master.module-question','admin.master.question','admin.master.question.update',
 'admin.master.classmate','admin.master.classmate.detail','admin.report.timetable','admin.report.timetable-detail','admin.report.question',
 'admin.report.item-analysis','admin.report.item-analysis.detail','logout','storage.local',);
-        registerArgumentsSet('views', 
+        registerArgumentsSet('views',
 'components.action-message','components.app-logo','components.app-logo-icon','components.auth-header','components.auth-session-status',
 'components.layouts.app','components.layouts.app.header','components.layouts.app.sidebar','components.layouts.auth','components.layouts.auth.card',
 'components.layouts.auth.simple','components.layouts.auth.split','components.placeholder-pattern','components.settings.layout','content.auth.login_admin',
-'content.auth.login_register','content.dashboard.dashboard','content.dashboard.modal-dashboard','dashboard','debug_video_frontend',
-'e60dd9d2c3a62d619c9acb38f20d5aa5::icon.book-open-text','e60dd9d2c3a62d619c9acb38f20d5aa5::icon.chevrons-up-down','e60dd9d2c3a62d619c9acb38f20d5aa5::icon.folder-git-2','e60dd9d2c3a62d619c9acb38f20d5aa5::icon.layout-grid','e60dd9d2c3a62d619c9acb38f20d5aa5::navlist.group',
-'flux.icon.book-open-text','flux.icon.chevrons-up-down','flux.icon.folder-git-2','flux.icon.layout-grid','flux.navlist.group',
-'layout.app','layout.auth','layout.auth.app','layout.detail.app','layout.detail.header',
-'layout.footer','layout.loading','layout.navbar','layout.sidebar','layout.warning',
-'livewire-filepond::upload','livewire.admin.dashboard.admin-dashboard-index','livewire.admin.exam.detail.admin-exam-detail-index','livewire.admin.exam.live-stream.admin-exam-live-stream-index','livewire.admin.exam.monitor.admin-exam-monitor-detail-index',
+'content.auth.login_register','content.dashboard.dashboard','content.dashboard.modal-dashboard','dashboard','debug-status',
+'debug_video_frontend','e60dd9d2c3a62d619c9acb38f20d5aa5::icon.book-open-text','e60dd9d2c3a62d619c9acb38f20d5aa5::icon.chevrons-up-down','e60dd9d2c3a62d619c9acb38f20d5aa5::icon.folder-git-2','e60dd9d2c3a62d619c9acb38f20d5aa5::icon.layout-grid',
+'e60dd9d2c3a62d619c9acb38f20d5aa5::navlist.group','flux.icon.book-open-text','flux.icon.chevrons-up-down','flux.icon.folder-git-2','flux.icon.layout-grid',
+'flux.navlist.group','layout.app','layout.auth','layout.auth.app','layout.detail.app',
+'layout.detail.header','layout.footer','layout.loading','layout.navbar','layout.sidebar',
+'layout.warning','livewire-filepond::upload','livewire.admin.change-password.admin-change-password-index','livewire.admin.dashboard.admin-dashboard-index','livewire.admin.dashboard.admin-dashboard-index-old',
+'livewire.admin.exam.detail.admin-exam-detail-index','livewire.admin.exam.history-timetable.admin-exam-history-timetable-index','livewire.admin.exam.history-timetable.detail.admin-exam-history-timetable-detail-index','livewire.admin.exam.live-stream.admin-exam-live-stream-index','livewire.admin.exam.monitor.admin-exam-monitor-detail-index',
 'livewire.admin.exam.monitor.admin-exam-monitor-index','livewire.admin.exam.timetable.admin-exam-timetable-index','livewire.admin.exam.timetable.admin-exam-timetable-modal','livewire.admin.exam.warning.admin-exam-warning-index','livewire.admin.lecturer-management',
 'livewire.admin.master-student-index','livewire.admin.master-supervisor-index','livewire.admin.master.admin.admin-master-admin-index','livewire.admin.master.admin.admin-master-admin-modal','livewire.admin.master.classmate.admin-master-classmate-index',
 'livewire.admin.master.classmate.admin-master-classmate-modal','livewire.admin.master.classmate.detail.admin-master-classmate-detail-index','livewire.admin.master.classmate.detail.admin-master-classmate-detail-modal','livewire.admin.master.exam-type.admin-master-exam-type-index','livewire.admin.master.exam-type.admin-master-exam-type-modal',
@@ -3971,7 +3983,7 @@ namespace PHPSTORM_META {
 'tallstack-ui::components.slide','tallstack-ui::components.stats','tallstack-ui::components.step.items','tallstack-ui::components.step.step','tallstack-ui::components.step.variations.circles',
 'tallstack-ui::components.step.variations.panels','tallstack-ui::components.step.variations.simple','tallstack-ui::components.tab.items','tallstack-ui::components.tab.tab','tallstack-ui::components.table.index',
 'tallstack-ui::components.table.paginators','tallstack-ui::components.theme-switch','tallstack-ui::components.tooltip','tallstack-ui::components.wrapper.input','tallstack-ui::components.wrapper.radio',);
-        registerArgumentsSet('translations', 
+        registerArgumentsSet('translations',
 'auth.failed','auth.password','auth.throttle','pagination.previous','pagination.next',
 'passwords.reset','passwords.sent','passwords.throttled','passwords.token','passwords.user',
 'validation.accepted','validation.accepted_if','validation.active_url','validation.after','validation.after_or_equal',
@@ -4940,7 +4952,7 @@ namespace PHPSTORM_META {
 'livewire-filepond::.Applications.DATA EWA.CBT.cbt-new.vendor.spatie.livewire-filepond.resources.lang.zh_TW.filepond.labelMaxFileSizeExceeded','livewire-filepond::.Applications.DATA EWA.CBT.cbt-new.vendor.spatie.livewire-filepond.resources.lang.zh_TW.filepond.labelMaxFileSize','livewire-filepond::.Applications.DATA EWA.CBT.cbt-new.vendor.spatie.livewire-filepond.resources.lang.zh_TW.filepond.labelMaxTotalFileSizeExceeded','livewire-filepond::.Applications.DATA EWA.CBT.cbt-new.vendor.spatie.livewire-filepond.resources.lang.zh_TW.filepond.labelMaxTotalFileSize','livewire-filepond::.Applications.DATA EWA.CBT.cbt-new.vendor.spatie.livewire-filepond.resources.lang.zh_TW.filepond.labelFileTypeNotAllowed',
 'livewire-filepond::.Applications.DATA EWA.CBT.cbt-new.vendor.spatie.livewire-filepond.resources.lang.zh_TW.filepond.fileValidateTypeLabelExpectedTypes','livewire-filepond::.Applications.DATA EWA.CBT.cbt-new.vendor.spatie.livewire-filepond.resources.lang.zh_TW.filepond.imageValidateSizeLabelFormatError','livewire-filepond::.Applications.DATA EWA.CBT.cbt-new.vendor.spatie.livewire-filepond.resources.lang.zh_TW.filepond.imageValidateSizeLabelImageSizeTooSmall','livewire-filepond::.Applications.DATA EWA.CBT.cbt-new.vendor.spatie.livewire-filepond.resources.lang.zh_TW.filepond.imageValidateSizeLabelImageSizeTooBig','livewire-filepond::.Applications.DATA EWA.CBT.cbt-new.vendor.spatie.livewire-filepond.resources.lang.zh_TW.filepond.imageValidateSizeLabelExpectedMinSize',
 'livewire-filepond::.Applications.DATA EWA.CBT.cbt-new.vendor.spatie.livewire-filepond.resources.lang.zh_TW.filepond.imageValidateSizeLabelExpectedMaxSize','livewire-filepond::.Applications.DATA EWA.CBT.cbt-new.vendor.spatie.livewire-filepond.resources.lang.zh_TW.filepond.imageValidateSizeLabelImageResolutionTooLow','livewire-filepond::.Applications.DATA EWA.CBT.cbt-new.vendor.spatie.livewire-filepond.resources.lang.zh_TW.filepond.imageValidateSizeLabelImageResolutionTooHigh','livewire-filepond::.Applications.DATA EWA.CBT.cbt-new.vendor.spatie.livewire-filepond.resources.lang.zh_TW.filepond.imageValidateSizeLabelExpectedMinResolution','livewire-filepond::.Applications.DATA EWA.CBT.cbt-new.vendor.spatie.livewire-filepond.resources.lang.zh_TW.filepond.imageValidateSizeLabelExpectedMaxResolution',);
-        registerArgumentsSet('env', 
+        registerArgumentsSet('env',
 'APP_NAME','APP_SLUG_NAME','APP_ENV','APP_KEY','APP_PREVIOUS_KEYS',
 'APP_DEBUG','APP_URL','APP_LOCALE','APP_FALLBACK_LOCALE','APP_FAKER_LOCALE',
 'APP_MAINTENANCE_DRIVER','PHP_CLI_SERVER_WORKERS','BCRYPT_ROUNDS','LOG_CHANNEL','LOG_STACK',
@@ -4952,7 +4964,7 @@ namespace PHPSTORM_META {
 'MAIL_PORT','MAIL_USERNAME','MAIL_PASSWORD','MAIL_FROM_ADDRESS','MAIL_FROM_NAME',
 'AWS_ACCESS_KEY_ID','AWS_SECRET_ACCESS_KEY','AWS_DEFAULT_REGION','AWS_BUCKET','AWS_USE_PATH_STYLE_ENDPOINT',
 'VITE_APP_NAME','TALLSTACKUI_PREFIX',);
-        
+
                 expectedArguments(\Illuminate\Support\Facades\Gate::has(), 0, argumentsSet('auth'));
     expectedArguments(\Illuminate\Support\Facades\Gate::allows(), 0, argumentsSet('auth'));
     expectedArguments(\Illuminate\Support\Facades\Gate::denies(), 0, argumentsSet('auth'));
@@ -5016,5 +5028,5 @@ namespace PHPSTORM_META {
                 expectedArguments(\Illuminate\Contracts\Translation\Translator::get(), 0, argumentsSet('translations'));
                 expectedArguments(\env(), 0, argumentsSet('env'));
                 expectedArguments(\Illuminate\Support\Env::get(), 0, argumentsSet('env'));
-            
+
 }

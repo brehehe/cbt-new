@@ -20,7 +20,7 @@
 
     <!-- Filters -->
     <div class="bg-white rounded-lg shadow mb-6 p-4">
-        <div class="grid grid-cols-4 md:grid-cols-4 gap-4 items-end">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <!-- Search -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Cari</label>
@@ -28,39 +28,16 @@
                     class="form-control mt-1">
             </div>
 
-            <!-- Faculty Filter -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Fakultas</label>
-                <select wire:model.live="facultyFilter" class="form-control mt-1">
-                    <option value="">Semua Fakultas</option>
-                    @foreach ($faculties as $faculty)
-                        <option value="{{ $faculty }}">{{ $faculty }}</option>
-                    @endforeach
-                </select>
-            </div>
-
             <!-- Department Filter -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Jurusan</label>
-                <select wire:model.live="departmentFilter" class="form-control mt-1">
-                    <option value="">Semua Jurusan</option>
-                    @foreach ($departments as $department)
-                        <option value="{{ $department }}">{{ $department }}</option>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Prodi</label>
+                <select wire:model.live="filterStudy" class="form-control mt-1">
+                    <option value="">Semua Prodi</option>
+                    @foreach ($getStudys as $key_study => $getStudy)
+                        <option value="{{ $key_study }}">{{ $getStudy }}</option>
                     @endforeach
                 </select>
             </div>
-
-            <!-- Position Filter -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Jabatan</label>
-                <select wire:model.live="positionFilter" class="form-control mt-1">
-                    <option value="">Semua Jabatan</option>
-                    @foreach ($positions as $position)
-                        <option value="{{ $position }}">{{ $position }}</option>
-                    @endforeach
-                </select>
-            </div>
-
             <!-- Per Page -->
             <!-- <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Per Halaman</label>
@@ -84,16 +61,13 @@
                             Dosen
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            ID/NIDN
+                            ID
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Jurusan
+                            NIDN
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Jabatan
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Spesialisasi
+                            NIP
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Aksi
@@ -121,23 +95,15 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">{{ $lecturer->userDetail->lecturer_id ?? '-' }}</div>
-                                <div class="text-sm text-gray-500">NIDN:
-                                    {{ $lecturer->userDetail->lecturer_nidn ?? '-' }}</div>
+
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    {{ $lecturer->userDetail->lecturer_department ?? '-' }}</div>
-                                <div class="text-sm text-gray-500">{{ $lecturer->userDetail->lecturer_faculty ?? '-' }}
+                                <div class="text-sm text-gray-900">{{ $lecturer->userDetail->lecturer_nidn ?? '-' }}
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    {{ $lecturer->userDetail->lecturer_position ?? '-' }}</div>
-                                <div class="text-sm text-gray-500">
-                                    {{ $lecturer->userDetail->lecturer_education_level ?? '-' }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $lecturer->userDetail->lecturer_specialization ?? '-' }}
+                                <div class="text-sm text-gray-900">{{ $lecturer->userDetail->lecturer_nip ?? '-' }}
+                                </div>
                             </td>
                             <td class="center">
                                 <div class="flex items-center">

@@ -168,7 +168,7 @@
                             {{-- Jawaban yang dipilih user --}}
                             <td>
                                 {{ $letter($labelChosen) }}.
-                                {{ optional($chosenAnswer)->timetable_answer->context ?? '-' }}
+                                {{ optional($chosenAnswer)->context ?? '-' }}
                             </td>
                             <td>
                                 @if ($userModuleQuestion->status === 'correct')

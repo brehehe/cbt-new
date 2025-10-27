@@ -1,11 +1,11 @@
-@section('title', 'Tipe Soal')
+@section('title', 'Tipe Ujian')
 <div>
     {{-- Knowing others is intelligence; knowing yourself is true wisdom. --}}
     @include('livewire.admin.master.question-type.admin-master-question-type-modal')
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#f58634]">Tipe Soal</h1>
+                <h1 class="text-2xl font-bold text-[#f58634]">Tipe Ujian</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div>
@@ -50,7 +50,7 @@
                 <thead>
                     <tr>
                         <th class="w-1 center">No</th>
-                        <th>Tipe Soal</th>
+                        <th>Tipe Ujian</th>
                         <th>Deskripsi</th>
                         <th class="w-1 center">Aksi</th>
                     </tr>

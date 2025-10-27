@@ -20,34 +20,12 @@
 
     <!-- Filters -->
     <div class="bg-white rounded-lg shadow mb-6 p-4">
-        <div class="grid grid-cols-3 md:grid-cols-3 gap-4 items-end">
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-4 items-end">
             <!-- Search -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Cari</label>
                 <input type="text" wire:model.live="search" placeholder="ID Pengawas, Nama, Email..."
                     class="form-control mt-1">
-            </div>
-
-            <!-- Departemen Filter -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Departemen</label>
-                <select wire:model.live="departmentFilter" class="form-control mt-1">
-                    <option value="">Semua Departemen</option>
-                    <option value="Fakultas Teknologi Informasi">Fakultas Teknologi Informasi</option>
-                    <option value="Fakultas Ekonomi">Fakultas Ekonomi</option>
-                    <option value="Fakultas Teknik">Fakultas Teknik</option>
-                    <option value="Fakultas Sains">Fakultas Sains</option>
-                </select>
-            </div>
-
-            <!-- Status Filter -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select wire:model.live="statusFilter" class="form-control mt-1">
-                    <option value="">Semua Status</option>
-                    <option value="active">Aktif</option>
-                    <option value="inactive">Tidak Aktif</option>
-                </select>
             </div>
         </div>
     </div>
@@ -62,16 +40,10 @@
                             Pengawas
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Username
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             ID/NIP
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Departemen
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Area/Level
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Spesialisasi
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Status
@@ -108,25 +80,13 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">
+                                    {{ $supervisor->username ?? '-' }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">
                                     {{ $supervisor->userDetail->supervisor_id ?? ($supervisor->userDetail->employee_id ?? '-') }}
                                 </div>
-                                <div class="text-sm text-gray-500">NIP:
-                                    {{ $supervisor->userDetail->supervisor_nip ?? '-' }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    {{ $supervisor->userDetail->supervisor_department ?? '-' }}</div>
-                                <div class="text-sm text-gray-500">{{ $supervisor->userDetail->supervisor_unit ?? '-' }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    {{ $supervisor->userDetail->supervisor_area ?? '-' }}</div>
-                                <div class="text-sm text-gray-500">
-                                    Level: {{ $supervisor->userDetail->supervisor_level ?? '-' }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $supervisor->userDetail->supervisor_specialization ?? '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @php

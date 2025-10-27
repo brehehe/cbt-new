@@ -108,7 +108,7 @@
                     @enderror
                 </div>
                 <div>
-                    <label for="question_type_id" class="block text-sm font-medium text-gray-700">Tipe Soal<span
+                    <label for="question_type_id" class="block text-sm font-medium text-gray-700">Tipe Ujian<span
                             class="text-red-600">*</span></label>
                     <div wire:key="select-{{ rand() }}">
                         <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
@@ -120,7 +120,7 @@
                             }
                         });"
                             wire:model.live="question_type_id" id="question_type_id">
-                            <option value="">Pilih Tipe Soal</option>
+                            <option value="">Pilih Tipe Ujian</option>
                             @foreach ($question_types as $question_type)
                                 <option value="{{ $question_type?->id }}">{{ $question_type?->name }}</option>
                             @endforeach

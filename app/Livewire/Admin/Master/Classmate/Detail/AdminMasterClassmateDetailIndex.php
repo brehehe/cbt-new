@@ -22,6 +22,7 @@ class AdminMasterClassmateDetailIndex extends Component
     public $openStudentModal = false;
     public $users = [];
     public $user_id;
+    public $type_study = 'general';
 
     public function mount($id)
     {
@@ -34,6 +35,7 @@ class AdminMasterClassmateDetailIndex extends Component
             $this->name = $classmate->name;
             $this->user_id = $classmate->user_id;
             $this->description = $classmate->description;
+            $this->type_study = $classmate->type_study;
         }
     }
 
@@ -41,7 +43,7 @@ class AdminMasterClassmateDetailIndex extends Component
     {
         $this->validate([
             'name' => 'required|string|max:255',
-            'user_id' => 'required|exists:users,id',
+            'user_id' => $this->type_study == 'general' ? 'nullable' : 'required|exists:users,id',
             'description' => 'nullable|string',
         ]);
 
@@ -50,6 +52,7 @@ class AdminMasterClassmateDetailIndex extends Component
             $classmate->name = $this->name;
             $classmate->user_id = $this->user_id;
             $classmate->description = $this->description;
+            $classmate->type_study = $this->type_study;
             $classmate->save();
         }
         return AlertHelper::success('Berhasil', 'Data berhasil diperbarui.');
@@ -120,7 +123,8 @@ class AdminMasterClassmateDetailIndex extends Component
         $classmateStudents = ClassmateStudent::search($this->search)->where('classmate_id', $this->classmate_id)->select('id', 'user_id', 'classmate_id')->with(['user:id,name,email', 'user.userDetail'])->get();
 
         return view('livewire.admin.master.classmate.detail.admin-master-classmate-detail-index', [
-            'users' => $this->openStudentModal ? User::role(['Mahasiswa'])
+            'mahasiswas' => $this->openStudentModal ? User::role(['Mahasiswa'])
+                ->where('type_study', $this->type_study)
                 ->search($this->search)
                 ->whereNotIn('id', ClassmateStudent::select('user_id')->get()->pluck('user_id')->toArray() ?? [])
                 ->paginate($this->perPage) : [],
