@@ -1023,17 +1023,22 @@
             }
         }
 
-        // ==== PEERJS INITIALIZER (STABLE) ====
+        // ==== PEERJS INITIALIZER (OPTIMIZED FOR 55 STUDENTS) ====
         async function initializePeerJS() {
-            console.log("🔄 Initializing PeerJS...");
+            console.log("🔄 Initializing PeerJS (optimized)…");
 
+            // ICE servers: STUN + your TURN
             const ICE_SERVERS = [
                 { urls: 'stun:stun.l.google.com:19302' },
                 { urls: 'stun:stun1.l.google.com:19302' },
                 { urls: 'stun:stun.cloudflare.com:3478' },
-                // Gunakan TURN server kamu sendiri (coturn)
                 {
-                urls: 'turn:peer.toti.my.id:3478',
+                urls: 'turn:peer.toti.my.id:3478?transport=udp',
+                username: 'test',
+                credential: 'supersecret'
+                },
+                {
+                urls: 'turns:peer.toti.my.id:5349?transport=tcp',
                 username: 'test',
                 credential: 'supersecret'
                 }
@@ -1044,8 +1049,12 @@
                 path: '/peerjs',
                 secure: true,
                 debug: 1,
-                config: { iceServers: ICE_SERVERS },
-                pingInterval: 15000,   // kirim ping 15 detik sekali
+                config: {
+                iceServers: ICE_SERVERS,
+                iceTransportPolicy: 'all',
+                sdpSemantics: 'unified-plan'
+                },
+                pingInterval: 10000 // kirim ping tiap 10 detik
             });
 
             window.peer = peer;
@@ -1065,11 +1074,13 @@
                 tryReconnect();
             });
 
+            // === HANDLE INCOMING CALLS ===
             async function handleIncomingCall(call) {
                 const stream = await getCameraStream();
                 if (stream) {
                 call.answer(stream);
                 updateLiveSessionData({ connection_status: 'streaming' });
+
                 call.on('close', () => {
                     console.log('📴 Call closed');
                     updateLiveSessionData({ connection_status: 'connected' });
@@ -1094,25 +1105,37 @@
             async function getCameraStream() {
             try {
                 if (window.cameraStream) return window.cameraStream;
+
                 const constraints = {
                 video: {
                     facingMode: 'user',
                     width: { ideal: 640 },
-                    height: { ideal: 480 },
-                    frameRate: { ideal: 24 }
+                    height: { ideal: 360 },
+                    frameRate: { ideal: 15, max: 20 } // ringan dan cukup smooth
                 },
                 audio: false
                 };
+
                 const stream = await navigator.mediaDevices.getUserMedia(constraints);
                 window.cameraStream = stream;
-                console.log('🎥 Camera ready');
+                console.log('🎥 Camera ready (360p / 15 fps)');
+
+                // 🔹 Limit bitrate agar hemat bandwidth
+                const videoTrack = stream.getVideoTracks()[0];
+                const sender = new RTCPeerConnection().addTrack(videoTrack, stream);
+                const params = sender.getParameters();
+                if (!params.encodings) params.encodings = [{}];
+                params.encodings[0].maxBitrate = 300_000; // 300 kbps max
+                sender.setParameters(params);
+
                 return stream;
             } catch (e) {
                 console.error('🚫 Camera error:', e);
                 updateLiveSessionData({ camera_status: 'error' });
                 return null;
             }
-        }
+            }
+
 
 
         // Update live session data

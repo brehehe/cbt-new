@@ -64,7 +64,7 @@
                     <div class="mb-3 overflow-hidden bg-gray-900 rounded-lg aspect-video">
                         <video id="cameraPreview" autoplay class="object-cover w-full h-full"></video>
                     </div>
-                    <p class="text-sm text-gray-500">Pastikan wajah Anda terlihat jelas pada kamera</p>
+                    <p id="cameraStatus" class="text-sm text-gray-500">Pastikan wajah Anda terlihat jelas pada kamera</p>
                 </div>
 
                 <!-- Consent Checkbox -->
