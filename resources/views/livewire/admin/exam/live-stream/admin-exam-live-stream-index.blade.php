@@ -436,9 +436,18 @@
         let activeSessions = [];
         let isConnecting = false;
 
+        // Guard against duplicate initialization
+        window.__examLiveStreamInitialized = window.__examLiveStreamInitialized || false;
+        window.__examLiveStreamIntervals = window.__examLiveStreamIntervals || { durations: null };
+
         document.addEventListener('DOMContentLoaded', function() {
-            initializeLiveStreaming();
-            setupPeerJSConnections();
+            if (!window.__examLiveStreamInitialized) {
+                window.__examLiveStreamInitialized = true;
+                initializeLiveStreaming();
+                setupPeerJSConnections();
+            } else {
+                console.log('Skipping duplicate exam live-stream initialization');
+            }
         });
 
         // Initialize live streaming functionality
@@ -450,7 +459,10 @@
 
             // Update session durations
             updateSessionDurations();
-            setInterval(updateSessionDurations, 1000);
+            if (window.__examLiveStreamIntervals.durations) {
+                clearInterval(window.__examLiveStreamIntervals.durations);
+            }
+            window.__examLiveStreamIntervals.durations = setInterval(updateSessionDurations, 1000);
 
             // Connect to existing student streams
             setTimeout(() => {

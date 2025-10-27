@@ -81,13 +81,22 @@
         let activeSessions = [];
         let isConnecting = false;
 
+        // Guard against duplicate initialization and intervals
+        window.__supervisorInitialized = window.__supervisorInitialized || false;
+        window.__supervisorIntervals = window.__supervisorIntervals || { durations: null, monitor: null, refresh: null };
+
         document.addEventListener('DOMContentLoaded', function() {
             console.log('=== Supervisor Page Loaded ===');
             console.log('Page URL:', window.location.href);
             console.log('PeerJS available:', typeof Peer !== 'undefined');
 
-            initializeLiveStreaming();
-            setupPeerJSConnections();
+            if (!window.__supervisorInitialized) {
+                window.__supervisorInitialized = true;
+                initializeLiveStreaming();
+                setupPeerJSConnections();
+            } else {
+                console.log('Skipping duplicate initialization');
+            }
 
             // Add debugging functions to window for manual testing
             window.debugSupervisor = {
@@ -141,7 +150,8 @@
 
             // Update session durations
             updateSessionDurations();
-            setInterval(updateSessionDurations, 1000);
+            if (window.__supervisorIntervals.durations) clearInterval(window.__supervisorIntervals.durations);
+            window.__supervisorIntervals.durations = setInterval(updateSessionDurations, 1000);
 
             // Connect to existing student streams
             setTimeout(() => {
@@ -149,12 +159,14 @@
             }, 2000);
 
             // Set up periodic monitoring and reconnection
-            setInterval(() => {
+            if (window.__supervisorIntervals.monitor) clearInterval(window.__supervisorIntervals.monitor);
+            window.__supervisorIntervals.monitor = setInterval(() => {
                 monitorConnections();
             }, 30000); // Check every 30 seconds
 
             // Set up periodic refresh of stream data
-            setInterval(() => {
+            if (window.__supervisorIntervals.refresh) clearInterval(window.__supervisorIntervals.refresh);
+            window.__supervisorIntervals.refresh = setInterval(() => {
                 refreshStreamData();
             }, 60000); // Refresh every minute
         }

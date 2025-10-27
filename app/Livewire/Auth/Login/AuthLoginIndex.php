@@ -74,83 +74,31 @@ class AuthLoginIndex extends Component
     }
 
     public function login()
-    {
-        if (in_array(config('app.name_slug'), ['ikmb', 'medical_school'])) {
-            $this->ikmbLogin();
-        }
+{
         $this->validate();
 
-        $company = Company::where('code', $this->code)->first();
-        if (!$company) {
-            $this->showAlert('Kode perusahaan tidak ditemukan');
-            return;
+        $fieldType = filter_var($this->username_or_email, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $user = User::where($fieldType, $this->username_or_email)->first();
+
+        if (!$user) {
+            return $this->showAlert('User tidak ditemukan.');
         }
 
-        // Company validation (uncomment jika perlu)
-        // if (!$company->is_main) {
-        //     if (!$company->is_lifetime) {
-        //         if ($company->expires_at && now()->greaterThan($company->expires_at)) {
-        //             $this->showAlert('Akses ditolak. Akun perusahaan sudah kedaluwarsa.');
-        //             return;
-        //         }
-        //     }
-        // }
-
-        // Find user with smart identity resolution
-        $userResult = $this->findUserWithIdentityResolution($company->id);
-
-        if (!$userResult['success']) {
-            return AlertHelper::error('Akses Ditolak', $userResult['message']);
+        if (!Hash::check($this->password, $user->password)) {
+            return $this->showAlert('Password salah.');
         }
 
-        $user = $userResult['user'];
-        $loginMethod = $userResult['login_method'];
+        Auth::login($user, $this->remember);
 
-        // Check if user is employee
-        if ($user->type_user !== 'employee') {
-            return AlertHelper::error('Akses Ditolak', 'Hanya karyawan yang dapat mengakses sistem ini.');
-        }
+        session()->flash('saved', [
+            'title' => 'Login Berhasil!',
+            'text' => 'Anda berhasil login ke sistem!',
+        ]);
 
-        // Check if user has access to this company
-        $userRoleCompany = $user->companyRoles()->where('company_id', $company->id)->first();
-
-        if (!$userRoleCompany) {
-            return AlertHelper::error('Akses Ditolak', 'Anda tidak memiliki akses ke perusahaan ini. Silakan hubungi administrator perusahaan untuk mendapatkan akses.');
-        }
-
-        // Check if user role is active
-        if (!$userRoleCompany->is_active) {
-            return AlertHelper::error('Akses Ditolak', 'Akun Anda sedang tidak aktif. Silakan hubungi administrator perusahaan.');
-        }
-
-        // Attempt login with found credentials
-        $loginField = $this->determineLoginField($loginMethod);
-        $loginValue = $this->getLoginValue($user, $loginMethod);
-
-        $credentials = [
-            $loginField => $loginValue,
-            'password' => $this->password,
-            'type_user' => 'employee', // Tambahkan filter type_user dalam auth attempt
-        ];
-
-        if (auth()->attempt($credentials, $this->remember)) {
-            $user = User::find(auth()->user()->id);
-            $user->company_id = $company->id;
-            $user->save();
-
-            // Store login context
-            $this->storeLoginContext($user, $company, $loginMethod);
-
-            session()->flash('saved', [
-                'title' => 'Login Berhasil!',
-                'text' => 'Anda berhasil login ke sistem!',
-            ]);
-
-            return redirect()->intended(route('admin.dashboard'));
-        }
-
-        $this->showAlert('Email, username, atau password salah');
+        return $this->redirect(route('admin.dashboard'), navigate: true);
     }
+
+
 
     public function ikmbLogin()
     {

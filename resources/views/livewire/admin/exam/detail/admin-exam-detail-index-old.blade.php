@@ -642,10 +642,10 @@
             requestFullscreen();
 
             // Disable right click
-            document.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                logAlert('right_click', 'Mencoba membuka menu konteks');
-            });
+            // document.addEventListener('contextmenu', function(e) {
+            //     e.preventDefault();
+            //     logAlert('right_click', 'Mencoba membuka menu konteks');
+            // });
 
             // Disable F12, Ctrl+Shift+I, etc.
             document.addEventListener('keydown', function(e) {
@@ -1023,104 +1023,199 @@
             }
         }
 
-        // ==== PEERJS INITIALIZER (STABLE) ====
+        // Initialize streaming using mediasoup + socket.io (replacement for PeerJS)
         async function initializePeerJS() {
-            console.log("🔄 Initializing PeerJS...");
+            const SOCKET_PATH = '/mediasoup/socket.io';
+            const SERVER_URL = location.hostname.includes('localhost')
+                ? 'http://localhost:4445'
+                : 'https://procbt.id';
 
-            const ICE_SERVERS = [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' },
-                { urls: 'stun:stun.cloudflare.com:3478' },
-                // Gunakan TURN server kamu sendiri (coturn)
-                {
-                urls: 'turn:peer.toti.my.id:3478',
-                username: 'test',
-                credential: 'supersecret'
-                }
-            ];
-
-            const peer = new Peer({
-                host: 'peer.toti.my.id',
-                path: '/peerjs',
-                secure: true,
-                debug: 1,
-                config: { iceServers: ICE_SERVERS },
-                pingInterval: 15000,   // kirim ping 15 detik sekali
-            });
-
-            window.peer = peer;
-            let reconnectTimer;
-
-            peer.on('open', id => {
-                console.log('✅ Peer connected:', id);
-                updateLiveSessionData({ connection_status: 'connected' });
-                if (window.Livewire) Livewire.dispatch('updatePeerJSId', [id]);
-            });
-
-            peer.on('call', call => handleIncomingCall(call));
-            peer.on('disconnected', () => tryReconnect());
-            peer.on('error', err => {
-                console.warn('⚠️ PeerJS error:', err);
-                updateLiveSessionData({ connection_status: 'unstable' });
-                tryReconnect();
-            });
-
-            async function handleIncomingCall(call) {
-                const stream = await getCameraStream();
-                if (stream) {
-                call.answer(stream);
-                updateLiveSessionData({ connection_status: 'streaming' });
-                call.on('close', () => {
-                    console.log('📴 Call closed');
-                    updateLiveSessionData({ connection_status: 'connected' });
+            const waitSocketConnected = (socket) =>
+                new Promise((res, rej) => {
+                    if (socket.connected) return res();
+                    const t = setTimeout(() => rej(new Error('socket connect timeout')), 10000);
+                    socket.once('connect', () => { clearTimeout(t); res(); });
+                    socket.once('connect_error', (e) => { clearTimeout(t); rej(e); });
                 });
-                }
-            }
 
-            function tryReconnect() {
-                clearTimeout(reconnectTimer);
-                reconnectTimer = setTimeout(() => {
-                if (peer.disconnected) {
-                    console.log('🔁 Reconnecting PeerJS...');
-                    peer.reconnect();
-                }
-                }, 3000);
-            }
+            const emitAck = (socket, event, data = {}) =>
+                new Promise((resolve) => socket.emit(event, data, (resp) => resolve(resp)));
 
-            await getCameraStream();
-            }
+            let socket, msc, Device, device;
 
-            // === CAMERA STREAM HANDLER ===
-            async function getCameraStream() {
             try {
-                if (window.cameraStream) return window.cameraStream;
-                const constraints = {
-                video: {
-                    facingMode: 'user',
-                    width: { ideal: 640 },
-                    height: { ideal: 480 },
-                    frameRate: { ideal: 24 }
-                },
-                audio: false
-                };
-                const stream = await navigator.mediaDevices.getUserMedia(constraints);
-                window.cameraStream = stream;
-                console.log('🎥 Camera ready');
-                return stream;
-            } catch (e) {
-                console.error('🚫 Camera error:', e);
-                updateLiveSessionData({ camera_status: 'error' });
-                return null;
+                window.__mediasoupLastStep = 'start';
+                console.log('=== Initializing Mediasoup Producer ===');
+
+                // 1️⃣ Load socket.io (ESM)
+                const { io } = await import('https://cdn.socket.io/4.7.5/socket.io.esm.min.js');
+
+                // 2️⃣ Load mediasoup-client (fallback otomatis)
+                try {
+                    msc = await import('/js/mediasoup-client.bundle.js');
+                } catch {
+                    try {
+                        console.log('⚠️ Local mediasoup-client not found, using unpkg...');
+                        msc = await import('https://unpkg.com/mediasoup-client@3.7.8/lib/index.mjs');
+                    } catch {
+                        console.log('⚠️ unpkg failed, using skypack...');
+                        msc = await import('https://cdn.skypack.dev/mediasoup-client@3.7.8');
+                    }
+                }
+
+                Device = msc.Device || (msc.default && msc.default.Device);
+                if (!Device) throw new Error('mediasoup-client Device not available');
+                console.log('✅ mediasoup-client loaded');
+
+                // 3️⃣ Connect socket
+                socket = io(SERVER_URL, {
+                    path: SOCKET_PATH,
+                    transports: ['websocket'],
+                    secure: true,
+                    reconnection: true,
+                    reconnectionAttempts: 5,
+                    reconnectionDelay: 1000,
+                });
+
+                socket.on('connect', () => {
+                    console.log('🔌 mediasoup socket connected:', socket.id);
+                    if (window.Livewire) {
+                        try { Livewire.dispatch('updatePeerJSId', [socket.id]); } catch {}
+                    }
+                    updateLiveSessionData({ camera_status: 'active', connection_status: 'connected' });
+                });
+
+                socket.on('disconnect', () => {
+                    console.log('⚠️ mediasoup socket disconnected');
+                    updateLiveSessionData({ connection_status: 'disconnected' });
+                });
+
+                await waitSocketConnected(socket);
+
+                // 4️⃣ Get camera stream
+                window.__mediasoupLastStep = 'get_user_media';
+                if (!window.cameraStream) {
+                    window.cameraStream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            width: { ideal: 1280, min: 640 },
+                            height: { ideal: 720, min: 480 },
+                            frameRate: { ideal: 30, min: 15 }
+                        },
+                        audio: false
+                    });
+                    const preview = document.getElementById('cameraPreview');
+                    if (preview) preview.srcObject = window.cameraStream;
+                    console.log('✅ Camera preview started');
+                }
+                const cameraStream = window.cameraStream;
+
+                // 5️⃣ Get Router Capabilities
+                window.__mediasoupLastStep = 'get_caps_emit';
+                const capsResp = await emitAck(socket, 'getRouterRtpCapabilities');
+                if (!capsResp?.ok) throw new Error(capsResp?.error || 'Failed to get RTP capabilities');
+
+                // 6️⃣ Load device
+                device = new Device();
+                await device.load({ routerRtpCapabilities: capsResp.rtpCapabilities });
+
+                // 🔍 Filter codec — only allow VP8 + H264 + OPUS
+                device.rtpCapabilities.codecs = device.rtpCapabilities.codecs.filter(
+                    (c) =>
+                        c.mimeType.includes('VP8') ||
+                        c.mimeType.includes('H264') ||
+                        c.mimeType.includes('opus')
+                );
+                console.log('🎯 Active codecs:', device.rtpCapabilities.codecs.map(c => c.mimeType));
+
+                // 7️⃣ Create SEND transport
+                window.__mediasoupLastStep = 'create_transport_emit';
+                const txResp = await emitAck(socket, 'createTransport', { direction: 'send' });
+                if (!txResp?.ok) throw new Error(txResp?.error || 'Failed to create transport');
+                const params = txResp.params;
+
+                const sendTransport = device.createSendTransport({
+                    ...params,
+                    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+                });
+
+                sendTransport.on('connect', async ({ dtlsParameters }, callback, errback) => {
+                    try {
+                        const res = await emitAck(socket, 'connectTransport', {
+                        transportId: sendTransport.id,
+                        dtlsParameters
+                        });
+                        if (!res?.ok) throw new Error(res?.error || 'connectTransport failed');
+
+                        // 🕐 delay 200ms supaya DTLS siap di sisi router
+                        await new Promise(r => setTimeout(r, 200));
+                        callback();
+                    } catch (err) {
+                        console.error('connectTransport error:', err);
+                        errback(err);
+                    }
+                });
+
+
+                sendTransport.on('connectionstatechange', (state) => {
+                    console.log('🧭 Transport state:', state);
+                    if (state === 'connected') {
+                        updateLiveSessionData({ connection_status: 'connected' });
+                    }
+                });
+
+                sendTransport.on('produce', async ({ kind, rtpParameters }, callback, errback) => {
+                    try {
+                        const res = await emitAck(socket, 'produce', {
+                            transportId: sendTransport.id,
+                            kind,
+                            rtpParameters
+                        });
+                        if (!res?.ok) throw new Error(res?.error || 'produce failed');
+                        callback({ id: res.id });
+                    } catch (err) {
+                        console.error('produce error:', err);
+                        errback(err);
+                    }
+                });
+
+                // 8️⃣ Start producing
+                const videoTrack = cameraStream.getVideoTracks()[0];
+                await sendTransport.produce({
+                    track: videoTrack,
+                    encodings: [{ maxBitrate: 800_000 }],
+                    codecOptions: { videoGoogleStartBitrate: 800 }
+                });
+
+                updateLiveSessionData({ connection_status: 'streaming' });
+                console.log('🎥 Mediasoup producing camera stream ✅');
+            } catch (error) {
+                const step = window.__mediasoupLastStep;
+                console.error('❌ Failed to initialize mediasoup', {
+                    step,
+                    name: error?.name,
+                    message: error?.message,
+                    stack: error?.stack
+                });
+
+                alert(
+                    `⚠️ Streaming error (${step || 'n/a'}): ${error?.message || error}\n\n` +
+                    [
+                        '• Router codec: VP8 dulu, H264 fallback (42e01f/pkt-mode=1), +OPUS.',
+                        '• Filter AV1/H265 di client setelah device.load().',
+                        '• connectTransport() OK dulu, baru produce().'
+                    ].join('\n')
+                );
+
+                updateLiveSessionData({ camera_status: 'error', connection_status: 'unstable' });
             }
         }
 
-
-        // Update live session data
         function updateLiveSessionData(data) {
             if (window.Livewire) {
-                Livewire.dispatch('updateLiveSessionData', [data]);
+                try { Livewire.dispatch('updateLiveSessionData', [data]); } catch {}
             }
         }
+
 
         // Get HIGHLY COMPRESSED recording settings for CBT 2-3 hour recordings
         function getOptimalRecordingSettings() {
@@ -1583,22 +1678,29 @@
                     updateRecordingStatus('Saving', 'Using dispatch method...');
 
                     try {
-                        Livewire.dispatch('saveRecordingVideo', {
-                            videoBlob: base64Data
-                        });
+                        // Prevent multiple dispatches during save
+                if (window.__videoSaveInProgress) {
+                    console.log('⏳ Video save already in progress, skipping duplicate dispatch');
+                } else {
+                    window.__videoSaveInProgress = true;
+                    Livewire.dispatch('saveRecordingVideo', {
+                        videoBlob: base64Data
+                    });
 
-                        console.log('📡 Dispatch sent successfully');
+                    console.log('📡 Dispatch sent successfully');
 
-                        // Give dispatch time to process
-                        setTimeout(() => {
-                            updateRecordingStatus('Completed', 'Video dispatched');
-                            console.log('📡 Dispatch method completed');
-                            if (!saveSuccess) {
-                                alert(
-                                    `📡 Video dispatched ke server (${sizeInMB}MB) - cek server logs untuk konfirmasi`
-                                    );
-                            }
-                        }, 2000);
+                    // Give dispatch time to process
+                    setTimeout(() => {
+                        updateRecordingStatus('Completed', 'Video dispatched');
+                        console.log('📡 Dispatch method completed');
+                        window.__videoSaveInProgress = false;
+                        if (!saveSuccess) {
+                            alert(
+                                `📡 Video dispatched ke server (${sizeInMB}MB) - cek server logs untuk konfirmasi`
+                                );
+                        }
+                    }, 2000);
+                }
 
                     } catch (dispatchError) {
                         console.error('❌ Dispatch also failed:', dispatchError);
@@ -1609,15 +1711,17 @@
 
                 // Emergency method: Also try dispatch immediately (parallel)
                 setTimeout(() => {
-                    if (!saveSuccess) {
+                    if (!saveSuccess && !window.__videoSaveInProgress) {
                         console.log('📡 Emergency dispatch backup...');
                         try {
+                            window.__videoSaveInProgress = true;
                             Livewire.dispatch('saveRecordingVideo', {
                                 videoBlob: base64Data
                             });
                             console.log('📡 Emergency dispatch sent');
                         } catch (e) {
                             console.error('❌ Emergency dispatch failed:', e);
+                            window.__videoSaveInProgress = false;
                         }
                     }
                 }, 500);
@@ -1682,14 +1786,25 @@
                     console.log('📡 Calling saveRecordingVideo with optimized video...');
 
                     // Method 1: Direct Livewire dispatch (most reliable)
-                    Livewire.dispatch('saveRecordingVideo', {
-                        videoBlob: base64Data,
-                        compressionInfo: {
-                            originalSize: sizeInMB,
-                            compressionSavings: compressionSavings,
-                            optimized: true
-                        }
-                    });
+                    // Prevent duplicate optimized dispatches
+                    if (!window.__videoSaveInProgress) {
+                        window.__videoSaveInProgress = true;
+                        Livewire.dispatch('saveRecordingVideo', {
+                            videoBlob: base64Data,
+                            compressionInfo: {
+                                originalSize: sizeInMB,
+                                compressionSavings: compressionSavings,
+                                optimized: true
+                            }
+                        });
+                        // Reset in-progress flag after a short delay
+                        setTimeout(() => {
+                            window.__videoSaveInProgress = false;
+                            console.log('✅ Optimized dispatch cycle completed');
+                        }, 2000);
+                    } else {
+                        console.log('⏳ Optimized dispatch skipped due to in-progress flag');
+                    }
 
                     // Method 2: Try component.call as fallback
                     const component = document.querySelector('[wire\\:id]');
