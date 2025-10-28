@@ -1032,23 +1032,29 @@
 
             // ICE servers: STUN + your TURN
             const ICE_SERVERS = [
+                // Bisa tetap pakai STUN publik untuk fallback
                 { urls: 'stun:stun.l.google.com:19302' },
                 { urls: 'stun:stun1.l.google.com:19302' },
                 { urls: 'stun:stun.cloudflare.com:3478' },
+
+                // TURN UDP (utama)
                 {
-                urls: 'turn:peer.toti.my.id:3478?transport=udp',
-                username: 'test',
-                credential: 'supersecret'
+                    urls: 'turn:procbt.id:3478?transport=udp',
+                    username: 'admin',
+                    credential: 'ProcbtSecure123!'
                 },
+
+                // TURN TLS (aktif kalau nanti sudah pakai SSL)
                 {
-                urls: 'turns:peer.toti.my.id:5349?transport=tcp',
-                username: 'test',
-                credential: 'supersecret'
+                    urls: 'turns:procbt.id:5349?transport=tcp',
+                    username: 'admin',
+                    credential: 'ProcbtSecure123!'
                 }
             ];
 
+
             const peer = new Peer({
-                host: 'peer.toti.my.id',
+                host: 'procbt.id',
                 path: '/peerjs',
                 secure: true,
                 debug: 1,

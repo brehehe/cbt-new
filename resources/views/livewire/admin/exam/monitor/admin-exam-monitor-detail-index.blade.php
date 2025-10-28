@@ -342,47 +342,195 @@
 </div>
 
 @push('scripts')
-    <script>
-        let autoRefreshInterval;
+<script src="https://unpkg.com/peerjs@1.5.0/dist/peerjs.min.js"></script>
+<script>
+let peer = null, localStream = null, activeSessions = [], isConnecting = false;
 
-        document.addEventListener('livewire:initialized', function() {
-            // Initialize auto refresh
-            if (@json($autoRefresh ?? false)) {
-                startAutoRefresh();
+const PEER_CONFIG = {
+    host: 'procbt.id',
+    path: '/peerjs',
+    secure: true,
+    debug: 1, // 0 = silent, 1 = minimal log (recommended)
+    pingInterval: 15000,
+    config: {
+        iceServers: [
+            // STUN fallback
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+            { urls: 'stun:stun.cloudflare.com:3478' },
+
+            // TURN UDP (utama)
+            {
+                urls: 'turn:procbt.id:3478?transport=udp',
+                username: 'admin',
+                credential: 'ProcbtSecure123!'
+            },
+
+            // TURN TLS (aktif kalau SSL Coturn sudah jalan)
+            {
+                urls: 'turns:procbt.id:5349?transport=tcp',
+                username: 'admin',
+                credential: 'ProcbtSecure123!'
             }
+        ],
+        iceTransportPolicy: 'relay'
+    }
+};
 
-            // Listen for auto refresh toggle
-            Livewire.on('autoRefreshToggled', function(enabled) {
-                if (enabled) {
-                    startAutoRefresh();
-                } else {
-                    stopAutoRefresh();
-                }
-            });
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.__liveMonitorInited) return;
+    window.__liveMonitorInited = true;
 
-            // Listen for session data refresh events
-            Livewire.on('sessionDataRefreshed', function() {
-                console.log('Session data refreshed at', new Date().toLocaleTimeString());
-            });
+    initSupervisorCamera();
+    initPeer();
+    setInterval(updateDurations, 1000);
+});
+
+async function initSupervisorCamera() {
+    try {
+        localStream = await navigator.mediaDevices.getUserMedia({
+            video: { width: { ideal: 640 }, height: { ideal: 360 }, frameRate: { ideal: 15 } },
+            audio: false
+        });
+        console.log('🎥 Supervisor camera ready');
+    } catch (e) {
+        console.warn('⚠️ Supervisor camera skipped:', e.message);
+    }
+}
+
+function initPeer() {
+    peer = new Peer(PEER_CONFIG);
+
+    peer.on('open', id => {
+        console.log('✅ Peer connected:', id);
+        // optional: notify backend if needed
+    });
+
+    peer.on('call', call => {
+        console.log('📞 Incoming call from', call.peer);
+        call.answer(localStream);
+        call.on('stream', s => showStream(call.peer, s, 'real'));
+    });
+
+    peer.on('disconnected', () => {
+        console.warn('⚠️ Peer disconnected — trying to reconnect...');
+        setTimeout(() => peer.reconnect(), 3000);
+    });
+
+    peer.on('error', err => console.error('❌ Peer error:', err));
+}
+
+async function connectToStudentStreams() {
+    if (isConnecting) return;
+    isConnecting = true;
+
+    try {
+        const res = await fetch('/api/stream/real-streams');
+        const { streams = [] } = await res.json();
+
+        if (!streams.length) return loadDemo();
+
+        console.log(`Found ${streams.length} students`);
+        for (let i = 0; i < streams.length; i += 5) {
+            const batch = streams.slice(i, i + 5);
+            await Promise.all(batch.map(connectStudent));
+            await new Promise(r => setTimeout(r, 2000));
+        }
+    } catch (e) {
+        console.warn('Stream error → demo mode', e.message);
+        await loadDemo();
+    } finally {
+        isConnecting = false;
+    }
+}
+
+async function connectStudent(info) {
+    return new Promise((resolve, reject) => {
+        if (!peer) return reject('Peer not ready');
+        const call = peer.call(info.peer_id, localStream);
+        let timeout = setTimeout(() => { call.close(); reject('timeout'); }, 8000);
+
+        call.on('stream', stream => {
+            clearTimeout(timeout);
+            showStream(info.session_id, stream, 'real', info);
+            activeSessions.push({ id: info.session_id, call, ts: Date.now() });
+            resolve();
         });
 
-        function startAutoRefresh() {
-            stopAutoRefresh(); // Clear any existing interval
-            autoRefreshInterval = setInterval(() => {
-                Livewire.dispatch('refreshSessionData');
-            }, @json($refreshInterval ?? 3) * 1000);
-        }
+        call.on('close', () => cleanup(info.session_id));
+        call.on('error', e => { cleanup(info.session_id); reject(e); });
+    });
+}
 
-        function stopAutoRefresh() {
-            if (autoRefreshInterval) {
-                clearInterval(autoRefreshInterval);
-                autoRefreshInterval = null;
-            }
-        }
+function showStream(id, stream, type = 'demo', meta = {}) {
+    ['streamContainer', 'galleryContainer', 'singleStreamContainer'].forEach(prefix => {
+        const el = document.getElementById(`${prefix}-${id}`) ||
+                   (prefix === 'singleStreamContainer' ? document.getElementById(prefix) : null);
+        if (!el) return;
+        el.innerHTML = '';
 
-        // Clean up when page is unloaded
-        window.addEventListener('beforeunload', function() {
-            stopAutoRefresh();
-        });
-    </script>
+        const v = document.createElement('video');
+        Object.assign(v, { autoplay: true, muted: true, playsInline: true });
+        v.srcObject = stream;
+        v.className = 'w-full h-full object-cover rounded';
+        el.appendChild(v);
+
+        const tag = document.createElement('div');
+        tag.className = 'absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-0.5 rounded';
+        tag.textContent = type === 'real' ? '🔴 LIVE' : '🟡 DEMO';
+        el.appendChild(tag);
+    });
+}
+
+function cleanup(id) {
+    const s = activeSessions.find(x => x.id === id);
+    if (!s) return;
+    try { s.call?.close(); } catch {}
+    activeSessions = activeSessions.filter(x => x.id !== id);
+}
+
+async function loadDemo() {
+    const res = await fetch('/api/stream/sessions');
+    const { sessions = [] } = await res.json();
+    sessions.forEach((s, i) => setTimeout(() => mockDemo(s), i * 400));
+}
+
+function mockDemo(s) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 320; canvas.height = 240;
+    const ctx = canvas.getContext('2d');
+    const draw = () => {
+        ctx.fillStyle = '#111';
+        ctx.fillRect(0, 0, 320, 240);
+        ctx.fillStyle = '#0f0';
+        ctx.font = '16px sans-serif';
+        ctx.fillText('DEMO ' + (s.user_name || 'Student'), 10, 30);
+        ctx.fillText(new Date().toLocaleTimeString(), 10, 60);
+    };
+    const t = setInterval(draw, 100);
+    const stream = canvas.captureStream(10);
+    showStream(s.id, stream, 'demo');
+    activeSessions.push({ id: s.id, cleanup: () => { clearInterval(t); canvas.remove(); } });
+}
+
+function updateDurations() {
+    document.querySelectorAll('[id^="sessionDuration-"]').forEach(e => {
+        const sec = Math.floor(Math.random() * 3600);
+        e.textContent = format(sec);
+    });
+}
+
+function format(sec) {
+    const h = ~~(sec / 3600), m = ~~((sec % 3600) / 60), s = sec % 60;
+    return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':');
+}
+
+window.addEventListener('beforeunload', () => {
+    activeSessions.forEach(x => x.cleanup?.());
+    peer?.destroy();
+    localStream?.getTracks().forEach(t => t.stop());
+});
+
+setTimeout(connectToStudentStreams, 3000);
+</script>
 @endpush

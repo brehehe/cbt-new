@@ -188,7 +188,7 @@
                     path: '/peerjs',
                     secure: false
                 } : {
-                    host: 'peer.toti.my.id',
+                    host: 'procbt.id',
                     path: '/peerjs',
                     secure: true
                 };
@@ -198,15 +198,30 @@
                 // Initialize PeerJS with environment-specific config
                 peer = new Peer({
                     ...peerConfig,
-                    debug: 2, // Enable debug logs like student
+                    debug: 0, // Enable debug logs like student
+                    sdpSemantics: 'unified-plan',
                     config: {
-                        'iceServers': [{
-                                urls: 'stun:stun.l.google.com:19302'
-                            },
-                            {
-                                urls: 'stun:stun1.l.google.com:19302'
-                            }
-                        ]
+                        'iceServers': [
+                        // STUN publik sebagai fallback
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:stun1.l.google.com:19302' },
+                        { urls: 'stun:stun.cloudflare.com:3478' },
+
+                        // TURN server kamu (UDP utama)
+                        {
+                            urls: 'turn:procbt.id:3478?transport=udp',
+                            username: 'admin',
+                            credential: 'ProcbtSecure123!'
+                        },
+
+                        // TURN server TLS (aktif untuk HTTPS / secure PeerJS)
+                        {
+                            urls: 'turns:procbt.id:5349?transport=tcp',
+                            username: 'admin',
+                            credential: 'ProcbtSecure123!'
+                        }
+                        ],
+                        'iceTransportPolicy': 'relay'
                     }
                 });
 
@@ -337,17 +352,22 @@
 
         // Setup supervisor camera (optional - for two-way communication)
         async function setupSupervisorCamera() {
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({
-                    video: true,
-                    audio: false
-                });
-                console.log('Supervisor camera ready');
-            } catch (error) {
-                console.log('Supervisor camera not required:', error.message);
-                localStream = null;
-            }
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    width: { ideal: 640 },   // atau 480 kalau mau lebih hemat
+                    height: { ideal: 360 },
+                    frameRate: { ideal: 10, max: 15 } // hemat bandwidth
+                },
+                audio: false
+            });
+            console.log('🎥 Supervisor camera ready (low quality mode)');
+        } catch (error) {
+            console.log('Supervisor camera not required:', error.message);
+            localStream = null;
         }
+    }
+
 
         // Connect to student streams (filtered by timetable)
         async function connectToStudentStreams() {
@@ -634,7 +654,10 @@
 
                 try {
                     // Call the student - supervisor calls student to get their video
-                    const call = peer.call(streamInfo.peer_id, localStream || new MediaStream());
+                    const call = peer.call(streamInfo.peer_id, localStream, {
+                        constraints: { video: { width: 480, height: 270, frameRate: 10 } }
+                    });
+;
 
                     if (!call) {
                         clearTimeout(timeoutId);
@@ -1071,20 +1094,10 @@
         });
 
         // Cleanup on page unload
-        window.addEventListener('beforeunload', function() {
-            activeSessions.forEach(session => {
-                if (session.cleanup) {
-                    session.cleanup();
-                }
-            });
-
-            if (peer) {
-                peer.destroy();
-            }
-
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-            }
+        window.addEventListener('beforeunload', () => {
+            activeSessions.forEach(s => s.cleanup?.());
+            peer?.destroy();
+            localStream?.getTracks().forEach(t => t.stop());
         });
     </script>
 @endpush
