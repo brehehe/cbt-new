@@ -201,27 +201,15 @@
                     debug: 0, // Enable debug logs like student
                     sdpSemantics: 'unified-plan',
                     config: {
-                        'iceServers': [
-                        // STUN publik sebagai fallback
-                        { urls: 'stun:stun.l.google.com:19302' },
-                        { urls: 'stun:stun1.l.google.com:19302' },
-                        { urls: 'stun:stun.cloudflare.com:3478' },
-
-                        // TURN server kamu (UDP utama)
-                        {
+                        iceServers: [
+                            { urls: 'stun:stun.cloudflare.com:3478' },
+                            {
                             urls: 'turn:procbt.id:3478?transport=udp',
                             username: 'admin',
                             credential: 'ProcbtSecure123!'
-                        },
-
-                        // TURN server TLS (aktif untuk HTTPS / secure PeerJS)
-                        {
-                            urls: 'turns:procbt.id:5349?transport=tcp',
-                            username: 'admin',
-                            credential: 'ProcbtSecure123!'
-                        }
+                            }
                         ],
-                        'iceTransportPolicy': 'relay'
+                        iceTransportPolicy: 'relay'
                     }
                 });
 
@@ -352,22 +340,30 @@
 
         // Setup supervisor camera (optional - for two-way communication)
         async function setupSupervisorCamera() {
-        try {
-            localStream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    width: { ideal: 640 },   // atau 480 kalau mau lebih hemat
-                    height: { ideal: 360 },
-                    frameRate: { ideal: 10, max: 15 } // hemat bandwidth
-                },
-                audio: false
-            });
-            console.log('🎥 Supervisor camera ready (low quality mode)');
-        } catch (error) {
-            console.log('Supervisor camera not required:', error.message);
-            localStream = null;
-        }
-    }
+            try {
+                const constraints = {
+                    video: {
+                        width: { ideal: 640, max: 640 },
+                        height: { ideal: 360, max: 360 },
+                        frameRate: { ideal: 10, max: 12 } // ringan tapi jelas
+                    },
+                    audio: false // supervisor tidak perlu kirim suara
+                };
 
+                localStream = await navigator.mediaDevices.getUserMedia(constraints);
+                console.log('🎥 Supervisor camera started with lightweight settings');
+
+                // tampilkan preview kecil di halaman (opsional)
+                const preview = document.getElementById('supervisorPreview');
+                if (preview) {
+                    preview.srcObject = localStream;
+                    preview.play().catch(err => console.warn('Preview autoplay prevented:', err));
+                }
+            } catch (error) {
+                console.error('❌ Error starting supervisor camera:', error);
+                localStream = null;
+            }
+        }
 
         // Connect to student streams (filtered by timetable)
         async function connectToStudentStreams() {

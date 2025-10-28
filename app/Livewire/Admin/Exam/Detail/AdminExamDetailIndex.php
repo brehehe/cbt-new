@@ -41,6 +41,7 @@ class AdminExamDetailIndex extends Component
     protected $listeners = [
         'timeExpired',
         'saveRecordingVideo' => 'saveRecordingVideo',
+        'saveRecordingChunk' => 'saveRecordingChunk',
         'logAlert',
         'stopRecording',
         'pageReloaded',
@@ -48,7 +49,8 @@ class AdminExamDetailIndex extends Component
         'saveScreenshot',
         'initializePeerJS',
         'updatePeerJSId',
-        'completeExamFinalization'
+        'completeExamFinalization',
+        'finalizeRecording' => 'finalizeRecording'
     ];
 
     public function mount()
@@ -173,6 +175,333 @@ class AdminExamDetailIndex extends Component
             'user_id' => Auth::id(),
             'recording_id' => $this->currentRecording->id
         ]);
+    }
+
+    /**
+     * Save a single recording chunk sent from the client.
+     * Expects base64 data URI in $chunkBlob (data:video/...;base64,...) and a chunkNumber in $data.
+     */
+    public function saveRecordingChunk($chunkBlob = '', $data = [])
+    {
+        try {
+            if (!$this->currentRecording) {
+                \Log::warning('❌ saveRecordingChunk called without currentRecording', [
+                    'user_id' => Auth::id(),
+                    'user_timetable_id' => $this->userTimetableId,
+                ]);
+                return false;
+            }
+
+            // Normalize input parameters
+            $actualChunkBlob = $chunkBlob;
+            if (is_array($chunkBlob) && isset($chunkBlob['chunkBlob'])) {
+                $actualChunkBlob = $chunkBlob['chunkBlob'];
+            } elseif (is_array($data) && isset($data['chunkBlob'])) {
+                $actualChunkBlob = $data['chunkBlob'];
+            }
+
+            $chunkNumber = null;
+            if (is_array($chunkBlob) && isset($chunkBlob['chunkNumber'])) {
+                $chunkNumber = (int) $chunkBlob['chunkNumber'];
+            } elseif (is_array($data) && isset($data['chunkNumber'])) {
+                $chunkNumber = (int) $data['chunkNumber'];
+            }
+
+            // Validate format
+            if (empty($actualChunkBlob) || !preg_match('/^data:video\/[^;]+;.*base64,/', $actualChunkBlob)) {
+                \Log::error('❌ Invalid chunk blob format', [
+                    'user_id' => Auth::id(),
+                    'blob_preview' => is_string($actualChunkBlob) ? substr($actualChunkBlob, 0, 80) : 'not_string',
+                ]);
+                return false;
+            }
+
+            // Decode
+            $videoData = base64_decode(preg_replace('#^data:video/[^;]+;.*base64,#i', '', $actualChunkBlob));
+            if ($videoData === false || strlen($videoData) === 0) {
+                \Log::error('❌ Failed to decode chunk video data', [
+                    'user_id' => Auth::id(),
+                ]);
+                return false;
+            }
+
+            // Determine chunk number
+            if (!$chunkNumber || $chunkNumber <= 0) {
+                $chunkNumber = ($this->currentRecording->chunk_number ?? 0) + 1;
+            }
+
+            // Build path: store under chunks directory per userTimetable
+            $baseDir = 'exam_recordings/chunks/' . $this->userTimetableId;
+            $filename = $baseDir . '/' . $this->currentRecording->id . '_chunk_' . $chunkNumber . '.webm';
+
+            $disk = Storage::disk('public');
+            if (!$disk->exists($baseDir)) {
+                $disk->makeDirectory($baseDir);
+            }
+
+            $saveResult = $disk->put($filename, $videoData);
+            if (!$saveResult) {
+                \Log::error('❌ Failed to save chunk file', [
+                    'filename' => $filename,
+                ]);
+                return false;
+            }
+
+            $fileSize = $disk->size($filename);
+
+            // Update aggregate info on current recording
+            $newFileSizeTotal = ($this->currentRecording->file_size ?? 0) + $fileSize;
+            $this->currentRecording->update([
+                'chunk_number' => $chunkNumber,
+                'file_size' => $newFileSizeTotal,
+            ]);
+
+            \Log::info('✅ Chunk saved', [
+                'user_id' => Auth::id(),
+                'recording_id' => $this->currentRecording->id,
+                'chunk_number' => $chunkNumber,
+                'chunk_size' => $fileSize,
+                'total_size' => $newFileSizeTotal,
+                'path' => $filename,
+            ]);
+
+            // Inform client that chunk saved
+            $this->dispatch('chunkSaved', [
+                'chunk_number' => $chunkNumber,
+                'size' => $fileSize,
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            \Log::error('💥 Error saving recording chunk', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Finalize a chunked recording: write manifest and mark as completed.
+     */
+    public function finalizeRecording($data = [])
+    {
+        try {
+            if (!$this->currentRecording) {
+                return false;
+            }
+
+            $baseDir = 'exam_recordings/chunks/' . $this->userTimetableId;
+            $disk = Storage::disk('public');
+            if (!$disk->exists($baseDir)) {
+                // No chunks saved; nothing to finalize
+                \Log::warning('⚠️ finalizeRecording: baseDir not found', [
+                    'dir' => $baseDir,
+                ]);
+            }
+
+            // Collect chunk files
+            $files = $disk->files($baseDir);
+            $chunkFiles = array_values(array_filter($files, function ($f) {
+                return str_contains($f, '_chunk_') && str_ends_with($f, '.webm');
+            }));
+
+            // Sort by chunk number
+            usort($chunkFiles, function ($a, $b) {
+                $na = (int) preg_replace('/.*_chunk_(\d+)\.webm$/', '$1', $a);
+                $nb = (int) preg_replace('/.*_chunk_(\d+)\.webm$/', '$1', $b);
+                return $na <=> $nb;
+            });
+
+            // Compute total size
+            $totalSize = 0;
+            foreach ($chunkFiles as $f) {
+                $totalSize += $disk->size($f);
+            }
+
+            // Write manifest JSON
+            $manifest = [
+                'recording_id' => $this->currentRecording->id,
+                'user_timetable_id' => $this->userTimetableId,
+                'chunk_count' => count($chunkFiles),
+                'chunks' => $chunkFiles,
+                'finalized_at' => now()->toISOString(),
+            ];
+
+            $manifestPath = $baseDir . '/manifest.json';
+            $disk->put($manifestPath, json_encode($manifest));
+
+            // Attempt to merge chunks into a single WebM using ffmpeg first,
+            // and fall back to byte-concatenation if ffmpeg fails/unavailable
+            $mergedRelPath = null;
+            try {
+                if (count($chunkFiles) > 0) {
+                    $mergedRelPath = $baseDir . '/' . $this->currentRecording->id . '_merged.webm';
+                    $mergedAbsPath = $disk->path($mergedRelPath);
+
+                    // Try ffmpeg concat demuxer
+                    $ffmpegPath = trim((string) shell_exec('which ffmpeg'));
+                    if (!empty($ffmpegPath)) {
+                        $concatListPath = $disk->path($baseDir . '/concat.txt');
+                        $listLines = [];
+                        foreach ($chunkFiles as $cf) {
+                            $listLines[] = "file '" . $disk->path($cf) . "'";
+                        }
+                        file_put_contents($concatListPath, implode(PHP_EOL, $listLines));
+
+                        @unlink($mergedAbsPath);
+                        $cmd = escapeshellcmd($ffmpegPath) . ' -y -f concat -safe 0 -i ' . escapeshellarg($concatListPath) . ' -c copy ' . escapeshellarg($mergedAbsPath) . ' 2>&1';
+                        $output = [];
+                        $ret = 0;
+                        exec($cmd, $output, $ret);
+                        if ($ret === 0 && file_exists($mergedAbsPath) && filesize($mergedAbsPath) > 0) {
+                            $manifest['merged_video'] = $mergedRelPath;
+                            $disk->put($manifestPath, json_encode($manifest));
+                            \Log::info('✅ ffmpeg merged WebM created', [
+                                'path' => $mergedRelPath,
+                                'size' => filesize($mergedAbsPath)
+                            ]);
+                        } else {
+                            \Log::warning('⚠️ ffmpeg concat demuxer copy failed, trying concat protocol', [
+                                'ret' => $ret,
+                                'output_tail' => implode("\n", array_slice($output, -20))
+                            ]);
+
+                            // Attempt ffmpeg concat protocol with stream copy
+                            $protoParts = [];
+                            foreach ($chunkFiles as $cf) {
+                                $protoParts[] = $disk->path($cf);
+                            }
+                            $concatProto = 'concat:' . implode('|', $protoParts);
+                            @unlink($mergedAbsPath);
+                            $output = [];
+                            $ret = 0;
+                            $cmd = escapeshellcmd($ffmpegPath) . ' -y -i ' . escapeshellarg($concatProto) . ' -c copy ' . escapeshellarg($mergedAbsPath) . ' 2>&1';
+                            exec($cmd, $output, $ret);
+                            if ($ret === 0 && file_exists($mergedAbsPath) && filesize($mergedAbsPath) > 0) {
+                                $manifest['merged_video'] = $mergedRelPath;
+                                $disk->put($manifestPath, json_encode($manifest));
+                                \Log::info('✅ ffmpeg concat protocol merged WebM created', [
+                                    'path' => $mergedRelPath,
+                                    'size' => filesize($mergedAbsPath)
+                                ]);
+                            } else {
+                                \Log::warning('⚠️ ffmpeg concat protocol copy failed, trying re-encode', [
+                                    'ret' => $ret,
+                                    'output_tail' => implode("\n", array_slice($output, -20))
+                                ]);
+
+                                // Final attempt: re-encode using concat demuxer to normalize container/streams
+                                @unlink($mergedAbsPath);
+                                $output = [];
+                                $ret = 0;
+                                // Use libvpx for video and libvorbis for audio to stay WebM-compliant
+                                $cmd = escapeshellcmd($ffmpegPath) . ' -y -f concat -safe 0 -i ' . escapeshellarg($concatListPath) . ' -fflags +genpts -c:v libvpx -b:v 2M -c:a libvorbis -b:a 128k ' . escapeshellarg($mergedAbsPath) . ' 2>&1';
+                                exec($cmd, $output, $ret);
+                                if ($ret === 0 && file_exists($mergedAbsPath) && filesize($mergedAbsPath) > 0) {
+                                    $manifest['merged_video'] = $mergedRelPath;
+                                    $disk->put($manifestPath, json_encode($manifest));
+                                    \Log::info('✅ ffmpeg re-encode merged WebM created', [
+                                        'path' => $mergedRelPath,
+                                        'size' => filesize($mergedAbsPath)
+                                    ]);
+                                } else {
+                                    \Log::warning('⚠️ ffmpeg merge failed, falling back to byte-concat', [
+                                        'ret' => $ret,
+                                        'output_tail' => implode("\n", array_slice($output, -20))
+                                    ]);
+                                    $mergedRelPath = null; // ensure fallback
+                                }
+                            }
+                        }
+                    }
+
+                    // Fallback: byte-concatenate starting from the first chunk with EBML header
+                    if ($mergedRelPath === null) {
+                        $ebmlHeader = "\x1A\x45\xDF\xA3";
+                        $startIndex = 0;
+                        foreach ($chunkFiles as $idx => $cf) {
+                            $abs = $disk->path($cf);
+                            $firstBytes = @file_get_contents($abs, false, null, 0, 32);
+                            if ($firstBytes !== false && strpos($firstBytes, $ebmlHeader) !== false) {
+                                $startIndex = $idx;
+                                break;
+                            }
+                        }
+
+                        @unlink($mergedAbsPath);
+                        for ($i = $startIndex; $i < count($chunkFiles); $i++) {
+                            $srcAbs = $disk->path($chunkFiles[$i]);
+                            $data = @file_get_contents($srcAbs);
+                            if ($data === false) {
+                                \Log::warning('⚠️ Unable to read chunk for merge', ['chunk' => $chunkFiles[$i]]);
+                                continue;
+                            }
+                            file_put_contents($mergedAbsPath, $data, FILE_APPEND);
+                        }
+
+                        if (file_exists($mergedAbsPath) && filesize($mergedAbsPath) > 0) {
+                            $manifest['merged_video'] = $mergedRelPath;
+                            $disk->put($manifestPath, json_encode($manifest));
+                            \Log::info('✅ Byte-concat merged WebM created', [
+                                'path' => $mergedRelPath,
+                                'size' => filesize($mergedAbsPath)
+                            ]);
+                        } else {
+                            \Log::warning('⚠️ Byte-concat merged WebM not created or empty');
+                            $mergedRelPath = null;
+                        }
+                    }
+                }
+            } catch (\Throwable $t) {
+                \Log::error('💥 Error during merged WebM creation', [
+                    'error' => $t->getMessage()
+                ]);
+                $mergedRelPath = null;
+            }
+
+            // Update recording as completed
+            $this->currentRecording->update([
+                'video_path' => $mergedRelPath ?: $manifestPath,
+                'file_size' => $totalSize,
+                'end_time' => now(),
+                'status' => 'completed',
+            ]);
+
+            \Log::info('🎉 Recording finalized', [
+                'recording_id' => $this->currentRecording->id,
+                'manifest' => $manifestPath,
+                'merged_video' => $mergedRelPath,
+                'total_size' => $totalSize,
+                'chunk_count' => count($chunkFiles),
+            ]);
+
+            // Notify client
+            $this->dispatch('recordingFinalized', [
+                'manifest' => $manifestPath,
+                'merged_video' => $mergedRelPath,
+                'chunk_count' => count($chunkFiles),
+            ]);
+
+            // Optionally trigger exam completion flow if expected
+            if (method_exists($this, 'completeExamFinalization')) {
+                try {
+                    $this->completeExamFinalization();
+                } catch (\Throwable $t) {
+                    // Swallow to avoid breaking finalize flow
+                    \Log::warning('completeExamFinalization call failed or not implemented');
+                }
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            \Log::error('💥 Error finalizing recording', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
+
+        return false;
     }
 
     public function saveRecordingVideo($videoBlob = '', $data = [])

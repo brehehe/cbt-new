@@ -1032,26 +1032,13 @@
 
             // ICE servers: STUN + your TURN
             const ICE_SERVERS = [
-                // Bisa tetap pakai STUN publik untuk fallback
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' },
                 { urls: 'stun:stun.cloudflare.com:3478' },
-
-                // TURN UDP (utama)
                 {
                     urls: 'turn:procbt.id:3478?transport=udp',
                     username: 'admin',
                     credential: 'ProcbtSecure123!'
-                },
-
-                // TURN TLS (aktif kalau nanti sudah pakai SSL)
-                {
-                    urls: 'turns:procbt.id:5349?transport=tcp',
-                    username: 'admin',
-                    credential: 'ProcbtSecure123!'
                 }
             ];
-
 
             const peer = new Peer({
                 host: 'procbt.id',
@@ -1060,10 +1047,10 @@
                 debug: 1,
                 config: {
                 iceServers: ICE_SERVERS,
-                iceTransportPolicy: 'all',
+                iceTransportPolicy: 'relay',
                 sdpSemantics: 'unified-plan'
                 },
-                pingInterval: 10000 // kirim ping tiap 10 detik
+                pingInterval: 20000  // kirim ping tiap 10 detik
             });
 
             window.peer = peer;
@@ -1076,7 +1063,17 @@
             });
 
             peer.on('call', call => handleIncomingCall(call));
-            peer.on('disconnected', () => tryReconnect());
+            peer.on('disconnected', () => {
+                if (!reconnecting) {
+                    reconnecting = true;
+                    setTimeout(() => {
+                    if (peer.disconnected) {
+                        peer.reconnect();
+                    }
+                    reconnecting = false;
+                    }, 5000);
+                }
+            });
             peer.on('error', err => {
                 console.warn('⚠️ PeerJS error:', err);
                 updateLiveSessionData({ connection_status: 'unstable' });
@@ -1116,14 +1113,15 @@
                 if (window.cameraStream) return window.cameraStream;
 
                 const constraints = {
-                video: {
-                    facingMode: 'user',
-                    width: { ideal: 640 },
-                    height: { ideal: 360 },
-                    frameRate: { ideal: 15, max: 20 } // ringan dan cukup smooth
-                },
-                audio: false
+                    video: {
+                        facingMode: 'user',
+                        width: { ideal: 480, max: 480 },
+                        height: { ideal: 270, max: 270 },
+                        frameRate: { ideal: 10, max: 12 } // hemat CPU & bandwidth
+                    },
+                    audio: false
                 };
+
 
                 const stream = await navigator.mediaDevices.getUserMedia(constraints);
                 window.cameraStream = stream;
@@ -1134,7 +1132,7 @@
                 const sender = new RTCPeerConnection().addTrack(videoTrack, stream);
                 const params = sender.getParameters();
                 if (!params.encodings) params.encodings = [{}];
-                params.encodings[0].maxBitrate = 300_000; // 300 kbps max
+                params.encodings[0].maxBitrate = 150_000; // 300 kbps max
                 sender.setParameters(params);
 
                 return stream;
@@ -1312,7 +1310,43 @@
             });
         }
 
+        // Helper functions for chunk upload (global scope)
+        function blobToBase64(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = (e) => reject(e);
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        async function uploadLatestChunk(chunkBlob, chunkNumber) {
+            try {
+                const base64Data = await blobToBase64(chunkBlob);
+
+                const wireEl = document.querySelector('[wire\\:id]');
+                if (wireEl) {
+                    const livewireComponent = Livewire.find(wireEl.getAttribute('wire:id'));
+                    if (livewireComponent) {
+                        updateRecordingStatus('Saving', `Uploading chunk ${chunkNumber ?? 'n/a'}...`);
+                        await livewireComponent.call('saveRecordingChunk', base64Data, { chunkNumber });
+                        console.log(`✅ Chunk ${chunkNumber ?? 'auto'} uploaded successfully`);
+                        return true;
+                    }
+                }
+                // Fallback when no component found
+                Livewire.dispatch('saveRecordingChunk', { chunkBlob: base64Data, chunkNumber });
+                return true;
+            } catch (e) {
+                console.error('❌ Error converting/uploading chunk', e);
+                return false;
+            }
+        }
+
         // Start recording - continuous recording from start to finish
+        // Segmented mode: stop/start per interval so every chunk has WEBM header
+        window.segmentedRecording = true; // enable segmented recording for standalone chunks
+
         function startRecording() {
             if (!stream) {
                 console.error('No camera stream available for recording');
@@ -1320,7 +1354,11 @@
             }
 
             try {
-                console.log('Starting continuous exam recording...');
+                if (window.segmentedRecording) {
+                    console.log('Starting SEGMENTED exam recording (per-chunk stop/start)...');
+                } else {
+                    console.log('Starting continuous exam recording...');
+                }
 
                 // Check MediaRecorder support
                 if (!MediaRecorder.isTypeSupported('video/webm')) {
@@ -1334,16 +1372,90 @@
                 // Advanced video optimization settings
                 const options = getOptimalRecordingSettings();
 
+                // If segmented mode, record per segment with stop/start to ensure full WEBM header
+                if (window.segmentedRecording) {
+                    window.chunkCount = 0;
+                    isRecording = true;
+                    recordingStartTime = Date.now();
+
+                    const segmentDurationMs = 30000; // 30s per segment
+
+                    function beginSegment() {
+                        const segmentChunks = [];
+                        mediaRecorder = new MediaRecorder(stream, options);
+
+                        mediaRecorder.ondataavailable = function(event) {
+                            if (event.data && event.data.size > 0) {
+                                segmentChunks.push(event.data);
+                            }
+                        };
+
+                        mediaRecorder.onstop = async function() {
+                            try {
+                                const segmentBlob = new Blob(segmentChunks, {
+                                    type: mediaRecorder?.mimeType || 'video/webm'
+                                });
+
+                                window.chunkCount++;
+                                const sizeInMB = (segmentBlob.size / (1024 * 1024)).toFixed(2);
+                                updateRecordingInfo(`${window.chunkCount} chunks, last ${sizeInMB}MB`);
+
+                                if (segmentBlob.size > 0) {
+                                    await uploadLatestChunk(segmentBlob, window.chunkCount);
+                                    console.log(`✅ Segmented chunk ${window.chunkCount} uploaded (${sizeInMB}MB)`);
+                                } else {
+                                    console.warn('⚠️ Segmented chunk empty, skipping upload');
+                                }
+                            } catch (e) {
+                                console.error('❌ Failed to process/upload segmented chunk', e);
+                            }
+
+                            // Continue with next segment if still recording
+                            if (isRecording) {
+                                setTimeout(() => beginSegment(), 250);
+                            } else {
+                                // finalize after last segment stops
+                                saveFinalVideo();
+                            }
+                        };
+
+                        mediaRecorder.onerror = function(event) {
+                            console.error('❌ MediaRecorder error during SEGMENTED mode:', event.error);
+                            updateRecordingStatus('Error', 'Recorder error — restarting segment');
+                            try { mediaRecorder.stop(); } catch (_) {}
+                        };
+
+                        mediaRecorder.start(); // no timeslice; full chunk produced on stop
+
+                        // schedule stop for this segment
+                        window.segmentStopTimeout = setTimeout(() => {
+                            try {
+                                if (mediaRecorder && mediaRecorder.state === 'recording') {
+                                    mediaRecorder.stop();
+                                }
+                            } catch (_) {}
+                        }, segmentDurationMs);
+                    }
+
+                    updateRecordingStatus('Recording', 'CBT Segmented Mode');
+                    startRecordingTimer();
+                    startRecordingHealthMonitor();
+
+                    beginSegment();
+                    console.log('✅ Segmented CBT recording started');
+                    return; // do not run continuous mode below
+                }
+
                 mediaRecorder = new MediaRecorder(stream, options);
                 recordedChunks = [];
-                let chunkCount = 0;
+                window.chunkCount = 0;
                 let totalSize = 0;
 
                 // Enhanced data collection for long CBT recordings (2-3 hours)
                 mediaRecorder.ondataavailable = function(event) {
                     if (event.data.size > 0) {
                         recordedChunks.push(event.data);
-                        chunkCount++;
+                        window.chunkCount++;
                         totalSize += event.data.size;
                         totalRecordingSize = totalSize; // Update global variable
 
@@ -1355,12 +1467,12 @@
                         const chunkEfficiency = calculateChunkCompressionEfficiency(event.data.size, recordingMinutes);
 
                         console.log(
-                            `📦 CBT Chunk ${chunkCount}: ${sizeInMB}MB | Total: ${totalSizeInMB}MB | Duration: ${recordingMinutes}min | Compression: ${chunkEfficiency}`
+                            `📦 CBT Chunk ${window.chunkCount}: ${sizeInMB}MB | Total: ${totalSizeInMB}MB | Duration: ${recordingMinutes}min | Compression: ${chunkEfficiency}`
                         );
 
                         // Update recording info in UI with enhanced compression details
                         updateRecordingInfo(
-                            `${chunkCount} chunks, ${totalSizeInMB}MB, ${recordingMinutes}min, ${chunkEfficiency} compression`
+                            `${window.chunkCount} chunks, ${totalSizeInMB}MB, ${recordingMinutes}min, ${chunkEfficiency} compression`
                         );
 
                         // PROGRESSIVE COMPRESSION TRIGGERS based on file size growth
@@ -1401,6 +1513,13 @@
                             console.warn('⚠️ CBT recording approaching 1GB - browser may need memory management');
                             updateRecordingStatus('Warning', `Large file: ${totalSizeInMB}MB`);
                         }
+
+                        // Upload this chunk immediately for incremental saving
+                        try {
+                            uploadLatestChunk(event.data, window.chunkCount);
+                        } catch (e) {
+                            console.error('❌ Failed to queue chunk upload', e);
+                        }
                     }
                 };
 
@@ -1439,9 +1558,41 @@
                     }, 2000);
                 };
 
+                // Helper: convert Blob to base64 dataURL
+                function blobToBase64(blob) {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.onerror = (e) => reject(e);
+                        reader.readAsDataURL(blob);
+                    });
+                }
+
+                // Upload single chunk to server using Livewire method, with fallback dispatch
+                async function uploadLatestChunk(chunkBlob, chunkNumber) {
+                    try {
+                        const base64Data = await blobToBase64(chunkBlob);
+
+                        const wireEl = document.querySelector('[wire\\:id]');
+                        if (wireEl) {
+                            const livewireComponent = Livewire.find(wireEl.getAttribute('wire:id'));
+                            if (livewireComponent) {
+                                updateRecordingStatus('Saving', `Uploading chunk ${chunkNumber}...`);
+                                await livewireComponent.call('saveRecordingChunk', base64Data, { chunkNumber });
+                                console.log(`✅ Chunk ${chunkNumber} uploaded successfully`);
+                                return;
+                            }
+                        }
+                        // Fallback when no component found
+                        Livewire.dispatch('saveRecordingChunk', { chunkBlob: base64Data, chunkNumber });
+                    } catch (e) {
+                        console.error('❌ Error converting/uploading chunk', e);
+                    }
+                }
+
                 // ENHANCED: Start continuous recording for 2-3 hour exams
-                // Use longer intervals (5 minutes) to reduce memory pressure and prevent auto-stop
-                const timesliceInterval = 300000; // 5 minutes (300,000ms) - better for long recordings
+                // Use shorter intervals (1 minute) to reduce memory pressure and enable quick uploads
+                const timesliceInterval = 30000; // 1 minute (60,000ms) - smaller chunks for quick upload
 
                 console.log('🎬 Starting LONG-DURATION recording for CBT exam...');
                 console.log('📊 Configured for 2-3 hour continuous recording');
@@ -1500,6 +1651,8 @@
                 };
 
                 mediaRecorder.stop();
+                // For segmented mode, also clear segment timer
+                try { clearTimeout(window.segmentStopTimeout); } catch (_) {}
                 isRecording = false;
                 clearInterval(recordingDurationInterval);
                 stopEnhancedBackup();
@@ -1516,7 +1669,7 @@
         }
 
         // Save final video when exam ends
-        function saveFinalVideo() {
+        async function saveFinalVideo() {
             // Prevent multiple calls
             if (window.isSavingVideo) {
                 console.log('💾 saveFinalVideo already in progress, skipping...');
@@ -1529,8 +1682,38 @@
             console.log('MediaRecorder mimeType:', mediaRecorder?.mimeType);
 
             if (recordedChunks.length === 0) {
-                console.warn('⚠️ NO VIDEO DATA TO SAVE');
-                updateRecordingStatus('Completed', 'No data');
+                console.warn('⚠️ NO VIDEO DATA TO SAVE — finalizing server-side chunks');
+                updateRecordingStatus('Finalizing', 'Menggabungkan chunk di server...');
+
+                const wireEl = document.querySelector('[wire\\:id]');
+                if (wireEl) {
+                    const livewireComponent = Livewire.find(wireEl.getAttribute('wire:id'));
+                    if (livewireComponent) {
+                        livewireComponent.call('finalizeRecording')
+                            .then(() => {
+                                console.log('🎉 Recording finalized on server (no local chunks)');
+                                updateRecordingStatus('Completed', 'Video tersimpan sebagai beberapa chunk');
+                                alert('✅ Video ujian berhasil difinalisasi dari chunk yang diupload!');
+                                window.isSavingVideo = false;
+                                window.isRecordingStopping = false;
+                                recordedChunks = [];
+                            })
+                            .catch((err) => {
+                                console.error('❌ finalizeRecording failed, falling back to dispatch', err);
+                                Livewire.dispatch('finalizeRecording');
+                                window.isSavingVideo = false;
+                                window.isRecordingStopping = false;
+                            });
+                    } else {
+                        Livewire.dispatch('finalizeRecording');
+                        window.isSavingVideo = false;
+                        window.isRecordingStopping = false;
+                    }
+                } else {
+                    Livewire.dispatch('finalizeRecording');
+                    window.isSavingVideo = false;
+                    window.isRecordingStopping = false;
+                }
                 return;
             }
 
@@ -1553,6 +1736,44 @@
 
             updateRecordingStatus('Processing', `Preparing ${originalSizeInMB}MB...`);
             console.log('� Processing optimized video...');
+
+            // Ensure any remaining chunks are uploaded before finalizing
+            try {
+                updateRecordingStatus('Saving', 'Uploading remaining chunks...');
+                for (let i = 0; i < recordedChunks.length; i++) {
+                    await uploadLatestChunk(recordedChunks[i], undefined);
+                }
+                console.log('✅ All remaining chunks uploaded');
+            } catch (e) {
+                console.error('❌ Failed to upload remaining chunks', e);
+            }
+
+            // FAST PATH: finalize by stitching server-side chunks for immediate save
+            updateRecordingStatus('Finalizing', 'Menggabungkan chunk di server...');
+            const wireEl = document.querySelector('[wire\\:id]');
+            if (wireEl) {
+                const livewireComponent = Livewire.find(wireEl.getAttribute('wire:id'));
+                if (livewireComponent) {
+                    livewireComponent.call('finalizeRecording')
+                        .then(() => {
+                            console.log('🎉 Recording finalized on server');
+                            updateRecordingStatus('Completed', 'Video tersimpan sebagai beberapa chunk');
+                            alert('✅ Video ujian berhasil disimpan per chunk dan difinalisasi!');
+                            window.isSavingVideo = false;
+                            window.isRecordingStopping = false;
+                            recordedChunks = [];
+                        })
+                        .catch((err) => {
+                            console.error('❌ finalizeRecording failed, falling back to dispatch', err);
+                            Livewire.dispatch('finalizeRecording');
+                        });
+                } else {
+                    Livewire.dispatch('finalizeRecording');
+                }
+            } else {
+                Livewire.dispatch('finalizeRecording');
+            }
+            return;
 
             // Apply simple optimization check
             compressVideoBlob(originalBlob).then(function(finalBlob) {
@@ -2474,7 +2695,7 @@
             // Monitor streaming health
             setInterval(() => {
                 checkStreamingHealth();
-            }, 10000); // Every 10 seconds
+            }, 60000); // Every 10 seconds
 
             // Send initial session data
             updateLiveSessionActivity();
