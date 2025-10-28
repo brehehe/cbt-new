@@ -604,7 +604,8 @@ class AdminExamDetailIndex extends Component
             $this->isMark = $firstQuestion->is_mark;
             $this->question = $firstQuestion->timetableQuestion->question;
             $this->description = $firstQuestion->timetableQuestion->description;
-            $this->images = $firstQuestion->timetableQuestion->images;
+            $images = $firstQuestion->timetableQuestion->images;
+            $this->images = collect(json_decode($images, true));
             $this->number = 1;
             $this->timetable_answer_id = $firstQuestion->timetable_answer_id;
 
@@ -618,7 +619,7 @@ class AdminExamDetailIndex extends Component
                     'id'       => $answer->id,
                     'alphabet' => chr(64 + $index + 1),
                     'context'  => $answer->context,
-                    'images'   => $answer->images,
+                    'images'   => collect(json_decode($images, true)),
                 ];
             }
 
@@ -729,7 +730,8 @@ class AdminExamDetailIndex extends Component
             $questionModel = $currentQuestion->timetableQuestion;
             $this->question = $questionModel->question;
             $this->description = $questionModel->description;
-            $this->images = $questionModel->images;
+            $images = $questionModel->images;
+            $this->images = collect(json_decode($images, true));
 
             $index = array_search($currentQuestion->id, $this->questionIds());
             $this->number = $index !== false ? $index + 1 : 1;
@@ -743,7 +745,7 @@ class AdminExamDetailIndex extends Component
                     'id' => (string) $ans->id,
                     'alphabet' => chr(65 + $i),
                     'context' => $ans->context,
-                    'images' => $ans->images,
+                    'images' => collect(json_decode($ans->images, true)),
                 ]
             )->all();
         }

@@ -183,17 +183,18 @@
                             {{ $description }}
                         </div>
 
-                        @if (!empty($images) && $images->isNotEmpty())
+                        @if (!empty($images) && collect($images)->isNotEmpty())
                             <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 @foreach ($images as $image)
                                     <div
                                         class="overflow-hidden rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
-                                        <img src="{{ asset('storage/' . $image->path) }}" alt="Gambar soal"
+                                        <img src="{{ asset('storage/' . $image) }}" alt="Gambar soal"
                                             class="w-full h-auto object-cover">
                                     </div>
                                 @endforeach
                             </div>
                         @endif
+
                     </div>
 
                     <!-- Pilihan Jawaban -->
@@ -216,12 +217,14 @@
                                     </p>
 
                                     {{-- Gambar (jika ada) --}}
-                                    @if (!empty($question_answer['images']))
-                                        <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                                            @foreach ($question_answer['images'] as $img)
-                                                <img src="{{ asset('storage/' . $img->path) }}"
-                                                    alt="Gambar jawaban {{ $question_answer['alphabet'] }}"
-                                                    class="w-full h-auto rounded-md object-cover">
+                                    @if (!empty($question_answer['images']) && collect($question_answer['images'])->isNotEmpty())
+                                        <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                            @foreach ($question_answer['images'] as $image)
+                                                <div
+                                                    class="overflow-hidden rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+                                                    <img src="{{ asset('storage/' . $image) }}" alt="Gambar soal"
+                                                        class="w-full h-auto object-cover">
+                                                </div>
                                             @endforeach
                                         </div>
                                     @endif
