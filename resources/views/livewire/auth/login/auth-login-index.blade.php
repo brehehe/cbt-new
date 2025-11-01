@@ -281,25 +281,30 @@
                                 </div>
 
                                 <!-- Active Session Error -->
-                                @if($hasActiveSession && $activeSessionInfo)
-                                <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
-                                    <div class="flex items-start">
-                                        <div class="flex-shrink-0">
-                                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-                                            </svg>
-                                        </div>
-                                        <div class="ml-3">
-                                            <h3 class="text-sm font-medium text-red-800">
-                                                Login Tidak Diizinkan
-                                            </h3>
-                                            <div class="mt-2 text-sm text-red-700">
-                                                <p>Akun <strong>{{ $activeSessionInfo['username'] }}</strong> sudah login di perangkat lain.</p>
-                                                <p class="mt-1">Silakan logout dari perangkat lain terlebih dahulu atau hubungi administrator untuk bantuan.</p>
+                                @if ($hasActiveSession && $activeSessionInfo)
+                                    <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
+                                        <div class="flex items-start">
+                                            <div class="flex-shrink-0">
+                                                <svg class="h-5 w-5 text-red-400" fill="currentColor"
+                                                    viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd"
+                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                        clip-rule="evenodd"></path>
+                                                </svg>
+                                            </div>
+                                            <div class="ml-3">
+                                                <h3 class="text-sm font-medium text-red-800">
+                                                    Login Tidak Diizinkan
+                                                </h3>
+                                                <div class="mt-2 text-sm text-red-700">
+                                                    <p>Akun <strong>{{ $activeSessionInfo['username'] }}</strong> sudah
+                                                        login di perangkat lain.</p>
+                                                    <p class="mt-1">Silakan logout dari perangkat lain terlebih
+                                                        dahulu atau hubungi administrator untuk bantuan.</p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
                                 @endif
 
                                 <!-- Login Form -->
@@ -308,7 +313,8 @@
                                         <x-ts-input class="text-sm lg:text-base" icon="user"
                                             label="Username / Email / NIM"
                                             placeholder="Masukkan username, email, atau NIM" required type="text"
-                                            wire:model="username_or_email" wire:keyup.debounce.500ms="checkExistingSession" />
+                                            wire:model="username_or_email"
+                                            wire:keyup.debounce.500ms="checkExistingSession" />
 
                                         <x-ts-password class="text-sm lg:text-base" icon="key" label="Password"
                                             placeholder="Masukkan password Anda" required wire:model="password" />
@@ -317,7 +323,7 @@
                                     <div class="flex items-center justify-between pt-2">
                                         <x-ts-checkbox class="text-xs lg:text-sm" id="remember" label="Ingat saya"
                                             wire:model="remember" />
-                                        <a class="text-xs font-medium text-[#f58634] hover:text-green-700 lg:text-sm"
+                                        <a class="text-xs font-medium {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-green-700 lg:text-sm"
                                             href="#">
                                             Lupa Password?
                                         </a>
@@ -336,7 +342,8 @@
                                 </form>
                                 <div class="mt-4 text-center">
                                     <a href="{{ route('register') }}"
-                                        class="text-[#f58634] hover:text-[#317354] text-sm">Buat Akun ?</a>
+                                        class="{{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#317354] text-sm">Buat
+                                        Akun ?</a>
                                 </div>
                             </div>
                         </div>
@@ -563,25 +570,30 @@
                                 </div>
 
                                 <!-- Active Session Error -->
-                                @if($hasActiveSession && $activeSessionInfo)
-                                <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
-                                    <div class="flex items-start">
-                                        <div class="flex-shrink-0">
-                                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-                                            </svg>
-                                        </div>
-                                        <div class="ml-3">
-                                            <h3 class="text-sm font-medium text-red-800">
-                                                Login Tidak Diizinkan
-                                            </h3>
-                                            <div class="mt-2 text-sm text-red-700">
-                                                <p>Akun <strong>{{ $activeSessionInfo['username'] }}</strong> sudah login di perangkat lain.</p>
-                                                <p class="mt-1">Silakan logout dari perangkat lain terlebih dahulu atau hubungi administrator untuk bantuan.</p>
+                                @if ($hasActiveSession && $activeSessionInfo)
+                                    <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
+                                        <div class="flex items-start">
+                                            <div class="flex-shrink-0">
+                                                <svg class="h-5 w-5 text-red-400" fill="currentColor"
+                                                    viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd"
+                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                        clip-rule="evenodd"></path>
+                                                </svg>
+                                            </div>
+                                            <div class="ml-3">
+                                                <h3 class="text-sm font-medium text-red-800">
+                                                    Login Tidak Diizinkan
+                                                </h3>
+                                                <div class="mt-2 text-sm text-red-700">
+                                                    <p>Akun <strong>{{ $activeSessionInfo['username'] }}</strong> sudah
+                                                        login di perangkat lain.</p>
+                                                    <p class="mt-1">Silakan logout dari perangkat lain terlebih
+                                                        dahulu atau hubungi administrator untuk bantuan.</p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
                                 @endif
 
                                 <!-- Login Form -->
@@ -590,7 +602,8 @@
                                         <x-ts-input class="text-sm lg:text-base" icon="user"
                                             label="Username / Email / NIM"
                                             placeholder="Masukkan username, email, atau NIM" required type="text"
-                                            wire:model="username_or_email" wire:keyup.debounce.500ms="checkExistingSession" />
+                                            wire:model="username_or_email"
+                                            wire:keyup.debounce.500ms="checkExistingSession" />
 
                                         <x-ts-password class="text-sm lg:text-base" icon="key" label="Password"
                                             placeholder="Masukkan password Anda" required wire:model="password" />
@@ -957,7 +970,7 @@
                                     <div class="flex items-center justify-between pt-2">
                                         <x-ts-checkbox class="text-xs lg:text-sm" id="remember" label="Ingat saya"
                                             wire:model="remember" />
-                                        <a class="text-xs font-medium text-[#f58634] hover:text-green-700 lg:text-sm"
+                                        <a class="text-xs font-medium {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-green-700 lg:text-sm"
                                             href="#">
                                             Lupa Password?
                                         </a>
@@ -976,7 +989,8 @@
                                 </form>
                                 <div class="mt-4 text-center">
                                     <a href="{{ route('register') }}"
-                                        class="text-[#f58634] hover:text-[#317354] text-sm">Buat Akun ?</a>
+                                        class="{{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#317354] text-sm">Buat
+                                        Akun ?</a>
                                 </div>
                             </div>
                         </div>
@@ -1374,7 +1388,9 @@
                 <div class="flex flex-col items-center mb-6">
                     <img src="{{ asset('asset/img/LogoPROCBT.png') }}" alt="Logo PRO CBT"
                         class="h-12 drop-shadow-md mb-4">
-                    <h1 class="text-2xl font-bold text-[#f58634]">Selamat Datang Kembali!</h1>
+                    <h1
+                        class="text-2xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        Selamat Datang Kembali!</h1>
                     <p class="text-gray-600 text-sm">Akses dashboard admin Anda dengan aman</p>
                 </div>
 
@@ -1481,11 +1497,12 @@
                     <div class="flex items-center justify-between">
                         <label class="flex items-center">
                             <input autocomplete="off" type="checkbox" name="remember"
-                                class="rounded border-gray-300 text-[#f58634] focus:ring-[#1E3A8A]/20"
+                                class="rounded border-gray-300 {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} focus:ring-[#1E3A8A]/20"
                                 wire:model='remember'>
                             <span class="ml-2 text-sm text-gray-600">Ingat saya</span>
                         </label>
-                        <a href="#" class="text-sm text-[#f58634] hover:text-[#2563EB] transition-colors">Lupa
+                        <a href="#"
+                            class="text-sm {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#2563EB] transition-colors">Lupa
                             kata
                             sandi?</a>
                     </div>
@@ -1501,7 +1518,8 @@
                         <p class="text-sm text-gray-600">
                             Belum punya akun?
                             <a href="{{ route('register') }}"
-                                class="text-[#f58634] hover:underline font-semibold">Daftar di
+                                class="{{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:underline font-semibold">Daftar
+                                di
                                 sini</a>
                         </p>
                     </div>

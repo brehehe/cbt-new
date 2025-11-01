@@ -3,7 +3,9 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#f58634]">Manajemen Data Mahasiswa</h1>
+                <h1
+                    class="text-2xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                    Manajemen Data Mahasiswa</h1>
                 <p class="text-gray-600">Kelola data mahasiswa dalam sistem CBT</p>
             </div>
             <div>
@@ -39,9 +41,9 @@
                 </select>
             </div>
 
-             <div>
+            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                    <select wire:model.live="statusFilter" class="form-control mt-1">
+                <select wire:model.live="statusFilter" class="form-control mt-1">
                     <option value="">Semua Status</option>
                     <option value="active">Aktif</option>
                     <option value="graduate">Lulus</option>
@@ -51,9 +53,9 @@
                 </select>
             </div>
 
-             <div>
+            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tipe</label>
-                    <select wire:model.live="isStudentFilter" class="form-control mt-1">
+                <select wire:model.live="isStudentFilter" class="form-control mt-1">
                     <option value="">Semua Tipe</option>
                     <option value="mahasiswa">Mahasiswa</option>
                     <option value="general">General</option>
@@ -80,7 +82,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Status
                         </th>
-                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Tipe
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -115,7 +117,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">
-                                    {{ $admin->nim ?? $admin->username ?? '-' }}
+                                    {{ $admin->nim ?? ($admin->username ?? '-') }}
                                 </div>
                                 @if ($admin->userDetail && $admin->userDetail->student_id)
                                     <div class="text-sm text-gray-500">ID: {{ $admin->userDetail->student_id }}</div>
@@ -162,7 +164,10 @@
                             <td>
                                 @php
                                     $typeStudy = $admin->type_study;
-                                    $isStudentColors = $typeStudy == 'mahasiswa' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800';
+                                    $isStudentColors =
+                                        $typeStudy == 'mahasiswa'
+                                            ? 'bg-green-100 text-green-800'
+                                            : 'bg-blue-100 text-blue-800';
                                     $isStudentLabels = $typeStudy == 'mahasiswa' ? 'Mahasiswa' : 'General';
                                 @endphp
 

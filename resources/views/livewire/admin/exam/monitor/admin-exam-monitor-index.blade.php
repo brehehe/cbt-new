@@ -262,7 +262,8 @@
                                         'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
                                         'bg-red-100 text-red-800' => $session->risk_level === 'high',
                                         'bg-yellow-100 text-yellow-800' => $session->risk_level === 'medium',
-                                        'bg-orange-100 text-orange-800' => $session->risk_level === 'low',
+                                        '{{ config('app.name_slug') === 'ups_tegal' ? 'bg-orange-100 : 'bg-blue-100' }} {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-800' : 'text-orange-800' }}' =>
+                                            $session->risk_level === 'low',
                                         'bg-green-100 text-green-800' => $session->risk_level === 'none',
                                         'bg-gray-100 text-gray-800' => !in_array($session->risk_level, [
                                             'high',

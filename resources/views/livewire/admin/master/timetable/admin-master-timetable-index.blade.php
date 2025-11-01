@@ -3,7 +3,9 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#f58634]">Jadwal</h1>
+                <h1
+                    class="text-2xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                    Jadwal</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div>
@@ -114,16 +116,15 @@
                                         </button>
                                         <button
                                             class="btn btn-icon text-indigo-600 hover:text-indigo-800 transition-colors delete-btn"
-                                            wire:click="sessionIndex('{{ $timetable->id }}')"
-                                            title="Kelola Sesi">
+                                            wire:click="sessionIndex('{{ $timetable->id }}')" title="Kelola Sesi">
                                             <i class="fa-solid fa-users"></i>
                                         </button>
-                                        <button
-                                            class="btn btn-icon text-orange-600 hover:text-orange-800 transition-colors delete-btn"
+                                        {{-- <button
+                                            class="btn btn-icon {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-800' : 'text-orange-800' }} transition-colors delete-btn"
                                             wire:click="confirmSuspend('{{ $timetable->id }}')"
                                             title="Suspend Sesi Ujian">
                                             <i class="fa-solid fa-user-slash"></i>
-                                        </button>
+                                        </button> --}}
                                         <button
                                             class="btn btn-icon text-green-600 hover:text-green-800 transition-colors delete-btn"
                                             wire:click="confirmVideo('{{ $timetable->id }}')">

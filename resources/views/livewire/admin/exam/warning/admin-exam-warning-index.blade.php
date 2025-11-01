@@ -8,8 +8,11 @@
 
             <div class="space-y-6">
                 <div class="p-4 rounded-lg bg-orange-50">
-                    <h2 class="mb-2 font-semibold text-orange-800">Informasi Ujian</h2>
-                    <div class="grid grid-cols-2 gap-4 text-sm text-orange-700">
+                    <h2
+                        class="mb-2 font-semibold {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-800' : 'text-orange-800' }}">
+                        Informasi Ujian</h2>
+                    <div
+                        class="grid grid-cols-2 gap-4 text-sm {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : 'text-orange-700' }}">
                         <div>
                             <p><span class="font-medium">Modul:</span>
                                 {{ $userTimetable->timetable->module->name ?? '-' }}</p>
@@ -64,7 +67,8 @@
                     <div class="mb-3 overflow-hidden bg-gray-900 rounded-lg aspect-video">
                         <video id="cameraPreview" autoplay class="object-cover w-full h-full"></video>
                     </div>
-                    <p id="cameraStatus" class="text-sm text-gray-500">Pastikan wajah Anda terlihat jelas pada kamera</p>
+                    <p id="cameraStatus" class="text-sm text-gray-500">Pastikan wajah Anda terlihat jelas pada kamera
+                    </p>
                 </div>
 
                 <!-- Consent Checkbox -->

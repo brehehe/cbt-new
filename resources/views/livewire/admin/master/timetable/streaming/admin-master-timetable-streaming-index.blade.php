@@ -2,7 +2,9 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#f58634]">User</h1>
+                <h1
+                    class="text-2xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                    User</h1>
             </div>
             <div>
                 <button wire:click="refreshStreamData" class="btn btn-success">
@@ -65,10 +67,12 @@
 
                         <!-- Actions -->
                         <div class="mt-3 flex items-center gap-2">
-                            <button class="btn btn-sm btn-outline-danger" wire:click="suspendSession({{ $session->id }})">
+                            <button class="btn btn-sm btn-outline-danger"
+                                wire:click="suspendSession({{ $session->id }})">
                                 Suspend & Logout
                             </button>
-                            <button class="btn btn-sm btn-outline-warning" wire:click="terminateSession({{ $session->id }})">
+                            <button class="btn btn-sm btn-outline-warning"
+                                wire:click="terminateSession({{ $session->id }})">
                                 Putus Sesi
                             </button>
                         </div>
@@ -93,7 +97,11 @@
 
         // Guard against duplicate initialization and intervals
         window.__supervisorInitialized = window.__supervisorInitialized || false;
-        window.__supervisorIntervals = window.__supervisorIntervals || { durations: null, monitor: null, refresh: null };
+        window.__supervisorIntervals = window.__supervisorIntervals || {
+            durations: null,
+            monitor: null,
+            refresh: null
+        };
 
         document.addEventListener('DOMContentLoaded', function() {
             console.log('=== Supervisor Page Loaded ===');
@@ -211,12 +219,13 @@
                     debug: 0, // Enable debug logs like student
                     sdpSemantics: 'unified-plan',
                     config: {
-                        iceServers: [
-                            { urls: 'stun:stun.cloudflare.com:3478' },
+                        iceServers: [{
+                                urls: 'stun:stun.cloudflare.com:3478'
+                            },
                             {
-                            urls: 'turn:procbt.id:3478?transport=udp',
-                            username: 'admin',
-                            credential: 'ProcbtSecure123!'
+                                urls: 'turn:procbt.id:3478?transport=udp',
+                                username: 'admin',
+                                credential: 'ProcbtSecure123!'
                             }
                         ],
                         iceTransportPolicy: 'relay'
@@ -353,9 +362,18 @@
             try {
                 const constraints = {
                     video: {
-                        width: { ideal: 640, max: 640 },
-                        height: { ideal: 360, max: 360 },
-                        frameRate: { ideal: 10, max: 12 } // ringan tapi jelas
+                        width: {
+                            ideal: 640,
+                            max: 640
+                        },
+                        height: {
+                            ideal: 360,
+                            max: 360
+                        },
+                        frameRate: {
+                            ideal: 10,
+                            max: 12
+                        } // ringan tapi jelas
                     },
                     audio: false // supervisor tidak perlu kirim suara
                 };
@@ -661,9 +679,14 @@
                 try {
                     // Call the student - supervisor calls student to get their video
                     const call = peer.call(streamInfo.peer_id, localStream, {
-                        constraints: { video: { width: 480, height: 270, frameRate: 10 } }
-                    });
-;
+                        constraints: {
+                            video: {
+                                width: 480,
+                                height: 270,
+                                frameRate: 10
+                            }
+                        }
+                    });;
 
                     if (!call) {
                         clearTimeout(timeoutId);

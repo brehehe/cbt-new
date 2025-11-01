@@ -19,7 +19,7 @@ class AdminMasterTimetableSessionIndex extends Component
     public $timetable;
     public $perPage = 12;
     public $search = '';
-    public $filterStatus = 'all'; // all, active, suspended, terminated
+    public $filterStatus = 'all'; // all, active, disconnected
 
     protected $listeners = [
         'terminateSession',
@@ -53,7 +53,7 @@ class AdminMasterTimetableSessionIndex extends Component
 
         $session->update([
             'is_active' => false,
-            'connection_status' => 'suspended',
+            'connection_status' => 'disconnected',
             'last_activity' => Carbon::now(),
         ]);
 
@@ -101,7 +101,22 @@ class AdminMasterTimetableSessionIndex extends Component
                 ->where('user_id', $userId)
                 ->delete();
 
-            AlertHelper::success('Berhasil', 'Akun di-logout dari semua perangkat.');
+            // Putuskan semua live session user pada jadwal ini agar ujian langsung berhenti di sisi user
+            $liveSessions = ExamLiveSession::query()
+                ->where('user_id', $userId)
+                ->where('timetable_id', $this->timetable_id)
+                ->get();
+
+            foreach ($liveSessions as $session) {
+                $session->update([
+                    'is_active' => false,
+                    'connection_status' => 'disconnected',
+                    'last_activity' => Carbon::now(),
+                    'end_time' => Carbon::now(),
+                ]);
+            }
+
+            AlertHelper::success('Berhasil', 'Akun di-logout dari semua perangkat dan sesi ujian diputus.');
         } catch (\Throwable $e) {
             AlertHelper::warning('Perhatian', 'Gagal logout akun: ' . $e->getMessage());
         }

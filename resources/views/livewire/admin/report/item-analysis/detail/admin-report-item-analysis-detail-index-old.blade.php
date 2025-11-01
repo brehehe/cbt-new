@@ -14,7 +14,9 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#f58634]">Detail Analisis Butir Soal</h1>
+                <h1
+                    class="text-2xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                    Detail Analisis Butir Soal</h1>
                 <p class="text-gray-600 mt-2">
                     Ujian: <strong>{{ $timetable->name ?? 'Tidak diketahui' }}</strong> |
                     Modul: <strong>{{ $timetableModule->name ?? 'Tidak diketahui' }}</strong>
@@ -202,9 +204,11 @@
 
                             <div class="p-3 bg-orange-50 rounded-lg">
                                 <div class="flex justify-between items-center">
-                                    <span class="text-sm font-medium text-orange-600">Kontribusi Reliabilitas</span>
                                     <span
-                                        class="font-bold text-orange-800">{{ $analysis['reliability_contribution'] }}</span>
+                                        class="text-sm font-medium {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }}">Kontribusi
+                                        Reliabilitas</span>
+                                    <span
+                                        class="font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-800' : 'text-orange-800' }}">{{ $analysis['reliability_contribution'] }}</span>
                                 </div>
                             </div>
                         </div>

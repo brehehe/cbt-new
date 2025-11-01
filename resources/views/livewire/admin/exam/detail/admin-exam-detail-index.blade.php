@@ -10,11 +10,13 @@
     <video id="hiddenVideo" style="display: none;" autoplay muted></video>
     <canvas id="hiddenCanvas" style="display: none;"></canvas>
 
-    <header class="p-2 text-white bg-orange-600 shadow-lg sm:p-4">
+    <header
+        class="p-2 text-white {{ config('app.name_slug') === 'ups_tegal' ? 'bg-orange-600 : 'bg-blue-600' }} shadow-lg sm:p-4">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
                 <h1 class="text-lg font-bold sm:text-xl">Computer Based Test</h1>
-                <div class="px-2 py-1 bg-orange-600 rounded sm:px-3">
+                <div
+                    class="px-2 py-1 {{ config('app.name_slug') === 'ups_tegal' ? 'bg-orange-600 : 'bg-blue-600' }} rounded sm:px-3">
                     <span class="text-xs sm:text-sm">Modul: {{ $userTimetable->timetable->module->name ?? '-' }}</span>
                 </div>
                 <!-- Alert Counter -->
@@ -49,13 +51,15 @@
     <!-- Mobile Menu Toggle Button -->
     <div class="p-4 bg-white border-b border-gray-200 lg:hidden">
         <div class="flex items-center justify-between">
-            <button id="toggleLeftSidebar" class="flex items-center text-orange-600 hover:text-orange-600">
+            <button id="toggleLeftSidebar"
+                class="flex items-center {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }}">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
                 Navigasi Soal
             </button>
-            <button id="toggleRightSidebar" class="flex items-center text-orange-600 hover:text-orange-600">
+            <button id="toggleRightSidebar"
+                class="flex items-center {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }}">
                 Profil & Camera
                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -70,7 +74,9 @@
         <div id="leftSidebar"
             class="fixed z-30 h-full overflow-y-auto transition-transform duration-300 ease-in-out transform -translate-x-full bg-white border-r border-gray-200 shadow-sm lg:relative w-80 lg:w-80 lg:h-auto lg:translate-x-0">
             <div class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden bg-orange-50">
-                <h3 class="font-semibold text-orange-600">Navigasi Soal</h3>
+                <h3
+                    class="font-semibold {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }}">
+                    Navigasi Soal</h3>
                 <button id="closeLeftSidebar" class="text-gray-500 hover:text-gray-700">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -81,11 +87,14 @@
 
             <!-- Info Ujian -->
             <div class="p-4 border-b border-gray-200 bg-orange-50">
-                <h3 class="hidden mb-2 font-semibold text-orange-600 lg:block">Navigasi Soal</h3>
+                <h3
+                    class="hidden mb-2 font-semibold {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} lg:block">
+                    Navigasi Soal</h3>
                 <div class="text-sm text-gray-600">
                     <div>Total: {{ $questionNavigations['total'] }} soal</div>
                     <div class="flex flex-wrap gap-2 mt-2 lg:space-x-4 lg:flex-nowrap">
-                        <span class="text-xs text-orange-600 lg:text-sm">Dijawab:
+                        <span
+                            class="text-xs {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} lg:text-sm">Dijawab:
                             {{ $questionNavigations['answered'] }}</span>
                         <span class="text-xs text-yellow-600 lg:text-sm">Ditandai:
                             {{ $questionNavigations['marked'] }}</span>
@@ -205,14 +214,14 @@
                                 {{-- Radio --}}
                                 <input type="radio" name="timetable_answer_id"
                                     wire:model.live="timetable_answer_id" value="{{ $question_answer['id'] }}"
-                                    class="flex-shrink-0 mt-1 mr-3 text-orange-600 lg:mr-4">
+                                    class="flex-shrink-0 mt-1 mr-3 {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} lg:mr-4">
 
                                 {{-- Isi jawaban --}}
                                 <div class="flex-1">
                                     {{-- Teks jawaban --}}
                                     <p class="text-sm text-gray-700 lg:text-base">
                                         <span
-                                            class="font-medium text-orange-800">{{ $question_answer['alphabet'] }}.</span>
+                                            class="font-medium {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-800' : 'text-orange-800' }}">{{ $question_answer['alphabet'] }}.</span>
                                         <span class="ml-2">{{ $question_answer['context'] }}</span>
                                     </p>
 
@@ -241,7 +250,7 @@
                     <div class="flex">
                         @if ($first)
                             <button wire:click='previousQuestion()' type="button"
-                                class="flex items-center px-4 py-2 text-orange-600 transition-colors hover:text-orange-700">
+                                class="flex items-center px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} transition-colors hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : '{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : 'text-orange-700' }}' }}">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15 19l-7-7 7-7" />
@@ -255,7 +264,7 @@
                     <div class="flex">
                         @if ($last)
                             <button type="button" wire:click='nextQuestion()'
-                                class="flex items-center px-4 py-2 text-orange-600 transition-colors hover:text-orange-700">
+                                class="flex items-center px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} transition-colors hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : '{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : 'text-orange-700' }}' }}">
                                 Soal Selanjutnya
                                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -264,7 +273,7 @@
                             </button>
                         @else
                             <button type="button"
-                                class="flex items-center px-4 py-2 text-orange-600 transition-colors hover:text-orange-700"
+                                class="flex items-center px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} transition-colors hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : '{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : 'text-orange-700' }}' }}"
                                 wire:click="confirmFinishExam">
                                 Selesai Ujian
                                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -282,7 +291,9 @@
         <div id="rightSidebar"
             class="fixed right-0 z-30 h-full overflow-y-auto transition-transform duration-300 ease-in-out transform translate-x-full bg-white border-l border-gray-200 shadow-sm lg:relative w-80 lg:w-80 lg:h-auto lg:translate-x-0">
             <div class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden bg-orange-50">
-                <h3 class="font-semibold text-orange-800">Profil & Camera</h3>
+                <h3
+                    class="font-semibold {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-800' : 'text-orange-800' }}">
+                    Profil & Camera</h3>
                 <button id="closeRightSidebar" class="text-gray-500 hover:text-gray-700">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -295,7 +306,7 @@
             <div class="p-4 border-b border-gray-200 bg-orange-50">
                 <div class="text-center">
                     <div
-                        class="flex items-center justify-center w-16 h-16 mx-auto mb-3 bg-orange-600 rounded-full lg:w-20 lg:h-20">
+                        class="flex items-center justify-center w-16 h-16 mx-auto mb-3 {{ config('app.name_slug') === 'ups_tegal' ? 'bg-orange-600 : 'bg-blue-600' }} rounded-full lg:w-20 lg:h-20">
                         <span
                             class="text-lg font-bold text-white lg:text-xl">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</span>
                     </div>
@@ -310,7 +321,7 @@
                 <div class="flex items-center justify-between mb-3">
                     <h4 class="font-medium text-gray-800">Monitor Camera</h4>
                     <button @click="showCamera = !showCamera"
-                        class="px-2 py-1 text-xs text-white bg-orange-500 rounded hover:bg-orange-600">
+                        class="px-2 py-1 text-xs text-white {{ config('app.name_slug') === 'ups_tegal' ? 'bg-orange-500 : 'bg-blue-500' }} rounded hover:{{ config('app.name_slug') === 'ups_tegal' ? 'bg-orange-600 : 'bg-blue-600' }}">
                         <span x-text="showCamera ? 'Hide' : 'Show'"></span>
                     </button>
                 </div>
@@ -1031,8 +1042,9 @@
             console.log("🔄 Initializing PeerJS (optimized)…");
 
             // ICE servers: STUN + your TURN
-            const ICE_SERVERS = [
-                { urls: 'stun:stun.cloudflare.com:3478' },
+            const ICE_SERVERS = [{
+                    urls: 'stun:stun.cloudflare.com:3478'
+                },
                 {
                     urls: 'turn:procbt.id:3478?transport=udp',
                     username: 'admin',
@@ -1046,11 +1058,11 @@
                 secure: true,
                 debug: 1,
                 config: {
-                iceServers: ICE_SERVERS,
-                iceTransportPolicy: 'relay',
-                sdpSemantics: 'unified-plan'
+                    iceServers: ICE_SERVERS,
+                    iceTransportPolicy: 'relay',
+                    sdpSemantics: 'unified-plan'
                 },
-                pingInterval: 20000  // kirim ping tiap 10 detik
+                pingInterval: 20000 // kirim ping tiap 10 detik
             });
 
             window.peer = peer;
@@ -1058,7 +1070,9 @@
 
             peer.on('open', id => {
                 console.log('✅ Peer connected:', id);
-                updateLiveSessionData({ connection_status: 'connected' });
+                updateLiveSessionData({
+                    connection_status: 'connected'
+                });
                 if (window.Livewire) Livewire.dispatch('updatePeerJSId', [id]);
             });
 
@@ -1067,16 +1081,18 @@
                 if (!reconnecting) {
                     reconnecting = true;
                     setTimeout(() => {
-                    if (peer.disconnected) {
-                        peer.reconnect();
-                    }
-                    reconnecting = false;
+                        if (peer.disconnected) {
+                            peer.reconnect();
+                        }
+                        reconnecting = false;
                     }, 5000);
                 }
             });
             peer.on('error', err => {
                 console.warn('⚠️ PeerJS error:', err);
-                updateLiveSessionData({ connection_status: 'unstable' });
+                updateLiveSessionData({
+                    connection_status: 'unstable'
+                });
                 tryReconnect();
             });
 
@@ -1084,40 +1100,53 @@
             async function handleIncomingCall(call) {
                 const stream = await getCameraStream();
                 if (stream) {
-                call.answer(stream);
-                updateLiveSessionData({ connection_status: 'streaming' });
+                    call.answer(stream);
+                    updateLiveSessionData({
+                        connection_status: 'streaming'
+                    });
 
-                call.on('close', () => {
-                    console.log('📴 Call closed');
-                    updateLiveSessionData({ connection_status: 'connected' });
-                });
+                    call.on('close', () => {
+                        console.log('📴 Call closed');
+                        updateLiveSessionData({
+                            connection_status: 'connected'
+                        });
+                    });
                 }
             }
 
             function tryReconnect() {
                 clearTimeout(reconnectTimer);
                 reconnectTimer = setTimeout(() => {
-                if (peer.disconnected) {
-                    console.log('🔁 Reconnecting PeerJS...');
-                    peer.reconnect();
-                }
+                    if (peer.disconnected) {
+                        console.log('🔁 Reconnecting PeerJS...');
+                        peer.reconnect();
+                    }
                 }, 3000);
             }
 
             await getCameraStream();
-            }
+        }
 
-            // === CAMERA STREAM HANDLER ===
-            async function getCameraStream() {
+        // === CAMERA STREAM HANDLER ===
+        async function getCameraStream() {
             try {
                 if (window.cameraStream) return window.cameraStream;
 
                 const constraints = {
                     video: {
                         facingMode: 'user',
-                        width: { ideal: 480, max: 480 },
-                        height: { ideal: 270, max: 270 },
-                        frameRate: { ideal: 10, max: 12 } // hemat CPU & bandwidth
+                        width: {
+                            ideal: 480,
+                            max: 480
+                        },
+                        height: {
+                            ideal: 270,
+                            max: 270
+                        },
+                        frameRate: {
+                            ideal: 10,
+                            max: 12
+                        } // hemat CPU & bandwidth
                     },
                     audio: false
                 };
@@ -1138,10 +1167,12 @@
                 return stream;
             } catch (e) {
                 console.error('🚫 Camera error:', e);
-                updateLiveSessionData({ camera_status: 'error' });
+                updateLiveSessionData({
+                    camera_status: 'error'
+                });
                 return null;
             }
-            }
+        }
 
 
 
@@ -1329,13 +1360,18 @@
                     const livewireComponent = Livewire.find(wireEl.getAttribute('wire:id'));
                     if (livewireComponent) {
                         updateRecordingStatus('Saving', `Uploading chunk ${chunkNumber ?? 'n/a'}...`);
-                        await livewireComponent.call('saveRecordingChunk', base64Data, { chunkNumber });
+                        await livewireComponent.call('saveRecordingChunk', base64Data, {
+                            chunkNumber
+                        });
                         console.log(`✅ Chunk ${chunkNumber ?? 'auto'} uploaded successfully`);
                         return true;
                     }
                 }
                 // Fallback when no component found
-                Livewire.dispatch('saveRecordingChunk', { chunkBlob: base64Data, chunkNumber });
+                Livewire.dispatch('saveRecordingChunk', {
+                    chunkBlob: base64Data,
+                    chunkNumber
+                });
                 return true;
             } catch (e) {
                 console.error('❌ Error converting/uploading chunk', e);
@@ -1422,7 +1458,9 @@
                         mediaRecorder.onerror = function(event) {
                             console.error('❌ MediaRecorder error during SEGMENTED mode:', event.error);
                             updateRecordingStatus('Error', 'Recorder error — restarting segment');
-                            try { mediaRecorder.stop(); } catch (_) {}
+                            try {
+                                mediaRecorder.stop();
+                            } catch (_) {}
                         };
 
                         mediaRecorder.start(); // no timeslice; full chunk produced on stop
@@ -1578,13 +1616,18 @@
                             const livewireComponent = Livewire.find(wireEl.getAttribute('wire:id'));
                             if (livewireComponent) {
                                 updateRecordingStatus('Saving', `Uploading chunk ${chunkNumber}...`);
-                                await livewireComponent.call('saveRecordingChunk', base64Data, { chunkNumber });
+                                await livewireComponent.call('saveRecordingChunk', base64Data, {
+                                    chunkNumber
+                                });
                                 console.log(`✅ Chunk ${chunkNumber} uploaded successfully`);
                                 return;
                             }
                         }
                         // Fallback when no component found
-                        Livewire.dispatch('saveRecordingChunk', { chunkBlob: base64Data, chunkNumber });
+                        Livewire.dispatch('saveRecordingChunk', {
+                            chunkBlob: base64Data,
+                            chunkNumber
+                        });
                     } catch (e) {
                         console.error('❌ Error converting/uploading chunk', e);
                     }
@@ -1652,7 +1695,9 @@
 
                 mediaRecorder.stop();
                 // For segmented mode, also clear segment timer
-                try { clearTimeout(window.segmentStopTimeout); } catch (_) {}
+                try {
+                    clearTimeout(window.segmentStopTimeout);
+                } catch (_) {}
                 isRecording = false;
                 clearInterval(recordingDurationInterval);
                 stopEnhancedBackup();
@@ -1849,7 +1894,7 @@
                             if (!saveSuccess) {
                                 alert(
                                     `📡 Video dispatched ke server (${sizeInMB}MB) - cek server logs untuk konfirmasi`
-                                    );
+                                );
                             }
                         }, 2000);
 

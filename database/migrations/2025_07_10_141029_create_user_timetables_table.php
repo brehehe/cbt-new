@@ -20,7 +20,7 @@ return new class extends Migration
             $table->dateTime('end_exam')->nullable();
             $table->integer('mark')->default(0);
             $table->foreignUuid('study_id')->nullable();
-            $table->enum('status', ['warning', 'exam', 'done'])->default('warning');
+            $table->enum('status', ['warning', 'exam', 'done','suspend'])->default('warning');
             $table->foreignUuid('company_id')->nullable();
             $table->bigInteger('order')->default(0);
             $table->softDeletes();

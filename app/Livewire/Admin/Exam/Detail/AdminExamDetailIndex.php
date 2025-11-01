@@ -51,7 +51,8 @@ class AdminExamDetailIndex extends Component
         'initializePeerJS',
         'updatePeerJSId',
         'completeExamFinalization',
-        'finalizeRecording' => 'finalizeRecording'
+        'finalizeRecording' => 'finalizeRecording',
+        'completeSuspendFinalization'
     ];
 
     public function mount()
@@ -1116,6 +1117,65 @@ class AdminExamDetailIndex extends Component
     }
 
     /**
+     * Suspend exam: segera menyelesaikan ujian dengan status 'suspend'.
+     * Mirip finishExam, namun finalisasi diarahkan ke suspend.
+     */
+    public function suspendExam()
+    {
+        $this->saveCurrentAnswer();
+
+        \Log::info('⏸ suspendExam() called', [
+            'user_id' => Auth::id(),
+            'user_timetable_id' => $this->userTimetableId,
+            'has_current_recording' => !is_null($this->currentRecording)
+        ]);
+
+        try {
+            \Log::info('📡 Triggering video save and proceeding to suspend finalization...');
+
+            $this->js('
+                console.log("⏸ suspendExam() - Starting video save process with callback...");
+
+                if (window.isSuspendingExam) {
+                    console.log("❌ suspendExam already in progress, skipping...");
+                    return;
+                }
+                window.isSuspendingExam = true;
+
+                function completeSuspendAfterVideoSave() {
+                    console.log("✅ Video save completed, finalizing suspend...");
+                    Livewire.dispatch("completeSuspendFinalization");
+                }
+
+                function handleVideoSaveTimeout() {
+                    console.warn("⚠️ Video save timeout (3s), suspending anyway...");
+                    completeSuspendAfterVideoSave();
+                }
+
+                const videoSaveTimeout = setTimeout(handleVideoSaveTimeout, 3000);
+
+                if (typeof stopRecording === "function" && !window.isRecordingStopping) {
+                    console.log("🎬 Stopping recording before suspend...");
+
+                    window.examFinishCallback = function(success) {
+                        clearTimeout(videoSaveTimeout);
+                        completeSuspendAfterVideoSave();
+                    };
+
+                    stopRecording();
+                } else {
+                    console.log("❌ stopRecording not available, finalizing suspend immediately...");
+                    clearTimeout(videoSaveTimeout);
+                    completeSuspendAfterVideoSave();
+                }
+            ');
+            \Log::info('✅ Suspend video save process initiated');
+        } catch (\Exception $e) {
+            \Log::error('❌ Error initiating suspend video save: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Complete exam finalization after video has been saved
      * This method is called from JavaScript after video save is confirmed
      */
@@ -1213,6 +1273,95 @@ class AdminExamDetailIndex extends Component
         ]);
 
         // Redirect after all processes are complete
+        return redirect()->route('admin.exam.timetable');
+    }
+
+    /**
+     * Finalisasi ujian sebagai suspend setelah video tersimpan.
+     */
+    public function completeSuspendFinalization()
+    {
+        \Log::info('🎯 completeSuspendFinalization() called after video save', [
+            'user_id' => Auth::id(),
+            'user_timetable_id' => $this->userTimetableId,
+            'recording_status' => $this->currentRecording ? $this->currentRecording->status : 'no_recording'
+        ]);
+
+        // Tutup live session
+        if ($this->liveSession) {
+            $this->liveSession->update([
+                'is_active' => false,
+                'connection_status' => 'disconnected',
+                'end_time' => now()
+            ]);
+        }
+
+        // Ambil user timetable aktif (exam/warning)
+        $userTimetable = UserTimetable::whereIn('status', ['exam', 'warning'])
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (!$userTimetable) {
+            \Log::error('❌ No active user timetable found for suspend completion');
+            return redirect()->route('admin.exam.timetable');
+        }
+
+        // Finalisasi rekaman: gabungkan chunk menjadi satu file dan simpan ke ExamRecording
+        try {
+            $final = RecordingFinalizer::finalizeForUserTimetable($userTimetable->id);
+
+            // Update ExamRecording terbaru dengan hasil finalisasi
+            $latestRecording = ExamRecording::where('user_timetable_id', $userTimetable->id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+            if ($latestRecording) {
+                $latestRecording->update([
+                    'video_path' => $final['merged_video'] ?: $final['manifest'] ?? $latestRecording->video_path,
+                    'file_size' => $final['total_size'] ?? $latestRecording->file_size,
+                    'end_time' => now(),
+                    'status' => 'completed',
+                ]);
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('⚠️ Gagal finalisasi rekaman pada suspend: ' . $e->getMessage());
+        }
+
+        // Hitung nilai dari jawaban yang sudah ada sebelum suspend
+        $userTimetableQuestions = UserModuleQuestion::where('user_timetable_id', $userTimetable->id)->get();
+        $totalQuestions = $userTimetableQuestions->count();
+        $correctAnswers = 0;
+
+        foreach ($userTimetableQuestions as $question) {
+            if ($question->timetable_answer_id) {
+                $answer = TimetableAnswer::find($question->timetable_answer_id);
+                if ($answer && $answer->is_correct) {
+                    $question->update(['status' => 'correct']);
+                    $correctAnswers++;
+                } else {
+                    $question->update(['status' => 'wrong']);
+                }
+            } else {
+                $question->update(['status' => 'unanswered']);
+            }
+        }
+
+        $mark = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100, 2) : 0;
+        $mark = min($mark, 100);
+
+        // Tandai sebagai suspend dan simpan nilai
+        $userTimetable->update([
+            'status' => 'suspend',
+            'end_exam' => now(),
+            'mark' => $mark,
+        ]);
+
+        // Redirect keluar dari halaman ujian
+        $this->js('
+            console.log("⏸ Exam suspended by supervisor. Redirecting...");
+            window.location.href = "/admin/exam/timetable";
+        ');
+
+        session()->flash('error', 'Sesi ujian Anda telah di-suspend oleh pengawas.');
         return redirect()->route('admin.exam.timetable');
     }
 

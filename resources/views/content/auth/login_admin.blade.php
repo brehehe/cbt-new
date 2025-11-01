@@ -43,7 +43,9 @@
                 <div class="flex flex-col items-center mb-6">
                     <img src="{{ Vite::asset('resources/img/logo_m.png') }}" alt="PRO CBT Logo"
                         class="h-12 drop-shadow-md mb-4">
-                    <h1 class="text-2xl font-bold text-[#f58634]">Welcome Back!</h1>
+                    <h1
+                        class="text-2xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        Welcome Back!</h1>
                     <p class="text-gray-600 text-sm">Access your admin dashboard securely</p>
                 </div>
 
@@ -119,7 +121,8 @@
                             <div
                                 class="w-28 bg-gradient-to-r from-[#1E3A8A] to-[#C3D4EC] rounded-xl flex items-center justify-center p-[1px]">
                                 <div class="w-full h-full bg-white rounded-xl flex items-center justify-center">
-                                    <span class="text-[#f58634] font-bold tracking-wider">ABC123</span>
+                                    <span
+                                        class="{{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} font-bold tracking-wider">ABC123</span>
                                 </div>
                             </div>
                         </div>
@@ -129,10 +132,11 @@
                     <div class="flex items-center justify-between">
                         <label class="flex items-center">
                             <input type="checkbox" name="remember"
-                                class="rounded border-gray-300 text-[#f58634] focus:ring-[#1E3A8A]/20">
+                                class="rounded border-gray-300 {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} focus:ring-[#1E3A8A]/20">
                             <span class="ml-2 text-sm text-gray-600">Remember me</span>
                         </label>
-                        <a href="#" class="text-sm text-[#f58634] hover:text-[#2563EB] transition-colors">Forgot
+                        <a href="#"
+                            class="text-sm {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#2563EB] transition-colors">Forgot
                             password?</a>
                     </div>
 
