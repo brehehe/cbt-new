@@ -18,7 +18,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 
-class AdminExamDetailIndex extends Component
+class AdminExamDetailIndexOld extends Component
 {
     public $userTimetableId;
     public $remainingTime;
