@@ -81,7 +81,7 @@ class AdminExamDetailIndex extends Component
             ExamAlert::create([
                 'timetable_id' => $this->userTimetable->timetable_id,
                 'user_timetable_id' => $this->userTimetableId,
-                'alert_type' => 'multi_device_login_attempt',
+                'alert_type' => 'connection_lost',
                 'description' => 'Percobaan login dari perangkat lain terdeteksi',
                 'metadata' => [
                     'previous_session_id' => data_get($existingActive->session_metadata, 'session_id'),

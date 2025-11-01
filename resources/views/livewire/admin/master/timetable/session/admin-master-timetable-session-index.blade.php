@@ -34,7 +34,7 @@
                 <option value="all">Semua Status</option>
                 <option value="active">Aktif</option>
                 <option value="suspended">Suspend</option>
-                <option value="terminated">Putus</option>
+                <option value="disconnected">Putus</option>
             </select>
         </div>
     </div>
@@ -53,7 +53,7 @@
                                 $statusColor = match(true) {
                                     $session->is_active => 'bg-green-100 text-green-700',
                                     $session->connection_status === 'suspended' => 'bg-yellow-100 text-yellow-700',
-                                    $session->connection_status === 'terminated' => 'bg-red-100 text-red-700',
+                                    $session->connection_status === 'disconnected' => 'bg-red-100 text-red-700',
                                     default => 'bg-gray-100 text-gray-700'
                                 };
                                 $statusText = $session->is_active ? 'Aktif' : ucfirst($session->connection_status ?? 'Tidak aktif');

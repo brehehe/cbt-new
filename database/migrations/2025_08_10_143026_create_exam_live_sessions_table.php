@@ -24,7 +24,7 @@ return new class extends Migration
             $table->integer('total_questions')->default(0);
             $table->integer('answered_questions')->default(0);
             $table->integer('marked_questions')->default(0);
-            $table->enum('camera_status', ['active', 'inactive', 'error', 'pending'])->default('pending');
+            $table->enum('camera_status', ['active', 'inactive', 'serror', 'pending'])->default('pending');
             $table->enum('screen_status', ['active', 'inactive', 'error', 'pending'])->default('pending');
             $table->enum('connection_status', ['connected', 'disconnected', 'unstable'])->default('connected');
             $table->timestamp('last_activity')->nullable();
