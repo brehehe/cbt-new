@@ -62,6 +62,16 @@
                                     style="width: {{ $session->progress_percentage }}%"></div>
                             </div>
                         </div> -->
+
+                        <!-- Actions -->
+                        <div class="mt-3 flex items-center gap-2">
+                            <button class="btn btn-sm btn-outline-danger" wire:click="suspendSession({{ $session->id }})">
+                                Suspend & Logout
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" wire:click="terminateSession({{ $session->id }})">
+                                Putus Sesi
+                            </button>
+                        </div>
                     </div>
                 </div>
             @endforeach

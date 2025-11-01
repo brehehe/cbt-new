@@ -107,6 +107,7 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
         Route::get('/timetable/{timetable_id}/video', 'Timetable\Video\AdminMasterTimetableVideoIndex')->name('admin.master.timetable.video');
         Route::get('/timetable/{timetable_id}/alert', 'Timetable\Alert\AdminMasterTimetableAlertIndex')->name('admin.master.timetable.alert');
         Route::get('/timetable/{timetable_id}/streaming', 'Timetable\Streaming\AdminMasterTimetableStreamingIndex')->name('admin.master.timetable.streaming');
+        Route::get('/timetable/{timetable_id}/session', 'Timetable\Session\AdminMasterTimetableSessionIndex')->name('admin.master.timetable.session');
         Route::get('/timetable/{timetable_id}/{user_timetable_id}/answer', 'Timetable\Answer\AdminMasterTimetableAnswerIndex')->name('admin.master.timetable.answer');
         Route::get('/material', AdminMasterMaterialIndex::class)->name('admin.master.material');
         Route::get('/question-type', AdminMasterQuestionTypeIndex::class)->name('admin.master.question-type');

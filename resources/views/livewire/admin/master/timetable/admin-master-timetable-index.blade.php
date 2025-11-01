@@ -113,6 +113,18 @@
                                             <i class="fa-solid fa-camera"></i>
                                         </button>
                                         <button
+                                            class="btn btn-icon text-indigo-600 hover:text-indigo-800 transition-colors delete-btn"
+                                            wire:click="sessionIndex('{{ $timetable->id }}')"
+                                            title="Kelola Sesi">
+                                            <i class="fa-solid fa-users"></i>
+                                        </button>
+                                        <button
+                                            class="btn btn-icon text-orange-600 hover:text-orange-800 transition-colors delete-btn"
+                                            wire:click="confirmSuspend('{{ $timetable->id }}')"
+                                            title="Suspend Sesi Ujian">
+                                            <i class="fa-solid fa-user-slash"></i>
+                                        </button>
+                                        <button
                                             class="btn btn-icon text-green-600 hover:text-green-800 transition-colors delete-btn"
                                             wire:click="confirmVideo('{{ $timetable->id }}')">
                                             <i class="fa-solid fa-video"></i>

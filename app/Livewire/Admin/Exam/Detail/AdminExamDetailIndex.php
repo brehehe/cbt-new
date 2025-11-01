@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use App\Services\Exam\RecordingFinalizer;
 
 class AdminExamDetailIndex extends Component
 {
@@ -68,6 +69,36 @@ class AdminExamDetailIndex extends Component
             return redirect()->route('admin.exam.timetable');
         }
 
+        // Enforce single-device login: block new session if another active session exists with different session_id
+        $currentSessionId = session()->getId();
+        $existingActive = ExamLiveSession::where('user_timetable_id', $this->userTimetableId)
+            ->where('user_id', Auth::id())
+            ->where('is_active', true)
+            ->orderByDesc('last_activity')
+            ->first();
+
+        if ($existingActive && data_get($existingActive->session_metadata, 'session_id') && data_get($existingActive->session_metadata, 'session_id') !== $currentSessionId) {
+            ExamAlert::create([
+                'timetable_id' => $this->userTimetable->timetable_id,
+                'user_timetable_id' => $this->userTimetableId,
+                'alert_type' => 'multi_device_login_attempt',
+                'description' => 'Percobaan login dari perangkat lain terdeteksi',
+                'metadata' => [
+                    'previous_session_id' => data_get($existingActive->session_metadata, 'session_id'),
+                    'new_session_id' => $currentSessionId,
+                    'user_agent' => request()->header('User-Agent'),
+                    'ip' => request()->ip(),
+                ],
+            ]);
+
+            if ($this->userTimetable && in_array($this->userTimetable->status, ['exam', 'warning'])) {
+                $this->userTimetable->update(['status' => 'warning']);
+            }
+
+            AlertHelper::warning('Perhatian', 'Akun Anda sudah aktif di perangkat lain. Mohon hubungi pengawas.');
+            return redirect()->route('admin.exam.monitor');
+        }
+
         // Buat atau update live session
         $this->liveSession = ExamLiveSession::updateOrCreate(
             [
@@ -85,7 +116,8 @@ class AdminExamDetailIndex extends Component
                 'session_metadata' => [
                     'start_time' => Carbon::now()->toISOString(),
                     'user_agent' => request()->header('User-Agent'),
-                    'ip_address' => request()->ip()
+                    'ip_address' => request()->ip(),
+                    'session_id' => $currentSessionId,
                 ],
                 'browser_info' => [
                     'user_agent' => request()->header('User-Agent'),
@@ -291,204 +323,33 @@ class AdminExamDetailIndex extends Component
                 return false;
             }
 
-            $baseDir = 'exam_recordings/chunks/' . $this->userTimetableId;
-            $disk = Storage::disk('public');
-            if (!$disk->exists($baseDir)) {
-                // No chunks saved; nothing to finalize
-                \Log::warning('⚠️ finalizeRecording: baseDir not found', [
-                    'dir' => $baseDir,
-                ]);
-            }
+            $result = RecordingFinalizer::finalizeForUserTimetable($this->userTimetableId);
 
-            // Collect chunk files
-            $files = $disk->files($baseDir);
-            $chunkFiles = array_values(array_filter($files, function ($f) {
-                return str_contains($f, '_chunk_') && str_ends_with($f, '.webm');
-            }));
-
-            // Sort by chunk number
-            usort($chunkFiles, function ($a, $b) {
-                $na = (int) preg_replace('/.*_chunk_(\d+)\.webm$/', '$1', $a);
-                $nb = (int) preg_replace('/.*_chunk_(\d+)\.webm$/', '$1', $b);
-                return $na <=> $nb;
-            });
-
-            // Compute total size
-            $totalSize = 0;
-            foreach ($chunkFiles as $f) {
-                $totalSize += $disk->size($f);
-            }
-
-            // Write manifest JSON
-            $manifest = [
-                'recording_id' => $this->currentRecording->id,
-                'user_timetable_id' => $this->userTimetableId,
-                'chunk_count' => count($chunkFiles),
-                'chunks' => $chunkFiles,
-                'finalized_at' => now()->toISOString(),
-            ];
-
-            $manifestPath = $baseDir . '/manifest.json';
-            $disk->put($manifestPath, json_encode($manifest));
-
-            // Attempt to merge chunks into a single WebM using ffmpeg first,
-            // and fall back to byte-concatenation if ffmpeg fails/unavailable
-            $mergedRelPath = null;
-            try {
-                if (count($chunkFiles) > 0) {
-                    $mergedRelPath = $baseDir . '/' . $this->currentRecording->id . '_merged.webm';
-                    $mergedAbsPath = $disk->path($mergedRelPath);
-
-                    // Try ffmpeg concat demuxer
-                    $ffmpegPath = trim((string) shell_exec('which ffmpeg'));
-                    if (!empty($ffmpegPath)) {
-                        $concatListPath = $disk->path($baseDir . '/concat.txt');
-                        $listLines = [];
-                        foreach ($chunkFiles as $cf) {
-                            $listLines[] = "file '" . $disk->path($cf) . "'";
-                        }
-                        file_put_contents($concatListPath, implode(PHP_EOL, $listLines));
-
-                        @unlink($mergedAbsPath);
-                        $cmd = escapeshellcmd($ffmpegPath) . ' -y -f concat -safe 0 -i ' . escapeshellarg($concatListPath) . ' -c copy ' . escapeshellarg($mergedAbsPath) . ' 2>&1';
-                        $output = [];
-                        $ret = 0;
-                        exec($cmd, $output, $ret);
-                        if ($ret === 0 && file_exists($mergedAbsPath) && filesize($mergedAbsPath) > 0) {
-                            $manifest['merged_video'] = $mergedRelPath;
-                            $disk->put($manifestPath, json_encode($manifest));
-                            \Log::info('✅ ffmpeg merged WebM created', [
-                                'path' => $mergedRelPath,
-                                'size' => filesize($mergedAbsPath)
-                            ]);
-                        } else {
-                            \Log::warning('⚠️ ffmpeg concat demuxer copy failed, trying concat protocol', [
-                                'ret' => $ret,
-                                'output_tail' => implode("\n", array_slice($output, -20))
-                            ]);
-
-                            // Attempt ffmpeg concat protocol with stream copy
-                            $protoParts = [];
-                            foreach ($chunkFiles as $cf) {
-                                $protoParts[] = $disk->path($cf);
-                            }
-                            $concatProto = 'concat:' . implode('|', $protoParts);
-                            @unlink($mergedAbsPath);
-                            $output = [];
-                            $ret = 0;
-                            $cmd = escapeshellcmd($ffmpegPath) . ' -y -i ' . escapeshellarg($concatProto) . ' -c copy ' . escapeshellarg($mergedAbsPath) . ' 2>&1';
-                            exec($cmd, $output, $ret);
-                            if ($ret === 0 && file_exists($mergedAbsPath) && filesize($mergedAbsPath) > 0) {
-                                $manifest['merged_video'] = $mergedRelPath;
-                                $disk->put($manifestPath, json_encode($manifest));
-                                \Log::info('✅ ffmpeg concat protocol merged WebM created', [
-                                    'path' => $mergedRelPath,
-                                    'size' => filesize($mergedAbsPath)
-                                ]);
-                            } else {
-                                \Log::warning('⚠️ ffmpeg concat protocol copy failed, trying re-encode', [
-                                    'ret' => $ret,
-                                    'output_tail' => implode("\n", array_slice($output, -20))
-                                ]);
-
-                                // Final attempt: re-encode using concat demuxer to normalize container/streams
-                                @unlink($mergedAbsPath);
-                                $output = [];
-                                $ret = 0;
-                                // Use libvpx for video and libvorbis for audio to stay WebM-compliant
-                                $cmd = escapeshellcmd($ffmpegPath) . ' -y -f concat -safe 0 -i ' . escapeshellarg($concatListPath) . ' -fflags +genpts -c:v libvpx -b:v 2M -c:a libvorbis -b:a 128k ' . escapeshellarg($mergedAbsPath) . ' 2>&1';
-                                exec($cmd, $output, $ret);
-                                if ($ret === 0 && file_exists($mergedAbsPath) && filesize($mergedAbsPath) > 0) {
-                                    $manifest['merged_video'] = $mergedRelPath;
-                                    $disk->put($manifestPath, json_encode($manifest));
-                                    \Log::info('✅ ffmpeg re-encode merged WebM created', [
-                                        'path' => $mergedRelPath,
-                                        'size' => filesize($mergedAbsPath)
-                                    ]);
-                                } else {
-                                    \Log::warning('⚠️ ffmpeg merge failed, falling back to byte-concat', [
-                                        'ret' => $ret,
-                                        'output_tail' => implode("\n", array_slice($output, -20))
-                                    ]);
-                                    $mergedRelPath = null; // ensure fallback
-                                }
-                            }
-                        }
-                    }
-
-                    // Fallback: byte-concatenate starting from the first chunk with EBML header
-                    if ($mergedRelPath === null) {
-                        $ebmlHeader = "\x1A\x45\xDF\xA3";
-                        $startIndex = 0;
-                        foreach ($chunkFiles as $idx => $cf) {
-                            $abs = $disk->path($cf);
-                            $firstBytes = @file_get_contents($abs, false, null, 0, 32);
-                            if ($firstBytes !== false && strpos($firstBytes, $ebmlHeader) !== false) {
-                                $startIndex = $idx;
-                                break;
-                            }
-                        }
-
-                        @unlink($mergedAbsPath);
-                        for ($i = $startIndex; $i < count($chunkFiles); $i++) {
-                            $srcAbs = $disk->path($chunkFiles[$i]);
-                            $data = @file_get_contents($srcAbs);
-                            if ($data === false) {
-                                \Log::warning('⚠️ Unable to read chunk for merge', ['chunk' => $chunkFiles[$i]]);
-                                continue;
-                            }
-                            file_put_contents($mergedAbsPath, $data, FILE_APPEND);
-                        }
-
-                        if (file_exists($mergedAbsPath) && filesize($mergedAbsPath) > 0) {
-                            $manifest['merged_video'] = $mergedRelPath;
-                            $disk->put($manifestPath, json_encode($manifest));
-                            \Log::info('✅ Byte-concat merged WebM created', [
-                                'path' => $mergedRelPath,
-                                'size' => filesize($mergedAbsPath)
-                            ]);
-                        } else {
-                            \Log::warning('⚠️ Byte-concat merged WebM not created or empty');
-                            $mergedRelPath = null;
-                        }
-                    }
-                }
-            } catch (\Throwable $t) {
-                \Log::error('💥 Error during merged WebM creation', [
-                    'error' => $t->getMessage()
-                ]);
-                $mergedRelPath = null;
-            }
-
-            // Update recording as completed
             $this->currentRecording->update([
-                'video_path' => $mergedRelPath ?: $manifestPath,
-                'file_size' => $totalSize,
+                'video_path' => $result['merged_video'] ?: $result['manifest'],
+                'file_size' => $result['total_size'],
                 'end_time' => now(),
                 'status' => 'completed',
             ]);
 
             \Log::info('🎉 Recording finalized', [
                 'recording_id' => $this->currentRecording->id,
-                'manifest' => $manifestPath,
-                'merged_video' => $mergedRelPath,
-                'total_size' => $totalSize,
-                'chunk_count' => count($chunkFiles),
+                'manifest' => $result['manifest'],
+                'merged_video' => $result['merged_video'],
+                'total_size' => $result['total_size'],
+                'chunk_count' => $result['chunk_count'],
             ]);
 
-            // Notify client
             $this->dispatch('recordingFinalized', [
-                'manifest' => $manifestPath,
-                'merged_video' => $mergedRelPath,
-                'chunk_count' => count($chunkFiles),
+                'manifest' => $result['manifest'],
+                'merged_video' => $result['merged_video'],
+                'chunk_count' => $result['chunk_count'],
             ]);
 
-            // Optionally trigger exam completion flow if expected
             if (method_exists($this, 'completeExamFinalization')) {
                 try {
                     $this->completeExamFinalization();
                 } catch (\Throwable $t) {
-                    // Swallow to avoid breaking finalize flow
                     \Log::warning('completeExamFinalization call failed or not implemented');
                 }
             }
@@ -496,12 +357,11 @@ class AdminExamDetailIndex extends Component
             return true;
         } catch (\Exception $e) {
             \Log::error('💥 Error finalizing recording', [
+                'user_id' => Auth::id(),
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
+            return false;
         }
-
-        return false;
     }
 
     public function saveRecordingVideo($videoBlob = '', $data = [])
@@ -919,6 +779,11 @@ class AdminExamDetailIndex extends Component
 
         if ($this->userTimetable->status === 'warning') {
             return redirect()->route('admin.exam.warning');
+        }
+
+        if ($this->userTimetable->status === 'suspend') {
+            session()->flash('error', 'Sesi ujian Anda telah di-suspend oleh pengawas.');
+            return redirect()->route('admin.exam.timetable');
         }
 
         return null;

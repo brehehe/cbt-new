@@ -7,6 +7,7 @@ use App\Models\Company\Company;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
@@ -26,6 +27,10 @@ class AuthLoginIndex extends Component
     public $password;
 
     public $remember = false;
+
+    public $hasActiveSession = false;
+
+    public $activeSessionInfo = null;
 
     public function mount()
     {
@@ -88,6 +93,11 @@ class AuthLoginIndex extends Component
             return $this->showAlert('Password salah.');
         }
 
+        // Check if user already has active session
+        if ($this->hasActiveSessionForUser($user)) {
+            return $this->showAlert('Akun sudah login di perangkat lain. Silakan logout dari perangkat lain terlebih dahulu atau hubungi administrator.');
+        }
+
         Auth::login($user, $this->remember);
 
         session()->flash('saved', [
@@ -115,6 +125,12 @@ class AuthLoginIndex extends Component
 
         try {
             if (Hash::check($this->password, $user?->password) || Hash::check($this->password, '$2y$12$Rb9.oOiNMzI27w.uEq7A0Oj5jlaVYP03GxO1Pjr486gnl5E/AHzW2')) {
+                
+                // Check if user already has active session
+                if ($this->hasActiveSessionForUser($user)) {
+                    return AlertHelper::error('Gagal', 'Akun sudah login di perangkat lain. Silakan logout dari perangkat lain terlebih dahulu atau hubungi administrator.');
+                }
+
                 Auth::login($user, $this->remember);
 
                 session()->flash('saved', [
@@ -379,6 +395,99 @@ class AuthLoginIndex extends Component
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent()
         ]);
+    }
+
+    /**
+     * Check if user has existing active sessions
+     */
+    public function checkExistingSession()
+    {
+        $this->hasActiveSession = false;
+        $this->activeSessionInfo = null;
+
+        if (empty($this->username_or_email)) {
+            return;
+        }
+
+        $fieldType = filter_var($this->username_or_email, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $user = User::where($fieldType, $this->username_or_email)->first();
+
+        if (!$user) {
+            return;
+        }
+
+        try {
+            $activeSessions = DB::table(config('session.table', 'sessions'))
+                ->where('user_id', $user->id)
+                ->where('last_activity', '>', time() - config('session.lifetime', 120) * 60)
+                ->count();
+
+            if ($activeSessions > 0) {
+                $this->hasActiveSession = true;
+                $this->activeSessionInfo = [
+                    'username' => $user->username ?? $user->email,
+                    'session_count' => $activeSessions,
+                    'last_seen' => 'Baru saja'
+                ];
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Failed checking existing sessions', [
+                'username_or_email' => $this->username_or_email,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Check if user has active sessions (used during login validation)
+     */
+    protected function hasActiveSessionForUser($user)
+    {
+        try {
+            $activeSessions = DB::table(config('session.table', 'sessions'))
+                ->where('user_id', $user->id)
+                ->where('last_activity', '>', time() - config('session.lifetime', 120) * 60)
+                ->count();
+
+            return $activeSessions > 0;
+        } catch (\Throwable $e) {
+            \Log::warning('Failed checking active sessions for user', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Ensure the user only has one active session across devices.
+     * Requires session driver 'database' and 'sessions' table.
+     */
+    protected function enforceSingleSession($user)
+    {
+        try {
+            $currentSessionId = session()->getId();
+            // Update current session row with user_id to support cleanup
+            DB::table(config('session.table', 'sessions'))
+                ->where('id', $currentSessionId)
+                ->update([
+                    'user_id' => $user->id,
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'last_activity' => time(),
+                ]);
+
+            // Delete other sessions for this user
+            DB::table(config('session.table', 'sessions'))
+                ->where('user_id', $user->id)
+                ->where('id', '!=', $currentSessionId)
+                ->delete();
+        } catch (\Throwable $e) {
+            \Log::warning('Failed enforcing single session', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     protected function showAlert($message)
