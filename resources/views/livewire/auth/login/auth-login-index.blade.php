@@ -196,85 +196,6 @@
                                 class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
                                 <div class="flex items-start space-x-3">
                                     <div
-                                        class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-emerald-400">
-                                        <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3
-                                            class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
-                                            Kebidanan (D-III)</h3>
-                                        <p
-                                            class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
-                                            Program Studi D-III Kebidanan memiliki akreditasi B dari Lembaga Akreditasi
-                                            Mandiri Perguruan Tinggi Kesehatan (LAM-PTKes)
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div
-                                class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
-                                <div class="flex items-start space-x-3">
-                                    <div
-                                        class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-orange-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-orange-400">
-                                        <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3
-                                            class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
-                                            Keperawatan (D-III)
-                                        </h3>
-                                        <p
-                                            class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
-                                            Salah satu yang mendasari berdirinya IKMB, dimulai sebagai Akademi
-                                            Keperawatan Mitra Bunda Persada sejak 2002
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div
-                                class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
-                                <div class="flex items-start space-x-3">
-                                    <div
-                                        class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
-                                        <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3
-                                            class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
-                                            Keperawatan (S1)
-                                        </h3>
-                                        <p
-                                            class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
-                                            Program Studi Ilmu Keperawatan S1 telah memperoleh akreditasi B dari Lembaga
-                                            Akreditasi Mandiri Perguruan Tinggi Kesehatan (LAM-PTKes)
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div
-                                class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
-                                <div class="flex items-start space-x-3">
-                                    <div
                                         class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-yellow-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-yellow-400">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                                             stroke="currentColor"
@@ -484,227 +405,197 @@
                                     <img alt="Logo" class="object-contain" style="width: 215px;" loading="lazy"
                                         src="{{ asset('asset/img/logo-ups.png') }}">
                                 </div>
-                                {{-- <div>
-                                    <h1 class="text-2xl font-extrabold tracking-tight text-white">Institut Kesehatan
-                                        Mitra Bunda</h1>
-                                    <p class="text-md text-white">insitutkmb@gmail.com</p>
-                                </div> --}}
                             </div>
 
                             <!-- Main Value Proposition -->
-                             <div class="space-y-2 mt-[40%] max-w-xl">
-                            <div
-                                class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
-                                <div class="flex items-start space-x-3">
-                                    <div
-                                        class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
-                                        <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3
-                                            class="mb-1 text-lg font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
-                                            Visi
-                                        </h3>
-                                        <p
-                                            class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
-                                            Menjadi pusat pendidikan kedokteran yang unggul, berintegritas, dan berdaya
-                                            saing global dalam mewujudkan pelayanan kesehatan yang berkualitas.
-                                        </p>
+                            <div class="space-y-2 mt-[40%] max-w-xl">
+                                <div
+                                    class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
+                                    <div class="flex items-start space-x-3">
+                                        <div
+                                            class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
+                                            <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path
+                                                    d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
+                                                    stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                                </path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3
+                                                class="mb-1 text-lg font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
+                                                Visi
+                                            </h3>
+                                            <p
+                                                class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
+                                                Menjadi pusat pendidikan kedokteran yang unggul, berintegritas, dan
+                                                berdaya
+                                                saing global dalam mewujudkan pelayanan kesehatan yang berkualitas.
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div
-                                class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
-                                <div class="flex items-start space-x-3">
-                                    <div
-                                        class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
-                                        <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3
-                                            class="mb-1 text-lg font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
-                                            Misi
-                                        </h3>
-                                        <div class="space-y-2">
-                                            <ul
-                                                class="space-y-1 text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
-                                                <li class="flex items-center gap-2">
-                                                    <span class="w-2 h-2 rounded-full bg-white"></span>
-                                                    <span>Menyelenggarakan pendidikan kedokteran yang inovatif, berbasis
-                                                        teknologi, dan berorientasi pada kebutuhan masyarakat.</span>
-                                                </li>
-                                                <li class="flex items-center gap-2">
-                                                    <span class="w-2 h-2 rounded-full bg-white"></span>
-                                                    <span>Menghasilkan lulusan dokter yang kompeten, berempati, dan
-                                                        menjunjung etika profesi.</span>
-                                                </li>
-                                                <li class="flex items-center gap-2">
-                                                    <span class="w-2 h-2 rounded-full bg-white"></span>
-                                                    <span>Mengembangkan penelitian yang bermanfaat bagi kemajuan ilmu
-                                                        kedokteran dan kesehatan publik.</span>
-                                                </li>
-                                                <li class="flex items-center gap-2">
-                                                    <span class="w-2 h-2 rounded-full bg-white"></span>
-                                                    <span>Berperan aktif dalam pengabdian kepada masyarakat melalui
-                                                        program kesehatan berkelanjutan.</span>
-                                                </li>
-                                            </ul>
+                                <div
+                                    class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
+                                    <div class="flex items-start space-x-3">
+                                        <div
+                                            class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
+                                            <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path
+                                                    d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
+                                                    stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                                </path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3
+                                                class="mb-1 text-lg font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
+                                                Misi
+                                            </h3>
+                                            <div class="space-y-2">
+                                                <ul
+                                                    class="space-y-1 text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
+                                                    <li class="flex items-center gap-2">
+                                                        <span class="w-2 h-2 rounded-full bg-white"></span>
+                                                        <span>Menyelenggarakan pendidikan kedokteran yang inovatif,
+                                                            berbasis
+                                                            teknologi, dan berorientasi pada kebutuhan
+                                                            masyarakat.</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2">
+                                                        <span class="w-2 h-2 rounded-full bg-white"></span>
+                                                        <span>Menghasilkan lulusan dokter yang kompeten, berempati, dan
+                                                            menjunjung etika profesi.</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2">
+                                                        <span class="w-2 h-2 rounded-full bg-white"></span>
+                                                        <span>Mengembangkan penelitian yang bermanfaat bagi kemajuan
+                                                            ilmu
+                                                            kedokteran dan kesehatan publik.</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2">
+                                                        <span class="w-2 h-2 rounded-full bg-white"></span>
+                                                        <span>Berperan aktif dalam pengabdian kepada masyarakat melalui
+                                                            program kesehatan berkelanjutan.</span>
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <div
+                            class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
+                            <div class="flex items-start space-x-3">
+                                <div
+                                    class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-emerald-400">
+                                    <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path
+                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3
+                                        class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
+                                        Kebidanan (D-III)</h3>
+                                    <p
+                                        class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
+                                        Program Studi D-III Kebidanan memiliki akreditasi B dari Lembaga Akreditasi
+                                        Mandiri Perguruan Tinggi Kesehatan (LAM-PTKes)
+                                    </p>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Features Grid -->
-                        <div class="my-6 grid grid-cols-1 gap-3 xl:grid-cols-2 xl:gap-4">
-                            <div
-                                class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
-                                <div class="flex items-start space-x-3">
-                                    <div
-                                        class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-blue-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-blue-400">
-                                        <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3
-                                            class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
-                                            Farmasi (S1)</h3>
-                                        <p
-                                            class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white text-justify">
-                                            Prodi Sarjana Farmasi IKMB bersamaan dengan Prodi NERS (Profesi
-                                            Keperawatan), sebagai bagian dari pengembangan institusi dari status Akademi
-                                            ke STIKes
-                                        </p>
-                                    </div>
+                        <div
+                            class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
+                            <div class="flex items-start space-x-3">
+                                <div
+                                    class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-blue-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-blue-400">
+                                    <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path
+                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3
+                                        class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
+                                        Keperawatan (D-III)
+                                    </h3>
+                                    <p
+                                        class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
+                                        Salah satu yang mendasari berdirinya IKMB, dimulai sebagai Akademi
+                                        Keperawatan Mitra Bunda Persada sejak 2002
+                                    </p>
                                 </div>
                             </div>
+                        </div>
 
-                            <div
-                                class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
-                                <div class="flex items-start space-x-3">
-                                    <div
-                                        class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-emerald-400">
-                                        <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3
-                                            class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
-                                            Kebidanan (D-III)</h3>
-                                        <p
-                                            class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
-                                            Program Studi D-III Kebidanan memiliki akreditasi B dari Lembaga Akreditasi
-                                            Mandiri Perguruan Tinggi Kesehatan (LAM-PTKes)
-                                        </p>
-                                    </div>
+                        <div
+                            class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
+                            <div class="flex items-start space-x-3">
+                                <div
+                                    class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
+                                    <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path
+                                            d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
+                                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3
+                                        class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
+                                        Keperawatan (S1)
+                                    </h3>
+                                    <p
+                                        class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
+                                        Program Studi Ilmu Keperawatan S1 telah memperoleh akreditasi B dari Lembaga
+                                        Akreditasi Mandiri Perguruan Tinggi Kesehatan (LAM-PTKes)
+                                    </p>
                                 </div>
                             </div>
-
-                            <div
-                                class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
-                                <div class="flex items-start space-x-3">
-                                    <div
-                                        class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-blue-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-blue-400">
-                                        <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3
-                                            class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
-                                            Keperawatan (D-III)
-                                        </h3>
-                                        <p
-                                            class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
-                                            Salah satu yang mendasari berdirinya IKMB, dimulai sebagai Akademi
-                                            Keperawatan Mitra Bunda Persada sejak 2002
-                                        </p>
-                                    </div>
+                        </div>
+                        <div
+                            class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
+                            <div class="flex items-start space-x-3">
+                                <div
+                                    class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-yellow-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-yellow-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor"
+                                        class="icon icon-tabler icons-tabler-outline icon-tabler-list-details h-6 w-6">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M13 5h8" />
+                                        <path d="M13 9h5" />
+                                        <path d="M13 15h8" />
+                                        <path d="M13 19h5" />
+                                        <path
+                                            d="M3 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
+                                        <path
+                                            d="M3 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
+                                    </svg>
                                 </div>
-                            </div>
-
-                            <div
-                                class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
-                                <div class="flex items-start space-x-3">
-                                    <div
-                                        class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
-                                        <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3
-                                            class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
-                                            Keperawatan (S1)
-                                        </h3>
-                                        <p
-                                            class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
-                                            Program Studi Ilmu Keperawatan S1 telah memperoleh akreditasi B dari Lembaga
-                                            Akreditasi Mandiri Perguruan Tinggi Kesehatan (LAM-PTKes)
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div
-                                class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
-                                <div class="flex items-start space-x-3">
-                                    <div
-                                        class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-yellow-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-yellow-400">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-list-details h-6 w-6">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M13 5h8" />
-                                            <path d="M13 9h5" />
-                                            <path d="M13 15h8" />
-                                            <path d="M13 19h5" />
-                                            <path
-                                                d="M3 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
-                                            <path
-                                                d="M3 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3
-                                            class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
-                                            Profesi Ners (Nursing Professional)
-                                        </h3>
-                                        <p
-                                            class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
-                                            Termasuk dalam jalur penerimaan baru bersama Prodi Kedokteran, S1
-                                            Keperawatan & lainnya
-                                        </p>
-                                    </div>
+                                <div>
+                                    <h3
+                                        class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
+                                        Profesi Ners (Nursing Professional)
+                                    </h3>
+                                    <p
+                                        class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
+                                        Termasuk dalam jalur penerimaan baru bersama Prodi Kedokteran, S1
+                                        Keperawatan & lainnya
+                                    </p>
                                 </div>
                             </div>
                         </div>
