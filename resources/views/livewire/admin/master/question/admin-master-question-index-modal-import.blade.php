@@ -20,7 +20,7 @@
 
         <!-- Body -->
         <div class="px-6 py-4 text-gray-600 overflow-auto" style="max-height: 80vh">
-            <div class="mb-4">
+            {{-- <div class="mb-4">
                 <label for="study_id_import" class="block text-sm font-medium text-gray-700">Prodi <span
                         class="text-red-600">*</span></label>
                 <select class="mt-1 form-control" wire:model='study_id_import'>
@@ -32,7 +32,7 @@
                 @error('study_id_import')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
-            </div>
+            </div> --}}
             <div class="mb-4">
                 <div class="flex justify-between">
                     <label for="file_import" class="block text-sm font-medium text-gray-700">File</label>

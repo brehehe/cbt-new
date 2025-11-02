@@ -43,28 +43,30 @@ class QuestionImportJob implements ShouldQueue
                     continue;
                 }
 
-                $topic = Topic::withoutGlobalScopes()->where('name', 'ilike', "%{$value[0]}%")->first();
+                $study = Study::withoutGlobalScopes()->whereLike('name', "%{$value[0]}%")->first();
 
-                $material_category = $topic?->materialCategories()->withoutGlobalScopes()->whereLike('name', "%$value[1]%")->first();
+                $topic = $study->topics()->withoutGlobalScopes()->whereLike('name', "%{$value[1]}%")->first();
 
-                $material = $material_category?->materials()->withoutGlobalScopes()->whereLike('name', "%$value[2]%")->first();
+                $material_category = $topic?->materialCategories()->withoutGlobalScopes()->whereLike('name', "%$value[2]%")->first();
 
-                $question_type = QuestionType::withoutGlobalScopes()->whereLike('name', "%$value[3]%")->first();
+                $material = $material_category?->materials()->withoutGlobalScopes()->whereLike('name', "%$value[3]%")->first();
 
-                if (!$topic || !$question_type) continue;
+                $question_type = QuestionType::withoutGlobalScopes()->whereLike('name', "%$value[4]%")->first();
+
+                if (!$question_type || !$value[5]) continue;
 
                 $request_question = [
                     'user_id'              => $this->user?->id,
                     'company_id'           => $this->user?->company?->id,
+                    'study_id'             => $study?->id,
                     'topic_id'             => $topic?->id,
-                    'study_id'             => $this->study_id,
                     'material_category_id' => $material_category?->id,
                     'material_id'          => $material?->id,
                     'question_type_id'     => $question_type?->id,
-                    'question'             => $value[4],
+                    'question'             => $value[5],
                     'images'               => null,
                     'old_images'           => null,
-                    'description'          => $value[5],
+                    'description'          => $value[6],
                     'weight_correct'       => null,
                     'weight_incorrect'     => null,
                 ];
@@ -74,16 +76,17 @@ class QuestionImportJob implements ShouldQueue
                     throw new Exception("Ada kesalahaan saat QuestionImportJob => QuestionService => updateOrCreate", 500);
                 }
 
-                for ($i = 6; $i <= 10; $i++) {
+                for ($i = 7; $i <= 11; $i++) {
+                    if (!$value[$i]) continue;
                     $request_answer = [
                         'company_id' => $this->user?->company?->id,
                         'alphabet'   => null,
                         'context'    => $value[$i],
                         'images'     => null,
                         'old_images' => null,
-                        'is_correct' => $i == $this->letterToValue($value[11]) ? true : false,
+                        'is_correct' => $i == $this->letterToValue($value[12]) ? true : false,
                     ];
-                    
+
                     $answer = app(AnswerService::class)->updateOrCreate($question, $request_answer);
                     if (!$answer) {
                         throw new Exception("Ada kesalahaan saat QuestionImportJob => AnswerService => updateOrCreate", 500);
@@ -104,11 +107,11 @@ class QuestionImportJob implements ShouldQueue
     function letterToValue(?string $ch): ?int
     {
         static $map = [
-            'A'=>6,
-            'B'=>7,
-            'C'=>8,
-            'D'=>9,
-            'E'=>10
+            'A'=>7,
+            'B'=>8,
+            'C'=>9,
+            'D'=>10,
+            'E'=>11
         ];
         return $map[strtoupper(trim((string)$ch))] ?? null;
     }

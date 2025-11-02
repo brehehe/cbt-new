@@ -189,7 +189,7 @@ class AdminMasterQuestionIndex extends Component
         // dd($this->study_id_import, $this->file_import);
         $this->validate(
             [
-                'study_id_import' => 'required|exists:studies,id',
+                'study_id_import' => 'nullable|exists:studies,id',
                 'file_import'     => 'required|file|mimes:xls,xlsx|max:10240',   // 10 MB
             ],
             [
