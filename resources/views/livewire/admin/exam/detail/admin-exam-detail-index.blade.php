@@ -10,11 +10,13 @@
     <video id="hiddenVideo" style="display: none;" autoplay muted></video>
     <canvas id="hiddenCanvas" style="display: none;"></canvas>
 
-    <header class="p-2 text-white bg-orange-600 shadow-lg sm:p-4">
+    <header
+        class="p-2 text-white {{ config('app.name_slug') === 'ups_tegal' ? 'bg-orange-600 : 'bg-blue-600' }} shadow-lg sm:p-4">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
                 <h1 class="text-lg font-bold sm:text-xl">Computer Based Test</h1>
-                <div class="px-2 py-1 bg-orange-600 rounded sm:px-3">
+                <div
+                    class="px-2 py-1 {{ config('app.name_slug') === 'ups_tegal' ? 'bg-orange-600 : 'bg-blue-600' }} rounded sm:px-3">
                     <span class="text-xs sm:text-sm">Modul: {{ $userTimetable->timetable->module->name ?? '-' }}</span>
                 </div>
                 <!-- Alert Counter -->
@@ -49,13 +51,15 @@
     <!-- Mobile Menu Toggle Button -->
     <div class="p-4 bg-white border-b border-gray-200 lg:hidden">
         <div class="flex items-center justify-between">
-            <button id="toggleLeftSidebar" class="flex items-center text-orange-600 hover:text-orange-600">
+            <button id="toggleLeftSidebar"
+                class="flex items-center {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }}">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
                 Navigasi Soal
             </button>
-            <button id="toggleRightSidebar" class="flex items-center text-orange-600 hover:text-orange-600">
+            <button id="toggleRightSidebar"
+                class="flex items-center {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }}">
                 Profil & Camera
                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -70,7 +74,9 @@
         <div id="leftSidebar"
             class="fixed z-30 h-full overflow-y-auto transition-transform duration-300 ease-in-out transform -translate-x-full bg-white border-r border-gray-200 shadow-sm lg:relative w-80 lg:w-80 lg:h-auto lg:translate-x-0">
             <div class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden bg-orange-50">
-                <h3 class="font-semibold text-orange-600">Navigasi Soal</h3>
+                <h3
+                    class="font-semibold {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }}">
+                    Navigasi Soal</h3>
                 <button id="closeLeftSidebar" class="text-gray-500 hover:text-gray-700">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -81,11 +87,14 @@
 
             <!-- Info Ujian -->
             <div class="p-4 border-b border-gray-200 bg-orange-50">
-                <h3 class="hidden mb-2 font-semibold text-orange-600 lg:block">Navigasi Soal</h3>
+                <h3
+                    class="hidden mb-2 font-semibold {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} lg:block">
+                    Navigasi Soal</h3>
                 <div class="text-sm text-gray-600">
                     <div>Total: {{ $questionNavigations['total'] }} soal</div>
                     <div class="flex flex-wrap gap-2 mt-2 lg:space-x-4 lg:flex-nowrap">
-                        <span class="text-xs text-orange-600 lg:text-sm">Dijawab:
+                        <span
+                            class="text-xs {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} lg:text-sm">Dijawab:
                             {{ $questionNavigations['answered'] }}</span>
                         <span class="text-xs text-yellow-600 lg:text-sm">Ditandai:
                             {{ $questionNavigations['marked'] }}</span>
@@ -183,17 +192,18 @@
                             {{ $description }}
                         </div>
 
-                        @if (!empty($images) && $images->isNotEmpty())
+                        @if (!empty($images) && collect($images)->isNotEmpty())
                             <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 @foreach ($images as $image)
                                     <div
                                         class="overflow-hidden rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
-                                        <img src="{{ asset('storage/' . $image->path) }}" alt="Gambar soal"
+                                        <img src="{{ asset('storage/' . $image) }}" alt="Gambar soal"
                                             class="w-full h-auto object-cover">
                                     </div>
                                 @endforeach
                             </div>
                         @endif
+
                     </div>
 
                     <!-- Pilihan Jawaban -->
@@ -204,24 +214,26 @@
                                 {{-- Radio --}}
                                 <input type="radio" name="timetable_answer_id"
                                     wire:model.live="timetable_answer_id" value="{{ $question_answer['id'] }}"
-                                    class="flex-shrink-0 mt-1 mr-3 text-orange-600 lg:mr-4">
+                                    class="flex-shrink-0 mt-1 mr-3 {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} lg:mr-4">
 
                                 {{-- Isi jawaban --}}
                                 <div class="flex-1">
                                     {{-- Teks jawaban --}}
                                     <p class="text-sm text-gray-700 lg:text-base">
                                         <span
-                                            class="font-medium text-orange-800">{{ $question_answer['alphabet'] }}.</span>
+                                            class="font-medium {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-800' : 'text-orange-800' }}">{{ $question_answer['alphabet'] }}.</span>
                                         <span class="ml-2">{{ $question_answer['context'] }}</span>
                                     </p>
 
                                     {{-- Gambar (jika ada) --}}
-                                    @if (!empty($question_answer['images']))
-                                        <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                                            @foreach ($question_answer['images'] as $img)
-                                                <img src="{{ asset('storage/' . $img->path) }}"
-                                                    alt="Gambar jawaban {{ $question_answer['alphabet'] }}"
-                                                    class="w-full h-auto rounded-md object-cover">
+                                    @if (!empty($question_answer['images']) && collect($question_answer['images'])->isNotEmpty())
+                                        <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                            @foreach ($question_answer['images'] as $image)
+                                                <div
+                                                    class="overflow-hidden rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+                                                    <img src="{{ asset('storage/' . $image) }}" alt="Gambar soal"
+                                                        class="w-full h-auto object-cover">
+                                                </div>
                                             @endforeach
                                         </div>
                                     @endif
@@ -238,7 +250,7 @@
                     <div class="flex">
                         @if ($first)
                             <button wire:click='previousQuestion()' type="button"
-                                class="flex items-center px-4 py-2 text-orange-600 transition-colors hover:text-orange-700">
+                                class="flex items-center px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} transition-colors hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : '{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : 'text-orange-700' }}' }}">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15 19l-7-7 7-7" />
@@ -252,7 +264,7 @@
                     <div class="flex">
                         @if ($last)
                             <button type="button" wire:click='nextQuestion()'
-                                class="flex items-center px-4 py-2 text-orange-600 transition-colors hover:text-orange-700">
+                                class="flex items-center px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} transition-colors hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : '{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : 'text-orange-700' }}' }}">
                                 Soal Selanjutnya
                                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -261,7 +273,7 @@
                             </button>
                         @else
                             <button type="button"
-                                class="flex items-center px-4 py-2 text-orange-600 transition-colors hover:text-orange-700"
+                                class="flex items-center px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} transition-colors hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : '{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : 'text-orange-700' }}' }}"
                                 wire:click="confirmFinishExam">
                                 Selesai Ujian
                                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -279,7 +291,9 @@
         <div id="rightSidebar"
             class="fixed right-0 z-30 h-full overflow-y-auto transition-transform duration-300 ease-in-out transform translate-x-full bg-white border-l border-gray-200 shadow-sm lg:relative w-80 lg:w-80 lg:h-auto lg:translate-x-0">
             <div class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden bg-orange-50">
-                <h3 class="font-semibold text-orange-800">Profil & Camera</h3>
+                <h3
+                    class="font-semibold {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-800' : 'text-orange-800' }}">
+                    Profil & Camera</h3>
                 <button id="closeRightSidebar" class="text-gray-500 hover:text-gray-700">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -292,7 +306,7 @@
             <div class="p-4 border-b border-gray-200 bg-orange-50">
                 <div class="text-center">
                     <div
-                        class="flex items-center justify-center w-16 h-16 mx-auto mb-3 bg-orange-600 rounded-full lg:w-20 lg:h-20">
+                        class="flex items-center justify-center w-16 h-16 mx-auto mb-3 {{ config('app.name_slug') === 'ups_tegal' ? 'bg-orange-600 : 'bg-blue-600' }} rounded-full lg:w-20 lg:h-20">
                         <span
                             class="text-lg font-bold text-white lg:text-xl">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</span>
                     </div>
@@ -307,7 +321,7 @@
                 <div class="flex items-center justify-between mb-3">
                     <h4 class="font-medium text-gray-800">Monitor Camera</h4>
                     <button @click="showCamera = !showCamera"
-                        class="px-2 py-1 text-xs text-white bg-orange-500 rounded hover:bg-orange-600">
+                        class="px-2 py-1 text-xs text-white {{ config('app.name_slug') === 'ups_tegal' ? 'bg-orange-500 : 'bg-blue-500' }} rounded hover:{{ config('app.name_slug') === 'ups_tegal' ? 'bg-orange-600 : 'bg-blue-600' }}">
                         <span x-text="showCamera ? 'Hide' : 'Show'"></span>
                     </button>
                 </div>
@@ -1023,167 +1037,144 @@
             }
         }
 
-        // Initialize PeerJS for live streaming to supervisor
+        // ==== PEERJS INITIALIZER (OPTIMIZED FOR 55 STUDENTS) ====
         async function initializePeerJS() {
-            try {
-                console.log('=== Starting PeerJS initialization ===');
-                console.log('PeerJS available:', typeof Peer !== 'undefined');
-                console.log('Livewire available:', typeof window.Livewire !== 'undefined');
+            console.log("🔄 Initializing PeerJS (optimized)…");
 
-                // Check if PeerJS is loaded
-                if (typeof Peer === 'undefined') {
-                    console.error('PeerJS library not loaded!');
-                    return;
+            // ICE servers: STUN + your TURN
+            const ICE_SERVERS = [{
+                    urls: 'stun:stun.cloudflare.com:3478'
+                },
+                {
+                    urls: 'turn:procbt.id:3478?transport=udp',
+                    username: 'admin',
+                    credential: 'ProcbtSecure123!'
                 }
+            ];
 
-                console.log('Initializing PeerJS for student...');
+            const peer = new Peer({
+                host: 'procbt.id',
+                path: '/peerjs',
+                secure: true,
+                debug: 1,
+                config: {
+                    iceServers: ICE_SERVERS,
+                    iceTransportPolicy: 'relay',
+                    sdpSemantics: 'unified-plan'
+                },
+                pingInterval: 20000 // kirim ping tiap 10 detik
+            });
 
-                // Initialize PeerJS with auto-generated ID
-                peer = new Peer({
-                    host: 'peer.toti.my.id',
-                    path: '/peerjs',
-                    secure: true, // Use HTTP instead of HTTPS
-                    debug: 2, // Enable debug logs
-                    config: {
-                        'iceServers': [{
-                                urls: 'stun:stun.l.google.com:19302'
-                            },
-                            {
-                                urls: 'stun:stun1.l.google.com:19302'
-                            }
-                        ]
-                    }
+            window.peer = peer;
+            let reconnectTimer;
+
+            peer.on('open', id => {
+                console.log('✅ Peer connected:', id);
+                updateLiveSessionData({
+                    connection_status: 'connected'
                 });
+                if (window.Livewire) Livewire.dispatch('updatePeerJSId', [id]);
+            });
 
-                console.log('PeerJS instance created, waiting for connection...');
-
-                peer.on('open', function(id) {
-                    console.log('PeerJS connected with ID:', id);
-                    console.log('Livewire available:', !!window.Livewire);
-
-                    // Send PeerJS ID to server for supervisor to connect
-                    if (window.Livewire) {
-                        console.log('Dispatching updatePeerJSId with ID:', id);
-                        try {
-                            Livewire.dispatch('updatePeerJSId', [id]);
-                            console.log('updatePeerJSId dispatched successfully');
-                        } catch (error) {
-                            console.error('Error dispatching updatePeerJSId:', error);
+            peer.on('call', call => handleIncomingCall(call));
+            peer.on('disconnected', () => {
+                if (!reconnecting) {
+                    reconnecting = true;
+                    setTimeout(() => {
+                        if (peer.disconnected) {
+                            peer.reconnect();
                         }
-                    } else {
-                        console.error('Livewire is not available!');
-                    }
-
-                    // Update live session status
-                    updateLiveSessionData({
-                        camera_status: 'active',
-                        connection_status: 'connected'
-                    });
+                        reconnecting = false;
+                    }, 5000);
+                }
+            });
+            peer.on('error', err => {
+                console.warn('⚠️ PeerJS error:', err);
+                updateLiveSessionData({
+                    connection_status: 'unstable'
                 });
+                tryReconnect();
+            });
 
-                peer.on('call', function(call) {
-                    console.log('Incoming call from supervisor');
+            // === HANDLE INCOMING CALLS ===
+            async function handleIncomingCall(call) {
+                const stream = await getCameraStream();
+                if (stream) {
+                    call.answer(stream);
+                    updateLiveSessionData({
+                        connection_status: 'streaming'
+                    });
 
-                    // Answer the call with our camera stream
-                    if (cameraStream) {
-                        call.answer(cameraStream);
-                        currentCall = call;
-
-                        // Update connection status
-                        updateLiveSessionData({
-                            connection_status: 'streaming'
-                        });
-
-                        console.log('Answered call with camera stream');
-                    } else {
-                        console.log('No camera stream available to answer call');
-                        // Try to get camera stream first
-                        getCameraStreamForPeerJS().then(stream => {
-                            if (stream) {
-                                call.answer(stream);
-                                currentCall = call;
-                                cameraStream = stream;
-                            }
-                        });
-                    }
-
-                    call.on('close', function() {
-                        console.log('Call closed by supervisor');
-                        currentCall = null;
+                    call.on('close', () => {
+                        console.log('📴 Call closed');
                         updateLiveSessionData({
                             connection_status: 'connected'
                         });
                     });
-                });
-
-                peer.on('disconnected', function() {
-                    console.log('PeerJS disconnected');
-                    updateLiveSessionData({
-                        connection_status: 'disconnected'
-                    });
-                });
-
-                peer.on('error', function(err) {
-                    console.log('PeerJS error:', err);
-                    updateLiveSessionData({
-                        connection_status: 'unstable'
-                    });
-                });
-
-                // Try to get camera stream for PeerJS
-                getCameraStreamForPeerJS();
-
-            } catch (error) {
-                console.log('Failed to initialize PeerJS:', error);
-                updateLiveSessionData({
-                    camera_status: 'error',
-                    connection_status: 'unstable'
-                });
+                }
             }
+
+            function tryReconnect() {
+                clearTimeout(reconnectTimer);
+                reconnectTimer = setTimeout(() => {
+                    if (peer.disconnected) {
+                        console.log('🔁 Reconnecting PeerJS...');
+                        peer.reconnect();
+                    }
+                }, 3000);
+            }
+
+            await getCameraStream();
         }
 
-        // Get camera stream specifically for PeerJS
-        async function getCameraStreamForPeerJS() {
+        // === CAMERA STREAM HANDLER ===
+        async function getCameraStream() {
             try {
-                // Use the same stream as recording or create new one
-                if (stream) {
-                    cameraStream = stream;
-                    console.log('Using existing camera stream for PeerJS');
-                    return stream;
-                }
+                if (window.cameraStream) return window.cameraStream;
 
-                // Create new stream for PeerJS
                 const constraints = {
                     video: {
+                        facingMode: 'user',
                         width: {
-                            ideal: 1280,
-                            min: 640
+                            ideal: 480,
+                            max: 480
                         },
                         height: {
-                            ideal: 720,
-                            min: 480
+                            ideal: 270,
+                            max: 270
                         },
                         frameRate: {
-                            ideal: 30,
-                            min: 15
-                        }
+                            ideal: 10,
+                            max: 12
+                        } // hemat CPU & bandwidth
                     },
                     audio: false
                 };
 
-                cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
-                console.log('Created new camera stream for PeerJS');
 
-                return cameraStream;
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                window.cameraStream = stream;
+                console.log('🎥 Camera ready (360p / 15 fps)');
 
-            } catch (error) {
-                console.error('Failed to get camera stream for PeerJS:', error);
+                // 🔹 Limit bitrate agar hemat bandwidth
+                const videoTrack = stream.getVideoTracks()[0];
+                const sender = new RTCPeerConnection().addTrack(videoTrack, stream);
+                const params = sender.getParameters();
+                if (!params.encodings) params.encodings = [{}];
+                params.encodings[0].maxBitrate = 150_000; // 300 kbps max
+                sender.setParameters(params);
+
+                return stream;
+            } catch (e) {
+                console.error('🚫 Camera error:', e);
                 updateLiveSessionData({
                     camera_status: 'error'
                 });
                 return null;
             }
         }
+
+
 
         // Update live session data
         function updateLiveSessionData(data) {
@@ -1350,7 +1341,48 @@
             });
         }
 
+        // Helper functions for chunk upload (global scope)
+        function blobToBase64(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = (e) => reject(e);
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        async function uploadLatestChunk(chunkBlob, chunkNumber) {
+            try {
+                const base64Data = await blobToBase64(chunkBlob);
+
+                const wireEl = document.querySelector('[wire\\:id]');
+                if (wireEl) {
+                    const livewireComponent = Livewire.find(wireEl.getAttribute('wire:id'));
+                    if (livewireComponent) {
+                        updateRecordingStatus('Saving', `Uploading chunk ${chunkNumber ?? 'n/a'}...`);
+                        await livewireComponent.call('saveRecordingChunk', base64Data, {
+                            chunkNumber
+                        });
+                        console.log(`✅ Chunk ${chunkNumber ?? 'auto'} uploaded successfully`);
+                        return true;
+                    }
+                }
+                // Fallback when no component found
+                Livewire.dispatch('saveRecordingChunk', {
+                    chunkBlob: base64Data,
+                    chunkNumber
+                });
+                return true;
+            } catch (e) {
+                console.error('❌ Error converting/uploading chunk', e);
+                return false;
+            }
+        }
+
         // Start recording - continuous recording from start to finish
+        // Segmented mode: stop/start per interval so every chunk has WEBM header
+        window.segmentedRecording = true; // enable segmented recording for standalone chunks
+
         function startRecording() {
             if (!stream) {
                 console.error('No camera stream available for recording');
@@ -1358,7 +1390,11 @@
             }
 
             try {
-                console.log('Starting continuous exam recording...');
+                if (window.segmentedRecording) {
+                    console.log('Starting SEGMENTED exam recording (per-chunk stop/start)...');
+                } else {
+                    console.log('Starting continuous exam recording...');
+                }
 
                 // Check MediaRecorder support
                 if (!MediaRecorder.isTypeSupported('video/webm')) {
@@ -1372,16 +1408,92 @@
                 // Advanced video optimization settings
                 const options = getOptimalRecordingSettings();
 
+                // If segmented mode, record per segment with stop/start to ensure full WEBM header
+                if (window.segmentedRecording) {
+                    window.chunkCount = 0;
+                    isRecording = true;
+                    recordingStartTime = Date.now();
+
+                    const segmentDurationMs = 30000; // 30s per segment
+
+                    function beginSegment() {
+                        const segmentChunks = [];
+                        mediaRecorder = new MediaRecorder(stream, options);
+
+                        mediaRecorder.ondataavailable = function(event) {
+                            if (event.data && event.data.size > 0) {
+                                segmentChunks.push(event.data);
+                            }
+                        };
+
+                        mediaRecorder.onstop = async function() {
+                            try {
+                                const segmentBlob = new Blob(segmentChunks, {
+                                    type: mediaRecorder?.mimeType || 'video/webm'
+                                });
+
+                                window.chunkCount++;
+                                const sizeInMB = (segmentBlob.size / (1024 * 1024)).toFixed(2);
+                                updateRecordingInfo(`${window.chunkCount} chunks, last ${sizeInMB}MB`);
+
+                                if (segmentBlob.size > 0) {
+                                    await uploadLatestChunk(segmentBlob, window.chunkCount);
+                                    console.log(`✅ Segmented chunk ${window.chunkCount} uploaded (${sizeInMB}MB)`);
+                                } else {
+                                    console.warn('⚠️ Segmented chunk empty, skipping upload');
+                                }
+                            } catch (e) {
+                                console.error('❌ Failed to process/upload segmented chunk', e);
+                            }
+
+                            // Continue with next segment if still recording
+                            if (isRecording) {
+                                setTimeout(() => beginSegment(), 250);
+                            } else {
+                                // finalize after last segment stops
+                                saveFinalVideo();
+                            }
+                        };
+
+                        mediaRecorder.onerror = function(event) {
+                            console.error('❌ MediaRecorder error during SEGMENTED mode:', event.error);
+                            updateRecordingStatus('Error', 'Recorder error — restarting segment');
+                            try {
+                                mediaRecorder.stop();
+                            } catch (_) {}
+                        };
+
+                        mediaRecorder.start(); // no timeslice; full chunk produced on stop
+
+                        // schedule stop for this segment
+                        window.segmentStopTimeout = setTimeout(() => {
+                            try {
+                                if (mediaRecorder && mediaRecorder.state === 'recording') {
+                                    mediaRecorder.stop();
+                                }
+                            } catch (_) {}
+                        }, segmentDurationMs);
+                    }
+
+                    updateRecordingStatus('Recording', 'CBT Segmented Mode');
+                    startRecordingTimer();
+                    startRecordingHealthMonitor();
+
+                    beginSegment();
+                    console.log('✅ Segmented CBT recording started');
+                    return; // do not run continuous mode below
+                }
+
                 mediaRecorder = new MediaRecorder(stream, options);
                 recordedChunks = [];
-                let chunkCount = 0;
+                window.chunkCount = 0;
                 let totalSize = 0;
 
                 // Enhanced data collection for long CBT recordings (2-3 hours)
                 mediaRecorder.ondataavailable = function(event) {
                     if (event.data.size > 0) {
                         recordedChunks.push(event.data);
-                        chunkCount++;
+                        window.chunkCount++;
                         totalSize += event.data.size;
                         totalRecordingSize = totalSize; // Update global variable
 
@@ -1393,12 +1505,12 @@
                         const chunkEfficiency = calculateChunkCompressionEfficiency(event.data.size, recordingMinutes);
 
                         console.log(
-                            `📦 CBT Chunk ${chunkCount}: ${sizeInMB}MB | Total: ${totalSizeInMB}MB | Duration: ${recordingMinutes}min | Compression: ${chunkEfficiency}`
+                            `📦 CBT Chunk ${window.chunkCount}: ${sizeInMB}MB | Total: ${totalSizeInMB}MB | Duration: ${recordingMinutes}min | Compression: ${chunkEfficiency}`
                         );
 
                         // Update recording info in UI with enhanced compression details
                         updateRecordingInfo(
-                            `${chunkCount} chunks, ${totalSizeInMB}MB, ${recordingMinutes}min, ${chunkEfficiency} compression`
+                            `${window.chunkCount} chunks, ${totalSizeInMB}MB, ${recordingMinutes}min, ${chunkEfficiency} compression`
                         );
 
                         // PROGRESSIVE COMPRESSION TRIGGERS based on file size growth
@@ -1439,6 +1551,13 @@
                             console.warn('⚠️ CBT recording approaching 1GB - browser may need memory management');
                             updateRecordingStatus('Warning', `Large file: ${totalSizeInMB}MB`);
                         }
+
+                        // Upload this chunk immediately for incremental saving
+                        try {
+                            uploadLatestChunk(event.data, window.chunkCount);
+                        } catch (e) {
+                            console.error('❌ Failed to queue chunk upload', e);
+                        }
                     }
                 };
 
@@ -1477,9 +1596,46 @@
                     }, 2000);
                 };
 
+                // Helper: convert Blob to base64 dataURL
+                function blobToBase64(blob) {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.onerror = (e) => reject(e);
+                        reader.readAsDataURL(blob);
+                    });
+                }
+
+                // Upload single chunk to server using Livewire method, with fallback dispatch
+                async function uploadLatestChunk(chunkBlob, chunkNumber) {
+                    try {
+                        const base64Data = await blobToBase64(chunkBlob);
+
+                        const wireEl = document.querySelector('[wire\\:id]');
+                        if (wireEl) {
+                            const livewireComponent = Livewire.find(wireEl.getAttribute('wire:id'));
+                            if (livewireComponent) {
+                                updateRecordingStatus('Saving', `Uploading chunk ${chunkNumber}...`);
+                                await livewireComponent.call('saveRecordingChunk', base64Data, {
+                                    chunkNumber
+                                });
+                                console.log(`✅ Chunk ${chunkNumber} uploaded successfully`);
+                                return;
+                            }
+                        }
+                        // Fallback when no component found
+                        Livewire.dispatch('saveRecordingChunk', {
+                            chunkBlob: base64Data,
+                            chunkNumber
+                        });
+                    } catch (e) {
+                        console.error('❌ Error converting/uploading chunk', e);
+                    }
+                }
+
                 // ENHANCED: Start continuous recording for 2-3 hour exams
-                // Use longer intervals (5 minutes) to reduce memory pressure and prevent auto-stop
-                const timesliceInterval = 300000; // 5 minutes (300,000ms) - better for long recordings
+                // Use shorter intervals (1 minute) to reduce memory pressure and enable quick uploads
+                const timesliceInterval = 30000; // 1 minute (60,000ms) - smaller chunks for quick upload
 
                 console.log('🎬 Starting LONG-DURATION recording for CBT exam...');
                 console.log('📊 Configured for 2-3 hour continuous recording');
@@ -1538,6 +1694,10 @@
                 };
 
                 mediaRecorder.stop();
+                // For segmented mode, also clear segment timer
+                try {
+                    clearTimeout(window.segmentStopTimeout);
+                } catch (_) {}
                 isRecording = false;
                 clearInterval(recordingDurationInterval);
                 stopEnhancedBackup();
@@ -1554,7 +1714,7 @@
         }
 
         // Save final video when exam ends
-        function saveFinalVideo() {
+        async function saveFinalVideo() {
             // Prevent multiple calls
             if (window.isSavingVideo) {
                 console.log('💾 saveFinalVideo already in progress, skipping...');
@@ -1567,8 +1727,38 @@
             console.log('MediaRecorder mimeType:', mediaRecorder?.mimeType);
 
             if (recordedChunks.length === 0) {
-                console.warn('⚠️ NO VIDEO DATA TO SAVE');
-                updateRecordingStatus('Completed', 'No data');
+                console.warn('⚠️ NO VIDEO DATA TO SAVE — finalizing server-side chunks');
+                updateRecordingStatus('Finalizing', 'Menggabungkan chunk di server...');
+
+                const wireEl = document.querySelector('[wire\\:id]');
+                if (wireEl) {
+                    const livewireComponent = Livewire.find(wireEl.getAttribute('wire:id'));
+                    if (livewireComponent) {
+                        livewireComponent.call('finalizeRecording')
+                            .then(() => {
+                                console.log('🎉 Recording finalized on server (no local chunks)');
+                                updateRecordingStatus('Completed', 'Video tersimpan sebagai beberapa chunk');
+                                alert('✅ Video ujian berhasil difinalisasi dari chunk yang diupload!');
+                                window.isSavingVideo = false;
+                                window.isRecordingStopping = false;
+                                recordedChunks = [];
+                            })
+                            .catch((err) => {
+                                console.error('❌ finalizeRecording failed, falling back to dispatch', err);
+                                Livewire.dispatch('finalizeRecording');
+                                window.isSavingVideo = false;
+                                window.isRecordingStopping = false;
+                            });
+                    } else {
+                        Livewire.dispatch('finalizeRecording');
+                        window.isSavingVideo = false;
+                        window.isRecordingStopping = false;
+                    }
+                } else {
+                    Livewire.dispatch('finalizeRecording');
+                    window.isSavingVideo = false;
+                    window.isRecordingStopping = false;
+                }
                 return;
             }
 
@@ -1591,6 +1781,44 @@
 
             updateRecordingStatus('Processing', `Preparing ${originalSizeInMB}MB...`);
             console.log('� Processing optimized video...');
+
+            // Ensure any remaining chunks are uploaded before finalizing
+            try {
+                updateRecordingStatus('Saving', 'Uploading remaining chunks...');
+                for (let i = 0; i < recordedChunks.length; i++) {
+                    await uploadLatestChunk(recordedChunks[i], undefined);
+                }
+                console.log('✅ All remaining chunks uploaded');
+            } catch (e) {
+                console.error('❌ Failed to upload remaining chunks', e);
+            }
+
+            // FAST PATH: finalize by stitching server-side chunks for immediate save
+            updateRecordingStatus('Finalizing', 'Menggabungkan chunk di server...');
+            const wireEl = document.querySelector('[wire\\:id]');
+            if (wireEl) {
+                const livewireComponent = Livewire.find(wireEl.getAttribute('wire:id'));
+                if (livewireComponent) {
+                    livewireComponent.call('finalizeRecording')
+                        .then(() => {
+                            console.log('🎉 Recording finalized on server');
+                            updateRecordingStatus('Completed', 'Video tersimpan sebagai beberapa chunk');
+                            alert('✅ Video ujian berhasil disimpan per chunk dan difinalisasi!');
+                            window.isSavingVideo = false;
+                            window.isRecordingStopping = false;
+                            recordedChunks = [];
+                        })
+                        .catch((err) => {
+                            console.error('❌ finalizeRecording failed, falling back to dispatch', err);
+                            Livewire.dispatch('finalizeRecording');
+                        });
+                } else {
+                    Livewire.dispatch('finalizeRecording');
+                }
+            } else {
+                Livewire.dispatch('finalizeRecording');
+            }
+            return;
 
             // Apply simple optimization check
             compressVideoBlob(originalBlob).then(function(finalBlob) {
@@ -1666,7 +1894,7 @@
                             if (!saveSuccess) {
                                 alert(
                                     `📡 Video dispatched ke server (${sizeInMB}MB) - cek server logs untuk konfirmasi`
-                                    );
+                                );
                             }
                         }, 2000);
 
@@ -1781,9 +2009,9 @@
                                         console.log(
                                             `📊 Final stats: ${sizeInMB}MB saved with ${compressionSavings}% compression`
                                         );
-                                        alert(
-                                            `✅ Video ujian berhasil disimpan dan dioptimalkan!\n📊 Ukuran: ${sizeInMB}MB\n🗜️ Kompresi: ${compressionSavings}%`
-                                        );
+                                        // alert(
+                                        //     `✅ Video ujian berhasil disimpan dan dioptimalkan!\n📊 Ukuran: ${sizeInMB}MB\n🗜️ Kompresi: ${compressionSavings}%`
+                                        // );
                                     } else {
                                         console.error('❌ Server returned false');
                                         updateRecordingStatus('Error', 'Save failed');
@@ -2512,7 +2740,7 @@
             // Monitor streaming health
             setInterval(() => {
                 checkStreamingHealth();
-            }, 10000); // Every 10 seconds
+            }, 60000); // Every 10 seconds
 
             // Send initial session data
             updateLiveSessionActivity();

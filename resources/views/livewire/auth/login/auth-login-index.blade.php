@@ -63,24 +63,6 @@
 
                             <!-- Main Value Proposition -->
                             <div class="max-w-xl space-y-4 mt-[25%]">
-                                <!-- <h2 class="text-2xl font-bold leading-tight tracking-tight xl:text-3xl">
-                                    <span
-                                        class="block cursor-default text-white transition-colors duration-300 hover:text-green-200">Misi</span>
-                                    <span
-                                        class="inline-block cursor-default text-white/90 transition-all duration-300 hover:translate-x-2 hover:text-white">Bisnis
-                                        &</span>
-                                    <span
-                                        class="inline-block cursor-default text-white/80 transition-all duration-300 hover:translate-x-4 hover:text-white">Pemeliharaan</span>
-                                </h2>
-
-                                <p
-                                    class="cursor-default text-sm leading-relaxed text-white/90 transition-colors duration-300 hover:text-white xl:text-base">
-                                    Perusahaan layanan fasilitas bisnis dan pemeliharaan yang profesional & berpengalaman
-                                    sejak tahun 2004. Kami berkomitmen memberikan layanan terbaik untuk mengoptimalkan
-                                    pertumbuhan bisnis Anda dengan berbagai jenis layanan terintegrasi.
-                                </p> -->
-
-
 
                                 <!-- Company Stats -->
                                 <div class="mt-[60%] grid grid-cols-3 gap-32">
@@ -214,85 +196,6 @@
                                 class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
                                 <div class="flex items-start space-x-3">
                                     <div
-                                        class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-emerald-400">
-                                        <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3
-                                            class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
-                                            Kebidanan (D-III)</h3>
-                                        <p
-                                            class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
-                                            Program Studi D-III Kebidanan memiliki akreditasi B dari Lembaga Akreditasi
-                                            Mandiri Perguruan Tinggi Kesehatan (LAM-PTKes)
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div
-                                class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
-                                <div class="flex items-start space-x-3">
-                                    <div
-                                        class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-orange-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-orange-400">
-                                        <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3
-                                            class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
-                                            Keperawatan (D-III)
-                                        </h3>
-                                        <p
-                                            class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
-                                            Salah satu yang mendasari berdirinya IKMB, dimulai sebagai Akademi
-                                            Keperawatan Mitra Bunda Persada sejak 2002
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div
-                                class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
-                                <div class="flex items-start space-x-3">
-                                    <div
-                                        class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
-                                        <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3
-                                            class="mb-1 text-sm font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
-                                            Keperawatan (S1)
-                                        </h3>
-                                        <p
-                                            class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
-                                            Program Studi Ilmu Keperawatan S1 telah memperoleh akreditasi B dari Lembaga
-                                            Akreditasi Mandiri Perguruan Tinggi Kesehatan (LAM-PTKes)
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div
-                                class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
-                                <div class="flex items-start space-x-3">
-                                    <div
                                         class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-yellow-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-yellow-400">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                                             stroke="currentColor"
@@ -377,6 +280,32 @@
                                     <p class="text-sm text-gray-600 lg:text-base">Masuk ke sistem CBT</p>
                                 </div>
 
+                                <!-- Active Session Error -->
+                                @if ($hasActiveSession && $activeSessionInfo)
+                                    <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
+                                        <div class="flex items-start">
+                                            <div class="flex-shrink-0">
+                                                <svg class="h-5 w-5 text-red-400" fill="currentColor"
+                                                    viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd"
+                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                        clip-rule="evenodd"></path>
+                                                </svg>
+                                            </div>
+                                            <div class="ml-3">
+                                                <h3 class="text-sm font-medium text-red-800">
+                                                    Login Tidak Diizinkan
+                                                </h3>
+                                                <div class="mt-2 text-sm text-red-700">
+                                                    <p>Akun <strong>{{ $activeSessionInfo['username'] }}</strong> sudah
+                                                        login di perangkat lain.</p>
+                                                    <p class="mt-1">Silakan logout dari perangkat lain terlebih
+                                                        dahulu atau hubungi administrator untuk bantuan.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
 
                                 <!-- Login Form -->
                                 <form class="space-y-4 lg:space-y-6" wire:submit="login">
@@ -384,7 +313,8 @@
                                         <x-ts-input class="text-sm lg:text-base" icon="user"
                                             label="Username / Email / NIM"
                                             placeholder="Masukkan username, email, atau NIM" required type="text"
-                                            wire:model="username_or_email" />
+                                            wire:model="username_or_email"
+                                            wire:keyup.debounce.500ms="checkExistingSession" />
 
                                         <x-ts-password class="text-sm lg:text-base" icon="key" label="Password"
                                             placeholder="Masukkan password Anda" required wire:model="password" />
@@ -393,7 +323,7 @@
                                     <div class="flex items-center justify-between pt-2">
                                         <x-ts-checkbox class="text-xs lg:text-sm" id="remember" label="Ingat saya"
                                             wire:model="remember" />
-                                        <a class="text-xs font-medium text-[#f58634] hover:text-green-700 lg:text-sm"
+                                        <a class="text-xs font-medium {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-green-700 lg:text-sm"
                                             href="#">
                                             Lupa Password?
                                         </a>
@@ -412,7 +342,8 @@
                                 </form>
                                 <div class="mt-4 text-center">
                                     <a href="{{ route('register') }}"
-                                        class="text-[#f58634] hover:text-[#317354] text-sm">Buat Akun ?</a>
+                                        class="{{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#317354] text-sm">Buat
+                                        Akun ?</a>
                                 </div>
                             </div>
                         </div>
@@ -444,6 +375,294 @@
                             <!-- Footer -->
                             <p class="text-xs font-medium text-gray-500">
                                 © {{ date('Y') }} Institut Kesehatan Mitra Bunda
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @elseif (config('app.name_slug') == 'ups_tegal')
+        <div class="relative h-screen overflow-hidden bg-[#dce0f4]">
+            <!-- Advanced Animated Background -->
+            <div class="absolute inset-0">
+                <!-- Flowing gradient mesh -->
+                <div class="absolute inset-0 opacity-40">
+                    <div class="absolute left-0 top-0 h-full w-full animate-pulse bg-gradient-to-br from-blue-500/20 via-indigo-500/15 to-cyan-500/20"
+                        style="animation-duration: 8s;"></div>
+                    <div class="absolute inset-0 animate-pulse bg-gradient-to-tl from-blue-600/15 via-transparent to-blue-400/20"
+                        style="animation-duration: 12s; animation-delay: 2s;"></div>
+                </div>
+
+                <!-- Floating elements -->
+                <div
+                    class="absolute left-20 top-20 h-3 w-3 animate-bounce cursor-pointer rounded-full bg-blue-500/50 transition-all duration-500 hover:scale-150 hover:bg-blue-400">
+                </div>
+                <div
+                    class="duration-400 absolute right-24 top-1/3 h-8 w-2 animate-pulse cursor-pointer bg-indigo-500/50 transition-all hover:h-16 hover:bg-indigo-400">
+                </div>
+                <div class="hover:scale-200 duration-600 absolute bottom-1/4 left-1/4 h-4 w-4 rotate-45 animate-spin cursor-pointer bg-cyan-500/50 transition-all"
+                    style="animation-duration: 15s;"></div>
+                <div
+                    class="absolute bottom-20 right-20 h-1 w-12 animate-pulse cursor-pointer bg-blue-600/50 transition-all duration-500 hover:w-20">
+                </div>
+            </div>
+
+            <!-- Main Container -->
+            <div class="relative flex h-screen">
+                <!-- Left Panel: Company Showcase - Hidden on mobile -->
+                <div class="group relative hidden w-0 overflow-hidden lg:block lg:w-3/5">
+                    <!-- Background with modern clip-path -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 transition-all duration-1000 hover:from-blue-500 hover:via-blue-600 hover:to-blue-800"
+                        style="clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); background-image: url('{{ asset('asset/img/background-auth-ups.jpeg') }}'); background-size: cover; background-position: center;">
+                    </div>
+
+                    <!-- Subtle pattern overlay -->
+                    <div class="absolute inset-0 opacity-10">
+                        <div class="h-full w-full"
+                            style="background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.3) 1px, transparent 0); background-size: 40px 40px;">
+                        </div>
+                    </div>
+
+                    <!-- Content Container -->
+                    <div class="relative z-10 flex h-full flex-col p-6 text-white xl:p-12">
+                        <!-- Header Section -->
+                        <div class="space-y-6">
+                            <!-- Company Logo & Brand -->
+                            <div class="group/brand flex items-center space-x-3">
+                                <div class="relative">
+                                    <img alt="Logo" class="object-contain" style="width: 215px;" loading="lazy"
+                                        src="{{ asset('asset/img/logo-ups.png') }}">
+                                </div>
+                            </div>
+
+                            <!-- Main Value Proposition -->
+                            <div class="space-y-2 mt-[40%] max-w-xl">
+                                <div
+                                    class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
+                                    <div class="flex items-start space-x-3">
+                                        <div
+                                            class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
+                                            <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path
+                                                    d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
+                                                    stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                                </path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3
+                                                class="mb-1 text-lg font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
+                                                Visi
+                                            </h3>
+                                            <p
+                                                class="text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
+                                                Menjadi pusat pendidikan kedokteran yang unggul, berintegritas, dan
+                                                berdaya
+                                                saing global dalam mewujudkan pelayanan kesehatan yang berkualitas.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
+                                    <div class="flex items-start space-x-3">
+                                        <div
+                                            class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
+                                            <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path
+                                                    d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
+                                                    stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                                </path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3
+                                                class="mb-1 text-lg font-semibold text-white transition-transform duration-300 group-hover/card:translate-x-1">
+                                                Misi
+                                            </h3>
+                                            <div class="space-y-2">
+                                                <ul
+                                                    class="space-y-1 text-xs text-white/80 transition-colors duration-300 group-hover/card:text-white">
+                                                    <li class="flex items-center gap-2">
+                                                        <span class="w-2 h-2 rounded-full bg-white"></span>
+                                                        <span>Menyelenggarakan pendidikan kedokteran yang inovatif,
+                                                            berbasis
+                                                            teknologi, dan berorientasi pada kebutuhan
+                                                            masyarakat.</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2">
+                                                        <span class="w-2 h-2 rounded-full bg-white"></span>
+                                                        <span>Menghasilkan lulusan dokter yang kompeten, berempati, dan
+                                                            menjunjung etika profesi.</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2">
+                                                        <span class="w-2 h-2 rounded-full bg-white"></span>
+                                                        <span>Mengembangkan penelitian yang bermanfaat bagi kemajuan
+                                                            ilmu
+                                                            kedokteran dan kesehatan publik.</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2">
+                                                        <span class="w-2 h-2 rounded-full bg-white"></span>
+                                                        <span>Berperan aktif dalam pengabdian kepada masyarakat melalui
+                                                            program kesehatan berkelanjutan.</span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Login Form - Full width on mobile, partial on desktop -->
+                <div class="relative flex min-h-screen w-full items-center justify-center p-4 lg:w-2/5 lg:p-8 xl:p-16">
+                    <!-- Mobile Header - Only visible on mobile -->
+                    <div class="absolute left-4 top-4 lg:hidden">
+                        <div
+                            class="inline-flex items-center space-x-3 rounded-2xl border border-gray-200/50 bg-white/90 px-4 py-2 shadow-xl backdrop-blur-xl">
+                            <div
+                                class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600">
+                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11"
+                                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                </svg>
+                            </div>
+                            <div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Login Card - Properly centered -->
+                    <div class="w-full max-w-md">
+                        <!-- Glassmorphism backdrop -->
+                        <div class="relative">
+                            <div
+                                class="absolute -inset-1 rounded-3xl bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-cyan-500/10 opacity-60 blur-xl filter">
+                            </div>
+
+                            <!-- Main card -->
+                            <div
+                                class="relative rounded-3xl border border-gray-200/50 bg-white/95 p-6 shadow-2xl backdrop-blur-2xl lg:p-8">
+                                <!-- Header -->
+                                <div class="mb-6 text-center lg:mb-8">
+                                    <div class="relative mb-4 inline-block lg:mb-6">
+                                        <div
+                                            class="mx-auto flex h-16 w-16 items-center justify-center rounded-full shadow-xl lg:h-20 lg:w-20">
+                                            <!-- <svg class="h-8 w-8 text-white lg:h-10 lg:w-10" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path
+                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                                    stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                            </svg> -->
+                                            <img src="{{ asset('asset/img/logo-ups-potrait.png') }}" alt="">
+                                        </div>
+                                    </div>
+
+                                    <h2 class="mb-1 text-xl font-bold text-gray-800 lg:mb-2 lg:text-2xl">Universitas
+                                        Pancasakti Tegal</h2>
+                                    <p class="text-sm text-gray-600 lg:text-base">Masuk ke sistem CBT</p>
+                                </div>
+
+                                <!-- Active Session Error -->
+                                @if ($hasActiveSession && $activeSessionInfo)
+                                    <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
+                                        <div class="flex items-start">
+                                            <div class="flex-shrink-0">
+                                                <svg class="h-5 w-5 text-red-400" fill="currentColor"
+                                                    viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd"
+                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                        clip-rule="evenodd"></path>
+                                                </svg>
+                                            </div>
+                                            <div class="ml-3">
+                                                <h3 class="text-sm font-medium text-red-800">
+                                                    Login Tidak Diizinkan
+                                                </h3>
+                                                <div class="mt-2 text-sm text-red-700">
+                                                    <p>Akun <strong>{{ $activeSessionInfo['username'] }}</strong> sudah
+                                                        login di perangkat lain.</p>
+                                                    <p class="mt-1">Silakan logout dari perangkat lain terlebih
+                                                        dahulu atau hubungi administrator untuk bantuan.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <!-- Login Form -->
+                                <form class="space-y-4 lg:space-y-6" wire:submit="login">
+                                    <div class="space-y-4 lg:space-y-6">
+                                        <x-ts-input class="text-sm lg:text-base" icon="user"
+                                            label="Username / Email / NIM"
+                                            placeholder="Masukkan username, email, atau NIM" required type="text"
+                                            wire:model="username_or_email"
+                                            wire:keyup.debounce.500ms="checkExistingSession" />
+
+                                        <x-ts-password class="text-sm lg:text-base" icon="key" label="Password"
+                                            placeholder="Masukkan password Anda" required wire:model="password" />
+                                    </div>
+
+                                    <div class="flex items-center justify-between pt-2">
+                                        <x-ts-checkbox class="text-xs lg:text-sm" id="remember" label="Ingat saya"
+                                            wire:model="remember" />
+                                        <a class="text-xs font-medium text-[#2b7fff] hover:text-blue-700 lg:text-sm"
+                                            href="#">
+                                            Lupa Password?
+                                        </a>
+                                    </div>
+
+                                    <div class="pt-4">
+                                        <x-ts-button
+                                            class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base !bg-blue-500"
+                                            icon="arrow-right" position="right" type="submit" loading="login">
+                                            <x-slot:text>Masuk</x-slot:text>
+                                        </x-ts-button>
+                                        {{-- <button class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base text-black bg-[#2b7fff]">
+                                            Masuk
+                                        </button> --}}
+                                    </div>
+                                </form>
+                                <div class="mt-4 text-center">
+                                    <a href="{{ route('register') }}"
+                                        class="text-[#2b7fff] hover:text-[#317354] text-sm">Buat Akun ?</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Status & Footer -->
+                        <div class="mt-6 space-y-4 text-center">
+                            <!-- Status -->
+                            <div class="flex justify-center">
+                                <div
+                                    class="inline-flex items-center gap-3 rounded-full border border-gray-200/40 bg-white/80 px-4 py-2 shadow-lg backdrop-blur-xl">
+                                    <div class="flex items-center gap-1">
+                                        <div class="h-2 w-2 animate-pulse rounded-full bg-blue-500"></div>
+                                        <span class="text-xs font-medium text-gray-600">Online</span>
+                                    </div>
+                                    <div class="h-3 w-px bg-gray-300/50"></div>
+                                    <div class="flex items-center gap-1">
+                                        <svg class="h-3 w-3 text-blue-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path
+                                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                            </path>
+                                        </svg>
+                                        <span class="text-xs font-medium text-gray-600">Secure</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Footer -->
+                            <p class="text-xs font-medium text-gray-500">
+                                © {{ date('Y') }} PRO CBT
                             </p>
                         </div>
                     </div>
@@ -751,7 +970,7 @@
                                     <div class="flex items-center justify-between pt-2">
                                         <x-ts-checkbox class="text-xs lg:text-sm" id="remember" label="Ingat saya"
                                             wire:model="remember" />
-                                        <a class="text-xs font-medium text-[#f58634] hover:text-green-700 lg:text-sm"
+                                        <a class="text-xs font-medium {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-green-700 lg:text-sm"
                                             href="#">
                                             Lupa Password?
                                         </a>
@@ -770,7 +989,8 @@
                                 </form>
                                 <div class="mt-4 text-center">
                                     <a href="{{ route('register') }}"
-                                        class="text-[#f58634] hover:text-[#317354] text-sm">Buat Akun ?</a>
+                                        class="{{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#317354] text-sm">Buat
+                                        Akun ?</a>
                                 </div>
                             </div>
                         </div>
@@ -1168,7 +1388,9 @@
                 <div class="flex flex-col items-center mb-6">
                     <img src="{{ asset('asset/img/LogoPROCBT.png') }}" alt="Logo PRO CBT"
                         class="h-12 drop-shadow-md mb-4">
-                    <h1 class="text-2xl font-bold text-[#f58634]">Selamat Datang Kembali!</h1>
+                    <h1
+                        class="text-2xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        Selamat Datang Kembali!</h1>
                     <p class="text-gray-600 text-sm">Akses dashboard admin Anda dengan aman</p>
                 </div>
 
@@ -1275,11 +1497,12 @@
                     <div class="flex items-center justify-between">
                         <label class="flex items-center">
                             <input autocomplete="off" type="checkbox" name="remember"
-                                class="rounded border-gray-300 text-[#f58634] focus:ring-[#1E3A8A]/20"
+                                class="rounded border-gray-300 {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} focus:ring-[#1E3A8A]/20"
                                 wire:model='remember'>
                             <span class="ml-2 text-sm text-gray-600">Ingat saya</span>
                         </label>
-                        <a href="#" class="text-sm text-[#f58634] hover:text-[#2563EB] transition-colors">Lupa
+                        <a href="#"
+                            class="text-sm {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#2563EB] transition-colors">Lupa
                             kata
                             sandi?</a>
                     </div>
@@ -1295,7 +1518,8 @@
                         <p class="text-sm text-gray-600">
                             Belum punya akun?
                             <a href="{{ route('register') }}"
-                                class="text-[#f58634] hover:underline font-semibold">Daftar di
+                                class="{{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:underline font-semibold">Daftar
+                                di
                                 sini</a>
                         </p>
                     </div>

@@ -60,7 +60,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth'])->name('dashboard');
 
 // Admin Dashboard Routes
-Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middleware' => ['auth', 'verified', CheckUserTimetable::class]], function () {
+Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middleware' => ['auth', CheckUserTimetable::class]], function () {
     Route::get('/', 'Dashboard\AdminDashboardIndex')->name('admin.dashboard');
 
     // Debug route for video testing
@@ -109,6 +109,7 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
         Route::get('/timetable/{timetable_id}/video', 'Timetable\Video\AdminMasterTimetableVideoIndex')->name('admin.master.timetable.video');
         Route::get('/timetable/{timetable_id}/alert', 'Timetable\Alert\AdminMasterTimetableAlertIndex')->name('admin.master.timetable.alert');
         Route::get('/timetable/{timetable_id}/streaming', 'Timetable\Streaming\AdminMasterTimetableStreamingIndex')->name('admin.master.timetable.streaming');
+        Route::get('/timetable/{timetable_id}/session', 'Timetable\Session\AdminMasterTimetableSessionIndex')->name('admin.master.timetable.session');
         Route::get('/timetable/{timetable_id}/{user_timetable_id}/answer', 'Timetable\Answer\AdminMasterTimetableAnswerIndex')->name('admin.master.timetable.answer');
         Route::get('/material', AdminMasterMaterialIndex::class)->name('admin.master.material');
         Route::get('/question-type', AdminMasterQuestionTypeIndex::class)->name('admin.master.question-type');
@@ -134,7 +135,7 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
 });
 
 // Dosen Dashboard Routes
-Route::group(['namespace' => 'App\Livewire\Dosen', 'prefix' => 'dosen', 'middleware' => ['auth', 'verified', CheckUserTimetable::class]], function () {
+Route::group(['namespace' => 'App\Livewire\Dosen', 'prefix' => 'dosen', 'middleware' => ['auth', CheckUserTimetable::class]], function () {
     Route::get('/', 'Dashboard\DosenDashboardIndex')->name('dosen.dashboard');
 
     // Route::group(['prefix' => 'exam'], function () {
@@ -156,7 +157,7 @@ Route::group(['namespace' => 'App\Livewire\Dosen', 'prefix' => 'dosen', 'middlew
 });
 
 // Mahasiswa Dashboard Routes
-Route::group(['namespace' => 'App\Livewire\Mahasiswa', 'prefix' => 'mahasiswa', 'middleware' => ['auth', 'verified', CheckUserTimetable::class]], function () {
+Route::group(['namespace' => 'App\Livewire\Mahasiswa', 'prefix' => 'mahasiswa', 'middleware' => ['auth', CheckUserTimetable::class]], function () {
     Route::get('/', 'Dashboard\MahasiswaDashboardIndex')->name('mahasiswa.dashboard');
 
     // Route::group(['prefix' => 'exam'], function () {
@@ -171,7 +172,7 @@ Route::group(['namespace' => 'App\Livewire\Mahasiswa', 'prefix' => 'mahasiswa', 
 });
 
 // Pengawas Dashboard Routes
-Route::group(['namespace' => 'App\Livewire\Pengawas', 'prefix' => 'pengawas', 'middleware' => ['auth', 'verified', CheckUserTimetable::class]], function () {
+Route::group(['namespace' => 'App\Livewire\Pengawas', 'prefix' => 'pengawas', 'middleware' => ['auth', CheckUserTimetable::class]], function () {
     Route::get('/', 'Dashboard\PengawasDashboardIndex')->name('pengawas.dashboard');
 
     // Route::group(['prefix' => 'monitor'], function () {

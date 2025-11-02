@@ -3,6 +3,8 @@
 namespace App\Livewire\Admin\Master\Timetable;
 
 use App\Helpers\AlertHelper;
+use App\Models\Exam\ExamLiveSession;
+use App\Models\Exam\ExamRecording;
 use App\Models\Classmate\Classmate;
 use App\Models\Master\Exam\ExamRoom;
 use App\Models\Master\Exam\ExamSession;
@@ -10,6 +12,7 @@ use App\Models\Master\Question\Module;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Master\Timetable\Timetable;
+use App\Models\User\UserTimetable;
 use App\Models\Study\Study;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -18,6 +21,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Session;
 use Carbon\Carbon;
+use App\Services\Exam\RecordingFinalizer;
 
 class AdminMasterTimetableIndex extends Component
 {
@@ -240,6 +244,11 @@ class AdminMasterTimetableIndex extends Component
         return redirect()->route('admin.master.timetable.alert', ['timetable_id' => $id]);
     }
 
+    public function sessionIndex($id)
+    {
+        return redirect()->route('admin.master.timetable.session', ['timetable_id' => $id]);
+    }
+
     public function liveSession($id)
     {
         return redirect()->route('admin.master.timetable.streaming', ['timetable_id' => $id]);
@@ -263,5 +272,71 @@ class AdminMasterTimetableIndex extends Component
             ->extends('layout.app')
             ->section('content')
         ;
+    }
+
+    public function confirmSuspend($id)
+    {
+        return AlertHelper::confirmWarning('suspendTimetable', 'Apakah Anda Yakin Mensuspend Sesi Ujian?', $id);
+    }
+
+    public function suspendTimetable($id)
+    {
+        try {
+            DB::beginTransaction();
+            $timetableId = is_array($id) ? ($id[0] ?? null) : $id;
+            if (!$timetableId) {
+                throw new \InvalidArgumentException('ID Jadwal tidak valid.');
+            }
+
+            // Nonaktifkan semua live session aktif untuk jadwal ini
+            $sessions = ExamLiveSession::where('timetable_id', $timetableId)
+                ->where('is_active', true)
+                ->get();
+            foreach ($sessions as $session) {
+                $session->update([
+                    'is_active' => false,
+                    'connection_status' => 'disconnected',
+                    'end_time' => Carbon::now(),
+                ]);
+            }
+
+            // Tandai semua user_timetables yang sedang ujian menjadi suspend
+            $userTimetables = UserTimetable::where('timetable_id', $timetableId)
+                ->whereIn('status', ['exam', 'warning'])
+                ->get();
+
+            foreach ($userTimetables as $ut) {
+                $ut->update([
+                    'status' => 'suspend',
+                    'end_exam' => Carbon::now(),
+                ]);
+
+                // Finalisasi rekaman chunk untuk masing-masing peserta
+                $result = RecordingFinalizer::finalizeForUserTimetable($ut->id);
+
+                // Update rekaman terakhir peserta dengan hasil finalisasi
+                $latestRecording = ExamRecording::where('user_timetable_id', $ut->id)
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+                if ($latestRecording) {
+                    $latestRecording->update([
+                        'video_path' => $result['merged_video'] ?: $result['manifest'],
+                        'file_size' => $result['total_size'],
+                        'end_time' => Carbon::now(),
+                        'status' => 'completed',
+                    ]);
+                }
+            }
+
+            DB::commit();
+            AlertHelper::success('Berhasil', 'Sesi ujian berhasil di-suspend dan rekaman tersimpan.');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            AlertHelper::error('Gagal', 'Suspend sesi ujian gagal dilakukan.');
+            Log::error('Gagal suspend jadwal', [
+                'error' => $th->getMessage(),
+                'trace' => $th->getTraceAsString(),
+            ]);
+        }
     }
 }

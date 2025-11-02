@@ -28,7 +28,9 @@
     <div class="mb-3 bg-white rounded-lg p-3 shadow-sm">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-lg font-bold text-[#f58634] mb-1">Analisis Butir Soal</h1>
+                <h1
+                    class="text-lg font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} mb-1">
+                    Analisis Butir Soal</h1>
                 <div class="text-xs text-gray-600">
                     <span class="font-medium">{{ $timetable->name ?? 'N/A' }}</span> •
                     {{ $timetableModule->name ?? 'N/A' }} •
@@ -150,7 +152,8 @@
                                 @if ($analysis['difficulty_index'] < 0.3)
                                     <span class="text-red-600">Perbaiki soal</span>
                                 @elseif($analysis['difficulty_index'] > 0.7)
-                                    <span class="text-orange-600">Persulit</span>
+                                    <span
+                                        class="{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }}">Persulit</span>
                                 @else
                                     <span class="text-green-600">Baik</span>
                                 @endif

@@ -27,37 +27,39 @@
                     Tipe <span class="text-red-600">*</span>
                 </label>
 
+                @php
+                    $brandBg = config('app.name_slug') === 'ups_tegal' ? 'bg-blue-600' : 'bg-orange-600';
+                    $brandBorder = config('app.name_slug') === 'ups_tegal' ? 'border-blue-600' : 'border-orange-600';
+                @endphp
+
                 <div class="mt-2 flex space-x-2">
-                    <button
-                        type="button"
-                        wire:click="$set('type_study', 'mahasiswa')"
+                    <button type="button" wire:click="$set('type_study', 'mahasiswa')"
                         class="px-4 py-2 rounded-md border
-                            {{ $type_study === 'mahasiswa' ? 'bg-orange-600 text-white border-orange-600' : 'bg-white text-gray-700 border-gray-300' }}">
-                        Mahasiswa
+            {{ $type_study === 'mahasiswa' ? "$brandBg text-white $brandBorder" : 'bg-white text-gray-700 border-gray-300' }}">
+                        Kelas
                     </button>
 
-                    <button
-                        type="button"
-                        wire:click="$set('type_study', 'general')"
+                    <button type="button" wire:click="$set('type_study', 'general')"
                         class="px-4 py-2 rounded-md border
-                            {{ $type_study === 'general' ? 'bg-orange-600 text-white border-orange-600' : 'bg-white text-gray-700 border-gray-300' }}">
+            {{ $type_study === 'general' ? "$brandBg text-white $brandBorder" : 'bg-white text-gray-700 border-gray-300' }}">
                         General
                     </button>
                 </div>
+
 
                 @error('type_study')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
-            @if($type_study === 'mahasiswa')
+            @if ($type_study === 'mahasiswa')
                 <div class="mb-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700">Nama Lengkap <span
                                     class="text-red-600">*</span></label>
-                            <input id="name" type="text" wire:model.defer="name" placeholder="Contoh: Ahmad Fauzi"
-                                class="mt-1 form-control">
+                            <input id="name" type="text" wire:model.defer="name"
+                                placeholder="Contoh: Ahmad Fauzi" class="mt-1 form-control">
                             @error('name')
                                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                             @enderror
@@ -92,7 +94,8 @@
                                 <input :type="show ? 'text' : 'password'" id="password" wire:model.defer="password"
                                     placeholder="Minimum 8 karakter" class="mt-1 form-control">
                                 <button type="button" @click="show = !show"
-                                    class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500" tabindex="-1">
+                                    class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"
+                                    tabindex="-1">
                                     <i :class="show ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
                                 </button>
                             </div>
@@ -103,8 +106,8 @@
                         <div>
                             <label for="phone" class="block text-sm font-medium text-gray-700">No. Telepon <span
                                     class="text-red-600">*</span></label>
-                            <input id="phone" type="tel" wire:model.defer="phone" placeholder="Contoh: 081234567890"
-                                class="mt-1 form-control">
+                            <input id="phone" type="tel" wire:model.defer="phone"
+                                placeholder="Contoh: 081234567890" class="mt-1 form-control">
                             @error('phone')
                                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                             @enderror
@@ -279,8 +282,8 @@
                         </div>
                         <div>
                             <label for="city" class="block text-sm font-medium text-gray-700">Kota</label>
-                            <input id="city" type="text" wire:model.defer="city" placeholder="Contoh: Jakarta"
-                                class="mt-1 form-control">
+                            <input id="city" type="text" wire:model.defer="city"
+                                placeholder="Contoh: Jakarta" class="mt-1 form-control">
                             @error('city')
                                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                             @enderror
@@ -319,8 +322,9 @@
                         <div>
                             <label for="emergency_contact_name" class="block text-sm font-medium text-gray-700">Nama
                                 Kontak Darurat</label>
-                            <input id="emergency_contact_name" type="text" wire:model.defer="emergency_contact_name"
-                                placeholder="Contoh: Ayah/Ibu" class="mt-1 form-control">
+                            <input id="emergency_contact_name" type="text"
+                                wire:model.defer="emergency_contact_name" placeholder="Contoh: Ayah/Ibu"
+                                class="mt-1 form-control">
                             @error('emergency_contact_name')
                                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                             @enderror
@@ -328,8 +332,9 @@
                         <div>
                             <label for="emergency_contact_phone" class="block text-sm font-medium text-gray-700">No.
                                 Telepon Darurat</label>
-                            <input id="emergency_contact_phone" type="tel" wire:model.defer="emergency_contact_phone"
-                                placeholder="Contoh: 08123456789" class="mt-1 form-control">
+                            <input id="emergency_contact_phone" type="tel"
+                                wire:model.defer="emergency_contact_phone" placeholder="Contoh: 08123456789"
+                                class="mt-1 form-control">
                             @error('emergency_contact_phone')
                                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                             @enderror
@@ -354,8 +359,8 @@
                 </div>
             @elseif($type_study === 'general')
                 <div class="grid grid-cols-2 gap-4">
-                    <div >
-                        <label for="name" class="block text-sm font-medium text-gray-700">Nama  <span
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Nama <span
                                 class="text-red-600">*</span></label>
                         <input id="name" type="name" wire:model.defer="name" placeholder="Contoh : Admin"
                             class="mt-1 form-control">
@@ -363,11 +368,11 @@
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div >
+                    <div>
                         <label for="username" class="block text-sm font-medium text-gray-700">Username <span
                                 class="text-red-600">*</span></label>
-                        <input id="username" type="name" wire:model.defer="username" placeholder="Contoh : Admin"
-                            class="mt-1 form-control">
+                        <input id="username" type="name" wire:model.defer="username"
+                            placeholder="Contoh : Admin" class="mt-1 form-control">
                         @error('username')
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
@@ -376,8 +381,8 @@
                     <div class="mb-4">
                         <label for="email" class="block text-sm font-medium text-gray-700">Email <span
                                 class="text-red-600">*</span></label>
-                        <input id="email" type="email" wire:model.defer="email" placeholder="Contoh : admin@gmail.com"
-                            class="mt-1 form-control">
+                        <input id="email" type="email" wire:model.defer="email"
+                            placeholder="Contoh : admin@gmail.com" class="mt-1 form-control">
                         @error('email')
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
@@ -385,8 +390,8 @@
                     <div class="mb-4">
                         <label for="phone" class="block text-sm font-medium text-gray-700">Nomor Telepon <span
                                 class="text-red-600">*</span></label>
-                        <input id="phone" type="number" wire:model.defer="phone" placeholder="Contoh : 081234567890"
-                            class="mt-1 form-control">
+                        <input id="phone" type="number" wire:model.defer="phone"
+                            placeholder="Contoh : 081234567890" class="mt-1 form-control">
                         @error('phone')
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror

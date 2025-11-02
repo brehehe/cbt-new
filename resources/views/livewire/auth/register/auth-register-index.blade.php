@@ -382,7 +382,9 @@
                 <!-- Logo & Title -->
                 <div class="flex flex-col items-center mb-6">
                     <img src="{{ asset('asset/img/logo.png') }}" alt="PRO CBT Logo" class="h-12 drop-shadow-md">
-                    <h1 class="text-2xl font-bold text-[#f58634]">Buat Akun Anda</h1>
+                    <h1
+                        class="text-2xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        Buat Akun Anda</h1>
                     <p class="text-gray-600 text-sm">Daftar untuk mengakses dashboard Anda</p>
                 </div>
 
@@ -398,11 +400,31 @@
                     <div class="w-full mb-8">
                         <!-- Step Labels -->
                         <div class="flex justify-between text-sm text-gray-600 mb-2 font-medium">
-                            <span :class="step >= 1 ? 'text-[#f58634] font-semibold' : ''">Step 1</span>
-                            <span :class="step >= 2 ? 'text-[#f58634] font-semibold' : ''">Step 2</span>
-                            <span :class="step >= 3 ? 'text-[#f58634] font-semibold' : ''">Step 3</span>
-                            <span :class="step >= 4 ? 'text-[#f58634] font-semibold' : ''">Step 4</span>
-                            <span :class="step >= 5 ? 'text-[#f58634] font-semibold' : ''">Step 5</span>
+                            <span
+                                :class="step >= 1 ?
+                                    '{{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} font-semibold' :
+                                    ''">Step
+                                1</span>
+                            <span
+                                :class="step >= 2 ?
+                                    '{{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} font-semibold' :
+                                    ''">Step
+                                2</span>
+                            <span
+                                :class="step >= 3 ?
+                                    '{{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} font-semibold' :
+                                    ''">Step
+                                3</span>
+                            <span
+                                :class="step >= 4 ?
+                                    '{{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} font-semibold' :
+                                    ''">Step
+                                4</span>
+                            <span
+                                :class="step >= 5 ?
+                                    '{{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} font-semibold' :
+                                    ''">Step
+                                5</span>
                         </div>
 
                         <!-- Progress Bar Track -->
@@ -874,7 +896,9 @@
                 <div class="mt-4 text-center">
                     <p class="text-sm text-gray-600">
                         Sudah punya akun?
-                        <a href="{{ route('login') }}" class="text-[#f58634] hover:underline font-semibold">Login di
+                        <a href="{{ route('login') }}"
+                            class="{{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:underline font-semibold">Login
+                            di
                             sini</a>
                     </p>
                 </div>

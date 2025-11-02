@@ -3,7 +3,10 @@
 namespace App\Livewire\Admin\Master\Timetable\Streaming;
 
 use App\Models\Exam\ExamLiveSession;
+use App\Models\Exam\ExamRecording;
 use App\Models\Master\Timetable\Timetable;
+use App\Models\User\UserTimetable;
+use App\Services\Exam\RecordingFinalizer;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -25,7 +28,8 @@ class AdminMasterTimetableStreamingIndex extends Component
         'selectSession',
         'takeSnapshot',
         'sendMessage',
-        'terminateSession'
+        'terminateSession',
+        'suspendSession'
     ];
 
     public function mount($timetable_id)
@@ -105,6 +109,60 @@ class AdminMasterTimetableStreamingIndex extends Component
 
             session()->flash('success', 'Sesi ujian ' . $session->user->name . ' telah dihentikan');
         }
+    }
+
+    public function suspendSession($sessionId)
+    {
+        $session = ExamLiveSession::with(['user', 'userTimetable'])->find($sessionId);
+        if (!$session) {
+            session()->flash('error', 'Sesi tidak ditemukan.');
+            return;
+        }
+
+        // Nonaktifkan sesi live
+        $session->update([
+            'is_active' => false,
+            'connection_status' => 'terminated',
+            'last_activity' => now()
+        ]);
+
+        // Tandai user timetable sebagai suspend
+        $userTimetable = $session->userTimetable;
+        if ($userTimetable && in_array($userTimetable->status, ['exam', 'warning'])) {
+            $userTimetable->update([
+                'status' => 'suspend',
+                'end_exam' => now(),
+            ]);
+
+            // Finalisasi rekaman untuk user timetable ini
+            try {
+                $final = RecordingFinalizer::finalizeForUserTimetable($userTimetable->id);
+
+                if ($final && isset($final['merged_path'])) {
+                    // Update ExamRecording terbaru
+                    $latestRecording = ExamRecording::where('user_timetable_id', $userTimetable->id)
+                        ->orderBy('created_at', 'desc')
+                        ->first();
+
+                    if ($latestRecording) {
+                        $latestRecording->update([
+                            'video_path' => $final['merged_path'],
+                            'file_size' => $final['file_size'] ?? $latestRecording->file_size,
+                            'status' => 'completed',
+                            'end_time' => now(),
+                        ]);
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Jangan blokir suspend; hanya log error finalisasi
+                \Log::error('Gagal finalisasi rekaman saat suspend: ' . $e->getMessage(), [
+                    'user_timetable_id' => $userTimetable->id ?? null,
+                    'session_id' => $sessionId,
+                ]);
+            }
+        }
+
+        session()->flash('success', 'Sesi ' . ($session->user->name ?? 'peserta') . ' telah disuspend dan pengguna dilogout.');
     }
 
     private function loadActiveSessions()

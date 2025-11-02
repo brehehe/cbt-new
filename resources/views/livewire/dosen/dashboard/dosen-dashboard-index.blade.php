@@ -78,7 +78,9 @@
     <div class="mb-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-[#f58634]">Selamat Datang, {{ Auth::user()->name ?? 'Dosen' }}!</h1>
+                <h1
+                    class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                    Selamat Datang, {{ Auth::user()->name ?? 'Dosen' }}!</h1>
                 <p class="text-gray-600 mt-1">Kelola ujian dan monitor performa mahasiswa Anda</p>
                 <p class="text-sm text-gray-500">{{ \Carbon\Carbon::now()->format('l, j F Y') }}</p>
             </div>
@@ -112,7 +114,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Total Ujian Saya</p>
-                    <h3 class="text-3xl font-bold text-[#f58634]">{{ $totalMyExams ?? 0 }}</h3>
+                    <h3
+                        class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        {{ $totalMyExams ?? 0 }}</h3>
                     <div class="flex items-center mt-2">
                         <span class="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
                             {{ $activeExams ?? 0 }} sedang berlangsung
@@ -120,7 +124,8 @@
                     </div>
                 </div>
                 <div class="bg-gradient-to-br from-[#f58634]/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
-                    <svg class="w-8 h-8 text-[#f58634]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-8 h-8 {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                         </path>
@@ -135,7 +140,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Mahasiswa Terdaftar</p>
-                    <h3 class="text-3xl font-bold text-[#f58634]">{{ $totalStudents ?? 0 }}</h3>
+                    <h3
+                        class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        {{ $totalStudents ?? 0 }}</h3>
                     <div class="flex items-center mt-2">
                         <div class="w-2 h-2 bg-green-500 rounded-full pulse-dot mr-2"></div>
                         <span class="text-xs text-green-600">{{ $activeStudents ?? 0 }} sedang ujian</span>
@@ -157,7 +164,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Bank Soal</p>
-                    <h3 class="text-3xl font-bold text-[#f58634]">{{ $totalQuestions ?? 0 }}</h3>
+                    <h3
+                        class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        {{ $totalQuestions ?? 0 }}</h3>
                     <div class="flex items-center mt-2">
                         <span class="text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded-full">
                             {{ $questionTypes ?? 0 }} kategori
@@ -180,7 +189,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Rata-rata Nilai</p>
-                    <h3 class="text-3xl font-bold text-[#f58634]">{{ number_format($averageScore ?? 0, 1) }}</h3>
+                    <h3
+                        class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        {{ number_format($averageScore ?? 0, 1) }}</h3>
                     <div class="flex items-center mt-2">
                         @if (($averageScore ?? 0) >= 75)
                             <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">Sangat Baik</span>
@@ -256,7 +267,8 @@
             class="quick-action-card bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100 block">
             <div class="flex items-center justify-center mb-4">
                 <div class="bg-gradient-to-br from-orange-500/20 to-orange-600/20 p-4 rounded-2xl">
-                    <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-8 h-8 {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }}"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
                         </path>
@@ -315,7 +327,7 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-800">Ujian Mendatang</h3>
                 <a href="{{ route('admin.exam.timetable') }}"
-                    class="text-[#f58634] hover:text-[#2d8c5b] text-sm font-medium">
+                    class="{{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#2d8c5b] text-sm font-medium">
                     Kelola →
                 </a>
             </div>
@@ -388,7 +400,7 @@
                             </div>
                             <div class="text-right">
                                 <span
-                                    class="text-xs font-semibold {{ $activity['status'] === 'completed' ? 'text-green-600' : 'text-orange-600' }}">
+                                    class="text-xs font-semibold {{ $activity['status'] === 'completed' ? 'text-green-600' : '{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }}' }}">
                                     {{ $activity['status'] === 'completed' ? 'Selesai' : 'Berlangsung' }}
                                 </span>
                             </div>

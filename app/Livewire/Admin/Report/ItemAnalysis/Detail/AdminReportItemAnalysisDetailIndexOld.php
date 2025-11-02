@@ -11,7 +11,7 @@ use App\Models\User\UserTimetable;
 use App\Models\User\UserModuleQuestion;
 use Illuminate\Support\Facades\DB;
 
-class AdminReportItemAnalysisDetailIndex extends Component
+class AdminReportItemAnalysisDetailIndexOld extends Component
 {
     protected $paginationTheme = 'bootstrap';
 

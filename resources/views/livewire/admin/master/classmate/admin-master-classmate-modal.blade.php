@@ -24,21 +24,28 @@
                 <label class="block text-sm font-medium text-gray-700">
                     Tipe <span class="text-red-600">*</span>
                 </label>
+                @php
+                    $brandBg = config('app.name_slug') === 'ups_tegal' ? 'bg-blue-600' : 'bg-orange-600';
+                    $brandBorder = config('app.name_slug') === 'ups_tegal' ? 'border-blue-600' : 'border-orange-600';
+                @endphp
 
                 <div class="mt-2 flex space-x-2">
-                    <button
-                        type="button"
-                        wire:click="setType('mahasiswa')"
+                    <button type="button" wire:click="setType('mahasiswa')"
                         class="px-4 py-2 rounded-md border
-                            {{ $type_study === 'mahasiswa' ? 'bg-orange-600 text-white border-orange-600' : 'bg-white text-gray-700 border-gray-300' }}">
+                            {{ $type_study === 'mahasiswa' ? $brandBg . ' text-white ' . $brandBorder : 'bg-white text-gray-700 border-gray-300' }}">
                         Kelas
                     </button>
 
-                    <button
-                        type="button"
-                        wire:click="setType('general')"
+                    @php
+                        // Tentukan warna brand dulu
+                        $brandBg2 = config('app.name_slug') === 'ups_tegal' ? 'bg-blue-600' : 'bg-orange-600';
+                        $brandBorder2 =
+                            config('app.name_slug') === 'ups_tegal' ? 'border-blue-600' : 'border-orange-600';
+                    @endphp
+
+                    <button type="button" wire:click="setType('general')"
                         class="px-4 py-2 rounded-md border
-                            {{ $type_study === 'general' ? 'bg-orange-600 text-white border-orange-600' : 'bg-white text-gray-700 border-gray-300' }}">
+                            {{ $type_study === 'general' ? "$brandBg2 text-white $brandBorder2" : 'bg-white text-gray-700 border-gray-300' }}">
                         General
                     </button>
                 </div>
@@ -47,63 +54,63 @@
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
             </div>
-            @if($type_study == 'mahasiswa')
-            <div class="mb-4">
-                <label for="name" class="block text-sm font-medium text-gray-700">Nama <span
-                        class="text-red-500">*</span></label>
-                <input type="text" id="name" wire:model.defer="name" class="mt-1 form-control"
-                    placeholder="Nama Peserta" />
-                @error('name')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-            <div class="mb-4">
-                <label for="user_id" class="block text-sm font-medium text-gray-700">Dosen <span
-                        class="text-red-600">*</span></label>
-                <div wire:key="select-{{ rand() }}">
-                    <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
-                        dropdownParent: 'body',
-                        allowClear: true,
-                        plugins: ['clear_button'],
-                        onChange: function(e) {
-                            @this.set('user_id', e ? e : '');
-                        }
-                    });"
-                        wire:model.lazy="user_id" id="user_id">
-                        <option value="">-- Pilih Dosen --</option>
-                        @foreach ($users as $key_user => $user)
-                            <option value="{{ $key_user }}">{{ $user }}</option>
-                        @endforeach
-                    </select>
+            @if ($type_study == 'mahasiswa')
+                <div class="mb-4">
+                    <label for="name" class="block text-sm font-medium text-gray-700">Nama <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" id="name" wire:model.defer="name" class="mt-1 form-control"
+                        placeholder="Nama Peserta" />
+                    @error('name')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
-                @error('user_id')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-            <div class="mb-4">
-                <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
-                <textarea id="description" wire:model.defer="description" placeholder="Deskripsi Peserta" class="mt-1 form-control"></textarea>
-                @error('description')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                @enderror
-            </div>
+                <div class="mb-4">
+                    <label for="user_id" class="block text-sm font-medium text-gray-700">Dosen <span
+                            class="text-red-600">*</span></label>
+                    <div wire:key="select-{{ rand() }}">
+                        <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
+                            dropdownParent: 'body',
+                            allowClear: true,
+                            plugins: ['clear_button'],
+                            onChange: function(e) {
+                                @this.set('user_id', e ? e : '');
+                            }
+                        });"
+                            wire:model.lazy="user_id" id="user_id">
+                            <option value="">-- Pilih Dosen --</option>
+                            @foreach ($users as $key_user => $user)
+                                <option value="{{ $key_user }}">{{ $user }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @error('user_id')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div class="mb-4">
+                    <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                    <textarea id="description" wire:model.defer="description" placeholder="Deskripsi Peserta" class="mt-1 form-control"></textarea>
+                    @error('description')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             @elseif($type_study == 'general')
-            <div class="mb-4">
-                <label for="name" class="block text-sm font-medium text-gray-700">Nama <span
-                        class="text-red-500">*</span></label>
-                <input type="text" id="name" wire:model.defer="name" class="mt-1 form-control"
-                    placeholder="Nama Peserta" />
-                @error('name')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-            <div class="mb-4">
-                <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
-                <textarea id="description" wire:model.defer="description" placeholder="Deskripsi Peserta" class="mt-1 form-control"></textarea>
-                @error('description')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                @enderror
-            </div>
+                <div class="mb-4">
+                    <label for="name" class="block text-sm font-medium text-gray-700">Nama <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" id="name" wire:model.defer="name" class="mt-1 form-control"
+                        placeholder="Nama Peserta" />
+                    @error('name')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div class="mb-4">
+                    <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                    <textarea id="description" wire:model.defer="description" placeholder="Deskripsi Peserta" class="mt-1 form-control"></textarea>
+                    @error('description')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             @endif
         </div>
 

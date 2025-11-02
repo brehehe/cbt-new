@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use App\Services\Exam\RecordingFinalizer;
 
 class AdminExamDetailIndex extends Component
 {
@@ -41,6 +42,7 @@ class AdminExamDetailIndex extends Component
     protected $listeners = [
         'timeExpired',
         'saveRecordingVideo' => 'saveRecordingVideo',
+        'saveRecordingChunk' => 'saveRecordingChunk',
         'logAlert',
         'stopRecording',
         'pageReloaded',
@@ -48,7 +50,9 @@ class AdminExamDetailIndex extends Component
         'saveScreenshot',
         'initializePeerJS',
         'updatePeerJSId',
-        'completeExamFinalization'
+        'completeExamFinalization',
+        'finalizeRecording' => 'finalizeRecording',
+        'completeSuspendFinalization'
     ];
 
     public function mount()
@@ -64,6 +68,36 @@ class AdminExamDetailIndex extends Component
     {
         if (!$this->userTimetable || !$this->userTimetable->timetable_id) {
             return redirect()->route('admin.exam.timetable');
+        }
+
+        // Enforce single-device login: block new session if another active session exists with different session_id
+        $currentSessionId = session()->getId();
+        $existingActive = ExamLiveSession::where('user_timetable_id', $this->userTimetableId)
+            ->where('user_id', Auth::id())
+            ->where('is_active', true)
+            ->orderByDesc('last_activity')
+            ->first();
+
+        if ($existingActive && data_get($existingActive->session_metadata, 'session_id') && data_get($existingActive->session_metadata, 'session_id') !== $currentSessionId) {
+            ExamAlert::create([
+                'timetable_id' => $this->userTimetable->timetable_id,
+                'user_timetable_id' => $this->userTimetableId,
+                'alert_type' => 'connection_lost',
+                'description' => 'Percobaan login dari perangkat lain terdeteksi',
+                'metadata' => [
+                    'previous_session_id' => data_get($existingActive->session_metadata, 'session_id'),
+                    'new_session_id' => $currentSessionId,
+                    'user_agent' => request()->header('User-Agent'),
+                    'ip' => request()->ip(),
+                ],
+            ]);
+
+            if ($this->userTimetable && in_array($this->userTimetable->status, ['exam', 'warning'])) {
+                $this->userTimetable->update(['status' => 'warning']);
+            }
+
+            AlertHelper::warning('Perhatian', 'Akun Anda sudah aktif di perangkat lain. Mohon hubungi pengawas.');
+            return redirect()->route('admin.exam.monitor');
         }
 
         // Buat atau update live session
@@ -83,7 +117,8 @@ class AdminExamDetailIndex extends Component
                 'session_metadata' => [
                     'start_time' => Carbon::now()->toISOString(),
                     'user_agent' => request()->header('User-Agent'),
-                    'ip_address' => request()->ip()
+                    'ip_address' => request()->ip(),
+                    'session_id' => $currentSessionId,
                 ],
                 'browser_info' => [
                     'user_agent' => request()->header('User-Agent'),
@@ -173,6 +208,161 @@ class AdminExamDetailIndex extends Component
             'user_id' => Auth::id(),
             'recording_id' => $this->currentRecording->id
         ]);
+    }
+
+    /**
+     * Save a single recording chunk sent from the client.
+     * Expects base64 data URI in $chunkBlob (data:video/...;base64,...) and a chunkNumber in $data.
+     */
+    public function saveRecordingChunk($chunkBlob = '', $data = [])
+    {
+        try {
+            if (!$this->currentRecording) {
+                \Log::warning('❌ saveRecordingChunk called without currentRecording', [
+                    'user_id' => Auth::id(),
+                    'user_timetable_id' => $this->userTimetableId,
+                ]);
+                return false;
+            }
+
+            // Normalize input parameters
+            $actualChunkBlob = $chunkBlob;
+            if (is_array($chunkBlob) && isset($chunkBlob['chunkBlob'])) {
+                $actualChunkBlob = $chunkBlob['chunkBlob'];
+            } elseif (is_array($data) && isset($data['chunkBlob'])) {
+                $actualChunkBlob = $data['chunkBlob'];
+            }
+
+            $chunkNumber = null;
+            if (is_array($chunkBlob) && isset($chunkBlob['chunkNumber'])) {
+                $chunkNumber = (int) $chunkBlob['chunkNumber'];
+            } elseif (is_array($data) && isset($data['chunkNumber'])) {
+                $chunkNumber = (int) $data['chunkNumber'];
+            }
+
+            // Validate format
+            if (empty($actualChunkBlob) || !preg_match('/^data:video\/[^;]+;.*base64,/', $actualChunkBlob)) {
+                \Log::error('❌ Invalid chunk blob format', [
+                    'user_id' => Auth::id(),
+                    'blob_preview' => is_string($actualChunkBlob) ? substr($actualChunkBlob, 0, 80) : 'not_string',
+                ]);
+                return false;
+            }
+
+            // Decode
+            $videoData = base64_decode(preg_replace('#^data:video/[^;]+;.*base64,#i', '', $actualChunkBlob));
+            if ($videoData === false || strlen($videoData) === 0) {
+                \Log::error('❌ Failed to decode chunk video data', [
+                    'user_id' => Auth::id(),
+                ]);
+                return false;
+            }
+
+            // Determine chunk number
+            if (!$chunkNumber || $chunkNumber <= 0) {
+                $chunkNumber = ($this->currentRecording->chunk_number ?? 0) + 1;
+            }
+
+            // Build path: store under chunks directory per userTimetable
+            $baseDir = 'exam_recordings/chunks/' . $this->userTimetableId;
+            $filename = $baseDir . '/' . $this->currentRecording->id . '_chunk_' . $chunkNumber . '.webm';
+
+            $disk = Storage::disk('public');
+            if (!$disk->exists($baseDir)) {
+                $disk->makeDirectory($baseDir);
+            }
+
+            $saveResult = $disk->put($filename, $videoData);
+            if (!$saveResult) {
+                \Log::error('❌ Failed to save chunk file', [
+                    'filename' => $filename,
+                ]);
+                return false;
+            }
+
+            $fileSize = $disk->size($filename);
+
+            // Update aggregate info on current recording
+            $newFileSizeTotal = ($this->currentRecording->file_size ?? 0) + $fileSize;
+            $this->currentRecording->update([
+                'chunk_number' => $chunkNumber,
+                'file_size' => $newFileSizeTotal,
+            ]);
+
+            \Log::info('✅ Chunk saved', [
+                'user_id' => Auth::id(),
+                'recording_id' => $this->currentRecording->id,
+                'chunk_number' => $chunkNumber,
+                'chunk_size' => $fileSize,
+                'total_size' => $newFileSizeTotal,
+                'path' => $filename,
+            ]);
+
+            // Inform client that chunk saved
+            $this->dispatch('chunkSaved', [
+                'chunk_number' => $chunkNumber,
+                'size' => $fileSize,
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            \Log::error('💥 Error saving recording chunk', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Finalize a chunked recording: write manifest and mark as completed.
+     */
+    public function finalizeRecording($data = [])
+    {
+        try {
+            if (!$this->currentRecording) {
+                return false;
+            }
+
+            $result = RecordingFinalizer::finalizeForUserTimetable($this->userTimetableId);
+
+            $this->currentRecording->update([
+                'video_path' => $result['merged_video'] ?: $result['manifest'],
+                'file_size' => $result['total_size'],
+                'end_time' => now(),
+                'status' => 'completed',
+            ]);
+
+            \Log::info('🎉 Recording finalized', [
+                'recording_id' => $this->currentRecording->id,
+                'manifest' => $result['manifest'],
+                'merged_video' => $result['merged_video'],
+                'total_size' => $result['total_size'],
+                'chunk_count' => $result['chunk_count'],
+            ]);
+
+            $this->dispatch('recordingFinalized', [
+                'manifest' => $result['manifest'],
+                'merged_video' => $result['merged_video'],
+                'chunk_count' => $result['chunk_count'],
+            ]);
+
+            if (method_exists($this, 'completeExamFinalization')) {
+                try {
+                    $this->completeExamFinalization();
+                } catch (\Throwable $t) {
+                    \Log::warning('completeExamFinalization call failed or not implemented');
+                }
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            \Log::error('💥 Error finalizing recording', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+            ]);
+            return false;
+        }
     }
 
     public function saveRecordingVideo($videoBlob = '', $data = [])
@@ -592,6 +782,11 @@ class AdminExamDetailIndex extends Component
             return redirect()->route('admin.exam.warning');
         }
 
+        if ($this->userTimetable->status === 'suspend') {
+            session()->flash('error', 'Sesi ujian Anda telah di-suspend oleh pengawas.');
+            return redirect()->route('admin.exam.timetable');
+        }
+
         return null;
     }
 
@@ -604,7 +799,8 @@ class AdminExamDetailIndex extends Component
             $this->isMark = $firstQuestion->is_mark;
             $this->question = $firstQuestion->timetableQuestion->question;
             $this->description = $firstQuestion->timetableQuestion->description;
-            $this->images = $firstQuestion->timetableQuestion->images;
+            $images = $firstQuestion->timetableQuestion->images;
+            $this->images = collect(json_decode($images, true));
             $this->number = 1;
             $this->timetable_answer_id = $firstQuestion->timetable_answer_id;
 
@@ -618,7 +814,7 @@ class AdminExamDetailIndex extends Component
                     'id'       => $answer->id,
                     'alphabet' => chr(64 + $index + 1),
                     'context'  => $answer->context,
-                    'images'   => $answer->images,
+                    'images'   => collect(json_decode($images, true)),
                 ];
             }
 
@@ -729,7 +925,8 @@ class AdminExamDetailIndex extends Component
             $questionModel = $currentQuestion->timetableQuestion;
             $this->question = $questionModel->question;
             $this->description = $questionModel->description;
-            $this->images = $questionModel->images;
+            $images = $questionModel->images;
+            $this->images = collect(json_decode($images, true));
 
             $index = array_search($currentQuestion->id, $this->questionIds());
             $this->number = $index !== false ? $index + 1 : 1;
@@ -743,7 +940,7 @@ class AdminExamDetailIndex extends Component
                     'id' => (string) $ans->id,
                     'alphabet' => chr(65 + $i),
                     'context' => $ans->context,
-                    'images' => $ans->images,
+                    'images' => collect(json_decode($ans->images, true)),
                 ]
             )->all();
         }
@@ -920,6 +1117,65 @@ class AdminExamDetailIndex extends Component
     }
 
     /**
+     * Suspend exam: segera menyelesaikan ujian dengan status 'suspend'.
+     * Mirip finishExam, namun finalisasi diarahkan ke suspend.
+     */
+    public function suspendExam()
+    {
+        $this->saveCurrentAnswer();
+
+        \Log::info('⏸ suspendExam() called', [
+            'user_id' => Auth::id(),
+            'user_timetable_id' => $this->userTimetableId,
+            'has_current_recording' => !is_null($this->currentRecording)
+        ]);
+
+        try {
+            \Log::info('📡 Triggering video save and proceeding to suspend finalization...');
+
+            $this->js('
+                console.log("⏸ suspendExam() - Starting video save process with callback...");
+
+                if (window.isSuspendingExam) {
+                    console.log("❌ suspendExam already in progress, skipping...");
+                    return;
+                }
+                window.isSuspendingExam = true;
+
+                function completeSuspendAfterVideoSave() {
+                    console.log("✅ Video save completed, finalizing suspend...");
+                    Livewire.dispatch("completeSuspendFinalization");
+                }
+
+                function handleVideoSaveTimeout() {
+                    console.warn("⚠️ Video save timeout (3s), suspending anyway...");
+                    completeSuspendAfterVideoSave();
+                }
+
+                const videoSaveTimeout = setTimeout(handleVideoSaveTimeout, 3000);
+
+                if (typeof stopRecording === "function" && !window.isRecordingStopping) {
+                    console.log("🎬 Stopping recording before suspend...");
+
+                    window.examFinishCallback = function(success) {
+                        clearTimeout(videoSaveTimeout);
+                        completeSuspendAfterVideoSave();
+                    };
+
+                    stopRecording();
+                } else {
+                    console.log("❌ stopRecording not available, finalizing suspend immediately...");
+                    clearTimeout(videoSaveTimeout);
+                    completeSuspendAfterVideoSave();
+                }
+            ');
+            \Log::info('✅ Suspend video save process initiated');
+        } catch (\Exception $e) {
+            \Log::error('❌ Error initiating suspend video save: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Complete exam finalization after video has been saved
      * This method is called from JavaScript after video save is confirmed
      */
@@ -1012,10 +1268,100 @@ class AdminExamDetailIndex extends Component
 
         session()->flash('saved', [
             'title' => 'Ujian Telah Selesai!',
-            'text' => "Terima kasih telah mengerjakan ujian. Nilai Anda: {$mark}/100",
+            // 'text' => "Terima kasih telah mengerjakan ujian. Nilai Anda: {$mark}/100",
+            'text' => "Terima kasih telah mengerjakan ujian",
         ]);
 
         // Redirect after all processes are complete
+        return redirect()->route('admin.exam.timetable');
+    }
+
+    /**
+     * Finalisasi ujian sebagai suspend setelah video tersimpan.
+     */
+    public function completeSuspendFinalization()
+    {
+        \Log::info('🎯 completeSuspendFinalization() called after video save', [
+            'user_id' => Auth::id(),
+            'user_timetable_id' => $this->userTimetableId,
+            'recording_status' => $this->currentRecording ? $this->currentRecording->status : 'no_recording'
+        ]);
+
+        // Tutup live session
+        if ($this->liveSession) {
+            $this->liveSession->update([
+                'is_active' => false,
+                'connection_status' => 'disconnected',
+                'end_time' => now()
+            ]);
+        }
+
+        // Ambil user timetable aktif (exam/warning)
+        $userTimetable = UserTimetable::whereIn('status', ['exam', 'warning'])
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (!$userTimetable) {
+            \Log::error('❌ No active user timetable found for suspend completion');
+            return redirect()->route('admin.exam.timetable');
+        }
+
+        // Finalisasi rekaman: gabungkan chunk menjadi satu file dan simpan ke ExamRecording
+        try {
+            $final = RecordingFinalizer::finalizeForUserTimetable($userTimetable->id);
+
+            // Update ExamRecording terbaru dengan hasil finalisasi
+            $latestRecording = ExamRecording::where('user_timetable_id', $userTimetable->id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+            if ($latestRecording) {
+                $latestRecording->update([
+                    'video_path' => $final['merged_video'] ?: $final['manifest'] ?? $latestRecording->video_path,
+                    'file_size' => $final['total_size'] ?? $latestRecording->file_size,
+                    'end_time' => now(),
+                    'status' => 'completed',
+                ]);
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('⚠️ Gagal finalisasi rekaman pada suspend: ' . $e->getMessage());
+        }
+
+        // Hitung nilai dari jawaban yang sudah ada sebelum suspend
+        $userTimetableQuestions = UserModuleQuestion::where('user_timetable_id', $userTimetable->id)->get();
+        $totalQuestions = $userTimetableQuestions->count();
+        $correctAnswers = 0;
+
+        foreach ($userTimetableQuestions as $question) {
+            if ($question->timetable_answer_id) {
+                $answer = TimetableAnswer::find($question->timetable_answer_id);
+                if ($answer && $answer->is_correct) {
+                    $question->update(['status' => 'correct']);
+                    $correctAnswers++;
+                } else {
+                    $question->update(['status' => 'wrong']);
+                }
+            } else {
+                $question->update(['status' => 'unanswered']);
+            }
+        }
+
+        $mark = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100, 2) : 0;
+        $mark = min($mark, 100);
+
+        // Tandai sebagai suspend dan simpan nilai
+        $userTimetable->update([
+            'status' => 'suspend',
+            'end_exam' => now(),
+            'mark' => $mark,
+        ]);
+
+        // Redirect keluar dari halaman ujian
+        $this->js('
+            console.log("⏸ Exam suspended by supervisor. Redirecting...");
+            window.location.href = "/admin/exam/timetable";
+        ');
+
+        session()->flash('error', 'Sesi ujian Anda telah di-suspend oleh pengawas.');
         return redirect()->route('admin.exam.timetable');
     }
 

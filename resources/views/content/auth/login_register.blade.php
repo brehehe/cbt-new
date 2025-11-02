@@ -26,7 +26,9 @@
                 <div class="flex flex-col items-center mb-6">
                     <img src="{{ Vite::asset('resources/img/logo_m.png') }}" alt="PRO CBT Logo"
                         class="h-12 drop-shadow-md mb-4">
-                    <h1 class="text-2xl font-bold text-[#f58634]">Create Your Account</h1>
+                    <h1
+                        class="text-2xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        Create Your Account</h1>
                     <p class="text-gray-600 text-sm">Register to access your dashboard</p>
                 </div>
 

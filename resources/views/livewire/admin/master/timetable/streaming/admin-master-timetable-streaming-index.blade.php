@@ -2,7 +2,9 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#f58634]">User</h1>
+                <h1
+                    class="text-2xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                    User</h1>
             </div>
             <div>
                 <button wire:click="refreshStreamData" class="btn btn-success">
@@ -62,6 +64,18 @@
                                     style="width: {{ $session->progress_percentage }}%"></div>
                             </div>
                         </div> -->
+
+                        <!-- Actions -->
+                        <div class="mt-3 flex items-center gap-2">
+                            <button class="btn btn-sm btn-outline-danger"
+                                wire:click="suspendSession({{ $session->id }})">
+                                Suspend & Logout
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning"
+                                wire:click="terminateSession({{ $session->id }})">
+                                Putus Sesi
+                            </button>
+                        </div>
                     </div>
                 </div>
             @endforeach
@@ -81,13 +95,26 @@
         let activeSessions = [];
         let isConnecting = false;
 
+        // Guard against duplicate initialization and intervals
+        window.__supervisorInitialized = window.__supervisorInitialized || false;
+        window.__supervisorIntervals = window.__supervisorIntervals || {
+            durations: null,
+            monitor: null,
+            refresh: null
+        };
+
         document.addEventListener('DOMContentLoaded', function() {
             console.log('=== Supervisor Page Loaded ===');
             console.log('Page URL:', window.location.href);
             console.log('PeerJS available:', typeof Peer !== 'undefined');
 
-            initializeLiveStreaming();
-            setupPeerJSConnections();
+            if (!window.__supervisorInitialized) {
+                window.__supervisorInitialized = true;
+                initializeLiveStreaming();
+                setupPeerJSConnections();
+            } else {
+                console.log('Skipping duplicate initialization');
+            }
 
             // Add debugging functions to window for manual testing
             window.debugSupervisor = {
@@ -141,7 +168,8 @@
 
             // Update session durations
             updateSessionDurations();
-            setInterval(updateSessionDurations, 1000);
+            if (window.__supervisorIntervals.durations) clearInterval(window.__supervisorIntervals.durations);
+            window.__supervisorIntervals.durations = setInterval(updateSessionDurations, 1000);
 
             // Connect to existing student streams
             setTimeout(() => {
@@ -149,12 +177,14 @@
             }, 2000);
 
             // Set up periodic monitoring and reconnection
-            setInterval(() => {
+            if (window.__supervisorIntervals.monitor) clearInterval(window.__supervisorIntervals.monitor);
+            window.__supervisorIntervals.monitor = setInterval(() => {
                 monitorConnections();
             }, 30000); // Check every 30 seconds
 
             // Set up periodic refresh of stream data
-            setInterval(() => {
+            if (window.__supervisorIntervals.refresh) clearInterval(window.__supervisorIntervals.refresh);
+            window.__supervisorIntervals.refresh = setInterval(() => {
                 refreshStreamData();
             }, 60000); // Refresh every minute
         }
@@ -176,7 +206,7 @@
                     path: '/peerjs',
                     secure: false
                 } : {
-                    host: 'peer.toti.my.id',
+                    host: 'procbt.id',
                     path: '/peerjs',
                     secure: true
                 };
@@ -186,15 +216,19 @@
                 // Initialize PeerJS with environment-specific config
                 peer = new Peer({
                     ...peerConfig,
-                    debug: 2, // Enable debug logs like student
+                    debug: 0, // Enable debug logs like student
+                    sdpSemantics: 'unified-plan',
                     config: {
-                        'iceServers': [{
-                                urls: 'stun:stun.l.google.com:19302'
+                        iceServers: [{
+                                urls: 'stun:stun.cloudflare.com:3478'
                             },
                             {
-                                urls: 'stun:stun1.l.google.com:19302'
+                                urls: 'turn:procbt.id:3478?transport=udp',
+                                username: 'admin',
+                                credential: 'ProcbtSecure123!'
                             }
-                        ]
+                        ],
+                        iceTransportPolicy: 'relay'
                     }
                 });
 
@@ -326,13 +360,35 @@
         // Setup supervisor camera (optional - for two-way communication)
         async function setupSupervisorCamera() {
             try {
-                localStream = await navigator.mediaDevices.getUserMedia({
-                    video: true,
-                    audio: false
-                });
-                console.log('Supervisor camera ready');
+                const constraints = {
+                    video: {
+                        width: {
+                            ideal: 640,
+                            max: 640
+                        },
+                        height: {
+                            ideal: 360,
+                            max: 360
+                        },
+                        frameRate: {
+                            ideal: 10,
+                            max: 12
+                        } // ringan tapi jelas
+                    },
+                    audio: false // supervisor tidak perlu kirim suara
+                };
+
+                localStream = await navigator.mediaDevices.getUserMedia(constraints);
+                console.log('🎥 Supervisor camera started with lightweight settings');
+
+                // tampilkan preview kecil di halaman (opsional)
+                const preview = document.getElementById('supervisorPreview');
+                if (preview) {
+                    preview.srcObject = localStream;
+                    preview.play().catch(err => console.warn('Preview autoplay prevented:', err));
+                }
             } catch (error) {
-                console.log('Supervisor camera not required:', error.message);
+                console.error('❌ Error starting supervisor camera:', error);
                 localStream = null;
             }
         }
@@ -622,7 +678,15 @@
 
                 try {
                     // Call the student - supervisor calls student to get their video
-                    const call = peer.call(streamInfo.peer_id, localStream || new MediaStream());
+                    const call = peer.call(streamInfo.peer_id, localStream, {
+                        constraints: {
+                            video: {
+                                width: 480,
+                                height: 270,
+                                frameRate: 10
+                            }
+                        }
+                    });;
 
                     if (!call) {
                         clearTimeout(timeoutId);
@@ -1059,20 +1123,10 @@
         });
 
         // Cleanup on page unload
-        window.addEventListener('beforeunload', function() {
-            activeSessions.forEach(session => {
-                if (session.cleanup) {
-                    session.cleanup();
-                }
-            });
-
-            if (peer) {
-                peer.destroy();
-            }
-
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-            }
+        window.addEventListener('beforeunload', () => {
+            activeSessions.forEach(s => s.cleanup?.());
+            peer?.destroy();
+            localStream?.getTracks().forEach(t => t.stop());
         });
     </script>
 @endpush

@@ -115,14 +115,17 @@
     <div class="mb-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-[#f58634]">Halo, {{ Auth::user()->name ?? 'Mahasiswa' }}! 👋</h1>
+                <h1
+                    class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                    Halo, {{ Auth::user()->name ?? 'Mahasiswa' }}! 👋</h1>
                 <p class="text-gray-600 mt-1">Siap untuk mengikuti ujian hari ini?</p>
                 <p class="text-sm text-gray-500">{{ \Carbon\Carbon::now()->format('l, j F Y') }}</p>
             </div>
             <div class="flex items-center gap-3">
                 <!-- Notifications -->
                 <div class="relative">
-                    <button class="p-2 text-gray-600 hover:text-[#f58634] relative">
+                    <button
+                        class="p-2 text-gray-600 hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} relative">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15 17h5l-5-5 5-5h-5l-5 5z"></path>
@@ -153,7 +156,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Ujian Hari Ini</p>
-                    <h3 class="text-3xl font-bold text-[#f58634]">{{ $todayExams ?? 0 }}</h3>
+                    <h3
+                        class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        {{ $todayExams ?? 0 }}</h3>
                     <div class="flex items-center mt-2">
                         @if (($activeExamToday ?? 0) > 0)
                             <div class="w-2 h-2 bg-red-500 rounded-full pulse-dot mr-2"></div>
@@ -164,7 +169,8 @@
                     </div>
                 </div>
                 <div class="bg-gradient-to-br from-[#f58634]/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
-                    <svg class="w-8 h-8 text-[#f58634]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-8 h-8 {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
@@ -178,7 +184,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Total Ujian</p>
-                    <h3 class="text-3xl font-bold text-[#f58634]">{{ $totalExams ?? 0 }}</h3>
+                    <h3
+                        class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        {{ $totalExams ?? 0 }}</h3>
                     <div class="flex items-center mt-2">
                         <span class="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
                             {{ $completedExams ?? 0 }} selesai
@@ -201,7 +209,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Rata-rata Nilai</p>
-                    <h3 class="text-3xl font-bold text-[#f58634]">{{ number_format($averageScore ?? 0, 1) }}</h3>
+                    <h3
+                        class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        {{ number_format($averageScore ?? 0, 1) }}</h3>
                     <div class="flex items-center mt-2">
                         @php
                             $avgScore = $averageScore ?? 0;
@@ -238,7 +248,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Peringkat Peserta</p>
-                    <h3 class="text-3xl font-bold text-[#f58634]">#{{ $classRank ?? '-' }}</h3>
+                    <h3
+                        class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        #{{ $classRank ?? '-' }}</h3>
                     <div class="flex items-center mt-2">
                         <span class="text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded-full">
                             dari {{ $totalStudents ?? 0 }} mahasiswa
@@ -383,7 +395,7 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-800">Hasil Ujian Terbaru</h3>
                 <a href="{{ route('student.results') }}"
-                    class="text-[#f58634] hover:text-[#2d8c5b] text-sm font-medium">
+                    class="{{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#2d8c5b] text-sm font-medium">
                     Lihat Semua →
                 </a>
             </div>
@@ -474,13 +486,16 @@
             </a>
 
             <a href="{{ route('student.help') }}"
-                class="flex flex-col items-center p-4 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors group">
+                class="flex flex-col items-center p-4 rounded-lg transition-colors group
+                    {{ config('app.name_slug') === 'ups_tegal' ? 'bg-orange-50 hover:bg-orange-100' : 'bg-blue-50 hover:bg-blue-100' }}">
                 <div
-                    class="w-12 h-12 bg-orange-100 group-hover:bg-orange-200 rounded-xl flex items-center justify-center mb-3">
-                    <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-                        </path>
+                    class="w-12 h-12 rounded-xl flex items-center justify-center mb-3
+                        {{ config('app.name_slug') === 'ups_tegal' ? 'bg-orange-100 group-hover:bg-orange-200' : 'bg-blue-100 group-hover:bg-blue-200' }}">
+                    <svg class="w-6 h-6 {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }}"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3
+                            0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01
+                            M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
                 <span class="text-sm font-medium text-gray-700">Bantuan</span>

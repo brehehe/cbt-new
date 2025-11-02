@@ -65,31 +65,43 @@
         @yield('content')
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
-            // Initialize camera
-            async function initCamera() {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({
-                        video: true
-                    });
-                    const video = document.getElementById('cameraPreview');
-                    video.srcObject = stream;
-                } catch (err) {
-                    console.error('Error accessing camera:', err);
-                    alert('Tidak dapat mengakses kamera. Pastikan kamera terhubung dan izin diberikan.');
-                }
-            }
+    const consentCheckbox = document.getElementById('consent');
+    const startButton = document.getElementById('startExam');
+    const cameraStatus = document.getElementById('cameraStatus');
+    let cameraActive = false;
 
-            // Enable start button when consent is given
-            const consentCheckbox = document.getElementById('consent');
-            const startButton = document.getElementById('startExam');
+    // Fungsi inisialisasi kamera
+    async function initCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            const video = document.getElementById('cameraPreview');
+            video.srcObject = stream;
+            cameraActive = true;
+            cameraStatus.textContent = "✅ Kamera aktif dan berfungsi.";
+            cameraStatus.classList.remove("text-gray-500");
+            cameraStatus.classList.add("text-green-600");
+            updateButtonState();
+        } catch (err) {
+            console.error('Error accessing camera:', err);
+            cameraActive = false;
+            cameraStatus.textContent = "❌ Kamera tidak dapat diakses. Harap izinkan akses kamera sebelum melanjutkan.";
+            cameraStatus.classList.remove("text-gray-500");
+            cameraStatus.classList.add("text-red-600");
+            updateButtonState();
+        }
+    }
 
-            consentCheckbox.addEventListener('change', function() {
-                startButton.disabled = !this.checked;
-            });
+    // Fungsi cek kondisi tombol
+    function updateButtonState() {
+        startButton.disabled = !(consentCheckbox.checked && cameraActive);
+    }
 
-            // Start camera when page loads
-            initCamera();
-        </script>
+    // Event listener untuk checkbox
+    consentCheckbox.addEventListener('change', updateButtonState);
+
+    // Jalankan kamera saat halaman dimuat
+    window.addEventListener('DOMContentLoaded', initCamera);
+</script>
     </body>
 
 </html>
