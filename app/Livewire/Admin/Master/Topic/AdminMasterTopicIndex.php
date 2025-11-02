@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Master\Topic;
 
 use App\Helpers\AlertHelper;
 use App\Models\Master\Question\Topic;
+use App\Models\Study\Study;
 use App\Services\Topic\TopicService;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -19,12 +20,14 @@ class AdminMasterTopicIndex extends Component
     protected $paginationTheme = 'bootstrap';
     public $perPage = 10, $search;
 
-    public $data_id, $name, $description;
+    public $studies;
+    public $data_id, $name, $description, $study_id;
 
     public function render()
     {
         $topics = Topic::search($this->search)
-            ->select('id', 'company_id', 'name', 'description');
+            ->with('study')
+            ->select('id', 'company_id', 'name', 'description', 'study_id');
         return view('livewire.admin.master.topic.admin-master-topic-index', [
             'topics' => $topics->paginate($this->perPage)
         ])->extends('layout.app')->section('content');
@@ -33,6 +36,16 @@ class AdminMasterTopicIndex extends Component
     public function mount()
     {
         // dd(Auth::user()?->company);
+        if (Auth::user()?->hasRole('Dosen')) {
+            $studyIds = Auth::user()?->studys ?? []; // array dari JSON
+            $this->studies = Study::whereIn('id', $studyIds)
+                ->orderBy('name', 'asc')
+                ->pluck('name', 'id')
+                ->toArray();
+            $this->study_id = array_key_first($this->studys);
+        } else {
+            $this->studies = Study::orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
+        }
     }
 
     public function hydrate()
@@ -48,7 +61,7 @@ class AdminMasterTopicIndex extends Component
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['data_id', 'name', 'description']);
+        $this->reset(['data_id', 'name', 'description', 'study_id']);
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
 
@@ -56,11 +69,13 @@ class AdminMasterTopicIndex extends Component
     {
         $this->validate(
             [
+                'study_id'    => 'required',
                 'name'        => 'required',
                 'description' => 'nullable',
             ],
             [
-                'name.required' => 'Nama Topik wajib diisi.'
+                'study_id.required' => 'Prodi wajib diisi.',
+                'name.required'     => 'Nama Topik wajib diisi.',
             ]
         );
 
@@ -69,9 +84,12 @@ class AdminMasterTopicIndex extends Component
             $request = [
                 'id'          => $this->data_id,
                 'company_id'  => Auth::user()?->company?->id,
+                'study_id'    => $this->study_id,
                 'name'        => $this->name,
                 'description' => $this->description,
             ];
+
+            // dd($request);
 
             $topic = app(TopicService::class)->updateOrCreate($request);
 
@@ -98,6 +116,7 @@ class AdminMasterTopicIndex extends Component
     {
         $result            = Topic::findOrFail($id);
         $this->data_id     = $result?->id;
+        $this->study_id    = $result?->study_id;
         $this->name        = $result?->name;
         $this->description = $result?->description;
         $this->openModal();

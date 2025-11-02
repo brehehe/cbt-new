@@ -1,18 +1,17 @@
 <?php
 
-namespace App\Models\Master\Question;
+namespace App\Models\Master\Exam;
 
 use App\Models\Company\Company;
-use App\Models\Study\Study;
+use App\Models\Master\Timetable\Timetable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
-class Topic extends Model
+class ExamRoom extends Model
 {
     //
     use SoftDeletes, HasUuids;
@@ -27,7 +26,7 @@ class Topic extends Model
     {
         parent::boot();
 
-        static::addGlobalScope('company_scope', function (Builder $builder) {
+        static::addGlobalScope('user_scope', function (Builder $builder) {
             $user = Auth::user();
 
             if (!$user || !$user->hasRole('Anonymous')) {
@@ -40,7 +39,7 @@ class Topic extends Model
         static::creating(function ($modelCreate) {
             $lastOrder = static::max('order');
             $modelCreate->order = $lastOrder ? $lastOrder + 1 : 1;
-            // $modelCreate->company_id = $modelCreate->company_id ?? auth()->user()->company_id;
+            $modelCreate->company_id = $modelCreate->company_id ?? auth()->user()->company_id;
         });
     }
 
@@ -49,37 +48,17 @@ class Topic extends Model
         $term = '%'. $term .'%';
 
         $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id', 'name', 'description'], 'ILIKE', $term);
+            $query->whereAny(['company_id', 'name', 'code', 'description'], 'ILIKE', $term);
         });
     }
 
     /**
-     * Get the study that owns the Topic
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function study(): BelongsTo
-    {
-        return $this->belongsTo(Study::class, 'study_id', 'id');
-    }
-
-    /**
-     * Get all of the materialCategories for the Topic
+     * Get all of the timeTables for the ExamRoom
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function materialCategories(): HasMany
+    public function timeTables(): HasMany
     {
-        return $this->hasMany(MaterialCategory::class, 'topic_id', 'id');
-    }
-
-    /**
-     * Get all of the questions for the Topic
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function questions(): HasMany
-    {
-        return $this->hasMany(Question::class, 'topic_id', 'id');
+        return $this->hasMany(Timetable::class, 'exam_room_id', 'id');
     }
 }

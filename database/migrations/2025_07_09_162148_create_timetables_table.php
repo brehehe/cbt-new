@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->foreignUuid('classmate_id')->nullable();
             $table->foreignUuid('module_id')->nullable();
+            $table->foreignUuid('exam_room_id')->nullable();
+            $table->foreignUuid('exam_session_id')->nullable();
             $table->jsonb('supervisors')->nullable();
             $table->datetime('start_time');
             $table->datetime('end_time');

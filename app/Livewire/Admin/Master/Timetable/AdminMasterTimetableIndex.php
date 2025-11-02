@@ -4,6 +4,8 @@ namespace App\Livewire\Admin\Master\Timetable;
 
 use App\Helpers\AlertHelper;
 use App\Models\Classmate\Classmate;
+use App\Models\Master\Exam\ExamRoom;
+use App\Models\Master\Exam\ExamSession;
 use App\Models\Master\Question\Module;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -36,6 +38,10 @@ class AdminMasterTimetableIndex extends Component
     public $study_id;
     public $classmates = [];
     public $classmate_id;
+    public $examRooms = [];
+    public $exam_room_id;
+    public $examSessions = [];
+    public $exam_session_id;
 
     public function mount()
     {
@@ -44,7 +50,9 @@ class AdminMasterTimetableIndex extends Component
             ->pluck('name', 'id')
             ->toArray();
         $this->getSupervisors = User::companyRole('Pengawas', Auth::user()->company_id)->select('name', 'id')->get()->pluck('name', 'id')->toArray();
-        $this->classmates = Classmate::where('company_id', Auth::user()->company_id)->pluck('name', 'id')->toArray();
+        $this->classmates     = Classmate::where('company_id', Auth::user()->company_id)->pluck('name', 'id')->toArray();
+        $this->examRooms      = ExamRoom::where('company_id', Auth::user()->company_id)->get();
+        $this->examSessions   = ExamSession::where('company_id', Auth::user()->company_id)->get();
     }
 
     public function openModal()
@@ -75,6 +83,8 @@ class AdminMasterTimetableIndex extends Component
             'description',
             'studys',
             'classmate_id',
+            'exam_room_id',
+            'exam_session_id'
         ]);
         return $this->dispatch('close-modal', ['id' => 'modal-timetable']);
     }
@@ -83,14 +93,16 @@ class AdminMasterTimetableIndex extends Component
     {
         $data = Timetable::find($id);
 
-        $this->data_id     = $data->id;
-        $this->name        = $data->name;
-        $this->module_id   = $data->module_id;
-        $this->classmate_id   = $data->classmate_id;
-        $this->supervisors = json_decode($data->supervisors, true) ?? [];
-        $this->start_time  = Carbon::parse($data->start_time)->format('Y-m-d\TH:i');
-        $this->end_time    = Carbon::parse($data->end_time)->format('Y-m-d\TH:i');
-        $this->description = $data->description;
+        $this->data_id         = $data->id;
+        $this->name            = $data->name;
+        $this->module_id       = $data->module_id;
+        $this->exam_room_id    = $data->exam_room_id;
+        $this->exam_session_id = $data->exam_session_id;
+        $this->classmate_id    = $data->classmate_id;
+        $this->supervisors     = json_decode($data->supervisors, true) ?? [];
+        $this->start_time      = Carbon::parse($data->start_time)->format('Y-m-d\TH:i');
+        $this->end_time        = Carbon::parse($data->end_time)->format('Y-m-d\TH:i');
+        $this->description     = $data->description;
 
         // Pastikan hasil decode adalah array
         $rawStudys = $data->studys;
@@ -167,16 +179,20 @@ class AdminMasterTimetableIndex extends Component
     public function submit()
     {
         $this->validate([
-            'name' => 'required',
-            'module_id' => 'required',
-            'supervisors' => 'required',
-            'start_time' => 'required',
-            'classmate_id' => 'required',
-            'end_time' => 'required',
+            'name'            => 'required',
+            'module_id'       => 'required',
+            'supervisors'     => 'required',
+            'start_time'      => 'required',
+            'classmate_id'    => 'required',
+            'exam_room_id'    => 'required',
+            'exam_session_id' => 'required',
+            'end_time'        => 'required',
         ], [
             'classmate_id.required' => 'Peserta wajib diisi',
             'name.required' => 'Nama Jadwal wajib diisi',
             'module_id.required' => 'Modul wajib diisi',
+            'exam_room_id.required' => 'Ruang ujian wajib diisi',
+            'exam_session_id.required' => 'Sesi ujian wajib diisi',
             'supervisors.required' => 'Pengawas wajib diisi',
             'start_time.required' => 'Waktu Mulai wajib diisi',
             'end_time.required' => 'Waktu Selesai wajib diisi',
@@ -187,15 +203,17 @@ class AdminMasterTimetableIndex extends Component
             Timetable::updateOrCreate([
                 'id' => $this->data_id,
             ], [
-                'company_id' => Auth::user()->company_id,
-                'classmate_id' => $this->classmate_id,
-                'name' => $this->name,
-                'module_id' => $this->module_id,
-                'supervisors' => json_encode($this->supervisors),
-                'start_time' => $this->start_time,
-                'end_time' => $this->end_time,
-                'description' => $this->description,
-                'studys' => $this->studys ? json_encode(json_encode(array_keys($this->studys))) : null,
+                'company_id'      => Auth::user()->company_id,
+                'classmate_id'    => $this->classmate_id,
+                'name'            => $this->name,
+                'module_id'       => $this->module_id,
+                'exam_room_id'    => $this->exam_room_id,
+                'exam_session_id' => $this->exam_session_id,
+                'supervisors'     => json_encode($this->supervisors),
+                'start_time'      => $this->start_time,
+                'end_time'        => $this->end_time,
+                'description'     => $this->description,
+                'studys'          => $this->studys ? json_encode(json_encode(array_keys($this->studys))) : null,
             ]);
             DB::commit();
             AlertHelper::success('Berhasil', 'Data berhasil disimpan!');

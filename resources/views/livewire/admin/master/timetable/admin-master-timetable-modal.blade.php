@@ -77,6 +77,52 @@
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
+                    <div>
+                        <label for="exam_room_id" class="block text-sm font-medium text-gray-700">Ruang Ujian <span
+                                class="text-red-600">*</span></label>
+                        <div wire:key="select-{{ rand() }}">
+                            <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
+                                dropdownParent: 'body',
+                                allowClear: true,
+                                plugins: ['clear_button'],
+                                onChange: function(e) {
+                                    @this.set('exam_room_id', e ? e : '');
+                                }
+                            });"
+                                wire:model.lazy="exam_room_id" id="exam_room_id">
+                                <option value="">-- Pilih Ruang Ujian --</option>
+                                @foreach ($examRooms as $key => $value)
+                                    <option value="{{ $value->id }}">{{ $value->name }} - [CODE]:{{ $value?->code }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @error('exam_room_id')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="exam_session_id" class="block text-sm font-medium text-gray-700">Sesi Ujian <span
+                                class="text-red-600">*</span></label>
+                        <div wire:key="select-{{ rand() }}">
+                            <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
+                                dropdownParent: 'body',
+                                allowClear: true,
+                                plugins: ['clear_button'],
+                                onChange: function(e) {
+                                    @this.set('exam_session_id', e ? e : '');
+                                }
+                            });"
+                                wire:model.lazy="exam_session_id" id="exam_session_id">
+                                <option value="">-- Pilih Sesi Ujian --</option>
+                                @foreach ($examSessions as $key => $value)
+                                    <option value="{{ $value->id }}">{{ $value->name }} - [CODE]:{{ $value?->code }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @error('exam_session_id')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                     @if ($module_id)
                         <div class="bg-white/80">
                             <div class="table-container">

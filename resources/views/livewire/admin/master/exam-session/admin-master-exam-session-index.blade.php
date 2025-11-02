@@ -1,11 +1,11 @@
-@section('title', 'Topik Ujian')
+@section('title', 'Sesi Ujian')
 <div>
-    {{-- Be like water. --}}
-    @include('livewire.admin.master.topic.admin-master-topic-modal')
+    {{-- Success is as dangerous as failure. --}}
+    @include('livewire.admin.master.exam-session.admin-master-exam-session-modal')
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#f58634]">Topik Ujian</h1>
+                <h1 class="text-2xl font-bold text-[#f58634]">Sesi Ujian</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div>
@@ -43,25 +43,36 @@
             </div>
         </div>
     </div>
-    <!-- Table Section -->
-    <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
+    <!-- Table Section --><div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
         <div class="table-container">
             <table class="table">
                 <thead>
                     <tr>
                         <th class="w-1 center">No</th>
-                        <th>Prodi</th>
-                        <th>Nama</th>
+                        <th>Nama Sesi Ujian</th>
+                        <th>Nama Sesi Ujian</th>
+                        <th>Aktif</th>
                         <th>Deskripsi</th>
                         <th class="w-1 center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($topics as $index => $result)
+                    @forelse ($exam_sessions as $index => $result)
                         <tr>
-                            <td class="center">{{ $topics->firstItem() + $index }}</td>
-                            <td>{{ $result?->study?->name ?? '-' }}</td>
+                            <td class="center">{{ $exam_sessions->firstItem() + $index }}</td>
                             <td>{{ $result?->name }}</td>
+                            <td>{{ $result?->code }}</td>
+                            <td>
+                                <div class="flex items-center mt-2" wire:key="{{ rand() }}">
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" wire:click="toggleExamSessionIsActive('{{ $result->id }}')"
+                                            class="sr-only peer" {{ $result?->is_active ? 'checked' : '' }}>
+                                        <div
+                                            class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                                        </div>
+                                    </label>
+                                </div>
+                            </td>
                             <td>{{ $result?->description }}</td>
                             <td class="center">
                                 <div class="flex items-center">
@@ -99,13 +110,13 @@
         <div class="px-5 py-4 bg-gray-50/80 border-t border-gray-200">
             <div class="flex items-center justify-between">
                 <div class="text-sm text-gray-700">
-                    Menampilkan <span class="font-medium">{{ $topics->firstItem() }}</span> sampai <span
-                        class="font-medium">{{ $topics->lastItem() }}</span> dari <span
-                        class="font-medium">{{ $topics->total() }}</span> hasil
+                    Menampilkan <span class="font-medium">{{ $exam_sessions->firstItem() }}</span> sampai <span
+                        class="font-medium">{{ $exam_sessions->lastItem() }}</span> dari <span
+                        class="font-medium">{{ $exam_sessions->total() }}</span> hasil
                 </div>
                 <div>
                     <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        {{ $topics->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
+                        {{ $exam_sessions->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
                     </nav>
                 </div>
             </div>

@@ -10,7 +10,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M13 16h-1v-4h-1m1-4h.01M12 20.5C6.753 20.5 2.5 16.247 2.5 11S6.753 1.5 12 1.5 21.5 5.753 21.5 11 17.247 20.5 12 20.5z" />
                 </svg>
-                <h2 class="text-xl font-semibold text-gray-800">Modal Topik Ujian</h2>
+                <h2 class="text-xl font-semibold text-gray-800">Modal Sesi Ujian</h2>
             </div>
             <button wire:click="closeModal()"
                 class="text-gray-500 hover:text-red-500 transition-colors text-2xl leading-none cursor-pointer">
@@ -21,31 +21,27 @@
         <!-- Body -->
         <div class="px-6 py-4 text-gray-600">
             <div class="mb-4">
-                <label for="study_id" class="block text-sm font-medium text-gray-700">Prodi <span
+                <label for="name" class="block text-sm font-medium text-gray-700">Nama Sesi Ujian <span
                         class="text-red-600">*</span></label>
-                <select class="mt-1 form-control" wire:model.lazy='study_id'>
-                    <option value="">Pilih prodi</option>
-                    @foreach ($studies as $key_study => $study)
-                        <option value="{{ $key_study }}">{{ $study }}</option>
-                    @endforeach
-                </select>
-                @error('study_id')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-            <div class="mb-4">
-                <label for="name" class="block text-sm font-medium text-gray-700">Nama Topik <span
-                        class="text-red-600">*</span></label>
-                <input type="text" id="name" wire:model.defer="name" placeholder="Nama Topik"
+                <input type="text" id="name" wire:model.defer="name" placeholder="Nama Sesi Ujian"
                     class="mt-1 form-control">
                 @error('name')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
             </div>
             <div class="mb-4">
-                <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi Topik</label>
-                <input type="text" id="description" wire:model.defer="description" placeholder="Deskripsi Topik"
+                <label for="code" class="block text-sm font-medium text-gray-700">Code Sesi Ujian <span
+                        class="text-red-600">*</span></label>
+                <input type="text" id="code" wire:model.defer="code" placeholder="Code Sesi Ujian"
                     class="mt-1 form-control">
+                @error('code')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+            <div class="mb-4">
+                <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi Sesi Ujian</label>
+                {{-- <input type="text" id="description" wire:model.defer="description" placeholder="Deskripsi Kategori Materi" class="mt-1 form-control"> --}}
+                <textarea id="description" wire:model.defer="description" placeholder="" class="mt-1 form-control"></textarea>
                 @error('description')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror

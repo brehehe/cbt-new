@@ -3,6 +3,8 @@
 use App\Http\Middleware\CheckUserTimetable;
 use App\Livewire\Admin\Master\Classmate\AdminMasterClassmateIndex;
 use App\Livewire\Admin\Master\Classmate\Detail\AdminMasterClassmateDetailIndex;
+use App\Livewire\Admin\Master\ExamRoom\AdminMasterExamRoomIndex;
+use App\Livewire\Admin\Master\ExamSession\AdminMasterExamSessionIndex;
 use App\Livewire\Admin\Master\ExamType\AdminMasterExamTypeIndex;
 use App\Livewire\Admin\Master\Material\AdminMasterMaterialIndex;
 use App\Livewire\Admin\Master\MaterialCategory\AdminMasterMaterialCategoryIndex;
@@ -111,6 +113,8 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
         Route::get('/material', AdminMasterMaterialIndex::class)->name('admin.master.material');
         Route::get('/question-type', AdminMasterQuestionTypeIndex::class)->name('admin.master.question-type');
         Route::get('/exam-type', AdminMasterExamTypeIndex::class)->name('admin.master.exam-type');
+        Route::get('/exam-room', AdminMasterExamRoomIndex::class)->name('admin.master.exam-room');
+        Route::get('/exam-session', AdminMasterExamSessionIndex::class)->name('admin.master.exam-session');
         Route::get('/module', AdminMasterModuleIndex::class)->name('admin.master.module');
         Route::get('/module-question/{id}', AdminMasterModuleQuestionIndex::class)->name('admin.master.module-question');
         Route::get('/question', AdminMasterQuestionIndex::class)->name('admin.master.question');

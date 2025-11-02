@@ -3,9 +3,11 @@
 namespace App\Models\Study;
 
 use App\Models\Company\Company;
+use App\Models\Master\Question\Topic;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
@@ -48,5 +50,15 @@ class Study extends Model
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id'], 'ILIKE', $term);
         });
+    }
+
+    /**
+     * Get all of the topics for the Study
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function topics(): HasMany
+    {
+        return $this->hasMany(Topic::class, 'study_id', 'id');
     }
 }

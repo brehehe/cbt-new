@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('topics', function (Blueprint $table) {
+        Schema::create('exam_sessions', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('company_id')->nullable();
-            $table->foreignUuid('study_id')->nullable();
-            $table->string('name')->comment('Nama topik ujian');
-            $table->longText('description')->nullable()->comment('deskripsi dari topik ujian');
+            $table->string('name');
+            $table->string('code')->nullable();
+            $table->longText('description')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->bigInteger('order')->default(0);
             $table->softDeletes();
             $table->timestamps();
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('topics');
+        Schema::dropIfExists('exam_sessions');
     }
 };

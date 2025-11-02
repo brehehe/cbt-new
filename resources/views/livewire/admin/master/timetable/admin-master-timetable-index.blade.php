@@ -53,6 +53,8 @@
                         <th>Peserta</th>
                         <th>Nama</th>
                         <th>Modul</th>
+                        <th>Ruang</th>
+                        <th>Sesi</th>
                         <th>Waktu Mulai</th>
                         <th>Waktu Selesai</th>
                         <th>Token</th>
@@ -63,11 +65,13 @@
                     @forelse ($timetables as $index => $timetable)
                         <tr>
                             <td class="center">{{ $timetables->firstItem() + $index }}</td>
-                            <td>{{ $timetable->classmate->name ?? '-' }}</td>
-                            <td>{{ $timetable->name ?? '-' }}</td>
-                            <td>{{ $timetable->module->name ?? '-' }}</td>
-                            <td>{{ $timetable->start_time }}</td>
-                            <td>{{ $timetable->end_time }}</td>
+                            <td>{{ $timetable?->classmate->name ?? '-' }}</td>
+                            <td>{{ $timetable?->name ?? '-' }}</td>
+                            <td>{{ $timetable?->module->name ?? '-' }}</td>
+                            <td>{{ $timetable?->examRoom?->name ?? '-' }}</td>
+                            <td>{{ $timetable?->examSession?->name ?? '-' }}</td>
+                            <td>{{ $timetable?->start_time }}</td>
+                            <td>{{ $timetable?->end_time }}</td>
                             <td>
                                 @if ($timetable->code)
                                     <div class="flex items-center gap-2">

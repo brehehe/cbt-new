@@ -96,10 +96,22 @@
                                     'icon' => 'fa-scroll',
                                 ],
                                 [
+                                    'label' => 'Ruang Ujian',
+                                    'url' => route('admin.master.exam-room'),
+                                    'pattern' => ['admin/master/exam-room*'],
+                                    'icon' => 'fa-house',
+                                ],
+                                [
+                                    'label' => 'Sesi Ujian',
+                                    'url' => route('admin.master.exam-session'),
+                                    'pattern' => ['admin/master/exam-session*'],
+                                    'icon' => 'fa-clock',
+                                ],
+                                [
                                     'label' => 'Jadwal',
                                     'url' => '/admin/master/timetable',
                                     'pattern' => 'admin/master/timetable*',
-                                    'icon' => 'fa-clock',
+                                    'icon' => 'fa-calendar',
                                 ],
                                 [
                                     'label' => 'Prodi',

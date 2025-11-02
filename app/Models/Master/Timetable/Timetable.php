@@ -4,6 +4,8 @@ namespace App\Models\Master\Timetable;
 
 use App\Models\Classmate\Classmate;
 use App\Models\Company\Company;
+use App\Models\Master\Exam\ExamRoom;
+use App\Models\Master\Exam\ExamSession;
 use App\Models\User\UserTimetable;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Master\Question\Module;
@@ -14,6 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Timetable extends Model
 {
@@ -138,5 +141,25 @@ class Timetable extends Model
     public function classmate()
     {
         return $this->belongsTo(Classmate::class, 'classmate_id', 'id');
+    }
+
+    /**
+     * Get the examRoom that owns the Timetable
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function examRoom(): BelongsTo
+    {
+        return $this->belongsTo(ExamRoom::class, 'exam_room_id', 'id');
+    }
+
+    /**
+     * Get the examSession that owns the Timetable
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function examSession(): BelongsTo
+    {
+        return $this->belongsTo(ExamSession::class, 'exam_session_id', 'id');
     }
 }
