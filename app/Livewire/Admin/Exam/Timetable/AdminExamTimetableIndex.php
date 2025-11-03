@@ -129,7 +129,7 @@ class AdminExamTimetableIndex extends Component
             return AlertHelper::error('Gagal', 'Data Ujian Tidak Ditemukan');
         }
 
-        if ($userTimetable->status == 'done') {
+        if (in_array($userTimetable->status, ['done', 'suspend'])) {
             return AlertHelper::error('Gagal', 'Ujian Sudah Selesai');
         }
 
