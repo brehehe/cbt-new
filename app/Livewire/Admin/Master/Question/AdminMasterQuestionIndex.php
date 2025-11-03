@@ -179,6 +179,31 @@ class AdminMasterQuestionIndex extends Component
         return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
     }
 
+    public function confirmDelete($id)
+    {
+        return AlertHelper::confirmDelete('delete', 'Anda yakin ingin menghapus data ini?', $id);
+    }
+
+    public function delete($id)
+    {
+        try {
+            DB::beginTransaction();
+            app(QuestionService::class)->delete($id[0]);
+            DB::commit();
+        } catch (Exception | Throwable $th) {
+            DB::rollBack();
+            $error = [
+                'message' => $th->getMessage(),
+                'file'    => $th->getFile(),
+                'line'    => $th->getLine(),
+            ];
+            Log::error('Ada Kesalahaan saat AdminMasterModuleIndex => delete', $error);
+            return AlertHelper::error('Gagal', 'Ada kesalahan saat menghapus data');
+        }
+
+        return AlertHelper::success('Berhasil', 'Data berhasil dihapus.');
+    }
+
     public function openModalImport()
     {
         return $this->dispatch('open-modal', ['id' => 'modal-import-question']);

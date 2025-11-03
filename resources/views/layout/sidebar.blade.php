@@ -165,7 +165,7 @@
                                 [
                                     'label' => 'Topik Ujian',
                                     'url' => route('admin.master.topic'),
-                                    'pattern' => 'admin/master/topic',
+                                    'pattern' => 'admin/master/topic-question*',
                                     'icon' => 'fa-tags',
                                 ],
                                 [
