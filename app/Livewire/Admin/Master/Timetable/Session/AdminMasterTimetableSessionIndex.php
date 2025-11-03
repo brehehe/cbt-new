@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Master\Timetable\Session;
 
 use App\Helpers\AlertHelper;
 use App\Models\Exam\ExamLiveSession;
+use App\Models\Exam\ExamRecording;
 use App\Models\Master\Timetable\Timetable;
 use App\Models\User\UserTimetable;
 use App\Services\Exam\RecordingFinalizer;
@@ -65,7 +66,20 @@ class AdminMasterTimetableSessionIndex extends Component
             ]);
 
             try {
-                RecordingFinalizer::finalizeForUserTimetable($userTimetable->id);
+                // Finalisasi chunk rekaman dan simpan hasil ke ExamRecording terbaru
+                $final = RecordingFinalizer::finalizeForUserTimetable($userTimetable->id);
+
+                $latestRecording = ExamRecording::where('user_timetable_id', $userTimetable->id)
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+                if ($latestRecording) {
+                    $latestRecording->update([
+                        'video_path' => $final['merged_video'] ?: ($final['manifest'] ?? $latestRecording->video_path),
+                        'file_size' => $final['total_size'] ?? $latestRecording->file_size,
+                        'end_time' => Carbon::now(),
+                        'status' => 'completed',
+                    ]);
+                }
             } catch (\Throwable $e) {
                 AlertHelper::warning('Perhatian', 'Gagal finalisasi rekaman: ' . $e->getMessage());
             }
