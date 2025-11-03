@@ -21,6 +21,7 @@ class ExamRoomService
                 'id' => $data['id'] ?? null
             ],
             [
+                'company_id'  => $data['company_id'] ?? null,
                 'name'        => $data['name'] ?? '',
                 'code'        => $data['code'] ?? null,
                 'description' => $data['description'] ?? null,
