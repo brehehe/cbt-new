@@ -59,6 +59,8 @@ class AdminMasterSettingIndex extends Component
 
     public $logo_potrait;
 
+    public $is_mark;
+
     public $tax_id;
 
     public $industry;
@@ -104,6 +106,7 @@ class AdminMasterSettingIndex extends Component
             'pic_phone',
             'pic_email',
             'companyServices',
+            'is_mark',
         ]);
 
         if ($tab === 'perusahaan') {
@@ -123,6 +126,7 @@ class AdminMasterSettingIndex extends Component
                 'logo_potrait',
                 'pic_phone',
                 'pic_email',
+                'is_mark',
             ])->with('companyDetail')->find($this->company_id);
 
             if ($company) {
@@ -142,6 +146,7 @@ class AdminMasterSettingIndex extends Component
                 $this->pic_position = $company->pic_position;
                 $this->pic_phone = $company->pic_phone;
                 $this->pic_email = $company->pic_email;
+                $this->is_mark = $company->is_mark;
             }
         } elseif ($tab === 'layanan') {
             $this->companyServices = CompanyService::select('id', 'start_date', 'company_id', 'service_month_id', 'duration_days', 'is_lifetime')->with('serviceMonth:id,name,description', 'company:id,name,description')->where('company_id', $this->company_id)->get();
@@ -202,6 +207,7 @@ class AdminMasterSettingIndex extends Component
                 'pic_position' => $this->pic_position,
                 'pic_phone' => $this->pic_phone,
                 'pic_email' => $this->pic_email,
+                'is_mark' => $this->is_mark,
             ]);
 
             CompanyDetail::updateOrCreate([

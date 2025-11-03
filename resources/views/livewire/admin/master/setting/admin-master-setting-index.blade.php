@@ -234,6 +234,15 @@
                             </div>
                         </div>
                     </div>
+                    <div class="p-6 bg-white shadow rounded-lg">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Lainya</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             @elseif ($currentTab === 'layanan')
                 <div
