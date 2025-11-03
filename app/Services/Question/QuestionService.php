@@ -25,72 +25,79 @@ class QuestionService
     }
 
     public function updateOrCreate($request)
-{
-    try {
-        $imagePaths = [];
+    {
+        try {
+            $imagePaths = [];
+            $folder = "question/{$this->main_folder}";
+            $disk   = 'public';
 
-        // 🔹 Pastikan folder tujuan ada
-        $folder = "question/{$this->main_folder}";
-        $disk = 'public';
-        if (!\Storage::disk($disk)->exists($folder)) {
-            \Storage::disk($disk)->makeDirectory($folder);
-        }
-
-        // 🔹 Proses semua gambar
-        if (isset($request['images']) && is_array($request['images'])) {
-            foreach ($request['images'] as $img) {
-                // Jika masih berupa TemporaryUploadedFile dari Livewire
-                if ($img instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
-                    $storedPath = $img->store($folder, $disk);
-                    $imagePaths[] = '/' . $storedPath;
-                } else {
-                    // Jika dari edit (sudah asset('storage/...'))
-                    $path = str_replace(asset('storage'), '', $img);
-                    $imagePaths[] = $path;
-                }
+            if (!Storage::disk($disk)->exists($folder)) {
+                Storage::disk($disk)->makeDirectory($folder);
             }
-        }
 
-        // 🔹 Gabungkan gambar lama jika masih dipertahankan
-        if (!empty($request['old_images'])) {
-            foreach ($request['old_images'] as $old) {
-                $path = str_replace(asset('storage'), '', $old);
-                if (!in_array($path, $imagePaths)) {
-                    $imagePaths[] = $path;
+            // helper: ubah apa pun (TemporaryUploadedFile / URL) jadi path storage konsisten: "/question/....jpg"
+            $normalize = function ($val) use ($folder, $disk) {
+                if ($val instanceof TemporaryUploadedFile) {
+                    $stored = $val->store($folder, $disk);           // "question/2025/11/xxx.jpg"
+                    return '/'.ltrim($stored, '/');                  // "/question/2025/11/xxx.jpg"
                 }
+                // String URL/relative -> ambil path & hilangkan prefix "/storage"
+                $path = parse_url($val, PHP_URL_PATH) ?? (string) $val;   // "/storage/question/....jpg"
+                $path = Str::of($path)->replaceFirst('/storage', '')->start('/')->toString();
+                return $path;                                             // "/question/....jpg"
+            };
+
+            // 1) FINAL = normalisasi semua item di request['images'] (ini sumber kebenaran)
+            $final = [];
+            foreach (($request['images'] ?? []) as $img) {
+                $final[$normalize($img)] = true;   // pakai associative utk unique
             }
+
+            // 2) Normalisasi OLD utk hitung mana yang dihapus
+            $old = [];
+            foreach (($request['old_images'] ?? []) as $img) {
+                $old[$normalize($img)] = true;
+            }
+
+            // 3) Hapus file yang tidak ada lagi di final
+            $toDelete = array_diff(array_keys($old), array_keys($final));
+            foreach ($toDelete as $rm) {
+                Storage::disk($disk)->delete(ltrim($rm, '/')); // hapus "question/....jpg"
+            }
+
+            // 4) Simpan hasil akhir
+            $imagePaths = array_keys($final);
+
+            // 🔹 Simpan data
+            $question = \App\Models\Master\Question\Question::updateOrCreate(
+                ['id' => $request['id'] ?? null],
+                [
+                    'user_id'              => $request['user_id'] ?? null,
+                    'study_id'             => $request['study_id'] ?? null,
+                    'company_id'           => $request['company_id'] ?? null,
+                    'topic_id'             => $request['topic_id'] ?? null,
+                    'material_category_id' => $request['material_category_id'] ?? null,
+                    'material_id'          => $request['material_id'] ?? null,
+                    'question_type_id'     => $request['question_type_id'] ?? null,
+                    'question'             => $request['question'] ?? null,
+                    'images'               => json_encode($imagePaths),
+                    'weight_correct'       => $request['weight_correct'] ?? null,
+                    'weight_incorrect'     => $request['weight_incorrect'] ?? null,
+                    'description'          => $request['description'] ?? null,
+                ]
+            );
+
+            return $question;
+
+        } catch (\Throwable $th) {
+            \Log::error('❌ Error di QuestionService::updateOrCreate', [
+                'msg'  => $th->getMessage(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
+            ]);
+            throw $th;
         }
-
-        // 🔹 Simpan data
-        $question = \App\Models\Master\Question\Question::updateOrCreate(
-            ['id' => $request['id'] ?? null],
-            [
-                'user_id'              => $request['user_id'] ?? null,
-                'study_id'             => $request['study_id'] ?? null,
-                'company_id'           => $request['company_id'] ?? null,
-                'topic_id'             => $request['topic_id'] ?? null,
-                'material_category_id' => $request['material_category_id'] ?? null,
-                'material_id'          => $request['material_id'] ?? null,
-                'question_type_id'     => $request['question_type_id'] ?? null,
-                'question'             => $request['question'] ?? null,
-                'images'               => json_encode($imagePaths),
-                'weight_correct'       => $request['weight_correct'] ?? null,
-                'weight_incorrect'     => $request['weight_incorrect'] ?? null,
-                'description'          => $request['description'] ?? null,
-            ]
-        );
-
-        return $question;
-
-    } catch (\Throwable $th) {
-        \Log::error('❌ Error di QuestionService::updateOrCreate', [
-            'msg'  => $th->getMessage(),
-            'file' => $th->getFile(),
-            'line' => $th->getLine(),
-        ]);
-        throw $th;
     }
-}
 
 
     private function uploadImages(array $old_images, array $new_images)
