@@ -1040,6 +1040,7 @@
             const SERVER_URL = location.hostname.includes('localhost') ?
                 'http://localhost:4445' :
                 'https://procbt.id';
+                'https://universitaspancasakti.procbt.id';
 
             const waitSocketConnected = (socket) =>
                 new Promise((res, rej) => {

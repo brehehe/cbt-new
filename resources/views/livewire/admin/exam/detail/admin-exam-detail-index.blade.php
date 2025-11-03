@@ -249,10 +249,8 @@
                     <!-- Tombol Soal Sebelumnya - Sebelah Kiri -->
                     <div class="flex">
                         @if ($first)
-                            <button wire:click="previousQuestion" type="button"
-                                class="flex items-center px-4 py-2
-                                    {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600 hover:text-blue-700' : 'text-orange-600 hover:text-orange-700' }}
-                                    transition-colors">
+                            <button wire:click='previousQuestion()' type="button"
+                                class="flex items-center px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} transition-colors hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : '{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : 'text-orange-700' }}' }}">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15 19l-7-7 7-7" />
@@ -265,10 +263,8 @@
                     <!-- Tombol Soal Selanjutnya/Selesai Ujian - Sebelah Kanan -->
                     <div class="flex">
                         @if ($last)
-                            <button wire:click="nextQuestion" type="button"
-                                class="flex items-center px-4 py-2
-                                    {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600 hover:text-blue-700' : 'text-orange-600 hover:text-orange-700' }}
-                                    transition-colors">
+                            <button type="button" wire:click='nextQuestion()'
+                                class="flex items-center px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} transition-colors hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : '{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : 'text-orange-700' }}' }}">
                                 Soal Selanjutnya
                                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -276,10 +272,9 @@
                                 </svg>
                             </button>
                         @else
-                            <button wire:click="confirmFinishExam" type="button"
-                                class="flex items-center px-4 py-2
-                                    {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600 hover:text-blue-700' : 'text-orange-600 hover:text-orange-700' }}
-                                    transition-colors">
+                            <button type="button"
+                                class="flex items-center px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} transition-colors hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : '{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : 'text-orange-700' }}' }}"
+                                wire:click="confirmFinishExam">
                                 Selesai Ujian
                                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -290,7 +285,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
         <!-- Sidebar Kanan - Camera dan Profile -->
@@ -377,7 +371,7 @@
             </div>
 
             <!-- Recording Status -->
-            <div class="p-4">
+            {{-- <div class="p-4">
                 <h4 class="mb-3 font-medium text-gray-800">Recording & Streaming</h4>
                 <div class="space-y-2 text-sm">
                     <div class="flex justify-between">
@@ -397,7 +391,7 @@
                         <span class="text-green-600" id="recordingDuration">00:00</span>
                     </div>
                 </div>
-            </div>
+            </div> --}}
         </div>
     </div>
 
