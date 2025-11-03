@@ -24,6 +24,7 @@ class QuestionImport implements ToCollection
         try {
             //head column
             $header = [
+                'Prodi',
                 'Topik Soal',
                 'Kategori Materi',
                 'Materi Soal',

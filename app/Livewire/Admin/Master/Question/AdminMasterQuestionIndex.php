@@ -27,7 +27,7 @@ class AdminMasterQuestionIndex extends Component
 {
     use WithPagination, WithFileUploads, WithFilePond;
     protected $paginationTheme = 'bootstrap';
-    public $perPage = 5, $search;
+    public $perPage = 10, $search;
 
     public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id, $question, $description, $weight_correct, $weight_incorrect;
     public $topics = [], $material_categories = [], $materials = [], $question_types = [];
