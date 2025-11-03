@@ -148,7 +148,7 @@ class AdminExamTimetableIndex extends Component
     {
         $userTimetableStatusDone = UserTimetable::query()
             ->where('user_id', Auth::id())
-            ->where('status', 'done')
+            ->whereIn('status', ['done', 'suspend'])
             ->get()
             ->pluck('timetable_id')
             ->toArray();
