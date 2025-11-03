@@ -165,7 +165,7 @@
                                 [
                                     'label' => 'Topik Ujian',
                                     'url' => route('admin.master.topic'),
-                                    'pattern' => 'admin/master/topic-question*',
+                                    'pattern' => 'admin/master/topic-question',
                                     'icon' => 'fa-tags',
                                 ],
                                 [
@@ -189,14 +189,20 @@
                                 [
                                     'label' => 'Modul Soal',
                                     'url' => route('admin.master.module'),
-                                    'pattern' => 'admin/master/module',
+                                    'pattern' => ['admin/master/module-question', 'admin/master/module-question/*'],
                                     'icon' => 'fa-folder-open',
                                 ],
                                 [
                                     'label' => 'Bank Soal',
                                     'url' => route('admin.master.question'),
-                                    'pattern' => 'admin/master/question',
+                                    'pattern' => ['admin/master/question', 'admin/master/question/*'],
                                     'icon' => 'fa-database',
+                                ],
+                                [
+                                    'label' => 'Seting',
+                                    'url' => route('admin.master.setting'),
+                                    'pattern' => ['admin/master/setting', 'admin/master/setting/*'],
+                                    'icon' => 'fa-cog',
                                 ],
                             ];
                         }

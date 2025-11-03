@@ -55,6 +55,10 @@ class AdminMasterSettingIndex extends Component
 
     public $logo;
 
+    public $logo_potrait_old;
+
+    public $logo_potrait;
+
     public $tax_id;
 
     public $industry;
@@ -116,6 +120,7 @@ class AdminMasterSettingIndex extends Component
                 'description',
                 'pic_name',
                 'pic_position',
+                'logo_potrait',
                 'pic_phone',
                 'pic_email',
             ])->with('companyDetail')->find($this->company_id);
@@ -129,6 +134,7 @@ class AdminMasterSettingIndex extends Component
                 $this->country = $company->companyDetail->country;
                 $this->address = $company->companyDetail->address;
                 $this->logo_old = $company->logo;
+                $this->logo_potrait_old = $company->logo_potrait;
                 $this->tax_id = $company->tax_id;
                 $this->industry = $company->industry;
                 $this->description = $company->description;
@@ -158,6 +164,7 @@ class AdminMasterSettingIndex extends Component
                 'pic_phone' => 'required',
                 'pic_email' => 'required',
                 'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'logo_potrait' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             ]);
 
             if ($this->logo) {
@@ -168,6 +175,15 @@ class AdminMasterSettingIndex extends Component
                 $this->logo = $this->logo_old; // fallback jika tidak ada upload baru
             }
 
+            if ($this->logo_potrait) {
+                $randomName = Str::random(40) . '.' . $this->logo_potrait->getClientOriginalExtension();
+                $logo_potraitPath = $this->logo_potrait->storeAs('public/company', $randomName);
+                $this->logo_potrait = $logo_potraitPath; // untuk simpan di database
+            } else {
+                $this->logo_potrait = $this->logo_potrait_old; // fallback jika tidak ada upload baru
+            }
+
+
             $company = Company::updateOrCreate([
                 'id' => $this->company_id,
             ], [
@@ -177,6 +193,7 @@ class AdminMasterSettingIndex extends Component
                 'phone' => $this->phone,
                 'website' => $this->website,
                 'logo' => $this->logo,
+                'logo_potrait' => $this->logo_potrait,
                 'tax_id' => $this->tax_id,
                 'industry' => $this->industry,
                 'description' => $this->description,
@@ -194,9 +211,12 @@ class AdminMasterSettingIndex extends Component
                 'country' => $this->country,
             ]);
 
-            $this->reset(['logo']);
+            // Reset file upload states agar tidak memanggil temporaryUrl() pada string path
+            $this->reset(['logo', 'logo_potrait']);
 
+            // Refresh preview paths dari data tersimpan
             $this->logo_old = $company->logo;
+            $this->logo_potrait_old = $company->logo_potrait;
 
             return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
         }

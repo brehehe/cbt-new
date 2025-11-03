@@ -5,11 +5,14 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[#f58634]">Ruang Ujian</h1>
+                <h1
+                    class="text-2xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                    Ruang Ujian</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div>
-                <button wire:click="openModal()" class="btn btn-warning">
+                <button wire:click="openModal()"
+                    class="{{ config('app.name_slug') === 'ups_tegal' ? 'btn btn-primary' : 'btn btn-warning' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -66,7 +69,8 @@
                             <td>
                                 <div class="flex items-center mt-2" wire:key="{{ rand() }}">
                                     <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" wire:click="toggleExamRoomIsActive('{{ $result->id }}')"
+                                        <input type="checkbox"
+                                            wire:click="toggleExamRoomIsActive('{{ $result->id }}')"
                                             class="sr-only peer" {{ $result->is_active ? 'checked' : '' }}>
                                         <div
                                             class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">

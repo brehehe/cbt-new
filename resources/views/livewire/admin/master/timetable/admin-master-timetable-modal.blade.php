@@ -92,7 +92,8 @@
                                 wire:model.lazy="exam_room_id" id="exam_room_id">
                                 <option value="">-- Pilih Ruang Ujian --</option>
                                 @foreach ($examRooms as $key => $value)
-                                    <option value="{{ $value->id }}">{{ $value->name }} - [CODE]:{{ $value?->code }}</option>
+                                    <option value="{{ $value->id }}">{{ $value->name }} -
+                                        [CODE]:{{ $value?->code }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -115,7 +116,8 @@
                                 wire:model.lazy="exam_session_id" id="exam_session_id">
                                 <option value="">-- Pilih Sesi Ujian --</option>
                                 @foreach ($examSessions as $key => $value)
-                                    <option value="{{ $value->id }}">{{ $value->name }} - [CODE]:{{ $value?->code }}</option>
+                                    <option value="{{ $value->id }}">{{ $value->name }} -
+                                        [CODE]:{{ $value?->code }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -184,15 +186,16 @@
                     <div>
                         <label for="end_time" class="block text-sm font-medium text-gray-700">Waktu Selesai <span
                                 class="text-red-600">*</span></label>
-                        <input type="datetime-local" id="end_time" wire:model.defer="end_time" placeholder="Masukkan"
-                            class="mt-1 form-control">
+                        <input type="datetime-local" id="end_time" wire:model.defer="end_time"
+                            placeholder="Masukkan" class="mt-1 form-control">
                         @error('end_time')
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
                     <div>
                         <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
-                        <textarea id="description" wire:model.defer="description" placeholder="Masukkan Deskripsi" class="mt-1 form-control"></textarea>
+                        <textarea id="description" wire:model.defer="description" placeholder="Masukkan Deskripsi"
+                            class="mt-1 form-control"></textarea>
                     </div>
                 </div>
             </div>
@@ -205,7 +208,7 @@
                 Batal
             </button>
             <button wire:click='submit'
-                class="px-4 py-2 bg-[#f58634] hover:bg-[#f58634] text-white rounded-lg shadow transition">
+                class="px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} hover:{{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} text-white rounded-lg shadow transition">
                 Simpan
             </button>
         </div>

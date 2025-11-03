@@ -23,6 +23,7 @@ return new class extends Migration
 
             // Informasi tambahan
             $table->string('logo')->nullable(); // Path logo (URL atau lokal)
+            $table->string('logo_potrait')->nullable(); // Path logo (URL atau lokal)
             $table->string('tax_id')->nullable(); // NPWP / Tax ID
             $table->string('industry')->nullable(); // Industri
             $table->text('description')->nullable(); // Deskripsi perusahaan
@@ -41,6 +42,7 @@ return new class extends Migration
             $table->boolean('is_central')->default(false);
             $table->boolean('is_main')->default(false); //
             $table->boolean('is_lifetime')->default(false);
+            $table->boolean('is_mark')->default(false);
 
             //akses token
             $table->longText('one_health_access_token')->nullable()->comment('save auth access token');

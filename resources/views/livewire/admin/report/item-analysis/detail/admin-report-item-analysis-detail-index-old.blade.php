@@ -347,7 +347,8 @@
                 <button class="btn btn-outline-primary" onclick="window.print()">
                     <i class="fas fa-print mr-2"></i>Cetak Laporan
                 </button>
-                <button class="btn btn-warning" onclick="exportToExcel()">
+                <button class="{{ config('app.name_slug') === 'ups_tegal' ? 'btn btn-primary' : 'btn btn-warning' }}"
+                    onclick="exportToExcel()">
                     <i class="fas fa-file-excel mr-2"></i>Export Excel
                 </button>
             </div>

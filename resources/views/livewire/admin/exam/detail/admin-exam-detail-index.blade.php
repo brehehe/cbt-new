@@ -73,7 +73,8 @@
         <!-- Sidebar Kiri - Navigasi Soal -->
         <div id="leftSidebar"
             class="fixed z-30 h-full overflow-y-auto transition-transform duration-300 ease-in-out transform -translate-x-full bg-white border-r border-gray-200 shadow-sm lg:relative w-80 lg:w-80 lg:h-auto lg:translate-x-0">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden bg-orange-50">
+            <div
+                class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden {{ config('app.name_slug') === 'ups_tegal' ? 'bg-blue-50' : 'bg-orange-50' }}">
                 <h3
                     class="font-semibold {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }}">
                     Navigasi Soal</h3>
@@ -86,7 +87,8 @@
             </div>
 
             <!-- Info Ujian -->
-            <div class="p-4 border-b border-gray-200 bg-orange-50">
+            <div
+                class="p-4 border-b border-gray-200 {{ config('app.name_slug') === 'ups_tegal' ? 'bg-blue-50' : 'bg-orange-50' }}">
                 <h3
                     class="hidden mb-2 font-semibold {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} lg:block">
                     Navigasi Soal</h3>
@@ -109,7 +111,7 @@
                 <div class="mb-2 text-xs text-gray-500">Keterangan:</div>
                 <div class="grid grid-cols-4 gap-2 text-xs">
                     <div class="flex items-center">
-                        <div class="w-3 h-3 mr-2 bg-green-500 rounded"></div>
+                        <div class="w-3 h-3 mr-2 bg-blue-500 rounded"></div>
                         <span>Aktif</span>
                     </div>
                     <div class="flex items-center">
@@ -138,7 +140,9 @@
                             $buttonClass = 'w-8 h-8 text-xs font-medium rounded lg:w-8 lg:h-8 lg:text-sm ';
 
                             if ($isCurrent) {
-                                $buttonClass .= 'text-white bg-green-600 ring-2 ring-green-300';
+                                $buttonClass .= 'text-white bg-blue-600 ring-2 ring-blue-300';
+                            } elseif ($isAnswered && $isMarked) {
+                                $buttonClass .= 'text-white bg-yellow-500 transition-colors hover:bg-yellow-600';
                             } elseif ($isAnswered) {
                                 $buttonClass .= 'text-white bg-green-500';
                             } elseif ($isMarked) {
@@ -210,7 +214,7 @@
                     <div class="space-y-4" wire:key="question-{{ $questionNavigationId }}">
                         @foreach ($question_answers as $question_answer)
                             <label
-                                class="flex items-start p-3 transition-all border border-gray-200 rounded-lg cursor-pointer lg:p-4 hover:bg-orange-50 hover:border-orange-300">
+                                class="flex items-start p-3 transition-all border border-gray-200 rounded-lg cursor-pointer lg:p-4 {{ config('app.name_slug') === 'ups_tegal' ? 'hover:bg-blue-50 hover:border-blue-300' : 'hover:bg-orange-50 hover:border-orange-300' }}">
                                 {{-- Radio --}}
                                 <input type="radio" name="timetable_answer_id"
                                     wire:model.live="timetable_answer_id" value="{{ $question_answer['id'] }}"
@@ -246,11 +250,15 @@
             <!-- Footer Navigasi Soal -->
             <div class="p-4 border-t border-gray-200 lg:p-6 bg-gray-50">
                 <div class="flex items-center justify-between">
-                    <!-- Tombol Soal Sebelumnya - Sebelah Kiri -->
+                    <!-- Tombol Soal Sebelumnya -->
                     <div class="flex">
                         @if ($first)
-                            <button wire:click='previousQuestion()' type="button"
-                                class="flex items-center px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} transition-colors hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : '{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : 'text-orange-700' }}' }}">
+                            <button wire:click="previousQuestion" type="button"
+                                class="flex items-center px-4 py-2
+                        {{ config('app.name_slug') === 'ups_tegal'
+                            ? 'text-blue-600 hover:text-blue-700'
+                            : 'text-orange-600 hover:text-orange-700' }}
+                        transition-colors">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15 19l-7-7 7-7" />
@@ -260,11 +268,15 @@
                         @endif
                     </div>
 
-                    <!-- Tombol Soal Selanjutnya/Selesai Ujian - Sebelah Kanan -->
+                    <!-- Tombol Soal Selanjutnya / Selesai Ujian -->
                     <div class="flex">
                         @if ($last)
-                            <button type="button" wire:click='nextQuestion()'
-                                class="flex items-center px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} transition-colors hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : '{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : 'text-orange-700' }}' }}">
+                            <button type="button" wire:click="nextQuestion"
+                                class="flex items-center px-4 py-2
+                        {{ config('app.name_slug') === 'ups_tegal'
+                            ? 'text-blue-600 hover:text-blue-700'
+                            : 'text-orange-600 hover:text-orange-700' }}
+                        transition-colors">
                                 Soal Selanjutnya
                                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -272,9 +284,12 @@
                                 </svg>
                             </button>
                         @else
-                            <button type="button"
-                                class="flex items-center px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} transition-colors hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : '{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : 'text-orange-700' }}' }}"
-                                wire:click="confirmFinishExam">
+                            <button type="button" wire:click="confirmFinishExam"
+                                class="flex items-center px-4 py-2
+                        {{ config('app.name_slug') === 'ups_tegal'
+                            ? 'text-blue-600 hover:text-blue-700'
+                            : 'text-orange-600 hover:text-orange-700' }}
+                        transition-colors">
                                 Selesai Ujian
                                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -285,12 +300,14 @@
                     </div>
                 </div>
             </div>
+
         </div>
 
         <!-- Sidebar Kanan - Camera dan Profile -->
         <div id="rightSidebar"
             class="fixed right-0 z-30 h-full overflow-y-auto transition-transform duration-300 ease-in-out transform translate-x-full bg-white border-l border-gray-200 shadow-sm lg:relative w-80 lg:w-80 lg:h-auto lg:translate-x-0">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden bg-orange-50">
+            <div
+                class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden {{ config('app.name_slug') === 'ups_tegal' ? 'bg-blue-50' : 'bg-orange-50' }}">
                 <h3
                     class="font-semibold {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-800' : 'text-orange-800' }}">
                     Profil & Camera</h3>
@@ -303,7 +320,8 @@
             </div>
 
             <!-- Profile Mahasiswa -->
-            <div class="p-4 border-b border-gray-200 bg-orange-50">
+            <div
+                class="p-4 border-b border-gray-200 {{ config('app.name_slug') === 'ups_tegal' ? 'bg-blue-50' : 'bg-orange-50' }}">
                 <div class="text-center">
                     <div
                         class="flex items-center justify-center w-16 h-16 mx-auto mb-3 {{ config('app.name_slug') === 'ups_tegal' ? 'bg-blue-600' : 'bg-orange-600' }} rounded-full lg:w-20 lg:h-20">

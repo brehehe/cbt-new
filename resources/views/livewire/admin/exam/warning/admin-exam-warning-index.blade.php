@@ -83,7 +83,7 @@
                 <!-- Action Button -->
                 <div class="flex justify-center mt-8">
                     <button id="startExam" disabled wire:click="confirmStartUjian()"
-                        class="px-6 py-3 font-medium text-white transition-colors bg-[#f58634] rounded-lg hover:bg-[#f58634] disabled:bg-gray-300 disabled:cursor-not-allowed">
+                        class="px-6 py-3 font-medium text-white transition-colors {{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} rounded-lg hover:{{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} disabled:bg-gray-300 disabled:cursor-not-allowed">
                         Mulai Ujian
                     </button>
                 </div>

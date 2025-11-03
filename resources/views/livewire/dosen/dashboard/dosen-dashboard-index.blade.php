@@ -88,7 +88,7 @@
                 <!-- Quick Actions Dropdown -->
                 <div class="relative">
                     <button id="quickActionsBtn"
-                        class="inline-flex items-center px-4 py-2 bg-[#f58634] hover:bg-[#2d8c5b] text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                        class="inline-flex items-center px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} hover:bg-[#2d8c5b] text-white text-sm font-medium rounded-lg transition-colors duration-200">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
