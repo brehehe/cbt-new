@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_timetables', function (Blueprint $table) {
-            // Timestamp ketika timer dipause akibat force logout
-            $table->timestamp('paused_at')->nullable()->after('end_exam');
-            // Akumulasi total detik yang dipause
-            $table->bigInteger('pause_total_seconds')->default(0)->after('paused_at');
+            // // Timestamp ketika timer dipause akibat force logout
+            // $table->timestamp('paused_at')->nullable()->after('end_exam');
+            // // Akumulasi total detik yang dipause
+            // $table->bigInteger('pause_total_seconds')->default(0)->after('paused_at');
         });
     }
 
