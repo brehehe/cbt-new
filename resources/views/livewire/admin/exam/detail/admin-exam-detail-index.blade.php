@@ -1114,7 +1114,7 @@
             ];
 
             const peer = new Peer({
-                host: 'procbt.id',
+                host: 'ups.procbt.id',
                 path: '/peerjs',
                 secure: true,
                 debug: 1,

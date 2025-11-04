@@ -24948,6 +24948,13 @@ namespace App\Livewire\Admin\Master\Timetable\Streaming {
             }
     }
 
+namespace App\Livewire\Admin\Master\Timetable\Session {
+    /**
+     */
+    class AdminMasterTimetableSessionIndex extends \Livewire\Component {
+            }
+    }
+
 namespace App\Livewire\Admin\Master\Timetable\Answer {
     /**
      */
@@ -24973,6 +24980,20 @@ namespace App\Livewire\Admin\Master\ExamType {
     /**
      */
     class AdminMasterExamTypeIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\ExamRoom {
+    /**
+     */
+    class AdminMasterExamRoomIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\ExamSession {
+    /**
+     */
+    class AdminMasterExamSessionIndex extends \Livewire\Component {
             }
     }
 

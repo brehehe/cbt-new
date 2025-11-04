@@ -16,7 +16,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-APP_DIR="/var/www/html/drshieldapp/procbt.id"
+APP_DIR="/var/www/html/drshieldapp/ups.procbt.id"
 CONFIG_DIR="$APP_DIR/config"
 PHP_VERSION="8.3"
 NGINX_USER="www-data"

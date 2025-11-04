@@ -6,23 +6,23 @@ const HOST = process.env.HOST || "0.0.0.0";
 
 // Jalankan PeerJS hanya sebagai HTTP server
 const peerServer = PeerServer({
-    port: PORT,
-    host: HOST,
-    path: "/peerjs",
-    allow_discovery: true,
-    proxied: true,
-    // CORS aman untuk domain kamu
-    cors: {
-        origin: [
-            "https://procbt.id",
-            "https://universitaspancasakti.procbt.id",
-            "https://peer.toti.my.id",
-            "http://localhost:8000",
-            "https://localhost:8000",
-        ],
-        methods: ["GET", "POST", "OPTIONS"],
-        credentials: true,
-    },
+  port: PORT,
+  host: HOST,
+  path: '/peerjs',
+  allow_discovery: true,
+  proxied: true,
+  // CORS aman untuk domain kamu
+  cors: {
+    origin: [
+      'https://procbt.id',
+      'https://ups.procbt.id',
+      'https://peer.toti.my.id',
+      'http://localhost:8000',
+      'https://localhost:8000'
+    ],
+    methods: ['GET', 'POST', 'OPTIONS'],
+    credentials: true
+  }
 });
 
 // ===== EVENT LOG =====
