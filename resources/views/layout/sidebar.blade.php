@@ -135,7 +135,7 @@
                                 [
                                     'label' => 'Peserta',
                                     'url' => '/admin/master/classmate',
-                                    'pattern' => 'admin/master/classmate',
+                                    'pattern' => ['admin/master/classmate', 'admin/master/classmate/*'],
                                     'icon' => 'fa-users',
                                 ],
                                 [

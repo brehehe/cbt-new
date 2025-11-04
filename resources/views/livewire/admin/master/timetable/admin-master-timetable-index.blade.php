@@ -92,6 +92,17 @@
                             </td>
                             <td class="center">
                                 <div class="flex items-center">
+                                    <a class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors"
+                                        href="{{ route('admin.print.daftar-hadir', $timetable->id) }}" target="_blank"
+                                        title="Cetak Daftar Hadir">
+                                        <i class="fa-solid fa-file-lines"></i>
+                                    </a>
+
+                                    <a class="btn btn-icon text-green-600 hover:text-green-800 transition-colors"
+                                        href="{{ route('admin.print.berita-acara', $timetable->id) }}" target="_blank"
+                                        title="Cetak Berita Acara">
+                                        <i class="fa-solid fa-file-signature"></i>
+                                    </a>
                                     @if (!$timetable->code)
                                         <button
                                             class="btn btn-icon text-green-600 hover:text-green-800 transition-colors edit-btn"

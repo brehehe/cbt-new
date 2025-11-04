@@ -20,7 +20,7 @@
             <!-- Header -->
             <div class="flex items-center justify-between mb-4">
                 <!-- Logo kiri -->
-                <img src="/path/to/logo.png" alt="Logo" class="w-16 h-16">
+                <img src="{{ asset('storage/' . $company->logo_potrait) }}" alt="Logo" class="w-16 h-16">
 
                 <!-- Teks tengah -->
                 <div class="text-center flex-1">
@@ -39,32 +39,46 @@
                 <tbody>
                     <tr class="align-top">
                         <td class="py-[2px] w-32">Wilayah</td>
-                        <td class="py-[2px] border-b border-gray-400" colspan="5">: 64 - Jawa Tengah</td>
+                        <td class="py-[2px] border-b border-gray-400" colspan="5">: {{ $company?->code_region }} -
+                            {{ $company?->region }}</td>
                     </tr>
                     <tr class="align-top">
                         <td class="py-[2px]">Tempat Pelaksanaan</td>
                         <td class="py-[2px] border-b border-gray-400" colspan="5">
-                            : 9640007 - UNIVERSITAS PANCASAKTI TEGAL
+                            : {{ $company?->code_name }} - {{ $company?->name }}
                         </td>
                     </tr>
                     <tr class="align-top">
                         <td class="py-[2px]">Ruang</td>
-                        <td class="py-[2px] border-b border-gray-400" colspan="3">: LAB FTIK A</td>
+                        <td class="py-[2px] border-b border-gray-400" colspan="3">: {{ $exam_room?->name }}</td>
                         <td class="py-[2px] w-20 pl-6">Sesi</td>
-                        <td class="py-[2px] border-b border-gray-400">: 1</td>
+                        <td class="py-[2px] border-b border-gray-400">: {{ $exam_session?->name }}</td>
                     </tr>
+                    @php
+                        use Carbon\Carbon;
+
+                        // Konversi ke waktu lokal dan formatkan
+                        $hari = Carbon::parse($timetable->start_time)->translatedFormat('l'); // Senin
+                        $tanggal = Carbon::parse($timetable->start_time)->translatedFormat('d F Y'); // 04 November 2025
+                        $pukulMulai = Carbon::parse($timetable->start_time)->format('H.i');
+                        $pukulSelesai = Carbon::parse($timetable->end_time)->format('H.i');
+                    @endphp
+
                     <tr class="align-top">
                         <td class="py-[2px]">Hari</td>
                         <td class="py-[2px] border-b border-gray-400">
-                            : Senin
+                            : {{ $hari }}
                         </td>
                         <td class="py-[2px] pl-6">Tanggal</td>
                         <td class="py-[2px] border-b border-gray-400">
-                            : 03 Juni 2024
+                            : {{ $tanggal }}
                         </td>
                         <td class="py-[2px] pl-6">Pukul</td>
-                        <td class="py-[2px] border-b border-gray-400">: 08.30 - 11.30</td>
+                        <td class="py-[2px] border-b border-gray-400">
+                            : {{ $pukulMulai }} - {{ $pukulSelesai }}
+                        </td>
                     </tr>
+
                 </tbody>
             </table>
 
@@ -81,15 +95,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for ($i = 1; $i <= 20; $i++)
+                    @foreach ($classmateDetail as $class)
                         <tr class="h-6">
-                            <td class="border border-gray-400">{{ $i }}</td>
-                            <td class="border border-gray-400">90000{{ $i }}</td>
-                            <td class="border border-gray-400 text-left pl-2">Nama Peserta {{ $i }}</td>
+                            <td class="border border-gray-400">{{ $loop->iteration }}</td>
+                            <td class="border border-gray-400">{{ $class->user_id }}</td>
+                            <td class="border border-gray-400 text-left pl-2">{{ $class->user->name }}</td>
                             <td class="border border-gray-400"></td>
                             <td class="border border-gray-400"></td>
                         </tr>
-                    @endfor
+                    @endforeach
                 </tbody>
             </table>
 
@@ -107,15 +121,15 @@
                 <table class="w-full border-collapse">
                     <tr>
                         <td class="border border-gray-400 p-1">Jumlah Peserta yang Seharusnya Hadir</td>
-                        <td class="border border-gray-400 p-1 w-16 text-center">20</td>
+                        <td class="border border-gray-400 p-1 w-16 text-center"></td>
                     </tr>
                     <tr>
                         <td class="border border-gray-400 p-1">Jumlah Peserta yang Tidak Hadir</td>
-                        <td class="border border-gray-400 p-1 text-center">1</td>
+                        <td class="border border-gray-400 p-1 text-center"></td>
                     </tr>
                     <tr>
                         <td class="border border-gray-400 p-1">Jumlah Peserta Hadir</td>
-                        <td class="border border-gray-400 p-1 text-center">19</td>
+                        <td class="border border-gray-400 p-1 text-center"></td>
                     </tr>
                 </table>
             </div>
@@ -145,7 +159,8 @@
         <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
         <script>
             new QRCode(document.getElementById("qrcode"), {
-                text: "9640007-20240603-04-1",
+                // text: "9640007-20240603-04-1",
+                text: "{{ $company->code_name }}",
                 width: 120,
                 height: 120
             });

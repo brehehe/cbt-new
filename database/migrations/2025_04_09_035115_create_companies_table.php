@@ -16,7 +16,10 @@ return new class extends Migration
             $table->foreignUuid('company_id')->nullable(); // parent perusahan
             $table->foreignUuid('service_id')->nullable(); // parent perusahan
             $table->char('code', 6); // Kode perusahaan
+            $table->string('code_name')->nullable(); // Nama perusahaan
             $table->string('name'); // Nama perusahaan
+            $table->string('code_region')->nullable(); // Nama perusahaan
+            $table->string('region')->nullable(); // Nama perusahaan
             $table->string('email'); // Email resmi
             $table->string('phone'); // Telepon
             $table->string('website')->nullable(); // Website

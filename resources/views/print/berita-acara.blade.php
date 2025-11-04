@@ -26,26 +26,45 @@
             <!-- Header -->
             <div class="flex items-center mb-6">
                 <!-- Logo -->
-                <img src="/path/to/logo.png" alt="Logo" class="w-20 h-20 mr-4">
+                <img src="{{ asset('storage/' . $company->logo_potrait) }}" alt="Logo" class="w-20 h-20 mr-4">
 
                 <!-- Teks -->
                 <div class="flex-1 text-center">
                     <h1 class="font-bold text-lg uppercase">BERITA ACARA PELAKSANAAN</h1>
                     <p class="font-semibold uppercase">
-                        TES SUBSTANTIF CALON MAHASISWA PPG PRAJABATAN<br>
+                        {{ $timetable->name }}<br>
                         TAHUN 2024
                     </p>
                 </div>
             </div>
 
 
+            @php
+                use Carbon\Carbon;
+
+                $tanggal = Carbon::parse($timetable->start_time);
+                $hari = $tanggal->translatedFormat('l'); // contoh: Senin
+                $tgl = $tanggal->translatedFormat('d'); // contoh: 03
+                $bulan = $tanggal->translatedFormat('F'); // contoh: Juni
+                $tahun = $tanggal->translatedFormat('Y'); // contoh: 2024
+
+                $pukulMulai = Carbon::parse($timetable->start_time)->format('H:i');
+                $pukulSelesai = Carbon::parse($timetable->end_time)->format('H:i');
+
+                $lokasi = $exam_room->name ?? 'Lokasi Tidak Diketahui';
+                $namaKampus = $company->name ?? 'UNIVERSITAS PANCASAKTI TEGAL';
+            @endphp
+
             <!-- Deskripsi -->
-            <p class="text-justify mb-6">
-                Pada hari ini Senin tanggal <strong>03</strong> bulan <strong>Juni</strong> tahun <strong>2024</strong>,
-                di
-                <strong>UNIVERSITAS PANCASAKTI TEGAL</strong> telah diselenggarakan
-                TES SUBSTANTIF CALON MAHASISWA PPG PRAJABATAN Tahun 2024 dengan CAT-UNBK
-                dari pukul <strong>08:00</strong> sampai dengan pukul <strong>10:00</strong>.
+            <p class="text-justify mb-6 leading-relaxed">
+                Pada hari ini {{ $hari }} tanggal <strong>{{ $tgl }}</strong> bulan
+                <strong>{{ $bulan }}</strong> tahun <strong>{{ $tahun }}</strong>,
+                di <strong>{{ strtoupper($namaKampus) }}</strong> (ruang <strong>{{ $lokasi }}</strong>)
+                telah diselenggarakan
+                <strong>{{ $timetable->name }} Tahun {{ $tahun }}</strong>
+                dengan {{ $timetable->module->questionType->name }} dari pukul
+                <strong>{{ $pukulMulai }}</strong> sampai dengan
+                <strong>{{ $pukulSelesai }}</strong>.
             </p>
 
             <!-- Detail Informasi -->
@@ -124,7 +143,7 @@
 
             <!-- Footer -->
             <div class="mt-6 border-t border-gray-400 text-center text-[11px] py-1 font-semibold uppercase">
-                TES SUBSTANTIF CALON MAHASISWA PPG PRAJABATAN
+                {{ $timetable->name }}
             </div>
         </div>
 
