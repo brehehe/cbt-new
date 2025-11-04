@@ -342,6 +342,11 @@
                         class="px-2 py-1 text-xs text-white {{ config('app.name_slug') === 'ups_tegal' ? 'bg-blue-500' : 'bg-orange-500' }} rounded hover:{{ config('app.name_slug') === 'ups_tegal' ? 'bg-blue-600' : 'bg-orange-600' }}">
                         <span x-text="showCamera ? 'Hide' : 'Show'"></span>
                     </button>
+                    <button id="cameraRefreshButton"
+                        class="ml-2 px-2 py-1 text-xs text-white bg-gray-500 rounded hover:bg-gray-600 hidden"
+                        onclick="try { sessionStorage.removeItem('cameraReloadAttempts'); } catch(e) {}; window.location.reload();">
+                        Refresh Halaman
+                    </button>
                 </div>
 
                 <div x-show="showCamera" x-transition>
@@ -477,6 +482,31 @@
         let currentCall = null;
         let cameraStream = null;
 
+        // Auto reload helper when camera fails to appear
+        function tryAutoReload(reason) {
+            const maxAttempts = 2; // prevent infinite loop
+            const delayMs = 3000; // 3 seconds before reload
+            let attempts = 0;
+            try {
+                attempts = parseInt(sessionStorage.getItem('cameraReloadAttempts') || '0', 10);
+            } catch (e) {
+                attempts = 0;
+            }
+
+            if (attempts < maxAttempts) {
+                attempts += 1;
+                try { sessionStorage.setItem('cameraReloadAttempts', attempts.toString()); } catch (e) {}
+                console.warn(`🔁 Auto reload (${attempts}/${maxAttempts}): ${reason}`);
+                setTimeout(() => {
+                    window.location.reload();
+                }, delayMs);
+            } else {
+                console.warn('🚫 Auto reload limit reached. Please refresh manually.');
+                const btn = document.getElementById('cameraRefreshButton');
+                if (btn) btn.classList.remove('hidden');
+            }
+        }
+
         // Initialize everything when page loads
         document.addEventListener("DOMContentLoaded", function() {
             console.log('=== DOMContentLoaded fired ===');
@@ -498,7 +528,8 @@
 
             if (!cameraPreview) {
                 console.error('❌ CRITICAL: Camera preview element missing');
-                alert('❌ Error: Camera preview element not found. Please refresh the page.');
+                alert('❌ Kamera tidak ditemukan. Halaman akan di-refresh otomatis jika memungkinkan.');
+                tryAutoReload('Camera preview element missing');
                 return;
             }
 
@@ -537,8 +568,19 @@
                 } catch (err) {
                     console.error('❌ Camera initialization failed:', err);
                     // Don't stop here - camera issues are common
+                    tryAutoReload('initializeCamera() threw an error');
                 }
             }, 500); // Small delay to let countdown start first
+
+            // Fallback: if camera not active after a short period, reload
+            setTimeout(() => {
+                const cam = document.getElementById('cameraPreview');
+                const noStream = !cam || !cam.srcObject;
+                const notPlaying = cam && cam.readyState < 2; // HAVE_CURRENT_DATA
+                if (noStream || notPlaying) {
+                    tryAutoReload('Camera not active after initialization window');
+                }
+            }, 8000);
 
             // Initialize other components with delays
             setTimeout(() => {
@@ -936,6 +978,7 @@
                             console.log('✅ Camera preview playing');
                             updateCameraStatus('Camera Active', 'text-green-600');
                             updateRecordingStatus('Preview Active', 'Camera feed working');
+                            try { sessionStorage.removeItem('cameraReloadAttempts'); } catch (e) {}
                         })
                         .catch(e => {
                             console.warn('⚠️ Video autoplay prevented:', e.message);
