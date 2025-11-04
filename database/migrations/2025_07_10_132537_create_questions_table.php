@@ -20,9 +20,9 @@ return new class extends Migration
             $table->foreignUuid('material_category_id')->nullable();
             $table->foreignUuid('material_id')->nullable();
             $table->foreignUuid('question_type_id')->nullable();
-            $table->string('question')->comment('soal');
+            $table->longText('question')->comment('soal');
             $table->jsonb('images')->nullable()->comment('gambar soal');
-            $table->text('description')->nullable()->comment('keterangan soal');
+            $table->longText('description')->nullable()->comment('keterangan soal');
             $table->double('weight_correct')->nullable()->comment('score jika soal ini terjawab benar');
             $table->double('weight_incorrect')->nullable()->comment('score jika soal ini terjawab salah');
             $table->bigInteger('order')->default(0);
