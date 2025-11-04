@@ -374,7 +374,8 @@
     <div class="mb-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-gray-700">
+                <h1
+                    class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
                     Selamat datang kembali,
                     {{ Auth::user()->name ?? 'Admin' }}!</h1>
                 <p class="text-gray-600 mt-1">Berikut aktivitas sistem CBT Anda hari ini.</p>
