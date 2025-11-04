@@ -55,7 +55,7 @@
                         <th class="w-1 center">No</th>
                         <th>Nama Sesi Ujian</th>
                         <th>Nama Sesi Ujian</th>
-                        <th>Aktif</th>
+                        {{-- <th>Aktif</th> --}}
                         <th>Deskripsi</th>
                         <th class="w-1 center">Aksi</th>
                     </tr>
@@ -66,7 +66,7 @@
                             <td class="center">{{ $exam_sessions->firstItem() + $index }}</td>
                             <td>{{ $result?->name }}</td>
                             <td>{{ $result?->code }}</td>
-                            <td>
+                            {{-- <td>
                                 <div class="flex items-center mt-2" wire:key="{{ rand() }}">
                                     <label class="relative inline-flex items-center cursor-pointer">
                                         <input type="checkbox"
@@ -77,7 +77,7 @@
                                         </div>
                                     </label>
                                 </div>
-                            </td>
+                            </td> --}}
                             <td>{{ $result?->description }}</td>
                             <td class="center">
                                 <div class="flex items-center">
