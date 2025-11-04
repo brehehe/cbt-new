@@ -374,8 +374,7 @@
     <div class="mb-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1
-                    class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                <h1 class="text-2xl font-bold text-gray-700">
                     Selamat datang kembali,
                     {{ Auth::user()->name ?? 'Admin' }}!</h1>
                 <p class="text-gray-600 mt-1">Berikut aktivitas sistem CBT Anda hari ini.</p>
@@ -383,19 +382,19 @@
             </div>
             <div class="flex items-center gap-3">
                 <!-- Auto Refresh Toggle -->
-                <label class="relative inline-flex items-center cursor-pointer">
+                {{-- <label class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" id="autoRefresh" class="sr-only peer" checked>
                     <div
                         class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#f58634]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:{{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }}">
                     </div>
                     <span class="ml-3 text-sm font-medium text-gray-600">Segarkan Otomatis</span>
-                </label>
+                </label> --}}
 
                 <!-- Real-time Status Indicator -->
-                <div class="flex items-center space-x-2">
+                {{-- <div class="flex items-center space-x-2">
                     <div id="realtimeIndicator" class="w-3 h-3 rounded-full bg-green-500 pulse-dot"></div>
                     <span class="text-sm text-gray-600">Langsung</span>
-                </div>
+                </div> --}}
 
                 <!-- Refresh Button -->
                 <button wire:click="refreshData" id="refreshButton"
@@ -409,9 +408,9 @@
                 </button>
 
                 <!-- Last Update Time -->
-                <div class="text-xs text-gray-500">
+                {{-- <div class="text-xs text-gray-500">
                     Pembaruan terakhir: <span id="lastUpdateTime">{{ date('H:i:s') }}</span>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>

@@ -48,34 +48,40 @@
 
     <!-- Table Section -->
     <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
-        <div class="table-container">
-            <table class="table">
-                <thead>
+        <!-- Table Wrapper -->
+        <div class="table-container overflow-x-auto">
+            <table class="min-w-full table-auto border-collapse text-sm">
+                <thead class="bg-gray-100 text-gray-700">
                     <tr>
-                        <th class="w-1 center">No</th>
-                        <th>Peserta</th>
-                        <th>Nama</th>
-                        <th>Modul</th>
-                        <th>Ruang</th>
-                        <th>Sesi</th>
-                        <th>Waktu Mulai</th>
-                        <th>Waktu Selesai</th>
-                        <th>Token</th>
-                        <th class="w-1 center">Aksi</th>
+                        <th class="w-1 text-center px-3 py-2">No</th>
+                        <th class="px-3 py-2 text-left">Peserta</th>
+                        <th class="px-3 py-2 text-left">Nama</th>
+                        <th class="px-3 py-2 text-left">Modul</th>
+                        <th class="px-3 py-2 text-left">Ruang</th>
+                        <th class="px-3 py-2 text-left">Sesi</th>
+                        <th class="px-3 py-2 text-left">Waktu Mulai</th>
+                        <th class="px-3 py-2 text-left">Waktu Selesai</th>
+                        <th class="px-3 py-2 text-left">Token</th>
+                        <th class="w-1 text-center px-3 py-2">Aksi</th>
                     </tr>
                 </thead>
-                <tbody>
+
+                <tbody class="divide-y divide-gray-200">
                     @forelse ($timetables as $index => $timetable)
-                        <tr>
-                            <td class="center">{{ $timetables->firstItem() + $index }}</td>
-                            <td>{{ $timetable?->classmate->name ?? '-' }}</td>
-                            <td>{{ $timetable?->name ?? '-' }}</td>
-                            <td>{{ $timetable?->module->name ?? '-' }}</td>
-                            <td>{{ $timetable?->examRoom?->name ?? '-' }}</td>
-                            <td>{{ $timetable?->examSession?->name ?? '-' }}</td>
-                            <td>{{ $timetable?->start_time }}</td>
-                            <td>{{ $timetable?->end_time }}</td>
-                            <td>
+                        <tr class="hover:bg-gray-50">
+                            <td class="text-center px-3 py-2">
+                                {{ $timetables->firstItem() + $index }}
+                            </td>
+                            <td class="px-3 py-2">{{ $timetable?->classmate->name ?? '-' }}</td>
+                            <td class="px-3 py-2">{{ $timetable?->name ?? '-' }}</td>
+                            <td class="px-3 py-2">{{ $timetable?->module->name ?? '-' }}</td>
+                            <td class="px-3 py-2">{{ $timetable?->examRoom?->name ?? '-' }}</td>
+                            <td class="px-3 py-2">{{ $timetable?->examSession?->name ?? '-' }}</td>
+                            <td class="px-3 py-2">{{ $timetable?->start_time }}</td>
+                            <td class="px-3 py-2">{{ $timetable?->end_time }}</td>
+
+                            <!-- Token -->
+                            <td class="px-3 py-2">
                                 @if ($timetable->code)
                                     <div class="flex items-center gap-2">
                                         <span
@@ -90,79 +96,136 @@
                                     <span class="text-gray-400">-</span>
                                 @endif
                             </td>
-                            <td class="center">
-                                <div class="flex items-center">
-                                    <a class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors"
-                                        href="{{ route('admin.print.daftar-hadir', $timetable->id) }}" target="_blank"
-                                        title="Cetak Daftar Hadir">
-                                        <i class="fa-solid fa-file-lines"></i>
-                                    </a>
 
-                                    <a class="btn btn-icon text-green-600 hover:text-green-800 transition-colors"
-                                        href="{{ route('admin.print.berita-acara', $timetable->id) }}" target="_blank"
-                                        title="Cetak Berita Acara">
-                                        <i class="fa-solid fa-file-signature"></i>
-                                    </a>
-                                    @if (!$timetable->code)
-                                        <button
-                                            class="btn btn-icon text-green-600 hover:text-green-800 transition-colors edit-btn"
-                                            wire:click="confirmGenerateToken('{{ $timetable->id }}')">
-                                            <i class="fa-solid fa-square-binary"></i> <!-- atau fa-edit (versi lama) -->
-                                        </button>
-                                    @endif
-                                    @if (!$timetable->code)
-                                        <!-- Tombol Edit -->
-                                        <button
-                                            class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn"
-                                            wire:click="edit('{{ $timetable->id }}')">
-                                            <i class="fa-solid fa-pen-to-square"></i> <!-- atau fa-edit (versi lama) -->
-                                        </button>
+                            <!-- Aksi -->
+                            <td class="text-center px-3 py-2 relative">
+                                <div x-data="{ open: false, x: 0, y: 0 }" class="inline-block text-left">
+                                    <button
+                                        @click="
+                                    open = !open;
+                                    const rect = $el.getBoundingClientRect();
+                                    x = rect.right - 200;
+                                    y = rect.bottom + window.scrollY;
+                                "
+                                        class="px-3 py-2 bg-gray-100 rounded-md hover:bg-gray-200 transition text-gray-700">
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                    </button>
 
-                                        <!-- Tombol Delete -->
-                                        <button
-                                            class="btn btn-icon text-red-600 hover:text-red-800 transition-colors delete-btn"
-                                            wire:click="confirmDelete('{{ $timetable->id }}')">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    @else
-                                        <button
-                                            class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors delete-btn"
-                                            wire:click="liveSession('{{ $timetable->id }}')">
-                                            <i class="fa-solid fa-camera"></i>
-                                        </button>
-                                        <button
-                                            class="btn btn-icon text-indigo-600 hover:text-indigo-800 transition-colors delete-btn"
-                                            wire:click="sessionIndex('{{ $timetable->id }}')" title="Kelola Sesi">
-                                            <i class="fa-solid fa-users"></i>
-                                        </button>
-                                        {{-- <button
-                                            class="btn btn-icon {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-800' : 'text-orange-800' }} transition-colors delete-btn"
-                                            wire:click="confirmSuspend('{{ $timetable->id }}')"
-                                            title="Suspend Sesi Ujian">
-                                            <i class="fa-solid fa-user-slash"></i>
-                                        </button> --}}
-                                        <button
-                                            class="btn btn-icon text-green-600 hover:text-green-800 transition-colors delete-btn"
-                                            wire:click="confirmVideo('{{ $timetable->id }}')">
-                                            <i class="fa-solid fa-video"></i>
-                                        </button>
-                                        <button
-                                            class="btn btn-icon text-yellow-600 hover:text-yellow-800 transition-colors delete-btn"
-                                            wire:click="confirmAlert('{{ $timetable->id }}')">
-                                            <i class="fa-solid fa-triangle-exclamation"></i>
-                                        </button>
-                                        <button
-                                            class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors delete-btn"
-                                            wire:click="confirmDetail('{{ $timetable->id }}')">
-                                            <i class="fa-solid fa-eye"></i>
-                                        </button>
-                                    @endif
+                                    <!-- Dropdown keluar body -->
+                                    <template x-teleport="body">
+                                        <div x-show="open" x-transition.opacity @click.away="open = false"
+                                            class="fixed z-50 w-52 bg-white border border-gray-200 rounded-lg shadow-xl"
+                                            :style="`top:${y}px; left:${x}px`">
+
+                                            <ul class="py-1 text-sm text-gray-700">
+                                                @if (!$timetable->code)
+                                                    <li>
+                                                        <button
+                                                            wire:click="confirmGenerateToken('{{ $timetable->id }}')"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                            <i
+                                                                class="fa-solid fa-square-binary mr-2 text-green-600"></i>
+                                                            Generate Token
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ route('admin.print.daftar-hadir', $timetable->id) }}"
+                                                            target="_blank" class="block px-4 py-2 hover:bg-gray-100">
+                                                            <i class="fa-solid fa-file-lines mr-2 text-blue-600"></i>
+                                                            Cetak Daftar Hadir
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ route('admin.print.berita-acara', $timetable->id) }}"
+                                                            target="_blank" class="block px-4 py-2 hover:bg-gray-100">
+                                                            <i
+                                                                class="fa-solid fa-file-signature mr-2 text-green-600"></i>
+                                                            Cetak Berita Acara
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <button wire:click="edit('{{ $timetable->id }}')"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                            <i class="fa-solid fa-pen-to-square mr-2 text-blue-600"></i>
+                                                            Edit
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button wire:click="confirmDelete('{{ $timetable->id }}')"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600">
+                                                            <i class="fa-solid fa-trash mr-2"></i> Hapus
+                                                        </button>
+                                                    </li>
+                                                @else
+                                                    <li>
+                                                        <button wire:click="liveSession('{{ $timetable->id }}')"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                            <i class="fa-solid fa-camera mr-2 text-blue-600"></i>
+                                                            Live Session
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button wire:click="sessionIndex('{{ $timetable->id }}')"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                            <i class="fa-solid fa-users mr-2 text-indigo-600"></i>
+                                                            Kelola Sesi
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button wire:click="confirmVideo('{{ $timetable->id }}')"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                            <i class="fa-solid fa-video mr-2 text-green-600"></i>
+                                                            Video
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button wire:click="confirmAlert('{{ $timetable->id }}')"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                            <i
+                                                                class="fa-solid fa-triangle-exclamation mr-2 text-yellow-600"></i>
+                                                            Alert
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ route('admin.print.daftar-hadir', $timetable->id) }}"
+                                                            target="_blank" class="block px-4 py-2 hover:bg-gray-100">
+                                                            <i class="fa-solid fa-file-lines mr-2 text-blue-600"></i>
+                                                            Cetak Daftar Hadir
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ route('admin.print.berita-acara', $timetable->id) }}"
+                                                            target="_blank" class="block px-4 py-2 hover:bg-gray-100">
+                                                            <i
+                                                                class="fa-solid fa-file-signature mr-2 text-green-600"></i>
+                                                            Cetak Berita Acara
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <button wire:click="confirmDetail('{{ $timetable->id }}')"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                            <i class="fa-solid fa-eye mr-2 text-blue-600"></i>
+                                                            Detail
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button wire:click="confirmDelete('{{ $timetable->id }}')"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600">
+                                                            <i class="fa-solid fa-trash mr-2"></i> Hapus
+                                                        </button>
+                                                    </li>
+                                                @endif
+                                            </ul>
+                                        </div>
+                                    </template>
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="no-data">Tidak ada data</td>
+                            <td colspan="10" class="text-center py-4 text-gray-500">
+                                Tidak ada data
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -170,21 +233,19 @@
         </div>
 
         <!-- Pagination -->
-        <div class="px-5 py-4 bg-gray-50/80 border-t border-gray-200">
-            <div class="flex items-center justify-between">
-                <div class="text-sm text-gray-700">
-                    Menampilkan <span class="font-medium">{{ $timetables->firstItem() }}</span> sampai <span
-                        class="font-medium">{{ $timetables->lastItem() }}</span> dari <span
-                        class="font-medium">{{ $timetables->total() }}</span> hasil
-                </div>
-                <div>
-                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        {{ $timetables->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
-                    </nav>
-                </div>
+        <div
+            class="px-5 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between text-sm text-gray-700">
+            <div>
+                Menampilkan <span class="font-medium">{{ $timetables->firstItem() }}</span> sampai
+                <span class="font-medium">{{ $timetables->lastItem() }}</span> dari
+                <span class="font-medium">{{ $timetables->total() }}</span> hasil
+            </div>
+            <div>
+                {{ $timetables->links('vendor.livewire.custom') }}
             </div>
         </div>
     </div>
+
 </div>
 @push('scripts')
     <script>
