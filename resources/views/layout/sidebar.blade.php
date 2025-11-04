@@ -195,7 +195,7 @@
                                 [
                                     'label' => 'Bank Soal',
                                     'url' => route('admin.master.question'),
-                                    'pattern' => 'admin/master/question',
+                                    'pattern' => ['admin/master/question', 'admin/master/question/*'],
                                     'icon' => 'fa-database',
                                 ],
                             ];
