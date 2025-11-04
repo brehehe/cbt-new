@@ -18,6 +18,9 @@ return new class extends Migration
             $table->dateTime('start_process');
             $table->dateTime('start_exam')->nullable();
             $table->dateTime('end_exam')->nullable();
+            // Pause support: when force logout happens
+            $table->timestamp('paused_at')->nullable();
+            $table->bigInteger('pause_total_seconds')->default(0);
             $table->integer('mark')->default(0);
             $table->foreignUuid('study_id')->nullable();
             $table->enum('status', ['warning', 'exam', 'done','suspend'])->default('warning');

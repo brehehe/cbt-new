@@ -130,6 +130,22 @@ class AdminMasterTimetableSessionIndex extends Component
                 ]);
             }
 
+            // Pause timer pada UserTimetable yang aktif untuk user ini pada timetable terkait
+            $userTimetable = UserTimetable::query()
+                ->where('user_id', $userId)
+                ->where('timetable_id', $this->timetable_id)
+                ->whereIn('status', ['exam', 'warning'])
+                ->first();
+
+            if ($userTimetable) {
+                // Set paused_at jika belum diset (hindari overwrite bila sudah paused)
+                if (is_null($userTimetable->paused_at)) {
+                    $userTimetable->update([
+                        'paused_at' => Carbon::now(),
+                    ]);
+                }
+            }
+
             AlertHelper::success('Berhasil', 'Akun di-logout dari semua perangkat dan sesi ujian diputus.');
         } catch (\Throwable $e) {
             AlertHelper::warning('Perhatian', 'Gagal logout akun: ' . $e->getMessage());
