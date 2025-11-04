@@ -4,7 +4,7 @@
             <!-- Left Section: Logo & Sidebar Toggle -->
             <div class="flex items-center">
                 <img src="{{ config('app.name_slug') === 'ups_tegal'
-                    ? asset('asset/img/logo-ups.png')
+                    ? asset('asset/img/logo-ups-blue.png')
                     : asset('asset/img/logo-procbt.png') }}"
                     alt="PRO CBT Logo" class="h-10 w-auto mr-2">
                 <button id="toggleSidebar"

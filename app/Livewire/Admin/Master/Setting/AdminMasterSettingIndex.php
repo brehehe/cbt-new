@@ -22,7 +22,7 @@ class AdminMasterSettingIndex extends Component
     use WithFileUploads;
 
     public $tabs = [
-        'perusahaan',
+        'universitas',
         // 'satu-sehat',
         'layanan',
     ];
@@ -39,7 +39,10 @@ class AdminMasterSettingIndex extends Component
     // Perusahaan
     public $code;
 
+    public $code_name;
     public $name;
+    public $code_region;
+    public $region;
 
     public $email_company;
 
@@ -54,6 +57,12 @@ class AdminMasterSettingIndex extends Component
     public $logo_old;
 
     public $logo;
+
+    public $logo_potrait_old;
+
+    public $logo_potrait;
+
+    public $is_mark;
 
     public $tax_id;
 
@@ -77,7 +86,7 @@ class AdminMasterSettingIndex extends Component
         $this->company_id = auth()->user()->company_id;
 
         $this->getCountrys = Country::select('code', 'name')->orderBy('name', 'asc')->get()->toArray();
-        $this->setTab('perusahaan');
+        $this->setTab('universitas');
     }
 
     public function setTab($tab)
@@ -100,9 +109,13 @@ class AdminMasterSettingIndex extends Component
             'pic_phone',
             'pic_email',
             'companyServices',
+            'is_mark',
+            'code_name',
+            'region',
+            'code_region',
         ]);
 
-        if ($tab === 'perusahaan') {
+        if ($tab === 'universitas') {
             $company = Company::select([
                 'id',
                 'code',
@@ -116,8 +129,13 @@ class AdminMasterSettingIndex extends Component
                 'description',
                 'pic_name',
                 'pic_position',
+                'logo_potrait',
                 'pic_phone',
                 'pic_email',
+                'is_mark',
+                'code_name',
+                'region',
+                'code_region',
             ])->with('companyDetail')->find($this->company_id);
 
             if ($company) {
@@ -129,6 +147,7 @@ class AdminMasterSettingIndex extends Component
                 $this->country = $company->companyDetail->country;
                 $this->address = $company->companyDetail->address;
                 $this->logo_old = $company->logo;
+                $this->logo_potrait_old = $company->logo_potrait;
                 $this->tax_id = $company->tax_id;
                 $this->industry = $company->industry;
                 $this->description = $company->description;
@@ -136,6 +155,10 @@ class AdminMasterSettingIndex extends Component
                 $this->pic_position = $company->pic_position;
                 $this->pic_phone = $company->pic_phone;
                 $this->pic_email = $company->pic_email;
+                $this->is_mark = $company->is_mark;
+                $this->code_name = $company->code_name;
+                $this->region = $company->region;
+                $this->code_region = $company->code_region;
             }
         } elseif ($tab === 'layanan') {
             $this->companyServices = CompanyService::select('id', 'start_date', 'company_id', 'service_month_id', 'duration_days', 'is_lifetime')->with('serviceMonth:id,name,description', 'company:id,name,description')->where('company_id', $this->company_id)->get();
@@ -145,7 +168,7 @@ class AdminMasterSettingIndex extends Component
 
     public function save()
     {
-        if ($this->currentTab === 'perusahaan') {
+        if ($this->currentTab === 'universitas') {
             $this->validate([
                 'code' => 'required',
                 'name' => 'required',
@@ -158,6 +181,10 @@ class AdminMasterSettingIndex extends Component
                 'pic_phone' => 'required',
                 'pic_email' => 'required',
                 'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'logo_potrait' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'code_name' => 'required',
+                'region' => 'required',
+                'code_region' => 'required',
             ]);
 
             if ($this->logo) {
@@ -168,6 +195,15 @@ class AdminMasterSettingIndex extends Component
                 $this->logo = $this->logo_old; // fallback jika tidak ada upload baru
             }
 
+            if ($this->logo_potrait) {
+                $randomName = Str::random(40) . '.' . $this->logo_potrait->getClientOriginalExtension();
+                $logo_potraitPath = $this->logo_potrait->storeAs('public/company', $randomName);
+                $this->logo_potrait = $logo_potraitPath; // untuk simpan di database
+            } else {
+                $this->logo_potrait = $this->logo_potrait_old; // fallback jika tidak ada upload baru
+            }
+
+
             $company = Company::updateOrCreate([
                 'id' => $this->company_id,
             ], [
@@ -177,6 +213,7 @@ class AdminMasterSettingIndex extends Component
                 'phone' => $this->phone,
                 'website' => $this->website,
                 'logo' => $this->logo,
+                'logo_potrait' => $this->logo_potrait,
                 'tax_id' => $this->tax_id,
                 'industry' => $this->industry,
                 'description' => $this->description,
@@ -185,6 +222,10 @@ class AdminMasterSettingIndex extends Component
                 'pic_position' => $this->pic_position,
                 'pic_phone' => $this->pic_phone,
                 'pic_email' => $this->pic_email,
+                'is_mark' => $this->is_mark,
+                'code_name' => $this->code_name,
+                'region' => $this->region,
+                'code_region' => $this->code_region,
             ]);
 
             CompanyDetail::updateOrCreate([
@@ -194,9 +235,12 @@ class AdminMasterSettingIndex extends Component
                 'country' => $this->country,
             ]);
 
-            $this->reset(['logo']);
+            // Reset file upload states agar tidak memanggil temporaryUrl() pada string path
+            $this->reset(['logo', 'logo_potrait']);
 
+            // Refresh preview paths dari data tersimpan
             $this->logo_old = $company->logo;
+            $this->logo_potrait_old = $company->logo_potrait;
 
             return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
         }

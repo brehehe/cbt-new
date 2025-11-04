@@ -158,6 +158,28 @@ class AdminExamDetailIndex extends Component
         ]);
     }
 
+    // Cek auth untuk mendeteksi force logout dari pengawas
+    public function checkAuth(): bool
+    {
+        return Auth::check();
+    }
+
+    // Mengambil status UserTimetable terkini untuk polling status
+    public function getUserTimetableStatus(): ?string
+    {
+        // Jika belum set id, cari yang aktif untuk user
+        if (!$this->userTimetableId) {
+            $active = UserTimetable::where('user_id', Auth::id())
+                ->whereIn('status', ['exam', 'warning', 'suspend', 'done'])
+                ->orderByDesc('updated_at')
+                ->first();
+            return $active?->status;
+        }
+
+        $current = UserTimetable::find($this->userTimetableId);
+        return $current?->status;
+    }
+
     public function initializePeerJS()
     {
         // Method ini akan dipanggil dari JavaScript setelah PeerJS berhasil diinisialisasi
@@ -850,14 +872,54 @@ class AdminExamDetailIndex extends Component
 
         $startTime = Carbon::parse($this->userTimetable->start_exam);
         $duration = $timetable->timetable->module->duration ?? 60; // Default 60 minutes if not set
-        $endTime = $startTime->addMinutes($duration);
+        // Perpanjang waktu selesai dengan akumulasi pause_total_seconds
+        $pauseSeconds = (int) ($this->userTimetable->pause_total_seconds ?? 0);
+        $endTime = $startTime->addMinutes($duration)->copy()->addSeconds($pauseSeconds);
 
         $this->remainingTime = max(0, $endTime->timestamp - now()->timestamp);
         \Log::info('Countdown calculated', [
             'start_exam' => $this->userTimetable->start_exam,
             'duration' => $duration,
+            'pause_total_seconds' => $pauseSeconds,
             'remaining_seconds' => $this->remainingTime
         ]);
+    }
+
+    // Resume timer jika sedang paused (paused_at != null): tambahkan durasi pause ke akumulasi
+    public function resumeTimerIfPaused(): int
+    {
+        $this->userTimetable = UserTimetable::find($this->userTimetableId) ?? $this->userTimetable;
+        if (!$this->userTimetable) {
+            return 0;
+        }
+
+        if (!is_null($this->userTimetable->paused_at)) {
+            $pausedAt = Carbon::parse($this->userTimetable->paused_at);
+            $delta = now()->diffInSeconds($pausedAt);
+            $newTotal = (int) ($this->userTimetable->pause_total_seconds ?? 0) + $delta;
+
+            $this->userTimetable->update([
+                'pause_total_seconds' => $newTotal,
+                'paused_at' => null,
+            ]);
+
+            \Log::info('⏯️ Resumed timer, accumulated pause seconds', [
+                'user_timetable_id' => $this->userTimetable->id,
+                'added_seconds' => $delta,
+                'pause_total_seconds' => $newTotal,
+            ]);
+        }
+
+        // Recalculate and return latest remaining time
+        $this->calculateRemainingTime();
+        return (int) $this->remainingTime;
+    }
+
+    // Public accessor untuk mengambil sisa detik dari server
+    public function getRemainingTime(): int
+    {
+        $this->calculateRemainingTime();
+        return (int) $this->remainingTime;
     }
 
     private function refreshQuestionData()

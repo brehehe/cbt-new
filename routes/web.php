@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Print\PrintController;
 use App\Http\Middleware\CheckUserTimetable;
 use App\Livewire\Admin\Master\Classmate\AdminMasterClassmateIndex;
 use App\Livewire\Admin\Master\Classmate\Detail\AdminMasterClassmateDetailIndex;
@@ -131,6 +132,15 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
         Route::get('/question', AdminReportQuestionIndex::class)->name('admin.report.question');
         Route::get('/item-analysis', AdminReportItemAnalysisIndex::class)->name('admin.report.item-analysis');
         Route::get('/item-analysis/{id}/detail', AdminReportItemAnalysisDetailIndex::class)->name('admin.report.item-analysis.detail');
+    });
+
+    // Print previews (temporary demo routes)
+    Route::group(['prefix' => 'print'], function () {
+        Route::get('/daftar-hadir/{session_id}', [PrintController::class, 'printDaftarHadir'])
+            ->name('admin.print.daftar-hadir');
+
+        Route::get('/berita-acara/{session_id}', [PrintController::class, 'printBeritaAcara'])
+            ->name('admin.print.berita-acara');
     });
 });
 

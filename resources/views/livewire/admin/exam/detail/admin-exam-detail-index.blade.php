@@ -73,7 +73,8 @@
         <!-- Sidebar Kiri - Navigasi Soal -->
         <div id="leftSidebar"
             class="fixed z-30 h-full overflow-y-auto transition-transform duration-300 ease-in-out transform -translate-x-full bg-white border-r border-gray-200 shadow-sm lg:relative w-80 lg:w-80 lg:h-auto lg:translate-x-0">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden bg-orange-50">
+            <div
+                class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden {{ config('app.name_slug') === 'ups_tegal' ? 'bg-blue-50' : 'bg-orange-50' }}">
                 <h3
                     class="font-semibold {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }}">
                     Navigasi Soal</h3>
@@ -86,7 +87,8 @@
             </div>
 
             <!-- Info Ujian -->
-            <div class="p-4 border-b border-gray-200 bg-orange-50">
+            <div
+                class="p-4 border-b border-gray-200 {{ config('app.name_slug') === 'ups_tegal' ? 'bg-blue-50' : 'bg-orange-50' }}">
                 <h3
                     class="hidden mb-2 font-semibold {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} lg:block">
                     Navigasi Soal</h3>
@@ -109,7 +111,7 @@
                 <div class="mb-2 text-xs text-gray-500">Keterangan:</div>
                 <div class="grid grid-cols-4 gap-2 text-xs">
                     <div class="flex items-center">
-                        <div class="w-3 h-3 mr-2 bg-green-500 rounded"></div>
+                        <div class="w-3 h-3 mr-2 bg-blue-500 rounded"></div>
                         <span>Aktif</span>
                     </div>
                     <div class="flex items-center">
@@ -138,7 +140,9 @@
                             $buttonClass = 'w-8 h-8 text-xs font-medium rounded lg:w-8 lg:h-8 lg:text-sm ';
 
                             if ($isCurrent) {
-                                $buttonClass .= 'text-white bg-green-600 ring-2 ring-green-300';
+                                $buttonClass .= 'text-white bg-blue-600 ring-2 ring-blue-300';
+                            } elseif ($isAnswered && $isMarked) {
+                                $buttonClass .= 'text-white bg-yellow-500 transition-colors hover:bg-yellow-600';
                             } elseif ($isAnswered) {
                                 $buttonClass .= 'text-white bg-green-500';
                             } elseif ($isMarked) {
@@ -210,7 +214,7 @@
                     <div class="space-y-4" wire:key="question-{{ $questionNavigationId }}">
                         @foreach ($question_answers as $question_answer)
                             <label
-                                class="flex items-start p-3 transition-all border border-gray-200 rounded-lg cursor-pointer lg:p-4 hover:bg-orange-50 hover:border-orange-300">
+                                class="flex items-start p-3 transition-all border border-gray-200 rounded-lg cursor-pointer lg:p-4 {{ config('app.name_slug') === 'ups_tegal' ? 'hover:bg-blue-50 hover:border-blue-300' : 'hover:bg-orange-50 hover:border-orange-300' }}">
                                 {{-- Radio --}}
                                 <input type="radio" name="timetable_answer_id"
                                     wire:model.live="timetable_answer_id" value="{{ $question_answer['id'] }}"
@@ -246,11 +250,15 @@
             <!-- Footer Navigasi Soal -->
             <div class="p-4 border-t border-gray-200 lg:p-6 bg-gray-50">
                 <div class="flex items-center justify-between">
-                    <!-- Tombol Soal Sebelumnya - Sebelah Kiri -->
+                    <!-- Tombol Soal Sebelumnya -->
                     <div class="flex">
                         @if ($first)
-                            <button wire:click='previousQuestion()' type="button"
-                                class="flex items-center px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} transition-colors hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : '{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : 'text-orange-700' }}' }}">
+                            <button wire:click="previousQuestion" type="button"
+                                class="flex items-center px-4 py-2
+                        {{ config('app.name_slug') === 'ups_tegal'
+                            ? 'text-blue-600 hover:text-blue-700'
+                            : 'text-orange-600 hover:text-orange-700' }}
+                        transition-colors">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15 19l-7-7 7-7" />
@@ -260,11 +268,15 @@
                         @endif
                     </div>
 
-                    <!-- Tombol Soal Selanjutnya/Selesai Ujian - Sebelah Kanan -->
+                    <!-- Tombol Soal Selanjutnya / Selesai Ujian -->
                     <div class="flex">
                         @if ($last)
-                            <button type="button" wire:click='nextQuestion()'
-                                class="flex items-center px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} transition-colors hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : '{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : 'text-orange-700' }}' }}">
+                            <button type="button" wire:click="nextQuestion"
+                                class="flex items-center px-4 py-2
+                        {{ config('app.name_slug') === 'ups_tegal'
+                            ? 'text-blue-600 hover:text-blue-700'
+                            : 'text-orange-600 hover:text-orange-700' }}
+                        transition-colors">
                                 Soal Selanjutnya
                                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -272,9 +284,12 @@
                                 </svg>
                             </button>
                         @else
-                            <button type="button"
-                                class="flex items-center px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }} transition-colors hover:{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : '{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : 'text-orange-700' }}' }}"
-                                wire:click="confirmFinishExam">
+                            <button type="button" wire:click="confirmFinishExam"
+                                class="flex items-center px-4 py-2
+                        {{ config('app.name_slug') === 'ups_tegal'
+                            ? 'text-blue-600 hover:text-blue-700'
+                            : 'text-orange-600 hover:text-orange-700' }}
+                        transition-colors">
                                 Selesai Ujian
                                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -285,12 +300,14 @@
                     </div>
                 </div>
             </div>
+
         </div>
 
         <!-- Sidebar Kanan - Camera dan Profile -->
         <div id="rightSidebar"
             class="fixed right-0 z-30 h-full overflow-y-auto transition-transform duration-300 ease-in-out transform translate-x-full bg-white border-l border-gray-200 shadow-sm lg:relative w-80 lg:w-80 lg:h-auto lg:translate-x-0">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden bg-orange-50">
+            <div
+                class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden {{ config('app.name_slug') === 'ups_tegal' ? 'bg-blue-50' : 'bg-orange-50' }}">
                 <h3
                     class="font-semibold {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-800' : 'text-orange-800' }}">
                     Profil & Camera</h3>
@@ -303,7 +320,8 @@
             </div>
 
             <!-- Profile Mahasiswa -->
-            <div class="p-4 border-b border-gray-200 bg-orange-50">
+            <div
+                class="p-4 border-b border-gray-200 {{ config('app.name_slug') === 'ups_tegal' ? 'bg-blue-50' : 'bg-orange-50' }}">
                 <div class="text-center">
                     <div
                         class="flex items-center justify-center w-16 h-16 mx-auto mb-3 {{ config('app.name_slug') === 'ups_tegal' ? 'bg-blue-600' : 'bg-orange-600' }} rounded-full lg:w-20 lg:h-20">
@@ -324,6 +342,11 @@
                         class="px-2 py-1 text-xs text-white {{ config('app.name_slug') === 'ups_tegal' ? 'bg-blue-500' : 'bg-orange-500' }} rounded hover:{{ config('app.name_slug') === 'ups_tegal' ? 'bg-blue-600' : 'bg-orange-600' }}">
                         <span x-text="showCamera ? 'Hide' : 'Show'"></span>
                     </button>
+                    {{-- <button id="cameraRefreshButton"
+                        class="ml-2 px-2 py-1 text-xs text-white bg-gray-500 rounded hover:bg-gray-600 hidden"
+                        onclick="try { sessionStorage.removeItem('cameraReloadAttempts'); } catch(e) {}; window.location.reload();">
+                        Refresh Halaman
+                    </button> --}}
                 </div>
 
                 <div x-show="showCamera" x-transition>
@@ -459,6 +482,101 @@
         let currentCall = null;
         let cameraStream = null;
 
+        // Auto reload helper when camera fails to appear
+        function tryAutoReload(reason) {
+            const maxAttempts = 2; // prevent infinite loop
+            const delayMs = 3000; // 3 seconds before reload
+            let attempts = 0;
+            try {
+                attempts = parseInt(sessionStorage.getItem('cameraReloadAttempts') || '0', 10);
+            } catch (e) {
+                attempts = 0;
+            }
+
+            if (attempts < maxAttempts) {
+                attempts += 1;
+                try {
+                    sessionStorage.setItem('cameraReloadAttempts', attempts.toString());
+                } catch (e) {}
+                console.warn(`🔁 Auto reload (${attempts}/${maxAttempts}): ${reason}`);
+                setTimeout(() => {
+                    window.location.reload();
+                }, delayMs);
+            } else {
+                console.warn('🚫 Auto reload limit reached. Please refresh manually.');
+                const btn = document.getElementById('cameraRefreshButton');
+                if (btn) btn.classList.remove('hidden');
+            }
+        }
+
+        // Safe redirect helper to avoid duplicate redirects and race conditions
+        function safeRedirect(url) {
+            try {
+                if (window.hasRedirected) return;
+                window.hasRedirected = true;
+
+                // Stop timers
+                try {
+                    if (window.authPollInterval) clearInterval(window.authPollInterval);
+                } catch (e) {}
+                try {
+                    if (window.countdownInterval) clearInterval(window.countdownInterval);
+                } catch (e) {}
+
+                // Attempt to stop recording gracefully
+                try {
+                    if (typeof stopRecording === 'function') {
+                        stopRecording();
+                    }
+                } catch (e) {
+                    console.warn('⚠️ stopRecording failed in safeRedirect:', e);
+                }
+
+                // Tear down peer connection
+                try {
+                    if (window.peer && typeof window.peer.destroy === 'function') window.peer.destroy();
+                } catch (e) {}
+
+                // Small delay to allow any pending operations to settle
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 500);
+            } catch (e) {
+                // As last resort, force redirect
+                window.location.href = url;
+            }
+        }
+
+        // Livewire helpers: safely get component and call methods
+        function getLivewireComponent() {
+            try {
+                const wireEl = document.querySelector('[wire\\:id]');
+                if (wireEl && window.Livewire && typeof Livewire.find === 'function') {
+                    return Livewire.find(wireEl.getAttribute('wire:id'));
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        async function callWire(method, ...args) {
+            try {
+                const lw = (typeof $wire !== 'undefined' && $wire) || getLivewireComponent();
+                if (!lw) throw new Error('Livewire component not available');
+                if (typeof lw.call === 'function') {
+                    return await lw.call(method, ...args);
+                }
+                if (typeof lw[method] === 'function') {
+                    return await lw[method](...args);
+                }
+                throw new Error('Livewire method not found: ' + method);
+            } catch (e) {
+                throw e;
+            }
+        }
+
+        // Try to expose $wire (if available) to avoid undefined errors
+        try { window.$wire = window.$wire || @this; } catch (e) {}
+
         // Initialize everything when page loads
         document.addEventListener("DOMContentLoaded", function() {
             console.log('=== DOMContentLoaded fired ===');
@@ -480,34 +598,52 @@
 
             if (!cameraPreview) {
                 console.error('❌ CRITICAL: Camera preview element missing');
-                alert('❌ Error: Camera preview element not found. Please refresh the page.');
+                alert('❌ Kamera tidak ditemukan. Halaman akan di-refresh otomatis jika memungkinkan.');
+                tryAutoReload('Camera preview element missing');
                 return;
             }
 
-            // Get remaining time from server with detailed logging
-            const totalSeconds = {{ $remainingTime ?? 0 }};
-            console.log('⏰ Raw remaining time from server:', totalSeconds);
-            console.log('⏰ Type of remainingTime:', typeof totalSeconds);
+            // Ambil sisa waktu dari server dan lakukan resume jika perlu
+            const serverSeconds = {{ $remainingTime ?? 0 }};
+            console.log('⏰ Raw remaining time from server:', serverSeconds);
+            console.log('⏰ Type of remainingTime:', typeof serverSeconds);
 
-            // Better fallback logic with validation
-            let actualTime;
-            if (totalSeconds && totalSeconds > 0) {
-                actualTime = totalSeconds;
-                console.log('✅ Using server time:', actualTime, 'seconds');
+            // Inisialisasi countdown setelah mencoba resume di server
+            console.log('🕐 Starting countdown initialization with resume...');
+            const hasLivewire = (typeof $wire !== 'undefined') || (window.Livewire && document.querySelector('[wire\\:id]'));
+            if (hasLivewire) {
+                callWire('resumeTimerIfPaused')
+                    .then(() => callWire('getRemainingTime'))
+                    .then((latestSeconds) => {
+                        const useSeconds = parseInt(latestSeconds);
+                        const finalSeconds = (useSeconds && useSeconds > 0) ? useSeconds : (serverSeconds && serverSeconds > 0 ? serverSeconds : 3600);
+                        console.log('⏱️ Final countdown seconds after resume/getRemainingTime:', finalSeconds);
+                        startCountdown(finalSeconds);
+                        console.log('✅ Countdown started successfully after resume');
+                    })
+                    .catch((e) => {
+                        console.warn('⚠️ Resume/getRemainingTime failed, falling back:', e);
+                        const fallbackSeconds = (serverSeconds && serverSeconds > 0) ? serverSeconds : 3600;
+                        try {
+                            startCountdown(fallbackSeconds);
+                            console.log('✅ Countdown started with fallback');
+                        } catch (err) {
+                            console.error('❌ Countdown failed:', err);
+                            alert('❌ Countdown initialization failed: ' + err.message);
+                            return;
+                        }
+                    });
             } else {
-                actualTime = 60 * 60; // 1 hour fallback for testing
-                console.warn('⚠️ Server time invalid, using 1 hour fallback:', actualTime, 'seconds');
-            }
-
-            // Start countdown FIRST - most important
-            console.log('🕐 Starting countdown initialization...');
-            try {
-                startCountdown(actualTime);
-                console.log('✅ Countdown started successfully');
-            } catch (err) {
-                console.error('❌ Countdown failed:', err);
-                alert('❌ Countdown initialization failed: ' + err.message);
-                return;
+                const fallbackSeconds = (serverSeconds && serverSeconds > 0) ? serverSeconds : 3600;
+                console.warn('⚠️ Livewire not available, using fallback seconds:', fallbackSeconds);
+                try {
+                    startCountdown(fallbackSeconds);
+                    console.log('✅ Countdown started with fallback (no Livewire)');
+                } catch (err) {
+                    console.error('❌ Countdown failed:', err);
+                    alert('❌ Countdown initialization failed: ' + err.message);
+                    return;
+                }
             }
 
             // Initialize camera SECOND - critical for exam
@@ -519,8 +655,19 @@
                 } catch (err) {
                     console.error('❌ Camera initialization failed:', err);
                     // Don't stop here - camera issues are common
+                    tryAutoReload('initializeCamera() threw an error');
                 }
             }, 500); // Small delay to let countdown start first
+
+            // Fallback: if camera not active after a short period, reload
+            setTimeout(() => {
+                const cam = document.getElementById('cameraPreview');
+                const noStream = !cam || !cam.srcObject;
+                const notPlaying = cam && cam.readyState < 2; // HAVE_CURRENT_DATA
+                if (noStream || notPlaying) {
+                    tryAutoReload('Camera not active after initialization window');
+                }
+            }, 8000);
 
             // Initialize other components with delays
             setTimeout(() => {
@@ -544,11 +691,47 @@
                 console.log('✅ Live session monitoring and emergency check completed');
             }, 2000);
 
+            // Start polling for auth/session status changes (force logout / suspend)
+            setTimeout(() => {
+                try {
+                    startAuthAndStatusPolling();
+                    console.log('✅ Auth & status polling started');
+                } catch (e) {
+                    console.warn('⚠️ Failed to start auth polling:', e);
+                }
+            }, 2200);
+
             // Mark page as loaded
             setTimeout(() => {
                 pageLoaded = true;
                 console.log('✅ Page fully loaded and initialized');
             }, 3000);
+
+            // Try to reinitialize camera/peer when page becomes visible again
+            window.addEventListener('pageshow', () => {
+                try {
+                    const cam = document.getElementById('cameraPreview');
+                    if (!cam || !cam.srcObject || cam.readyState < 2) {
+                        initializeCamera();
+                    }
+                } catch (e) {}
+                try {
+                    initializePeerJS();
+                } catch (e) {}
+            });
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    try {
+                        const cam = document.getElementById('cameraPreview');
+                        const noStream = !cam || !cam.srcObject;
+                        const notPlaying = cam && cam.readyState < 2;
+                        if (noStream || notPlaying) {
+                            initializeCamera();
+                        }
+                    } catch (e) {}
+                }
+            });
         });
 
         // Enhanced countdown function with better error handling
@@ -656,10 +839,10 @@
             requestFullscreen();
 
             // Disable right click
-            document.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                logAlert('right_click', 'Mencoba membuka menu konteks');
-            });
+            // document.addEventListener('contextmenu', function(e) {
+            //     e.preventDefault();
+            //     logAlert('right_click', 'Mencoba membuka menu konteks');
+            // });
 
             // Disable F12, Ctrl+Shift+I, etc.
             document.addEventListener('keydown', function(e) {
@@ -908,6 +1091,12 @@
                 }
 
                 console.log('📺 Setting up camera preview...');
+                // Improve autoplay reliability across browsers
+                try {
+                    cameraPreview.muted = true; // allow autoplay in Chrome/Edge
+                    cameraPreview.playsInline = true; // iOS Safari inline playback
+                    cameraPreview.setAttribute('autoplay', '');
+                } catch (e) {}
                 cameraPreview.srcObject = stream;
 
                 // Enhanced video play handling
@@ -918,6 +1107,9 @@
                             console.log('✅ Camera preview playing');
                             updateCameraStatus('Camera Active', 'text-green-600');
                             updateRecordingStatus('Preview Active', 'Camera feed working');
+                            try {
+                                sessionStorage.removeItem('cameraReloadAttempts');
+                            } catch (e) {}
                         })
                         .catch(e => {
                             console.warn('⚠️ Video autoplay prevented:', e.message);
@@ -1172,6 +1364,67 @@
                 });
                 return null;
             }
+        }
+
+        // === AUTH & STATUS POLLING ===
+        function startAuthAndStatusPolling() {
+            const POLL_MS = 2000;
+            // Prevent duplicate suspend handling
+            if (typeof window.isSuspending === 'undefined') {
+                window.isSuspending = false;
+            }
+            const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+            if (window.authPollInterval) {
+                clearInterval(window.authPollInterval);
+            }
+            window.authPollInterval = setInterval(async () => {
+                try {
+                    const isAuth = await callWire('checkAuth');
+                    if (!isAuth) {
+                        console.warn('🔒 Session invalidated by supervisor, redirecting to login');
+                        safeRedirect('/login');
+                        return;
+                    }
+
+                    const status = await callWire('getUserTimetableStatus');
+                    if (status === 'suspend') {
+                        console.warn('⏸ Status changed to suspend — finalizing recording');
+                        clearInterval(window.authPollInterval);
+                        if (!window.isSuspending) {
+                            window.isSuspending = true;
+                            // Stop recording first to flush last chunk
+                            try {
+                                if (typeof stopRecording === 'function') {
+                                    stopRecording();
+                                    await sleep(1500);
+                                }
+                            } catch (e) {
+                                console.warn('⚠️ stopRecording failed during suspend:', e);
+                            }
+                        }
+                        try {
+                            await callWire('suspendExam');
+                            // Server-side method will trigger redirect via JS after finalization
+                        } catch (e) {
+                            console.warn('⚠️ suspendExam call failed, fallback redirect');
+                            safeRedirect('/admin/exam/timetable');
+                        }
+                        return;
+                    }
+
+                    if (status === 'done') {
+                        console.warn('✅ Status changed to done — redirecting');
+                        safeRedirect('/admin/exam/timetable');
+                        return;
+                    }
+                } catch (err) {
+                    console.warn('⚠️ Auth/status polling error:', err);
+                    const msg = (err && (err.message || err.status || '')) + '';
+                    if (/401|Unauthenticated|Unauthorized/i.test(msg)) {
+                        safeRedirect('/login');
+                    }
+                }
+            }, POLL_MS);
         }
 
 

@@ -9,7 +9,8 @@
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div>
-                <button wire:click="openModal()" class="btn btn-warning">
+                <button wire:click="openModal()"
+                    class="{{ config('app.name_slug') === 'ups_tegal' ? 'btn btn-primary' : 'btn btn-warning' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -91,6 +92,17 @@
                             </td>
                             <td class="center">
                                 <div class="flex items-center">
+                                    <a class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors"
+                                        href="{{ route('admin.print.daftar-hadir', $timetable->id) }}" target="_blank"
+                                        title="Cetak Daftar Hadir">
+                                        <i class="fa-solid fa-file-lines"></i>
+                                    </a>
+
+                                    <a class="btn btn-icon text-green-600 hover:text-green-800 transition-colors"
+                                        href="{{ route('admin.print.berita-acara', $timetable->id) }}" target="_blank"
+                                        title="Cetak Berita Acara">
+                                        <i class="fa-solid fa-file-signature"></i>
+                                    </a>
                                     @if (!$timetable->code)
                                         <button
                                             class="btn btn-icon text-green-600 hover:text-green-800 transition-colors edit-btn"

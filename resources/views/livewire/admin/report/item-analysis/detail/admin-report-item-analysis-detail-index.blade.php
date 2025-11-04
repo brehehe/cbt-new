@@ -660,7 +660,7 @@
                 </p>
             </div>
             {{-- <div class="flex space-x-3">
-                <button class="btn btn-warning" onclick="exportToExcel()">
+                <button class="{{config('app.name_slug') === 'ups_tegal' ? 'btn btn-primary' : 'btn btn-warning'}}" onclick="exportToExcel()">
                     <i class="fas fa-file-excel mr-2"></i>Export Excel
                 </button>
             </div> --}}
@@ -920,44 +920,44 @@
 
                 <!-- Group Analysis -->
                 ${analysis.upper_group_total > 0 ? `
-                                                                                        <div class="pt-6 border-t border-gray-200">
-                                                                                            <h4 class="font-semibold text-gray-800 mb-3">Analisis Kelompok (27% Atas vs 27% Bawah)</h4>
-                                                                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                                                                <div class="bg-green-50 p-4 rounded-lg">
-                                                                                                    <h5 class="font-medium text-green-800 mb-2">Kelompok Atas</h5>
-                                                                                                    <p class="text-sm text-green-600">
-                                                                                                        ${analysis.upper_group_correct} dari ${analysis.upper_group_total} peserta menjawab benar
-                                                                                                        (${((analysis.upper_group_correct / analysis.upper_group_total) * 100).toFixed(1)}%)
-                                                                                                    </p>
-                                                                                                </div>
-                                                                                                <div class="bg-red-50 p-4 rounded-lg">
-                                                                                                    <h5 class="font-medium text-red-800 mb-2">Kelompok Bawah</h5>
-                                                                                                    <p class="text-sm text-red-600">
-                                                                                                        ${analysis.lower_group_correct} dari ${analysis.lower_group_total} peserta menjawab benar
-                                                                                                        (${((analysis.lower_group_correct / analysis.lower_group_total) * 100).toFixed(1)}%)
-                                                                                                    </p>
+                                                                                            <div class="pt-6 border-t border-gray-200">
+                                                                                                <h4 class="font-semibold text-gray-800 mb-3">Analisis Kelompok (27% Atas vs 27% Bawah)</h4>
+                                                                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                                                    <div class="bg-green-50 p-4 rounded-lg">
+                                                                                                        <h5 class="font-medium text-green-800 mb-2">Kelompok Atas</h5>
+                                                                                                        <p class="text-sm text-green-600">
+                                                                                                            ${analysis.upper_group_correct} dari ${analysis.upper_group_total} peserta menjawab benar
+                                                                                                            (${((analysis.upper_group_correct / analysis.upper_group_total) * 100).toFixed(1)}%)
+                                                                                                        </p>
+                                                                                                    </div>
+                                                                                                    <div class="bg-red-50 p-4 rounded-lg">
+                                                                                                        <h5 class="font-medium text-red-800 mb-2">Kelompok Bawah</h5>
+                                                                                                        <p class="text-sm text-red-600">
+                                                                                                            ${analysis.lower_group_correct} dari ${analysis.lower_group_total} peserta menjawab benar
+                                                                                                            (${((analysis.lower_group_correct / analysis.lower_group_total) * 100).toFixed(1)}%)
+                                                                                                        </p>
+                                                                                                    </div>
                                                                                                 </div>
                                                                                             </div>
-                                                                                        </div>
-                                                                                        ` : ''}
+                                                                                            ` : ''}
 
                 <!-- Option Analysis -->
                 ${analysis.option_analysis && analysis.option_analysis.length > 0 ? `
-                                                                                        <div class="pt-6 border-t border-gray-200">
-                                                                                            <h4 class="font-semibold text-gray-800 mb-3">Analisis Opsi Jawaban</h4>
-                                                                                            <div class="overflow-x-auto">
-                                                                                                <table class="min-w-full">
-                                                                                                    <thead>
-                                                                                                        <tr class="bg-gray-50">
-                                                                                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Opsi</th>
-                                                                                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Jawaban</th>
-                                                                                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Dipilih</th>
-                                                                                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Persentase</th>
-                                                                                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                                                                                        </tr>
-                                                                                                    </thead>
-                                                                                                    <tbody class="divide-y divide-gray-200">
-                                                                                                        ${analysis.option_analysis.map((option, index) => `
+                                                                                            <div class="pt-6 border-t border-gray-200">
+                                                                                                <h4 class="font-semibold text-gray-800 mb-3">Analisis Opsi Jawaban</h4>
+                                                                                                <div class="overflow-x-auto">
+                                                                                                    <table class="min-w-full">
+                                                                                                        <thead>
+                                                                                                            <tr class="bg-gray-50">
+                                                                                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Opsi</th>
+                                                                                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Jawaban</th>
+                                                                                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Dipilih</th>
+                                                                                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Persentase</th>
+                                                                                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                                                                                            </tr>
+                                                                                                        </thead>
+                                                                                                        <tbody class="divide-y divide-gray-200">
+                                                                                                            ${analysis.option_analysis.map((option, index) => `
                                     <tr class="${option.is_correct ? 'bg-green-50' : ''}">
                                         <td class="px-3 py-2 text-sm font-medium text-gray-900">
                                             ${option.option?.alphabet || String.fromCharCode(65 + index)}
@@ -982,11 +982,11 @@
                                         </td>
                                     </tr>
                                 `).join('')}
-                                                                                                    </tbody>
-                                                                                                </table>
+                                                                                                        </tbody>
+                                                                                                    </table>
+                                                                                                </div>
                                                                                             </div>
-                                                                                        </div>
-                                                                                        ` : ''}
+                                                                                            ` : ''}
 
                 <!-- Recommendations -->
                 <div class="pt-6 border-t border-gray-200">

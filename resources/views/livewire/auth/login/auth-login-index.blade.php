@@ -335,7 +335,7 @@
                                             icon="arrow-right" position="right" type="submit" loading="login">
                                             <x-slot:text>Masuk</x-slot:text>
                                         </x-ts-button>
-                                        {{-- <button class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base text-black bg-[#f58634]">
+                                        {{-- <button class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base text-black {{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }}">
                                             Masuk
                                         </button> --}}
                                     </div>
@@ -982,7 +982,7 @@
                                             icon="arrow-right" position="right" type="submit" loading="login">
                                             <x-slot:text>Masuk</x-slot:text>
                                         </x-ts-button>
-                                        {{-- <button class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base text-black bg-[#f58634]">
+                                        {{-- <button class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base text-black {{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }}">
                                             Masuk
                                         </button> --}}
                                     </div>

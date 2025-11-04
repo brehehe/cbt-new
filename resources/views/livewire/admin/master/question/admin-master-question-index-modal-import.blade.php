@@ -36,8 +36,8 @@
             <div class="mb-4">
                 <div class="flex justify-between">
                     <label for="file_import" class="block text-sm font-medium text-gray-700">File</label>
-                    <a href="{{ asset('import/Template soal CBT.xlsx') }}"
-                        download="Template Import Soal.xlsx" class="block text-sm font-medium text-gray-500"">Download Template</a>
+                    <a href="{{ asset('import/Template soal CBT.xlsx') }}" download="Template Import Soal.xlsx"
+                        class="block text-sm font-medium text-gray-500"">Download Template</a>
                     {{-- <label for="file_import" class="block text-sm font-medium text-gray-700">File</label> --}}
                 </div>
                 {{-- <input type="file" id="file_import" wire:model.defer="file_import" placeholder="" class="mt-1 form-control"> --}}
@@ -55,7 +55,7 @@
                 Batal
             </button>
             <button wire:click='importQuestion()'
-                class="px-4 py-2 bg-[#f58634] hover:bg-[#f58634] text-white rounded-lg shadow transition">
+                class="px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} hover:{{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} text-white rounded-lg shadow transition">
                 Simpan
             </button>
         </div>

@@ -23,7 +23,7 @@ class AdminMasterExamRoomIndex extends Component
 
     public function render()
     {
-        $exam_rooms = ExamRoom::search($this->search)->select('id', 'name', 'code', 'description');
+        $exam_rooms = ExamRoom::search($this->search)->select('id', 'name', 'code', 'description', 'is_active');
         return view('livewire.admin.master.exam-room.admin-master-exam-room-index', [
             'exam_rooms' => $exam_rooms->paginate($this->perPage)
         ])->extends('layout.app')->section('content');

@@ -350,7 +350,7 @@
             isConnecting = false;
 
         const PEER_CONFIG = {
-            host: 'procbt.id',
+            host: 'ups.procbt.id',
             path: '/peerjs',
             secure: true,
             debug: 1, // 0 = silent, 1 = minimal log (recommended)

@@ -5,10 +5,11 @@
                 <h1
                     class="text-2xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
                     Pengaturan</h1>
-                <p class="text-gray-600">Kelola pengaturan perusahaan Anda dengan mudah.</p>
+                <p class="text-gray-600">Kelola pengaturan universitas Anda dengan mudah.</p>
             </div>
             <div>
-                <button wire:click="save()" class="btn btn-warning">
+                <button wire:click="save()"
+                    class="{{ config('app.name_slug') === 'ups_tegal' ? 'btn btn-primary' : 'btn btn-warning' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -19,36 +20,25 @@
         </div>
     </div>
 
-
     <div class="mb-4">
-        <div class="overflow-x-auto  w-full">
-            <nav class="flex w-full gap-2 px-2" aria-label="Tabs">
-                @foreach ($tabs as $tab)
-                    <button wire:click="setTab('{{ $tab }}')"
-                        class="text-center px-4 py-2 text-sm font-medium transition-all duration-300 cursor-pointer rounded-2xl
-                               {{ $currentTab === $tab ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-black' }}">
-                        {{ Str::title(Str::replace('-', ' ', $tab)) }}
-                    </button>
-                @endforeach
-            </nav>
-        </div>
-
         <div class="mt-4">
-            @if ($currentTab === 'perusahaan')
+            @if ($currentTab === 'universitas')
                 <div class="space-y-6 mb-2">
-                    {{-- Informasi Perusahaan --}}
+                    {{-- Informasi Universitas --}}
                     <div class="p-6 bg-white shadow rounded-lg">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Informasi Perusahaan</h2>
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Informasi Universitas</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">
-                                    Kode Perusahaan
-                                </label>
-                                <input type="text" wire:model="code" placeholder="Contoh: ABC123" disabled
-                                    class="mt-1 block w-full rounded-md border-gray-300 px-4 py-2 shadow-sm input-disabled focus:border-blue-500 focus:ring-blue-500" />
+                                <label class="block text-sm font-medium text-gray-700">Code Universitas <span
+                                        class="text-red-600">*</span></label>
+                                <input type="text" wire:model="code_name" placeholder="Contoh: 9640007"
+                                    class="mt-1 form-control" />
+                                @error('code_name')
+                                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Nama Perusahaan <span
+                                <label class="block text-sm font-medium text-gray-700">Nama Universitas <span
                                         class="text-red-600">*</span></label>
                                 <input type="text" wire:model="name" placeholder="Contoh: PT Maju Jaya"
                                     class="mt-1 form-control" />
@@ -57,9 +47,27 @@
                                 @enderror
                             </div>
                             <div>
+                                <label class="block text-sm font-medium text-gray-700">Code Wilayah <span
+                                        class="text-red-600">*</span></label>
+                                <input type="text" wire:model="code_region" placeholder="Contoh: 64"
+                                    class="mt-1 form-control" />
+                                @error('code_region')
+                                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Nama Wilayah <span
+                                        class="text-red-600">*</span></label>
+                                <input type="text" wire:model="region" placeholder="Contoh: Jawa Timur"
+                                    class="mt-1 form-control" />
+                                @error('region')
+                                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
                                 <label class="block text-sm font-medium text-gray-700">Email Resmi</label>
                                 <input type="email" wire:model="email_company"
-                                    placeholder="Contoh: info@perusahaan.com" class="mt-1 form-control" />
+                                    placeholder="Contoh: info@universitas.com" class="mt-1 form-control" />
                                 @error('email_company')
                                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                                 @enderror
@@ -76,19 +84,19 @@
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700">Website</label>
                                 <input type="url" wire:model="website"
-                                    placeholder="Contoh: https://www.perusahaan.com" class="mt-1 form-control" />
+                                    placeholder="Contoh: https://www.universitas.com" class="mt-1 form-control" />
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700">Deskripsi</label>
-                                <textarea wire:model="description" placeholder="Ceritakan secara singkat tentang perusahaan Anda..."
+                                <textarea wire:model="description" placeholder="Ceritakan secara singkat tentang universitas Anda..."
                                     class="mt-1 form-control"></textarea>
                             </div>
                         </div>
                     </div>
 
-                    {{-- Alamat Perusahaan --}}
+                    {{-- Alamat Universitas --}}
                     <div class="p-6 bg-white shadow rounded-lg">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Alamat Perusahaan</h2>
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Alamat Universitas</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Negara <span
@@ -137,7 +145,7 @@
                                 class="text-red-600">*</span></h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="{{ $logo || $logo_old ? null : 'md:col-span-2' }}">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Logo Perusahaan</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Logo Universitas</label>
 
                                 <input type="file" wire:model.live="logo"
                                     class="block text-sm text-gray-500 w-full
@@ -154,7 +162,7 @@
                                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
-                            @if ($logo)
+                            @if (is_object($logo))
                                 <div class="mt-4">
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Preview
                                         Logo:</label>
@@ -168,6 +176,43 @@
                                             Logo:</label>
                                         <img src="{{ asset('storage/' . $logo_old) }}" alt="Preview Logo"
                                             class="h-100 w-auto rounded border shadow" />
+                                    </div>
+                                @endif
+                            @endif
+
+                            <div class="{{ $logo_potrait || $logo_potrait_old ? null : 'md:col-span-2' }}">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Logo Potrait
+                                    Universitas</label>
+
+                                <input type="file" wire:model.live="logo_potrait"
+                                    class="block text-sm text-gray-500 w-full
+                                           file:px-2 file:py-1 file:rounded-md
+                                           file:border file:border-gray-300
+                                           file:text-xs file:font-medium
+                                           file:bg-blue-50 file:text-blue-700
+                                           hover:file:bg-blue-100"
+                                    accept="image/*" />
+                                <div wire:loading wire:target="logo_potrait" class="text-sm text-gray-500 mt-1">
+                                    Uploading Logo Potrait...
+                                </div>
+                                @error('logo_potrait')
+                                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            @if (is_object($logo_potrait))
+                                <div class="mt-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Preview
+                                        Logo Potrait:</label>
+                                    <img src="{{ $logo_potrait->temporaryUrl() }}" alt="Preview Logo Potrait"
+                                        class="h-100 w-auto rounded border shadow" />
+                                </div>
+                            @else
+                                @if ($logo_potrait_old)
+                                    <div class="mt-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Preview
+                                            Logo Potrait:</label>
+                                        <img src="{{ asset('storage/' . $logo_potrait_old) }}"
+                                            alt="Preview Logo Potrait" class="h-100 w-auto rounded border shadow" />
                                     </div>
                                 @endif
                             @endif
@@ -213,6 +258,20 @@
                                         class="text-red-600">*</span></label>
                                 <input type="text" wire:model="pic_email" placeholder="Contoh: 081234567890"
                                     class="mt-1 form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6 bg-white shadow rounded-lg">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Lainya</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Sembunyikan Nilai</label>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" wire:model="is_mark" class="sr-only peer">
+                                    <div
+                                        class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                                    </div>
+                                </label>
                             </div>
                         </div>
                     </div>

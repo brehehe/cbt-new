@@ -16,13 +16,17 @@ return new class extends Migration
             $table->foreignUuid('company_id')->nullable(); // parent perusahan
             $table->foreignUuid('service_id')->nullable(); // parent perusahan
             $table->char('code', 6); // Kode perusahaan
+            $table->string('code_name')->nullable(); // Nama perusahaan
             $table->string('name'); // Nama perusahaan
+            $table->string('code_region')->nullable(); // Nama perusahaan
+            $table->string('region')->nullable(); // Nama perusahaan
             $table->string('email'); // Email resmi
             $table->string('phone'); // Telepon
             $table->string('website')->nullable(); // Website
 
             // Informasi tambahan
             $table->string('logo')->nullable(); // Path logo (URL atau lokal)
+            $table->string('logo_potrait')->nullable(); // Path logo (URL atau lokal)
             $table->string('tax_id')->nullable(); // NPWP / Tax ID
             $table->string('industry')->nullable(); // Industri
             $table->text('description')->nullable(); // Deskripsi perusahaan
@@ -41,6 +45,7 @@ return new class extends Migration
             $table->boolean('is_central')->default(false);
             $table->boolean('is_main')->default(false); //
             $table->boolean('is_lifetime')->default(false);
+            $table->boolean('is_mark')->default(false);
 
             //akses token
             $table->longText('one_health_access_token')->nullable()->comment('save auth access token');
