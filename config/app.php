@@ -123,5 +123,6 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
-    'name_slug' => env('APP_SLUG_NAME')
+    'name_slug' => env('APP_SLUG_NAME'),
+    'import_question' => env('IMPORT_QUESTION', false)
 ];

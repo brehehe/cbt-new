@@ -2,6 +2,8 @@
 
 namespace App\Jobs\Question;
 
+use App\Models\Master\Question\Material;
+use App\Models\Master\Question\MaterialCategory;
 use App\Models\Master\Question\QuestionType;
 use App\Models\Master\Question\Topic;
 use App\Models\Study\Study;
@@ -11,7 +13,7 @@ use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Auth;
-use Log;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class QuestionImportJob implements ShouldQueue
@@ -43,37 +45,71 @@ class QuestionImportJob implements ShouldQueue
                     continue;
                 }
 
-                $question_type = QuestionType::withoutGlobalScopes()->whereLike('name', "%$value[4]%")->first();
-
-                if (!$question_type || !$value[5]) continue;
-
-                for ($j = 7; $j < 10; $j++) { 
-                    if (!$value[$i]) continue;
+                if (!$value[0] || !$value[1] || !$value[4] || !$value[5]) {
+                    Log::warning("Data soal tidak bisa masuk, ada field yang kosong", [
+                        'collection' => $value,
+                    ]);
+                    continue;
                 }
 
-                $study = Study::withoutGlobalScopes()->whereLike('name', "%{$value[0]}%")->first() ??
-                    Study::create([
-                        'company_id' => $this->user?->company?->id,
-                        'name' => $value[0]
-                    ]);
+                $question_type = QuestionType::withoutGlobalScopes()->whereLike('name', "%$value[4]%")->first();
 
-                $topic = $study?->topics()->withoutGlobalScopes()->whereLike('name', "%{$value[1]}%")->first() ?? 
-                    $study->topics()->create([
-                        'company_id' => $this->user?->company?->id,
-                        'name' => $value[1]
+                if (!$question_type) {
+                     Log::warning("Data soal tidak bisa masuk, karena Tipe Soal tidak ditemukan", [
+                        'collection' => $value,
                     ]);
+                    continue;
+                };
 
-                $material_category = $topic?->materialCategories()->withoutGlobalScopes()->whereLike('name', "%$value[2]%")->first() ??
-                     $topic?->materialCategories()->create([
-                        'company_id' => $this->user?->company?->id,
-                        'name' => $value[2]
-                     ]);
+                for ($j = 7; $j < 10; $j++) {
+                    if (!$value[$j]) {
+                        Log::warning("Data soal tidak bisa masuk, karena jawaban kosong ", [
+                            'collection' => $value,
+                        ]);
+                        continue;
+                    }
+                }
 
-                $material = $material_category?->materials()->withoutGlobalScopes()->whereLike('name', "%$value[3]%")->first() ??
-                    $material_category?->materials()->create([
+                $study = Study::withoutGlobalScopes()->whereLike('name', "%{$value[0]}%")->first();
+
+                if (!$study && $value[0]) {
+                    $study = Study::create([
                         'company_id' => $this->user?->company?->id,
-                        'name' => $value[3]
+                        'name'       => $value[0]
                     ]);
+                }
+
+                $topic = $study?->topics()->withoutGlobalScopes()->whereLike('name', "%{$value[1]}%")->first();
+
+                if (!$topic && $value[1]) {
+                    $topic = Topic::create([
+                        'company_id' => $this->user?->company?->id,
+                        'study_id'   => $study?->id,
+                        'name'       => $value[1]
+                    ]);
+                }
+
+                $material_category = $topic?->materialCategories()->withoutGlobalScopes()->whereLike('name', "%$value[2]%")->first();
+
+                if (!$material_category && $value[2]) {
+                    $material_category = MaterialCategory::create([
+                        'company_id' => $this->user?->company?->id,
+                        'topic_id'   => $topic?->id,
+                        'name'       => $value[2]
+                    ]);
+                }
+
+                $material = $material_category?->materials()->withoutGlobalScopes()->whereLike('name', "%$value[3]%")->first();
+
+                if (!$material && $value[3]) {
+                    Material::create([
+                        'company_id'           => $this->user?->company?->id,
+                        'topic_id'             => $topic?->id,
+                        'material_category_id' => $material_category?->id,
+                        'level'                => 1,
+                        'name'                 => $value[3],
+                    ]);
+                }
 
                 $request_question = [
                     'user_id'              => $this->user?->id,
