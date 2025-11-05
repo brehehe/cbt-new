@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PRO CBT - Admin Login</title>
+        <title>{{ config('app.name') }} - Admin Login</title>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
             rel="stylesheet">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -41,7 +41,7 @@
 
                 <!-- Logo & Welcome -->
                 <div class="flex flex-col items-center mb-6">
-                    <img src="{{ Vite::asset('resources/img/logo_m.png') }}" alt="PRO CBT Logo"
+                    <img src="{{ Vite::asset('resources/img/logo_m.png') }}" alt="{{ config('app.name') }} Logo"
                         class="h-12 drop-shadow-md mb-4">
                     <h1
                         class="text-2xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
@@ -149,7 +149,7 @@
 
                 <!-- Footer -->
                 <div class="mt-6 text-center text-xs text-gray-500">
-                    <p>© 2024 PRO CBT. All rights reserved.</p>
+                    <p>© 2024 {{ config('app.name') }}. All rights reserved.</p>
                     <p class="mt-0.5">Secure login • Admin Portal</p>
                 </div>
             </div>

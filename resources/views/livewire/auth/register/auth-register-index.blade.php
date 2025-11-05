@@ -381,7 +381,7 @@
 
                 <!-- Logo & Title -->
                 <div class="flex flex-col items-center mb-6">
-                    <img src="{{ asset('asset/img/logo.png') }}" alt="PRO CBT Logo" class="h-12 drop-shadow-md">
+                    <img src="{{ asset('asset/img/logo.png') }}" alt="{{ config('app.name') }} Logo" class="h-12 drop-shadow-md">
                     <h1
                         class="text-2xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
                         Buat Akun Anda</h1>
@@ -906,7 +906,7 @@
 
                 <!-- Footer -->
                 <div class="mt-6 text-center text-xs text-gray-500">
-                    <p>© 2024 PRO CBT. All rights reserved.</p>
+                    <p>© 2024 {{ config('app.name') }}. All rights reserved.</p>
                     <p class="mt-0.5">Secure registration • Admin Portal</p>
                 </div>
             </div>

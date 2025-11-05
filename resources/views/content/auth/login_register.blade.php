@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PRO CBT - Register</title>
+        <title>{{ config('app.name') }} - Register</title>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
             rel="stylesheet">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -217,7 +217,7 @@
 
                 <!-- Footer -->
                 <div class="mt-6 text-center text-xs text-gray-500">
-                    <p>© 2024 PRO CBT. All rights reserved.</p>
+                    <p>© 2025 {{ config('app.name') }}. All rights reserved.</p>
                     <p class="mt-0.5">Secure registration • Admin Portal</p>
                 </div>
             </div>
