@@ -429,7 +429,7 @@
 <script>
         let peer=null, localStream=null, activeSessions=[], isConnecting=false;
         const PEER_CONFIG = {
-        host: 'ups.procbt.id',
+        host: 'procbt.id',
         path: '/peerjs',
         secure: true,
         debug: 0,

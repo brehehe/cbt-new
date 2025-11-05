@@ -1041,6 +1041,7 @@
                 'http://localhost:4445' :
                 'https://procbt.id';
                 'https://ups.procbt.id';
+                'https://cbtfk.upstegal.ac.id';
 
             const waitSocketConnected = (socket) =>
                 new Promise((res, rej) => {

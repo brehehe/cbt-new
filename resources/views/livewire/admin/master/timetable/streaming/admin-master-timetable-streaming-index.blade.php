@@ -206,7 +206,7 @@
                     path: '/peerjs',
                     secure: false
                 } : {
-                    host: 'ups.procbt.id',
+                    host: 'procbt.id',
                     path: '/peerjs',
                     secure: true
                 };

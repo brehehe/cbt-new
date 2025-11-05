@@ -661,9 +661,9 @@
                             </div>
 
                             <!-- Footer -->
-                            <p class="text-xs font-medium text-gray-500">
+                            <!-- <p class="text-xs font-medium text-gray-500">
                                 © {{ date('Y') }} PRO CBT
-                            </p>
+                            </p> -->
                         </div>
                     </div>
                 </div>
