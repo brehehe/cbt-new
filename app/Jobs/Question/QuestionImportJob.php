@@ -43,17 +43,37 @@ class QuestionImportJob implements ShouldQueue
                     continue;
                 }
 
-                $study = Study::withoutGlobalScopes()->whereLike('name', "%{$value[0]}%")->first();
-
-                $topic = $study->topics()->withoutGlobalScopes()->whereLike('name', "%{$value[1]}%")->first();
-
-                $material_category = $topic?->materialCategories()->withoutGlobalScopes()->whereLike('name', "%$value[2]%")->first();
-
-                $material = $material_category?->materials()->withoutGlobalScopes()->whereLike('name', "%$value[3]%")->first();
-
                 $question_type = QuestionType::withoutGlobalScopes()->whereLike('name', "%$value[4]%")->first();
 
                 if (!$question_type || !$value[5]) continue;
+
+                for ($j = 7; $j < 10; $j++) { 
+                    if (!$value[$i]) continue;
+                }
+
+                $study = Study::withoutGlobalScopes()->whereLike('name', "%{$value[0]}%")->first() ??
+                    Study::create([
+                        'company_id' => $this->user?->company?->id,
+                        'name' => $value[0]
+                    ]);
+
+                $topic = $study?->topics()->withoutGlobalScopes()->whereLike('name', "%{$value[1]}%")->first() ?? 
+                    $study->topics()->create([
+                        'company_id' => $this->user?->company?->id,
+                        'name' => $value[1]
+                    ]);
+
+                $material_category = $topic?->materialCategories()->withoutGlobalScopes()->whereLike('name', "%$value[2]%")->first() ??
+                     $topic?->materialCategories()->create([
+                        'company_id' => $this->user?->company?->id,
+                        'name' => $value[2]
+                     ]);
+
+                $material = $material_category?->materials()->withoutGlobalScopes()->whereLike('name', "%$value[3]%")->first() ??
+                    $material_category?->materials()->create([
+                        'company_id' => $this->user?->company?->id,
+                        'name' => $value[3]
+                    ]);
 
                 $request_question = [
                     'user_id'              => $this->user?->id,
