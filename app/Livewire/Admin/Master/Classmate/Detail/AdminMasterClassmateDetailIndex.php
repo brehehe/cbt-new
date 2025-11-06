@@ -103,6 +103,24 @@ class AdminMasterClassmateDetailIndex extends Component
         }
     }
 
+    public function toggleSelectAllAllPages($selectAll = true)
+    {
+        // Ambil semua ID sesuai filter aktif tanpa memuat data berat
+        $ids = User::role(['Mahasiswa'])
+            ->where('type_study', $this->type_study)
+            ->search($this->search)
+            ->whereNotIn('id', ClassmateStudent::select('user_id')->get()->pluck('user_id')->toArray() ?? [])
+            ->pluck('id');
+
+        foreach ($ids as $id) {
+            if ($selectAll) {
+                $this->selectedStudents[$id] = true;
+            } else {
+                unset($this->selectedStudents[$id]);
+            }
+        }
+    }
+
     public function submitModuleStudent()
     {
         if (count($this->selectedStudents) > 0) {
