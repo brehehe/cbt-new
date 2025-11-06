@@ -38,10 +38,10 @@
                         <span class="mx-2 text-gray-400">|</span> --}}
                         <button type="button" wire:click="toggleSelectAllAllPages(true)"
                             class="px-3 py-1.5 text-sm rounded-md bg-emerald-600 text-white hover:bg-emerald-700 focus:outline-none">Pilih
-                            Semua (Semua Halaman)</button>
+                            Semua</button>
                         <button type="button" wire:click="toggleSelectAllAllPages(false)"
                             class="px-3 py-1.5 text-sm rounded-md bg-slate-600 text-white hover:bg-slate-700 focus:outline-none">Batalkan
-                            Semua (Semua Halaman)</button>
+                            Semua</button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full table-auto divide-y divide-gray-200">
