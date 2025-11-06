@@ -32,10 +32,15 @@
                 </div>
                 <!-- Table Section -->
                 <div class="bg-white rounded-lg shadow border">
+                    <div class="flex items-center justify-end gap-2 px-5 py-3 border-b bg-gray-50/70">
+                        <button type="button" wire:click="toggleSelectAllOnPage(true)" class="px-3 py-1.5 text-sm rounded-md bg-green-600 text-white hover:bg-green-700 focus:outline-none">Pilih Semua</button>
+                        <button type="button" wire:click="toggleSelectAllOnPage(false)" class="px-3 py-1.5 text-sm rounded-md bg-gray-600 text-white hover:bg-gray-700 focus:outline-none">Batalkan Semua</button>
+                    </div>
                     <div class="overflow-x-auto">
                         <table class="w-full table-auto divide-y divide-gray-200">
                             <thead class="bg-gray-50 sticky top-0 z-10">
                                 <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pilih</th>
                                     <th
                                         class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         No</th>
@@ -54,6 +59,9 @@
                                 @forelse($mahasiswas as $index => $result)
                                     <tr class="hover:bg-gray-50 cursor-pointer {{ $selectedStudents[$result->id] ?? false ? 'bg-yellow-100' : '' }}"
                                         wire:click="choiceQuestion('{{ $result->id }}')">
+                                        <td class="px-4 py-3">
+                                            <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" onclick="event.stopPropagation()" wire:model.live="selectedStudents.{{ $result->id }}">
+                                        </td>
                                         <td class="px-4 py-3 text-sm text-gray-900">
                                             {{ $mahasiswas->firstItem() + $index }}
                                         </td>

