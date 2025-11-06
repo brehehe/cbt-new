@@ -29,7 +29,7 @@
         <div class="flex justify-between items-center">
             <div>
                 <h1
-                    class="text-lg font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} mb-1">
+                    class="text-lg font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} mb-1">
                     Analisis Butir Soal</h1>
                 <div class="text-xs text-gray-600">
                     <span class="font-medium">{{ $timetable->name ?? 'N/A' }}</span> •
@@ -153,7 +153,7 @@
                                     <span class="text-red-600">Perbaiki soal</span>
                                 @elseif($analysis['difficulty_index'] > 0.7)
                                     <span
-                                        class="{{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }}">Persulit</span>
+                                        class="{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-blue-600' : 'text-orange-600' }}">Persulit</span>
                                 @else
                                     <span class="text-green-600">Baik</span>
                                 @endif

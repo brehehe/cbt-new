@@ -4,13 +4,13 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1
-                    class="text-2xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                    class="text-2xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
                     Manajemen Data Pengawas</h1>
                 <p class="text-gray-600">Kelola data pengawas dalam sistem CBT</p>
             </div>
             <div>
                 <button wire:click="openModal()"
-                    class="{{ config('app.name_slug') === 'ups_tegal' ? 'btn btn-primary' : 'btn btn-warning' }}">
+                    class="{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'btn btn-primary' : 'btn btn-warning' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />

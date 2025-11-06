@@ -9,10 +9,10 @@
             <div class="space-y-6">
                 <div class="p-4 rounded-lg bg-orange-50">
                     <h2
-                        class="mb-2 font-semibold {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-800' : 'text-orange-800' }}">
+                        class="mb-2 font-semibold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-blue-800' : 'text-orange-800' }}">
                         Informasi Ujian</h2>
                     <div
-                        class="grid grid-cols-2 gap-4 text-sm {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-700' : 'text-orange-700' }}">
+                        class="grid grid-cols-2 gap-4 text-sm {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-blue-700' : 'text-orange-700' }}">
                         <div>
                             <p><span class="font-medium">Modul:</span>
                                 {{ $userTimetable->timetable->module->name ?? '-' }}</p>
@@ -83,7 +83,7 @@
                 <!-- Action Button -->
                 <div class="flex justify-center mt-8">
                     <button id="startExam" disabled wire:click="confirmStartUjian()"
-                        class="px-6 py-3 font-medium text-white transition-colors {{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} rounded-lg hover:{{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} disabled:bg-gray-300 disabled:cursor-not-allowed">
+                        class="px-6 py-3 font-medium text-white transition-colors {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} rounded-lg hover:{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} disabled:bg-gray-300 disabled:cursor-not-allowed">
                         Mulai Ujian
                     </button>
                 </div>

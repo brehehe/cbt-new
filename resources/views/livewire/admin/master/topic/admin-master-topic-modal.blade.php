@@ -59,7 +59,7 @@
                 Batal
             </button>
             <button wire:click='submit'
-                class="px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} hover:{{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} text-white rounded-lg shadow transition">
+                class="px-4 py-2 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} hover:{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} text-white rounded-lg shadow transition">
                 Simpan
             </button>
         </div>

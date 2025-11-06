@@ -28,8 +28,8 @@
                 </label>
 
                 @php
-                    $brandBg = config('app.name_slug') === 'ups_tegal' ? 'bg-blue-600' : 'bg-orange-600';
-                    $brandBorder = config('app.name_slug') === 'ups_tegal' ? 'border-blue-600' : 'border-orange-600';
+                    $brandBg = in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'bg-blue-600' : 'bg-orange-600';
+                    $brandBorder = in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'border-blue-600' : 'border-orange-600';
                 @endphp
 
                 <div class="mt-2 flex space-x-2">
@@ -437,7 +437,7 @@
                 Batal
             </button>
             <button wire:click='submit'
-                class="px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} hover:{{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} text-white rounded-lg shadow transition">
+                class="px-4 py-2 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} hover:{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} text-white rounded-lg shadow transition">
                 {{ $data_id ? 'Update' : 'Simpan' }}
             </button>
         </div>

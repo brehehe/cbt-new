@@ -6,7 +6,7 @@
     <div class="flex-shrink-0 h-16 flex items-center gap-3 px-6 border-b border-gray-100">
         <div>
             @php
-                $brandColor = config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]';
+                $brandColor = in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]';
             @endphp
             <h2 class="text-lg font-bold {{ $brandColor }}">PROCBT</h2>
             <p class="text-xs text-gray-500">Healthcare System</p>
@@ -20,7 +20,7 @@
                 <!-- Dashboard -->
                 @php
                     $isActive = Request::is('admin');
-                    $brandColor = config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]';
+                    $brandColor = in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]';
                 @endphp
 
                 <a href="/admin"

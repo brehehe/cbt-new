@@ -36,7 +36,7 @@
             </button>
             <button wire:click="submitQuestion"
                 class="px-4 py-2
-        {{ config('app.name_slug') === 'ups_tegal'
+        {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma'])
             ? 'bg-[#2b7fff] hover:bg-[#1e6ee6]'
             : 'bg-[#f58634] hover:bg-[#e26f20]' }}
         text-white rounded-lg shadow transition">

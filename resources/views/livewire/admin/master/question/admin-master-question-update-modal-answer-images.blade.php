@@ -36,7 +36,7 @@
                 Batal
             </button>
             @php
-                $isUpsTegal = config('app.name_slug') === 'ups_tegal';
+                $isUpsTegal = in_array(config('app.name_slug'), ['ups_tegal', 'unimma']);
             @endphp
 
             <button wire:click="submitAnswer"

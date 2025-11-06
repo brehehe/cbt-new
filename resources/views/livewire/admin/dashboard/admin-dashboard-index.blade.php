@@ -375,7 +375,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1
-                    class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                    class="text-3xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
                     Selamat datang kembali,
                     {{ Auth::user()->name ?? 'Admin' }}!</h1>
                 <p class="text-gray-600 mt-1">Berikut aktivitas sistem CBT Anda hari ini.</p>
@@ -386,7 +386,7 @@
                 {{-- <label class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" id="autoRefresh" class="sr-only peer" checked>
                     <div
-                        class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#f58634]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:{{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }}">
+                        class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#f58634]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }}">
                     </div>
                     <span class="ml-3 text-sm font-medium text-gray-600">Segarkan Otomatis</span>
                 </label> --}}
@@ -399,7 +399,7 @@
 
                 <!-- Refresh Button -->
                 <button wire:click="refreshData" id="refreshButton"
-                    class="inline-flex items-center px-4 py-2 {{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} hover:{{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                    class="inline-flex items-center px-4 py-2 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} hover:{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} text-white text-sm font-medium rounded-lg transition-colors duration-200">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
@@ -425,7 +425,7 @@
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Total Pengguna</p>
                     <h3
-                        class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        class="text-3xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
                         {{ number_format($totalUsers) }}</h3>
                     <div class="flex items-center mt-2">
                         <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
@@ -438,7 +438,7 @@
                     </div>
                 </div>
                 <div class="bg-gradient-to-br from-[#f58634]/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
-                    <svg class="w-8 h-8 {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}"
+                    <svg class="w-8 h-8 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -454,7 +454,7 @@
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Ujian Hari Ini</p>
                     <h3
-                        class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        class="text-3xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
                         {{ $todayExams }}</h3>
                     <div class="flex items-center mt-2">
                         <div class="w-2 h-2 bg-blue-500 rounded-full pulse-dot mr-2"></div>
@@ -477,16 +477,16 @@
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Ujian Aktif</p>
                     <h3
-                        class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        class="text-3xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
                         {{ $activeExams }}</h3>
                     <div class="flex items-center mt-2">
                         @if ($activeExams > 0)
                             <div
                                 class="w-2 h-2 rounded-full pulse-dot mr-2
-                                    {{ config('app.name_slug') === 'ups_tegal' ? 'bg-blue-500' : 'bg-orange-500' }}">
+                                    {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'bg-blue-500' : 'bg-orange-500' }}">
                             </div>
                             <span
-                                class="text-xs {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }}">Sedang
+                                class="text-xs {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-blue-600' : 'text-orange-600' }}">Sedang
                                 berlangsung</span>
                         @else
                             <span class="text-xs text-gray-500">Tidak ada ujian aktif</span>
@@ -494,7 +494,7 @@
                     </div>
                 </div>
                 <div class="bg-gradient-to-br from-orange-500/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
-                    <svg class="w-8 h-8 {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }}"
+                    <svg class="w-8 h-8 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-blue-600' : 'text-orange-600' }}"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -510,7 +510,7 @@
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Peringatan Keamanan</p>
                     <h3
-                        class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        class="text-3xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
                         {{ $examAlerts }}</h3>
                     <div class="flex items-center mt-2">
                         @if ($examAlerts > 0)
@@ -621,7 +621,7 @@
                 <h3 class="text-lg font-semibold text-gray-800">Tren Ujian Mingguan</h3>
                 <div class="flex items-center space-x-2">
                     <div
-                        class="w-3 h-3 {{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} rounded-full">
+                        class="w-3 h-3 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} rounded-full">
                     </div>
                     <span class="text-sm text-gray-600">Ujian Dimulai</span>
                 </div>
@@ -698,7 +698,7 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-800">Pemantauan Sesi Langsung</h3>
                 <a href="{{ route('admin.exam.live-stream') }}"
-                    class="{{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#2d8c5b] text-sm font-medium">
+                    class="{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#2d8c5b] text-sm font-medium">
                     Lihat Semua →
                 </a>
             </div>
@@ -720,7 +720,7 @@
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-gray-600">Masalah Kamera</span>
                         <span
-                            class="font-medium {{ config('app.name_slug') === 'ups_tegal' ? 'text-blue-600' : 'text-orange-600' }}">{{ $liveSessionStats['camera_issues'] ?? 0 }}</span>
+                            class="font-medium {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-blue-600' : 'text-orange-600' }}">{{ $liveSessionStats['camera_issues'] ?? 0 }}</span>
                     </div>
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-gray-600">Masalah Koneksi</span>
@@ -747,7 +747,7 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-800">Peringatan Kritis (24 Jam Terakhir)</h3>
                 <a href="{{ route('admin.exam.monitor') }}"
-                    class="{{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#2d8c5b] text-sm font-medium">
+                    class="{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#2d8c5b] text-sm font-medium">
                     View All →
                 </a>
             </div>
@@ -796,7 +796,7 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-800">Ujian Mendatang</h3>
                 <a href="{{ route('admin.exam.timetable') }}"
-                    class="{{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#2d8c5b] text-sm font-medium">
+                    class="{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#2d8c5b] text-sm font-medium">
                     Kelola →
                 </a>
             </div>
@@ -839,7 +839,7 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-800">Hasil Ujian Terbaru</h3>
                 <a href="{{ route('admin.report.item-analysis') }}"
-                    class="{{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#2d8c5b] text-sm font-medium">
+                    class="{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#2d8c5b] text-sm font-medium">
                     Lihat Laporan →
                 </a>
             </div>

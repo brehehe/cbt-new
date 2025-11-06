@@ -190,7 +190,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1
-                    class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                    class="text-3xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
                     Monitoring Center - {{ Auth::user()->name ?? 'Pengawas' }}
                 </h1>
                 <p class="text-gray-600 mt-1">Pantau ujian dan deteksi pelanggaran secara real-time</p>
@@ -212,7 +212,7 @@
                 <label class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" id="autoRefresh" class="sr-only peer" checked>
                     <div
-                        class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#f58634]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:{{ config('app.name_slug') === 'ups_tegal' ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }}">
+                        class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#f58634]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }}">
                     </div>
                     <span class="ml-3 text-sm font-medium text-gray-600">Auto Refresh</span>
                 </label>
@@ -235,7 +235,7 @@
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Peserta Aktif</p>
                     <h3
-                        class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        class="text-3xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
                         {{ $activeExaminees ?? 0 }}</h3>
                     <div class="flex items-center mt-2">
                         <div class="w-2 h-2 bg-green-500 rounded-full pulse-dot mr-2"></div>
@@ -243,7 +243,7 @@
                     </div>
                 </div>
                 <div class="bg-gradient-to-br from-[#f58634]/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
-                    <svg class="w-8 h-8 {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}"
+                    <svg class="w-8 h-8 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
@@ -260,7 +260,7 @@
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Peringatan Keamanan</p>
                     <h3
-                        class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        class="text-3xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
                         {{ $securityAlerts ?? 0 }}</h3>
                     <div class="flex items-center mt-2">
                         @if (($criticalAlerts ?? 0) > 0)
@@ -288,7 +288,7 @@
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Masalah Kamera</p>
                     <h3
-                        class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        class="text-3xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
                         {{ $cameraIssues ?? 0 }}</h3>
                     <div class="flex items-center mt-2">
                         <span class="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
@@ -313,7 +313,7 @@
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Ruang Ujian Aktif</p>
                     <h3
-                        class="text-3xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        class="text-3xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
                         {{ $activeRooms ?? 0 }}</h3>
                     <div class="flex items-center mt-2">
                         <span class="text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded-full">
