@@ -39,6 +39,7 @@ class DatabaseSeeder extends Seeder
             QuestionSeeder::class,
 
             UserDetailSeeder::class,
+            QuestionPaketSeeder::class,
         ]);
     }
 }
