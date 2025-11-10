@@ -668,7 +668,7 @@
                 </div>
             </div>
         </div>
-        @elseif (config('app.name_slug') == 'ups_tegal')
+    @elseif (config('app.name_slug') == 'ups_tegal')
         <div class="relative h-screen overflow-hidden bg-[#dce0f4]">
             <!-- Advanced Animated Background -->
             <div class="absolute inset-0">
@@ -851,7 +851,7 @@
                                         </div>
                                     </div>
 
-                                    <h2 class="mb-1 text-xl font-bold text-gray-800 lg:mb-2 lg:text-2xl">Universitas Muhammadiyah Magelang</h2>
+                                    <h2 class="mb-1 text-xl font-bold text-gray-800 lg:mb-2 lg:text-2xl">Universitas Pancasakti Tegal</h2>
                                     <p class="text-sm text-gray-600 lg:text-base">Masuk ke sistem CBT</p>
                                 </div>
 
