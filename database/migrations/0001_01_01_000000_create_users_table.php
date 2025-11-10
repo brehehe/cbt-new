@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('nim')->nullable();
             $table->string('username')->nullable();
+            $table->text('photo')->nullable();
             $table->char('phone', 15)->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->jsonb('studys')->nullable()->comment('Array of study programs or departments');
@@ -28,7 +29,7 @@ return new class extends Migration
             $table->bigInteger('order')->default(0);
             $table->jsonb('alternative_contacts')->nullable()->after('phone')->comment('Alternative emails/phones for different contexts');
             $table->enum('type_user', ['employee', 'patient'])->default('employee')->comment('Type of user: employee, or patient');
-            $table->enum('type_study',['default','mahasiswa','general'])->default('default')->comment('Type of study: default, mahasiswa, or general');
+            $table->enum('type_study', ['default', 'mahasiswa', 'general'])->default('default')->comment('Type of study: default, mahasiswa, or general');
             $table->boolean('is_head')->default(true)->comment('Apakah role ini adalah kepala dari perusahaan atau tidak');
             $table->boolean('is_active')->default(true)->comment('Status aktif dari role ini');
             $table->rememberToken();

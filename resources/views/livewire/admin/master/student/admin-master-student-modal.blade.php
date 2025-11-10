@@ -28,8 +28,12 @@
                 </label>
 
                 @php
-                    $brandBg = in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'bg-blue-600' : 'bg-orange-600';
-                    $brandBorder = in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'border-blue-600' : 'border-orange-600';
+                    $brandBg = in_array(config('app.name_slug'), ['ups_tegal', 'unimma'])
+                        ? 'bg-blue-600'
+                        : 'bg-orange-600';
+                    $brandBorder = in_array(config('app.name_slug'), ['ups_tegal', 'unimma'])
+                        ? 'border-blue-600'
+                        : 'border-orange-600';
                 @endphp
 
                 <div class="mt-2 flex space-x-2">
@@ -113,6 +117,44 @@
                             @enderror
                         </div>
                     </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="{{ $profile || $profile_old ? null : 'md:col-span-2' }}">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Foto</label>
+
+                        <input type="file" wire:model.live="profile"
+                            class="block text-sm text-gray-500 w-full
+                                           file:px-2 file:py-1 file:rounded-md
+                                           file:border file:border-gray-300
+                                           file:text-xs file:font-medium
+                                           file:bg-blue-50 file:text-blue-700
+                                           hover:file:bg-blue-100"
+                            accept="image/*" />
+                        <div wire:loading wire:target="profile" class="text-sm text-gray-500 mt-1">
+                            Uploading profile...
+                        </div>
+                        @error('profile')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    @if (is_object($profile))
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Preview
+                                profile:</label>
+                            <img src="{{ $profile->temporaryUrl() }}" alt="Preview profile"
+                                class="h-100 w-auto rounded border shadow" />
+                        </div>
+                    @else
+                        @if ($profile_old)
+                            <div class="mt-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Preview
+                                    profile:</label>
+                                <img src="{{ asset('storage/' . $profile_old) }}" alt="Preview profile"
+                                    class="h-100 w-auto rounded border shadow" />
+                            </div>
+                        @endif
+                    @endif
                 </div>
 
                 <!-- Academic Information Section -->
@@ -358,44 +400,88 @@
                     </div>
                 </div>
             @elseif($type_study === 'general')
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700">Nama <span
-                                class="text-red-600">*</span></label>
-                        <input id="name" type="name" wire:model.defer="name" placeholder="Contoh : Admin"
-                            class="mt-1 form-control">
-                        @error('name')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label for="username" class="block text-sm font-medium text-gray-700">Username <span
-                                class="text-red-600">*</span></label>
-                        <input id="username" type="name" wire:model.defer="username"
-                            placeholder="Contoh : Admin" class="mt-1 form-control">
-                        @error('username')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
+                <div class="mb-4">
+                    <label for="name" class="block text-sm font-medium text-gray-700">Nama <span
+                            class="text-red-600">*</span></label>
+                    <input id="name" type="name" wire:model.defer="name" placeholder="Contoh : Admin"
+                        class="mt-1 form-control">
+                    @error('name')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div class="mb-4">
+                    <label for="nim" class="block text-sm font-medium text-gray-700">NIM <span
+                            class="text-red-600">*</span></label>
+                    <input id="nim" type="text" wire:model.defer="nim" placeholder="Contoh: 20241001"
+                        class="mt-1 form-control">
+                    @error('nim')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div class="mb-4">
+                    <label for="username" class="block text-sm font-medium text-gray-700">Username <span
+                            class="text-red-600">*</span></label>
+                    <input id="username" type="name" wire:model.defer="username" placeholder="Contoh : Admin"
+                        class="mt-1 form-control">
+                    @error('username')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                    <div class="mb-4">
-                        <label for="email" class="block text-sm font-medium text-gray-700">Email <span
-                                class="text-red-600">*</span></label>
-                        <input id="email" type="email" wire:model.defer="email"
-                            placeholder="Contoh : admin@gmail.com" class="mt-1 form-control">
-                        @error('email')
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email <span
+                            class="text-red-600">*</span></label>
+                    <input id="email" type="email" wire:model.defer="email"
+                        placeholder="Contoh : admin@gmail.com" class="mt-1 form-control">
+                    @error('email')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div class="grid grid-cols-2 gap-2 mb-4">
+                    <div class="{{ $profile || $profile_old ? null : 'md:col-span-2' }}">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Foto</label>
+
+                        <input type="file" wire:model.live="profile"
+                            class="block text-sm text-gray-500 w-full
+                                           file:px-2 file:py-1 file:rounded-md
+                                           file:border file:border-gray-300
+                                           file:text-xs file:font-medium
+                                           file:bg-blue-50 file:text-blue-700
+                                           hover:file:bg-blue-100"
+                            accept="image/*" />
+                        <div wire:loading wire:target="profile" class="text-sm text-gray-500 mt-1">
+                            Uploading profile...
+                        </div>
+                        @error('profile')
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div class="mb-4">
-                        <label for="phone" class="block text-sm font-medium text-gray-700">Nomor Telepon <span
-                                class="text-red-600">*</span></label>
-                        <input id="phone" type="number" wire:model.defer="phone"
-                            placeholder="Contoh : 081234567890" class="mt-1 form-control">
-                        @error('phone')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    @if (is_object($profile))
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Preview
+                                profile:</label>
+                            <img src="{{ $profile->temporaryUrl() }}" alt="Preview profile"
+                                class="h-100 w-auto rounded border shadow" />
+                        </div>
+                    @else
+                        @if ($profile_old)
+                            <div class="mt-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Preview
+                                    profile:</label>
+                                <img src="{{ asset('storage/' . $profile_old) }}" alt="Preview profile"
+                                    class="h-100 w-auto rounded border shadow" />
+                            </div>
+                        @endif
+                    @endif
+                </div>
+                <div class="mb-4">
+                    <label for="phone" class="block text-sm font-medium text-gray-700">Nomor Telepon <span
+                            class="text-red-600">*</span></label>
+                    <input id="phone" type="number" wire:model.defer="phone"
+                        placeholder="Contoh : 081234567890" class="mt-1 form-control">
+                    @error('phone')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="mb-4">

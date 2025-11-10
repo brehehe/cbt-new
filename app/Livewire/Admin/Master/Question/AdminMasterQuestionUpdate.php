@@ -39,7 +39,7 @@ class AdminMasterQuestionUpdate extends Component
 
     public function render()
     {
-        $answers = $this->get_question->answers()->search($this->search)->get();
+        $answers = $this->get_question->answers()->orderBy('order', 'asc')->search($this->search)->get();
         return view('livewire.admin.master.question.admin-master-question-update', [
             'answers' => $answers
         ])->extends('layout.app')->section('content');

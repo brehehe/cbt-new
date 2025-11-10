@@ -90,22 +90,33 @@
                         <th class="border border-gray-400 p-1 w-8">No.</th>
                         <th class="border border-gray-400 p-1">Nomor Peserta</th>
                         <th class="border border-gray-400 p-1">Nama Peserta</th>
+                        <th class="border border-gray-400 p-1">Foto Peserta</th>
                         <th class="border border-gray-400 p-1">Tanda Tangan</th>
                         <th class="border border-gray-400 p-1">Keterangan</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($classmateDetail as $class)
+                        @php
+                            $profile = $class->user->profile
+                                ? asset('storage/' . $class->user->profile)
+                                : auth()->user()->profile ?? asset('asset/img/profile.png');
+                        @endphp
                         <tr class="h-6">
                             <td class="border border-gray-400">{{ $loop->iteration }}</td>
-                            <td class="border border-gray-400">{{ $class->user_id }}</td>
+                            <td class="border border-gray-400">{{ $class->user->nim }}</td>
                             <td class="border border-gray-400 text-left pl-2">{{ $class->user->name }}</td>
+                            <td class="border border-gray-400 p-1">
+                                <img src="{{ $profile }}" alt="Foto Peserta" class="mx-auto object-cover"
+                                    style="width: 100px;">
+                            </td>
                             <td class="border border-gray-400"></td>
                             <td class="border border-gray-400"></td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
+
 
             <!-- Keterangan -->
             <div class="mt-3 text-[10px] leading-tight">

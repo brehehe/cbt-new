@@ -118,7 +118,9 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $result?->topic?->name }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $result?->question }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
+                                {{ Str::limit($result?->question, 120) }}
+                            </td>
                             <td class="center">
                                 <div class="flex items-center">
                                     <a class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn"

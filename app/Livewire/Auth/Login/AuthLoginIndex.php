@@ -82,8 +82,11 @@ class AuthLoginIndex extends Component
     {
         $this->validate();
 
-        $fieldType = filter_var($this->username_or_email, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
-        $user = User::where($fieldType, $this->username_or_email)->first();
+        // Coba cari berdasarkan email, username, atau nim
+        $user = User::where('email', $this->username_or_email)
+            ->orWhere('username', $this->username_or_email)
+            ->orWhere('nim', $this->username_or_email)
+            ->first();
 
         if (!$user) {
             return $this->showAlert('User tidak ditemukan.');
@@ -93,7 +96,7 @@ class AuthLoginIndex extends Component
             return $this->showAlert('Password salah.');
         }
 
-        // Check if user already has active session
+        // Cek apakah user masih punya session aktif
         if ($this->hasActiveSessionForUser($user)) {
             return $this->showAlert('Akun sudah login di perangkat lain. Silakan logout dari perangkat lain terlebih dahulu atau hubungi administrator.');
         }
@@ -107,7 +110,6 @@ class AuthLoginIndex extends Component
 
         return $this->redirect(route('admin.dashboard'), navigate: true);
     }
-
 
 
     public function ikmbLogin()

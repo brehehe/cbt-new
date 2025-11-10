@@ -104,6 +104,7 @@ class AdminMasterStudentIndex extends Component
     public $isStudent;
     public $isStudentFilter;
     public $type_study;
+    public $photo, $photo_old;
 
     public function openModal()
     {
@@ -169,6 +170,8 @@ class AdminMasterStudentIndex extends Component
             'preferred_language',
             'verification_status',
             'notes',
+            'photo',
+            'photo_old',
         ]);
         $this->resetErrorBag();
         $this->resetValidation();
@@ -280,7 +283,7 @@ class AdminMasterStudentIndex extends Component
     {
         $currentCompanyId = Auth::user()->company_id;
 
-        if($this->type_study == 'mahasiswa') {
+        if ($this->type_study == 'mahasiswa') {
             $validatedData = $this->validate([
                 'name' => 'required|string|max:255',
                 'nim' => [
@@ -369,7 +372,7 @@ class AdminMasterStudentIndex extends Component
                 'preferred_language' => 'nullable|string|max:10',
                 'verification_status' => 'nullable|in:pending,verified,rejected',
                 'notes' => 'nullable|string|max:1000',
-            ],[
+            ], [
                 'study_id.required' => 'Program studi wajib diisi.',
             ]);
         } elseif ($this->type_study == 'general') {
@@ -384,8 +387,8 @@ class AdminMasterStudentIndex extends Component
                         ->where('company_id', $currentCompanyId)
                         ->ignore($this->data_id),
                 ],
-                 'nim' => [
-                    'nullable',
+                'nim' => [
+                    'required',
                     'string',
                     'regex:/^\S*$/u', // tidak boleh ada spasi
                     'max:255',
@@ -426,17 +429,21 @@ class AdminMasterStudentIndex extends Component
             if ($this->type_study == 'mahasiswa') {
                 $userResult = $this->handleUserIdentityResolution($currentCompanyId, $validatedData);
 
-            if (!$userResult['success']) {
-                DB::rollBack();
-                $this->addError('general', $userResult['message']);
-                return;
-            }
+                if (!$userResult['success']) {
+                    DB::rollBack();
+                    $this->addError('general', $userResult['message']);
+                    return;
+                }
 
-            $user = $userResult['user'];
+                $user = $userResult['user'];
 
-            // Update user detail
-            $this->updateUserDetail($user, $validatedData);
+                // Update user detail
+                $this->updateUserDetail($user, $validatedData);
             } else {
+                if ($this->profile && $this->profile instanceof \Illuminate\Http\UploadedFile) {
+                    $profile = $this->profile->store('profiles', 'public');
+                }
+
                 $user = User::updateOrCreate(
                     ['id' => $this->data_id],
                     [
@@ -449,6 +456,7 @@ class AdminMasterStudentIndex extends Component
                         'study_id' => $this->study_id,
                         'company_id' => $currentCompanyId,
                         'type_user' => 'employee',
+                        'profile' => $profile,
                         'type_study' => $this->type_study ?? 'general',
                     ]
                 );
