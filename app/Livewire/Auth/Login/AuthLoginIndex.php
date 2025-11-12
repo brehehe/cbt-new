@@ -34,6 +34,11 @@ class AuthLoginIndex extends Component
 
     public function mount()
     {
+        // Jika sudah login, langsung redirect ke dashboard
+        if (Auth::check()) {
+            return redirect()->route('admin.dashboard'); // ubah 'dashboard' sesuai nama route kamu
+        }
+
         $this->generateCaptcha();
         $this->code = '1Br0ck';
 
@@ -45,6 +50,7 @@ class AuthLoginIndex extends Component
             // $this->login();
         }
     }
+
 
     public function generateCaptcha()
     {
