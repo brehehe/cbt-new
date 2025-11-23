@@ -46,9 +46,9 @@ class AdminMasterModuleQuestionIndex extends Component
             $questions->where('study_id', $this->filterStudyId);
         }
 
-        if ($this->filterQuestionTypeId) {
-            $questions->where('question_type_id', $this->filterQuestionTypeId);
-        }
+        // if ($this->filterQuestionTypeId) {
+        //     $questions->where('question_type_id', $this->filterQuestionTypeId);
+        // }
 
         if ($this->filterTopicId) {
             $questions->where('topic_id', $this->filterTopicId);

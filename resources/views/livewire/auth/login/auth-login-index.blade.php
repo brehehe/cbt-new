@@ -723,7 +723,7 @@
                             </div>
 
                             <!-- Main Value Proposition -->
-                            <div class="space-y-2 mt-[40%] max-w-xl">
+                            <!-- <div class="space-y-2 mt-[40%] max-w-xl">
                                 <div
                                     class="group/card cursor-pointer rounded-xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm transition-all duration-500 hover:-rotate-1 hover:scale-105 hover:bg-white/20 xl:p-4">
                                     <div class="flex items-start space-x-3">
@@ -800,7 +800,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>

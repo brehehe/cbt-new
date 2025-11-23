@@ -1611,6 +1611,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property string|null $photo
  * @property-read \App\Models\Classmate\ClassmateStudent|null $classmateStudent
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Company\Company> $companies
  * @property-read int|null $companies_count
@@ -1652,6 +1653,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePhone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePhoto($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereProfile($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereStudyId($value)

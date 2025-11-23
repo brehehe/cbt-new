@@ -32,16 +32,19 @@ class AdminExamHistoryTimetableIndex extends Component
     public function render()
     {
         $userTimetables = UserTimetable::with(['timetable', 'user'])
-            ->whereHas('timetable', function ($query) {
-                $query->where('name', 'like', '%' . $this->search . '%');
+        ->where(function ($query) {
+            $query->whereHas('timetable', function ($q) {
+                $q->where('name', 'like', '%' . $this->search . '%');
             })
-            ->where('user_id', Auth::id())
-            ->orWhereHas('user', function ($query) {
-                $query->where('name', 'like', '%' . $this->search . '%')
+            ->orWhereHas('user', function ($q) {
+                $q->where('name', 'like', '%' . $this->search . '%')
                     ->orWhere('email', 'like', '%' . $this->search . '%');
-            })
-            ->where('status', 'done')
-            ->orderBy('created_at', 'desc');
+            });
+        })
+        ->where('user_id', Auth::id()) // hanya user login
+        ->where('status', 'done')
+        ->orderBy('created_at', 'desc');
+
 
         return view('livewire.admin.exam.history-timetable.admin-exam-history-timetable-index', [
             'userTimetables' => $userTimetables->paginate($this->perPage),

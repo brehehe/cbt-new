@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1
-                    class="text-2xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                    class="text-2xl font-bold {{ config('app.name_slug') === 'ups_tegal' ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
                     Riwayat Ujian</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
@@ -42,7 +42,7 @@
                     <tr>
                         <th class="w-1 center">No</th>
                         <th>Nama Ujian</th>
-                        {{-- <th>Nama Mahasiswa</th> --}}
+                        {{-- <th>Nama Siswa</th> --}}
                         <th>Durasi</th>
                         <th>Jam Mulai</th>
                         <th>Jam Akhir</th>
@@ -56,9 +56,9 @@
                             <td>{{ $userTimetable->timetable->name ?? '-' }}</td>
                             {{-- <td>{{ $userTimetable->user->name ?? '-' }}</td> --}}
                             <td>{{ $userTimetable?->timetable?->module?->duration ?? 0 }} / Menit</td>
-                            <td>{{ Carbon\Carbon::parse($userTimetable->timetable->start_time)->format('d F Y H:i') ?? '-' }}
+                            <td>{{ Carbon\Carbon::parse($userTimetable?->timetable?->start_time)->format('d F Y H:i') ?? '-' }}
                             </td>
-                            <td>{{ Carbon\Carbon::parse($userTimetable->timetable->end_time)->format('d F Y H:i') ?? '-' }}
+                            <td>{{ Carbon\Carbon::parse($userTimetable?->timetable?->end_time)->format('d F Y H:i') ?? '-' }}
                             </td>
                             <td>
                                 <div class="flex justify-end items-center">
