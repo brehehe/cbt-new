@@ -36,16 +36,15 @@ class DatabaseSeeder extends Seeder
             QuestionTypeSeeder::class,
 
             // Question
-            UserDetailSeeder::class,
         ]);
-        if (env('QUESTION_PACKAGE', 'NO_PACKAGE')) {
+        if (env('QUESTION_DUMMY') === true) {
             $this->call([
                 QuestionSeeder::class,
             ]);
-        } else {
-            $this->call([
-                QuestionPaketSeeder::class,
-            ]);
         }
+        $this->call([
+            UserDetailSeeder::class,
+            QuestionPaketSeeder::class,
+        ]);
     }
 }
