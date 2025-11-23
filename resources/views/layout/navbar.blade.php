@@ -11,6 +11,10 @@
                     <img src="{{ asset('asset/img/unimma.webp') }}"
                         alt="UNIMMA Logo"
                         class="h-10 w-auto mr-2">
+                @elseif (config('app.name_slug') === 'unidayan')
+                    <img src="{{ asset('asset/img/unidayan/logo-primary.png') }}"
+                        alt="UNIDAYAN Logo"
+                        class="h-10 w-auto mr-2">
                 @else
                     <img src="{{ asset('asset/img/logo-procbt.png') }}"
                         alt="PRO CBT Logo"
