@@ -700,7 +700,7 @@
                 <div class="group relative hidden w-0 overflow-hidden lg:block lg:w-3/5">
                     <!-- Background with modern clip-path -->
                     <div class="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 transition-all duration-1000 hover:from-blue-500 hover:via-blue-600 hover:to-blue-800"
-                        style="clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); background-image: url('{{ asset('asset/img/unidayan-background.jpeg') }}'); background-size: cover; background-position: center;">
+                        style="clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); background-image: url('{{ asset('asset/img/unidayan/1676430503.jpg') }}'); background-size: cover; background-position: center;">
                     </div>
 
                     <!-- Subtle pattern overlay -->
@@ -718,7 +718,7 @@
                             <div class="group/brand flex items-center space-x-3">
                                 <div class="relative">
                                     <img alt="Logo" class="object-contain" style="width: 215px;" loading="lazy"
-                                        src="{{ asset('asset/img/unidayan-removebg-preview.png') }}">
+                                        src="{{ asset('asset/img/unidayan/logo-primary.png') }}">
                                 </div>
                             </div>
 
@@ -847,11 +847,11 @@
                                                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                                                     stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
                                             </svg> -->
-                                            <img src="{{ asset('asset/img/logo-unidayan.webp') }}" alt="">
+                                            <img src="{{ asset('asset/img/unidayan/images.png') }}" alt="">
                                         </div>
                                     </div>
 
-                                    <h2 class="mb-1 text-xl font-bold text-gray-800 lg:mb-2 lg:text-1xl">Universitas Muhammadiyah Magelang</h2>
+                                    <h2 class="mb-1 text-xl font-bold text-gray-800 lg:mb-2 lg:text-1xl">Universitas Dayanu Ikhsanuddin</h2>
                                     <p class="text-sm text-gray-600 lg:text-base">Masuk ke sistem CBT</p>
                                 </div>
 
