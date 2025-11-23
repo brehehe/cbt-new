@@ -18,6 +18,8 @@ const peerServer = PeerServer({
       'https://ups.procbt.id',
       'https://peer.toti.my.id',
       'https://cbtfk.upstegal.ac.id',
+      'https://unimma.procbt.id',
+      'https://unidayan.procbt.id',
       'http://localhost:8000',
       'https://localhost:8000'
     ],
