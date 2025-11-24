@@ -34,6 +34,11 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
 });
 
+// Profile route accessible by all authenticated users including Mahasiswa
+Route::middleware(['auth', CheckUserTimetable::class])->group(function () {
+    Route::get('/profile', \App\Livewire\Admin\Profile\AdminProfileIndex::class)->name('user.profile');
+});
+
 require __DIR__ . '/auth.php';
 
 Route::group(['namespace' => 'App\Livewire\Auth'], function () {
@@ -72,10 +77,6 @@ Route::group(['namespace' => 'App\Livewire\Admin', 'prefix' => 'admin', 'middlew
     // User Management Routes
     Route::get('/students', \App\Livewire\Admin\StudentManagement::class)->name('admin.students');
     Route::get('/lecturers', \App\Livewire\Admin\LecturerManagement::class)->name('admin.lecturers');
-
-    Route::group(['namespace' => 'Profile', 'prefix' => 'profile'], function () {
-        Route::get('/profile', 'AdminProfileIndex')->name('user.profile.profile');
-    });
 
     Route::group(['namespace' => 'ChangePassword', 'prefix' => 'change-password'], function () {
         Route::get('/change-password', 'AdminChangePasswordIndex')->name('user.change-password.change-password');

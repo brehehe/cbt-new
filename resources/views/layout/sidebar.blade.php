@@ -36,6 +36,23 @@
                     </div>
                 </a>
 
+                <!-- Profile Menu - Available for all authenticated users -->
+                <!-- @php
+                    $isProfileActive = Request::is('profile');
+                @endphp
+                <a href="{{ route('user.profile') }}"
+                    class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
+                    {{ $isProfileActive
+                        ? "bg-[#C3D4EC]/50 $brandColor active-menu"
+                        : "text-gray-600 hover:bg-[#C3D4EC]/20 hover:$brandColor" }}">
+                    <div class="flex items-center gap-3">
+                        <i
+                            class="fa-solid fa-user mr-2 text-lg
+                            {{ $isProfileActive ? $brandColor : 'text-gray-400 group-hover:' . $brandColor }}"></i>
+                        <span class="sidebar-text">Profil</span>
+                    </div>
+                </a> -->
+
                 <!-- Divider: Ujian -->
                 @if (Auth::user()->hasRole(['Mahasiswa', 'Admin']))
                     <div>
@@ -262,6 +279,12 @@ if (auth()->check()) {
     if (auth()->user()->hasRole('Pengawas')) {
         $masters = [
             [
+                'label' => 'Regulasi',
+                'url' => '/admin/master/regulation',
+                'pattern' => 'admin/master/regulation',
+                'icon' => 'fa-scroll',
+            ],
+            [
                 'label' => 'Ruang Ujian',
                 'url' => route('admin.master.exam-room'),
                 'pattern' => ['admin/master/exam-room*'],
@@ -278,6 +301,18 @@ if (auth()->check()) {
                 'url' => '/admin/master/timetable',
                 'pattern' => 'admin/master/timetable*',
                 'icon' => 'fa-calendar',
+            ],
+            [
+                'label' => 'Prodi',
+                'url' => route('admin.master.study'),
+                'pattern' => 'admin/master/study',
+                'icon' => 'fa-building-columns',
+            ],
+            [
+                'label' => 'Peserta',
+                'url' => '/admin/master/classmate',
+                'pattern' => ['admin/master/classmate', 'admin/master/classmate/*'],
+                'icon' => 'fa-users',
             ],
         ];
     }
@@ -305,7 +340,7 @@ if (auth()->check()) {
                 @endforeach
 
                 <!-- Divider: Laporan -->
-                @if (!Auth::user()->hasRole(['Mahasiswa', 'Pengawas']))
+                @if (!Auth::user()->hasRole(['Mahasiswa']))
                     <div>
                         <div
                             class="w-full group flex items-center justify-between custom-padding text-xs font-bold {{ $brandColor }} uppercase tracking-wide">

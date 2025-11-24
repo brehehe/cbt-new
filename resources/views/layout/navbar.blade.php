@@ -141,11 +141,11 @@
                             </p>
                         </div>
                         <div class="p-2">
-                            <a href="/admin/profile/profile"
+                            <!-- <a href="/admin/profile/profile"
                                 class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} rounded-lg transition-all duration-200">
                                 <i class="fas fa-user w-4"></i>
                                 <span>Profile</span>
-                            </a>
+                            </a> -->
                             <a href="/admin/change-password/change-password"
                                 class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} rounded-lg transition-all duration-200">
                                 <i class="fas fa-lock w-4"></i>

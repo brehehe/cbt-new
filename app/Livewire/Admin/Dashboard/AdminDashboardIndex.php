@@ -38,6 +38,7 @@ class AdminDashboardIndex extends Component
     public $criticalAlerts;
     public $systemPerformance;
     public $uptimeDetails;
+    public $userProfile; // User profile data for authenticated user
 
     public function mount()
     {
@@ -625,8 +626,62 @@ class AdminDashboardIndex extends Component
 
             // Detailed uptime information
             $this->uptimeDetails = $this->getUptimeDetails();
+
+            // Load user profile with role-based access control
+            $this->userProfile = $this->getUserProfileData();
+            dd($this->userProfile);
         } catch (\Exception $e) {
             Session::flash('error', 'Error loading dashboard data: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get user profile data based on role with if-else authentication
+     */
+    private function getUserProfileData()
+    {
+        $currentUser = auth()->user();
+        // If-else logic for role-based profile access
+        if ($currentUser->hasRole('Mahasiswa')) {
+            // Mahasiswa can only view their own profile with academic information
+            return [
+                'user' => $currentUser->load('userDetail.study'),
+                'role' => 'Mahasiswa',
+                'can_view_others' => true,
+                'show_academic_info' => true,
+            ];
+        } elseif ($currentUser->hasRole('Admin')) {
+            // Admin can view their profile with admin information
+            return [
+                'user' => $currentUser->load('userDetail'),
+                'role' => 'Admin',
+                'can_view_others' => true,
+                'show_academic_info' => false,
+            ];
+        } elseif ($currentUser->hasRole('Dosen')) {
+            // Dosen can view their profile
+            return [
+                'user' => $currentUser->load('userDetail'),
+                'role' => 'Dosen',
+                'can_view_others' => false,
+                'show_academic_info' => false,
+            ];
+        } elseif ($currentUser->hasRole('Pengawas')) {
+            // Pengawas can view their profile
+            return [
+                'user' => $currentUser->load('userDetail'),
+                'role' => 'Pengawas',
+                'can_view_others' => false,
+                'show_academic_info' => false,
+            ];
+        } else {
+            // Default for other roles
+            return [
+                'user' => $currentUser->load('userDetail'),
+                'role' => 'User',
+                'can_view_others' => false,
+                'show_academic_info' => false,
+            ];
         }
     }
 
