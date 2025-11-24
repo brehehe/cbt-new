@@ -6,7 +6,7 @@
     <div class="flex-shrink-0 h-16 flex items-center gap-3 px-6 border-b border-gray-100">
         <div>
             @php
-                $brandColor = in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]';
+                $brandColor = in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]';
             @endphp
             <h2 class="text-lg font-bold {{ $brandColor }}">PROCBT</h2>
             <p class="text-xs text-gray-500">Healthcare System</p>
@@ -20,7 +20,7 @@
                 <!-- Dashboard -->
                 @php
                     $isActive = Request::is('admin');
-                    $brandColor = in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]';
+                    $brandColor = in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]';
                 @endphp
 
                 <a href="/admin"
@@ -92,122 +92,199 @@
                 @endif
 
                 @php
-                    $masters = [];
-                    if (auth()->check()) {
-                        if (auth()->user()->hasRole('Admin')) {
-                            $masters = [
-                                [
-                                    'label' => 'Skala Penilaian',
-                                    'url' => '/admin/master/rating-scale',
-                                    'pattern' => 'admin/master/rating-scale',
-                                    'icon' => 'fa-chart-bar',
-                                ],
-                                [
-                                    'label' => 'Regulasi',
-                                    'url' => '/admin/master/regulation',
-                                    'pattern' => 'admin/master/regulation',
-                                    'icon' => 'fa-scroll',
-                                ],
-                                [
-                                    'label' => 'Ruang Ujian',
-                                    'url' => route('admin.master.exam-room'),
-                                    'pattern' => ['admin/master/exam-room*'],
-                                    'icon' => 'fa-house',
-                                ],
-                                [
-                                    'label' => 'Sesi Ujian',
-                                    'url' => route('admin.master.exam-session'),
-                                    'pattern' => ['admin/master/exam-session*'],
-                                    'icon' => 'fa-clock',
-                                ],
-                                [
-                                    'label' => 'Jadwal',
-                                    'url' => '/admin/master/timetable',
-                                    'pattern' => 'admin/master/timetable*',
-                                    'icon' => 'fa-calendar',
-                                ],
-                                [
-                                    'label' => 'Prodi',
-                                    'url' => route('admin.master.study'),
-                                    'pattern' => 'admin/master/study',
-                                    'icon' => 'fa-building-columns',
-                                ],
-                                [
-                                    'label' => 'Peserta',
-                                    'url' => '/admin/master/classmate',
-                                    'pattern' => ['admin/master/classmate', 'admin/master/classmate/*'],
-                                    'icon' => 'fa-users',
-                                ],
-                                [
-                                    'label' => 'Admin',
-                                    'url' => '/admin/master/admin',
-                                    'pattern' => 'admin/master/admin',
-                                    'icon' => 'fa-user-shield',
-                                ],
-                                [
-                                    'label' => 'Dosen',
-                                    'url' => '/admin/master/lecturer',
-                                    'pattern' => 'admin/master/lecturer',
-                                    'icon' => 'fa-chalkboard-teacher',
-                                ],
-                                [
-                                    'label' => 'Pengawas',
-                                    'url' => '/admin/master/supervisor',
-                                    'pattern' => 'admin/master/supervisor',
-                                    'icon' => 'fa-user-tie',
-                                ],
-                                [
-                                    'label' => 'Mahasiswa',
-                                    'url' => '/admin/master/student',
-                                    'pattern' => 'admin/master/student',
-                                    'icon' => 'fa-user-graduate',
-                                ],
-                                [
-                                    'label' => 'Topik Ujian',
-                                    'url' => route('admin.master.topic'),
-                                    'pattern' => 'admin/master/topic-question',
-                                    'icon' => 'fa-tags',
-                                ],
-                                [
-                                    'label' => 'Kategori Materi',
-                                    'url' => route('admin.master.material-category'),
-                                    'pattern' => 'admin/master/material-category',
-                                    'icon' => 'fa-layer-group',
-                                ],
-                                [
-                                    'label' => 'Materi',
-                                    'url' => route('admin.master.material'),
-                                    'pattern' => 'admin/master/material',
-                                    'icon' => 'fa-book',
-                                ],
-                                [
-                                    'label' => 'Tipe Ujian',
-                                    'url' => route('admin.master.question-type'),
-                                    'pattern' => 'admin/master/question-type',
-                                    'icon' => 'fa-list-ol',
-                                ],
-                                [
-                                    'label' => 'Modul Soal',
-                                    'url' => route('admin.master.module'),
-                                    'pattern' => ['admin/master/module-question', 'admin/master/module-question/*'],
-                                    'icon' => 'fa-folder-open',
-                                ],
-                                [
-                                    'label' => 'Bank Soal',
-                                    'url' => route('admin.master.question'),
-                                    'pattern' => ['admin/master/question', 'admin/master/question/*'],
-                                    'icon' => 'fa-database',
-                                ],
-                                [
-                                    'label' => 'Seting',
-                                    'url' => route('admin.master.setting'),
-                                    'pattern' => ['admin/master/setting', 'admin/master/setting/*'],
-                                    'icon' => 'fa-cog',
-                                ],
-                            ];
-                        }
-                    }
-                @endphp
+$masters = [];
+
+if (auth()->check()) {
+
+    // ============================
+    // ROLE ADMIN
+    // ============================
+    if (auth()->user()->hasRole('Admin')) {
+        $masters = [
+            [
+                'label' => 'Skala Penilaian',
+                'url' => '/admin/master/rating-scale',
+                'pattern' => 'admin/master/rating-scale',
+                'icon' => 'fa-chart-bar',
+            ],
+            [
+                'label' => 'Regulasi',
+                'url' => '/admin/master/regulation',
+                'pattern' => 'admin/master/regulation',
+                'icon' => 'fa-scroll',
+            ],
+            [
+                'label' => 'Ruang Ujian',
+                'url' => route('admin.master.exam-room'),
+                'pattern' => ['admin/master/exam-room*'],
+                'icon' => 'fa-house',
+            ],
+            [
+                'label' => 'Sesi Ujian',
+                'url' => route('admin.master.exam-session'),
+                'pattern' => ['admin/master/exam-session*'],
+                'icon' => 'fa-clock',
+            ],
+            [
+                'label' => 'Jadwal',
+                'url' => '/admin/master/timetable',
+                'pattern' => 'admin/master/timetable*',
+                'icon' => 'fa-calendar',
+            ],
+            [
+                'label' => 'Prodi',
+                'url' => route('admin.master.study'),
+                'pattern' => 'admin/master/study',
+                'icon' => 'fa-building-columns',
+            ],
+            [
+                'label' => 'Peserta',
+                'url' => '/admin/master/classmate',
+                'pattern' => ['admin/master/classmate', 'admin/master/classmate/*'],
+                'icon' => 'fa-users',
+            ],
+            [
+                'label' => 'Admin',
+                'url' => '/admin/master/admin',
+                'pattern' => 'admin/master/admin',
+                'icon' => 'fa-user-shield',
+            ],
+            [
+                'label' => 'Dosen',
+                'url' => '/admin/master/lecturer',
+                'pattern' => 'admin/master/lecturer',
+                'icon' => 'fa-chalkboard-teacher',
+            ],
+            [
+                'label' => 'Pengawas',
+                'url' => '/admin/master/supervisor',
+                'pattern' => 'admin/master/supervisor',
+                'icon' => 'fa-user-tie',
+            ],
+            [
+                'label' => 'Mahasiswa',
+                'url' => '/admin/master/student',
+                'pattern' => 'admin/master/student',
+                'icon' => 'fa-user-graduate',
+            ],
+            [
+                'label' => 'Topik Ujian',
+                'url' => route('admin.master.topic'),
+                'pattern' => 'admin/master/topic-question',
+                'icon' => 'fa-tags',
+            ],
+            [
+                'label' => 'Kategori Materi',
+                'url' => route('admin.master.material-category'),
+                'pattern' => 'admin/master/material-category',
+                'icon' => 'fa-layer-group',
+            ],
+            [
+                'label' => 'Materi',
+                'url' => route('admin.master.material'),
+                'pattern' => 'admin/master/material',
+                'icon' => 'fa-book',
+            ],
+            [
+                'label' => 'Tipe Ujian',
+                'url' => route('admin.master.question-type'),
+                'pattern' => 'admin/master/question-type',
+                'icon' => 'fa-list-ol',
+            ],
+            [
+                'label' => 'Modul Soal',
+                'url' => route('admin.master.module'),
+                'pattern' => ['admin/master/module-question', 'admin/master/module-question/*'],
+                'icon' => 'fa-folder-open',
+            ],
+            [
+                'label' => 'Bank Soal',
+                'url' => route('admin.master.question'),
+                'pattern' => ['admin/master/question', 'admin/master/question/*'],
+                'icon' => 'fa-database',
+            ],
+            [
+                'label' => 'Seting',
+                'url' => route('admin.master.setting'),
+                'pattern' => ['admin/master/setting', 'admin/master/setting/*'],
+                'icon' => 'fa-cog',
+            ],
+        ];
+    }
+
+    // ============================
+    // ROLE DOSEN
+    // ============================
+    if (auth()->user()->hasRole('Dosen')) {
+        $masters = [
+            [
+                'label' => 'Topik Ujian',
+                'url' => route('admin.master.topic'),
+                'pattern' => 'admin/master/topic-question',
+                'icon' => 'fa-tags',
+            ],
+            [
+                'label' => 'Kategori Materi',
+                'url' => route('admin.master.material-category'),
+                'pattern' => 'admin/master/material-category',
+                'icon' => 'fa-layer-group',
+            ],
+            [
+                'label' => 'Materi',
+                'url' => route('admin.master.material'),
+                'pattern' => 'admin/master/material',
+                'icon' => 'fa-book',
+            ],
+            [
+                'label' => 'Tipe Ujian',
+                'url' => route('admin.master.question-type'),
+                'pattern' => 'admin/master/question-type',
+                'icon' => 'fa-list-ol',
+            ],
+            [
+                'label' => 'Modul Soal',
+                'url' => route('admin.master.module'),
+                'pattern' => ['admin/master/module-question', 'admin/master/module-question/*'],
+                'icon' => 'fa-folder-open',
+            ],
+            [
+                'label' => 'Bank Soal',
+                'url' => route('admin.master.question'),
+                'pattern' => ['admin/master/question', 'admin/master/question/*'],
+                'icon' => 'fa-database',
+            ],
+        ];
+    }
+
+    // ============================
+    // ROLE PENGAWAS
+    // ============================
+    if (auth()->user()->hasRole('Pengawas')) {
+        $masters = [
+            [
+                'label' => 'Ruang Ujian',
+                'url' => route('admin.master.exam-room'),
+                'pattern' => ['admin/master/exam-room*'],
+                'icon' => 'fa-house',
+            ],
+            [
+                'label' => 'Sesi Ujian',
+                'url' => route('admin.master.exam-session'),
+                'pattern' => ['admin/master/exam-session*'],
+                'icon' => 'fa-clock',
+            ],
+            [
+                'label' => 'Jadwal',
+                'url' => '/admin/master/timetable',
+                'pattern' => 'admin/master/timetable*',
+                'icon' => 'fa-calendar',
+            ],
+        ];
+    }
+
+}
+@endphp
+
 
                 @foreach ($masters as $master)
                     @php

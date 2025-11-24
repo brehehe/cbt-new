@@ -183,7 +183,7 @@
                                 'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
                                 'bg-red-100 text-red-800' => $session->risk_level === 'high',
                                 'bg-yellow-100 text-yellow-800' => $session->risk_level === 'medium',
-                                '{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'bg-orange-100 : 'bg-blue-100' }} {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-blue-800' : 'text-orange-800' }}' =>
+                                '{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-orange-100 : 'bg-blue-100' }} {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-800' : 'text-orange-800' }}' =>
                                     $session->risk_level === 'low',
                                 'bg-green-100 text-green-800' => $session->risk_level === 'none',
                             ])>
@@ -219,7 +219,7 @@
                                                 'window_blur',
                                                 'page_reload',
                                             ]),
-                                            '{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'bg-orange-100 : 'bg-blue-100' }} {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-blue-800' : 'text-orange-800' }}' => in_array(
+                                            '{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-orange-100 : 'bg-blue-100' }} {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-800' : 'text-orange-800' }}' => in_array(
                                                 $alert->alert_type,
                                                 ['camera_error', 'right_click']),
                                         ])>

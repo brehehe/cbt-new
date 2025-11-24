@@ -4,13 +4,13 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1
-                    class="text-2xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                    class="text-2xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
                     Data Peserta Detail</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div>
                 <button wire:click="submit()"
-                    class="{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'btn btn-primary' : 'btn btn-warning' }}">
+                    class="{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'btn btn-primary' : 'btn btn-warning' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -28,8 +28,8 @@
                 </label>
 
                 @php
-                    $brandBg = in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'bg-blue-600' : 'bg-orange-600';
-                    $brandBorder = in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'border-blue-600' : 'border-orange-600';
+                    $brandBg = in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-600' : 'bg-orange-600';
+                    $brandBorder = in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'border-blue-600' : 'border-orange-600';
                 @endphp
 
                 <div class="mt-2 flex space-x-2">
@@ -124,7 +124,7 @@
                     <span class="text-sm text-gray-700 ml-2">data</span> --}}
                     <div>
                         <h1
-                            class="text-2xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                            class="text-2xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
                             Data Mahasiswa</h1>
                         {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
                     </div>

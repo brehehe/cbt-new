@@ -301,7 +301,65 @@ class UserDetailSeeder extends Seeder
             RoleHelper::assignRoleToUserInCompany($user, 'Mahasiswa', $companyId);
         }
 
-        for ($i = 0; $i < 50; $i++) {
+        for ($i = 1; $i <= 10; $i++) {
+            $mahasiswa = User::create([
+                'name' => 'Mahasiswa ' . ($i + 1),
+                'email' => 'mahasiswa' . ($i + 1) . '@gmail.com',
+                'username' => Str::replace(' ', '', strtolower('Mahasiswa ' . ($i + 1))),
+                'password' => Hash::make('password123'),
+                'email_verified_at' => now(),
+                'company_id' => $companyId,
+                'study_id' => Study::withoutGlobalScope('user_scope')
+                    ->where('company_id', $companyId)
+                    ->inRandomOrder()
+                    ->first()->id,
+                'type_study'=> 'general',
+            ]);
+
+            $mahasiswa->assignRole('Mahasiswa');
+
+            UserDetail::create([
+                'nim' => '2024' . str_pad($i + 11, 4, '0', STR_PAD_LEFT),
+                'user_id' => $mahasiswa->id,
+                'student_id' => '2024' . str_pad($i + 11, 4, '0', STR_PAD_LEFT),
+                'student_program' => 'Kedokteran',
+                'student_faculty' => 'Fakultas Kedokteran',
+                'student_department' => 'Ilmu Kedokteran',
+                'student_class' => 'A',
+                'student_semester' => '3',
+                'student_academic_year' => '2024/2025',
+                'student_status' => 'active',
+                'student_entry_date' => '2024-09-01',
+                'student_gpa' => rand(300, 400) / 100,
+                'birth_place' => 'Jakarta',
+                'birth_date' => '2000-01-01',
+                'gender' => 'male',
+                'religion' => 'Islam',
+                'nationality' => 'Indonesian',
+                'marital_status' => 'single',
+                'address' => 'Jl. Contoh No. ' . rand(1, 100),
+                'city' => 'Jakarta',
+                'province' => 'DKI Jakarta',
+                'country' => 'ID',
+                'phone' => '021' . rand(10000000, 99999999),
+                'mobile_phone' => '08' . rand(1000000000, 9999999999),
+                'identity_type' => 'KTP',
+                'identity_number' => rand(1000000000000000, 9999999999999999),
+                'blood_group' => ['A', 'B', 'AB', 'O'][rand(0, 3)],
+                'emergency_contact_name' => 'Orang Tua',
+                'emergency_contact_phone' => '08' . rand(1000000000, 9999999999),
+                'emergency_contact_relation' => 'Parent',
+                'verification_status' => 'verified',
+                'verified_at' => now(),
+                'status' => 'active',
+                'total_exams_taken' => rand(5, 25),
+                'average_score' => rand(6500, 9500) / 100
+            ]);
+
+            RoleHelper::assignRoleToUserInCompany($mahasiswa, 'Mahasiswa', $companyId);
+        }
+
+        for ($i = 11; $i <= 50; $i++) {
             $mahasiswa = User::create([
                 'name' => 'Mahasiswa ' . ($i + 1),
                 'email' => 'mahasiswa' . ($i + 1) . '@gmail.com',

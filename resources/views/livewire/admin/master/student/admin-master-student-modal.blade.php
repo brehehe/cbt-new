@@ -28,10 +28,10 @@
                 </label>
 
                 @php
-                    $brandBg = in_array(config('app.name_slug'), ['ups_tegal', 'unimma'])
+                    $brandBg = in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan'])
                         ? 'bg-blue-600'
                         : 'bg-orange-600';
-                    $brandBorder = in_array(config('app.name_slug'), ['ups_tegal', 'unimma'])
+                    $brandBorder = in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan'])
                         ? 'border-blue-600'
                         : 'border-orange-600';
                 @endphp
@@ -523,7 +523,7 @@
                 Batal
             </button>
             <button wire:click='submit'
-                class="px-4 py-2 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} hover:{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma']) ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} text-white rounded-lg shadow transition">
+                class="px-4 py-2 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} hover:{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} text-white rounded-lg shadow transition">
                 {{ $data_id ? 'Update' : 'Simpan' }}
             </button>
         </div>
