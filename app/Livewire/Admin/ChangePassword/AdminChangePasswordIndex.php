@@ -17,8 +17,8 @@ class AdminChangePasswordIndex extends Component
 
     protected $rules = [
         'currentPassword' => 'required|string',
-        'newPassword'     => 'required|string|min:8|confirmed',
-        'confirmPassword' => 'required|string|min:8',
+        'newPassword'     => 'required|string|min:8',
+        'confirmPassword' => 'required|string|min:8|same:newPassword',
     ];
 
     protected $messages = [

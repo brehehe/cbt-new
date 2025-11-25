@@ -23,13 +23,13 @@
                 class="text-red-600">*</span>
         </label>
         <div x-data="{ show: false }" class="relative">
-            <input :type="show ? 'text' : 'currentPassword'" id="currentPassword" wire:model.defer="currentPassword"
-                placeholder="Contoh : 12345678"
+            <input :type="show ? 'text' : 'password'" id="currentPassword" wire:model.defer="currentPassword"
+                :placeholder="show ? 'password' : '********'"
                 class="mt-1 block w-full rounded-md border-gray-300 px-4 py-2 shadow-sm focus:border-[#f58634] focus:ring-[#f58634] pr-10">
 
             <button type="button" @click="show = !show"
                 class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500" tabindex="-1">
-                <i :class="show ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                <i :class="show ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
             </button>
         </div>
 
@@ -42,13 +42,13 @@
                 class="text-red-600">*</span>
         </label>
         <div x-data="{ show: false }" class="relative">
-            <input :type="show ? 'text' : 'newPassword'" id="newPassword" wire:model.defer="newPassword"
-                placeholder="Contoh : 12345678"
+            <input :type="show ? 'text' : 'password'" id="newPassword" wire:model.defer="newPassword"
+                :placeholder="show ? 'password' : '********'"
                 class="mt-1 block w-full rounded-md border-gray-300 px-4 py-2 shadow-sm focus:border-[#f58634] focus:ring-[#f58634] pr-10">
 
             <button type="button" @click="show = !show"
                 class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500" tabindex="-1">
-                <i :class="show ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                <i :class="show ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
             </button>
         </div>
 
@@ -61,13 +61,13 @@
                 class="text-red-600">*</span>
         </label>
         <div x-data="{ show: false }" class="relative">
-            <input :type="show ? 'text' : 'confirmPassword'" id="confirmPassword" wire:model.defer="confirmPassword"
-                placeholder="Contoh : 12345678"
+            <input :type="show ? 'text' : 'password'" id="confirmPassword" wire:model.defer="confirmPassword"
+                :placeholder="show ? 'password' : '********'"
                 class="mt-1 block w-full rounded-md border-gray-300 px-4 py-2 shadow-sm focus:border-[#f58634] focus:ring-[#f58634] pr-10">
 
             <button type="button" @click="show = !show"
                 class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500" tabindex="-1">
-                <i :class="show ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                <i :class="show ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
             </button>
         </div>
 
