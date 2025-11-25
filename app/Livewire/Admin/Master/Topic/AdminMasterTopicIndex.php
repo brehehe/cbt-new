@@ -21,7 +21,7 @@ class AdminMasterTopicIndex extends Component
     public $perPage = 10, $search;
 
     public $studies;
-    public $data_id, $name, $description, $study_id;
+    public $data_id, $name, $description, $study_id, $studys;
 
     public function render()
     {
@@ -36,16 +36,27 @@ class AdminMasterTopicIndex extends Component
     public function mount()
     {
         // dd(Auth::user()?->company);
-        if (Auth::user()?->hasRole('Dosen')) {
-            $studyIds = Auth::user()?->studys ?? []; // array dari JSON
-            $this->studies = Study::whereIn('id', $studyIds)
-                ->orderBy('name', 'asc')
-                ->pluck('name', 'id')
-                ->toArray();
-            $this->study_id = array_key_first($this->studys);
-        } else {
-            $this->studies = Study::orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
-        }
+       if (Auth::user()?->hasRole('Dosen')) {
+
+    $studyIds = Auth::user()?->studys ?? []; // array dari JSON
+
+    $this->studies = Study::whereIn('id', $studyIds)
+        ->orderBy('name', 'asc')
+        ->pluck('name', 'id')
+        ->toArray();
+
+    // Ambil key pertama dari $this->studies
+   $this->study_id = !empty($this->studies)
+    ? array_key_first($this->studies)
+    : null;
+
+} else {
+
+    $this->studies = Study::orderBy('name', 'asc')
+        ->pluck('name', 'id')
+        ->toArray();
+}
+
     }
 
     public function hydrate()
