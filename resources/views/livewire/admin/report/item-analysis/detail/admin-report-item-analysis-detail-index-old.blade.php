@@ -347,7 +347,7 @@
                 <button class="btn btn-outline-primary" onclick="window.print()">
                     <i class="fas fa-print mr-2"></i>Cetak Laporan
                 </button>
-                <button class="{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'btn btn-primary' : 'btn btn-warning' }}"
+                <button class="{{ in_array(config('app.name_slug'), ['pro-cbt']) ? 'btn btn-warning' : 'btn btn-primary' }}"
                     onclick="exportToExcel()">
                     <i class="fas fa-file-excel mr-2"></i>Export Excel
                 </button>
