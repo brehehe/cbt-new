@@ -180,17 +180,44 @@ class AdminMasterTimetableIndex extends Component
         }
     }
 
+    protected $rules = [
+        'start_time' => 'required|date',
+        'end_time' => 'required|date|after:start_time',
+    ];
+
+    protected $messages = [
+        'start_time.required' => 'Waktu Mulai wajib diisi',
+        'end_time.required' => 'Waktu Selesai wajib diisi',
+        'end_time.after' => 'Waktu Selesai harus lebih besar dari Waktu Mulai',
+    ];
+
+
+    public function updatedStartTime($value)
+    {
+        $this->start_time = Carbon::parse($value)->format('Y-m-d H:i:s');
+        $this->end_time = Carbon::parse($this->start_time)->addHour(2)->format('Y-m-d H:i:s');
+        $this->validateOnly('start_time');
+        $this->validateOnly('end_time');
+    }
+
+    public function updatedEndTime($value)
+    {
+        $this->end_time = Carbon::parse($value)->format('Y-m-d H:i:s');
+        $this->validateOnly('end_time');
+        $this->validateOnly('start_time');
+    }
+
     public function submit()
     {
         $this->validate([
             'name'            => 'required',
             'module_id'       => 'required',
             'supervisors'     => 'required',
-            'start_time'      => 'required',
+            'start_time'      => 'required|date',
+            'end_time'        => 'required|date|after:start_time',
             'classmate_id'    => 'required',
             'exam_room_id'    => 'required',
             'exam_session_id' => 'required',
-            'end_time'        => 'required',
         ], [
             'classmate_id.required' => 'Peserta wajib diisi',
             'name.required' => 'Nama Jadwal wajib diisi',
@@ -200,10 +227,14 @@ class AdminMasterTimetableIndex extends Component
             'supervisors.required' => 'Pengawas wajib diisi',
             'start_time.required' => 'Waktu Mulai wajib diisi',
             'end_time.required' => 'Waktu Selesai wajib diisi',
+
+            // VALIDASI PENTING BARU
+            'end_time.after' => 'Waktu Selesai harus lebih besar dari Waktu Mulai',
         ]);
 
         try {
             DB::beginTransaction();
+
             Timetable::updateOrCreate([
                 'id' => $this->data_id,
             ], [
@@ -217,17 +248,21 @@ class AdminMasterTimetableIndex extends Component
                 'start_time'      => $this->start_time,
                 'end_time'        => $this->end_time,
                 'description'     => $this->description,
-                'studys'          => $this->studys ? json_encode(json_encode(array_keys($this->studys))) : null,
+                'studys'          => $this->studys ? json_encode(array_keys($this->studys)) : null,
             ]);
+
             DB::commit();
             AlertHelper::success('Berhasil', 'Data berhasil disimpan!');
             $this->closeModal();
+
         } catch (\Throwable $th) {
+
             DB::rollback();
             AlertHelper::error('Gagal', 'Data gagal disimpan!');
             return Log::info('Gagal Menyimpan Data Jadwal : ' . $th);
         }
     }
+
 
     public function confirmDetail($id)
     {

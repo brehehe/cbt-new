@@ -177,7 +177,7 @@
                     <div>
                         <label for="start_time" class="block text-sm font-medium text-gray-700">Waktu Mulai <span
                                 class="text-red-600">*</span></label>
-                        <input type="datetime-local" id="start_time" wire:model.defer="start_time"
+                        <input type="datetime-local" id="start_time" wire:model.live="start_time"
                             placeholder="Masukkan" class="mt-1 form-control">
                         @error('start_time')
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
@@ -186,7 +186,7 @@
                     <div>
                         <label for="end_time" class="block text-sm font-medium text-gray-700">Waktu Selesai <span
                                 class="text-red-600">*</span></label>
-                        <input type="datetime-local" id="end_time" wire:model.defer="end_time"
+                        <input type="datetime-local" id="end_time" wire:model.live="end_time"
                             placeholder="Masukkan" class="mt-1 form-control">
                         @error('end_time')
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
