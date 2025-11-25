@@ -21,7 +21,7 @@ return new class extends Migration
             // Pause support: when force logout happens
             $table->timestamp('paused_at')->nullable();
             $table->bigInteger('pause_total_seconds')->default(0);
-            $table->integer('mark')->default(0);
+            $table->decimal('mark',15,2)->default(0);
             $table->foreignUuid('study_id')->nullable();
             $table->enum('status', ['warning', 'exam', 'done','suspend'])->default('warning');
             $table->foreignUuid('company_id')->nullable();
