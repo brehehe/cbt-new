@@ -215,25 +215,68 @@ Route::get('logout', function () {
 })->name('logout');
 
 Route::get('/clearallsession', function () {
-    return '
-        <h2>Konfirmasi Hapus Semua Session</h2>
-        <p>Apakah Anda yakin ingin menghapus SEMUA user session? Semua user akan logout termasuk admin.</p>
-        <a href="/clearallsession/confirm"
-            style="padding:10px 20px; background:red; color:white; border-radius:5px; text-decoration:none;">
-            Ya, hapus semua session
-        </a>
-        <br><br>
-        <a href="/" style="padding:10px 20px; background:gray; color:white; border-radius:5px; text-decoration:none;">
-            Batal
-        </a>
-    ';
+
+    // Ambil semua session
+    $sessions = DB::table('sessions')->get();
+
+    $html = "
+    <h2>Daftar User yang Sedang Login</h2>
+    <form method='POST' action='/clearallsession/confirm'>
+        ".csrf_field()."
+        <table border='1' cellpadding='10' cellspacing='0'>
+            <tr>
+                <th>Pilih</th>
+                <th>User ID</th>
+                <th>Nama</th>
+                <th>IP Address</th>
+                <th>User Agent</th>
+                <th>Last Activity</th>
+            </tr>
+    ";
+
+    foreach ($sessions as $s) {
+
+        // Ambil nama user jika ada
+        $userName = '-';
+        if ($s->user_id) {
+            $user = DB::table('users')->where('id', $s->user_id)->first();
+            $userName = $user ? $user->name : '(User tidak ditemukan)';
+        }
+
+        $html .= "
+            <tr>
+                <td><input type='checkbox' name='sessions[]' value='{$s->id}'></td>
+                <td>{$s->user_id}</td>
+                <td>{$userName}</td>
+                <td>{$s->ip_address}</td>
+                <td>{$s->user_agent}</td>
+                <td>".date('Y-m-d H:i:s', $s->last_activity)."</td>
+            </tr>
+        ";
+    }
+
+    $html .= "
+        </table>
+        <br>
+        <button type='submit' style='padding:10px 20px; background:red; color:white;'>Hapus Session Terpilih</button>
+        <a href='/' style='padding:10px 20px; background:gray; color:white; text-decoration:none;'>Batal</a>
+    </form>
+    ";
+
+    return $html;
 });
 
-Route::get('/clearallsession/confirm', function () {
+Route::post('/clearallsession/confirm', function () {
 
-    // HAPUS semua session user
-    DB::table('sessions')->truncate();
+    if (!request()->has('sessions')) {
+        return "Tidak ada session yang dipilih.";
+    }
 
-    // Redirect semua user yang login (termasuk admin) ke /login
-    return redirect('/login')->with('message', 'Semua user telah dipaksa logout.');
+    $selected = request()->sessions;
+
+    DB::table('sessions')
+        ->whereIn('id', $selected)
+        ->delete();
+
+    return redirect('/clearallsession')->with('message', 'Session terpilih telah dihapus.');
 });
