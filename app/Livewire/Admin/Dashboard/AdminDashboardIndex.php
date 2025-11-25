@@ -629,7 +629,6 @@ class AdminDashboardIndex extends Component
 
             // Load user profile with role-based access control
             $this->userProfile = $this->getUserProfileData();
-            dd($this->userProfile);
         } catch (\Exception $e) {
             Session::flash('error', 'Error loading dashboard data: ' . $e->getMessage());
         }
