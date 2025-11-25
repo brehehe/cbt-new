@@ -62,6 +62,10 @@ class AdminMasterSettingIndex extends Component
 
     public $logo_potrait;
 
+    public $background_login_old;
+
+    public $background_login;
+
     public $is_mark;
 
     public $tax_id;
@@ -77,6 +81,10 @@ class AdminMasterSettingIndex extends Component
     public $pic_phone;
 
     public $pic_email;
+
+    public $color_primary;
+
+    public $color_secondary;
 
     // Service
     public $companyServices = [];
@@ -113,6 +121,10 @@ class AdminMasterSettingIndex extends Component
             'code_name',
             'region',
             'code_region',
+            'background_login_old',
+            'background_login',
+            'color_primary',
+            'color_secondary',
         ]);
 
         if ($tab === 'universitas') {
@@ -136,6 +148,9 @@ class AdminMasterSettingIndex extends Component
                 'code_name',
                 'region',
                 'code_region',
+                'background_login',
+                'color_primary',
+                'color_secondary',
             ])->with('companyDetail')->find($this->company_id);
 
             if ($company) {
@@ -159,6 +174,9 @@ class AdminMasterSettingIndex extends Component
                 $this->code_name = $company->code_name;
                 $this->region = $company->region;
                 $this->code_region = $company->code_region;
+                $this->background_login_old = $company->background_login;
+                $this->color_primary = $company->color_primary;
+                $this->color_secondary = $company->color_secondary;
             }
         } elseif ($tab === 'layanan') {
             $this->companyServices = CompanyService::select('id', 'start_date', 'company_id', 'service_month_id', 'duration_days', 'is_lifetime')->with('serviceMonth:id,name,description', 'company:id,name,description')->where('company_id', $this->company_id)->get();
@@ -185,6 +203,9 @@ class AdminMasterSettingIndex extends Component
                 'code_name' => 'required',
                 'region' => 'required',
                 'code_region' => 'required',
+                'background_login' => 'nullable|image|max:2048',
+                'color_primary' => 'required',
+                'color_secondary' => 'required',
             ]);
 
             if ($this->logo) {
@@ -203,6 +224,13 @@ class AdminMasterSettingIndex extends Component
                 $this->logo_potrait = $this->logo_potrait_old; // fallback jika tidak ada upload baru
             }
 
+            if ($this->background_login) {
+                $randomName = Str::random(40) . '.' . $this->background_login->getClientOriginalExtension();
+                $background_loginPath = $this->background_login->storeAs('public/company', $randomName);
+                $this->background_login = $background_loginPath; // untuk simpan di database
+            } else {
+                $this->background_login = $this->background_login_old; // fallback jika tidak ada upload baru
+            }
 
             $company = Company::updateOrCreate([
                 'id' => $this->company_id,
@@ -226,6 +254,9 @@ class AdminMasterSettingIndex extends Component
                 'code_name' => $this->code_name,
                 'region' => $this->region,
                 'code_region' => $this->code_region,
+                'background_login' => $this->background_login,
+                'color_primary' => $this->color_primary,
+                'color_secondary' => $this->color_secondary,
             ]);
 
             CompanyDetail::updateOrCreate([
@@ -236,7 +267,7 @@ class AdminMasterSettingIndex extends Component
             ]);
 
             // Reset file upload states agar tidak memanggil temporaryUrl() pada string path
-            $this->reset(['logo', 'logo_potrait']);
+            $this->reset(['logo', 'logo_potrait', 'background_login']);
 
             // Refresh preview paths dari data tersimpan
             $this->logo_old = $company->logo;

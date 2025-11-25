@@ -24742,6 +24742,13 @@ namespace Illuminate\Testing {
             }
     }
 
+namespace App\Livewire\Admin\Profile {
+    /**
+     */
+    class AdminProfileIndex extends \Livewire\Component {
+            }
+    }
+
 namespace App\Livewire\Auth\Login {
     /**
      */
@@ -24771,13 +24778,6 @@ namespace App\Livewire\Admin {
     /**
      */
     class LecturerManagement extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Profile {
-    /**
-     */
-    class AdminProfileIndex extends \Livewire\Component {
             }
     }
 
@@ -30035,6 +30035,11 @@ namespace  {
 }
 
 
+namespace Facades\Livewire\Features\SupportFileUploads {
+    /**
+     * @mixin \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl     */
+    class GenerateSignedUploadUrl extends \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl {}
+}
 
 
 

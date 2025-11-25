@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use App\Models\Company\Company;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,6 +30,12 @@ class AppServiceProvider extends ServiceProvider
 
         Blade::directive('number', function ($expression) {
             return "<?php echo number_format($expression, 0, ',', '.'); ?>";
+        });
+
+        view()->composer('*', function ($view) {
+            $company = Company::first(); // atau where('slug', config('app.name_slug'))
+
+            $view->with('companyData', $company);
         });
     }
 }

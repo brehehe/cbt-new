@@ -114,7 +114,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1
-                    class="text-2xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                    class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
                     Detail Analisis Butir Soal</h1>
                 <p class="text-gray-600 mt-2">
                     Ujian: <strong>{{ $timetable->name ?? 'Tidak diketahui' }}</strong> |
@@ -494,10 +494,10 @@
                                 <div class="p-3 bg-orange-50 rounded-lg">
                                     <div class="flex justify-between items-center">
                                         <span
-                                            class="text-sm font-medium {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-600' : 'text-orange-600' }}">Kontribusi
+                                            class="text-sm font-medium text-[{{$companyData->color_primary}}]">Kontribusi
                                             Reliabilitas</span>
                                         <span
-                                            class="font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-800' : 'text-orange-800' }}">{{ $analysis['reliability_contribution'] }}</span>
+                                            class="font-bold text-[{{$companyData->color_primary}}]">{{ $analysis['reliability_contribution'] }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -910,8 +910,8 @@
 
                             <div class="p-3 bg-orange-50 rounded-lg">
                                 <div class="flex justify-between items-center">
-                                    <span class="text-sm font-medium {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-600' : 'text-orange-600' }}">Kontribusi Reliabilitas</span>
-                                    <span class="font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-800' : 'text-orange-800' }}">${analysis.reliability_contribution}</span>
+                                    <span class="text-sm font-medium text-[{{$companyData->color_primary}}]">Kontribusi Reliabilitas</span>
+                                    <span class="font-bold text-[{{$companyData->color_primary}}]">${analysis.reliability_contribution}</span>
                                 </div>
                             </div>
                         </div>

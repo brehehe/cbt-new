@@ -1,3 +1,13 @@
+@php
+    use App\Models\Company\Company;
+
+    $company = Company::first(); // ambil 1 data pertama
+
+    $primary = $company?->color_primary ?? '#f58634';
+    $secondary = $company?->color_secondary ?? '#e88742ff';
+    $brandColor = "text-[{$primary}]";
+@endphp
+
 <!-- Sidebar Container with Flex Structure -->
 <aside id="sidebar"
     class="fixed inset-y-0 left-0 flex flex-col bg-white/80 backdrop-blur-sm w-64 border-r border-gray-100 shadow-lg z-40 transition-transform duration-300 ease-in-out transform translate-x-0">
@@ -5,9 +15,6 @@
     <!-- Logo Section -->
     <div class="flex-shrink-0 h-16 flex items-center gap-3 px-6 border-b border-gray-100">
         <div>
-            @php
-                $brandColor = in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]';
-            @endphp
             <h2 class="text-lg font-bold {{ $brandColor }}">PROCBT</h2>
             <p class="text-xs text-gray-500">Healthcare System</p>
         </div>
@@ -20,7 +27,6 @@
                 <!-- Dashboard -->
                 @php
                     $isActive = Request::is('admin');
-                    $brandColor = in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]';
                 @endphp
 
                 <a href="/admin"
@@ -211,7 +217,7 @@ if (auth()->check()) {
             [
                 'label' => 'Modul Soal',
                 'url' => route('admin.master.module'),
-                'pattern' => ['admin/master/module-question', 'admin/master/module-question/*'],
+                'pattern' => ['admin/master/module', 'admin/master/module/*'],
                 'icon' => 'fa-folder-open',
             ],
             [

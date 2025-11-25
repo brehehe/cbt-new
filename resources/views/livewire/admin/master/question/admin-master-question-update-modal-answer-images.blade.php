@@ -35,13 +35,8 @@
                 class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow transition cursor-pointer">
                 Batal
             </button>
-            @php
-                $isUpsTegal = in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']);
-            @endphp
-
             <button wire:click="submitAnswer"
-                class="px-4 py-2 {{ $isUpsTegal ? 'bg-[#2b7fff] hover:bg-[#1e6ee6]' : 'bg-[#f58634] hover:bg-[#e26f20]' }}
-        text-white rounded-lg shadow transition">
+                class="px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_primary }}] text-white rounded-lg shadow transition">
                 Simpan
             </button>
         </div>

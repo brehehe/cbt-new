@@ -30,10 +30,14 @@ class AuthLoginIndex extends Component
 
     public $hasActiveSession = false;
 
+    public $company = [];
+
     public $activeSessionInfo = null;
 
     public function mount()
     {
+        $this->company = Company::first();
+
         // Jika sudah login, langsung redirect ke dashboard
         if (Auth::check()) {
             return redirect()->route('admin.dashboard'); // ubah 'dashboard' sesuai nama route kamu

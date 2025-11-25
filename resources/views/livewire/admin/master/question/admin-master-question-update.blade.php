@@ -8,7 +8,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1
-                    class="text-2xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                    class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
                     Ubah Data Soal</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
@@ -144,7 +144,7 @@
                 <div class="md:col-span-2">
                     <label for="question" class="block text-sm font-medium text-gray-700">Gambar<span
                             class="text-red-600">*</span></label>
-                    <button class="btn btn-warning mt-1" wire:click='modalImages()'>Gambar</button>
+                    <button class="bg-[{{ $companyData->color_primary }}] text-white px-2 py-1 rounded" wire:click='modalImages()'>Gambar</button>
                 </div>
                 <div class="md:col-span-2">
                     <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi
@@ -199,7 +199,7 @@
                             <tr>
                                 <td class="center">{{ chr(64 + $loop->iteration) }} </td>
                                 <td>
-                                    <button class="btn btn-warning mt-1"
+                                    <button class="bg-[{{ $companyData->color_primary }}] text-white px-2 py-1 rounded"
                                         wire:click="modalAnswerImage('{{ $result?->id }}', '{{ chr(64 + $loop->iteration) }}')">Gambar</button>
                                 </td>
                                 <td>{{ $result?->context }}</td>

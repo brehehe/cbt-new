@@ -4,7 +4,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1
-                    class="text-2xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                    class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#2b7fff' }}]">
                     Ujian</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
@@ -72,7 +72,7 @@
                                 @else
                                     <div class="flex justify-end items-center">
                                         <button
-                                            class="btn btn-icon {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-600' : 'text-orange-600' }} hover:{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-800' : 'text-orange-800' }} transition-colors edit-btn"
+                                            class="btn btn-icon text-[{{ $companyData->color_primary ?? '#2b7fff' }}] hover:text-[{{ $companyData->color_primary ?? '#2b7fff' }}] transition-colors edit-btn"
                                             wire:click="confirmBackExam('{{ $timetable->userTimetable->id }}')">
                                             <i class="fa-regular fa-book-open-cover"></i> Kembali Ujian
                                         </button>

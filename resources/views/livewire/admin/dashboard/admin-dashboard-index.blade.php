@@ -375,7 +375,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1
-                    class="text-3xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                    class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
                     Selamat datang kembali,
                     {{ Auth::user()->name ?? 'Admin' }}!</h1>
                 <p class="text-gray-600 mt-1">Berikut aktivitas sistem CBT Anda hari ini.</p>
@@ -386,7 +386,7 @@
                 {{-- <label class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" id="autoRefresh" class="sr-only peer" checked>
                     <div
-                        class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#f58634]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }}">
+                        class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#f58634]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[{{ $companyData->color_primary }}]">
                     </div>
                     <span class="ml-3 text-sm font-medium text-gray-600">Segarkan Otomatis</span>
                 </label> --}}
@@ -399,7 +399,7 @@
 
                 <!-- Refresh Button -->
                 <button wire:click="refreshData" id="refreshButton"
-                    class="inline-flex items-center px-4 py-2 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} hover:{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                    class="inline-flex items-center px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_primary }}] text-white text-sm font-medium rounded-lg transition-colors duration-200">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
@@ -425,7 +425,7 @@
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Total Pengguna</p>
                     <h3
-                        class="text-3xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
                         {{ number_format($totalUsers) }}</h3>
                     <div class="flex items-center mt-2">
                         <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
@@ -438,7 +438,7 @@
                     </div>
                 </div>
                 <div class="bg-gradient-to-br from-[#f58634]/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
-                    <svg class="w-8 h-8 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}"
+                    <svg class="w-8 h-8 text-[{{ $companyData->color_primary ?? '#f58634' }}]"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -454,7 +454,7 @@
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Ujian Hari Ini</p>
                     <h3
-                        class="text-3xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
                         {{ $todayExams }}</h3>
                     <div class="flex items-center mt-2">
                         <div class="w-2 h-2 bg-blue-500 rounded-full pulse-dot mr-2"></div>
@@ -477,16 +477,16 @@
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Ujian Aktif</p>
                     <h3
-                        class="text-3xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
                         {{ $activeExams }}</h3>
                     <div class="flex items-center mt-2">
                         @if ($activeExams > 0)
                             <div
                                 class="w-2 h-2 rounded-full pulse-dot mr-2
-                                    {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-500' : 'bg-orange-500' }}">
+                                    bg-[{{ $companyData->color_primary }}]">
                             </div>
                             <span
-                                class="text-xs {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-600' : 'text-orange-600' }}">Sedang
+                                class="text-xs text-[{{ $companyData->color_primary }}]">Sedang
                                 berlangsung</span>
                         @else
                             <span class="text-xs text-gray-500">Tidak ada ujian aktif</span>
@@ -494,7 +494,7 @@
                     </div>
                 </div>
                 <div class="bg-gradient-to-br from-orange-500/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
-                    <svg class="w-8 h-8 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-600' : 'text-orange-600' }}"
+                    <svg class="w-8 h-8 text-[{{ $companyData->color_primary }}]"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -510,7 +510,7 @@
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Peringatan Keamanan</p>
                     <h3
-                        class="text-3xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
                         {{ $examAlerts }}</h3>
                     <div class="flex items-center mt-2">
                         @if ($examAlerts > 0)
@@ -536,10 +536,11 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             {{-- Profile Card --}}
             <div class="lg:col-span-1 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="bg-gradient-to-r {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'from-[#2b7fff] to-blue-600' : 'from-[#f58634] to-orange-600' }} p-6 text-white">
+                <div class="bg-gradient-to-r from-[{{ $companyData->color_primary }}] to-[{{ $companyData->color_secondary }}]
+ p-6 text-white">
                     <div class="flex flex-col items-center text-center">
                         {{-- Avatar --}}
-                        <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} text-3xl font-bold mb-3">
+                        <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center text-[{{ $companyData->color_primary ?? '#f58634' }}] text-3xl font-bold mb-3">
                             {{ strtoupper(substr($userProfile['user']->name ?? 'U', 0, 1)) }}
                         </div>
                         {{-- User Info --}}
@@ -584,7 +585,7 @@
                 {{-- MAHASISWA: Show academic information --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-4">
-                        <div class="p-4 bg-blue-50 rounded-lg border-l-4 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'border-[#2b7fff]' : 'border-[#f58634]' }}">
+                        <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-[{{ $companyData->color_primary }}]">
                             <label class="text-xs text-gray-500 uppercase">NIM</label>
                             <p class="text-lg font-semibold text-gray-800">
                                 {{ $userProfile['user']->userDetail->nim ?? '-' }}
@@ -617,14 +618,14 @@
                 </div>
 
                 {{-- Info Message for Mahasiswa --}}
-                <div class="mt-6 p-4 bg-blue-50 border-l-4 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'border-[#2b7fff]' : 'border-[#f58634]' }} rounded-r">
+                <div class="mt-6 p-4 bg-blue-50 border-l-4 border-[{{ $companyData->color_primary ?? '#f58634' }}] rounded-r">
                     <div class="flex items-start">
-                        <svg class="w-5 h-5 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-[{{ $companyData->color_primary ?? '#f58634' }}] mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         <div>
-                            <h4 class="text-sm font-semibold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-800' : 'text-orange-800' }}">Informasi Penting</h4>
-                            <p class="text-sm {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-700' : 'text-orange-700' }} mt-1">
+                            <h4 class="text-sm font-semibold text-[{{ $companyData->color_primary ?? '#f58634' }}]">Informasi Penting</h4>
+                            <p class="text-sm text-[{{ $companyData->color_primary ?? '#f58634' }}] mt-1">
                                 Anda login sebagai <strong>Mahasiswa</strong>. Informasi profil pribadi Anda hanya dapat dilihat oleh Anda sendiri.
                                 Jika ada kesalahan data, silakan hubungi administrator.
                             </p>
@@ -636,7 +637,7 @@
                 <div class="mt-6 pt-6 border-t border-gray-200">
                     <div class="flex flex-wrap gap-3">
                         <a href="{{ route('settings.profile') }}"
-                           class="inline-flex items-center px-4 py-2 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-[#2b7fff] hover:bg-blue-700' : 'bg-[#f58634] hover:bg-orange-700' }} text-white rounded-lg text-sm transition-colors duration-200">
+                           class="inline-flex items-center px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_secondary }}] text-white rounded-lg text-sm transition-colors duration-200">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                             </svg>
@@ -746,7 +747,7 @@
                 <h3 class="text-lg font-semibold text-gray-800">Tren Ujian Mingguan</h3>
                 <div class="flex items-center space-x-2">
                     <div
-                        class="w-3 h-3 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-[#2b7fff]' : 'bg-[#f58634]' }} rounded-full">
+                        class="w-3 h-3 bg-[{{ $companyData->color_primary }}] rounded-full">
                     </div>
                     <span class="text-sm text-gray-600">Ujian Dimulai</span>
                 </div>
@@ -823,7 +824,7 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-800">Pemantauan Sesi Langsung</h3>
                 <a href="{{ route('admin.exam.live-stream') }}"
-                    class="{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#2d8c5b] text-sm font-medium">
+                    class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-[#2d8c5b] text-sm font-medium">
                     Lihat Semua →
                 </a>
             </div>
@@ -845,12 +846,12 @@
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-gray-600">Masalah Kamera</span>
                         <span
-                            class="font-medium {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-600' : 'text-orange-600' }}">{{ $liveSessionStats['camera_issues'] ?? 0 }}</span>
+                            class="font-medium text-[{{ $companyData->color_primary }}]">{{ $liveSessionStats['camera_issues'] ?? 0 }}</span>
                     </div>
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-gray-600">Masalah Koneksi</span>
                         <span
-                            class="font-medium text-red-600">{{ $liveSessionStats['connection_issues'] ?? 0 }}</span>
+                            class="font-medium text-[{{ $companyData->color_primary }}]">{{ $liveSessionStats['connection_issues'] ?? 0 }}</span>
                     </div>
                 </div>
             @else
@@ -872,7 +873,7 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-800">Peringatan Kritis (24 Jam Terakhir)</h3>
                 <a href="{{ route('admin.exam.monitor') }}"
-                    class="{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#2d8c5b] text-sm font-medium">
+                    class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-[#2d8c5b] text-sm font-medium">
                     View All →
                 </a>
             </div>
@@ -921,7 +922,7 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-800">Ujian Mendatang</h3>
                 <a href="{{ route('admin.exam.timetable') }}"
-                    class="{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#2d8c5b] text-sm font-medium">
+                    class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-[#2d8c5b] text-sm font-medium">
                     Kelola →
                 </a>
             </div>
@@ -964,7 +965,7 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-800">Hasil Ujian Terbaru</h3>
                 <a href="{{ route('admin.report.item-analysis') }}"
-                    class="{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:text-[#2d8c5b] text-sm font-medium">
+                    class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-[#2d8c5b] text-sm font-medium">
                     Lihat Laporan →
                 </a>
             </div>

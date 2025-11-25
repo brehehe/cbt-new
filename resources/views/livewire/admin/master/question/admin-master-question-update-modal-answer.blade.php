@@ -66,9 +66,7 @@
             </button>
             <button wire:click="submitAnswer"
                 class="px-4 py-2
-        {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan'])
-            ? 'bg-[#2b7fff] hover:bg-[#1e6ee6]'
-            : 'bg-[#f58634] hover:bg-[#e26f20]' }}
+        bg-[{{$companyData->color_primary}}] hover:bg-[{{$companyData->color_primary}}]
         text-white rounded-lg shadow transition">
                 Simpan
             </button>

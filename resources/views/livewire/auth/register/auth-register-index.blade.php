@@ -383,7 +383,7 @@
                 <div class="flex flex-col items-center mb-6">
                     <img src="{{ asset('asset/img/logo.png') }}" alt="{{ config('app.name') }} Logo" class="h-12 drop-shadow-md">
                     <h1
-                        class="text-2xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                        class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
                         Buat Akun Anda</h1>
                     <p class="text-gray-600 text-sm">Daftar untuk mengakses dashboard Anda</p>
                 </div>
@@ -402,27 +402,27 @@
                         <div class="flex justify-between text-sm text-gray-600 mb-2 font-medium">
                             <span
                                 :class="step >= 1 ?
-                                    '{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} font-semibold' :
+                                    'text-[{{ $companyData->color_primary }}] font-semibold' :
                                     ''">Step
                                 1</span>
                             <span
                                 :class="step >= 2 ?
-                                    '{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} font-semibold' :
+                                    'text-[{{ $companyData->color_primary }}] font-semibold' :
                                     ''">Step
                                 2</span>
                             <span
                                 :class="step >= 3 ?
-                                    '{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} font-semibold' :
+                                    'text-[{{ $companyData->color_primary }}] font-semibold' :
                                     ''">Step
                                 3</span>
                             <span
                                 :class="step >= 4 ?
-                                    '{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} font-semibold' :
+                                    'text-[{{ $companyData->color_primary }}] font-semibold' :
                                     ''">Step
                                 4</span>
                             <span
                                 :class="step >= 5 ?
-                                    '{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} font-semibold' :
+                                    'text-[{{ $companyData->color_primary }}] font-semibold' :
                                     ''">Step
                                 5</span>
                         </div>
@@ -897,7 +897,7 @@
                     <p class="text-sm text-gray-600">
                         Sudah punya akun?
                         <a href="{{ route('login') }}"
-                            class="{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:underline font-semibold">Login
+                            class="text-[{{ $companyData->color_primary }}] hover:underline font-semibold">Login
                             di
                             sini</a>
                     </p>

@@ -11,12 +11,14 @@
     <canvas id="hiddenCanvas" style="display: none;"></canvas>
 
     <header
-        class="p-2 text-white {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-600' : 'bg-orange-600' }} shadow-lg sm:p-4">
+        class="p-2 text-white bg-[{{ $companyData->color_primary ?? '#2b7fff' }}]
+ shadow-lg sm:p-4">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
                 <h1 class="text-lg font-bold sm:text-xl">Computer Based Test</h1>
                 <div
-                    class="px-2 py-1 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-600' : 'bg-orange-600' }} rounded sm:px-3">
+                    class="px-2 py-1 bg-[{{ $companyData->color_primary ?? '#2b7fff' }}]
+ rounded sm:px-3">
                     <span class="text-xs sm:text-sm">Modul: {{ $userTimetable->timetable->module->name ?? '-' }}</span>
                 </div>
                 <!-- Alert Counter -->
@@ -303,7 +305,8 @@
             <div class="p-4 border-b border-gray-200 bg-orange-50">
                 <div class="text-center">
                     <div
-                        class="flex items-center justify-center w-16 h-16 mx-auto mb-3 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-600' : 'bg-orange-600' }} rounded-full lg:w-20 lg:h-20">
+                        class="flex items-center justify-center w-16 h-16 mx-auto mb-3 bg-[{{ $companyData->color_primary ?? '#2b7fff' }}]
+ rounded-full lg:w-20 lg:h-20">
                         <span
                             class="text-lg font-bold text-white lg:text-xl">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</span>
                     </div>
@@ -318,7 +321,7 @@
                 <div class="flex items-center justify-between mb-3">
                     <h4 class="font-medium text-gray-800">Monitor Camera</h4>
                     <button @click="showCamera = !showCamera"
-                        class="px-2 py-1 text-xs text-white {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-500' : 'bg-orange-500' }} rounded hover:{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-600' : 'bg-orange-600' }}">
+                        class="px-2 py-1 text-xs text-white bg-[{{ $companyData->color_primary ?? '#2b7fff' }}] hover:bg-[{{ $companyData->color_primary ?? '#2b7fff' }}] rounded">
                         <span x-text="showCamera ? 'Hide' : 'Show'"></span>
                     </button>
                 </div>

@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1
-                    class="text-2xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                    class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
                     Pengaturan</h1>
                 <p class="text-gray-600">Kelola pengaturan universitas Anda dengan mudah.</p>
             </div>
@@ -217,6 +217,42 @@
                                 @endif
                             @endif
 
+                            <div class="{{ $background_login || $background_login_old ? null : 'md:col-span-2' }}">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Background Login</label>
+
+                                <input type="file" wire:model.live="background_login"
+                                    class="block text-sm text-gray-500 w-full
+                                           file:px-2 file:py-1 file:rounded-md
+                                           file:border file:border-gray-300
+                                           file:text-xs file:font-medium
+                                           file:bg-blue-50 file:text-blue-700
+                                           hover:file:bg-blue-100"
+                                    accept="image/*" />
+                                <div wire:loading wire:target="background_login" class="text-sm text-gray-500 mt-1">
+                                    Uploading Background Login...
+                                </div>
+                                @error('background_login')
+                                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            @if (is_object($background_login))
+                                <div class="mt-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Preview
+                                        Background Login:</label>
+                                    <img src="{{ $background_login->temporaryUrl() }}" alt="Preview Background Login"
+                                        class="h-100 w-auto rounded border shadow" />
+                                </div>
+                            @else
+                                @if ($background_login_old)
+                                    <div class="mt-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Preview
+                                            Background Login:</label>
+                                        <img src="{{ asset('storage/' . $background_login_old) }}"
+                                            alt="Preview Background Login" class="h-100 w-auto rounded border shadow" />
+                                    </div>
+                                @endif
+                            @endif
+
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">NPWP / Tax ID</label>
                                 <input type="text" wire:model="tax_id" placeholder="Contoh: 01.234.567.8-901.000"
@@ -228,6 +264,28 @@
                                     placeholder="Contoh: Teknologi Informasi, Konstruksi, dll."
                                     class="mt-1 form-control" />
                             </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Color Primary</label>
+                                <div class="flex items-center gap-3">
+                                    <input type="color" wire:model.live="color_primary" class="mt-1 form-control" />
+
+                                    <!-- PREVIEW -->
+                                    <div class="w-8 h-8 rounded border"
+                                        style="background-color: {{ $color_primary }};"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Color Secondary</label>
+                                <div class="flex items-center gap-3">
+                                    <input type="color" wire:model.live="color_secondary" class="mt-1 form-control" />
+
+                                    <!-- PREVIEW -->
+                                    <div class="w-8 h-8 rounded border"
+                                        style="background-color: {{ $color_secondary }};"></div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 

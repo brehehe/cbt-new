@@ -3,25 +3,12 @@
         <div class="flex justify-between h-16">
             <!-- Left Section: Logo & Sidebar Toggle -->
             <div class="flex items-center">
-                @if (config('app.name_slug') === 'ups_tegal')
-                    <img src="{{ asset('asset/img/logo-ups-blue.png') }}"
-                        alt="UPS Tegal Logo"
-                        class="h-10 w-auto mr-2">
-                @elseif (config('app.name_slug') === 'unimma')
-                    <img src="{{ asset('asset/img/unimma.webp') }}"
-                        alt="UNIMMA Logo"
-                        class="h-10 w-auto mr-2">
-                @elseif (config('app.name_slug') === 'unidayan')
-                    <img src="{{ asset('asset/img/unidayan/logo-primary.png') }}"
-                        alt="UNIDAYAN Logo"
-                        class="h-10 w-auto mr-2">
-                @else
-                    <img src="{{ asset('asset/img/logo-procbt.png') }}"
-                        alt="PRO CBT Logo"
-                        class="h-10 w-auto mr-2">
-                @endif
+                <img src="{{ $companyData?->logo ? asset('storage/'.$companyData->logo) : asset('asset/img/logo-procbt.png') }}"
+                    alt="Company Logo"
+                    class="h-9 w-auto mr-2">
                 <button id="toggleSidebar"
-                    class="p-2 rounded-xl {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} hover:bg-[#C3D4EC]/20 transition-all duration-200 cursor-pointer">
+                    class="p-2 rounded-xl text-[{{ $companyData->color_primary ?? '#f58634' }}]
+ hover:bg-[#C3D4EC]/20 transition-all duration-200 cursor-pointer">
                     <i class="fas fa-bars text-lg"></i>
                 </button>
             </div>
@@ -58,9 +45,11 @@
                                         lalu</p>
                                 </div>
                             @elseif($isExpiringSoon)
-                                <i class="fas fa-clock {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-600' : 'text-orange-600' }}"></i>
+                                <i class="fas fa-clock text-[{{ $companyData->color_primary ?? '#f58634' }}]
+"></i>
                                 <div class="text-left">
-                                    <p class="text-xs {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-600' : 'text-orange-600' }} font-medium">Berakhir Dalam {{ $daysLeft }}
+                                    <p class="text-xs text-[{{ $companyData->color_primary ?? '#f58634' }}]
+ font-medium">Berakhir Dalam {{ $daysLeft }}
                                         hari lagi</p>
                                 </div>
                             @else
@@ -82,7 +71,8 @@
                 <!-- Notifications -->
                 <!-- <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open"
-                        class="p-2 rounded-xl text-gray-500 hover:bg-[#C3D4EC]/20 hover:{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} transition-all duration-200 relative">
+                        class="p-2 rounded-xl text-gray-500 hover:bg-[#C3D4EC]/20 hover:text-[{{ $companyData->color_primary ?? '#f58634' }}]
+ transition-all duration-200 relative">
                         <i class="fas fa-bell text-lg"></i>
                         <span
                             class="absolute top-1 right-1 h-4 w-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center">3</span>
@@ -142,12 +132,14 @@
                         </div>
                         <div class="p-2">
                             <!-- <a href="/admin/profile/profile"
-                                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} rounded-lg transition-all duration-200">
+                                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-[{{ $companyData->color_primary ?? '#f58634' }}]
+ rounded-lg transition-all duration-200">
                                 <i class="fas fa-user w-4"></i>
                                 <span>Profile</span>
                             </a> -->
                             <a href="/admin/change-password/change-password"
-                                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} rounded-lg transition-all duration-200">
+                                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-[{{ $companyData->color_primary ?? '#f58634' }}]
+ rounded-lg transition-all duration-200">
                                 <i class="fas fa-lock w-4"></i>
                                 <span>Rubah Password</span>
                             </a>

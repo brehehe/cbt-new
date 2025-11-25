@@ -4,7 +4,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1
-                    class="text-2xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                    class="text-2xl font-bold text-[{{$companyData->color_primary}}]">
                     Data Peserta Detail</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
@@ -27,10 +27,12 @@
                     Tipe <span class="text-red-600">*</span>
                 </label>
 
-                @php
-                    $brandBg = in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-600' : 'bg-orange-600';
-                    $brandBorder = in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'border-blue-600' : 'border-orange-600';
-                @endphp
+               @php
+$brandBg = "bg-[{$companyData->color_primary}]";
+$brandBorder = "border-[{$companyData->color_primary}]";
+@endphp
+
+
 
                 <div class="mt-2 flex space-x-2">
                     <button type="button" wire:click="$set('type_study', 'mahasiswa')"
@@ -124,7 +126,7 @@
                     <span class="text-sm text-gray-700 ml-2">data</span> --}}
                     <div>
                         <h1
-                            class="text-2xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+                            class="text-2xl font-bold text-[{{$companyData->color_primary}}]">
                             Data Mahasiswa</h1>
                         {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
                     </div>

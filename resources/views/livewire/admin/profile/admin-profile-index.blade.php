@@ -3,7 +3,7 @@
 <div class="container mx-auto px-4 py-6">
     <!-- Header -->
     <div class="mb-6">
-        <h1 class="text-3xl font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}">
+        <h1 class="text-3xl font-bold text-[{{ $companyData->color_primary }}]">
             Profil Pengguna
         </h1>
         <p class="text-gray-600 mt-1">
@@ -18,10 +18,10 @@
     <!-- Profile Card -->
     <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
         <!-- Profile Header -->
-        <div class="bg-gradient-to-r {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'from-[#2b7fff] to-blue-600' : 'from-[#f58634] to-orange-600' }} p-6 text-white">
+        <div class="bg-gradient-to-r bg-[{{$$companyData->color_primary}] p-6 text-white">
             <div class="flex items-center space-x-4">
                 <!-- Avatar -->
-                <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }} text-3xl font-bold">
+                <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center text-[{{ $companyData->color_primary }}] text-3xl font-bold">
                     {{ strtoupper(substr($user->name ?? 'U', 0, 1)) }}
                 </div>
                 <!-- User Info -->
@@ -53,7 +53,7 @@
                 <!-- Basic Information -->
                 <div>
                     <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <svg class="w-5 h-5 mr-2 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 mr-2 text-[{{ $companyData->color_primary }}]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
                         Informasi Dasar
@@ -87,7 +87,7 @@
                 <!-- Additional Information -->
                 <div>
                     <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <svg class="w-5 h-5 mr-2 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-[#2b7fff]' : 'text-[#f58634]' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 mr-2 text-[{{ $companyData->color_primary }}]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         Informasi Tambahan
