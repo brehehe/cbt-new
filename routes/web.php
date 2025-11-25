@@ -213,3 +213,27 @@ Route::get('logout', function () {
 
     return redirect()->route('login');
 })->name('logout');
+
+Route::get('/clearallsession', function () {
+    return '
+        <h2>Konfirmasi Hapus Semua Session</h2>
+        <p>Apakah Anda yakin ingin menghapus SEMUA user session? Semua user akan logout termasuk admin.</p>
+        <a href="/clearallsession/confirm"
+            style="padding:10px 20px; background:red; color:white; border-radius:5px; text-decoration:none;">
+            Ya, hapus semua session
+        </a>
+        <br><br>
+        <a href="/" style="padding:10px 20px; background:gray; color:white; border-radius:5px; text-decoration:none;">
+            Batal
+        </a>
+    ';
+});
+
+Route::get('/clearallsession/confirm', function () {
+
+    // HAPUS semua session user
+    DB::table('sessions')->truncate();
+
+    // Redirect semua user yang login (termasuk admin) ke /login
+    return redirect('/login')->with('message', 'Semua user telah dipaksa logout.');
+});
