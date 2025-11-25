@@ -216,11 +216,31 @@ Route::get('logout', function () {
 
 Route::get('/clearallsession', function () {
 
-    // Ambil semua session
+    // ========== JIKA BELUM VERIFIKASI PASSWORD ==========
+    if (!session('clearsession_verified')) {
+
+        return '
+            <h2>Masukkan Password Admin</h2>
+            <form method="POST" action="/clearallsession/check">
+                '.csrf_field().'
+                <input type="password" name="password" placeholder="Password"
+                    style="padding:10px; width:200px;">
+                <br><br>
+                <button type="submit" style="padding:10px 20px; background:blue; color:white;">
+                    Verifikasi
+                </button>
+            </form>
+        ';
+    }
+
+    // ========== JIKA SUDAH VERIFIKASI PASSWORD ==========
+
     $sessions = DB::table('sessions')->get();
 
     $html = "
     <h2>Daftar User yang Sedang Login</h2>
+
+    <!-- FORM HAPUS SESSION TERPILIH -->
     <form method='POST' action='/clearallsession/confirm'>
         ".csrf_field()."
         <table border='1' cellpadding='10' cellspacing='0'>
@@ -235,8 +255,6 @@ Route::get('/clearallsession', function () {
     ";
 
     foreach ($sessions as $s) {
-
-        // Ambil nama user jika ada
         $userName = '-';
         if ($s->user_id) {
             $user = DB::table('users')->where('id', $s->user_id)->first();
@@ -258,25 +276,70 @@ Route::get('/clearallsession', function () {
     $html .= "
         </table>
         <br>
-        <button type='submit' style='padding:10px 20px; background:red; color:white;'>Hapus Session Terpilih</button>
-        <a href='/' style='padding:10px 20px; background:gray; color:white; text-decoration:none;'>Batal</a>
+
+        <!-- BUTTON HAPUS TERPILIH -->
+        <button type='submit' style='padding:10px 20px; background:red; color:white;'>
+            Hapus Session Terpilih
+        </button>
+
     </form>
+
+    <br><br>
+
+    <!-- FORM HAPUS SEMUA -->
+    <form method='POST' action='/clearallsession/clearall'>
+        ".csrf_field()."
+        <button type='submit' style='padding:10px 20px; background:darkred; color:white;'>
+            Hapus Semua Session (Force Logout Semua User)
+        </button>
+    </form>
+
+    <br><br>
+    <a href='/' style='padding:10px 20px; background:gray; color:white; text-decoration:none;'>Batal</a>
     ";
 
     return $html;
 });
 
+Route::post('/clearallsession/check', function () {
+
+    $input = request()->password;
+    $password = env('CLEAR_SESSION_PASSWORD');
+
+    if ($input === $password) {
+        session(['clearsession_verified' => true]);
+        return redirect('/clearallsession');
+    }
+
+    return "<h2>Password salah!</h2>
+            <a href='/clearallsession'>Coba Lagi</a>";
+});
+
 Route::post('/clearallsession/confirm', function () {
+
+    if (!session('clearsession_verified')) {
+        return redirect('/clearallsession')->with('error', 'Tidak diizinkan.');
+    }
 
     if (!request()->has('sessions')) {
         return "Tidak ada session yang dipilih.";
     }
 
-    $selected = request()->sessions;
-
     DB::table('sessions')
-        ->whereIn('id', $selected)
+        ->whereIn('id', request()->sessions)
         ->delete();
 
     return redirect('/clearallsession')->with('message', 'Session terpilih telah dihapus.');
+});
+
+
+Route::post('/clearallsession/clearall', function () {
+
+    if (!session('clearsession_verified')) {
+        return redirect('/clearallsession')->with('error', 'Tidak diizinkan.');
+    }
+
+    DB::table('sessions')->truncate();
+
+    return redirect('/clearallsession')->with('message', 'Semua session telah dihapus. Semua user telah logout.');
 });
