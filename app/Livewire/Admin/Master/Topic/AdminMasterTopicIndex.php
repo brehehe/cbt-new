@@ -38,24 +38,24 @@ class AdminMasterTopicIndex extends Component
         // dd(Auth::user()?->company);
        if (Auth::user()?->hasRole('Dosen')) {
 
-    $studyIds = Auth::user()?->studys ?? []; // array dari JSON
+            $studyIds = Auth::user()?->studys ?? []; // array dari JSON
 
-    $this->studies = Study::whereIn('id', $studyIds)
-        ->orderBy('name', 'asc')
-        ->pluck('name', 'id')
-        ->toArray();
+            $this->studies = Study::whereIn('id', $studyIds)
+                ->orderBy('name', 'asc')
+                ->pluck('name', 'id')
+                ->toArray();
 
-    // Ambil key pertama dari $this->studies
-   $this->study_id = !empty($this->studies)
-    ? array_key_first($this->studies)
-    : null;
+            // Ambil key pertama dari $this->studies
+        $this->study_id = !empty($this->studies)
+            ? array_key_first($this->studies)
+            : null;
 
-} else {
+        } else {
 
-    $this->studies = Study::orderBy('name', 'asc')
-        ->pluck('name', 'id')
-        ->toArray();
-}
+            $this->studies = Study::orderBy('name', 'asc')
+                ->pluck('name', 'id')
+                ->toArray();
+        }
 
     }
 

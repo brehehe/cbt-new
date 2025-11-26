@@ -56,10 +56,10 @@ class CompanySeeder extends Seeder
         $company_datas = [
             [
                 'code'    => '1Br0ck',                                                      // Str::random(6)
-                'name'    => 'Burningroom PRO CBT',
-                'email'   => 'burningroomPRO CBT@gmail.com',
+                'name'    => 'PRO CBT',
+                'email'   => 'procbt@gmail.com',
                 'phone'   => '08' . Factory::create()->numberBetween(100000000, 999999999),
-                'website' => 'https://burningroom.co.id',
+                'website' => 'https://procbt.co.id',
                 'service_id' => $serviceMonth->id,
 
                 'address'      => Factory::create()->streetAddress(),
@@ -70,9 +70,9 @@ class CompanySeeder extends Seeder
                 'postal_code'  => Factory::create()->postcode(),
                 'country'      => 'Indonesia',
 
-                'pic_name'     => 'Burningroom Technology',
+                'pic_name'     => 'PRO CBT',
                 'pic_position' => 'CEO',
-                'pic_email'    => 'burningroomofficial.co.id@gmail.com',
+                'pic_email'    => 'procbt@gmail.com',
                 'pic_phone'    => '08' . Factory::create()->numberBetween(100000000, 999999999),
 
                 'is_active'   => true,
