@@ -52,8 +52,7 @@ class AdminMasterTimetableDetailIndex extends Component
             return '-';
         }
 
-        return RatingScale::where('company_id', $this->company_id)
-            ->where('min_score', '<=', $mark)
+        return RatingScale::where('min_score', '<=', $mark)
             ->where('max_score', '>=', $mark)
             ->orderBy('order')
             ->first()
