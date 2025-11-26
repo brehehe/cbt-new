@@ -151,7 +151,13 @@
                             <td><span
                                     class="px-2 py-1 rounded bg-red-100 text-red-700 font-semibold">{{ $userTimetable->userModuleQuestions->where('status', 'wrong')->count() }}</span>
                             </td>
-                            <td>{{ $userTimetable->mark }}</td>
+                            <td>
+                                {{ $userTimetable->mark }}
+                                <span class="ml-2 px-2 py-1 rounded bg-blue-100 text-blue-700 font-semibold">
+                                    {{ $this->getGrade($userTimetable->mark) }}
+                                </span>
+                            </td>
+
                             <td class="center">
                                 <div class="flex items-center">
                                     <button
