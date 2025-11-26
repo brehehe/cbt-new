@@ -11,7 +11,6 @@ use Livewire\Component;
 use Session;
 use Carbon\Carbon;
 use Livewire\WithPagination;
-use App\Models\Master\RatingScale\RatingScale;
 
 class AdminMasterTimetableDetailIndex extends Component
 {
@@ -44,19 +43,6 @@ class AdminMasterTimetableDetailIndex extends Component
     public function confirmDetail($id)
     {
         return redirect()->route('admin.master.timetable.answer', ['timetable_id' => $this->timetable_id, 'user_timetable_id' => $id]);
-    }
-
-    public function getGrade($mark)
-    {
-        if ($mark === null) {
-            return '-';
-        }
-
-        return RatingScale::where('min_score', '<=', $mark)
-            ->where('max_score', '>=', $mark)
-            ->orderBy('order')
-            ->first()
-            ?->grade_letter ?? '-';
     }
 
     public function render()
