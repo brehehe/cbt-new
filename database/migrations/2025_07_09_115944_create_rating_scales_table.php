@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('rating_scales', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('grade_letter');
-            $table->integer('min_score')->default(0);
-            $table->integer('max_score')->default(0);
+            $table->decimal('min_score', 15, 2)->default(0);
+            $table->decimal('max_score', 15, 2)->default(0);
             $table->longText('description')->nullable();
             $table->foreignUuid('company_id')->nullable();
             $table->bigInteger('order')->default(0);
