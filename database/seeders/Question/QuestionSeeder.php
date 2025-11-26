@@ -22,18 +22,18 @@ class QuestionSeeder extends Seeder
     {
         //
         $companys = Company::get();
-        $topics = [
-            ['name' => 'Sistem Saraf'],
-            ['name' => 'Sistem Pernapasan'],
-            ['name' => 'Sistem Gigi'],
-            ['name' => 'Sistem Tulang'],
-            ['name' => 'Sistem Kelenjar'],
-            ['name' => 'Sistem Pencernaan'],
-            ['name' => 'Sistem Peredaran Darah'],
-            ['name' => 'Sistem Otot'],
-            ['name' => 'Sistem Reproduksi'],
-            ['name' => 'Sistem Imun']
-        ];
+        // $topics = [
+        //     ['name' => 'Sistem Saraf'],
+        //     ['name' => 'Sistem Pernapasan'],
+        //     ['name' => 'Sistem Gigi'],
+        //     ['name' => 'Sistem Tulang'],
+        //     ['name' => 'Sistem Kelenjar'],
+        //     ['name' => 'Sistem Pencernaan'],
+        //     ['name' => 'Sistem Peredaran Darah'],
+        //     ['name' => 'Sistem Otot'],
+        //     ['name' => 'Sistem Reproduksi'],
+        //     ['name' => 'Sistem Imun']
+        // ];
         foreach ($companys as $company) {
 
             Study::create([
@@ -47,11 +47,11 @@ class QuestionSeeder extends Seeder
             ]);
 
             // Create topics for this company
-            $companyTopics = [];
-            foreach ($topics as $topic) {
-                $topic['company_id'] = $company->id;
-                $companyTopics[] = Topic::create($topic);
-            }
+            // $companyTopics = [];
+            // foreach ($topics as $topic) {
+            //     $topic['company_id'] = $company->id;
+            //     $companyTopics[] = Topic::create($topic);
+            // }
 
             // // Get question types for this company
             // $questionTypes = QuestionType::withoutGlobalScope('user_scope')->where('company_id', $company->id)->get();
