@@ -700,7 +700,7 @@
                 <div class="group relative hidden w-0 overflow-hidden lg:block lg:w-3/5">
                     <!-- Background with modern clip-path -->
                     <div class="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 transition-all duration-1000 hover:from-blue-500 hover:via-blue-600 hover:to-blue-800"
-                        style="clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); background-image: url('{{ $company->background_login ? asset('storage/'.$company->background_login) : asset('asset/img/unimma-background.jpeg') }}'); background-size: cover; background-position: center;">
+                        style="clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); background-image: url('{{ $company->background_login ? asset('storage/'.$company->background_login) : asset('asset/img/auth-pro-cbt.webp') }}'); background-size: cover; background-position: center;">
                     </div>
 
                     <!-- Subtle pattern overlay -->

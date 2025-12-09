@@ -114,6 +114,10 @@ namespace App\Models\Company{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property int $order
+ * @property string $color_primary
+ * @property string $color_secondary
+ * @property string $color_text
+ * @property string|null $background_login
  * @property-read Company|null $company
  * @property-read \App\Models\Company\CompanyDetail|null $companyDetail
  * @property-read \App\Models\User|null $user
@@ -121,9 +125,13 @@ namespace App\Models\Company{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereBackgroundLogin($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereCodeName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereCodeRegion($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereColorPrimary($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereColorSecondary($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereColorText($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereCompanyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereDeletedAt($value)
@@ -940,8 +948,8 @@ namespace App\Models\Master\RatingScale{
 /**
  * @property string $id
  * @property string $grade_letter
- * @property int $min_score
- * @property int $max_score
+ * @property string $min_score
+ * @property string $max_score
  * @property string|null $description
  * @property string|null $company_id
  * @property int $order
@@ -1593,6 +1601,7 @@ namespace App\Models{
  * @property string|null $email
  * @property string|null $nim
  * @property string|null $username
+ * @property string|null $photo
  * @property string|null $phone
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property array<array-key, mixed>|null $studys Array of study programs or departments
@@ -1611,7 +1620,6 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property string|null $photo
  * @property-read \App\Models\Classmate\ClassmateStudent|null $classmateStudent
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Company\Company> $companies
  * @property-read int|null $companies_count
@@ -1975,7 +1983,7 @@ namespace App\Models\User{
  * @property string|null $end_exam
  * @property string|null $paused_at
  * @property int $pause_total_seconds
- * @property int $mark
+ * @property string $mark
  * @property string|null $study_id
  * @property string $status
  * @property string|null $company_id
