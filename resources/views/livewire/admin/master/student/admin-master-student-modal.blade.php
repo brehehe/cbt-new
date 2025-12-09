@@ -27,21 +27,17 @@
                     Tipe <span class="text-red-600">*</span>
                 </label>
 
-                @php
-                    $brandBg = 'bg-[{{$companyData->color_primary}}]';
-                    $brandBorder = 'border-[{{$companyData->color_primary}}]';
-                @endphp
 
                 <div class="mt-2 flex space-x-2">
                     <button type="button" wire:click="$set('type_study', 'mahasiswa')"
                         class="px-4 py-2 rounded-md border
-            {{ $type_study === 'mahasiswa' ? "$brandBg text-white $brandBorder" : 'bg-white text-gray-700 border-gray-300' }}">
+                            {{ $type_study === 'mahasiswa' ? 'bg-[' . $companyData->color_primary . '] text-white border-[' . $companyData->color_primary . ']' : 'bg-white text-gray-700 border-gray-300' }}">
                         Kelas
                     </button>
 
                     <button type="button" wire:click="$set('type_study', 'general')"
                         class="px-4 py-2 rounded-md border
-            {{ $type_study === 'general' ? "$brandBg text-white $brandBorder" : 'bg-white text-gray-700 border-gray-300' }}">
+                            {{ $type_study === 'general' ? 'bg-[' . $companyData->color_primary . '] text-white border-[' . $companyData->color_primary . ']' : 'bg-white text-gray-700 border-gray-300' }}">
                         General
                     </button>
                 </div>
@@ -406,9 +402,9 @@
                     @enderror
                 </div>
                 <div class="mb-4">
-                    <label for="nim" class="block text-sm font-medium text-gray-700">NIM <span
+                    <label for="nim" class="block text-sm font-medium text-gray-700">Nomer Peserta <span
                             class="text-red-600">*</span></label>
-                    <input id="nim" type="text" wire:model.defer="nim" placeholder="Contoh: 20241001"
+                    <input id="nim" type="text" wire:model.defer="nim" placeholder="Contoh: 20251001"
                         class="mt-1 form-control">
                     @error('nim')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>

@@ -3099,6 +3099,7 @@
         },
         {
             "name": "league/uri",
+<<<<<<< HEAD
             "version": "7.6.0",
             "source": {
                 "type": "git",
@@ -3113,6 +3114,22 @@
             },
             "require": {
                 "league/uri-interfaces": "^7.6",
+=======
+            "version": "7.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/uri.git",
+                "reference": "8d587cddee53490f9b82bf203d3a9aa7ea4f9807"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/uri/zipball/8d587cddee53490f9b82bf203d3a9aa7ea4f9807",
+                "reference": "8d587cddee53490f9b82bf203d3a9aa7ea4f9807",
+                "shasum": ""
+            },
+            "require": {
+                "league/uri-interfaces": "^7.7",
+>>>>>>> 4e12e801b857ebaa0fdb38ef0bc37cd7dcb5292a
                 "php": "^8.1",
                 "psr/http-factory": "^1"
             },
@@ -3185,7 +3202,11 @@
                 "docs": "https://uri.thephpleague.com",
                 "forum": "https://thephpleague.slack.com",
                 "issues": "https://github.com/thephpleague/uri-src/issues",
+<<<<<<< HEAD
                 "source": "https://github.com/thephpleague/uri/tree/7.6.0"
+=======
+                "source": "https://github.com/thephpleague/uri/tree/7.7.0"
+>>>>>>> 4e12e801b857ebaa0fdb38ef0bc37cd7dcb5292a
             },
             "funding": [
                 {
@@ -3193,6 +3214,7 @@
                     "type": "github"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-11-18T12:17:23+00:00"
         },
         {
@@ -3207,6 +3229,22 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/thephpleague/uri-interfaces/zipball/ccbfb51c0445298e7e0b7f4481b942f589665368",
                 "reference": "ccbfb51c0445298e7e0b7f4481b942f589665368",
+=======
+            "time": "2025-12-07T16:02:06+00:00"
+        },
+        {
+            "name": "league/uri-interfaces",
+            "version": "7.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/uri-interfaces.git",
+                "reference": "62ccc1a0435e1c54e10ee6022df28d6c04c2946c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/uri-interfaces/zipball/62ccc1a0435e1c54e10ee6022df28d6c04c2946c",
+                "reference": "62ccc1a0435e1c54e10ee6022df28d6c04c2946c",
+>>>>>>> 4e12e801b857ebaa0fdb38ef0bc37cd7dcb5292a
                 "shasum": ""
             },
             "require": {
@@ -3269,7 +3307,11 @@
                 "docs": "https://uri.thephpleague.com",
                 "forum": "https://thephpleague.slack.com",
                 "issues": "https://github.com/thephpleague/uri-src/issues",
+<<<<<<< HEAD
                 "source": "https://github.com/thephpleague/uri-interfaces/tree/7.6.0"
+=======
+                "source": "https://github.com/thephpleague/uri-interfaces/tree/7.7.0"
+>>>>>>> 4e12e801b857ebaa0fdb38ef0bc37cd7dcb5292a
             },
             "funding": [
                 {
@@ -3277,7 +3319,11 @@
                     "type": "github"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-11-18T12:17:23+00:00"
+=======
+            "time": "2025-12-07T16:03:21+00:00"
+>>>>>>> 4e12e801b857ebaa0fdb38ef0bc37cd7dcb5292a
         },
         {
             "name": "livewire/flux",
@@ -6642,6 +6688,7 @@
         },
         {
             "name": "symfony/http-kernel",
+<<<<<<< HEAD
             "version": "v7.4.1",
             "source": {
                 "type": "git",
@@ -6652,6 +6699,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/http-kernel/zipball/171d2ec4002012a023e042c6041d7fde58b143c6",
                 "reference": "171d2ec4002012a023e042c6041d7fde58b143c6",
+=======
+            "version": "v7.4.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/http-kernel.git",
+                "reference": "f6e6f0a5fa8763f75a504b930163785fb6dd055f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/http-kernel/zipball/f6e6f0a5fa8763f75a504b930163785fb6dd055f",
+                "reference": "f6e6f0a5fa8763f75a504b930163785fb6dd055f",
+>>>>>>> 4e12e801b857ebaa0fdb38ef0bc37cd7dcb5292a
                 "shasum": ""
             },
             "require": {
@@ -6737,7 +6796,11 @@
             "description": "Provides a structured process for converting a Request into a Response",
             "homepage": "https://symfony.com",
             "support": {
+<<<<<<< HEAD
                 "source": "https://github.com/symfony/http-kernel/tree/v7.4.1"
+=======
+                "source": "https://github.com/symfony/http-kernel/tree/v7.4.2"
+>>>>>>> 4e12e801b857ebaa0fdb38ef0bc37cd7dcb5292a
             },
             "funding": [
                 {
@@ -6757,7 +6820,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-12-07T16:28:51+00:00"
+=======
+            "time": "2025-12-08T07:43:37+00:00"
+>>>>>>> 4e12e801b857ebaa0fdb38ef0bc37cd7dcb5292a
         },
         {
             "name": "symfony/mailer",
