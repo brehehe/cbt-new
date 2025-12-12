@@ -374,8 +374,7 @@
     <div class="mb-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1
-                    class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                <h1 class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
                     Selamat datang kembali,
                     {{ Auth::user()->name ?? 'Admin' }}!</h1>
                 <p class="text-gray-600 mt-1">Berikut aktivitas sistem CBT Anda hari ini.</p>
@@ -416,595 +415,478 @@
         </div>
     </div>
 
-    <!-- Main Stats Overview -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <!-- Total Users -->
-        <div
-            class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 fade-in">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-gray-600 mb-1">Total Pengguna</p>
-                    <h3
-                        class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
-                        {{ number_format($totalUsers) }}</h3>
-                    <div class="flex items-center mt-2">
-                        <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                            @if (isset($monthlyStats['new_users_this_month']) && $monthlyStats['new_users_this_month'] > 0)
-                                +{{ $monthlyStats['new_users_this_month'] }} bulan ini
-                            @else
-                                Pengguna terdaftar
-                            @endif
-                        </span>
-                    </div>
-                </div>
-                <div class="bg-gradient-to-br from-[#f58634]/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
-                    <svg class="w-8 h-8 text-[{{ $companyData->color_primary ?? '#f58634' }}]"
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <!-- Today's Exams -->
-        <div
-            class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 fade-in">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-gray-600 mb-1">Ujian Hari Ini</p>
-                    <h3
-                        class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
-                        {{ $todayExams }}</h3>
-                    <div class="flex items-center mt-2">
-                        <div class="w-2 h-2 bg-blue-500 rounded-full pulse-dot mr-2"></div>
-                        <span class="text-xs text-blue-600">Ujian dimulai hari ini</span>
-                    </div>
-                </div>
-                <div class="bg-gradient-to-br from-blue-500/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
-                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <!-- Active Exams -->
-        <div
-            class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 fade-in">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-gray-600 mb-1">Ujian Aktif</p>
-                    <h3
-                        class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
-                        {{ $activeExams }}</h3>
-                    <div class="flex items-center mt-2">
-                        @if ($activeExams > 0)
-                            <div
-                                class="w-2 h-2 rounded-full pulse-dot mr-2
-                                    bg-[{{ $companyData->color_primary }}]">
-                            </div>
-                            <span
-                                class="text-xs text-[{{ $companyData->color_primary }}]">Sedang
-                                berlangsung</span>
-                        @else
-                            <span class="text-xs text-gray-500">Tidak ada ujian aktif</span>
-                        @endif
-                    </div>
-                </div>
-                <div class="bg-gradient-to-br from-orange-500/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
-                    <svg class="w-8 h-8 text-[{{ $companyData->color_primary }}]"
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <!-- Exam Alerts -->
-        <div
-            class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 fade-in">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-gray-600 mb-1">Peringatan Keamanan</p>
-                    <h3
-                        class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
-                        {{ $examAlerts }}</h3>
-                    <div class="flex items-center mt-2">
-                        @if ($examAlerts > 0)
-                            <div class="w-2 h-2 bg-red-500 rounded-full pulse-dot mr-2"></div>
-                            <span class="text-xs text-red-600">Pelanggaran keamanan</span>
-                        @else
-                            <span class="text-xs text-green-600">Semua aman</span>
-                        @endif
-                    </div>
-                </div>
-                <div class="bg-gradient-to-br from-red-500/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
-                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.732 15.5c-.77.833.192 2.5 1.732 2.5z" />
-                    </svg>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- User Profile Section - ONLY for Mahasiswa --}}
-    @if(Auth::user()->hasRole('Mahasiswa') && isset($userProfile) && $userProfile)
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            {{-- Profile Card --}}
-            <div class="lg:col-span-1 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="bg-gradient-to-r from-[{{ $companyData->color_primary }}] to-[{{ $companyData->color_secondary }}]
- p-6 text-white">
-                    <div class="flex flex-col items-center text-center">
-                        {{-- Avatar --}}
-                        <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center text-[{{ $companyData->color_primary ?? '#f58634' }}] text-3xl font-bold mb-3">
-                            {{ strtoupper(substr($userProfile['user']->name ?? 'U', 0, 1)) }}
-                        </div>
-                        {{-- User Info --}}
-                        <h3 class="text-xl font-bold">{{ $userProfile['user']->name ?? 'Pengguna' }}</h3>
-                        <p class="text-blue-100 text-sm mt-1">{{ $userProfile['user']->email ?? '-' }}</p>
-                        <span class="mt-2 px-3 py-1 bg-white/20 rounded-full text-xs font-medium">
-                            {{ $userProfile['role'] ?? 'User' }}
-                        </span>
-                    </div>
-                </div>
-
-                {{-- Profile Details --}}
-                <div class="p-6">
-                    <h4 class="text-sm font-semibold text-gray-700 mb-4">Informasi Dasar</h4>
-                    <div class="space-y-3 text-sm">
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">Username:</span>
-                            <span class="font-medium text-gray-800">{{ $userProfile['user']->username ?? '-' }}</span>
-                        </div>
-                        @if($userProfile['user']->userDetail && $userProfile['user']->userDetail->phone)
-                            <div class="flex justify-between">
-                                <span class="text-gray-500">Telepon:</span>
-                                <span class="font-medium text-gray-800">{{ $userProfile['user']->userDetail->phone }}</span>
-                            </div>
-                        @endif
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">Terdaftar:</span>
-                            <span class="font-medium text-gray-800">{{ $userProfile['user']->created_at?->format('d M Y') ?? '-' }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Profile Information - Mahasiswa Only --}}
-            <div class="lg:col-span-2 bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-lg font-semibold text-gray-800">
-                        📚 Informasi Akademik Mahasiswa
-                    </h3>
-                </div>
-
-                {{-- MAHASISWA: Show academic information --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-4">
-                        <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-[{{ $companyData->color_primary }}]">
-                            <label class="text-xs text-gray-500 uppercase">NIM</label>
-                            <p class="text-lg font-semibold text-gray-800">
-                                {{ $userProfile['user']->userDetail->nim ?? '-' }}
-                            </p>
-                        </div>
-
-                        <div class="p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
-                            <label class="text-xs text-gray-500 uppercase">Program Studi</label>
-                            <p class="text-lg font-semibold text-gray-800">
-                                {{ $userProfile['user']->userDetail->study->name ?? '-' }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div class="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500">
-                            <label class="text-xs text-gray-500 uppercase">Angkatan</label>
-                            <p class="text-lg font-semibold text-gray-800">
-                                {{ $userProfile['user']->userDetail->angkatan ?? '-' }}
-                            </p>
-                        </div>
-
-                        <div class="p-4 bg-orange-50 rounded-lg border-l-4 border-orange-500">
-                            <label class="text-xs text-gray-500 uppercase">Semester</label>
-                            <p class="text-lg font-semibold text-gray-800">
-                                {{ $userProfile['user']->userDetail->semester ?? '-' }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Info Message for Mahasiswa --}}
-                <div class="mt-6 p-4 bg-blue-50 border-l-4 border-[{{ $companyData->color_primary ?? '#f58634' }}] rounded-r">
-                    <div class="flex items-start">
-                        <svg class="w-5 h-5 text-[{{ $companyData->color_primary ?? '#f58634' }}] mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <div>
-                            <h4 class="text-sm font-semibold text-[{{ $companyData->color_primary ?? '#f58634' }}]">Informasi Penting</h4>
-                            <p class="text-sm text-[{{ $companyData->color_primary ?? '#f58634' }}] mt-1">
-                                Anda login sebagai <strong>Mahasiswa</strong>. Informasi profil pribadi Anda hanya dapat dilihat oleh Anda sendiri.
-                                Jika ada kesalahan data, silakan hubungi administrator.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Quick Actions --}}
-                <div class="mt-6 pt-6 border-t border-gray-200">
-                    <div class="flex flex-wrap gap-3">
-                        <a href="{{ route('settings.profile') }}"
-                           class="inline-flex items-center px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_secondary }}] text-white rounded-lg text-sm transition-colors duration-200">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                            </svg>
-                            Edit Profil
-                        </a>
-
-                        <a href="{{ route('settings.password') }}"
-                           class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm transition-colors duration-200">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
-                            </svg>
-                            Ubah Password
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
+    {{-- Tampilkan profil untuk semua user --}}
+    @if (isset($userProfile) && $userProfile)
+        {{-- User Profile Section will now appear for all roles --}}
+        @include('livewire.admin.dashboard.partials.user-profile-section')
     @endif
 
-    <!-- Secondary Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <!-- Completed Exams -->
-        <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
-            <div class="flex items-center justify-between mb-4">
-                <div class="bg-gradient-to-br from-green-500/20 to-[#C3D4EC]/20 p-3 rounded-2xl">
-                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <span class="text-2xl font-bold text-green-600">{{ number_format($completedExams) }}</span>
-            </div>
-            <p class="text-sm text-gray-600">Ujian Selesai</p>
-            @if (isset($monthlyStats['completed_this_month']))
-                <p class="text-xs text-green-600 mt-1">{{ $monthlyStats['completed_this_month'] }} bulan ini</p>
-            @endif
-        </div>
-
-        <!-- Total Exam Types -->
-        <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
-            <div class="flex items-center justify-between mb-4">
-                <div class="bg-gradient-to-br from-purple-500/20 to-[#C3D4EC]/20 p-3 rounded-2xl">
-                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
-                        </path>
-                    </svg>
-                </div>
-                <span class="text-2xl font-bold text-purple-600">{{ number_format($totalExamTypes) }}</span>
-            </div>
-            <p class="text-sm text-gray-600">Kategori Ujian</p>
-            <p class="text-xs text-purple-600 mt-1">Jenis tersedia</p>
-        </div>
-
-        <!-- Completion Rate -->
-        <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
-            <div class="flex items-center justify-between mb-4">
-                <div class="bg-gradient-to-br from-indigo-500/20 to-[#C3D4EC]/20 p-3 rounded-2xl">
-                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                    </svg>
-                </div>
-                <span class="text-2xl font-bold text-indigo-600">
-                    @if (isset($monthlyStats['avg_completion_rate']))
-                        {{ $monthlyStats['avg_completion_rate'] }}%
-                    @else
-                        0%
-                    @endif
-                </span>
-            </div>
-            <p class="text-sm text-gray-600">Tingkat Penyelesaian</p>
-            <p class="text-xs text-indigo-600 mt-1">Rata-rata bulan ini</p>
-        </div>
-
-        <!-- Live Sessions -->
-        <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
-            <div class="flex items-center justify-between mb-4">
-                <div class="bg-gradient-to-br from-yellow-500/20 to-[#C3D4EC]/20 p-3 rounded-2xl">
-                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
-                        </path>
-                    </svg>
-                </div>
-                <span class="text-2xl font-bold text-yellow-600">
-                    @if (isset($liveSessionStats['active_sessions']))
-                        {{ $liveSessionStats['active_sessions'] }}
-                    @else
-                        0
-                    @endif
-                </span>
-            </div>
-            <p class="text-sm text-gray-600">Sesi Langsung</p>
-            <div class="flex items-center mt-1">
-                <div class="w-2 h-2 bg-yellow-500 rounded-full pulse-dot mr-2"></div>
-                <span class="text-xs text-yellow-600">Aktif sekarang</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Charts and Analytics Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-        <!-- Weekly Exam Trends -->
-        <div class="lg:col-span-2 bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold text-gray-800">Tren Ujian Mingguan</h3>
-                <div class="flex items-center space-x-2">
-                    <div
-                        class="w-3 h-3 bg-[{{ $companyData->color_primary }}] rounded-full">
-                    </div>
-                    <span class="text-sm text-gray-600">Ujian Dimulai</span>
-                </div>
-            </div>
-
-            <div class="chart-container" wire:ignore>
-                <canvas id="weeklyChart" width="400" height="200"></canvas>
-            </div>
-        </div>
-
-        <!-- Exam Status Distribution -->
-        <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-800 mb-6">Distribusi Status Ujian</h3>
-
-            <!-- Status Items -->
-            <div class="space-y-4">
-                @if (isset($examStatistics))
-                    @php
-                        $totalExamSessions = array_sum($examStatistics);
-                        $statusColors = [
-                            'done' => ['bg-green-500', 'text-green-700', 'bg-green-50'],
-                            'exam' => ['bg-blue-500', 'text-blue-700', 'bg-blue-50'],
-                            'warning' => ['bg-yellow-500', 'text-yellow-700', 'bg-yellow-50'],
-                            'blocked' => ['bg-red-500', 'text-red-700', 'bg-red-50'],
-                        ];
-
-                        $statusLabels = [
-                            'done' => 'Selesai',
-                            'exam' => 'Sedang Ujian',
-                            'warning' => 'Peringatan',
-                            'blocked' => 'Diblokir',
-                        ];
-                    @endphp
-
-                    @foreach ($examStatistics as $status => $count)
-                        @php
-                            $percentage = $totalExamSessions > 0 ? round(($count / $totalExamSessions) * 100, 1) : 0;
-                            $colors = $statusColors[$status] ?? ['bg-gray-500', 'text-gray-700', 'bg-gray-50'];
-                        @endphp
-
-                        <div class="flex items-center justify-between p-3 {{ $colors[2] }} rounded-lg">
-                            <div class="flex items-center">
-                                <div
-                                    class="w-3 h-3 {{ $statusLabels[$status] ?? ucfirst($status) }} rounded-full mr-3">
-                                </div>
-                                <span
-                                    class="text-sm font-medium {{ $colors[1] }} capitalize">{{ $status }}</span>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-sm font-bold {{ $colors[1] }}">{{ $count }}</div>
-                                <div class="text-xs text-gray-500">{{ $percentage }}%</div>
-                            </div>
+    @if (!Auth::user()->hasRole('Mahasiswa'))
+        <!-- Main Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total Users -->
+            <div
+                class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 fade-in">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">Total Pengguna</p>
+                        <h3 class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                            {{ number_format($totalUsers) }}</h3>
+                        <div class="flex items-center mt-2">
+                            <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                                @if (isset($monthlyStats['new_users_this_month']) && $monthlyStats['new_users_this_month'] > 0)
+                                    +{{ $monthlyStats['new_users_this_month'] }} bulan ini
+                                @else
+                                    Pengguna terdaftar
+                                @endif
+                            </span>
                         </div>
-                    @endforeach
-                @else
-                    <div class="text-center text-gray-500 py-8">
-                        <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-                            </path>
-                        </svg>
-                        <p class="text-sm">Tidak ada data ujian</p>
                     </div>
+                    <div class="bg-gradient-to-br from-[#f58634]/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
+                        <svg class="w-8 h-8 text-[{{ $companyData->color_primary ?? '#f58634' }}]" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Exams -->
+            <div
+                class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 fade-in">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">Ujian Hari Ini</p>
+                        <h3 class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                            {{ $todayExams }}</h3>
+                        <div class="flex items-center mt-2">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full pulse-dot mr-2"></div>
+                            <span class="text-xs text-blue-600">Ujian dimulai hari ini</span>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-br from-blue-500/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Exams -->
+            <div
+                class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 fade-in">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">Ujian Aktif</p>
+                        <h3 class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                            {{ $activeExams }}</h3>
+                        <div class="flex items-center mt-2">
+                            @if ($activeExams > 0)
+                                <div
+                                    class="w-2 h-2 rounded-full pulse-dot mr-2
+                                    bg-[{{ $companyData->color_primary }}]">
+                                </div>
+                                <span class="text-xs text-[{{ $companyData->color_primary }}]">Sedang
+                                    berlangsung</span>
+                            @else
+                                <span class="text-xs text-gray-500">Tidak ada ujian aktif</span>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-br from-orange-500/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
+                        <svg class="w-8 h-8 text-[{{ $companyData->color_primary }}]" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exam Alerts -->
+            <div
+                class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 fade-in">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">Peringatan Keamanan</p>
+                        <h3 class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                            {{ $examAlerts }}</h3>
+                        <div class="flex items-center mt-2">
+                            @if ($examAlerts > 0)
+                                <div class="w-2 h-2 bg-red-500 rounded-full pulse-dot mr-2"></div>
+                                <span class="text-xs text-red-600">Pelanggaran keamanan</span>
+                            @else
+                                <span class="text-xs text-green-600">Semua aman</span>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-br from-red-500/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
+                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.732 15.5c-.77.833.192 2.5 1.732 2.5z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Secondary Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Completed Exams -->
+            <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="bg-gradient-to-br from-green-500/20 to-[#C3D4EC]/20 p-3 rounded-2xl">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <span class="text-2xl font-bold text-green-600">{{ number_format($completedExams) }}</span>
+                </div>
+                <p class="text-sm text-gray-600">Ujian Selesai</p>
+                @if (isset($monthlyStats['completed_this_month']))
+                    <p class="text-xs text-green-600 mt-1">{{ $monthlyStats['completed_this_month'] }} bulan ini</p>
                 @endif
             </div>
-        </div>
-    </div>
 
-    <!-- Live Monitoring and Alerts Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
-        <!-- Live Session Monitoring -->
-        <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold text-gray-800">Pemantauan Sesi Langsung</h3>
-                <a href="{{ route('admin.exam.live-stream') }}"
-                    class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-[#2d8c5b] text-sm font-medium">
-                    Lihat Semua →
-                </a>
+            <!-- Total Exam Types -->
+            <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="bg-gradient-to-br from-purple-500/20 to-[#C3D4EC]/20 p-3 rounded-2xl">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                            </path>
+                        </svg>
+                    </div>
+                    <span class="text-2xl font-bold text-purple-600">{{ number_format($totalExamTypes) }}</span>
+                </div>
+                <p class="text-sm text-gray-600">Kategori Ujian</p>
+                <p class="text-xs text-purple-600 mt-1">Jenis tersedia</p>
             </div>
 
-            @if (isset($liveSessionStats))
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="text-center p-4 bg-blue-50 rounded-lg">
-                        <div class="text-2xl font-bold text-blue-600">{{ $liveSessionStats['active_sessions'] ?? 0 }}
-                        </div>
-                        <div class="text-sm text-blue-600">Sesi Aktif</div>
+            <!-- Completion Rate -->
+            <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="bg-gradient-to-br from-indigo-500/20 to-[#C3D4EC]/20 p-3 rounded-2xl">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
                     </div>
-                    <div class="text-center p-4 bg-red-50 rounded-lg">
-                        <div class="text-2xl font-bold text-red-600">{{ $liveSessionStats['high_risk'] ?? 0 }}</div>
-                        <div class="text-sm text-red-600">Risiko Tinggi</div>
-                    </div>
+                    <span class="text-2xl font-bold text-indigo-600">
+                        @if (isset($monthlyStats['avg_completion_rate']))
+                            {{ $monthlyStats['avg_completion_rate'] }}%
+                        @else
+                            0%
+                        @endif
+                    </span>
                 </div>
+                <p class="text-sm text-gray-600">Tingkat Penyelesaian</p>
+                <p class="text-xs text-indigo-600 mt-1">Rata-rata bulan ini</p>
+            </div>
 
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-gray-600">Masalah Kamera</span>
-                        <span
-                            class="font-medium text-[{{ $companyData->color_primary }}]">{{ $liveSessionStats['camera_issues'] ?? 0 }}</span>
-                    </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-gray-600">Masalah Koneksi</span>
-                        <span
-                            class="font-medium text-[{{ $companyData->color_primary }}]">{{ $liveSessionStats['connection_issues'] ?? 0 }}</span>
-                    </div>
-                </div>
-            @else
-                <div class="text-center text-gray-500 py-8">
-                    <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Live Sessions -->
+            <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="bg-gradient-to-br from-yellow-500/20 to-[#C3D4EC]/20 p-3 rounded-2xl">
+                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
                             </path>
                         </svg>
                     </div>
-                    <p class="text-sm">Tidak ada sesi aktif</p>
+                    <span class="text-2xl font-bold text-yellow-600">
+                        @if (isset($liveSessionStats['active_sessions']))
+                            {{ $liveSessionStats['active_sessions'] }}
+                        @else
+                            0
+                        @endif
+                    </span>
                 </div>
-            @endif
+                <p class="text-sm text-gray-600">Sesi Langsung</p>
+                <div class="flex items-center mt-1">
+                    <div class="w-2 h-2 bg-yellow-500 rounded-full pulse-dot mr-2"></div>
+                    <span class="text-xs text-yellow-600">Aktif sekarang</span>
+                </div>
+            </div>
         </div>
 
-        <!-- Critical Alerts -->
-        <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold text-gray-800">Peringatan Kritis (24 Jam Terakhir)</h3>
-                <a href="{{ route('admin.exam.monitor') }}"
-                    class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-[#2d8c5b] text-sm font-medium">
-                    View All →
-                </a>
+        <!-- Charts and Analytics Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+            <!-- Weekly Exam Trends -->
+            <div class="lg:col-span-2 bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800">Tren Ujian Mingguan</h3>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 bg-[{{ $companyData->color_primary }}] rounded-full">
+                        </div>
+                        <span class="text-sm text-gray-600">Ujian Dimulai</span>
+                    </div>
+                </div>
+
+                <div class="chart-container" wire:ignore>
+                    <canvas id="weeklyChart" width="400" height="200"></canvas>
+                </div>
             </div>
 
-            @if (isset($criticalAlerts) && $criticalAlerts->count() > 0)
-                <div class="space-y-3 max-h-64 overflow-y-auto">
-                    @foreach ($criticalAlerts as $alert)
-                        <div class="flex items-start space-x-3 p-3 bg-red-50 rounded-lg border-l-4 border-red-500">
-                            <div class="flex-shrink-0">
-                                <div class="w-2 h-2 bg-red-500 rounded-full mt-2"></div>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="text-sm font-medium text-red-800">
-                                    {{ $alert->userTimetable->user->name ?? 'Unknown User' }}
-                                </div>
-                                <div class="text-xs text-red-600 mt-1">
-                                    Jenis Peringatan: {{ $alert->alert_type ?? 'Pelanggaran Keamanan' }}
-                                </div>
-                                <div class="text-xs text-gray-500 mt-1">
-                                    {{ $alert->created_at->diffForHumans() }}
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            @else
-                <div class="text-center text-gray-500 py-8">
-                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                    <p class="text-sm">Tidak ada peringatan kritis</p>
-                    <p class="text-xs text-gray-400 mt-1">Semua sistem aman</p>
-                </div>
-            @endif
-        </div>
-    </div>
+            <!-- Exam Status Distribution -->
+            <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-800 mb-6">Distribusi Status Ujian</h3>
 
-    <!-- Upcoming Exams and Recent Results -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
-        <!-- Upcoming Exams -->
-        <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold text-gray-800">Ujian Mendatang</h3>
-                <a href="{{ route('admin.exam.timetable') }}"
-                    class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-[#2d8c5b] text-sm font-medium">
-                    Kelola →
-                </a>
+                <!-- Status Items -->
+                <div class="space-y-4">
+                    @if (isset($examStatistics))
+                        @php
+                            $totalExamSessions = array_sum($examStatistics);
+                            $statusColors = [
+                                'done' => ['bg-green-500', 'text-green-700', 'bg-green-50'],
+                                'exam' => ['bg-blue-500', 'text-blue-700', 'bg-blue-50'],
+                                'warning' => ['bg-yellow-500', 'text-yellow-700', 'bg-yellow-50'],
+                                'blocked' => ['bg-red-500', 'text-red-700', 'bg-red-50'],
+                            ];
+
+                            $statusLabels = [
+                                'done' => 'Selesai',
+                                'exam' => 'Sedang Ujian',
+                                'warning' => 'Peringatan',
+                                'blocked' => 'Diblokir',
+                            ];
+                        @endphp
+
+                        @foreach ($examStatistics as $status => $count)
+                            @php
+                                $percentage =
+                                    $totalExamSessions > 0 ? round(($count / $totalExamSessions) * 100, 1) : 0;
+                                $colors = $statusColors[$status] ?? ['bg-gray-500', 'text-gray-700', 'bg-gray-50'];
+                            @endphp
+
+                            <div class="flex items-center justify-between p-3 {{ $colors[2] }} rounded-lg">
+                                <div class="flex items-center">
+                                    <div
+                                        class="w-3 h-3 {{ $statusLabels[$status] ?? ucfirst($status) }} rounded-full mr-3">
+                                    </div>
+                                    <span
+                                        class="text-sm font-medium {{ $colors[1] }} capitalize">{{ $status }}</span>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm font-bold {{ $colors[1] }}">{{ $count }}</div>
+                                    <div class="text-xs text-gray-500">{{ $percentage }}%</div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        <div class="text-center text-gray-500 py-8">
+                            <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                </path>
+                            </svg>
+                            <p class="text-sm">Tidak ada data ujian</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Monitoring and Alerts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+            <!-- Live Session Monitoring -->
+            <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800">Pemantauan Sesi Langsung</h3>
+                    <a href="{{ route('admin.exam.live-stream') }}"
+                        class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-[#2d8c5b] text-sm font-medium">
+                        Lihat Semua →
+                    </a>
+                </div>
+
+                @if (isset($liveSessionStats))
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="text-center p-4 bg-blue-50 rounded-lg">
+                            <div class="text-2xl font-bold text-blue-600">
+                                {{ $liveSessionStats['active_sessions'] ?? 0 }}
+                            </div>
+                            <div class="text-sm text-blue-600">Sesi Aktif</div>
+                        </div>
+                        <div class="text-center p-4 bg-red-50 rounded-lg">
+                            <div class="text-2xl font-bold text-red-600">{{ $liveSessionStats['high_risk'] ?? 0 }}
+                            </div>
+                            <div class="text-sm text-red-600">Risiko Tinggi</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-600">Masalah Kamera</span>
+                            <span
+                                class="font-medium text-[{{ $companyData->color_primary }}]">{{ $liveSessionStats['camera_issues'] ?? 0 }}</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-600">Masalah Koneksi</span>
+                            <span
+                                class="font-medium text-[{{ $companyData->color_primary }}]">{{ $liveSessionStats['connection_issues'] ?? 0 }}</span>
+                        </div>
+                    </div>
+                @else
+                    <div class="text-center text-gray-500 py-8">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                        </div>
+                        <p class="text-sm">Tidak ada sesi aktif</p>
+                    </div>
+                @endif
             </div>
 
-            @if (isset($upcomingExams) && $upcomingExams->count() > 0)
-                <div class="space-y-3">
-                    @foreach ($upcomingExams as $exam)
-                        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                            <div class="flex-1">
-                                <div class="text-sm font-medium text-blue-800">{{ $exam->name }}</div>
-                                <div class="text-xs text-blue-600 mt-1">{{ $exam->module->name ?? 'N/A' }}</div>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-xs text-gray-500">
-                                    {{ \Carbon\Carbon::parse($exam->start_time)->format('M d, Y') }}
-                                </div>
-                                <div class="text-xs text-blue-600">
-                                    {{ \Carbon\Carbon::parse($exam->start_time)->format('H:i') }}
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
+            <!-- Critical Alerts -->
+            <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800">Peringatan Kritis (24 Jam Terakhir)</h3>
+                    <a href="{{ route('admin.exam.monitor') }}"
+                        class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-[#2d8c5b] text-sm font-medium">
+                        View All →
+                    </a>
                 </div>
-            @else
-                <div class="text-center text-gray-500 py-8">
-                    <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                            </path>
-                        </svg>
+
+                @if (isset($criticalAlerts) && $criticalAlerts->count() > 0)
+                    <div class="space-y-3 max-h-64 overflow-y-auto">
+                        @foreach ($criticalAlerts as $alert)
+                            <div class="flex items-start space-x-3 p-3 bg-red-50 rounded-lg border-l-4 border-red-500">
+                                <div class="flex-shrink-0">
+                                    <div class="w-2 h-2 bg-red-500 rounded-full mt-2"></div>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-sm font-medium text-red-800">
+                                        {{ $alert->userTimetable->user->name ?? 'Unknown User' }}
+                                    </div>
+                                    <div class="text-xs text-red-600 mt-1">
+                                        Jenis Peringatan: {{ $alert->alert_type ?? 'Pelanggaran Keamanan' }}
+                                    </div>
+                                    <div class="text-xs text-gray-500 mt-1">
+                                        {{ $alert->created_at->diffForHumans() }}
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
-                    <p class="text-sm">Tidak ada ujian mendatang</p>
-                </div>
-            @endif
+                @else
+                    <div class="text-center text-gray-500 py-8">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <p class="text-sm">Tidak ada peringatan kritis</p>
+                        <p class="text-xs text-gray-400 mt-1">Semua sistem aman</p>
+                    </div>
+                @endif
+            </div>
         </div>
 
-        <!-- Recent Exam Results -->
-        <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold text-gray-800">Hasil Ujian Terbaru</h3>
-                <a href="{{ route('admin.report.item-analysis') }}"
-                    class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-[#2d8c5b] text-sm font-medium">
-                    Lihat Laporan →
-                </a>
+        <!-- Upcoming Exams and Recent Results -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+            <!-- Upcoming Exams -->
+            <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800">Ujian Mendatang</h3>
+                    <a href="{{ route('admin.exam.timetable') }}"
+                        class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-[#2d8c5b] text-sm font-medium">
+                        Kelola →
+                    </a>
+                </div>
+
+                @if (isset($upcomingExams) && $upcomingExams->count() > 0)
+                    <div class="space-y-3">
+                        @foreach ($upcomingExams as $exam)
+                            <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium text-blue-800">{{ $exam->name }}</div>
+                                    <div class="text-xs text-blue-600 mt-1">{{ $exam->module->name ?? 'N/A' }}</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xs text-gray-500">
+                                        {{ \Carbon\Carbon::parse($exam->start_time)->format('M d, Y') }}
+                                    </div>
+                                    <div class="text-xs text-blue-600">
+                                        {{ \Carbon\Carbon::parse($exam->start_time)->format('H:i') }}
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center text-gray-500 py-8">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                        </div>
+                        <p class="text-sm">Tidak ada ujian mendatang</p>
+                    </div>
+                @endif
             </div>
 
-            @if (isset($recentExamResults) && $recentExamResults->count() > 0)
-                <div class="space-y-3 max-h-64 overflow-y-auto">
-                    @foreach ($recentExamResults as $result)
-                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                            <div class="flex-1">
-                                <div class="text-sm font-medium text-green-800">{{ $result->user->name ?? 'Unknown' }}
-                                </div>
-                                <div class="text-xs text-green-600 mt-1">
-                                    {{ $result->timetable->module->name ?? 'N/A' }}</div>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-sm font-bold text-green-700">
-                                    {{ $result->mark ?? 0 }}/100
-                                </div>
-                                <div class="text-xs text-gray-500">
-                                    {{ $result->updated_at->diffForHumans() }}
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
+            <!-- Recent Exam Results -->
+            <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800">Hasil Ujian Terbaru</h3>
+                    <a href="{{ route('admin.report.item-analysis') }}"
+                        class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-[#2d8c5b] text-sm font-medium">
+                        Lihat Laporan →
+                    </a>
                 </div>
-            @else
-                <div class="text-center text-gray-500 py-8">
-                    <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-                            </path>
-                        </svg>
+
+                @if (isset($recentExamResults) && $recentExamResults->count() > 0)
+                    <div class="space-y-3 max-h-64 overflow-y-auto">
+                        @foreach ($recentExamResults as $result)
+                            <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium text-green-800">
+                                        {{ $result->user->name ?? 'Unknown' }}
+                                    </div>
+                                    <div class="text-xs text-green-600 mt-1">
+                                        {{ $result->timetable->module->name ?? 'N/A' }}</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm font-bold text-green-700">
+                                        {{ $result->mark ?? 0 }}/100
+                                    </div>
+                                    <div class="text-xs text-gray-500">
+                                        {{ $result->updated_at->diffForHumans() }}
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
-                    <p class="text-sm">Tidak ada hasil terbaru</p>
-                </div>
-            @endif
+                @else
+                    <div class="text-center text-gray-500 py-8">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                </path>
+                            </svg>
+                        </div>
+                        <p class="text-sm">Tidak ada hasil terbaru</p>
+                    </div>
+                @endif
+            </div>
         </div>
-    </div>
+    @endif
 </div>
 
 @push('scripts')

@@ -303,9 +303,9 @@ class UserDetailSeeder extends Seeder
 
         for ($i = 1; $i <= 10; $i++) {
             $mahasiswa = User::create([
-                'name' => 'Mahasiswa ' . ($i + 1),
-                'email' => 'mahasiswa' . ($i + 1) . '@gmail.com',
-                'username' => Str::replace(' ', '', strtolower('Mahasiswa ' . ($i + 1))),
+                'name' => 'Mahasiswa ' . ($i),
+                'email' => 'mahasiswa' . ($i) . '@gmail.com',
+                'username' => Str::replace(' ', '', strtolower('Mahasiswa ' . ($i))),
                 'password' => Hash::make('password123'),
                 'email_verified_at' => now(),
                 'company_id' => $companyId,
@@ -319,9 +319,9 @@ class UserDetailSeeder extends Seeder
             $mahasiswa->assignRole('Mahasiswa');
 
             UserDetail::create([
-                'nim' => '2024' . str_pad($i + 11, 4, '0', STR_PAD_LEFT),
+                'nim' => '2024' . str_pad($i, 4, '0', STR_PAD_LEFT),
                 'user_id' => $mahasiswa->id,
-                'student_id' => '2024' . str_pad($i + 11, 4, '0', STR_PAD_LEFT),
+                'student_id' => '2024' . str_pad($i, 4, '0', STR_PAD_LEFT),
                 'student_program' => 'Kedokteran',
                 'student_faculty' => 'Fakultas Kedokteran',
                 'student_department' => 'Ilmu Kedokteran',
@@ -361,9 +361,9 @@ class UserDetailSeeder extends Seeder
 
         for ($i = 11; $i <= 50; $i++) {
             $mahasiswa = User::create([
-                'name' => 'Mahasiswa ' . ($i + 1),
-                'email' => 'mahasiswa' . ($i + 1) . '@gmail.com',
-                'username' => Str::replace(' ', '', strtolower('Mahasiswa ' . ($i + 1))),
+                'name' => 'Mahasiswa ' . ($i),
+                'email' => 'mahasiswa' . ($i) . '@gmail.com',
+                'username' => Str::replace(' ', '', strtolower('Mahasiswa ' . ($i))),
                 'password' => Hash::make('password123'),
                 'email_verified_at' => now(),
                 'company_id' => $companyId,
@@ -377,9 +377,9 @@ class UserDetailSeeder extends Seeder
             $mahasiswa->assignRole('Mahasiswa');
 
             UserDetail::create([
-                'nim' => '2024' . str_pad($i + 11, 4, '0', STR_PAD_LEFT),
+                'nim' => '2024' . str_pad($i, 4, '0', STR_PAD_LEFT),
                 'user_id' => $mahasiswa->id,
-                'student_id' => '2024' . str_pad($i + 11, 4, '0', STR_PAD_LEFT),
+                'student_id' => '2024' . str_pad($i, 4, '0', STR_PAD_LEFT),
                 'student_program' => 'Kedokteran',
                 'student_faculty' => 'Fakultas Kedokteran',
                 'student_department' => 'Ilmu Kedokteran',

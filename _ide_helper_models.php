@@ -948,8 +948,8 @@ namespace App\Models\Master\RatingScale{
 /**
  * @property string $id
  * @property string $grade_letter
- * @property string $min_score
- * @property string $max_score
+ * @property numeric $min_score
+ * @property numeric $max_score
  * @property string|null $description
  * @property string|null $company_id
  * @property int $order
@@ -1257,7 +1257,7 @@ namespace App\Models\Service{
  * @property string $name
  * @property string $description
  * @property int $duration_days
- * @property string $price
+ * @property numeric $price
  * @property bool $is_trial
  * @property bool $is_lifetime
  * @property bool $is_active
@@ -1983,7 +1983,7 @@ namespace App\Models\User{
  * @property string|null $end_exam
  * @property string|null $paused_at
  * @property int $pause_total_seconds
- * @property string $mark
+ * @property numeric $mark
  * @property string|null $study_id
  * @property string $status
  * @property string|null $company_id

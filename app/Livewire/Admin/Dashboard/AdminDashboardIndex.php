@@ -640,11 +640,12 @@ class AdminDashboardIndex extends Component
     private function getUserProfileData()
     {
         $currentUser = auth()->user();
+
         // If-else logic for role-based profile access
         if ($currentUser->hasRole('Mahasiswa')) {
             // Mahasiswa can only view their own profile with academic information
             return [
-                'user' => $currentUser->load('userDetail.study'),
+                'user' => $currentUser->load('userDetail'),
                 'role' => 'Mahasiswa',
                 'can_view_others' => true,
                 'show_academic_info' => true,
@@ -652,7 +653,7 @@ class AdminDashboardIndex extends Component
         } elseif ($currentUser->hasRole('Admin')) {
             // Admin can view their profile with admin information
             return [
-                'user' => $currentUser->load('userDetail'),
+                'user' => $currentUser->load('userDetail','study'),
                 'role' => 'Admin',
                 'can_view_others' => true,
                 'show_academic_info' => false,
@@ -1357,8 +1358,23 @@ class AdminDashboardIndex extends Component
 
     public function render()
     {
-        return View::make('livewire.admin.dashboard.admin-dashboard-index')
-            ->extends('layout.app')
-            ->section('content');
+        return view('livewire.admin.dashboard.admin-dashboard-index', [
+            'totalUsers' => $this->totalUsers,
+            'activeExams' => $this->activeExams,
+            'totalExamTypes' => $this->totalExamTypes,
+            'todayExams' => $this->todayExams,
+            'completedExams' => $this->completedExams,
+            'examAlerts' => $this->examAlerts,
+            'weeklyExamStats' => $this->weeklyExamStats,
+            'monthlyStats' => $this->monthlyStats,
+            'examStatistics' => $this->examStatistics,
+            'liveSessionStats' => $this->liveSessionStats,
+            'upcomingExams' => $this->upcomingExams,
+            'recentExamResults' => $this->recentExamResults,
+            'criticalAlerts' => $this->criticalAlerts,
+            'systemPerformance' => $this->systemPerformance,
+            'uptimeDetails' => $this->uptimeDetails,
+            'userProfile' => $this->userProfile,
+        ])->extends('layout.app')->section('content');
     }
 }
