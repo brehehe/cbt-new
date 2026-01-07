@@ -72,8 +72,8 @@ class AuthLoginIndex extends Component
 
         if (config('app.env') === 'local' || config('app.env') === 'development') {
             $this->captchaInput = $this->captchaCode;
-            $this->username_or_email = 'procbt';
-            $this->password = '12345678';
+            // $this->username_or_email = 'procbt';
+            // $this->password = '12345678';
 
             // $this->login();
         }
