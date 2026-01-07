@@ -824,15 +824,12 @@
                                         </a>
                                     </div>
 
-                                    <div class="pt-4">
+                                    <div class="pt-2">
                                         <x-ts-button
                                             class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base !bg-blue-500"
                                             icon="arrow-right" position="right" type="submit" loading="login">
                                             <x-slot:text>Masuk</x-slot:text>
                                         </x-ts-button>
-                                        {{-- <button class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base text-black bg-[#2b7fff]">
-                                            Masuk
-                                        </button> --}}
                                     </div>
 
                                     @if ($is_credentials)
