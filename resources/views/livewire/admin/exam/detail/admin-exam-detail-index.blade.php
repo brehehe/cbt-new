@@ -1233,12 +1233,23 @@
         async function initializePeerJS() {
             console.log("🔄 Initializing PeerJS (optimized)…");
 
-            // ICE servers: STUN + your TURN
-            const ICE_SERVERS = [{
+            // ICE servers: STUN + TURN (UDP/TCP/TLS for better connectivity)
+            const ICE_SERVERS = [
+                {
                     urls: 'stun:stun.cloudflare.com:3478'
                 },
                 {
                     urls: 'turn:procbt.id:3478?transport=udp',
+                    username: 'admin',
+                    credential: 'ProcbtSecure123!'
+                },
+                {
+                    urls: 'turn:procbt.id:3478?transport=tcp',
+                    username: 'admin',
+                    credential: 'ProcbtSecure123!'
+                },
+                {
+                    urls: 'turns:procbt.id:5349?transport=tcp',
                     username: 'admin',
                     credential: 'ProcbtSecure123!'
                 }

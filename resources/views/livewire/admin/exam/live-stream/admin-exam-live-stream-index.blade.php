@@ -448,6 +448,13 @@
                 credential: 'ProcbtSecure123!'
             },
 
+            // TURN TCP (fallback)
+            {
+                urls: 'turn:procbt.id:3478?transport=tcp',
+                username: 'admin',
+                credential: 'ProcbtSecure123!'
+            },
+
             // TURN TLS (aktif kalau nanti sudah pakai SSL)
             {
                 urls: 'turns:procbt.id:5349?transport=tcp',
