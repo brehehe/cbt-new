@@ -170,7 +170,7 @@
         @endif
 
         {{-- Quick Actions --}}
-        <div class="mt-6 pt-6 border-t border-gray-200">
+        <!-- <div class="mt-6 pt-6 border-t border-gray-200">
             <div class="flex flex-wrap gap-3">
                 <a href="{{ route('settings.profile') }}"
                     class="inline-flex items-center px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_secondary }}] text-white rounded-lg text-sm transition-colors duration-200">
@@ -192,6 +192,6 @@
                     Ubah Password
                 </a>
             </div>
-        </div>
+        </div> -->
     </div>
 </div>
