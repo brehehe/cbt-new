@@ -34,8 +34,32 @@ class AuthLoginIndex extends Component
 
     public $activeSessionInfo = null;
 
+    public $credentials = [];
+    public $is_credentials = false;
+
     public function mount()
     {
+        $this->is_credentials = in_array(config('app.env'), ['local', 'development']) ? true : false;
+
+        $this->credentials = [
+            'admin'=>[
+                'username_or_email' => 'procbt',
+                'password' => '12345678',
+            ],
+            'dosen'=>[
+                'username_or_email' => 'muhammad.irfan@university.ac.id',
+                'password' => 'password123',
+            ],
+            'pengawas'=>[
+                'username_or_email' => 'ahmad.supervisor@cbt.test',
+                'password' => 'password123',
+            ],
+            'mahasiswa'=>[
+                'username_or_email' => 'mahasiswa1',
+                'password' => 'password123',
+            ],
+        ];
+
         $this->company = Company::first();
 
         // Jika sudah login, langsung redirect ke dashboard
@@ -55,6 +79,22 @@ class AuthLoginIndex extends Component
         }
     }
 
+    public function getCredentials($role)
+    {
+        if ($role == 'admin') {
+            $this->username_or_email = $this->credentials['admin']['username_or_email'];
+            $this->password = $this->credentials['admin']['password'];
+        } elseif ($role == 'dosen') {
+            $this->username_or_email = $this->credentials['dosen']['username_or_email'];
+            $this->password = $this->credentials['dosen']['password'];
+        } elseif ($role == 'pengawas') {
+            $this->username_or_email = $this->credentials['pengawas']['username_or_email'];
+            $this->password = $this->credentials['pengawas']['password'];
+        } elseif ($role == 'mahasiswa') {
+            $this->username_or_email = $this->credentials['mahasiswa']['username_or_email'];
+            $this->password = $this->credentials['mahasiswa']['password'];
+        }
+    }
 
     public function generateCaptcha()
     {

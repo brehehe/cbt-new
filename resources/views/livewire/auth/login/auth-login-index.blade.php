@@ -834,6 +834,17 @@
                                             Masuk
                                         </button> --}}
                                     </div>
+
+                                    @if ($is_credentials)
+                                        <div class="mt-4 grid grid-cols-2 gap-2">
+                                            @foreach ($credentials as $role => $val)
+                                                <button type="button" wire:click="getCredentials('{{ $role }}')"
+                                                    class="flex w-full items-center justify-center rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-100 hover:text-blue-600">
+                                                    <span class="capitalize">{{ $role }}</span>
+                                                </button>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 </form>
                                 <div class="mt-4 text-center">
                                     <a href="{{ route('register') }}"
