@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Livewire\Admin\Profile;
+namespace App\Livewire\Admin\User\Profile;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
-class AdminProfileIndex extends Component
+class AdminUserProfileIndex extends Component
 {
-
     public $user;
     public $canEdit = false;
     public $isEditing = false;
@@ -149,15 +148,8 @@ class AdminProfileIndex extends Component
 
     public function render()
     {
-        // Explicitly fetch company data with correct namespace
         $companyData = \App\Models\Company\Company::first();
 
-        return view('livewire.admin.profile.admin-profile-index', [
-            'user' => $this->user,
-            'canEdit' => $this->canEdit,
-            'companyData' => $companyData,
-        ])
-        ->extends('layout.app')
-        ->section('content');
+        return view('livewire.admin.user.profile.admin-user-profile-index');
     }
 }

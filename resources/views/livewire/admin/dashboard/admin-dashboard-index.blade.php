@@ -416,7 +416,7 @@
     </div>
 
     {{-- Tampilkan profil untuk semua user --}}
-    @if (isset($userProfile) && $userProfile)
+    @if (isset($userProfile) && $userProfile && Auth::user()->hasRole('Mahasiswa'))
         {{-- User Profile Section will now appear for all roles --}}
         @include('livewire.admin.dashboard.partials.user-profile-section')
     @endif

@@ -172,7 +172,7 @@
         {{-- Quick Actions --}}
         <div class="mt-6 pt-6 border-t border-gray-200">
             <div class="flex flex-wrap gap-3">
-                <a href="{{ route('settings.profile') }}"
+                <a href="{{ route('user.profile.profile') }}"
                     class="inline-flex items-center px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_secondary }}] text-white rounded-lg text-sm transition-colors duration-200">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -182,7 +182,7 @@
                     Edit Profil
                 </a>
 
-                <a href="{{ route('settings.password') }}"
+                <a href="{{ route('user.change-password.change-password') }}"
                     class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm transition-colors duration-200">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
