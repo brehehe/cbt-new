@@ -88,10 +88,6 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
             Route::get('/profile', 'AdminProfileIndex')->name('user.profile.profile');
         });
 
-        Route::group(['namespace' => 'User\Profile', 'prefix' => 'user'], function () {
-            Route::get('/profile', 'AdminUserProfileIndex')->name('user.profile');
-        });
-
         Route::group(['namespace' => 'Exam', 'prefix' => 'exam'], function () {
             Route::get('/timetable', 'Timetable\AdminExamTimetableIndex')->name('admin.exam.timetable');
             Route::get('/history-timetable', 'HistoryTimetable\AdminExamHistoryTimetableIndex')->name('admin.exam.history-timetable');
