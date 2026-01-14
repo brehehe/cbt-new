@@ -1,0 +1,141 @@
+<?php
+
+namespace App\Imports\User;
+
+use App\Helpers\RoleHelper;
+use App\Models\Study\Study;
+use App\Models\User;
+use App\Models\User\UserDetail;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Exception;
+
+class StudentImport implements ToCollection, WithHeadingRow
+{
+    /**
+     * @param Collection $rows
+     */
+    public function collection(Collection $rows)
+    {
+        try {
+            $currentCompanyId = Auth::user()->company_id;
+            $successCount = 0;
+            $errorCount = 0;
+            $errors = [];
+
+            foreach ($rows as $index => $row) {
+                try {
+                    DB::beginTransaction();
+
+                    // Validate required fields
+                    if (empty($row['name']) || empty($row['nim']) || empty($row['email'])) {
+                        throw new Exception("Row " . ($index + 2) . ": Name, NIM, and Email are required");
+                    }
+
+                    // Check if user already exists
+                    $existingUser = User::where(function ($query) use ($row, $currentCompanyId) {
+                        $query->where('email', $row['email'])
+                            ->orWhere('nim', $row['nim']);
+                    })
+                        ->where('company_id', $currentCompanyId)
+                        ->where('type_user', 'employee')
+                        ->first();
+
+                    if ($existingUser) {
+                        throw new Exception("Row " . ($index + 2) . ": User with email/NIM already exists");
+                    }
+
+                    // Get study_id if program_studi is provided
+                    $studyId = null;
+                    if (!empty($row['program_studi'])) {
+                        $study = Study::where('name', 'LIKE', '%' . $row['program_studi'] . '%')->first();
+                        if ($study) {
+                            $studyId = $study->id;
+                        }
+                    }
+
+                    // Default password if not provided
+                    $password = !empty($row['password']) ? $row['password'] : 'password123';
+                    $typeStudy = !empty($row['type_study']) ? $row['type_study'] : 'general';
+
+                    // Create user
+                    $user = User::create([
+                        'name' => $row['name'],
+                        'nim' => $row['nim'],
+                        'username' => $row['username'] ?? null,
+                        'email' => $row['email'],
+                        'password' => Hash::make($password),
+                        'phone' => $row['phone'] ?? '0',
+                        'study_id' => $studyId,
+                        'company_id' => $currentCompanyId,
+                        'type_user' => 'employee',
+                        'type_study' => $typeStudy,
+                    ]);
+
+                    // Create user detail
+                    $detailData = [
+                        'user_id' => $user->id,
+                        'address' => $row['address'] ?? null,
+                        'student_faculty' => $row['faculty'] ?? null,
+                        'student_department' => $row['department'] ?? null,
+                        'student_semester' => $row['semester'] ?? null,
+                        'student_status' => $row['student_status'] ?? 'active',
+                    ];
+
+                    // Handle identity_number encryption if provided
+                    if (!empty($row['identity_number'])) {
+                        try {
+                            $detailData['identity_number'] = Crypt::encryptString($row['identity_number']);
+                        } catch (Exception $e) {
+                            $detailData['identity_number'] = $row['identity_number'];
+                        }
+                    }
+
+                    UserDetail::create($detailData);
+
+                    // Assign Student role
+                    $isHead = true;
+                    $isActive = true;
+
+                    RoleHelper::assignRoleToUserInCompany(
+                        $user,
+                        'Mahasiswa',
+                        $currentCompanyId,
+                        null,
+                        $isHead,
+                        $isActive
+                    );
+
+                    DB::commit();
+                    $successCount++;
+                } catch (Exception $e) {
+                    DB::rollBack();
+                    $errorCount++;
+                    $errors[] = $e->getMessage();
+                    Log::error("Student Import Error: " . $e->getMessage());
+                }
+            }
+
+            // Log summary
+            Log::info("Student Import Completed", [
+                'success' => $successCount,
+                'errors' => $errorCount,
+                'details' => $errors
+            ]);
+        } catch (Exception | \Throwable $th) {
+            $error = [
+                'message' => $th->getMessage(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
+            ];
+            Log::error("Student Import Failed", $error);
+            throw $th;
+        }
+    }
+}

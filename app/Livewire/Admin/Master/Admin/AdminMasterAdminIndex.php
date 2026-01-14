@@ -19,6 +19,9 @@ use Crypt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use App\Traits\RegionTrait;
+use App\Exports\AdminExport;
+use App\Imports\User\AdminImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminMasterAdminIndex extends Component
 {
@@ -48,6 +51,9 @@ class AdminMasterAdminIndex extends Component
     // public $identity_card;
     public $is_head = true;
     public $is_active = true;
+
+    // Import file
+    public $importFile;
 
     public function openModal()
     {
@@ -369,6 +375,56 @@ class AdminMasterAdminIndex extends Component
 
         $user->delete();
         AlertHelper::success('Pengguna Berhasil Dihapus');
+    }
+
+    public function export()
+    {
+        try {
+            $fileName = 'admin_export_' . date('YmdHis') . '.xlsx';
+            return Excel::download(new AdminExport(), $fileName);
+        } catch (\Exception $e) {
+            Log::error('Admin Export Error: ' . $e->getMessage());
+            AlertHelper::error('Gagal', 'Gagal mengekspor data admin.');
+        }
+    }
+
+    public function import()
+    {
+        try {
+            $this->validate([
+                'importFile' => 'required|mimes:xlsx,xls|max:5120', // max 5MB
+            ]);
+
+            Excel::import(new AdminImport(), $this->importFile);
+
+            $this->reset('importFile');
+            AlertHelper::success('Berhasil', 'Data admin berhasil diimpor.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            AlertHelper::error('Gagal', 'File tidak valid. Pastikan format file adalah Excel (.xlsx atau .xls).');
+        } catch (\Exception $e) {
+            Log::error('Admin Import Error: ' . $e->getMessage());
+            AlertHelper::error('Gagal', 'Gagal mengimpor data admin: ' . $e->getMessage());
+        }
+    }
+
+    public function downloadTemplate()
+    {
+        try {
+            // Create a simple template with headers
+            $headers = [
+                ['Name', 'Username', 'Email', 'Phone', 'Password', 'Address']
+            ];
+
+            $fileName = 'admin_template.xlsx';
+            return Excel::download(new class($headers) implements \Maatwebsite\Excel\Concerns\FromArray {
+                private $data;
+                public function __construct($data) { $this->data = $data; }
+                public function array(): array { return $this->data; }
+            }, $fileName);
+        } catch (\Exception $e) {
+            Log::error('Admin Template Download Error: ' . $e->getMessage());
+            AlertHelper::error('Gagal', 'Gagal mengunduh template.');
+        }
     }
 
     public function render()

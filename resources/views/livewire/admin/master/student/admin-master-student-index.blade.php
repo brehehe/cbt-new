@@ -8,7 +8,29 @@
                     Manajemen Data Mahasiswa</h1>
                 <p class="text-gray-600">Kelola data mahasiswa dalam sistem CBT</p>
             </div>
-            <div>
+            <div class="flex gap-2">
+                <!-- Download Template Button -->
+                <button wire:click="downloadTemplate()"
+                    class="btn btn-success">
+                    <i class="fa-solid fa-file-download mr-1"></i>
+                    Template
+                </button>
+
+                <!-- Export Button -->
+                <button wire:click="export()"
+                    class="btn btn-info">
+                    <i class="fa-solid fa-file-export mr-1"></i>
+                    Export
+                </button>
+
+                <!-- Import Button -->
+                <label class="btn btn-warning cursor-pointer">
+                    <i class="fa-solid fa-file-import mr-1"></i>
+                    Import
+                    <input type="file" wire:model="importFile" accept=".xlsx,.xls" wire:change="import" class="hidden" />
+                </label>
+
+                <!-- Add Button -->
                 <button wire:click="openModal()"
                     class="{{ in_array(config('app.name_slug'), ['pro-cbt']) ? 'btn btn-warning' : 'btn btn-primary' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"

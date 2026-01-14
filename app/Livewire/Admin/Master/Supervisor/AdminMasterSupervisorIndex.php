@@ -17,6 +17,9 @@ use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Log;
 use Hash;
+use App\Exports\SupervisorExport;
+use App\Imports\User\SupervisorImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminMasterSupervisorIndex extends Component
 {
@@ -34,6 +37,9 @@ class AdminMasterSupervisorIndex extends Component
     public $departmentFilter = '';
 
     public $perPage = 5;
+
+    // Import file
+    public $importFile;
 
     // User
     public $data_id;
@@ -419,6 +425,56 @@ class AdminMasterSupervisorIndex extends Component
 
         $user->delete();
         AlertHelper::success('Pengguna Berhasil Dihapus');
+    }
+
+    public function export()
+    {
+        try {
+            $fileName = 'supervisor_export_' . date('YmdHis') . '.xlsx';
+            return Excel::download(new SupervisorExport(), $fileName);
+        } catch (\Exception $e) {
+            Log::error('Supervisor Export Error: ' . $e->getMessage());
+            AlertHelper::error('Gagal', 'Gagal mengekspor data pengawas.');
+        }
+    }
+
+    public function import()
+    {
+        try {
+            $this->validate([
+                'importFile' => 'required|mimes:xlsx,xls|max:5120', // max 5MB
+            ]);
+
+            Excel::import(new SupervisorImport(), $this->importFile);
+
+            $this->reset('importFile');
+            AlertHelper::success('Berhasil', 'Data pengawas berhasil diimpor.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            AlertHelper::error('Gagal', 'File tidak valid. Pastikan format file adalah Excel (.xlsx atau .xls).');
+        } catch (\Exception $e) {
+            Log::error('Supervisor Import Error: ' . $e->getMessage());
+            AlertHelper::error('Gagal', 'Gagal mengimpor data pengawas: ' . $e->getMessage());
+        }
+    }
+
+    public function downloadTemplate()
+    {
+        try {
+            // Create a simple template with headers
+            $headers = [
+                ['Name', 'Username', 'Email', 'Phone', 'Password', 'Position', 'Address']
+            ];
+
+            $fileName = 'supervisor_template.xlsx';
+            return Excel::download(new class($headers) implements \Maatwebsite\Excel\Concerns\FromArray {
+                private $data;
+                public function __construct($data) { $this->data = $data; }
+                public function array(): array { return $this->data; }
+            }, $fileName);
+        } catch (\Exception $e) {
+            Log::error('Supervisor Template Download Error: ' . $e->getMessage());
+            AlertHelper::error('Gagal', 'Gagal mengunduh template.');
+        }
     }
 
     public function render()

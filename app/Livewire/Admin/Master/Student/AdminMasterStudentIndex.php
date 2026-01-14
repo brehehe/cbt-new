@@ -19,6 +19,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use App\Exports\StudentExport;
+use App\Imports\User\StudentImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminMasterStudentIndex extends Component
 {
@@ -105,6 +108,9 @@ class AdminMasterStudentIndex extends Component
     public $isStudentFilter;
     public $type_study;
     public $photo, $photo_old;
+
+    // Import file
+    public $importFile;
 
     public function openModal()
     {
@@ -738,6 +744,56 @@ class AdminMasterStudentIndex extends Component
 
         $user->delete();
         AlertHelper::success('Pengguna Berhasil Dihapus');
+    }
+
+    public function export()
+    {
+        try {
+            $fileName = 'student_export_' . date('YmdHis') . '.xlsx';
+            return Excel::download(new StudentExport(), $fileName);
+        } catch (\Exception $e) {
+            Log::error('Student Export Error: ' . $e->getMessage());
+            AlertHelper::error('Gagal', 'Gagal mengekspor data mahasiswa.');
+        }
+    }
+
+    public function import()
+    {
+        try {
+            $this->validate([
+                'importFile' => 'required|mimes:xlsx,xls|max:5120', // max 5MB
+            ]);
+
+            Excel::import(new StudentImport(), $this->importFile);
+
+            $this->reset('importFile');
+            AlertHelper::success('Berhasil', 'Data mahasiswa berhasil diimpor.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            AlertHelper::error('Gagal', 'File tidak valid. Pastikan format file adalah Excel (.xlsx atau .xls).');
+        } catch (\Exception $e) {
+            Log::error('Student Import Error: ' . $e->getMessage());
+            AlertHelper::error('Gagal', 'Gagal mengimpor data mahasiswa: ' . $e->getMessage());
+        }
+    }
+
+    public function downloadTemplate()
+    {
+        try {
+            // Create a simple template with headers
+            $headers = [
+                ['Name', 'NIM', 'Username', 'Email', 'Phone', 'Password', 'Program Studi', 'Type Study', 'Faculty', 'Department', 'Semester', 'Student Status', 'Address', 'Identity Number']
+            ];
+
+            $fileName = 'student_template.xlsx';
+            return Excel::download(new class($headers) implements \Maatwebsite\Excel\Concerns\FromArray {
+                private $data;
+                public function __construct($data) { $this->data = $data; }
+                public function array(): array { return $this->data; }
+            }, $fileName);
+        } catch (\Exception $e) {
+            Log::error('Student Template Download Error: ' . $e->getMessage());
+            AlertHelper::error('Gagal', 'Gagal mengunduh template.');
+        }
     }
 
     public function render()

@@ -820,6 +820,10 @@ select:focus[data-flux-control] {
     @apply bg-[#4CAF50] text-white px-4 py-2.5 rounded-xl shadow hover:shadow-md transition;
 }
 
+.btn-info {
+    @apply bg-[#17A2B8] text-white px-4 py-2.5 rounded-xl shadow hover:shadow-md transition;
+}
+
 .btn-danger {
     @apply bg-[#F44336] text-white px-4 py-2.5 rounded-xl shadow hover:shadow-md transition;
 }

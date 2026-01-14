@@ -16,6 +16,9 @@ use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Log;
 use Hash;
+use App\Exports\LecturerExport;
+use App\Imports\User\LecturerImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminMasterLecturerIndex extends Component
 {
@@ -32,6 +35,9 @@ class AdminMasterLecturerIndex extends Component
     public $positionFilter = '';
 
     public $perPage = 5;
+
+    // Import file
+    public $importFile;
     public $showModal = false;
     public $editMode = false;
 
@@ -371,6 +377,56 @@ class AdminMasterLecturerIndex extends Component
     public function confirmDelete($id)
     {
         return AlertHelper::confirmDelete('delete', 'Apakah Anda yakin ingin menghapus data dosen ini?', $id);
+    }
+
+    public function export()
+    {
+        try {
+            $fileName = 'lecturer_export_' . date('YmdHis') . '.xlsx';
+            return Excel::download(new LecturerExport(), $fileName);
+        } catch (\Exception $e) {
+            Log::error('Lecturer Export Error: ' . $e->getMessage());
+            AlertHelper::error('Gagal', 'Gagal mengekspor data dosen.');
+        }
+    }
+
+    public function import()
+    {
+        try {
+            $this->validate([
+                'importFile' => 'required|mimes:xlsx,xls|max:5120', // max 5MB
+            ]);
+
+            Excel::import(new LecturerImport(), $this->importFile);
+
+            $this->reset('importFile');
+            AlertHelper::success('Berhasil', 'Data dosen berhasil diimpor.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            AlertHelper::error('Gagal', 'File tidak valid. Pastikan format file adalah Excel (.xlsx atau .xls).');
+        } catch (\Exception $e) {
+            Log::error('Lecturer Import Error: ' . $e->getMessage());
+            AlertHelper::error('Gagal', 'Gagal mengimpor data dosen: ' . $e->getMessage());
+        }
+    }
+
+    public function downloadTemplate()
+    {
+        try {
+            // Create a simple template with headers
+            $headers = [
+                ['Name', 'Username', 'Email', 'Phone', 'Password', 'NIDN/NIP', 'Faculty', 'Department', 'Position', 'Address']
+            ];
+
+            $fileName = 'lecturer_template.xlsx';
+            return Excel::download(new class($headers) implements \Maatwebsite\Excel\Concerns\FromArray {
+                private $data;
+                public function __construct($data) { $this->data = $data; }
+                public function array(): array { return $this->data; }
+            }, $fileName);
+        } catch (\Exception $e) {
+            Log::error('Lecturer Template Download Error: ' . $e->getMessage());
+            AlertHelper::error('Gagal', 'Gagal mengunduh template.');
+        }
     }
 
     public function render()
