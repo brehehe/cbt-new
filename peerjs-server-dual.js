@@ -1,7 +1,7 @@
 import { PeerServer } from "peer";
 
 // ===== CONFIGURASI DASAR =====
-const PORT = process.env.PORT || 4445;
+const PORT = process.env.PORT || 9000;
 const HOST = process.env.HOST || "0.0.0.0";
 
 // Jalankan PeerJS hanya sebagai HTTP server
@@ -12,17 +12,9 @@ const peerServer = PeerServer({
   allow_discovery: true,
   proxied: true,
   // CORS aman untuk domain kamu
+  // CORS: Allow ALL domains automatically (Maintenance Free)
   cors: {
-    origin: [
-      'https://procbt.id',
-      'https://ups.procbt.id',
-      'https://peer.toti.my.id',
-      'https://cbtfk.upstegal.ac.id',
-      'https://unimma.procbt.id',
-      'https://unidayan.procbt.id',
-      'http://localhost:8000',
-      'https://localhost:8000'
-    ],
+    origin: true,
     methods: ['GET', 'POST', 'OPTIONS'],
     credentials: true
   }
