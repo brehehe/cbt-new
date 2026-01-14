@@ -1,41 +1,7 @@
-nohup: ignoring input
-🚀 Starting HTTP PeerJS Server...
-⚠️  SSL certificates not found at:
-   Certificate: /etc/ssl/peerjs/peerjs.crt
-   Private Key: /etc/ssl/peerjs/peerjs.key
-
-💡 To enable HTTPS PeerJS server:
-   1. Get SSL certificate for 148.230.97.234
-   2. Place files at the paths above
-   3. Or set SSL_CERT_PATH and SSL_KEY_PATH environment variables
-   4. Restart this server
-
-🔄 Running HTTP-only mode for now...
-
-📡 PeerJS Servers Status:
-═══════════════════════════════
-
-📄 HTTP PeerJS Server (for backward compatibility):
-   Port: 9000
-   Protocol: HTTP
-   🔗 http://148.230.97.234:9000/peerjs
-
-🔒 HTTPS PeerJS Server: DISABLED
-   Reason: SSL certificates not found
-
-🌐 Client Configuration:
-════════════════════════════
-For HTTPS websites (https://cbt-new.drshieldapp.com):
-   ❌ Will fail: mixed content blocked
-   💡 Need HTTPS PeerJS server on port 9443
-
-For HTTP websites:
-   ✅ Will use: http://148.230.97.234:9000/peerjs
-
-🔍 Health Check URLs:
-═══════════════════════
-HTTP:  http://148.230.97.234:9000/peerjs
-node:events:497
+✅ PeerJS Server started on port 9000
+   Path: /peerjs
+   Access via Nginx HTTPS proxy: https://peer.toti.my.id/peerjs
+node:events:486
       throw er; // Unhandled 'error' event
       ^
 
@@ -43,16 +9,16 @@ Error: listen EADDRINUSE: address already in use 0.0.0.0:9000
     at Server.setupListenHandle [as _listen2] (node:net:1940:16)
     at listenInCluster (node:net:1997:12)
     at node:net:2206:7
-    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+    at process.processTicksAndRejections (node:internal/process/task_queues:89:21)
 Emitted 'error' event at:
-    at $9cd36c423c7aa5b9$export$f47674b57e51ee3b.<anonymous> (file:///var/www/html/drshieldapp/cbt-new.drshieldapp.com/node_modules/peer/dist/module.mjs:555:13)
-    at $9cd36c423c7aa5b9$export$f47674b57e51ee3b.emit (node:events:519:28)
-    at $9cd36c423c7aa5b9$export$f47674b57e51ee3b._onSocketError (file:///var/www/html/drshieldapp/cbt-new.drshieldapp.com/node_modules/peer/dist/module.mjs:313:14)
-    at WebSocketServer.<anonymous> (file:///var/www/html/drshieldapp/cbt-new.drshieldapp.com/node_modules/peer/dist/module.mjs:270:18)
-    at WebSocketServer.emit (node:events:519:28)
-    at Server.emit (node:events:519:28)
+    at $9cd36c423c7aa5b9$export$f47674b57e51ee3b.<anonymous> (file:///var/www/html/cbt-new-streaming/node_modules/peer/dist/module.mjs:555:13)
+    at $9cd36c423c7aa5b9$export$f47674b57e51ee3b.emit (node:events:508:28)
+    at $9cd36c423c7aa5b9$export$f47674b57e51ee3b._onSocketError (file:///var/www/html/cbt-new-streaming/node_modules/peer/dist/module.mjs:313:14)
+    at WebSocketServer.<anonymous> (file:///var/www/html/cbt-new-streaming/node_modules/peer/dist/module.mjs:270:18)
+    at WebSocketServer.emit (node:events:508:28)
+    at Server.emit (node:events:508:28)
     at emitErrorNT (node:net:1976:8)
-    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    at process.processTicksAndRejections (node:internal/process/task_queues:89:21) {
   code: 'EADDRINUSE',
   errno: -98,
   syscall: 'listen',
@@ -60,4 +26,4 @@ Emitted 'error' event at:
   port: 9000
 }
 
-Node.js v22.21.0
+Node.js v24.12.0

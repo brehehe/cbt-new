@@ -79,6 +79,11 @@ class AdminMasterTimetableStreamingIndex extends Component
         $this->resetPage();
     }
 
+    public function updatedPage($page)
+    {
+        $this->dispatch('streamDataRefreshed');
+    }
+
     public function takeSnapshot($sessionId)
     {
         $session = ExamLiveSession::find($sessionId);

@@ -1,0 +1,16 @@
+[Unit]
+Description=PeerJS Server for CBT Streaming
+After=network.target
+
+[Service]
+Type=simple
+User=procbt
+WorkingDirectory=/var/www/html/cbt-new-streaming
+ExecStart=/usr/bin/node /var/www/html/cbt-new-streaming/peerjs-server.js
+Restart=always
+RestartSec=10
+Environment="PORT=9000"
+Environment="NODE_ENV=production"
+
+[Install]
+WantedBy=multi-user.target

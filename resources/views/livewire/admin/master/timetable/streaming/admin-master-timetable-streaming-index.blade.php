@@ -1,4 +1,4 @@
-<div>
+ <div>
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
@@ -157,6 +157,16 @@
                     }
                 }
             };
+            // Listen for stream refresh events from Livewire (e.g., after pagination)
+            if (typeof Livewire !== 'undefined') {
+                Livewire.on('streamDataRefreshed', () => {
+                    console.log('⚡ Stream data refresh event received from Livewire');
+                    // Wait for DOM to update
+                    setTimeout(() => {
+                        connectToStudentStreams();
+                    }, 500);
+                });
+            }
         });
 
         // Initialize live streaming functionality
@@ -393,7 +403,7 @@
             }
         }
 
-        // Connect to student streams (filtered by timetable)
+        // Connect to student streams (filtered by visibility/pagination)
         async function connectToStudentStreams() {
             if (isConnecting) {
                 console.log('Already connecting to streams, skipping...');
@@ -403,13 +413,25 @@
             isConnecting = true;
 
             try {
-                // Clear existing streams first
-                activeSessions.forEach(session => {
-                    if (session.cleanup) {
-                        session.cleanup();
-                    }
+                // 1. Identify valid session IDs currently in the DOM (current page)
+                // This is the KEY to scalability: Only connect to what is visible!
+                const visibleSessionIds = [];
+                document.querySelectorAll('[id^="streamContainer-"]').forEach(el => {
+                    const id = el.id.replace('streamContainer-', '');
+                    if (id) visibleSessionIds.push(parseInt(id));
                 });
-                activeSessions = [];
+
+                console.log('Visible sessions on current page:', visibleSessionIds);
+
+                // 2. Clean up sessions that are no longer visible (e.g., after pagination change)
+                const sessionsToRemove = activeSessions.filter(s => !visibleSessionIds.includes(s.session_id));
+                sessionsToRemove.forEach(session => {
+                    console.log(`Cleaning up invisible session: ${session.user_name}`);
+                    if (session.cleanup) session.cleanup();
+                    // Remove from activeSessions array
+                    const index = activeSessions.indexOf(session);
+                    if (index > -1) activeSessions.splice(index, 1);
+                });
 
                 // Try to get real camera streams for this timetable
                 console.log('Checking for real student camera streams for timetable {{ $timetable->id }}...');
@@ -423,103 +445,58 @@
 
                     const realStreamsData = await realStreamsResponse.json();
 
-                    console.log('=== API Response ===');
-                    console.log('Full API response:', realStreamsData);
-                    console.log('Success:', realStreamsData.success);
-                    console.log('Total streams:', realStreamsData.streams?.length || 0);
-
-                    if (realStreamsData.streams && realStreamsData.streams.length > 0) {
-                        console.log('Stream details:', realStreamsData.streams.map(s => ({
-                            user_name: s.user_name,
-                            peer_id: s.peer_id,
-                            has_real_camera: s.has_real_camera,
-                            camera_status: s.camera_status,
-                            session_id: s.session_id,
-                            last_seen: s.last_seen
-                        })));
-                    }
-
-                    if (realStreamsData.success && Array.isArray(realStreamsData.streams) && realStreamsData.streams
-                        .length > 0) {
-                        console.log(
-                            `Found ${realStreamsData.streams.length} sessions for timetable {{ $timetable->id }}`);
+                    if (realStreamsData.success && Array.isArray(realStreamsData.streams) && realStreamsData.streams.length > 0) {
+                        console.log(`Found ${realStreamsData.streams.length} total streams`);
 
                         for (const streamInfo of realStreamsData.streams) {
-                            // Add to activeSessions first for handleIncomingStream
-                            activeSessions.push(streamInfo);
+                            // SCALABILITY CHECK: Only connect if this session is visible on the current page
+                            if (!visibleSessionIds.includes(streamInfo.session_id)) {
+                                // console.log(`Skipping off-screen session: ${streamInfo.user_name}`);
+                                continue;
+                            }
+
+                            // Check if already active/connected
+                            const existingSession = activeSessions.find(s => s.session_id === streamInfo.session_id);
+                            if (existingSession && existingSession.type === 'real' && existingSession.connection_status === 'connected') {
+                                continue; // Already connected
+                            }
+
+                            // Add to activeSessions if not present
+                            if (!existingSession) {
+                                activeSessions.push(streamInfo);
+                            }
 
                             if (streamInfo.has_real_camera && streamInfo.peer_id) {
-                                console.log(
-                                    `Found student with camera: ${streamInfo.user_name} (Peer ID: ${streamInfo.peer_id})`
-                                );
+                                console.log(`Found visible student with camera: ${streamInfo.user_name}`);
 
-                                // Check if peer is actually available before attempting connection
+                                // Check availability and connect
                                 if (await checkPeerAvailability(streamInfo.peer_id)) {
                                     try {
-                                        // Try to connect to student via PeerJS
                                         await connectToPeerJSStudent(streamInfo);
-                                        console.log(`✅ Successfully connected to ${streamInfo.user_name}`);
-
-                                        // Update session type to 'real'
-                                        const sessionIndex = activeSessions.findIndex(s => s.session_id === streamInfo
-                                            .session_id);
-                                        if (sessionIndex !== -1) {
-                                            activeSessions[sessionIndex].type = 'real';
-                                        }
                                     } catch (error) {
-                                        console.log(`❌ PeerJS connection failed for ${streamInfo.user_name}:`, error
-                                            .message);
-                                        // Fall back to demo for this session
-                                        console.log(`Using demo mode for ${streamInfo.user_name}`);
+                                        console.log(`❌ Connection failed for ${streamInfo.user_name}, falling back to demo`);
                                         createMockVideoStreamForSession(streamInfo, activeSessions.length);
-
-                                        // Update session type to 'demo'
-                                        const sessionIndex = activeSessions.findIndex(s => s.session_id === streamInfo
-                                            .session_id);
-                                        if (sessionIndex !== -1) {
-                                            activeSessions[sessionIndex].type = 'demo';
-                                            activeSessions[sessionIndex].error = error.message;
-                                        }
                                     }
                                 } else {
-                                    console.log(
-                                        `Peer ${streamInfo.peer_id} is not available, using demo mode for ${streamInfo.user_name}`
-                                    );
+                                    console.log(`Peer ${streamInfo.peer_id} not available, using demo`);
                                     createMockVideoStreamForSession(streamInfo, activeSessions.length);
-
-                                    // Update session type to 'demo'
-                                    const sessionIndex = activeSessions.findIndex(s => s.session_id === streamInfo
-                                        .session_id);
-                                    if (sessionIndex !== -1) {
-                                        activeSessions[sessionIndex].type = 'demo';
-                                        activeSessions[sessionIndex].error = 'Peer not available';
-                                    }
                                 }
                             } else {
-                                console.log(
-                                    `${streamInfo.user_name} - No camera or peer ID (camera: ${streamInfo.has_real_camera}, peer: ${streamInfo.peer_id})`
-                                );
-                                // No real camera or peer ID, use demo
+                                // No camera/peer, use demo
                                 createMockVideoStreamForSession(streamInfo, activeSessions.length);
-
-                                // Update session type to 'demo'
-                                const sessionIndex = activeSessions.findIndex(s => s.session_id === streamInfo
-                                    .session_id);
-                                if (sessionIndex !== -1) {
-                                    activeSessions[sessionIndex].type = 'demo';
-                                }
                             }
                         }
                         return;
                     }
                 } catch (realStreamError) {
-                    console.log('Real streams not available, using demo mode:', realStreamError.message);
-                    console.log('Error details:', realStreamError);
+                    console.log('Real streams error:', realStreamError.message);
                 }
 
-                // No real streams found, show empty state
-                console.log('No sessions found for timetable {{ $timetable->id }}');
-                showNoActiveSessions();
+                // If we get here and have no sessions, show empty state
+                 if (activeSessions.length === 0) {
+                    console.log('No active sessions to display');
+                    showNoActiveSessions();
+                 }
 
             } catch (error) {
                 console.error('Error connecting to student streams:', error);
