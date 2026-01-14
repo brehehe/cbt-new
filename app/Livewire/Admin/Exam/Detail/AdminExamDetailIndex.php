@@ -78,12 +78,23 @@ class AdminExamDetailIndex extends Component
             ->orderByDesc('last_activity')
             ->first();
 
-        if ($existingActive && data_get($existingActive->session_metadata, 'session_id') && data_get($existingActive->session_metadata, 'session_id') !== $currentSessionId) {
+        // Check if existing session is "stale" (inactive for > 2 minutes)
+        $isStale = false;
+        if ($existingActive) {
+            $lastActivity = Carbon::parse($existingActive->last_activity);
+            if (now()->diffInMinutes($lastActivity) > 2) {
+                $isStale = true;
+                // Auto-close stale session
+                $existingActive->update(['is_active' => false, 'connection_status' => 'timeout']);
+            }
+        }
+
+        if ($existingActive && !$isStale && data_get($existingActive->session_metadata, 'session_id') && data_get($existingActive->session_metadata, 'session_id') !== $currentSessionId) {
             ExamAlert::create([
                 'timetable_id' => $this->userTimetable->timetable_id,
                 'user_timetable_id' => $this->userTimetableId,
                 'alert_type' => 'connection_lost',
-                'description' => 'Percobaan login dari perangkat lain terdeteksi',
+                'description' => 'Percobaan login dari perangkat lain terdeteksi (Sesi aktif ditemukan)',
                 'metadata' => [
                     'previous_session_id' => data_get($existingActive->session_metadata, 'session_id'),
                     'new_session_id' => $currentSessionId,
@@ -92,11 +103,12 @@ class AdminExamDetailIndex extends Component
                 ],
             ]);
 
-            if ($this->userTimetable && in_array($this->userTimetable->status, ['exam', 'warning'])) {
-                $this->userTimetable->update(['status' => 'warning']);
-            }
+            // Optional: Don't immediately suspend/warn heavily if it's just a reconnect
+            // if ($this->userTimetable && in_array($this->userTimetable->status, ['exam', 'warning'])) {
+            //     $this->userTimetable->update(['status' => 'warning']);
+            // }
 
-            AlertHelper::warning('Perhatian', 'Akun Anda sudah aktif di perangkat lain. Mohon hubungi pengawas.');
+            AlertHelper::warning('Perhatian', 'Akun Anda tercatat masih aktif di perangkat lain/tab lain. Jika Anda baru saja refresh/reconnect, tunggu 2 menit atau hubungi pengawas.');
             return redirect()->route('admin.exam.monitor');
         }
 
@@ -1085,6 +1097,35 @@ class AdminExamDetailIndex extends Component
 
     public function timeExpired()
     {
+        // Double check remaining time on server side
+        $this->calculateRemainingTime();
+
+        if ($this->remainingTime > 15) {
+            \Log::warning('⚠️ Client triggered timeExpired but server has time remaining', [
+                'client_remaining' => 0,
+                'server_remaining' => $this->remainingTime,
+                'user_id' => Auth::id()
+            ]);
+
+            // Sync client timer instead of finishing
+            $this->js("
+                if(typeof remainingTime !== 'undefined') {
+                    remainingTime = {$this->remainingTime};
+                    console.log('🔄 Timer synced from server: {$this->remainingTime}s');
+
+                    // Restart interval if stopped
+                    if (!window.countdownInterval) {
+                        window.countdownInterval = setInterval(updateCountdown, 1000);
+                    }
+
+                    // Reset UI
+                    document.querySelector('#countdown').style.color = '';
+                }
+            ");
+
+            return;
+        }
+
         $this->finishExam();
     }
 

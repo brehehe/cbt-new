@@ -11,6 +11,7 @@ const peerServer = PeerServer({
   path: '/peerjs',
   allow_discovery: true,
   proxied: true,
+  alive_timeout: 60000, // Keep connections alive for 60 seconds before timeout
   // CORS aman untuk domain kamu
   // CORS: Allow ALL domains automatically (Maintenance Free)
   cors: {

@@ -88,12 +88,12 @@
     <script src="https://unpkg.com/peerjs@1.5.0/dist/peerjs.min.js"></script>
 
     <script>
-        // Global variables for PeerJS - declare only once
-        let peer = null;
-        let connections = {};
-        let localStream = null;
-        let activeSessions = [];
-        let isConnecting = false;
+        // Global variables for PeerJS - use var to prevent "already declared" errors on re-renders
+        var peer = window.peer || null;
+        var connections = window.connections || {};
+        var localStream = window.localStream || null;
+        var activeSessions = window.activeSessions || [];
+        var isConnecting = window.isConnecting || false;
 
         // Guard against duplicate initialization and intervals
         window.__supervisorInitialized = window.__supervisorInitialized || false;
@@ -252,7 +252,7 @@
                     setTimeout(() => {
                         console.log('🔄 Delayed connection attempt after supervisor PeerJS ready...');
                         connectToStudentStreams();
-                    }, 3000); // Additional 3 seconds delay
+                    }, 500); // Reduced to 0.5s for faster connection
                 });
 
                 peer.on('call', function(call) {
@@ -288,29 +288,44 @@
                     });
                 });
 
+                peer.on('disconnected', function() {
+                    console.log('⚠️ Supervisor PeerJS disconnected from server. Attempting to reconnect...');
+                    peer.reconnect();
+                });
+
+                peer.on('close', function() {
+                    console.log('❌ Supervisor PeerJS connection closed permanently. Re-initializing...');
+                    peer = null;
+                    setTimeout(setupPeerJSConnections, 5000);
+                });
+
                 peer.on('error', function(err) {
                     console.error('❌ PeerJS error:', err);
                     console.error('Error type:', err.type);
-                    console.error('Error message:', err.message);
 
-                    // Handle specific error types
-                    switch (err.type) {
-                        case 'network':
-                            console.log('Network error - check PeerJS server connection');
-                            break;
-                        case 'peer-unavailable':
-                            console.log('Peer unavailable - student may have disconnected');
-                            break;
-                        case 'server-error':
-                            console.log('Server error - PeerJS server may be down');
-                            break;
-                        default:
-                            console.log('Unknown PeerJS error type');
+                    if (err.type === 'peer-unavailable') {
+                        // This is normal for students who closed the tab
+                        console.log('Peer unavailable - student offline');
+                    } else if (err.type === 'network' || err.type === 'server-error' || err.type === 'socket-error') {
+                        console.log('🔥 Critical Network/Server Error - Reconnecting Supervisor...');
+                        if (peer) {
+                            peer.disconnect();
+                            setTimeout(() => {
+                                if (peer && !peer.destroyed) peer.reconnect();
+                            }, 2000);
+                        }
                     }
-
-                    // Fallback to demo mode if PeerJS fails
-                    console.log('PeerJS connection failed, using demo mode for all sessions');
                 });
+
+                // === HEARTBEAT WATCHDOG ===
+                // Periodically check if we are still connected to the signaling server
+                if (window.__supervisorIntervals.heartbeat) clearInterval(window.__supervisorIntervals.heartbeat);
+                window.__supervisorIntervals.heartbeat = setInterval(() => {
+                    if (peer && peer.disconnected && !peer.destroyed) {
+                        console.log('💓 Watchdog: Peer disconnected, forcing reconnect...');
+                        peer.reconnect();
+                    }
+                }, 5000); // Check every 5 seconds
 
             } catch (error) {
                 console.log('PeerJS initialization failed, using demo mode:', error);
@@ -414,17 +429,17 @@
 
             try {
                 // 1. Identify valid session IDs currently in the DOM (current page)
-                // This is the KEY to scalability: Only connect to what is visible!
+                // We use Strings for safe comparison to avoid "19" vs 19 mismatch
                 const visibleSessionIds = [];
                 document.querySelectorAll('[id^="streamContainer-"]').forEach(el => {
                     const id = el.id.replace('streamContainer-', '');
-                    if (id) visibleSessionIds.push(parseInt(id));
+                    if (id) visibleSessionIds.push(String(id));
                 });
 
-                console.log('Visible sessions on current page:', visibleSessionIds);
+                console.log('Visible session IDs (String):', visibleSessionIds);
 
                 // 2. Clean up sessions that are no longer visible (e.g., after pagination change)
-                const sessionsToRemove = activeSessions.filter(s => !visibleSessionIds.includes(s.session_id));
+                const sessionsToRemove = activeSessions.filter(s => !visibleSessionIds.includes(String(s.session_id)));
                 sessionsToRemove.forEach(session => {
                     console.log(`Cleaning up invisible session: ${session.user_name}`);
                     if (session.cleanup) session.cleanup();
@@ -446,19 +461,30 @@
                     const realStreamsData = await realStreamsResponse.json();
 
                     if (realStreamsData.success && Array.isArray(realStreamsData.streams) && realStreamsData.streams.length > 0) {
-                        console.log(`Found ${realStreamsData.streams.length} total streams`);
+                        console.log(`Found ${realStreamsData.streams.length} total streams`, realStreamsData.streams);
 
                         for (const streamInfo of realStreamsData.streams) {
                             // SCALABILITY CHECK: Only connect if this session is visible on the current page
-                            if (!visibleSessionIds.includes(streamInfo.session_id)) {
-                                // console.log(`Skipping off-screen session: ${streamInfo.user_name}`);
+                            // TYPE SAFE COMPARISON
+                            if (!visibleSessionIds.includes(String(streamInfo.session_id))) {
+                                console.log(`Skipping off-screen session: ${streamInfo.user_name} (ID: ${streamInfo.session_id})`);
                                 continue;
                             }
 
                             // Check if already active/connected
-                            const existingSession = activeSessions.find(s => s.session_id === streamInfo.session_id);
+                            // Check if already active/connected
+                            const existingSession = activeSessions.find(s => String(s.session_id) === String(streamInfo.session_id));
                             if (existingSession && existingSession.type === 'real' && existingSession.connection_status === 'connected') {
-                                continue; // Already connected
+                                // LIVEWIRE DOM RESET HANDLER:
+                                // If we are "Connected" in JS, but the DOM was reset (no <video> tag), we must re-attach the stream!
+                                const container = document.getElementById(`streamContainer-${streamInfo.session_id}`);
+                                const hasVideo = container && container.querySelector('video');
+
+                                if (container && !hasVideo && existingSession.stream && existingSession.stream.active) {
+                                     console.log(`♻️ streamContainer reset by Livewire, re-attaching video for ${streamInfo.user_name}`);
+                                     displayStudentStream(streamInfo.session_id, existingSession.stream, existingSession);
+                                }
+                                continue;
                             }
 
                             // Add to activeSessions if not present
@@ -938,7 +964,7 @@
                         `Stream displayed in container ${index} for session ${sessionId}: ${sessionData.user_name || sessionData.name}`
                     );
                 } else {
-                    console.warn(`Container ${index} not found for session ${sessionId}`);
+                    // console.debug(`Container ${index} not found for session ${sessionId}`);
                 }
             });
 

@@ -1,4 +1,4 @@
-<div id="exam-container">
+<div id="exam-container" class="flex flex-col min-h-screen bg-white">
     @php
         use App\Models\User\UserModuleQuestion;
 
@@ -10,11 +10,11 @@
     <video id="hiddenVideo" style="display: none;" autoplay muted></video>
     <canvas id="hiddenCanvas" style="display: none;"></canvas>
 
+    <!-- Header Fixed -->
     <header
-        class="p-2 text-white bg-[{{$companyData->color_primary}}] shadow-lg sm:p-4">
+        class="flex-none p-2 text-white bg-[{{$companyData->color_primary}}] shadow-lg z-50 relative">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-                <h1 class="text-lg font-bold sm:text-xl">Computer Based Test</h1>
                 <div
                     class="px-2 py-1 bg-[{{$companyData->color_primary}}] rounded sm:px-3">
                     <span class="text-xs sm:text-sm">Modul: {{ $userTimetable->timetable->module->name ?? '-' }}</span>
@@ -28,19 +28,18 @@
             </div>
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
                 <div class="text-center sm:text-right" wire:ignore>
-                    <div class="text-xs sm:text-sm opacity-90">Waktu Tersisa</div>
-                    <div class="font-mono text-base font-bold text-yellow-300 sm:text-lg" id="countdown"> 00:00:00
-                    </div>
+                    <span class="font-mono text-base font-bold text-white sm:text-lg" id="countdown"> 00:00:00
+                    </span>
                 </div>
                 <div class="flex gap-2">
                     <button wire:click='confirmFinishExam'
-                        class="px-3 py-2 text-xs font-medium transition-colors bg-red-600 rounded sm:px-4 sm:text-sm hover:bg-red-700">
+                        class="px-3 py-2 text-xs font-medium transition-colors bg-green-600 rounded hover:bg-green-700">
                         Selesai Ujian
                     </button>
 
                     <!-- Manual Save Recording Button for Testing -->
                     {{-- <button onclick="manualSaveRecording()"
-                        class="px-3 py-2 text-xs font-medium transition-colors bg-blue-600 rounded sm:px-4 sm:text-sm hover:bg-blue-700">
+                        class="px-3 py-2 text-xs font-medium transition-colors bg-blue-600 rounded hover:bg-blue-700">
                         💾 Save Video
                     </button> --}}
                 </div>
@@ -49,7 +48,7 @@
     </header>
 
     <!-- Mobile Menu Toggle Button -->
-    <div class="p-4 bg-white border-b border-gray-200 lg:hidden">
+    <div class="flex-none p-4 bg-white border-b border-gray-200 lg:hidden">
         <div class="flex items-center justify-between">
             <button id="toggleLeftSidebar"
                 class="flex items-center {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-600' : 'text-orange-600' }} hover:{{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-600' : 'text-orange-600' }}">
@@ -69,7 +68,8 @@
         </div>
     </div>
 
-    <div class="relative flex">
+    <!-- Main Content Wrapper (Flex 1 ensures it fills remaining height) -->
+    <div class="relative flex flex-1 overflow-hidden">
         <!-- Sidebar Kiri - Navigasi Soal -->
         <div id="leftSidebar"
             class="fixed z-30 h-full overflow-y-auto transition-transform duration-300 ease-in-out transform -translate-x-full bg-white border-r border-gray-200 shadow-sm lg:relative w-80 lg:w-80 lg:h-auto lg:translate-x-0">
@@ -93,7 +93,7 @@
                     class="hidden mb-2 font-semibold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-600' : 'text-orange-600' }} lg:block">
                     Navigasi Soal</h3>
                 <div class="text-sm text-gray-600">
-                    <div>Total: {{ $questionNavigations['total'] }} soal</div>
+                    <span>Total: {{ $questionNavigations['total'] }} soal</span>
                     <div class="flex flex-wrap gap-2 mt-2 lg:space-x-4 lg:flex-nowrap">
                         <span
                             class="text-xs {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-600' : 'text-orange-600' }} lg:text-sm">Dijawab:
@@ -165,31 +165,50 @@
         <div id="overlay" class="fixed inset-0 z-20 hidden bg-black bg-opacity-50 lg:hidden"></div>
 
         <!-- Konten Tengah - Area Soal -->
-        <div class="flex flex-col flex-1 min-h-screen bg-white">
+        <div class="flex flex-col flex-1 h-full overflow-hidden bg-white">
             <!-- Header Soal -->
             <div class="p-4 border-b border-gray-200 lg:p-6 bg-gray-50">
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <h2 class="text-lg font-semibold text-gray-800">Soal No. {{ $number }}</h2>
-                    <button wire:click='updateMark()' @class([
-                        'flex items-center justify-center sm:justify-start transition-colors',
-                        'text-yellow-600 hover:text-yellow-700' => $isMark,
-                        'text-gray-600 hover:text-gray-700' => !$isMark,
-                    ])>
-                        <svg class="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path
-                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                        Tandai Soal
-                    </button>
+                    <div class="flex items-center justify-between sm:gap-4">
+                        <h2 class="text-lg font-semibold text-gray-800">Soal No. {{ $number }}</h2>
+
+                        <!-- Mobile Top Navigation -->
+                        <div class="flex gap-2 sm:hidden">
+                            @if ($first)
+                                <button wire:click="previousQuestion" class="p-1 text-gray-600 bg-white border border-gray-300 rounded hover:bg-gray-100">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                                </button>
+                            @endif
+                            @if ($last)
+                                <button wire:click="nextQuestion" class="p-1 text-gray-600 bg-white border border-gray-300 rounded hover:bg-gray-100">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                </button>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button wire:click='updateMark()' @class([
+                            'flex items-center justify-center sm:justify-start transition-colors px-3 py-1 border rounded',
+                            'text-yellow-600 border-yellow-300 bg-yellow-50 hover:bg-yellow-100' => $isMark,
+                            'text-gray-600 border-gray-300 hover:bg-gray-100' => !$isMark,
+                        ])>
+                            <svg class="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <span class="text-sm">Ragu-Ragu</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <!-- Konten Soal -->
-            <div class="flex-1 p-4 overflow-y-auto lg:p-6">
+            <div class="flex-1 p-2 lg:p-4">
                 <div>
                     <!-- Pertanyaan -->
-                    <div class="mb-6">
-                        <p class="text-base leading-relaxed text-gray-800 lg:text-lg">
+                    <div class="mb-4">
+                        <p class="text-base leading-relaxed text-gray-800 lg:text-md">
                             {{ $question }}
                         </p>
                         <div class="mt-2 text-sm text-gray-600">
@@ -214,56 +233,55 @@
                     <div class="space-y-4" wire:key="question-{{ $questionNavigationId }}">
                         @foreach ($question_answers as $question_answer)
                             <label
-                                class="flex items-start p-3 transition-all border border-gray-200 rounded-lg cursor-pointer lg:p-4 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'hover:bg-blue-50 hover:border-blue-300' : 'hover:bg-orange-50 hover:border-orange-300' }}">
-                                {{-- Radio --}}
-                                <input type="radio" name="timetable_answer_id"
-                                    wire:model.live="timetable_answer_id" value="{{ $question_answer['id'] }}"
-                                    class="flex-shrink-0 mt-1 mr-3 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-600' : 'text-orange-600' }} lg:mr-4">
+                                class="block p-2 transition-all border border-gray-200 rounded-lg cursor-pointer lg:p-3 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'hover:bg-blue-50 hover:border-blue-300' : 'hover:bg-orange-50 hover:border-orange-300' }}">
 
-                                {{-- Isi jawaban --}}
-                                <div class="flex-1">
-                                    {{-- Teks jawaban --}}
-                                    <p class="text-sm text-gray-700 lg:text-base">
-                                        <span
-                                            class="font-medium {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-800' : 'text-orange-800' }}">{{ $question_answer['alphabet'] }}.</span>
-                                        <span class="ml-2">{{ $question_answer['context'] }}</span>
-                                    </p>
+                                {{-- Row 1: Radio + Text (Aligned Center) --}}
+                                <div class="flex items-center">
+                                    <input type="radio" name="timetable_answer_id"
+                                        wire:model.live="timetable_answer_id" value="{{ $question_answer['id'] }}"
+                                        class="flex-shrink-0 mr-2 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-600' : 'text-orange-600' }} lg:mr-4">
 
-                                    {{-- Gambar (jika ada) --}}
-                                    @if (!empty($question_answer['images']) && collect($question_answer['images'])->isNotEmpty())
-                                        <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <div class="flex-1">
+                                        <p class="text-sm text-gray-700 lg:text-base">
+                                            <span
+                                                class="font-medium {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-800' : 'text-orange-800' }}">{{ $question_answer['alphabet'] }}.</span>
+                                            <span class="ml-2">{{ $question_answer['context'] }}</span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {{-- Row 2: Images (Indented below text) --}}
+                                @if (!empty($question_answer['images']) && collect($question_answer['images'])->isNotEmpty())
+                                    <div class="mt-3 ml-6 lg:ml-8">
+                                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                             @foreach ($question_answer['images'] as $image)
                                                 <div
-                                                    class="overflow-hidden rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+                                                    class="overflow-hidden transition-shadow duration-300 border border-gray-200 shadow-sm rounded-xl hover:shadow-md">
                                                     <img src="{{ asset('storage/' . $image) }}" alt="Gambar soal"
-                                                        class="w-full h-auto object-cover">
+                                                        class="object-cover w-full h-auto">
                                                 </div>
                                             @endforeach
                                         </div>
-                                    @endif
-                                </div>
+                                    </div>
+                                @endif
                             </label>
                         @endforeach
                     </div>
                 </div>
             </div>
-            <!-- Footer Navigasi Soal -->
-            <div class="p-4 border-t border-gray-200 lg:p-6 bg-gray-50">
-                <div class="flex items-center justify-between">
+            <!-- Footer Navigasi Soal (Sticky Bottom) -->
+            <div class="sticky bottom-0 z-20 p-4 border-t border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 lg:p-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <div class="flex items-center justify-between max-w-7xl mx-auto">
                     <!-- Tombol Soal Sebelumnya -->
                     <div class="flex">
                         @if ($first)
                             <button wire:click="previousQuestion" type="button"
-                                class="flex items-center px-4 py-2
-                        {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan'])
-                            ? 'text-blue-600 hover:text-blue-700'
-                            : 'text-orange-600 hover:text-orange-700' }}
-                        transition-colors">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="flex items-center px-5 py-2.5 text-sm font-medium text-gray-700 transition-all bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 shadow-sm">
+                                <svg class="w-5 h-5 mr-2 -ml-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15 19l-7-7 7-7" />
                                 </svg>
-                                Soal Sebelumnya
+                                Sebelumnya
                             </button>
                         @endif
                     </div>
@@ -272,26 +290,21 @@
                     <div class="flex">
                         @if ($last)
                             <button type="button" wire:click="nextQuestion"
-                                class="flex items-center px-4 py-2
+                                class="flex items-center px-5 py-2.5 text-sm font-medium text-white transition-all rounded-lg shadow-sm
                         {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan'])
-                            ? 'text-blue-600 hover:text-blue-700'
-                            : 'text-orange-600 hover:text-orange-700' }}
-                        transition-colors">
-                                Soal Selanjutnya
-                                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            ? 'bg-blue-600 hover:bg-blue-700 ring-blue-200'
+                            : 'bg-orange-600 hover:bg-orange-700 ring-orange-200' }} hover:shadow-md focus:ring-4">
+                                Selanjutnya
+                                <svg class="w-5 h-5 ml-2 -mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 5l7 7-7 7" />
                                 </svg>
                             </button>
                         @else
                             <button type="button" wire:click="confirmFinishExam"
-                                class="flex items-center px-4 py-2
-                        {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan'])
-                            ? 'text-blue-600 hover:text-blue-700'
-                            : 'text-orange-600 hover:text-orange-700' }}
-                        transition-colors">
+                                class="flex items-center px-5 py-2.5 text-sm font-medium text-white transition-all bg-green-600 rounded-lg shadow-sm hover:bg-green-700 hover:shadow-md focus:ring-4 focus:ring-green-200">
                                 Selesai Ujian
-                                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 ml-2 -mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M5 13l4 4L19 7" />
                                 </svg>
@@ -475,6 +488,11 @@
         let peerConnection;
         let streamId = '{{ $liveSession->session_token ?? '' }}';
         let isStreaming = false;
+
+        // Flag to prevent duplicate listeners
+        window.examEnvInitialized = false;
+        // Map for alert throttling
+        window.lastAlertMap = {};
 
         // PeerJS variables
         let peer = null;
@@ -835,17 +853,63 @@
 
         // Initialize exam environment
         function initializeExamEnvironment() {
+            // Prevent duplicate initialization
+            if (window.examEnvInitialized) {
+                console.log('🛡️ Exam environment already initialized, skipping duplicate setup.');
+                return;
+            }
+            window.examEnvInitialized = true;
+            console.log('🛡️ Initializing Exam Environment & Security Listeners...');
+
             // Force fullscreen
             requestFullscreen();
 
-            // Disable right click
-            // document.addEventListener('contextmenu', function(e) {
-            //     e.preventDefault();
-            //     logAlert('right_click', 'Mencoba membuka menu konteks');
-            // });
-
-            // Disable F12, Ctrl+Shift+I, etc.
+            // Unified Keydown Listener
             document.addEventListener('keydown', function(e) {
+                // --- EXAM SHORTCUTS (Enabled only if not typing in an input) ---
+                if (!['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+                    // Navigation: Left/Right Arrows
+                    if (e.key === 'ArrowRight') {
+                        @if ($last) Livewire.dispatch('nextQuestion'); @endif
+                        return;
+                    }
+                    if (e.key === 'ArrowLeft') {
+                        @if ($first) Livewire.dispatch('previousQuestion'); @endif
+                        return;
+                    }
+
+                    // Answering: A, B, C, D, E
+                    const keyMap = {'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4};
+                    if (keyMap.hasOwnProperty(e.key) && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                        const radios = document.querySelectorAll('input[name="timetable_answer_id"]');
+                        const index = keyMap[e.key];
+                        if (radios[index]) {
+                            radios[index].click();
+                            // Visual feedback
+                            const label = radios[index].closest('label');
+                            if (label) {
+                                label.classList.add('ring-2', 'ring-blue-400');
+                                setTimeout(() => label.classList.remove('ring-2', 'ring-blue-400'), 300);
+                            }
+                        }
+                        return; // Allow the event (it's a valid interaction)
+                    }
+                }
+
+                // --- SECURITY BLOCKING ---
+
+                // Block F5 / Ctrl+R (Reload)
+                if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
+                    e.preventDefault();
+                    logAlert('page_reload', 'Mencoba me-refresh halaman');
+                }
+
+                // Block F11 (Fullscreen)
+                if (e.key === 'F11') {
+                    e.preventDefault();
+                    logAlert('fullscreen_toggle', 'Mencoba toggle fullscreen');
+                }
+
                 // F12
                 if (e.key === 'F12') {
                     e.preventDefault();
@@ -876,10 +940,7 @@
                     e.preventDefault();
                     logAlert('ctrl_tab', 'Mencoba beralih tab dengan Ctrl+Tab');
                 }
-            });
-
-            // Disable copy, paste, cut
-            document.addEventListener('keydown', function(e) {
+                // Copy/Paste/Cut (Ctrl+C, Ctrl+V, Ctrl+X)
                 if (e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 'x')) {
                     e.preventDefault();
                     logAlert('copy_paste', 'Mencoba copy/paste/cut');
@@ -1272,11 +1333,17 @@
             let reconnectTimer;
 
             peer.on('open', id => {
-                console.log('✅ Peer connected:', id);
-                updateLiveSessionData({
-                    connection_status: 'connected'
-                });
-                if (window.Livewire) Livewire.dispatch('updatePeerJSId', [id]);
+                console.log('✅ PeerJS connected with ID:', id);
+                console.log('✅ Connected to PeerJS server at ' + window.peerConfig.host + ':' + window.peerConfig.port);
+
+                // Update debugging info
+                document.getElementById('debug-peer-id').textContent = id;
+                document.getElementById('debug-status').textContent = 'Connected';
+                document.getElementById('debug-status').className = 'text-green-600 font-bold';
+
+                // Try to enforce fullscreen when connection is established
+                console.log('🤖 PeerJS connected - attempting auto-fullscreen...');
+                setTimeout(enforceFullscreen, 500);
             });
 
             peer.on('call', call => handleIncomingCall(call));
@@ -2002,7 +2069,7 @@
                             .then(() => {
                                 console.log('🎉 Recording finalized on server (no local chunks)');
                                 updateRecordingStatus('Completed', 'Video tersimpan sebagai beberapa chunk');
-                                alert('✅ Video ujian berhasil difinalisasi dari chunk yang diupload!');
+                                console.log('✅ Video ujian berhasil difinalisasi dari chunk yang diupload!');
                                 window.isSavingVideo = false;
                                 window.isRecordingStopping = false;
                                 recordedChunks = [];
@@ -2320,15 +2387,7 @@
             window.isSavingVideo = false;
         };
 
-        reader.onerror = function(error) {
-            console.error('❌ FileReader error:', error);
-            updateRecordingStatus('Error', 'Read failed');
-            recordedChunks = []; // Clear chunks even on error
 
-            // Reset flags on error too
-            window.isRecordingStopping = false;
-            window.isSavingVideo = false;
-        };
 
         // Update camera status
         function updateCameraStatus(status, className) {
@@ -2717,7 +2776,16 @@
         }
 
         // Log alert
+        // Log alert with throttling
         function logAlert(type, description) {
+            const now = Date.now();
+            // Prevent duplicate alerts of same type within 2 seconds
+            if (window.lastAlertMap[type] && (now - window.lastAlertMap[type] < 2000)) {
+                console.log(`⚠️ Alert throttled: ${type}`);
+                return;
+            }
+            window.lastAlertMap[type] = now;
+
             if (window.Livewire) {
                 Livewire.dispatch('logAlert', {
                     alertType: type,
@@ -2730,6 +2798,54 @@
                 });
             }
         }
+
+        // === KIOSK MODE: SECURITY FEATURES ===
+
+        // 1. Force Fullscreen on interaction
+        function enforceFullscreen() {
+            const elem = document.documentElement;
+            if (!document.fullscreenElement) {
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen().catch(err => {
+                        console.log('Auto-Fullscreen blocked by browser (normal security policy):', err);
+                        // If blocked, we rely on the Kiosk Overlay button
+                    });
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                }
+            }
+        }
+
+        // Attempt Auto-Fullscreen on Load (Best Effort)
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🤖 Attempting auto-fullscreen on load...');
+            setTimeout(enforceFullscreen, 500);
+        });
+
+        // Also try when Livewire initializes
+        document.addEventListener('livewire:initialized', () => {
+             console.log('🤖 Attempting auto-fullscreen on Livewire init...');
+             setTimeout(enforceFullscreen, 1000);
+        });
+
+
+        // 3. Block Right Click
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            logAlert('right_click', 'Attempted Context Menu');
+            return false;
+        });
+
+        // 4. Detect Focus Loss (Alt-Tab detection)
+        window.addEventListener('blur', function() {
+            // Uncomment to enable strict blurring (might be annoying during dev)
+            logAlert('window_blur', 'User switched window/tab (Focus Lost)');
+
+            // Show warning overlay
+            showWarning('Dilarang meninggalkan halaman ujian! (Focus Lost)');
+        });
 
         // Show warning modal
         function showWarning(message) {
@@ -2749,7 +2865,7 @@
 
                     // Force focus back to exam
                     window.focus();
-                    requestFullscreen();
+                    enforceFullscreen(); // Try to restore fullscreen
                 });
             }
         }
@@ -3130,7 +3246,7 @@
             }
 
             // Stop recording first
-            stopRecording();
+            // stopRecording(); // CHANGED: Don't finish exam on refresh/unload!
 
             // Stop video streams
             if (stream) {
