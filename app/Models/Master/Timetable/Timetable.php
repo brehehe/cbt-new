@@ -48,7 +48,16 @@ class Timetable extends Model
         'supervisors' => 'array',
         'start_time'  => 'datetime',
         'end_time'    => 'datetime',
+        'require_seb' => 'boolean',
     ];
+
+    /**
+     * Check if timetable requires Safe Exam Browser
+     */
+    public function requiresSEB(): bool
+    {
+        return $this->require_seb || config('seb.require_for_all_exams', false);
+    }
 
     protected static function boot()
     {

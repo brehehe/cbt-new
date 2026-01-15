@@ -197,6 +197,14 @@
                         <textarea id="description" wire:model.defer="description" placeholder="Masukkan Deskripsi"
                             class="mt-1 form-control"></textarea>
                     </div>
+                    <div class="flex items-center gap-3 p-4 bg-purple-50 rounded-lg border border-purple-200">
+                        <input type="checkbox" id="require_seb" wire:model.defer="require_seb"
+                            class="w-5 h-5 text-purple-600 rounded focus:ring-purple-500 focus:ring-2 cursor-pointer">
+                        <label for="require_seb" class="text-sm font-medium text-gray-700 cursor-pointer">
+                            🔒 Require Safe Exam Browser (SEB)
+                            <span class="block text-xs text-gray-500 mt-1">Ujian harus diakses melalui Safe Exam Browser</span>
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>

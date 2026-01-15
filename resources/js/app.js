@@ -1,4 +1,8 @@
 // =====================
+// SAFE EXAM BROWSER DETECTOR
+// =====================
+
+// =====================
 // SIDEBAR HANDLER
 // =====================
 document.addEventListener('DOMContentLoaded', function () {

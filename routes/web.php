@@ -42,6 +42,24 @@ Route::middleware(['auth', CheckUserTimetable::class])->group(function () {
 
 require __DIR__ . '/auth.php';
 
+// Safe Exam Browser Routes
+Route::prefix('seb')->name('seb.')->group(function () {
+    // Generic config - no timetable required, just login page
+    Route::get('/config', [App\Http\Controllers\SEBController::class, 'downloadGenericConfig'])
+        ->name('config.generic');
+
+    // Specific timetable config
+    Route::get('/config/{timetable}', [App\Http\Controllers\SEBController::class, 'downloadConfig'])
+        ->name('config.download');
+
+    Route::get('/validate', [App\Http\Controllers\SEBController::class, 'validateSEB'])
+        ->name('validate');
+
+    Route::get('/check/{timetable}', [App\Http\Controllers\SEBController::class, 'checkTimetableSEB'])
+        ->name('check.timetable')
+        ->middleware('auth');
+});
+
 Route::group(['middleware'=> [BlockBots::class]], function () {
     Route::group(['namespace' => 'App\Livewire\Auth'], function () {
         // Add your routes here

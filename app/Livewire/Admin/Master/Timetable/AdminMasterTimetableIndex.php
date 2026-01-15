@@ -46,6 +46,7 @@ class AdminMasterTimetableIndex extends Component
     public $exam_room_id;
     public $examSessions = [];
     public $exam_session_id;
+    public $require_seb = false;
 
     public function mount()
     {
@@ -88,7 +89,8 @@ class AdminMasterTimetableIndex extends Component
             'studys',
             'classmate_id',
             'exam_room_id',
-            'exam_session_id'
+            'exam_session_id',
+            'require_seb'
         ]);
         return $this->dispatch('close-modal', ['id' => 'modal-timetable']);
     }
@@ -107,6 +109,7 @@ class AdminMasterTimetableIndex extends Component
         $this->start_time      = Carbon::parse($data->start_time)->format('Y-m-d\TH:i');
         $this->end_time        = Carbon::parse($data->end_time)->format('Y-m-d\TH:i');
         $this->description     = $data->description;
+        $this->require_seb     = $data->require_seb ?? false;
 
         // Pastikan hasil decode adalah array
         $rawStudys = $data->studys;
@@ -249,6 +252,7 @@ class AdminMasterTimetableIndex extends Component
                 'end_time'        => $this->end_time,
                 'description'     => $this->description,
                 'studys'          => $this->studys ? json_encode(array_keys($this->studys)) : null,
+                'require_seb'     => $this->require_seb ?? false,
             ]);
 
             DB::commit();
