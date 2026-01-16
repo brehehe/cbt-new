@@ -1332,7 +1332,7 @@
             window.peer = peer;
             let reconnectTimer;
 
-            peer.on('open', id => {
+            peer.on('open', async (id) => {
                 console.log('✅ PeerJS connected with ID:', id);
                 console.log('✅ Connected to PeerJS server at ' + window.peerConfig.host + ':' + window.peerConfig.port);
 
@@ -1340,6 +1340,45 @@
                 document.getElementById('debug-peer-id').textContent = id;
                 document.getElementById('debug-status').textContent = 'Connected';
                 document.getElementById('debug-status').className = 'text-green-600 font-bold';
+
+                // ✨ NEW: Save peer_id to database
+                try {
+                    const sessionToken = streamId || '{{ $liveSession->session_token ?? '' }}';
+
+                    if (sessionToken) {
+                        console.log('📡 Saving peer_id to database...', { peer_id: id, session_token: sessionToken });
+
+                        const response = await fetch('/api/stream/update-peer-id', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                            },
+                            body: JSON.stringify({
+                                session_token: sessionToken,
+                                peer_id: id
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                            console.log('✅ Peer ID saved to database successfully');
+                            // Update live session data via Livewire
+                            updateLiveSessionData({
+                                peer_id: id,
+                                connection_status: 'connected'
+                            });
+                        } else {
+                            console.warn('⚠️ Failed to save peer_id:', data.error);
+                        }
+                    } else {
+                        console.warn('⚠️ No session token available to save peer_id');
+                    }
+                } catch (error) {
+                    console.error('❌ Error saving peer_id to database:', error);
+                    // Non-critical error - PeerJS still works, just won't be visible to supervisor immediately
+                }
 
                 // Try to enforce fullscreen when connection is established
                 console.log('🤖 PeerJS connected - attempting auto-fullscreen...');

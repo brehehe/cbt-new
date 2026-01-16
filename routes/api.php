@@ -158,6 +158,11 @@ Route::get('/stream/connect/{sessionToken}', [App\Http\Controllers\Admin\Exam\Li
 Route::post('/stream/signaling/{sessionToken}', [App\Http\Controllers\Admin\Exam\LiveStreamController::class, 'handleSignaling'])
     ->name('api.stream.signaling');
 
+// Update peer_id for live session
+Route::post('/stream/update-peer-id', [App\Http\Controllers\Admin\Exam\LiveStreamController::class, 'updatePeerId'])
+    ->name('api.stream.update-peer-id');
+
+
 // Real-time monitoring endpoints
 Route::get('/metrics/system', [RealTimeMetricsController::class, 'getSystemMetrics'])
     ->name('api.metrics.system');

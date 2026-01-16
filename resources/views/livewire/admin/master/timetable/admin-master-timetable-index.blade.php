@@ -54,7 +54,6 @@
                 <thead class="bg-gray-100 text-gray-700">
                     <tr>
                         <th class="w-1 text-center px-3 py-2">No</th>
-                        <th class="px-3 py-2 text-left">ID</th>
                         <th class="px-3 py-2 text-left">Peserta</th>
                         <th class="px-3 py-2 text-left">Nama</th>
                         <th class="px-3 py-2 text-left">Modul</th>
@@ -73,7 +72,6 @@
                             <td class="text-center px-3 py-2">
                                 {{ $timetables->firstItem() + $index }}
                             </td>
-                            <td class="px-3 py-2">{{ $timetable->id }}</td>
                             <td class="px-3 py-2">{{ $timetable?->classmate->name ?? '-' }}</td>
                             <td class="px-3 py-2">{{ $timetable?->name ?? '-' }}</td>
                             <td class="px-3 py-2">{{ $timetable?->module->name ?? '-' }}</td>

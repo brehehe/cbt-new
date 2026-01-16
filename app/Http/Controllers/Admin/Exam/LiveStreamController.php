@@ -188,6 +188,54 @@ class LiveStreamController extends Controller
     }
 
     /**
+     * Update peer ID for student's live session
+     */
+    public function updatePeerId(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'session_token' => 'required|string',
+                'peer_id' => 'required|string'
+            ]);
+
+            $session = ExamLiveSession::where('session_token', $validated['session_token'])
+                ->where('is_active', true)
+                ->first();
+
+            if (!$session) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Session not found or inactive'
+                ], 404);
+            }
+
+            $session->update([
+                'peer_id' => $validated['peer_id'],
+                'connection_status' => 'connected'
+            ]);
+
+            Log::info('Peer ID updated', [
+                'session_id' => $session->id,
+                'user' => $session->user->name,
+                'peer_id' => $validated['peer_id']
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Peer ID updated successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error updating peer ID: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to update peer ID'
+            ], 500);
+        }
+    }
+
+
+    /**
      * Check if student has active camera connection
      */
     private function checkStudentCameraConnection($session)
