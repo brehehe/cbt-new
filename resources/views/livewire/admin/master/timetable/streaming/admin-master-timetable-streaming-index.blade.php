@@ -187,16 +187,15 @@
             }, 2000);
 
             // Set up periodic monitoring and reconnection
-            if (window.__supervisorIntervals.monitor) clearInterval(window.__supervisorIntervals.monitor);
             window.__supervisorIntervals.monitor = setInterval(() => {
                 monitorConnections();
-            }, 30000); // Check every 30 seconds
+            }, 5000); // Check every 5 seconds
 
             // Set up periodic refresh of stream data
             if (window.__supervisorIntervals.refresh) clearInterval(window.__supervisorIntervals.refresh);
             window.__supervisorIntervals.refresh = setInterval(() => {
                 refreshStreamData();
-            }, 60000); // Refresh every minute
+            }, 120000); // Refresh every 2 minutes
         }
 
         // Setup PeerJS connections
@@ -550,6 +549,14 @@
                     // Check if call is still open
                     if (!session.call.open) {
                         console.log(`⚠️ Connection lost for ${session.user_name}, attempting reconnection...`);
+
+                        // Update UI to show reconnecting status
+                        const indicator = document.getElementById(`statusIndicator-${session.session_id}`);
+                        if (indicator) {
+                            indicator.className = 'absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium bg-orange-500 text-white';
+                            indicator.textContent = 'Reconnecting...';
+                        }
+
                         try {
                             await connectToPeerJSStudent(session);
                             console.log(`✅ Reconnected to ${session.user_name}`);
@@ -763,9 +770,21 @@
 
                     call.on('close', function() {
                         console.log(`Call closed with ${streamInfo.user_name}`);
+
+                        // Force update session status
+                        const sessionCtx = activeSessions.find(s => s.session_id === streamInfo.session_id);
+                        if (sessionCtx) {
+                            sessionCtx.connection_status = 'disconnected';
+                            // If we didn't initiate the close (e.g. not during cleanup), try to recover
+                            if (!streamInfo.isCleanup) {
+                                console.log(`Unexpected close for ${streamInfo.user_name}, marking for immediate check`);
+                            }
+                        }
+
                         if (!streamReceived) {
                             clearTimeout(timeoutId);
-                            reject(new Error('Call closed before receiving stream'));
+                            // Don't reject if we are just closing normally, but here we assume error if no stream
+                            console.log('Call closed before stream receipt');
                         }
                     });
 
@@ -784,6 +803,19 @@
                         reject(new Error(errorMessage));
                     });
 
+                    // Monitor ICE connection state for faster disconnect detection
+                    if (call.peerConnection) {
+                        call.peerConnection.oniceconnectionstatechange = () => {
+                            const state = call.peerConnection.iceConnectionState;
+                            console.log(`❄️ ICE state for ${streamInfo.user_name}: ${state}`);
+                            if (state === 'disconnected' || state === 'failed' || state === 'closed') {
+                                console.warn(`ICE connection critical for ${streamInfo.user_name}, restarting...`);
+                                // Close the call to trigger cleanup and reconnection logic
+                                if (call.open) call.close();
+                            }
+                        };
+                    }
+
                     // Additional timeout specifically for stream reception
                     setTimeout(() => {
                         if (!streamReceived && call && call.open) {
@@ -796,7 +828,7 @@
                                 ));
                             }
                         }
-                    }, 8000); // 8 seconds for stream reception
+                    }, 15000); // Increased to 15 seconds for stream reception
 
                 } catch (error) {
                     clearTimeout(timeoutId);
