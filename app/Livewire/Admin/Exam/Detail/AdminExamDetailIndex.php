@@ -203,6 +203,12 @@ class AdminExamDetailIndex extends Component
 
     public function updatePeerJSId($peerId)
     {
+        \Log::info('🔥 updatePeerJSId CALLED via Livewire', [
+            'peer_id' => $peerId,
+            'user_id' => Auth::id(),
+            'live_session_exists' => $this->liveSession ? 'yes' : 'no'
+        ]);
+
         $this->peerJSId = $peerId;
 
         // Update live session dengan PeerJS ID
@@ -213,11 +219,12 @@ class AdminExamDetailIndex extends Component
                 'last_activity' => Carbon::now()
             ]);
 
-            \Log::info('PeerJS ID updated for live session', [
+            \Log::info('✅ PeerJS ID updated for live session in DB', [
                 'peer_id' => $peerId,
-                'live_session_id' => $this->liveSession->id,
-                'user_id' => Auth::id()
+                'live_session_id' => $this->liveSession->id
             ]);
+        } else {
+             \Log::warning('⚠️ liveSession is NULL in updatePeerJSId');
         }
 
         // Emit event ke JavaScript untuk memberitahu bahwa PeerJS ID sudah disimpan
@@ -682,6 +689,16 @@ class AdminExamDetailIndex extends Component
             // Update browser info
             if (isset($data['browser_info'])) {
                 $updateData['browser_info'] = $data['browser_info'];
+            }
+
+            // Update peer_id if provided (Critical for streaming)
+            if (isset($data['peer_id']) && !empty($data['peer_id'])) {
+                $updateData['peer_id'] = $data['peer_id'];
+
+                // If we get a peer_id, we can assume camera is potentially active
+                if (!isset($data['camera_status'])) {
+                     $updateData['camera_status'] = 'active';
+                }
             }
 
             $this->liveSession->update($updateData);

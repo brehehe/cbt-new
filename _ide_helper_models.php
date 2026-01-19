@@ -1144,6 +1144,7 @@ namespace App\Models\Master\Timetable{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property bool $require_seb
  * @property-read \App\Models\Classmate\Classmate|null $classmate
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Master\Exam\ExamRoom|null $examRoom
@@ -1170,6 +1171,7 @@ namespace App\Models\Master\Timetable{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereModuleId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereRequireSeb($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereStartTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereStudyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereStudys($value)

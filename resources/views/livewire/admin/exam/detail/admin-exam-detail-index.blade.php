@@ -911,10 +911,10 @@
                 }
 
                 // F12
-                if (e.key === 'F12') {
-                    e.preventDefault();
-                    logAlert('dev_tools', 'Mencoba membuka developer tools dengan F12');
-                }
+                // if (e.key === 'F12') {
+                //     e.preventDefault();
+                //     logAlert('dev_tools', 'Mencoba membuka developer tools dengan F12');
+                // }
                 // Ctrl+Shift+I
                 if (e.ctrlKey && e.shiftKey && e.key === 'I') {
                     e.preventDefault();
@@ -1333,51 +1333,64 @@
             let reconnectTimer;
 
             peer.on('open', async (id) => {
+                console.log('🔥🔥🔥 VERSION 2.0 - NEW CODE LOADED 🔥🔥🔥');
                 console.log('✅ PeerJS connected with ID:', id);
-                console.log('✅ Connected to PeerJS server at ' + window.peerConfig.host + ':' + window.peerConfig.port);
 
-                // Update debugging info
-                document.getElementById('debug-peer-id').textContent = id;
-                document.getElementById('debug-status').textContent = 'Connected';
-                document.getElementById('debug-status').className = 'text-green-600 font-bold';
-
-                // ✨ NEW: Save peer_id to database
+                // Update debugging info (non-critical)
                 try {
-                    const sessionToken = streamId || '{{ $liveSession->session_token ?? '' }}';
+                    document.getElementById('debug-peer-id').textContent = id;
+                    document.getElementById('debug-status').textContent = 'Connected';
+                    document.getElementById('debug-status').className = 'text-green-600 font-bold';
+                } catch (e) {
+                    console.warn('⚠️ Debug elements not found (non-critical)');
+                }
 
-                    if (sessionToken) {
-                        console.log('📡 Saving peer_id to database...', { peer_id: id, session_token: sessionToken });
+                // ✨ CRITICAL: Save peer_id to database IMMEDIATELY
+                const sessionToken = streamId || '{{ $liveSession->session_token ?? '' }}';
+                console.log('🔥 SESSION TOKEN:', sessionToken);
+                console.log('🔥 PEER ID:', id);
 
-                        const response = await fetch('/api/stream/update-peer-id', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-                            },
-                            body: JSON.stringify({
-                                session_token: sessionToken,
-                                peer_id: id
-                            })
-                        });
-
-                        const data = await response.json();
-
-                        if (data.success) {
-                            console.log('✅ Peer ID saved to database successfully');
-                            // Update live session data via Livewire
-                            updateLiveSessionData({
-                                peer_id: id,
-                                connection_status: 'connected'
-                            });
+                // Method 1: Livewire (primary)
+                try {
+                    console.log('🔥 METHOD 1: Calling Livewire updatePeerJSId...');
+                    if (typeof Livewire !== 'undefined' && Livewire.find) {
+                        const component = Livewire.find('{{ $_instance->getId() }}');
+                        if (component) {
+                            await component.call('updatePeerJSId', id);
+                            console.log('✅ Livewire updatePeerJSId SUCCESS');
                         } else {
-                            console.warn('⚠️ Failed to save peer_id:', data.error);
+                            console.warn('⚠️ Livewire component not found');
                         }
                     } else {
-                        console.warn('⚠️ No session token available to save peer_id');
+                        console.warn('⚠️ Livewire not available');
                     }
-                } catch (error) {
-                    console.error('❌ Error saving peer_id to database:', error);
-                    // Non-critical error - PeerJS still works, just won't be visible to supervisor immediately
+                } catch (e) {
+                    console.error('❌ Livewire call failed:', e);
+                }
+
+                // Method 2: Direct API call (backup)
+                try {
+                    console.log('🔥 METHOD 2: Calling API /api/stream/update-peer-id...');
+                    const response = await fetch('/api/stream/update-peer-id', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            session_token: sessionToken,
+                            peer_id: id
+                        })
+                    });
+                    const data = await response.json();
+                    console.log('🔥 API RESPONSE:', data);
+                    if (data.success) {
+                        console.log('✅ API update-peer-id SUCCESS');
+                    } else {
+                        console.error('❌ API update-peer-id FAILED:', data.error);
+                    }
+                } catch (e) {
+                    console.error('❌ API call failed:', e);
                 }
 
                 // Try to enforce fullscreen when connection is established

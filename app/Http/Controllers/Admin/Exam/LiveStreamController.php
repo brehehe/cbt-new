@@ -48,7 +48,7 @@ class LiveStreamController extends Controller
                 // Check if student has active WebRTC connection
                 $hasRealStream = $this->checkStudentCameraConnection($session);
 
-                $streams[] = [
+                $streamData = [
                     'session_id' => $session->id,
                     'session_token' => $session->session_token,
                     'user_name' => $session->user->name,
@@ -60,6 +60,17 @@ class LiveStreamController extends Controller
                     'webrtc_endpoint' => $request->getSchemeAndHttpHost() . '/api/stream/connect/' . $session->session_token,
                     'peer_id' => $session->peer_id ?? null // PeerJS ID for direct connection
                 ];
+
+                // 🔥 DETAILED DEBUG LOGGING
+                Log::info('📹 Stream data for ' . $session->user->name, [
+                    'peer_id' => $session->peer_id ?? 'NULL',
+                    'has_real_camera' => $hasRealStream ? 'YES' : 'NO',
+                    'camera_status' => $session->camera_status,
+                    'updated_at' => $session->updated_at->toDateTimeString(),
+                    'seconds_ago' => $session->updated_at->diffInSeconds(now())
+                ]);
+
+                $streams[] = $streamData;
             }
 
             $realCameras = 0;

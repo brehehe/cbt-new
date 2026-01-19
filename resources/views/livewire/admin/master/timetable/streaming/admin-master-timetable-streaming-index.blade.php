@@ -464,6 +464,12 @@
                         console.log(`Found ${realStreamsData.streams.length} total streams`, realStreamsData.streams);
 
                         for (const streamInfo of realStreamsData.streams) {
+                            // 🔥 DETAILED DEBUG LOGGING
+                            console.log('📹 Processing stream for:', streamInfo.user_name);
+                            console.log('  - has_real_camera:', streamInfo.has_real_camera);
+                            console.log('  - peer_id:', streamInfo.peer_id || 'NULL');
+                            console.log('  - camera_status:', streamInfo.camera_status);
+                            console.log('  - connection_status:', streamInfo.connection_status);
                             // SCALABILITY CHECK: Only connect if this session is visible on the current page
                             // TYPE SAFE COMPARISON
                             if (!visibleSessionIds.includes(String(streamInfo.session_id))) {
