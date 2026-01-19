@@ -49,6 +49,7 @@ return new class extends Migration
 
             //akses token
             $table->longText('one_health_access_token')->nullable()->comment('save auth access token');
+
             $table->timestamps();
             $table->softDeletes();
             $table->bigInteger('order')->default(0);

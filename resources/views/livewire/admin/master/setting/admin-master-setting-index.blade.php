@@ -319,6 +319,33 @@
                             </div>
                         </div>
                     </div>
+                    {{-- Safe Exam Browser Configuration --}}
+                    <div class="p-6 bg-white shadow rounded-lg">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Safe Exam Browser (SEB)</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">SEB Quit Password</label>
+                                <input type="text" wire:model="quit_password_seb"
+                                    placeholder="Contoh: ProCBT@Quit2024!"
+                                    class="mt-1 form-control" />
+                                <p class="text-xs text-gray-500 mt-1">Password untuk keluar dari Safe Exam Browser (kosongkan untuk menggunakan default)</p>
+                                @error('quit_password_seb')
+                                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div class="flex items-end">
+                                <a href="{{ route('seb.config.generic') }}"
+                                   target="_blank"
+                                   class="btn btn-info inline-flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                    Download SEB Config
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="p-6 bg-white shadow rounded-lg">
                         <h2 class="text-lg font-semibold text-gray-800 mb-4">Lainya</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

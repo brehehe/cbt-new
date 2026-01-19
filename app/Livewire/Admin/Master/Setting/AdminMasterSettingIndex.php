@@ -86,6 +86,8 @@ class AdminMasterSettingIndex extends Component
 
     public $color_secondary;
 
+    public $quit_password_seb;
+
     // Service
     public $companyServices = [];
 
@@ -125,6 +127,7 @@ class AdminMasterSettingIndex extends Component
             'background_login',
             'color_primary',
             'color_secondary',
+            'quit_password_seb',
         ]);
 
         if ($tab === 'universitas') {
@@ -151,6 +154,7 @@ class AdminMasterSettingIndex extends Component
                 'background_login',
                 'color_primary',
                 'color_secondary',
+                'quit_password_seb',
             ])->with('companyDetail')->find($this->company_id);
 
             if ($company) {
@@ -177,6 +181,7 @@ class AdminMasterSettingIndex extends Component
                 $this->background_login_old = $company->background_login;
                 $this->color_primary = $company->color_primary;
                 $this->color_secondary = $company->color_secondary;
+                $this->quit_password_seb = $company->quit_password_seb;
             }
         } elseif ($tab === 'layanan') {
             $this->companyServices = CompanyService::select('id', 'start_date', 'company_id', 'service_month_id', 'duration_days', 'is_lifetime')->with('serviceMonth:id,name,description', 'company:id,name,description')->where('company_id', $this->company_id)->get();
@@ -206,6 +211,7 @@ class AdminMasterSettingIndex extends Component
                 'background_login' => 'nullable|image|max:2048',
                 'color_primary' => 'required',
                 'color_secondary' => 'required',
+                'quit_password_seb' => 'nullable|string|max:255',
             ]);
 
             if ($this->logo) {
@@ -257,6 +263,7 @@ class AdminMasterSettingIndex extends Component
                 'background_login' => $this->background_login,
                 'color_primary' => $this->color_primary,
                 'color_secondary' => $this->color_secondary,
+                'quit_password_seb' => $this->quit_password_seb,
             ]);
 
             CompanyDetail::updateOrCreate([

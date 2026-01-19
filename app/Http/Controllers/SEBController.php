@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Master\Timetable\Timetable;
+use App\Models\Company\Company;
 
 class SEBController extends Controller
 {
@@ -197,7 +198,13 @@ class SEBController extends Controller
     {
         $appUrl = config('app.url');
         $browserExamKey = config('seb.browser_exam_key', '');
-        $quitPassword = config('seb.quit_password', '');
+
+        // Get company-specific quit password, otherwise use config default
+        $quitPassword = config('seb.quit_password', 'admin123');
+        $company = Company::first();
+        if ($company && !empty($company->quit_password_seb)) {
+            $quitPassword = $company->quit_password_seb;
+        }
 
         // XML Plist format structure
         $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"></plist>');
@@ -318,7 +325,13 @@ class SEBController extends Controller
     {
         $appUrl = config('app.url');
         $browserExamKey = config('seb.browser_exam_key', '');
-        $quitPassword = config('seb.quit_password', '');
+
+        // Get company-specific quit password, otherwise use config default
+        $quitPassword = config('seb.quit_password', 'admin123');
+        $company = Company::first();
+        if ($company && !empty($company->quit_password_seb)) {
+            $quitPassword = $company->quit_password_seb;
+        }
 
         // XML Plist format structure
         $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"></plist>');
