@@ -12,6 +12,7 @@ use Illuminate\Support\Carbon;
 class AdminExamWarningIndex extends Component
 {
     public $user_timetable_id, $userTimetable, $regulations = [];
+    public $camera_device_id;
 
     public function mount()
     {
@@ -63,6 +64,27 @@ class AdminExamWarningIndex extends Component
             'status' => 'exam',
             'start_exam' => Carbon::now(),
         ]);
+
+        // Create or update ExamLiveSession with camera_device_id
+        \App\Models\Exam\ExamLiveSession::updateOrCreate(
+            [
+                'user_timetable_id' => $userTimetable->id,
+                'user_id' => Auth::id()
+            ],
+            [
+                'timetable_id' => $userTimetable->timetable_id,
+                'company_id' => $userTimetable->company_id,
+                'camera_device_id' => $this->camera_device_id,
+                'is_active' => true, // Mark as active so Detail page picks it up
+                'last_activity' => Carbon::now(),
+                 'session_metadata' => [
+                    'start_time' => Carbon::now()->toISOString(),
+                    'user_agent' => request()->header('User-Agent'),
+                    'ip_address' => request()->ip(),
+                    'session_id' => session()->getId(),
+                ],
+            ]
+        );
 
         session()->flash('saved', [
             'title' => 'Ujian Telah Dimulai!',

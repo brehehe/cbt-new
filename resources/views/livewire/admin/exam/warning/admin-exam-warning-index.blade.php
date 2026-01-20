@@ -63,13 +63,94 @@
 
                 <!-- Camera Check -->
                 <div class="p-4 border rounded-lg">
-                    <h3 class="mb-3 font-medium text-gray-900">Periksa Kamera</h3>
-                    <div class="mb-3 overflow-hidden bg-gray-900 rounded-lg aspect-video">
-                        <video id="cameraPreview" autoplay class="object-cover w-full h-full"></video>
+                    <h3 class="font-medium text-gray-900 mb-2">Periksa Kamera</h3>
+
+                    <div class="mb-3" wire:ignore>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Kamera</label>
+                        <select id="videoSource" wire:model="camera_device_id" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <option value="">Mencari kamera...</option>
+                        </select>
                     </div>
-                    <p id="cameraStatus" class="text-sm text-gray-500">Pastikan wajah Anda terlihat jelas pada kamera
-                    </p>
+
+                    <div class="mb-3 overflow-hidden bg-gray-900 rounded-lg aspect-video">
+                        <video id="cameraPreview" autoplay playsinline class="object-cover w-full h-full"></video>
+                    </div>
+                    <p id="cameraStatus" class="text-sm text-gray-500">Pastikan wajah Anda terlihat jelas pada kamera</p>
                 </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', async () => {
+                        const videoElement = document.getElementById('cameraPreview');
+                        const videoSelect = document.getElementById('videoSource');
+                        const statusElement = document.getElementById('cameraStatus');
+                        let currentStream = null;
+
+                        async function getCameras() {
+                            try {
+                                await navigator.mediaDevices.getUserMedia({ video: true }); // Request permission first
+                                const devices = await navigator.mediaDevices.enumerateDevices();
+                                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+
+                                videoSelect.innerHTML = '';
+
+                                if (videoDevices.length === 0) {
+                                     const option = document.createElement('option');
+                                     option.text = 'Tidak ada kamera ditemukan';
+                                     videoSelect.appendChild(option);
+                                     return;
+                                }
+
+                                videoDevices.forEach((device, index) => {
+                                    const option = document.createElement('option');
+                                    option.value = device.deviceId;
+                                    option.text = device.label || `Camera ${index + 1}`;
+                                    videoSelect.appendChild(option);
+                                });
+
+                                // Select the first one by default if not set
+                                if (videoDevices.length > 0) {
+                                    // Trigger change to start stream
+                                    startStream(videoDevices[0].deviceId);
+                                    // Update Livewire if needed (though wire:model does it on change)
+                                    @this.set('camera_device_id', videoDevices[0].deviceId);
+                                }
+                            } catch (err) {
+                                console.error('Error getting cameras:', err);
+                                statusElement.textContent = 'Gagal mendeteksi kamera: ' + err.message;
+                                statusElement.className = 'text-sm text-red-500';
+                            }
+                        }
+
+                        async function startStream(uDeviceId) {
+                            if (currentStream) {
+                                currentStream.getTracks().forEach(track => track.stop());
+                            }
+
+                            const constraints = {
+                                video: { deviceId: uDeviceId ? { exact: uDeviceId } : undefined }
+                            };
+
+                            try {
+                                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                                currentStream = stream;
+                                videoElement.srcObject = stream;
+                                statusElement.textContent = 'Kamera aktif. Silakan lanjutkan.';
+                                statusElement.className = 'text-sm text-green-500';
+                            } catch (err) {
+                                console.error('Error starting stream:', err);
+                                statusElement.textContent = 'Gagal memulai kamera: ' + err.message;
+                                statusElement.className = 'text-sm text-red-500';
+                            }
+                        }
+
+                        videoSelect.onchange = () => {
+                            startStream(videoSelect.value);
+                            @this.set('camera_device_id', videoSelect.value);
+                        };
+
+                        await getCameras();
+                    });
+                </script>
 
                 <!-- Consent Checkbox -->
                 <div class="flex items-start mt-6 space-x-3">

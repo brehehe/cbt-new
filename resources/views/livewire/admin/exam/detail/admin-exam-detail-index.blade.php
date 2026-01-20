@@ -488,6 +488,7 @@
         let peerConnection;
         let streamId = '{{ $liveSession->session_token ?? '' }}';
         let isStreaming = false;
+        let selectedCameraId = '{{ $liveSession->camera_device_id ?? "" }}';
 
         // Flag to prevent duplicate listeners
         window.examEnvInitialized = false;
@@ -1109,6 +1110,7 @@
                 // Step 4: Define camera constraints
                 const constraints = {
                     video: {
+                        deviceId: selectedCameraId ? { exact: selectedCameraId } : undefined,
                         width: {
                             ideal: 640,
                             min: 320
@@ -1117,7 +1119,7 @@
                             ideal: 480,
                             min: 240
                         },
-                        facingMode: 'user'
+                        facingMode: selectedCameraId ? undefined : 'user'
                         // Removed frameRate to avoid conflicts
                     },
                     audio: false
@@ -1456,7 +1458,8 @@
 
                 const constraints = {
                     video: {
-                        facingMode: 'user',
+                         deviceId: selectedCameraId ? { exact: selectedCameraId } : undefined,
+                        facingMode: selectedCameraId ? undefined : 'user',
                         width: {
                             ideal: 480,
                             max: 480

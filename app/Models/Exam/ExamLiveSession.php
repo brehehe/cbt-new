@@ -23,6 +23,7 @@ class ExamLiveSession extends Model
         'user_id',
         'company_id',
         'session_token',
+        'camera_device_id', // Selected camera device ID
         'peer_id', // PeerJS ID for direct connection
         'camera_stream_url',
         'screen_stream_url',
