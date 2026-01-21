@@ -24,6 +24,7 @@ class AdminMasterSettingIndex extends Component
     public $tabs = [
         'universitas',
         // 'satu-sehat',
+        'seb',
         'layanan',
     ];
 
@@ -88,6 +89,18 @@ class AdminMasterSettingIndex extends Component
 
     public $quit_password_seb;
 
+    // SEB Configuration
+    public $seb_use_encryption;
+    public $seb_encryption_key;
+    public $seb_show_taskbar;
+    public $seb_show_reload_button;
+    public $seb_show_time;
+    public $seb_show_input_language;
+    public $seb_allow_quit;
+    public $seb_allow_spell_check;
+    public $seb_enable_private_clipboard;
+    public $seb_browser_exam_key;
+
     // Service
     public $companyServices = [];
 
@@ -128,9 +141,19 @@ class AdminMasterSettingIndex extends Component
             'color_primary',
             'color_secondary',
             'quit_password_seb',
+            'seb_use_encryption',
+            'seb_encryption_key',
+            'seb_show_taskbar',
+            'seb_show_reload_button',
+            'seb_show_time',
+            'seb_show_input_language',
+            'seb_allow_quit',
+            'seb_allow_spell_check',
+            'seb_enable_private_clipboard',
+            'seb_browser_exam_key',
         ]);
 
-        if ($tab === 'universitas') {
+        if ($tab === 'universitas' || $tab === 'seb') {
             $company = Company::select([
                 'id',
                 'code',
@@ -155,6 +178,16 @@ class AdminMasterSettingIndex extends Component
                 'color_primary',
                 'color_secondary',
                 'quit_password_seb',
+                'seb_use_encryption',
+                'seb_encryption_key',
+                'seb_show_taskbar',
+                'seb_show_reload_button',
+                'seb_show_time',
+                'seb_show_input_language',
+                'seb_allow_quit',
+                'seb_allow_spell_check',
+                'seb_enable_private_clipboard',
+                'seb_browser_exam_key',
             ])->with('companyDetail')->find($this->company_id);
 
             if ($company) {
@@ -182,6 +215,18 @@ class AdminMasterSettingIndex extends Component
                 $this->color_primary = $company->color_primary;
                 $this->color_secondary = $company->color_secondary;
                 $this->quit_password_seb = $company->quit_password_seb;
+
+                // SEB Settings
+                $this->seb_use_encryption = $company->seb_use_encryption;
+                $this->seb_encryption_key = $company->seb_encryption_key;
+                $this->seb_show_taskbar = $company->seb_show_taskbar;
+                $this->seb_show_reload_button = $company->seb_show_reload_button;
+                $this->seb_show_time = $company->seb_show_time;
+                $this->seb_show_input_language = $company->seb_show_input_language;
+                $this->seb_allow_quit = $company->seb_allow_quit;
+                $this->seb_allow_spell_check = $company->seb_allow_spell_check;
+                $this->seb_enable_private_clipboard = $company->seb_enable_private_clipboard;
+                $this->seb_browser_exam_key = $company->seb_browser_exam_key;
             }
         } elseif ($tab === 'layanan') {
             $this->companyServices = CompanyService::select('id', 'start_date', 'company_id', 'service_month_id', 'duration_days', 'is_lifetime')->with('serviceMonth:id,name,description', 'company:id,name,description')->where('company_id', $this->company_id)->get();
@@ -191,7 +236,7 @@ class AdminMasterSettingIndex extends Component
 
     public function save()
     {
-        if ($this->currentTab === 'universitas') {
+        if ($this->currentTab === 'universitas' || $this->currentTab === 'seb') {
             $this->validate([
                 'code' => 'required',
                 'name' => 'required',
@@ -212,6 +257,16 @@ class AdminMasterSettingIndex extends Component
                 'color_primary' => 'required',
                 'color_secondary' => 'required',
                 'quit_password_seb' => 'nullable|string|max:255',
+                'seb_use_encryption' => 'nullable|boolean',
+                'seb_encryption_key' => 'nullable|string|max:255',
+                'seb_show_taskbar' => 'nullable|boolean',
+                'seb_show_reload_button' => 'nullable|boolean',
+                'seb_show_time' => 'nullable|boolean',
+                'seb_show_input_language' => 'nullable|boolean',
+                'seb_allow_quit' => 'nullable|boolean',
+                'seb_allow_spell_check' => 'nullable|boolean',
+                'seb_enable_private_clipboard' => 'nullable|boolean',
+                'seb_browser_exam_key' => 'nullable|string|max:255',
             ]);
 
             if ($this->logo) {
@@ -264,6 +319,16 @@ class AdminMasterSettingIndex extends Component
                 'color_primary' => $this->color_primary,
                 'color_secondary' => $this->color_secondary,
                 'quit_password_seb' => $this->quit_password_seb,
+                'seb_use_encryption' => $this->seb_use_encryption,
+                'seb_encryption_key' => $this->seb_encryption_key,
+                'seb_show_taskbar' => $this->seb_show_taskbar,
+                'seb_show_reload_button' => $this->seb_show_reload_button,
+                'seb_show_time' => $this->seb_show_time,
+                'seb_show_input_language' => $this->seb_show_input_language,
+                'seb_allow_quit' => $this->seb_allow_quit,
+                'seb_allow_spell_check' => $this->seb_allow_spell_check,
+                'seb_enable_private_clipboard' => $this->seb_enable_private_clipboard,
+                'seb_browser_exam_key' => $this->seb_browser_exam_key,
             ]);
 
             CompanyDetail::updateOrCreate([

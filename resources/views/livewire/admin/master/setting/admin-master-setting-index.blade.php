@@ -361,6 +361,127 @@
                         </div>
                     </div>
                 </div>
+            @elseif ($currentTab === 'seb')
+                <div class="space-y-6 mb-2">
+                    {{-- General SEB Settings --}}
+                    <div class="p-6 bg-white shadow rounded-lg">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Pengaturan Umum SEB</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Password Keluar (Quit Password)</label>
+                                <input type="text" wire:model="quit_password_seb" placeholder="Contoh: ProCBT@Quit2024!" class="mt-1 form-control" />
+                                <p class="text-xs text-gray-500 mt-1">Password yang diperlukan untuk keluar dari SEB Client.</p>
+                                @error('quit_password_seb') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Browser Exam Key (Opsional)</label>
+                                <input type="text" wire:model="seb_browser_exam_key" placeholder="Key Hashing" class="mt-1 form-control" />
+                                <p class="text-xs text-gray-500 mt-1">Isi jika Anda ingin memvalidasi integritas browser secara spesifik.</p>
+                                @error('seb_browser_exam_key') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- User Interface Settings --}}
+                    <div class="p-6 bg-white shadow rounded-lg">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Antarmuka Pengguna (User Interface)</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tampilkan Taskbar</label>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" wire:model="seb_show_taskbar" class="sr-only peer">
+                                    <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tombol Reload</label>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" wire:model="seb_show_reload_button" class="sr-only peer">
+                                    <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tampilkan Waktu</label>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" wire:model="seb_show_time" class="sr-only peer">
+                                    <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Input Bahasa (Keyboard)</label>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" wire:model="seb_show_input_language" class="sr-only peer">
+                                    <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Security & Restrictions --}}
+                    <div class="p-6 bg-white shadow rounded-lg">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Keamanan & Restriksi</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Izinkan Keluar (Quit)</label>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" wire:model="seb_allow_quit" class="sr-only peer">
+                                    <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Spell Check</label>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" wire:model="seb_allow_spell_check" class="sr-only peer">
+                                    <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Private Clipboard</label>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" wire:model="seb_enable_private_clipboard" class="sr-only peer">
+                                    <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Encryption (AES-256) --}}
+                    <div class="p-6 bg-white shadow rounded-lg border-l-4 border-blue-500">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Enkripsi Konfigurasi (AES-256)</h2>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Aktifkan Enkripsi File Konfigurasi</label>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" wire:model.live="seb_use_encryption" class="sr-only peer">
+                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                            <p class="text-xs text-gray-500 mt-1">Jika aktif, file .seb yang diunduh akan dienkripsi dan memerlukan password saat dibuka.</p>
+                        </div>
+
+                        @if($seb_use_encryption)
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Password Enkripsi</label>
+                                <input type="text" wire:model="seb_encryption_key" placeholder="Masukkan password enkripsi yang kuat..." class="mt-1 form-control" />
+                                <p class="text-xs text-gray-500 mt-1">Password ini HARUS diberitahukan kepada peserta ujian agar mereka bisa membuka file .seb</p>
+                                @error('seb_encryption_key') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        @endif
+                    </div>
+
+                    {{-- Download Preview --}}
+                    <div class="p-6 bg-indigo-50 shadow rounded-lg flex items-center justify-between">
+                        <div>
+                            <h3 class="font-bold text-indigo-700">Preview Konfigurasi</h3>
+                            <p class="text-sm text-indigo-600">Unduh file konfigurasi generic untuk menguji pengaturan saat ini.</p>
+                        </div>
+                        <a href="{{ route('seb.config.generic') }}" target="_blank" class="btn btn-indigo">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Download Test Config
+                        </a>
+                    </div>
+                </div>
+
             @elseif ($currentTab === 'layanan')
                 <div
                     class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
