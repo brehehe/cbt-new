@@ -322,8 +322,8 @@
                     {{-- Safe Exam Browser Configuration --}}
                     <div class="p-6 bg-white shadow rounded-lg">
                         <h2 class="text-lg font-semibold text-gray-800 mb-4">Safe Exam Browser (SEB)</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700">SEB Quit Password  <span class="text-xs text-gray-500 mt-1">Password untuk keluar dari Safe Exam Browser (kosongkan untuk menggunakan default)</span></label>
                                 <input type="text" wire:model="quit_password_seb"
                                     placeholder="Contoh: ProCBT@Quit2024!"
