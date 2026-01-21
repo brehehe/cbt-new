@@ -43,6 +43,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
         $this->call([
+            StudySeeder::class,
             UserDetailSeeder::class,
             QuestionPaketSeeder::class,
         ]);

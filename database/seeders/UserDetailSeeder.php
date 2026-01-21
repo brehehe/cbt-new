@@ -311,8 +311,11 @@ class UserDetailSeeder extends Seeder
                 'company_id' => $companyId,
                 'study_id' => Study::withoutGlobalScope('user_scope')
                     ->where('company_id', $companyId)
-                    ->inRandomOrder()
-                    ->first()->id,
+                    ->where('name', 'Kedokteran')
+                    ->first()?->id ?? Study::withoutGlobalScope('user_scope')
+                        ->where('company_id', $companyId)
+                        ->inRandomOrder()
+                        ->first()->id,
                 'type_study'=> 'general',
             ]);
 
