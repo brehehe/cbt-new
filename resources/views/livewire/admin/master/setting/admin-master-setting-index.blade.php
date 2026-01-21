@@ -324,11 +324,10 @@
                         <h2 class="text-lg font-semibold text-gray-800 mb-4">Safe Exam Browser (SEB)</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">SEB Quit Password</label>
+                                <label class="block text-sm font-medium text-gray-700">SEB Quit Password  <span class="text-xs text-gray-500 mt-1">Password untuk keluar dari Safe Exam Browser (kosongkan untuk menggunakan default)</span></label>
                                 <input type="text" wire:model="quit_password_seb"
                                     placeholder="Contoh: ProCBT@Quit2024!"
                                     class="mt-1 form-control" />
-                                <p class="text-xs text-gray-500 mt-1">Password untuk keluar dari Safe Exam Browser (kosongkan untuk menggunakan default)</p>
                                 @error('quit_password_seb')
                                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                                 @enderror
