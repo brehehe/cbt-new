@@ -69,7 +69,16 @@ class AdminMasterQuestionUpdate extends Component
         }
 
         if (Auth::user()?->hasRole('Dosen')) {
-            $studyIds = Auth::user()?->studys ?? []; // array dari JSON
+            $studyIds = Auth::user()?->studys ?? [];
+
+            // Ensure $studyIds is always an array
+            if (is_string($studyIds)) {
+                $studyIds = json_decode($studyIds, true) ?? [];
+            }
+
+            // Ensure it's an array and not null
+            $studyIds = is_array($studyIds) ? $studyIds : [];
+
             $this->studys = Study::whereIn('id', $studyIds)
                 ->orderBy('name', 'asc')
                 ->pluck('name', 'id')
