@@ -92,6 +92,12 @@ class AdminMasterQuestionUpdate extends Component
         // dd($this->old_images, $this->images);
     }
 
+    public function updatedImages($value)
+    {
+        // Sinkronkan $old_images dengan $images yang sudah diubah
+        $this->old_images = $this->images;
+    }
+
     public function updated()
     {
         //
@@ -144,6 +150,15 @@ class AdminMasterQuestionUpdate extends Component
 
         try {
             DB::beginTransaction();
+            
+            // Debug: Log data yang akan dikirim ke service
+            Log::info('📝 Livewire submit gambar soal', [
+                'total_images' => count($this->images),
+                'total_old_images' => count($this->old_images),
+                'images' => $this->images,
+                'old_images' => $this->old_images,
+            ]);
+            
             $request = [
                 'id'                   => $this->data_id,
                 'company_id'           => Auth::user()?->company?->id,
@@ -189,6 +204,15 @@ class AdminMasterQuestionUpdate extends Component
     public function closeModal()
     {
         $this->resetValidation();
+        
+        // Reset gambar ke state database agar perubahan filepond tidak disimpan jika dibatalkan
+        $this->images = [];
+        $this->old_images = [];
+        foreach (json_decode($this->get_question?->images, true) ?? [] as $key => $image) {
+            $this->old_images[] = asset('storage' . $image);
+            $this->images[]     = asset('storage' . $image);
+        }
+        
         $this->reset(['answer_id', 'answer_context', 'answer_description', 'answer_correct', 'answer_images', 'old_answer_images', 'answer_alphabet']);
         $this->dispatch('close-modal', ['id' => 'modal-images']);
         $this->dispatch('close-modal', ['id' => 'modal-answer-images']);
@@ -197,6 +221,15 @@ class AdminMasterQuestionUpdate extends Component
 
     public function modalImages()
     {
+        // Reset dan reload gambar dari database agar filepond menampilkan state terbaru
+        $this->images = [];
+        $this->old_images = [];
+        
+        foreach (json_decode($this->get_question?->images, true) ?? [] as $key => $image) {
+            $this->old_images[] = asset('storage' . $image);
+            $this->images[]     = asset('storage' . $image);
+        }
+        
         return $this->dispatch('open-modal', ['id' => 'modal-images']);
     }
 
@@ -217,6 +250,15 @@ class AdminMasterQuestionUpdate extends Component
 
         try {
             DB::beginTransaction();
+            
+            // Debug: Log data yang akan dikirim ke service
+            Log::info('📝 Livewire submit gambar jawaban', [
+                'total_images' => count($this->answer_images),
+                'total_old_images' => count($this->old_answer_images),
+                'answer_images' => $this->answer_images,
+                'old_answer_images' => $this->old_answer_images,
+            ]);
+            
             $request = [
                 'id'         => $this->answer_id,
                 'company_id' => Auth::user()?->company?->id,
@@ -266,6 +308,12 @@ class AdminMasterQuestionUpdate extends Component
         $this->submitAnswer();
     }
 
+    public function updatedAnswerImages($value)
+    {
+        // Sinkronkan $old_answer_images dengan $answer_images yang sudah diubah
+        $this->old_answer_images = $this->answer_images;
+    }
+
     public function modalAnswerImage($id, $alphabet)
     {
         $result                = Answer::findOrFail($id);
@@ -273,6 +321,11 @@ class AdminMasterQuestionUpdate extends Component
         $this->answer_id       = $result?->id;
         $this->answer_context  = $result?->context;
         $this->answer_correct  = $result?->is_correct;
+        
+        // Reset dan reload gambar dari database agar filepond menampilkan state terbaru
+        $this->answer_images = [];
+        $this->old_answer_images = [];
+        
         foreach (json_decode($result?->images, true) ?? [] as $key => $image) {
             $this->answer_images[]     = asset('storage' . $image);
             $this->old_answer_images[] = asset('storage' . $image);

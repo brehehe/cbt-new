@@ -82,6 +82,12 @@ class AdminMasterQuestionIndex extends Component
         }
     }
 
+    public function updatedImages($value)
+    {
+        // Sinkronkan $old_images dengan $images yang sudah diubah
+        $this->old_images = $this->images;
+    }
+
     public function updated()
     {
         //
