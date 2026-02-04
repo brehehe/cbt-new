@@ -1,3 +1,9 @@
+@php
+    use App\Models\Company\Company;
+
+    $company = Company::first(); 
+@endphp
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
@@ -9,7 +15,9 @@
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
             rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
+        
+        <link rel="icon" type="image/png"
+            href="{{asset($company?->logo_potrait)}}" />
         <!-- Add Selectize CSS -->
         <link rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap5.min.css"
