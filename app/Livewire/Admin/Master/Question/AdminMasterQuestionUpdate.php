@@ -64,8 +64,9 @@ class AdminMasterQuestionUpdate extends Component
         $this->materials           = Material::select('id', 'material_category_id', 'name')->where('material_category_id', $this->get_question?->material_category_id)->get();
 
         foreach (json_decode($this->get_question?->images, true) ?? [] as $key => $image) {
-            $this->old_images[] = asset('storage' . $image);
-            $this->images[]     = asset('storage' . $image);
+            $path = '/storage/' . ltrim($image, '/');
+            $this->old_images[] = $path;
+            $this->images[]     = $path;
         }
 
         if (Auth::user()?->hasRole('Dosen')) {
@@ -90,12 +91,6 @@ class AdminMasterQuestionUpdate extends Component
         $this->study_id = $this->get_question?->study_id;
 
         // dd($this->old_images, $this->images);
-    }
-
-    public function updatedImages($value)
-    {
-        // Sinkronkan $old_images dengan $images yang sudah diubah
-        $this->old_images = $this->images;
     }
 
     public function updated()
@@ -209,8 +204,9 @@ class AdminMasterQuestionUpdate extends Component
         $this->images = [];
         $this->old_images = [];
         foreach (json_decode($this->get_question?->images, true) ?? [] as $key => $image) {
-            $this->old_images[] = asset('storage' . $image);
-            $this->images[]     = asset('storage' . $image);
+            $path = '/storage/' . ltrim($image, '/');
+            $this->old_images[] = $path;
+            $this->images[]     = $path;
         }
         
         $this->reset(['answer_id', 'answer_context', 'answer_description', 'answer_correct', 'answer_images', 'old_answer_images', 'answer_alphabet']);
@@ -226,8 +222,9 @@ class AdminMasterQuestionUpdate extends Component
         $this->old_images = [];
         
         foreach (json_decode($this->get_question?->images, true) ?? [] as $key => $image) {
-            $this->old_images[] = asset('storage' . $image);
-            $this->images[]     = asset('storage' . $image);
+            $path = '/storage/' . ltrim($image, '/');
+            $this->old_images[] = $path;
+            $this->images[]     = $path;
         }
         
         return $this->dispatch('open-modal', ['id' => 'modal-images']);
@@ -308,12 +305,6 @@ class AdminMasterQuestionUpdate extends Component
         $this->submitAnswer();
     }
 
-    public function updatedAnswerImages($value)
-    {
-        // Sinkronkan $old_answer_images dengan $answer_images yang sudah diubah
-        $this->old_answer_images = $this->answer_images;
-    }
-
     public function modalAnswerImage($id, $alphabet)
     {
         $result                = Answer::findOrFail($id);
@@ -327,8 +318,9 @@ class AdminMasterQuestionUpdate extends Component
         $this->old_answer_images = [];
         
         foreach (json_decode($result?->images, true) ?? [] as $key => $image) {
-            $this->answer_images[]     = asset('storage' . $image);
-            $this->old_answer_images[] = asset('storage' . $image);
+            $path = '/storage/' . ltrim($image, '/');
+            $this->answer_images[]     = $path;
+            $this->old_answer_images[] = $path;
         }
         // dd($this->answer_images, $this->old_answer_images);
         // $this->dispatch('initFilepondWithImages', $this->answer_images);
