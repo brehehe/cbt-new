@@ -140,10 +140,10 @@
                                     <div class="flex items-center justify-between pt-2">
                                         <x-ts-checkbox class="text-xs lg:text-sm" id="remember" label="Ingat saya"
                                             wire:model="remember" />
-                                        <a class="text-xs font-medium text-[#2b7fff] hover:text-blue-700 lg:text-sm"
+                                        <!-- <a class="text-xs font-medium text-[#2b7fff] hover:text-blue-700 lg:text-sm"
                                             href="#">
                                             Lupa Password?
-                                        </a>
+                                        </a> -->
                                     </div>
 
                                     <div class="pt-2">
@@ -507,10 +507,10 @@
                                     <div class="flex items-center justify-between pt-2">
                                         <x-ts-checkbox class="text-xs lg:text-sm" id="remember" label="Ingat saya"
                                             wire:model="remember" />
-                                        <a class="text-xs font-medium text-[{{ $companyData->color_primary }}] hover:text-green-700 lg:text-sm"
+                                        <!-- <a class="text-xs font-medium text-[{{ $companyData->color_primary }}] hover:text-green-700 lg:text-sm"
                                             href="#">
                                             Lupa Password?
-                                        </a>
+                                        </a> -->
                                     </div>
 
                                     <div class="pt-4">
@@ -858,10 +858,10 @@
                                     <div class="flex items-center justify-between pt-2">
                                         <x-ts-checkbox class="text-xs lg:text-sm" id="remember" label="Ingat saya"
                                             wire:model="remember" />
-                                        <a class="text-xs font-medium text-orange-500 hover:text-orange-700 lg:text-sm"
+                                        <!-- <a class="text-xs font-medium text-orange-500 hover:text-orange-700 lg:text-sm"
                                             href="#">
                                             Lupa Password?
-                                        </a>
+                                        </a> -->
                                     </div>
 
                                     <div class="pt-4">
