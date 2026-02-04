@@ -118,6 +118,17 @@ namespace App\Models\Company{
  * @property string $color_secondary
  * @property string $color_text
  * @property string|null $background_login
+ * @property string|null $quit_password_seb Safe Exam Browser quit password
+ * @property bool $seb_use_encryption
+ * @property string|null $seb_encryption_key
+ * @property bool $seb_show_taskbar
+ * @property bool $seb_show_reload_button
+ * @property bool $seb_show_time
+ * @property bool $seb_show_input_language
+ * @property bool $seb_allow_quit
+ * @property bool $seb_allow_spell_check
+ * @property bool $seb_enable_private_clipboard
+ * @property string|null $seb_browser_exam_key
  * @property-read Company|null $company
  * @property-read \App\Models\Company\CompanyDetail|null $companyDetail
  * @property-read \App\Models\User|null $user
@@ -156,7 +167,18 @@ namespace App\Models\Company{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company wherePicName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company wherePicPhone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company wherePicPosition($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereQuitPasswordSeb($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereRegion($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereSebAllowQuit($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereSebAllowSpellCheck($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereSebBrowserExamKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereSebEnablePrivateClipboard($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereSebEncryptionKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereSebShowInputLanguage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereSebShowReloadButton($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereSebShowTaskbar($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereSebShowTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereSebUseEncryption($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereServiceId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereStartDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereTaxId($value)
@@ -416,6 +438,7 @@ namespace App\Models\Exam{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $peer_id
+ * @property string|null $camera_device_id
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Exam\ExamAlert> $examAlerts
  * @property-read int|null $exam_alerts_count
@@ -439,6 +462,7 @@ namespace App\Models\Exam{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereAlertCount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereAnsweredQuestions($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereBrowserInfo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereCameraDeviceId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereCameraStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereCameraStreamUrl($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereCompanyId($value)
