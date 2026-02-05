@@ -121,9 +121,6 @@
                 </div>
             </div>
 
-            @if (!$selectedSession)
-                <p class="text-sm text-gray-500 mt-3">Tidak ada sesi dipilih.</p>
-            @endif
         </div>
 
         <!-- Footer -->
@@ -1061,7 +1058,7 @@
 
             // Handle single view if selected
             const singleContainer = document.getElementById('singleStreamContainer');
-            if (singleContainer && @js($selectedSessionId) == sessionId) {
+            if (singleContainer && String(window.selectedSessionId || '') === String(sessionId)) {
                 singleContainer.innerHTML = '';
 
                 const video = document.createElement('video');
@@ -1077,7 +1074,7 @@
 
             // Handle modal focus view if selected
             const modalContainer = document.getElementById('modalStreamContainer');
-            if (modalContainer && @js($selectedSessionId) == sessionId) {
+            if (modalContainer && String(window.selectedSessionId || '') === String(sessionId)) {
                 modalContainer.innerHTML = '';
 
                 const video = document.createElement('video');
@@ -1227,6 +1224,14 @@
         document.addEventListener('livewire:initialized', function() {
             Livewire.on('sessionSelected', function(sessionId) {
                 console.log('Session selected:', sessionId);
+                window.selectedSessionId = String(sessionId);
+                const session = activeSessions.find(s => String(s.session_id) === String(sessionId));
+                if (session && session.stream && session.stream.active) {
+                    displayStudentStream(sessionId, session.stream, session);
+                } else {
+                    // If stream not cached yet, try reconnecting to attach it to modal
+                    connectToStudentStreams();
+                }
             });
 
             Livewire.on('viewModeChanged', function(mode) {
