@@ -66,10 +66,16 @@
                         </div> -->
 
                         <!-- Actions -->
-                        <div class="mt-3 flex items-center gap-2">
+                        <div class="mt-3">
                             <button type="button"
                                 wire:click="openSessionModal('{{ $session->id }}')"
-                                class="btn btn-sm btn-outline-primary">
+                                class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
                                 Detail
                             </button>
                             <!-- <button class="btn btn-sm btn-outline-danger"
