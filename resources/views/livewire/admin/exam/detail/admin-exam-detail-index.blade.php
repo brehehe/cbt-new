@@ -475,8 +475,8 @@
     <script>
         // Global variables
         const EXAM_CONFIG = {
-            isRecording: @json(!!$userTimetable->is_recording),
-            isStreaming: @json(!!$userTimetable->is_streaming)
+            isRecording: @json($is_recording),
+            isStreaming: @json($is_streaming)
         };
         console.log('🔧 Exam Configuration:', EXAM_CONFIG);
 
@@ -744,9 +744,11 @@
                         initializeCamera();
                     }
                 } catch (e) {}
-                try {
-                    initializePeerJS();
-                } catch (e) {}
+                if (EXAM_CONFIG.isStreaming) {
+                    try {
+                        initializePeerJS();
+                    } catch (e) {}
+                }
             });
 
             document.addEventListener('visibilitychange', () => {
@@ -1321,6 +1323,15 @@
 
         // ==== PEERJS INITIALIZER (OPTIMIZED FOR 55 STUDENTS) ====
         async function initializePeerJS() {
+            if (!EXAM_CONFIG.isStreaming) {
+                console.log('⏹️ PeerJS init skipped (Streaming disabled)');
+                try {
+                    if (window.peer && typeof window.peer.destroy === 'function') {
+                        window.peer.destroy();
+                    }
+                } catch (e) {}
+                return;
+            }
             console.log("🔄 Initializing PeerJS (optimized)…");
 
             // ICE servers: STUN + TURN (UDP/TCP/TLS for better connectivity)

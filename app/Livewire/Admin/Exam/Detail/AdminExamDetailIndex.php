@@ -38,6 +38,8 @@ class AdminExamDetailIndex extends Component
     public $alertCount = 0;
     public $liveSession = null;
     public $peerJSId = null;
+    public $is_recording = false;
+    public $is_streaming = false;
 
     protected $listeners = [
         'timeExpired',
@@ -136,7 +138,7 @@ class AdminExamDetailIndex extends Component
                     'user_agent' => request()->header('User-Agent'),
                     'platform' => $this->detectPlatform(request()->header('User-Agent'))
                 ],
-                'peer_id' => $this->peerJSId // Simpan PeerJS ID untuk koneksi langsung
+                'peer_id' => $this->is_streaming ? $this->peerJSId : null // Kosongkan jika streaming tidak aktif
             ]
         );
 
@@ -203,6 +205,17 @@ class AdminExamDetailIndex extends Component
 
     public function updatePeerJSId($peerId)
     {
+        if (!$this->is_streaming) {
+            if ($this->liveSession) {
+                $this->liveSession->update([
+                    'peer_id' => null,
+                    'camera_status' => 'pending',
+                    'last_activity' => Carbon::now()
+                ]);
+            }
+            return;
+        }
+
         \Log::info('🔥 updatePeerJSId CALLED via Livewire', [
             'peer_id' => $peerId,
             'user_id' => Auth::id(),
@@ -702,7 +715,7 @@ class AdminExamDetailIndex extends Component
             }
 
             // Update peer_id if provided (Critical for streaming)
-            if (isset($data['peer_id']) && !empty($data['peer_id'])) {
+            if ($this->is_streaming && isset($data['peer_id']) && !empty($data['peer_id'])) {
                 $updateData['peer_id'] = $data['peer_id'];
 
                 // If we get a peer_id, we can assume camera is potentially active
@@ -790,6 +803,8 @@ class AdminExamDetailIndex extends Component
 
 
         $this->userTimetableId = $this->userTimetable->id;
+    $this->is_recording = (bool) ($this->userTimetable->is_recording ?? false);
+    $this->is_streaming = (bool) ($this->userTimetable->is_streaming ?? false);
         // $this->checkQuestion();
 
         $this->calculateRemainingTime();
