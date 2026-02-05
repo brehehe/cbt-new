@@ -81,8 +81,6 @@
                             <td class="px-3 py-2">{{ $timetable?->examSession?->name ?? '-' }}</td>
                             <td class="px-3 py-2">{{ $timetable?->start_time }}</td>
                             <td class="px-3 py-2">{{ $timetable?->end_time }}</td>
-                              <td class="px-3 py-2">{{ $timetable?->is_recording ? 'Iya' : 'Tidak' }}</td>
-                            <td class="px-3 py-2">{{ $timetable?->is_streaming ? 'Iya' : 'Tidak' }}</td>
                             <!-- Token -->
                             <td class="px-3 py-2">
                                 @if ($timetable->code)
@@ -99,32 +97,8 @@
                                     <span class="text-gray-400">-</span>
                                 @endif
                             </td>
-
-                            <!-- <td class="px-3 py-2 text-center"> 
-                                <label class="inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" class="sr-only peer"
-                                        wire:click="toggleRecording('{{ $timetable->id }}')" {{$timetable->code ? 'disabled' : ''}}
-                                        @checked($timetable->is_recording)>
-                                    <div
-                                        class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:bg-blue-600 relative transition">
-                                        <span
-                                            class="absolute top-0.5 left-[2px] h-5 w-5 bg-white rounded-full transition-all peer-checked:translate-x-5"></span>
-                                    </div>
-                                </label>
-                            </td> -->
-                            <!-- <td class="px-3 py-2 text-center">
-                                <label class="inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" class="sr-only peer"
-                                        wire:click="toggleStreaming('{{ $timetable->id }}')" {{$timetable->code ? 'disabled' : ''}}
-                                        @checked($timetable->is_streaming)>
-                                    <div
-                                        class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:bg-blue-600 relative transition">
-                                        <span
-                                            class="absolute top-0.5 left-[2px] h-5 w-5 bg-white rounded-full transition-all peer-checked:translate-x-5"></span>
-                                    </div>
-                                </label>
-                            </td> -->
-
+                              <td class="px-3 py-2">{{ $timetable?->is_recording ? 'Iya' : 'Tidak' }}</td>
+                            <td class="px-3 py-2">{{ $timetable?->is_streaming ? 'Iya' : 'Tidak' }}</td>
                             <!-- Aksi -->
                             <td class="text-center px-3 py-2 relative">
                                 <div x-data="{ open: false, x: 0, y: 0 }" class="inline-block text-left">
