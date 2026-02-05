@@ -13,9 +13,13 @@ use Illuminate\Support\Facades\Auth;
 
 class UserTimetable extends Model
 {
-    //
     use SoftDeletes, HasUuids;
     protected $guarded = ['id'];
+
+    protected $casts = [
+        'is_recording' => 'boolean',
+        'is_streaming' => 'boolean',
+    ];
 
     public function company()
     {

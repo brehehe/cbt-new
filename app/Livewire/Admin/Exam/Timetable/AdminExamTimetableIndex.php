@@ -93,6 +93,8 @@ class AdminExamTimetableIndex extends Component
                 'timetable_id' => $timeTable->id,
                 'start_process' => Carbon::now(),
                 'studys' => $timeTable->studys,
+                'is_recording' => $timeTable?->is_recording ?? false,
+                'is_streaming' => $timeTable?->is_streaming ?? false,
             ]);
 
             foreach ($modulesQuestions as $moduleQuestion) {

@@ -197,6 +197,18 @@
                         <textarea id="description" wire:model.defer="description" placeholder="Masukkan Deskripsi"
                             class="mt-1 form-control"></textarea>
                     </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer">
+                            <input type="checkbox" wire:model.defer="is_recording"
+                                class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2">
+                            <span class="text-sm font-medium text-gray-700">Recording</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer">
+                            <input type="checkbox" wire:model.defer="is_streaming"
+                                class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2">
+                            <span class="text-sm font-medium text-gray-700">Streaming</span>
+                        </label>
+                    </div>
                     <!-- <div class="flex items-center gap-3 p-4 bg-purple-50 rounded-lg border border-purple-200">
                         <input type="checkbox" id="require_seb" wire:model.defer="require_seb"
                             class="w-5 h-5 text-purple-600 rounded focus:ring-purple-500 focus:ring-2 cursor-pointer">

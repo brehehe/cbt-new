@@ -49,6 +49,8 @@ class Timetable extends Model
         'start_time'  => 'datetime',
         'end_time'    => 'datetime',
         'require_seb' => 'boolean',
+        'is_recording' => 'boolean',
+        'is_streaming' => 'boolean',
     ];
 
     /**

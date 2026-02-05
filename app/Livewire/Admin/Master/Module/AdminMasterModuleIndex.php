@@ -124,6 +124,7 @@ class AdminMasterModuleIndex extends Component
                 'random_question'  => $this->random_question,
                 'description'      => $this->description,
                 'studys'           => $this->studys,
+                'is_all_study'    => $this->is_all_study,
             ];
 
             $module = app(ModuleService::class)->updateOrCreate($request);

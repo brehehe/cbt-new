@@ -47,6 +47,8 @@ class AdminMasterTimetableIndex extends Component
     public $examSessions = [];
     public $exam_session_id;
     public $require_seb = false;
+    public $is_recording = false;
+    public $is_streaming = false;
 
     public function mount()
     {
@@ -90,7 +92,9 @@ class AdminMasterTimetableIndex extends Component
             'classmate_id',
             'exam_room_id',
             'exam_session_id',
-            'require_seb'
+            'require_seb',
+            'is_recording',
+            'is_streaming'
         ]);
         return $this->dispatch('close-modal', ['id' => 'modal-timetable']);
     }
@@ -110,6 +114,8 @@ class AdminMasterTimetableIndex extends Component
         $this->end_time        = Carbon::parse($data->end_time)->format('Y-m-d\TH:i');
         $this->description     = $data->description;
         $this->require_seb     = $data->require_seb ?? false;
+        $this->is_recording    = $data->is_recording ?? false;
+        $this->is_streaming    = $data->is_streaming ?? false;
 
         // Pastikan hasil decode adalah array
         $rawStudys = $data->studys;
@@ -253,6 +259,8 @@ class AdminMasterTimetableIndex extends Component
                 'description'     => $this->description,
                 'studys'          => $this->studys ? json_encode(array_keys($this->studys)) : null,
                 'require_seb'     => $this->require_seb ?? false,
+                'is_recording'    => $this->is_recording ?? false,
+                'is_streaming'    => $this->is_streaming ?? false,
             ]);
 
             DB::commit();
@@ -264,6 +272,38 @@ class AdminMasterTimetableIndex extends Component
             DB::rollback();
             AlertHelper::error('Gagal', 'Data gagal disimpan!');
             return Log::info('Gagal Menyimpan Data Jadwal : ' . $th);
+        }
+    }
+
+    public function toggleRecording($id)
+    {
+        try {
+            $timetable = Timetable::findOrFail($id);
+            $timetable->update([
+                'is_recording' => !$timetable->is_recording,
+            ]);
+        } catch (\Throwable $th) {
+            AlertHelper::error('Gagal', 'Gagal mengubah status recording.');
+            Log::error('Gagal toggle recording', [
+                'error' => $th->getMessage(),
+                'trace' => $th->getTraceAsString(),
+            ]);
+        }
+    }
+
+    public function toggleStreaming($id)
+    {
+        try {
+            $timetable = Timetable::findOrFail($id);
+            $timetable->update([
+                'is_streaming' => !$timetable->is_streaming,
+            ]);
+        } catch (\Throwable $th) {
+            AlertHelper::error('Gagal', 'Gagal mengubah status streaming.');
+            Log::error('Gagal toggle streaming', [
+                'error' => $th->getMessage(),
+                'trace' => $th->getTraceAsString(),
+            ]);
         }
     }
 

@@ -62,6 +62,8 @@
                         <th class="px-3 py-2 text-left">Waktu Mulai</th>
                         <th class="px-3 py-2 text-left">Waktu Selesai</th>
                         <th class="px-3 py-2 text-left">Token</th>
+                        <th class="px-3 py-2 text-center">Recording</th>
+                        <th class="px-3 py-2 text-center">Streaming</th>
                         <th class="w-1 text-center px-3 py-2">Aksi</th>
                     </tr>
                 </thead>
@@ -95,6 +97,31 @@
                                 @else
                                     <span class="text-gray-400">-</span>
                                 @endif
+                            </td>
+
+                            <td class="px-3 py-2 text-center">
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer"
+                                        wire:click="toggleRecording('{{ $timetable->id }}')"
+                                        @checked($timetable->is_recording)>
+                                    <div
+                                        class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:bg-blue-600 relative transition">
+                                        <span
+                                            class="absolute top-0.5 left-[2px] h-5 w-5 bg-white rounded-full transition-all peer-checked:translate-x-5"></span>
+                                    </div>
+                                </label>
+                            </td>
+                            <td class="px-3 py-2 text-center">
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer"
+                                        wire:click="toggleStreaming('{{ $timetable->id }}')"
+                                        @checked($timetable->is_streaming)>
+                                    <div
+                                        class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:bg-blue-600 relative transition">
+                                        <span
+                                            class="absolute top-0.5 left-[2px] h-5 w-5 bg-white rounded-full transition-all peer-checked:translate-x-5"></span>
+                                    </div>
+                                </label>
                             </td>
 
                             <!-- Aksi -->
@@ -223,7 +250,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="text-center py-4 text-gray-500">
+                            <td colspan="12" class="text-center py-4 text-gray-500">
                                 Tidak ada data
                             </td>
                         </tr>

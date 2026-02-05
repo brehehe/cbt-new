@@ -62,26 +62,33 @@
                                         Prodi</th>
                                     <th
                                         class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Topik Soal</th>
-                                    <th
-                                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Pertanyaan</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                @forelse($questions as $index => $result)
-                                    <tr class="hover:bg-gray-50 cursor-pointer {{ $selected_all[$result->id] ?? false ? 'bg-yellow-100' : '' }}"
-                                        wire:click="choiceQuestion('{{ $result->id }}')">
-                                        <td class="px-4 py-3 text-sm text-gray-900">
-                                            {{ $questions->firstItem() + $index }}
+                                @forelse($questions->groupBy('topic.name') as $topicName => $topicQuestions)
+                                    <tr class="bg-gray-50">
+                                        <td colspan="3"
+                                            class="px-4 py-2 text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                            <div class="flex items-center justify-between">
+                                                <span>Topik: {{ $topicName ?? 'Tanpa Topik' }}</span>
+                                                <span class="text-[11px] text-gray-500">{{ $topicQuestions->count() }} soal</span>
+                                            </div>
                                         </td>
-                                        <td class="px-4 py-3 text-sm text-gray-900">{{ $result?->study?->name }}</td>
-                                        <td class="px-4 py-3 text-sm text-gray-900">{{ $result?->topic?->name }}</td>
-                                        <td class="px-4 py-3 text-sm text-gray-900">{{ $result?->question }}</td>
                                     </tr>
+                                    @foreach($topicQuestions as $index => $result)
+                                        <tr class="hover:bg-gray-50 cursor-pointer {{ $selected_all[$result->id] ?? false ? 'bg-yellow-100' : '' }}"
+                                            wire:click="choiceQuestion('{{ $result->id }}')">
+                                            <td class="px-4 py-3 text-sm text-gray-900">
+                                                {{ $questions->firstItem() + $loop->parent->index + $index }}
+                                            </td>
+                                            <td class="px-4 py-3 text-sm text-gray-900">{{ $result?->study?->name }}</td>
+                                            <td class="px-4 py-3 text-sm text-gray-900">{{ $result?->question }}</td>
+                                        </tr>
+                                    @endforeach
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="px-4 py-3 text-center text-sm text-gray-500">Tidak ada
+                                        <td colspan="3" class="px-4 py-3 text-center text-sm text-gray-500">Tidak ada
                                             data</td>
                                     </tr>
                                 @endforelse

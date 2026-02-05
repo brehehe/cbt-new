@@ -69,6 +69,7 @@ class AdminMasterModuleQuestionIndex extends Component
         $this->duration         = $this->get_module?->duration;
         $this->description      = $this->get_module?->description;
         $this->random_question  = $this->get_module?->random_question;
+        $this->is_all_study     = $this->get_module?->is_all_study;
 
         $this->studys           = json_decode($this->get_module?->studys) ?? [];
 
