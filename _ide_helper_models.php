@@ -1169,6 +1169,8 @@ namespace App\Models\Master\Timetable{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property bool $require_seb
+ * @property bool $is_recording
+ * @property bool $is_streaming
  * @property-read \App\Models\Classmate\Classmate|null $classmate
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Master\Exam\ExamRoom|null $examRoom
@@ -1192,6 +1194,8 @@ namespace App\Models\Master\Timetable{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereExamRoomId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereExamSessionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereIsRecording($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereIsStreaming($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereModuleId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereOrder($value)
@@ -2017,6 +2021,8 @@ namespace App\Models\User{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property bool $is_recording
+ * @property bool $is_streaming
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Master\Timetable\Timetable|null $timetable
  * @property-read \App\Models\User|null $user
@@ -2032,6 +2038,8 @@ namespace App\Models\User{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereEndExam($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereIsRecording($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereIsStreaming($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereMark($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable wherePauseTotalSeconds($value)

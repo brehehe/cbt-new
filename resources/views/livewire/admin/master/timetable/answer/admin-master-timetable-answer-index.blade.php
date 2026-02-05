@@ -6,6 +6,12 @@
                     class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
                     Nilai Ujian Detail</h1>
             </div>
+            <div>
+                <button wire:click="exportPdf" class="btn btn-primary">
+                    <i class="fa-solid fa-file-pdf mr-2"></i>
+                    Export PDF
+                </button>
+            </div>
         </div>
     </div>
     <div class="grid grid-cols-4 gap-4 mb-4">
@@ -162,17 +168,17 @@
                             <td>{{ optional($userModuleQuestion->timetableQuestion)->question ?? '-' }}</td>
 
                             {{-- Jawaban benar --}}
-                            <td>
+                            <td class="whitespace-nowrap">
                                 {{ $letter($labelCorrect) }}.
                                 {{ optional($correctAnswer)->context ?? '-' }}
                             </td>
 
                             {{-- Jawaban yang dipilih user --}}
-                            <td>
+                            <td class="whitespace-nowrap">
                                 {{ $letter($labelChosen) }}.
                                 {{ optional($chosenAnswer)->context ?? '-' }}
                             </td>
-                            <td>
+                            <td class="whitespace-nowrap">
                                 @if ($userModuleQuestion->status === 'correct')
                                     <span
                                         class="px-2 py-1 rounded bg-green-100 text-green-700 font-semibold">Benar</span>

@@ -100,8 +100,7 @@
                             @enderror
                         </div>
                         <div>
-                            <label for="phone" class="block text-sm font-medium text-gray-700">No. Telepon <span
-                                    class="text-red-600">*</span></label>
+                            <label for="phone" class="block text-sm font-medium text-gray-700">No. Telepon</label>
                             <input id="phone" type="tel" wire:model.defer="phone"
                                 placeholder="Contoh: 081234567890" class="mt-1 form-control">
                             @error('phone')
@@ -154,8 +153,7 @@
                     <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Informasi Akademik</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label for="study_id" class="block text-sm font-medium text-gray-700">Prodi <span
-                                    class="text-red-600">*</span></label>
+                            <label for="study_id" class="block text-sm font-medium text-gray-700">Prodi</label>
                             <select class="mt-1 form-control" wire:model.defer="study_id">
                                 <option value="">Pilih Prodi</option>
                                 @foreach ($studys as $id => $name)
@@ -306,8 +304,7 @@
                     <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Informasi Kontak</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="md:col-span-2">
-                            <label for="address" class="block text-sm font-medium text-gray-700">Alamat Lengkap <span
-                                    class="text-red-600">*</span></label>
+                            <label for="address" class="block text-sm font-medium text-gray-700">Alamat Lengkap</label>
                             <textarea id="address" wire:model.defer="address" placeholder="Contoh: Jl. Raya No. 123, RT 01/RW 02"
                                 class="mt-1 form-control" rows="3"></textarea>
                             @error('address')
@@ -467,8 +464,7 @@
                     @endif
                 </div>
                 <div class="mb-4">
-                    <label for="phone" class="block text-sm font-medium text-gray-700">Nomor Telepon <span
-                            class="text-red-600">*</span></label>
+                    <label for="phone" class="block text-sm font-medium text-gray-700">Nomor Telepon</label>
                     <input id="phone" type="number" wire:model.defer="phone"
                         placeholder="Contoh : 081234567890" class="mt-1 form-control">
                     @error('phone')
@@ -497,8 +493,7 @@
                     @enderror
                 </div>
                 <div>
-                    <label for="address" class="block text-sm font-medium text-gray-700">Alamat Lengkap <span
-                            class="text-red-600">*</span></label>
+                    <label for="address" class="block text-sm font-medium text-gray-700">Alamat Lengkap</label>
                     <textarea id="address" wire:model.defer="address" placeholder="Contoh: Jl. Raya No. 123, RT 01/RW 02"
                         class="mt-1 form-control" rows="3"></textarea>
                     @error('address')

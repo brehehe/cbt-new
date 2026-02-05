@@ -7,6 +7,7 @@ use App\Models\Master\Timetable\Timetable;
 use App\Models\User;
 use App\Models\User\UserTimetable;
 use Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Livewire\Component;
 use Session;
 use Carbon\Carbon;
@@ -70,5 +71,51 @@ class AdminMasterTimetableDetailIndex extends Component
         ])
             ->extends('layout.app')
             ->section('content');
+    }
+
+    public function exportPdf()
+    {
+        $userTimetables = UserTimetable::search($this->search)
+            ->where('timetable_id', $this->timetable_id)
+            ->with(['user', 'timetable', 'userModuleQuestions'])
+            ->get();
+
+        $ratingScales = RatingScale::orderBy('order')->get();
+        $gradeMap = [];
+        $countMap = [];
+
+        foreach ($userTimetables as $userTimetable) {
+            $mark = $userTimetable->mark;
+            $grade = '-';
+            if ($mark !== null) {
+                $scale = $ratingScales->first(function ($item) use ($mark) {
+                    return $item->min_score <= $mark && $item->max_score >= $mark;
+                });
+                $grade = $scale?->grade_letter ?? '-';
+            }
+
+            $countMap[$userTimetable->id] = [
+                'answered' => $userTimetable->userModuleQuestions->whereNotNull('timetable_answer_id')->count(),
+                'unanswered' => $userTimetable->userModuleQuestions->whereNull('timetable_answer_id')->count(),
+                'correct' => $userTimetable->userModuleQuestions->where('status', 'correct')->count(),
+                'wrong' => $userTimetable->userModuleQuestions->where('status', 'wrong')->count(),
+            ];
+
+            $gradeMap[$userTimetable->id] = $grade;
+        }
+
+        $pdf = Pdf::loadView('livewire.admin.master.timetable.detail.admin-master-timetable-detail-pdf', [
+            'timetable' => $this->timetable,
+            'start_time' => $this->start_time,
+            'end_time' => $this->end_time,
+            'userTimetables' => $userTimetables,
+            'countMap' => $countMap,
+            'gradeMap' => $gradeMap,
+        ])->setPaper('a4', 'landscape');
+
+        $fileName = 'nilai-ujian-' . ($this->timetable_id ?? 'timetable') . '.pdf';
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->output();
+        }, $fileName);
     }
 }

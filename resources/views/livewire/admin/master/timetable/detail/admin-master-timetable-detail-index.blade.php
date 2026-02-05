@@ -6,6 +6,12 @@
                     class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
                     Nilai Ujian</h1>
             </div>
+            <div>
+                <button wire:click="exportPdf" class="btn btn-primary">
+                    <i class="fa-solid fa-file-pdf mr-2"></i>
+                    Export PDF
+                </button>
+            </div>
         </div>
     </div>
     <div class="grid grid-cols-2 gap-4 mb-4">

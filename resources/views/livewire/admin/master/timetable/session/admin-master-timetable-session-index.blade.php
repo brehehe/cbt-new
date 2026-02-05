@@ -98,7 +98,7 @@
                                     <button class="btn btn-danger" wire:click="suspendSession('{{ $session->id }}')">
                                         <i class="fa-solid fa-user-slash"></i>
                                     </button>
-                                    <button class="btn btn-outline"
+                                    <button class="btn btn-warning"
                                         wire:click="forceLogoutUser('{{ $session->user->id }}')">
                                         <i class="fa-solid fa-right-from-bracket"></i>
                                     </button>

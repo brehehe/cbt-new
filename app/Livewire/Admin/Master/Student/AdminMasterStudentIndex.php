@@ -314,7 +314,7 @@ class AdminMasterStudentIndex extends Component
                 'password' => $this->data_id ? 'nullable|string|min:8' : 'required|string|min:8',
                 'profile' => 'nullable|image|max:2048',
                 'phone' => [
-                    'required',
+                    'nullable',
                     'string',
                     'max:15',
                     Rule::unique('users', 'phone')
@@ -332,9 +332,9 @@ class AdminMasterStudentIndex extends Component
                         ->where('company_id', $currentCompanyId)
                         ->ignore($this->data_id),
                 ],
-                'address' => 'required|string|max:500',
+                'address' => 'nullable|string|max:500',
                 'identity_number' => 'nullable|string|max:20',
-                'study_id' => 'required|exists:studies,id',
+                'study_id' => 'nullable|exists:studies,id',
                 // Student Specific Validation
                 'student_id' => 'nullable|string|max:20',
                 'student_program' => 'nullable|string|max:100',
@@ -385,7 +385,7 @@ class AdminMasterStudentIndex extends Component
             $this->validate([
                 'name' => 'required|string|max:255',
                 'phone' => [
-                    'required',
+                    'nullable',
                     'string',
                     'max:15',
                     Rule::unique('users', 'phone')
@@ -424,7 +424,7 @@ class AdminMasterStudentIndex extends Component
                 ],
                 'study_id' => 'nullable|exists:studies,id',
                 'password' => $this->data_id ? 'nullable|string|min:8' : 'required|string|min:8',
-                'address' => 'required|string|max:500',
+                'address' => 'nullable|string|max:500',
             ]);
         }
 

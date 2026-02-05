@@ -6,6 +6,7 @@ use App\Models\Master\Question\Module;
 use App\Models\Master\Timetable\Timetable;
 use App\Models\User;
 use Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
@@ -61,5 +62,26 @@ class AdminMasterTimetableAnswerIndex extends Component
         ])
             ->extends('layout.app')
             ->section('content');
+    }
+
+    public function exportPdf()
+    {
+        $userModuleQuestions = $this->user_timetable->userModuleQuestions()
+            ->search($this->search)
+            ->with(['timetableQuestion', 'timetableModule', 'timetableAnswer', 'timetableQuestion.answers'])
+            ->get();
+
+        $pdf = Pdf::loadView('livewire.admin.master.timetable.answer.admin-master-timetable-answer-pdf', [
+            'timetable' => $this->timetable,
+            'user_timetable' => $this->user_timetable,
+            'start_time' => $this->start_time,
+            'end_time' => $this->end_time,
+            'userModuleQuestions' => $userModuleQuestions,
+        ])->setPaper('a4', 'portrait');
+
+        $fileName = 'nilai-ujian-detail-' . ($this->user_timetable_id ?? 'peserta') . '.pdf';
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->output();
+        }, $fileName);
     }
 }
