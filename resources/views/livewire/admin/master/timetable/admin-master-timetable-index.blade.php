@@ -99,10 +99,10 @@
                                 @endif
                             </td>
 
-                            <td class="px-3 py-2 text-center">
+                            <td class="px-3 py-2 text-center"> 
                                 <label class="inline-flex items-center cursor-pointer">
                                     <input type="checkbox" class="sr-only peer"
-                                        wire:click="toggleRecording('{{ $timetable->id }}')"
+                                        wire:click="toggleRecording('{{ $timetable->id }}')" {{$timetable->code ? 'disabled' : ''}}
                                         @checked($timetable->is_recording)>
                                     <div
                                         class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:bg-blue-600 relative transition">
@@ -114,7 +114,7 @@
                             <td class="px-3 py-2 text-center">
                                 <label class="inline-flex items-center cursor-pointer">
                                     <input type="checkbox" class="sr-only peer"
-                                        wire:click="toggleStreaming('{{ $timetable->id }}')"
+                                        wire:click="toggleStreaming('{{ $timetable->id }}')" {{$timetable->code ? 'disabled' : ''}}
                                         @checked($timetable->is_streaming)>
                                     <div
                                         class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:bg-blue-600 relative transition">
