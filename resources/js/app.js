@@ -151,7 +151,8 @@ window.convertToRupiah = convertToRupiah;
 // MODAL HANDLER
 // =====================
 window.addEventListener('open-modal', event => {
-    const modal = document.getElementById(event.detail[0]?.id);
+    const modalId = event.detail?.id || event.detail?.[0]?.id;
+    const modal = document.getElementById(modalId);
     if (modal) {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
@@ -159,7 +160,8 @@ window.addEventListener('open-modal', event => {
 });
 
 window.addEventListener('close-modal', event => {
-    const modal = document.getElementById(event.detail[0]?.id);
+    const modalId = event.detail?.id || event.detail?.[0]?.id;
+    const modal = document.getElementById(modalId);
     if (modal) {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
