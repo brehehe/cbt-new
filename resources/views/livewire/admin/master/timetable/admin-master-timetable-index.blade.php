@@ -62,8 +62,8 @@
                         <th class="px-3 py-2 text-left">Waktu Mulai</th>
                         <th class="px-3 py-2 text-left">Waktu Selesai</th>
                         <th class="px-3 py-2 text-left">Token</th>
-                        <!-- <th class="px-3 py-2 text-center">Recording</th> -->
-                        <!-- <th class="px-3 py-2 text-center">Streaming</th> -->
+                        <th class="px-3 py-2 text-center">Recording</th>
+                        <th class="px-3 py-2 text-center">Streaming</th>
                         <th class="w-1 text-center px-3 py-2">Aksi</th>
                     </tr>
                 </thead>
@@ -81,7 +81,8 @@
                             <td class="px-3 py-2">{{ $timetable?->examSession?->name ?? '-' }}</td>
                             <td class="px-3 py-2">{{ $timetable?->start_time }}</td>
                             <td class="px-3 py-2">{{ $timetable?->end_time }}</td>
-
+                              <td class="px-3 py-2">{{ $timetable?->is_recording ? 'Iya' : 'Tidak' }}</td>
+                            <td class="px-3 py-2">{{ $timetable?->is_streaming ? 'Iya' : 'Tidak' }}</td>
                             <!-- Token -->
                             <td class="px-3 py-2">
                                 @if ($timetable->code)
