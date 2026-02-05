@@ -15,7 +15,7 @@
         </div>
     </div>
     <div class="flex h-full">
-        <div class="grid grid-cols-6 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             @foreach ($sessions as $session)
                 <div
                     class="bg-white rounded-lg shadow-sm overflow-hidden border {{ $selectedSessionId === $session->id ? 'ring-2 ring-blue-500' : '' }}">
@@ -96,7 +96,7 @@
 
 <div wire:ignore.self id="modal-streaming-session"
     class="modal fixed inset-0 bg-overlay hidden items-center justify-center z-50 transition-opacity duration-300 ease-in-out">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-auto flex flex-col transform transition-all scale-95 duration-300 ease-out animate-fade-in">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl mx-auto flex flex-col transform transition-all scale-95 duration-300 ease-out animate-fade-in">
         <!-- Header -->
         <div class="flex justify-between items-center p-6 border-b">
             <div class="flex items-center gap-2">
@@ -115,7 +115,7 @@
 
         <!-- Body -->
         <div class="px-6 py-4 text-gray-700">
-            <div id="modalStreamContainer" class="w-full aspect-video bg-black rounded-lg overflow-hidden">
+            <div id="modalStreamContainer" class="w-full aspect-video bg-black rounded-lg overflow-hidden min-h-[420px]">
                 <div class="flex items-center justify-center h-full text-white">
                     <div class="text-center">
                         <svg class="w-8 h-8 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor"
