@@ -100,7 +100,7 @@
                 </svg>
                 <h2 class="text-xl font-semibold text-gray-800">Detail Sesi Streaming</h2>
             </div>
-            <button wire:click="closeModal()"
+            <button wire:key="{{rand()}}" wire:click="closeModal()"
                 class="text-gray-500 hover:text-red-500 transition-colors text-2xl leading-none cursor-pointer">
                 &times;
             </button>
