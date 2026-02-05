@@ -159,13 +159,15 @@
                                                         </button>
                                                     </li>
                                                 @else
-                                                    <li>
-                                                        <button wire:click="liveSession('{{ $timetable->id }}')"
-                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
-                                                            <i class="fa-solid fa-camera mr-2 text-blue-600"></i>
-                                                            Live Session
-                                                        </button>
-                                                    </li>
+                                                    @if($timetable->is_streaming)
+                                                        <li>
+                                                            <button wire:click="liveSession('{{ $timetable->id }}')"
+                                                                class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                                <i class="fa-solid fa-camera mr-2 text-blue-600"></i>
+                                                                Live Session
+                                                            </button>
+                                                        </li>
+                                                    @endif
                                                     <li>
                                                         <button wire:click="sessionIndex('{{ $timetable->id }}')"
                                                             class="w-full text-left px-4 py-2 hover:bg-gray-100">
@@ -173,13 +175,15 @@
                                                             Kelola Sesi
                                                         </button>
                                                     </li>
-                                                    <li>
-                                                        <button wire:click="confirmVideo('{{ $timetable->id }}')"
-                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
-                                                            <i class="fa-solid fa-video mr-2 text-green-600"></i>
-                                                            Video
-                                                        </button>
-                                                    </li>
+                                                    @if($timetable->is_recording)
+                                                        <li>
+                                                            <button wire:click="confirmVideo('{{ $timetable->id }}')"
+                                                                class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                                <i class="fa-solid fa-video mr-2 text-green-600"></i>
+                                                                Video
+                                                            </button>
+                                                        </li>
+                                                    @endif
                                                     <li>
                                                         <button wire:click="confirmAlert('{{ $timetable->id }}')"
                                                             class="w-full text-left px-4 py-2 hover:bg-gray-100">
