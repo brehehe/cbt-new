@@ -237,6 +237,16 @@ class AdminExamDetailIndex extends Component
             return redirect()->route('admin.exam.timetable');
         }
 
+        // Cek apakah fitur recording diaktifkan untuk peserta ini (atau global jika logic diubah nanti)
+        // Asumsi field 'is_recording' ada di tabel user_timetables
+        if (!$this->userTimetable->is_recording) {
+             \Log::info('Recording skipped (is_recording=false)', [
+                'user_id' => Auth::id(),
+                'user_timetable_id' => $this->userTimetableId
+            ]);
+            return;
+        }
+
         // Buat recording entry baru
         $this->currentRecording = ExamRecording::create([
             'timetable_id' => $this->userTimetable->timetable_id,

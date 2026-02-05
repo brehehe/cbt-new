@@ -474,6 +474,12 @@
 
     <script>
         // Global variables
+        const EXAM_CONFIG = {
+            isRecording: @json(!!$userTimetable->is_recording),
+            isStreaming: @json(!!$userTimetable->is_streaming)
+        };
+        console.log('🔧 Exam Configuration:', EXAM_CONFIG);
+
         let mediaRecorder;
         let recordedChunks = [];
         let recordingStartTime;
@@ -696,11 +702,15 @@
             }, 1000);
 
             setTimeout(() => {
-                try {
-                    initializePeerJS();
-                    console.log('✅ PeerJS initialization started');
-                } catch (err) {
-                    console.warn('⚠️ PeerJS initialization failed (non-critical):', err);
+                if (EXAM_CONFIG.isStreaming) {
+                    try {
+                        initializePeerJS();
+                        console.log('✅ PeerJS initialization started');
+                    } catch (err) {
+                        console.warn('⚠️ PeerJS initialization failed (non-critical):', err);
+                    }
+                } else {
+                    console.log('⏹️ PeerJS initialization skipped (Streaming disabled)');
                 }
             }, 1500);
 
@@ -1197,27 +1207,44 @@
                 console.log('✅ Video elements connected successfully');
 
                 // Step 6: Start recording
-                console.log('🔍 Step 6: Starting recording...');
-                setTimeout(() => {
-                    try {
-                        startRecording();
-                        console.log('✅ Recording started');
-                        updateRecordingStatus('Recording', 'Active recording');
-                    } catch (recordError) {
-                        console.error('❌ Recording start failed:', recordError);
-                        updateRecordingStatus('Recording Failed', recordError.message);
-                    }
-                }, 1000);
+                console.log('🔍 Step 6: Starting recording check...');
+                if (EXAM_CONFIG.isRecording) {
+                    setTimeout(() => {
+                        try {
+                            startRecording();
+                            console.log('✅ Recording started');
+                            updateRecordingStatus('Recording', 'Active recording');
+                        } catch (recordError) {
+                            console.error('❌ Recording start failed:', recordError);
+                            updateRecordingStatus('Recording Failed', recordError.message);
+                        }
+                    }, 1000);
+                } else {
+                    console.log('⏹️ Recording skipped (Disabled by configuration)');
+                    updateRecordingStatus('Recording Disabled', 'Fitur recording dimatikan');
+                }
 
-                // Step 7: Initialize other features
-                setTimeout(() => {
-                    try {
-                        initializeLiveStreaming();
-                        console.log('✅ Live streaming initialized');
-                    } catch (streamingError) {
-                        console.warn('⚠️ Live streaming failed (non-critical):', streamingError);
-                    }
-                }, 2000);
+                // Step 7: Initialize other features (Streaming)
+                if (EXAM_CONFIG.isStreaming) {
+                    setTimeout(() => {
+                        try {
+                            if (typeof initializeLiveStreaming === 'function') {
+                                initializeLiveStreaming();
+                                console.log('✅ Live streaming initialized');
+                            } else {
+                                // If initializeLiveStreaming is not defined, we might relies on PeerJS directly
+                                // which is called separately in DOMContentLoaded.
+                                // But usually initializeLiveStreaming might be an old function name or alias.
+                                // We'll keep this check safe.
+                                console.log('ℹ️ initializeLiveStreaming function check passed (or skipped if undefined)');
+                            }
+                        } catch (streamingError) {
+                            console.warn('⚠️ Live streaming failed (non-critical):', streamingError);
+                        }
+                    }, 2000);
+                } else {
+                     console.log('⏹️ Live streaming skipped (Disabled by configuration)');
+                }
 
                 console.log('✅ === CAMERA INITIALIZATION SUCCESS ===');
                 updateRecordingStatus('Active', 'Recording started');
