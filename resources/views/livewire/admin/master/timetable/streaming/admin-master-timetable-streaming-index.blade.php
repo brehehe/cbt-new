@@ -100,7 +100,8 @@
                 </svg>
                 <h2 class="text-xl font-semibold text-gray-800">Detail Sesi Streaming</h2>
             </div>
-            <button wire:key="{{rand()}}" wire:click="closeModal()"
+            <button type="button" wire:click="closeModal()"
+                onclick="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'modal-streaming-session' } }))"
                 class="text-gray-500 hover:text-red-500 transition-colors text-2xl leading-none cursor-pointer">
                 &times;
             </button>
@@ -125,7 +126,8 @@
 
         <!-- Footer -->
         <div class="flex justify-end items-center gap-2 px-6 py-4 border-t">
-            <button wire:click="closeModal()"
+            <button type="button" wire:click="closeModal()"
+                onclick="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'modal-streaming-session' } }))"
                 class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow transition cursor-pointer">
                 Tutup
             </button>
