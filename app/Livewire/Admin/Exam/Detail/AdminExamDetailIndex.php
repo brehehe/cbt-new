@@ -72,6 +72,14 @@ class AdminExamDetailIndex extends Component
             return redirect()->route('admin.exam.timetable');
         }
 
+        if (!$this->userTimetable->is_streaming) {
+             \Log::info('Live session/Streaming skipped (is_streaming=false)', [
+                'user_id' => Auth::id(),
+                'user_timetable_id' => $this->userTimetableId
+            ]);
+            return;
+        }
+
         // Enforce single-device login: block new session if another active session exists with different session_id
         $currentSessionId = session()->getId();
         $existingActive = ExamLiveSession::where('user_timetable_id', $this->userTimetableId)

@@ -62,8 +62,8 @@
                         <th class="px-3 py-2 text-left">Waktu Mulai</th>
                         <th class="px-3 py-2 text-left">Waktu Selesai</th>
                         <th class="px-3 py-2 text-left">Token</th>
-                        <th class="px-3 py-2 text-center">Recording</th>
-                        <th class="px-3 py-2 text-center">Streaming</th>
+                        <!-- <th class="px-3 py-2 text-center">Recording</th> -->
+                        <!-- <th class="px-3 py-2 text-center">Streaming</th> -->
                         <th class="w-1 text-center px-3 py-2">Aksi</th>
                     </tr>
                 </thead>
@@ -99,7 +99,7 @@
                                 @endif
                             </td>
 
-                            <td class="px-3 py-2 text-center"> 
+                            <!-- <td class="px-3 py-2 text-center"> 
                                 <label class="inline-flex items-center cursor-pointer">
                                     <input type="checkbox" class="sr-only peer"
                                         wire:click="toggleRecording('{{ $timetable->id }}')" {{$timetable->code ? 'disabled' : ''}}
@@ -110,8 +110,8 @@
                                             class="absolute top-0.5 left-[2px] h-5 w-5 bg-white rounded-full transition-all peer-checked:translate-x-5"></span>
                                     </div>
                                 </label>
-                            </td>
-                            <td class="px-3 py-2 text-center">
+                            </td> -->
+                            <!-- <td class="px-3 py-2 text-center">
                                 <label class="inline-flex items-center cursor-pointer">
                                     <input type="checkbox" class="sr-only peer"
                                         wire:click="toggleStreaming('{{ $timetable->id }}')" {{$timetable->code ? 'disabled' : ''}}
@@ -122,7 +122,7 @@
                                             class="absolute top-0.5 left-[2px] h-5 w-5 bg-white rounded-full transition-all peer-checked:translate-x-5"></span>
                                     </div>
                                 </label>
-                            </td>
+                            </td> -->
 
                             <!-- Aksi -->
                             <td class="text-center px-3 py-2 relative">
