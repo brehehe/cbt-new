@@ -64,6 +64,8 @@ class AdminMasterTimetableIndex extends Component
 
     public function openModal()
     {
+        $this->is_recording = true;
+        $this->is_streaming = true;
         return $this->dispatch('open-modal', ['id' => 'modal-timetable']);
     }
 
