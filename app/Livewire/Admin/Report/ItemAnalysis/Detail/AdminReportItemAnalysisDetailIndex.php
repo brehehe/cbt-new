@@ -9,6 +9,7 @@ use App\Models\Timetable\TimetableQuestion;
 use App\Models\Timetable\TimetableAnswer;
 use App\Models\User\UserTimetable;
 use App\Models\User\UserModuleQuestion;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 
 class AdminReportItemAnalysisDetailIndex extends Component
@@ -117,19 +118,24 @@ class AdminReportItemAnalysisDetailIndex extends Component
     {
         $totalUsers = count($userScores);
 
-        if ($totalUsers < 10) {
+        // Take 27% from top and bottom (minimum 1 user each)
+        $groupSize = max(1, (int) ceil($totalUsers * 0.27));
+
+        // Avoid overlapping groups on very small samples
+        if ($groupSize * 2 > $totalUsers) {
+            $groupSize = (int) floor($totalUsers / 2);
+        }
+
+        if ($groupSize < 1) {
             return [
                 'discrimination_index' => 0,
-                'discrimination_level' => 'Tidak dapat dihitung (peserta < 10)',
+                'discrimination_level' => 'Tidak dapat dihitung (peserta < 2)',
                 'upper_group_correct' => 0,
                 'lower_group_correct' => 0,
                 'upper_group_total' => 0,
                 'lower_group_total' => 0
             ];
         }
-
-        // Take 27% from top and bottom (minimum 3 users each)
-        $groupSize = max(3, floor($totalUsers * 0.27));
 
         $upperGroup = array_slice($userScores, 0, $groupSize, true);
         $lowerGroup = array_slice($userScores, -$groupSize, $groupSize, true);
@@ -241,5 +247,25 @@ class AdminReportItemAnalysisDetailIndex extends Component
         return \view('livewire.admin.report.item-analysis.detail.admin-report-item-analysis-detail-index', [
             'itemAnalysisData' => $this->itemAnalysisData
         ])->extends('layout.app')->section('content');
+    }
+
+    public function exportPdf()
+    {
+        if (empty($this->itemAnalysisData)) {
+            $this->calculateItemAnalysis();
+        }
+
+        $pdf = Pdf::loadView('livewire.admin.report.item-analysis.detail.admin-report-item-analysis-detail-pdf', [
+            'timetable' => $this->timetable,
+            'timetableModule' => $this->timetableModule,
+            'timetableQuestions' => $this->timetableQuestions,
+            'userTimetables' => $this->userTimetables,
+            'itemAnalysisData' => $this->itemAnalysisData,
+        ])->setPaper('a4', 'landscape');
+
+        $fileName = 'analisis-butir-soal-' . ($this->timetableId ?? 'timetable') . '.pdf';
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->output();
+        }, $fileName);
     }
 }

@@ -130,6 +130,9 @@
                     <a href="{{ route('admin.report.item-analysis') }}" class="btn btn-secondary">
                         <i class="fas fa-arrow-left mr-2"></i>Kembali
                     </a>
+                    <button wire:click="exportPdf" class="btn btn-primary">
+                        <i class="fas fa-file-pdf mr-2"></i>Export PDF
+                    </button>
                 </div>
             </div>
         </div>
