@@ -68,6 +68,7 @@ class AdminMasterTimetableStreamingIndex extends Component
 
     public function closeModal()
     {
+        $this->reset(['selectedSessionId', 'selectedSession']);
         return $this->dispatch('close-modal', ['id' => 'modal-streaming-session']);
     }
 
