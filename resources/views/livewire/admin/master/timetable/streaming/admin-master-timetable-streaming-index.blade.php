@@ -67,6 +67,11 @@
 
                         <!-- Actions -->
                         <div class="mt-3 flex items-center gap-2">
+                            <button type="button"
+                                wire:click="openSessionModal('{{ $session->id }}')"
+                                class="btn btn-sm btn-outline-primary">
+                                Detail
+                            </button>
                             <!-- <button class="btn btn-sm btn-outline-danger"
                                 wire:click="suspendSession({{ $session->id }})">
                                 Suspend & Logout
@@ -79,6 +84,84 @@
                     </div>
                 </div>
             @endforeach
+        </div>
+    </div>
+</div>
+
+<div wire:ignore.self id="modal-streaming-session"
+    class="modal fixed inset-0 bg-overlay hidden items-center justify-center z-50 transition-opacity duration-300 ease-in-out">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-auto flex flex-col transform transition-all scale-95 duration-300 ease-out animate-fade-in">
+        <!-- Header -->
+        <div class="flex justify-between items-center p-6 border-b">
+            <div class="flex items-center gap-2">
+                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M13 16h-1v-4h-1m1-4h.01M12 20.5C6.753 20.5 2.5 16.247 2.5 11S6.753 1.5 12 1.5 21.5 5.753 21.5 11 17.247 20.5 12 20.5z" />
+                </svg>
+                <h2 class="text-xl font-semibold text-gray-800">Detail Sesi Streaming</h2>
+            </div>
+            <button wire:click="closeModal()"
+                class="text-gray-500 hover:text-red-500 transition-colors text-2xl leading-none cursor-pointer">
+                &times;
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="px-6 py-4 text-gray-700" style="max-height: 70vh; overflow-y: auto;">
+            @if ($selectedSession)
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-500">Nama</p>
+                        <p class="font-medium">{{ $selectedSession->user->name ?? '-' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Modul</p>
+                        <p class="font-medium">{{ $selectedSession->timetable->module->name ?? '-' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Status Koneksi</p>
+                        <p class="font-medium">{{ $selectedSession->connection_status ?? '-' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Status Kamera</p>
+                        <p class="font-medium">{{ $selectedSession->camera_status ?? '-' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Soal</p>
+                        <p class="font-medium">
+                            {{ $selectedSession->current_question_number ?? 0 }} / {{ $selectedSession->total_questions ?? 0 }}
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Terjawab</p>
+                        <p class="font-medium">{{ $selectedSession->answered_questions ?? 0 }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Ditandai</p>
+                        <p class="font-medium">{{ $selectedSession->marked_questions ?? 0 }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Peringatan</p>
+                        <p class="font-medium">{{ $selectedSession->warning_count ?? 0 }} / {{ $selectedSession->alert_count ?? 0 }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Aktivitas Terakhir</p>
+                        <p class="font-medium">
+                            {{ optional($selectedSession->last_activity)->format('d/m/Y H:i:s') ?? '-' }}
+                        </p>
+                    </div>
+                </div>
+            @else
+                <p class="text-sm text-gray-500">Tidak ada sesi dipilih.</p>
+            @endif
+        </div>
+
+        <!-- Footer -->
+        <div class="flex justify-end items-center gap-2 px-6 py-4 border-t">
+            <button wire:click="closeModal()"
+                class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow transition cursor-pointer">
+                Tutup
+            </button>
         </div>
     </div>
 </div>

@@ -60,6 +60,17 @@ class AdminMasterTimetableStreamingIndex extends Component
         $this->dispatch('sessionSelected', $sessionId);
     }
 
+    public function openSessionModal($sessionId)
+    {
+        $this->selectSession($sessionId);
+        return $this->dispatch('open-modal', ['id' => 'modal-streaming-session']);
+    }
+
+    public function closeModal()
+    {
+        return $this->dispatch('close-modal', ['id' => 'modal-streaming-session']);
+    }
+
     public function setViewMode($mode)
     {
         $this->viewMode = $mode;
