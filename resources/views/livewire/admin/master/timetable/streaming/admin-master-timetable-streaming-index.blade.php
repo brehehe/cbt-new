@@ -107,52 +107,22 @@
         </div>
 
         <!-- Body -->
-        <div class="px-6 py-4 text-gray-700" style="max-height: 70vh; overflow-y: auto;">
-            @if ($selectedSession)
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-sm text-gray-500">Nama</p>
-                        <p class="font-medium">{{ $selectedSession->user->name ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Modul</p>
-                        <p class="font-medium">{{ $selectedSession->timetable->module->name ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Status Koneksi</p>
-                        <p class="font-medium">{{ $selectedSession->connection_status ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Status Kamera</p>
-                        <p class="font-medium">{{ $selectedSession->camera_status ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Soal</p>
-                        <p class="font-medium">
-                            {{ $selectedSession->current_question_number ?? 0 }} / {{ $selectedSession->total_questions ?? 0 }}
-                        </p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Terjawab</p>
-                        <p class="font-medium">{{ $selectedSession->answered_questions ?? 0 }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Ditandai</p>
-                        <p class="font-medium">{{ $selectedSession->marked_questions ?? 0 }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Peringatan</p>
-                        <p class="font-medium">{{ $selectedSession->warning_count ?? 0 }} / {{ $selectedSession->alert_count ?? 0 }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Aktivitas Terakhir</p>
-                        <p class="font-medium">
-                            {{ optional($selectedSession->last_activity)->format('d/m/Y H:i:s') ?? '-' }}
-                        </p>
+        <div class="px-6 py-4 text-gray-700">
+            <div id="modalStreamContainer" class="w-full aspect-video bg-black rounded-lg overflow-hidden">
+                <div class="flex items-center justify-center h-full text-white">
+                    <div class="text-center">
+                        <svg class="w-8 h-8 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        <p class="text-xs text-gray-400">Memuat kamera...</p>
                     </div>
                 </div>
-            @else
-                <p class="text-sm text-gray-500">Tidak ada sesi dipilih.</p>
+            </div>
+
+            @if (!$selectedSession)
+                <p class="text-sm text-gray-500 mt-3">Tidak ada sesi dipilih.</p>
             @endif
         </div>
 
@@ -1103,6 +1073,31 @@
 
                 singleContainer.appendChild(video);
                 console.log(`Single view updated for session ${sessionId}`);
+            }
+
+            // Handle modal focus view if selected
+            const modalContainer = document.getElementById('modalStreamContainer');
+            if (modalContainer && @js($selectedSessionId) == sessionId) {
+                modalContainer.innerHTML = '';
+
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                video.autoplay = true;
+                video.muted = true;
+                video.playsInline = true;
+                video.className = 'w-full h-full object-cover';
+
+                video.addEventListener('error', (e) => {
+                    console.error(`Video error for modal session ${sessionId}:`, e);
+                    showVideoError(modalContainer, sessionData);
+                });
+
+                video.play().catch(e => {
+                    console.warn(`Video autoplay prevented for modal session ${sessionId}:`, e);
+                });
+
+                modalContainer.appendChild(video);
+                console.log(`Modal view updated for session ${sessionId}`);
             }
         }
 
