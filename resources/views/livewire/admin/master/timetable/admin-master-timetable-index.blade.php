@@ -97,8 +97,28 @@
                                     <span class="text-gray-400">-</span>
                                 @endif
                             </td>
-                              <td class="px-3 py-2">{{ $timetable?->is_recording ? 'Iya' : 'Tidak' }}</td>
-                            <td class="px-3 py-2">{{ $timetable?->is_streaming ? 'Iya' : 'Tidak' }}</td>
+                            <td class="px-3 py-2">
+                                @if($timetable?->is_recording)
+                                    <span class="inline-flex items-center rounded-full bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1">
+                                        Iya
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center rounded-full bg-gray-100 text-gray-600 text-xs font-semibold px-2.5 py-1">
+                                        Tidak
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-3 py-2">
+                                @if($timetable?->is_streaming)
+                                    <span class="inline-flex items-center rounded-full bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1">
+                                        Iya
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center rounded-full bg-gray-100 text-gray-600 text-xs font-semibold px-2.5 py-1">
+                                        Tidak
+                                    </span>
+                                @endif
+                            </td>
                             <!-- Aksi -->
                             <td class="text-center px-3 py-2 relative">
                                 <div x-data="{ open: false, x: 0, y: 0 }" class="inline-block text-left">
