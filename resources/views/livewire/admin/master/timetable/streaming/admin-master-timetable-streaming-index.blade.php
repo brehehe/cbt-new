@@ -92,9 +92,8 @@
             @endforeach
         </div>
     </div>
-</div>
 
-<div wire:ignore.self id="modal-streaming-session"
+    <div wire:ignore.self id="modal-streaming-session"
     class="modal fixed inset-0 bg-overlay hidden items-center justify-center z-50 transition-opacity duration-300 ease-in-out">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl mx-auto flex flex-col transform transition-all scale-95 duration-300 ease-out animate-fade-in">
         <!-- Header -->
@@ -139,9 +138,9 @@
             </button>
         </div>
     </div>
-</div>
+    </div>
 
-@push('scripts')
+    @push('scripts')
     <!-- Include PeerJS for easier WebRTC connections -->
     <script src="https://unpkg.com/peerjs@1.5.0/dist/peerjs.min.js"></script>
 
@@ -1261,4 +1260,5 @@
             localStream?.getTracks().forEach(t => t.stop());
         });
     </script>
-@endpush
+    @endpush
+</div>
