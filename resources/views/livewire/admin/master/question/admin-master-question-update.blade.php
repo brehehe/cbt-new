@@ -28,20 +28,33 @@
     <div class="space-y-6">
         <div class="p-4 bg-white shadow rounded-lg">
             <h2 class="text-lg font-semibold text-gray-800 mb-3">Detail Soal</h2>
-            <div class="mb-4">
-                <label for="study_id" class="block text-sm font-medium text-gray-700">Prodi <span
-                        class="text-red-600">*</span></label>
-                <select class="mt-1 form-control" wire:model.lazy='study_id'>
-                    <option value="">Pilih prodi</option>
-                    @foreach ($studys as $key_study => $study)
-                        <option value="{{ $key_study }}">{{ $study }}</option>
-                    @endforeach
-                </select>
-                @error('study_id')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                @enderror
-            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div >
+                    <label for="study_id" class="block text-sm font-medium text-gray-700">Prodi <span
+                            class="text-red-600">*</span></label>
+                    <select class="mt-1 form-control" wire:model.lazy='study_id'>
+                        <option value="">Pilih prodi</option>
+                        @foreach ($studys as $key_study => $study)
+                            <option value="{{ $key_study }}">{{ $study }}</option>
+                        @endforeach
+                    </select>
+                    @error('study_id')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div >
+                    <label for="category_question_id" class="block text-sm font-medium text-gray-700">Kategori Soal <span
+                            class="text-red-600">*</span></label>
+                    <select class="mt-1 form-control" wire:model.lazy='category_question_id'>
+                        <option value="">Pilih kategori soal</option>
+                        @foreach ($category_questions as $key_category_question => $category_question)
+                            <option value="{{ $category_question->id }}">{{ $category_question->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('category_question_id')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
                 <div>
                     <label for="topic_id" class="block text-sm font-medium text-gray-700">Topik Soal<span
                             class="text-red-600">*</span></label>
@@ -136,7 +149,7 @@
                 <div class="md:col-span-2">
                     <label for="question" class="block text-sm font-medium text-gray-700">Pertanyaan<span
                             class="text-red-600">*</span></label>
-                    <textarea id="question" wire:model="question" placeholder="Pertanyaan..." class="mt-1 form-control"></textarea>
+                    <textarea id="question" wire:model="question" placeholder="Pertanyaan..." class="mt-1 form-control" data-autosize="true" style="overflow:hidden;resize:none;" x-data x-init="$el.style.height='auto';$el.style.height=$el.scrollHeight+'px'" @input="$el.style.height='auto';$el.style.height=$el.scrollHeight+'px'"></textarea>
                     @error('question')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -149,7 +162,7 @@
                 <div class="md:col-span-2">
                     <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi
                         Pertanyaan</label>
-                    <textarea id="description" wire:model="description" placeholder="Deskripsi pertanyaan..." class="mt-1 form-control"></textarea>
+                    <textarea id="description" wire:model="description" placeholder="Deskripsi pertanyaan..." class="mt-1 form-control" data-autosize="true" style="overflow:hidden;resize:none;" x-data x-init="$el.style.height='auto';$el.style.height=$el.scrollHeight+'px'" @input="$el.style.height='auto';$el.style.height=$el.scrollHeight+'px'"></textarea>
                     @error('description')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -251,19 +264,39 @@
 </div>
 @push('scripts')
     <script>
+        function initTextareaAutosize() {
+            const textareas = document.querySelectorAll('textarea[data-autosize="true"]');
+            textareas.forEach((textarea) => {
+                const autoResize = () => {
+                    textarea.style.height = 'auto';
+                    textarea.style.height = `${textarea.scrollHeight}px`;
+                };
+                textarea.addEventListener('input', autoResize);
+                autoResize();
+            });
+        }
+
         FilePond.registerPlugin(
             FilePondPluginImagePreview,
             FilePondPluginFileValidateType
         );
 
-        const pond = FilePond.create(document.querySelector('#images'), {
+        const imagesPond = FilePond.create(document.querySelector('#images'), {
             allowMultiple: true,
             acceptedFileTypes: ['image/png', 'image/jpeg', 'image/webp'],
         });
 
-        const pond = FilePond.create(document.querySelector('#answer_images'), {
+        const answerImagesPond = FilePond.create(document.querySelector('#answer_images'), {
             allowMultiple: true,
             acceptedFileTypes: ['image/png', 'image/jpeg', 'image/webp'],
         });
+
+        document.addEventListener('DOMContentLoaded', initTextareaAutosize);
+        document.addEventListener('livewire:load', initTextareaAutosize);
+        if (typeof Livewire !== 'undefined') {
+            Livewire.hook('message.processed', () => {
+                initTextareaAutosize();
+            });
+        }
     </script>
 @endpush

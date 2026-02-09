@@ -38,7 +38,7 @@
     <div class="space-y-6 mb-6">
         <!-- SECTION 1: Informasi Umum Produk -->
         <div class="p-6 bg-white shadow rounded-lg">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Prodi</label>
                     <select wire:model.live="filterStudyId" class="mt-1 form-control">
@@ -67,6 +67,27 @@
                     </select>
                 </div>
             </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Difficulty</label>
+                    <select wire:model.live="filterDifficulty" class="mt-1 form-control">
+                        <option value="">Semua Difficulty</option>
+                        <option value="default">Unknown</option>
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Kategori Soal</label>
+                    <select wire:model.live="filterCategoryQuestionId" class="mt-1 form-control">
+                        <option value="">Semua Kategori Soal</option>
+                        @foreach ($category_questions as $key_category_question => $category_question)
+                            <option value="{{ $category_question->id }}">{{ $category_question->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
         </div>
     </div>
     <!-- Table Controls -->
@@ -91,20 +112,46 @@
             </div>
         </div>
     </div>
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+        <div class="flex items-center gap-3">
+            <label class="inline-flex items-center text-sm text-gray-700">
+                <input type="checkbox" class="form-checkbox" wire:model.live="selectAll">
+                <span class="ml-2">Pilih semua di halaman ini</span>
+            </label>
+        </div>
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+            <select class="mt-1 form-control" wire:model.live="bulkCategoryQuestionId">
+                <option value="">Pilih Kategori Soal</option>
+                @foreach ($category_questions as $category_question)
+                    <option value="{{ $category_question->id }}">{{ $category_question->name }}</option>
+                @endforeach
+            </select>
+            <button wire:click="applyBulkCategory" class="btn btn-primary" type="button">
+                Terapkan
+            </button>
+        </div>
+    </div>
     <!-- Table Section -->
     <div class="bg-white rounded-lg shadow overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <input type="checkbox" class="form-checkbox" wire:model.live="selectAll">
+                        </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prodi
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Topik
                             Soal</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori Soal
+                        </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Pertanyaan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Difficulty</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi
                         </th>
                     </tr>
@@ -113,14 +160,26 @@
                     @forelse ($questions as $index => $result)
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <input type="checkbox" class="form-checkbox" wire:model.live="selectedQuestions"
+                                    value="{{ $result->id }}">
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ $questions->firstItem() + $index }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $result?->study?->name }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $result?->topic?->name }}
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
-                                {{ Str::limit($result?->question, 120) }}
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $result?->categoryQuestion?->name ?? '-' }}
                             </td>
+                            <td class="px-6 py-4 text-sm text-gray-900 max-w-xs" x-data="{ expanded: false }">
+                                <span x-show="!expanded" class="block truncate">{{ Str::limit($result?->question, 50) }}</span>
+                                <span x-show="expanded" class="block">{{ $result?->question }}</span>
+                                <button type="button" class="mt-1 text-xs text-blue-600 hover:text-blue-800" @click="expanded = !expanded">
+                                    <span x-show="!expanded">Show</span>
+                                    <span x-show="expanded">Hide</span>
+                                </button>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $result?->difficulty == 'default' ? '-' : ucfirst($result?->difficulty) }}
                             <td class="center">
                                 <div class="flex items-center">
                                     <a class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn"

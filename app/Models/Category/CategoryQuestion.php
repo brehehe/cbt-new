@@ -1,18 +1,17 @@
 <?php
 
-namespace App\Models\Timetable;
+namespace App\Models\Category;
 
 use App\Models\Company\Company;
-use App\Models\Master\Question\Question;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Category\CategoryQuestion;
+use App\Models\Master\Question\Question;
 
-class TimetableQuestion extends Model
+
+class CategoryQuestion extends Model
 {
     //
     use SoftDeletes, HasUuids;
@@ -21,21 +20,6 @@ class TimetableQuestion extends Model
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id', 'id');
-    }
-
-    public function timetableModule()
-    {
-        return $this->belongsTo(TimetableModule::class, 'timetable_module_id', 'id');
-    }
-
-    public function answers()
-    {
-        return $this->hasMany(TimetableAnswer::class, 'timetable_question_id', 'id');
-    }
-
-    public function categoryQuestion(): BelongsTo
-    {
-        return $this->belongsTo(CategoryQuestion::class, 'category_question_id', 'id');
     }
 
     protected static function boot()
@@ -61,20 +45,15 @@ class TimetableQuestion extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
-        $term = '%' . $term . '%';
+        $term = '%'. $term .'%';
 
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id'], 'ILIKE', $term);
         });
     }
 
-    /**
-     * Get the question that owns the TimetableQuestion
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function question(): BelongsTo
+    public function questions()
     {
-        return $this->belongsTo(Question::class, 'question_id', 'id');
+        return $this->hasMany(Question::class, 'category_question_id', 'id');
     }
 }

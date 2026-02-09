@@ -8,6 +8,7 @@ use App\Models\Master\Question\QuestionType;
 use App\Models\Master\Question\Topic;
 use App\Models\Study\Study;
 use App\Services\Answer\AnswerService;
+use App\Models\Category\CategoryQuestion;
 use App\Services\Question\QuestionService;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -45,7 +46,7 @@ class QuestionImportJob implements ShouldQueue
                     continue;
                 }
 
-                if (!$value[0] || !$value[1] || !$value[4] || !$value[5]) {
+                if (!$value[0] || !$value[1] || !$value[4] || !$value[5] || !$value[6]) {
                     Log::warning("Data soal tidak bisa masuk, ada field yang kosong", [
                         'collection' => $value,
                     ]);
@@ -61,7 +62,7 @@ class QuestionImportJob implements ShouldQueue
                     continue;
                 };
 
-                for ($j = 7; $j < 10; $j++) {
+                for ($j = 8; $j < 11; $j++) {
                     if (!$value[$j]) {
                         Log::warning("Data soal tidak bisa masuk, karena jawaban kosong ", [
                             'collection' => $value,
@@ -111,6 +112,15 @@ class QuestionImportJob implements ShouldQueue
                     ]);
                 }
 
+                $category_question = CategoryQuestion::withoutGlobalScopes()->whereLike('name', "%$value[5]%")->first();
+
+                if (!$category_question && $value[5]) {
+                    CategoryQuestion::create([
+                        'company_id' => $this->user?->company?->id,
+                        'name'       => $value[5]
+                    ]);
+                };
+
                 $request_question = [
                     'user_id'              => $this->user?->id,
                     'company_id'           => $this->user?->company?->id,
@@ -119,10 +129,11 @@ class QuestionImportJob implements ShouldQueue
                     'material_category_id' => $material_category?->id,
                     'material_id'          => $material?->id,
                     'question_type_id'     => $question_type?->id,
-                    'question'             => $value[5],
+                    'category_question_id' => $category_question?->id,
+                    'question'             => $value[6],
                     'images'               => null,
                     'old_images'           => null,
-                    'description'          => $value[6],
+                    'description'          => $value[7],
                     'weight_correct'       => null,
                     'weight_incorrect'     => null,
                 ];
@@ -132,7 +143,7 @@ class QuestionImportJob implements ShouldQueue
                     throw new Exception("Ada kesalahaan saat QuestionImportJob => QuestionService => updateOrCreate", 500);
                 }
 
-                for ($i = 7; $i <= 11; $i++) {
+                for ($i = 8; $i <= 12; $i++) {
                     if (!$value[$i]) continue;
                     $request_answer = [
                         'company_id' => $this->user?->company?->id,
@@ -163,11 +174,11 @@ class QuestionImportJob implements ShouldQueue
     function letterToValue(?string $ch): ?int
     {
         static $map = [
-            'A'=>7,
-            'B'=>8,
-            'C'=>9,
-            'D'=>10,
-            'E'=>11
+            'A'=>8,
+            'B'=>9,
+            'C'=>10,
+            'D'=>11,
+            'E'=>12
         ];
         return $map[strtoupper(trim((string)$ch))] ?? null;
     }

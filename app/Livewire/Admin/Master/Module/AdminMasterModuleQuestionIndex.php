@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Master\Question\Module;
+use App\Models\Master\Question\ModuleQuestion;
 use App\Models\Master\Question\Question;
+use App\Models\Category\CategoryQuestion;
 use App\Services\Module\ModuleService;
 use Spatie\LivewireFilepond\WithFilePond;
 use App\Models\Master\Question\QuestionType;
@@ -32,6 +34,9 @@ class AdminMasterModuleQuestionIndex extends Component
     public $get_studys = [], $studys = [], $is_all_study = false, $topics = [];
     public $filterStudyId, $filterQuestionTypeId, $filterTopicId;
     public $selected_all = [], $openQuestion = false;
+    public $category_questions = [];
+    public $category_question_settings = [];
+    public $category_question_limits = [];
 
     public function render()
     {
@@ -72,6 +77,10 @@ class AdminMasterModuleQuestionIndex extends Component
         $this->is_all_study     = $this->get_module?->is_all_study;
 
         $this->studys           = json_decode($this->get_module?->studys) ?? [];
+        $this->category_questions = CategoryQuestion::select('id', 'name')->get();
+        $this->initializeCategoryQuestionSettings();
+        $this->loadCategoryQuestionLimits();
+        $this->applyCategoryQuestionSettings($this->get_module?->category_question_settings ?? []);
 
         if (Auth::user()?->hasRole('Dosen')) {
             $studyIds = Auth::user()?->studys ?? [];
@@ -94,6 +103,37 @@ class AdminMasterModuleQuestionIndex extends Component
 
         $this->topics           = Topic::select('id', 'name')->get();
         $this->question_types   = QuestionType::select('id', 'name')->get();
+    }
+
+    public function updatedQuestionTypeId()
+    {
+        $this->loadCategoryQuestionLimits();
+    }
+
+    public function updatedCategoryQuestionSettings($value, $key)
+    {
+        if (!is_string($key)) {
+            return;
+        }
+
+        $parts = explode('.', $key);
+        if (count($parts) !== 2) {
+            return;
+        }
+
+        [$categoryId, $field] = $parts;
+        if (!in_array($field, ['default', 'easy', 'medium', 'hard'], true)) {
+            return;
+        }
+
+        $max = (int) ($this->category_question_limits[$categoryId][$field] ?? 0);
+        $current = (int) ($this->category_question_settings[$categoryId][$field] ?? 0);
+        if ($current > $max) {
+            $this->category_question_settings[$categoryId][$field] = $max;
+        }
+        if ($current < 0) {
+            $this->category_question_settings[$categoryId][$field] = 0;
+        }
     }
 
     public function openModal()
@@ -132,6 +172,11 @@ class AdminMasterModuleQuestionIndex extends Component
                 'description'      => 'nullable',
                 'duration'         => 'required|numeric|min:1',
                 'studys'           => 'required|array',
+                'category_question_settings.*.enabled' => 'nullable|boolean',
+                'category_question_settings.*.default' => 'nullable|integer|min:0',
+                'category_question_settings.*.easy' => 'nullable|integer|min:0',
+                'category_question_settings.*.medium' => 'nullable|integer|min:0',
+                'category_question_settings.*.hard' => 'nullable|integer|min:0',
             ],
             [
                 'question_type_id.required' => 'Tipe Ujian wajib diisi.',
@@ -145,10 +190,34 @@ class AdminMasterModuleQuestionIndex extends Component
             ]
         );
 
+        $this->resetErrorBag('category_question_settings');
+        foreach ($this->category_question_settings as $categoryId => $settings) {
+            if (!($settings['enabled'] ?? false)) {
+                continue;
+            }
+            $limits = $this->category_question_limits[$categoryId] ?? ['default' => 0, 'easy' => 0, 'medium' => 0, 'hard' => 0];
+
+            foreach (['default', 'easy', 'medium', 'hard'] as $difficulty) {
+                $value = (int) ($settings[$difficulty] ?? 0);
+                $max = (int) ($limits[$difficulty] ?? 0);
+                if ($value > $max) {
+                    $this->addError(
+                        "category_question_settings.{$categoryId}.{$difficulty}",
+                        "Jumlah soal {$difficulty} melebihi maksimal tersedia ({$max})."
+                    );
+                }
+            }
+        }
+
+        if ($this->getErrorBag()->isNotEmpty()) {
+            return;
+        }
+
         try {
             DB::beginTransaction();
             $request = [
                 'id'               => $this->data_id,
+                'user_id'          => Auth::user()?->id,
                 'company_id'       => Auth::user()?->company?->id,
                 'question_type_id' => $this->question_type_id,
                 'name'             => $this->name,
@@ -156,12 +225,17 @@ class AdminMasterModuleQuestionIndex extends Component
                 'random_question'  => $this->random_question,
                 'description'      => $this->description,
                 'studys'           => $this->studys,
+                'is_all_study'     => $this->is_all_study,
+                'category_question_settings' => $this->getFilteredCategoryQuestionSettings(),
             ];
 
             $module = app(ModuleService::class)->updateOrCreate($request);
             if (!$module) {
                 throw new Exception("Ada kesalahaan saat ModuleService => updateOrCreate", 500);
             }
+
+            $this->get_module = $module;
+            $this->applyCategoryQuestionSettings($module->category_question_settings ?? []);
 
             DB::commit();
         } catch (Exception | Throwable $th) {
@@ -237,5 +311,96 @@ class AdminMasterModuleQuestionIndex extends Component
         }
 
         return AlertHelper::success('Berhasil', 'Data berhasil dihapus.');
+    }
+
+    private function initializeCategoryQuestionSettings(): void
+    {
+        $this->category_question_settings = [];
+        foreach ($this->category_questions as $category) {
+            $this->category_question_settings[$category->id] = [
+                'enabled' => false,
+                'default' => 0,
+                'easy'    => 0,
+                'medium'  => 0,
+                'hard'    => 0,
+            ];
+        }
+    }
+
+    private function applyCategoryQuestionSettings($existingSettings): void
+    {
+        $this->initializeCategoryQuestionSettings();
+
+        if (is_string($existingSettings)) {
+            $existingSettings = json_decode($existingSettings, true) ?? [];
+        }
+
+        foreach ($existingSettings ?? [] as $categoryId => $settings) {
+            if (!isset($this->category_question_settings[$categoryId])) {
+                continue;
+            }
+            $this->category_question_settings[$categoryId] = [
+                'enabled' => true,
+                'default' => (int) ($settings['default'] ?? 0),
+                'easy'    => (int) ($settings['easy'] ?? 0),
+                'medium'  => (int) ($settings['medium'] ?? 0),
+                'hard'    => (int) ($settings['hard'] ?? 0),
+            ];
+        }
+    }
+
+    private function getFilteredCategoryQuestionSettings(): array
+    {
+        $filtered = [];
+        foreach ($this->category_question_settings as $categoryId => $settings) {
+            if (!($settings['enabled'] ?? false)) {
+                continue;
+            }
+
+            $filtered[$categoryId] = [
+                'default' => (int) ($settings['default'] ?? 0),
+                'easy'   => (int) ($settings['easy'] ?? 0),
+                'medium' => (int) ($settings['medium'] ?? 0),
+                'hard'   => (int) ($settings['hard'] ?? 0),
+            ];
+        }
+
+        return $filtered;
+    }
+
+    private function loadCategoryQuestionLimits(): void
+    {
+        $limits = [];
+        foreach ($this->category_questions as $category) {
+            $limits[$category->id] = [
+                'default' => 0,
+                'easy' => 0,
+                'medium' => 0,
+                'hard' => 0,
+            ];
+        }
+
+        $query = Question::withoutGlobalScope('user_scope')
+            ->select('category_question_id', DB::raw("COALESCE(difficulty, 'default') as difficulty"), DB::raw('count(*) as total'))
+            ->whereNotNull('category_question_id');
+
+        if ($this->question_type_id) {
+            $query->where('question_type_id', $this->question_type_id);
+        }
+
+        $rows = $query->groupBy('category_question_id', DB::raw("COALESCE(difficulty, 'default')"))->get();
+
+        foreach ($rows as $row) {
+            if (!isset($limits[$row->category_question_id])) {
+                continue;
+            }
+            $difficulty = $row->difficulty ?? 'default';
+            if (!isset($limits[$row->category_question_id][$difficulty])) {
+                $limits[$row->category_question_id][$difficulty] = 0;
+            }
+            $limits[$row->category_question_id][$difficulty] = (int) $row->total;
+        }
+
+        $this->category_question_limits = $limits;
     }
 }

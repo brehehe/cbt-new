@@ -16,6 +16,9 @@ class Module extends Model
     //
     use SoftDeletes, HasUuids;
     protected $guarded = ['id'];
+    protected $casts = [
+        'category_question_settings' => 'array',
+    ];
 
     public function company()
     {

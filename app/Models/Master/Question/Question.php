@@ -5,6 +5,7 @@ namespace App\Models\Master\Question;
 use App\Models\Company\Company;
 use App\Models\Study\Study;
 use App\Models\Timetable\TimetableQuestion;
+use App\Models\Category\CategoryQuestion;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -117,6 +118,16 @@ class Question extends Model
     public function moduleQuestions(): HasMany
     {
         return $this->hasMany(ModuleQuestion::class, 'question_id', 'id');
+    }
+
+    /**
+     * Get the categoryQuestion that owns the Question
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function categoryQuestion(): BelongsTo
+    {
+        return $this->belongsTo(CategoryQuestion::class, 'category_question_id', 'id');
     }
 
     /**

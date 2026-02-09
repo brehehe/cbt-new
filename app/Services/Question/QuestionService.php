@@ -96,6 +96,7 @@ class QuestionService
                     'weight_correct'       => $request['weight_correct'] ?? null,
                     'weight_incorrect'     => $request['weight_incorrect'] ?? null,
                     'description'          => $request['description'] ?? null,
+                    'category_question_id'  => $request['category_question_id'] ?? null,
                 ]
             );
 

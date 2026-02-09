@@ -67,10 +67,10 @@ class AdminMasterTopicIndex extends Component
 
     }
 
-    public function hydrate()
-    {
-        $this->resetPage();
-    }
+    // public function hydrate()
+    // {
+    //     $this->resetPage();
+    // }
 
     public function openModal()
     {

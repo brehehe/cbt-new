@@ -76,17 +76,57 @@ class AdminExamTimetableIndex extends Component
 
             $transactionModule = $timeTable->timetableModule;
 
-            $modulesQuestions = $transactionModule->random_question ?
-                TimetableQuestion::withoutGlobalScope('user_scope')
-                ->select('id', 'study_id')
-                ->where('timetable_module_id', $transactionModule->id)
-                ->inRandomOrder()
-                ->get() :
-                TimetableQuestion::withoutGlobalScope('user_scope')
-                ->select('id', 'study_id')
-                ->where('timetable_module_id', $transactionModule->id)
-                ->inRandomOrder()
-                ->get();
+            $categorySettings = $transactionModule?->module?->category_question_settings ?? [];
+            if (is_string($categorySettings)) {
+                $categorySettings = json_decode($categorySettings, true) ?? [];
+            }
+
+            if (!empty($categorySettings)) {
+                $modulesQuestions = collect();
+
+                foreach ($categorySettings as $categoryId => $settings) {
+                    foreach (['default', 'easy', 'medium', 'hard'] as $difficulty) {
+                        $take = (int) ($settings[$difficulty] ?? 0);
+                        if ($take <= 0) {
+                            continue;
+                        }
+
+                        $query = TimetableQuestion::withoutGlobalScope('user_scope')
+                            ->select('id', 'study_id')
+                            ->where('timetable_module_id', $transactionModule->id)
+                            ->where('category_question_id', $categoryId);
+
+                        if ($difficulty === 'default') {
+                            $query->where(function ($q) {
+                                $q->where('difficulty', 'default')
+                                    ->orWhereNull('difficulty');
+                            });
+                        } else {
+                            $query->where('difficulty', $difficulty);
+                        }
+
+                        if ($transactionModule->random_question) {
+                            $query->inRandomOrder();
+                        } else {
+                            $query->orderBy('id');
+                        }
+
+                        $modulesQuestions = $modulesQuestions->merge($query->limit($take)->get());
+                    }
+                }
+            } else {
+                $query = TimetableQuestion::withoutGlobalScope('user_scope')
+                    ->select('id', 'study_id')
+                    ->where('timetable_module_id', $transactionModule->id);
+
+                if ($transactionModule->random_question) {
+                    $query->inRandomOrder();
+                } else {
+                    $query->orderBy('id');
+                }
+
+                $modulesQuestions = $query->get();
+            }
 
             $UserTimetable = UserTimetable::create([
                 'user_id' => Auth::id(),
@@ -119,10 +159,10 @@ class AdminExamTimetableIndex extends Component
         }
     }
 
-    public function hydrate()
-    {
-        $this->resetPage();
-    }
+    // public function hydrate()
+    // {
+    //     $this->resetPage();
+    // }
 
     public function confirmBackExam($id)
     {

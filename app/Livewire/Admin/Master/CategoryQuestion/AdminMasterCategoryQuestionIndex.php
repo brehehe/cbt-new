@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Livewire\Admin\Master\ExamType;
+namespace App\Livewire\Admin\Master\CategoryQuestion;
 
 use Exception;
-use Throwable;
 use Livewire\Component;
 use App\Helpers\AlertHelper;
-use App\Models\Master\Exam\ExamType;
-use App\Services\ExamType\ExamTypeService;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Category\CategoryQuestion;
+use App\Services\CategoryQuestion\CategoryQuestionService;
+use Throwable;
 
-class AdminMasterExamTypeIndex extends Component
+class AdminMasterCategoryQuestionIndex extends Component
 {
-    use WithPagination;
+     use WithPagination;
     protected $paginationTheme = 'bootstrap';
     public $perPage = 10, $search;
 
@@ -23,13 +23,13 @@ class AdminMasterExamTypeIndex extends Component
 
     public function render()
     {
-        $exam_types = ExamType::search($this->search)->select('id', 'name', 'description');
-        return view('livewire.admin.master.exam-type.admin-master-exam-type-index', [
-           'exam_types' => $exam_types->paginate($this->perPage)
+        $category_questions = CategoryQuestion::search($this->search)->select('id', 'name', 'description');
+        return view('livewire.admin.master.category-question.admin-master-category-question-index', [
+             'category_questions' => $category_questions->paginate($this->perPage)
         ])->extends('layout.app')->section('content');
     }
 
-    public function mount()
+     public function mount()
     {
         // dd(Auth::user()?->company);
     }
@@ -72,9 +72,9 @@ class AdminMasterExamTypeIndex extends Component
                     'description'          => $this->description,
                 ];
 
-                $exam_type = app(ExamTypeService::class)->updateOrCreate($request);
+                $exam_type = app(CategoryQuestionService::class)->updateOrCreate($request);
                 if (!$exam_type) {
-                    throw new Exception("Ada kesalahaan saat ExamTypeService => updateOrCreate", 500);
+                    throw new Exception("Ada kesalahaan saat CategoryQuestionService => updateOrCreate", 500);
                 }
 
             DB::commit();
@@ -85,7 +85,7 @@ class AdminMasterExamTypeIndex extends Component
                 'file'    => $th->getFile(),
                 'line'    => $th->getLine(),
             ];
-            Log::error('Ada Kesalahaan saat AdminMasterExamTypeIndex => submit', $error);
+            Log::error('Ada Kesalahaan saat AdminMasterCategoryQuestionIndex => submit', $error);
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
         }
 
@@ -93,9 +93,9 @@ class AdminMasterExamTypeIndex extends Component
         return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
     }
 
-    public function edit($id)
+     public function edit($id)
     {
-        $result                     = ExamType::findOrFail($id);
+        $result                     = CategoryQuestion::findOrFail($id);
         $this->data_id              = $result?->id;
         $this->name                 = $result?->name;
         $this->description          = $result?->description;
@@ -110,14 +110,14 @@ class AdminMasterExamTypeIndex extends Component
     public function delete($id)
     {
         try {
-            app(ExamTypeService::class)->delete($id[0]);
+            app(CategoryQuestionService::class)->delete($id[0]);
         } catch (Exception | Throwable $th) {
             $error = [
                 'message' => $th->getMessage(),
                 'file'    => $th->getFile(),
                 'line'    => $th->getLine(),
             ];
-            Log::error('Ada Kesalahaan saat AdminMasterExamTypeIndex => delete', $error);
+            Log::error('Ada Kesalahaan saat AdminMasterCategoryQuestionIndex => delete', $error);
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menghapus data');
         }
 

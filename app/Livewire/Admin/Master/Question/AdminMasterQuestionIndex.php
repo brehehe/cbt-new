@@ -14,6 +14,7 @@ use App\Services\Module\ModuleService;
 use App\Models\Master\Question\Material;
 use App\Models\Master\Question\Question;
 use App\Models\Master\Question\MaterialCategory;
+use App\Models\Category\CategoryQuestion;
 use App\Models\Master\Question\QuestionType;
 use App\Models\Study\Study;
 use App\Services\Question\QuestionService;
@@ -29,16 +30,32 @@ class AdminMasterQuestionIndex extends Component
     protected $paginationTheme = 'bootstrap';
     public $perPage = 10, $search;
 
-    public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id, $question, $description, $weight_correct, $weight_incorrect;
-    public $topics = [], $material_categories = [], $materials = [], $question_types = [];
+    public $selectedQuestions = [];
+    public $selectAll = false;
+    public $bulkCategoryQuestionId;
+
+    public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id, $question, $description, $weight_correct, $weight_incorrect, $category_question_id;
+    public $topics = [], $material_categories = [], $materials = [], $question_types = [], $category_questions = [];
     public $images = [], $old_images = [], $studys = [], $study_id;
-    public $filterStudyId, $filterQuestionTypeId, $filterTopicId;
+    public $filterStudyId, $filterQuestionTypeId, $filterTopicId, $filterDifficulty, $filterCategoryQuestionId;
     public $study_id_import, $file_import;
 
     public function render()
     {
-        $questions = Question::select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect', 'study_id')
-            ->search($this->search);
+        $questions = $this->buildQuestionsQuery();
+
+        return view('livewire.admin.master.question.admin-master-question-index', [
+            'questions' => $questions->paginate($this->perPage)
+        ])->extends('layout.app')->section('content');
+    }
+
+    protected function buildQuestionsQuery()
+    {
+        $questions = Question::select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect', 'study_id', 'difficulty', 'category_question_id')
+            ->search($this->search)
+            ->orderBy('created_at', 'desc')
+            ->orderBy('order', 'desc')
+            ->orderBy('question', 'asc');
 
         if ($this->filterStudyId) {
             $questions->where('study_id', $this->filterStudyId);
@@ -52,15 +69,123 @@ class AdminMasterQuestionIndex extends Component
             $questions->where('topic_id', $this->filterTopicId);
         }
 
-        return view('livewire.admin.master.question.admin-master-question-index', [
-            'questions' => $questions->paginate($this->perPage)
-        ])->extends('layout.app')->section('content');
+        if ($this->filterDifficulty) {
+            $questions->where('difficulty', $this->filterDifficulty);
+        }
+
+        if ($this->filterCategoryQuestionId) {
+            $questions->where('category_question_id', $this->filterCategoryQuestionId);
+        }
+
+        return $questions;
+    }
+
+    public function updatedSelectAll($value)
+    {
+        if ($value) {
+            $this->selectedQuestions = $this->buildQuestionsQuery()
+                ->pluck('id')
+                ->toArray();
+        } else {
+            $this->selectedQuestions = [];
+        }
+    }
+
+    public function updatedSelectedQuestions()
+    {
+        $this->selectAll = false;
+    }
+
+    public function updatedSearch()
+    {
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function updatedFilterStudyId()
+    {
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function updatedFilterQuestionTypeId()
+    {
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function updatedFilterTopicId()
+    {
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function updatedFilterDifficulty()
+    {
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function updatedFilterCategoryQuestionId()
+    {
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    protected function resetSelection()
+    {
+        $this->selectedQuestions = [];
+        $this->selectAll = false;
+    }
+
+    public function applyBulkCategory()
+    {
+        $this->validate([
+            'bulkCategoryQuestionId' => 'required|exists:category_questions,id',
+        ], [
+            'bulkCategoryQuestionId.required' => 'Kategori soal wajib dipilih.',
+            'bulkCategoryQuestionId.exists' => 'Kategori soal tidak valid.',
+        ]);
+
+        if (count($this->selectedQuestions) === 0) {
+            return AlertHelper::error('Gagal', 'Pilih minimal satu soal.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            Question::whereIn('id', $this->selectedQuestions)
+                ->update(['category_question_id' => $this->bulkCategoryQuestionId]);
+
+            DB::commit();
+        } catch (Exception | Throwable $th) {
+            DB::rollBack();
+            $error = [
+                'message' => $th->getMessage(),
+                'file'    => $th->getFile(),
+                'line'    => $th->getLine(),
+            ];
+            Log::error('Ada Kesalahaan saat AdminMasterQuestionIndex => applyBulkCategory', $error);
+            return AlertHelper::error('Gagal', 'Ada kesalahan saat memperbarui kategori soal.');
+        }
+
+        $this->resetSelection();
+        $this->bulkCategoryQuestionId = null;
+
+        return AlertHelper::success('Berhasil', 'Kategori soal berhasil diperbarui.');
     }
 
     public function mount()
     {
         $this->topics         = Topic::select('id', 'name')->get();
         $this->question_types = QuestionType::select('id', 'name')->get();
+        $this->category_questions = CategoryQuestion::select('id', 'name')->get();
         if (Auth::user()?->hasRole('Dosen')) {
             $studyIds = Auth::user()?->studys ?? [];
 
@@ -110,10 +235,10 @@ class AdminMasterQuestionIndex extends Component
             ->get();
     }
 
-    public function hydrate()
-    {
-        $this->resetPage();
-    }
+    // public function hydrate()
+    // {
+    //     $this->resetPage();
+    // }
 
     public function openModal()
     {
@@ -123,7 +248,7 @@ class AdminMasterQuestionIndex extends Component
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['data_id', 'study_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'images', 'weight_correct', 'weight_incorrect', 'study_id_import', 'file_import']);
+        $this->reset(['data_id', 'study_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'images', 'weight_correct', 'weight_incorrect', 'study_id_import', 'file_import', 'category_question_id']);
         $this->dispatch('close-modal', ['id' => 'modal-import-question']);
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
@@ -134,6 +259,7 @@ class AdminMasterQuestionIndex extends Component
             [
                 'study_id'             => 'required|exists:studies,id',
                 'topic_id'             => 'required|exists:topics,id',
+                'category_question_id'  => 'required|exists:category_questions,id',
                 'material_category_id' => 'nullable|exists:material_categories,id',
                 'material_id'          => 'nullable|exists:materials,id',
                 'question_type_id'     => 'required|exists:question_types,id',
@@ -151,6 +277,7 @@ class AdminMasterQuestionIndex extends Component
                 'question.required'           => 'Pertanyaan wajib diisi.',
                 'images.*.file'               => 'Gambar wajib berupa file.',
                 'images.*.mimes'              => 'Gambar hanya berformat : .jpg, .jpeg, .png.',
+                'category_question_id.exists'  => 'Kategori soal tidak valid.',
             ]
         );
 
@@ -171,6 +298,7 @@ class AdminMasterQuestionIndex extends Component
                 'description'          => $this->description,
                 'weight_correct'       => $this->weight_correct,
                 'weight_incorrect'     => $this->weight_incorrect,
+                'category_question_id'  => $this->category_question_id,
             ];
 
             $question = app(QuestionService::class)->updateOrCreate($request);

@@ -9,6 +9,7 @@ use App\Models\Master\Exam\ExamSession;
 use App\Models\User\UserTimetable;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Master\Question\Module;
+use App\Models\Master\Question\ModuleQuestion;
 use App\Models\Timetable\TimetableAnswer;
 use App\Models\Timetable\TimetableModule;
 use App\Models\Timetable\TimetableQuestion;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 
 class Timetable extends Model
 {
@@ -83,59 +85,125 @@ class Timetable extends Model
 
         static::saved(function ($model) {
             if ($model->module_id) {
-                $module = Module::find($model->module_id);
-                $timetableModule = TimetableModule::updateOrCreate(
-                    [
-                        'timetable_id' => $model->id,
-                        'module_id' => $module->id,
-                    ],
-                    [
-                        'studys' => $module->studys,
-                        'user_id' => $module->user_id,
-                        'question_type_id' => $module->question_type_id,
-                        'name' => $module->name,
-                        'description' => $module->description,
-                        'duration' => $module->duration,
-                        'random_question' => $module->random_question,
-                    ],
-                );
+                DB::transaction(function () use ($model) {
+                    $module = Module::find($model->module_id);
+                    if (!$module) {
+                        return;
+                    }
 
-                foreach ($module->moduleQuestions as $question) {
-                    $timetableQuestion = TimetableQuestion::updateOrCreate(
+                    $timetableModule = TimetableModule::updateOrCreate(
                         [
-                            'timetable_module_id' => $timetableModule->id,
-                            'question_id' => $question->question->id,
+                            'timetable_id' => $model->id,
+                            'module_id' => $module->id,
                         ],
                         [
-                            'study_id' => $question->question->study_id,
-                            'user_id' => $question->question->user_id,
-                            'topic_id' => $question->question->topic_id,
-                            'material_category_id' => $question->question->material_category_id,
-                            'material_id' => $question->question->material_id,
-                            'question_type_id' => $question->question->question_type_id,
-                            'question' => $question->question->question,
-                            'images' => $question->question->images,
-                            'description' => $question->question->description,
-                            'weight_correct' => $question->question->weight_correct,
-                            'weight_incorrect' => $question->question->weight_incorrect,
+                            'studys' => $module->studys,
+                            'user_id' => $module->user_id,
+                            'question_type_id' => $module->question_type_id,
+                            'name' => $module->name,
+                            'description' => $module->description,
+                            'duration' => $module->duration,
+                            'random_question' => $module->random_question,
                         ],
                     );
 
-                    foreach ($question->question->answers  as $key => $value) {
-                        TimetableAnswer::updateOrCreate(
-                            [
-                                'timetable_question_id' => $timetableQuestion->id,
-                                'answer_id' => $value->id,
-                            ],
-                            [
-                                'alphabet' => $value->alphabet,
-                                'context' => $value->context,
-                                'images' => $value->images,
-                                'is_correct' => $value->is_correct,
-                            ]
-                        );
-                    }
-                }
+                    ModuleQuestion::where('module_id', $module->id)
+                        ->with(['question.answers'])
+                        ->chunkById(200, function ($moduleQuestions) use ($timetableModule) {
+                            $now = now();
+                            $questionUpserts = [];
+
+                            foreach ($moduleQuestions as $moduleQuestion) {
+                                $question = $moduleQuestion->question;
+                                if (!$question) {
+                                    continue;
+                                }
+
+                                $questionUpserts[] = [
+                                    'timetable_module_id' => $timetableModule->id,
+                                    'question_id' => $question->id,
+                                    'study_id' => $question->study_id,
+                                    'user_id' => $question->user_id,
+                                    'topic_id' => $question->topic_id,
+                                    'material_category_id' => $question->material_category_id,
+                                    'material_id' => $question->material_id,
+                                    'question_type_id' => $question->question_type_id,
+                                    'category_question_id' => $question->category_question_id,
+                                    'difficulty' => $question->difficulty ?? 'default',
+                                    'question' => $question->question,
+                                    'images' => $question->images,
+                                    'description' => $question->description,
+                                    'weight_correct' => $question->weight_correct,
+                                    'weight_incorrect' => $question->weight_incorrect,
+                                    'created_at' => $now,
+                                    'updated_at' => $now,
+                                ];
+                            }
+
+                            if (!empty($questionUpserts)) {
+                                TimetableQuestion::upsert(
+                                    $questionUpserts,
+                                    ['timetable_module_id', 'question_id'],
+                                    [
+                                        'study_id',
+                                        'user_id',
+                                        'topic_id',
+                                        'material_category_id',
+                                        'material_id',
+                                        'question_type_id',
+                                        'category_question_id',
+                                        'difficulty',
+                                        'question',
+                                        'images',
+                                        'description',
+                                        'weight_correct',
+                                        'weight_incorrect',
+                                        'updated_at',
+                                    ]
+                                );
+
+                                $questionIds = collect($questionUpserts)->pluck('question_id')->all();
+                                $timetableQuestions = TimetableQuestion::where('timetable_module_id', $timetableModule->id)
+                                    ->whereIn('question_id', $questionIds)
+                                    ->get(['id', 'question_id'])
+                                    ->keyBy('question_id');
+
+                                $answerUpserts = [];
+                                foreach ($moduleQuestions as $moduleQuestion) {
+                                    $question = $moduleQuestion->question;
+                                    if (!$question) {
+                                        continue;
+                                    }
+
+                                    $timetableQuestion = $timetableQuestions->get($question->id);
+                                    if (!$timetableQuestion) {
+                                        continue;
+                                    }
+
+                                    foreach ($question->answers as $answer) {
+                                        $answerUpserts[] = [
+                                            'timetable_question_id' => $timetableQuestion->id,
+                                            'answer_id' => $answer->id,
+                                            'alphabet' => $answer->alphabet,
+                                            'context' => $answer->context,
+                                            'images' => $answer->images,
+                                            'is_correct' => $answer->is_correct,
+                                            'created_at' => $now,
+                                            'updated_at' => $now,
+                                        ];
+                                    }
+                                }
+
+                                if (!empty($answerUpserts)) {
+                                    TimetableAnswer::upsert(
+                                        $answerUpserts,
+                                        ['timetable_question_id', 'answer_id'],
+                                        ['alphabet', 'context', 'images', 'is_correct', 'updated_at']
+                                    );
+                                }
+                            }
+                        });
+                });
             }
         });
     }

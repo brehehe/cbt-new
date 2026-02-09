@@ -23,7 +23,7 @@
             <div class="mb-4">
                 <label for="answer_context" class="block text-sm font-medium text-gray-700">Konteks Jawaban <span
                         class="text-red-600">*</span></label>
-                <textarea id="answer_context" wire:model.defer="answer_context" placeholder="" class="mt-1 form-control"></textarea>
+                <textarea id="answer_context" wire:model.defer="answer_context" placeholder="" class="mt-1 form-control" data-autosize="true" rows="3" style="overflow:hidden;resize:none;" x-data x-init="$nextTick(() => { $el.style.height='auto'; $el.style.height=$el.scrollHeight+'px'; })" @focus="$el.style.height='auto';$el.style.height=$el.scrollHeight+'px'" @input="$el.style.height='auto';$el.style.height=$el.scrollHeight+'px'"></textarea>
                 @error('answer_context')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror

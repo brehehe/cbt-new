@@ -19,11 +19,6 @@ class AdminMasterTimetableAnswerIndex extends Component
     public $modules = [], $supervisors = [], $getSupervisors = [], $module_id;
     public $start_time, $end_time;
 
-    public function hydrate()
-    {
-        $this->resetPage();
-    }
-
     public function mount($timetable_id, $user_timetable_id)
     {
         $this->timetable_id = $timetable_id;

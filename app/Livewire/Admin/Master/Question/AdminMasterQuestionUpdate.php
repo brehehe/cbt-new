@@ -16,6 +16,7 @@ use App\Models\Master\Question\Topic;
 use App\Models\Master\Question\Answer;
 use App\Services\Answer\AnswerService;
 use App\Models\Master\Question\Material;
+use App\Models\Category\CategoryQuestion;
 use App\Models\Master\Question\Question;
 use Spatie\LivewireFilepond\WithFilePond;
 use App\Services\Question\QuestionService;
@@ -29,8 +30,8 @@ class AdminMasterQuestionUpdate extends Component
     protected $search;
 
     public $get_question;
-    public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id, $question, $description, $weight_correct, $weight_incorrect;
-    public $topics = [], $material_categories = [], $materials = [], $question_types = [];
+    public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id, $question, $description, $weight_correct, $weight_incorrect,$category_question_id;
+    public $topics = [], $material_categories = [], $materials = [], $question_types = [], $category_questions = [];
     public $images = [], $old_images = [];
 
     public $answer_id, $answer_context, $answer_description, $answer_correct, $answer_alphabet;
@@ -57,10 +58,11 @@ class AdminMasterQuestionUpdate extends Component
         $this->description          = $this->get_question?->description;
         $this->weight_correct       = $this->get_question?->weight_correct;
         $this->weight_incorrect     = $this->get_question?->weight_incorrect;
-
+        $this->category_question_id = $this->get_question?->category_question_id;
         $this->topics              = Topic::select('id', 'name')->get();
         $this->material_categories = MaterialCategory::select('id', 'topic_id', 'name')->where('topic_id', $this->get_question?->topic_id)->get();
         $this->question_types      = QuestionType::select('id', 'name')->get();
+        $this->category_questions  = CategoryQuestion::select('id', 'name')->get();
         $this->materials           = Material::select('id', 'material_category_id', 'name')->where('material_category_id', $this->get_question?->material_category_id)->get();
 
         foreach (json_decode($this->get_question?->images, true) ?? [] as $key => $image) {
@@ -129,6 +131,7 @@ class AdminMasterQuestionUpdate extends Component
                 'study_id'             => 'required|exists:studies,id',
                 // 'images.*'             => 'nullable|image|mimes:jpg,jpeg,png',
                 'description'          => 'nullable',
+                'category_question_id'  => 'required|exists:category_questions,id',
             ],
             [
                 'study_id.required'           => 'Prodi wajib diisi.',
@@ -140,6 +143,7 @@ class AdminMasterQuestionUpdate extends Component
                 'question.required'           => 'Pertanyaan wajib diisi.',
                 'images.*.image'              => 'Gambar wajib berupa gambar.',
                 'images.*.mimes'              => 'Gambar hanya berformat : .jpg, .jpeg, .png.',
+                'category_question_id.exists' => 'Kategori soal tidak valid.',
             ]
         );
 
@@ -168,6 +172,7 @@ class AdminMasterQuestionUpdate extends Component
                 'description'          => $this->description,
                 'weight_correct'       => $this->weight_correct,
                 'weight_incorrect'     => $this->weight_incorrect,
+                'category_question_id' => $this->category_question_id,
             ];
 
             $question = app(QuestionService::class)->updateOrCreate($request);

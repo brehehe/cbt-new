@@ -53,7 +53,8 @@ class AdminMasterTimetableIndex extends Component
     public function mount()
     {
         Session::forget('timetable_id');
-        $this->modules = Module::whereHas('moduleQuestions') // hanya yang punya relasi
+        $this->modules = Module::whereNotNull('category_question_settings')
+            ->whereRaw("category_question_settings <> '{}'::jsonb")
             ->pluck('name', 'id')
             ->toArray();
         $this->getSupervisors = User::companyRole('Pengawas', Auth::user()->company_id)->select('name', 'id')->get()->pluck('name', 'id')->toArray();
@@ -272,8 +273,8 @@ class AdminMasterTimetableIndex extends Component
         } catch (\Throwable $th) {
 
             DB::rollback();
-            AlertHelper::error('Gagal', 'Data gagal disimpan!');
-            return Log::info('Gagal Menyimpan Data Jadwal : ' . $th);
+            AlertHelper::error('Gagal', 'Data gagal disimpan!' . $th->getMessage());
+            return Log::error('Gagal Menyimpan Data Jadwal : ' . $th);
         }
     }
 

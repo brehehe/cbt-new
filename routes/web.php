@@ -10,6 +10,7 @@ use App\Livewire\Admin\Master\ExamSession\AdminMasterExamSessionIndex;
 use App\Livewire\Admin\Master\ExamType\AdminMasterExamTypeIndex;
 use App\Livewire\Admin\Master\Material\AdminMasterMaterialIndex;
 use App\Livewire\Admin\Master\MaterialCategory\AdminMasterMaterialCategoryIndex;
+use App\Livewire\Admin\Master\CategoryQuestion\AdminMasterCategoryQuestionIndex;
 use App\Livewire\Admin\Master\Module\AdminMasterModuleIndex;
 use App\Livewire\Admin\Master\Module\AdminMasterModuleQuestionIndex;
 use App\Livewire\Admin\Master\Question\AdminMasterQuestionIndex;
@@ -139,6 +140,7 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
             Route::get('/timetable/{timetable_id}/{user_timetable_id}/answer', 'Timetable\Answer\AdminMasterTimetableAnswerIndex')->name('admin.master.timetable.answer');
             Route::get('/material', AdminMasterMaterialIndex::class)->name('admin.master.material');
             Route::get('/question-type', AdminMasterQuestionTypeIndex::class)->name('admin.master.question-type');
+            Route::get('/category-question', AdminMasterCategoryQuestionIndex::class)->name('admin.master.category-question');
             Route::get('/exam-type', AdminMasterExamTypeIndex::class)->name('admin.master.exam-type');
             Route::get('/exam-room', AdminMasterExamRoomIndex::class)->name('admin.master.exam-room');
             Route::get('/exam-session', AdminMasterExamSessionIndex::class)->name('admin.master.exam-session');

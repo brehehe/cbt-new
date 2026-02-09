@@ -23,10 +23,10 @@ class AdminMasterRoleIndex extends Component
     public $data_id;
     public $name;
 
-    public function hydrate()
-    {
-        $this->resetPage();
-    }
+    // public function hydrate()
+    // {
+    //     $this->resetPage();
+    // }
 
     public function openModal()
     {

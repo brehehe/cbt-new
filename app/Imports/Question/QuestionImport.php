@@ -29,6 +29,7 @@ class QuestionImport implements ToCollection
                 'Kategori Materi',
                 'Materi Soal',
                 'Tipe Soal',
+                'Kategori Soal',
                 'Soal',
                 'Deskripsi Soal',
                 'A',

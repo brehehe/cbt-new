@@ -20,20 +20,33 @@
 
         <!-- Body -->
         <div class="px-6 py-4 text-gray-600 overflow-auto" style="max-height: 80vh">
-            <div class="mb-4">
-                <label for="study_id" class="block text-sm font-medium text-gray-700">Prodi <span
-                        class="text-red-600">*</span></label>
-                <select class="mt-1 form-control" wire:model.lazy='study_id'>
-                    <option value="">Pilih prodi</option>
-                    @foreach ($studys as $key_study => $study)
-                        <option value="{{ $key_study }}">{{ $study }}</option>
-                    @endforeach
-                </select>
-                @error('study_id')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                @enderror
-            </div>
             <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="study_id" class="block text-sm font-medium text-gray-700">Prodi <span
+                            class="text-red-600">*</span></label>
+                    <select class="mt-1 form-control" wire:model.lazy='study_id'>
+                        <option value="">Pilih prodi</option>
+                        @foreach ($studys as $key_study => $study)
+                            <option value="{{ $key_study }}">{{ $study }}</option>
+                        @endforeach
+                    </select>
+                    @error('study_id')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label for="category_question_id" class="block text-sm font-medium text-gray-700">Kategori Soal <span
+                            class="text-red-600">*</span></label>
+                    <select class="mt-1 form-control" wire:model.lazy='category_question_id'>
+                        <option value="">Pilih kategori soal</option>
+                        @foreach ($category_questions as $key_category_question => $category_question)
+                            <option value="{{ $category_question->id }}">{{ $category_question->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('category_question_id')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
                 <div class="mb-4">
                     <label for="topic_id" class="block text-sm font-medium text-gray-700">Topik Soal <span
                             class="text-red-600">*</span></label>

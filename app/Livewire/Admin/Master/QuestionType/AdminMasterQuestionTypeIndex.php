@@ -34,10 +34,10 @@ class AdminMasterQuestionTypeIndex extends Component
         // dd(Auth::user()?->company);
     }
 
-    public function hydrate ()
-    {
-        $this->resetPage();
-    }
+    // public function hydrate ()
+    // {
+    //     $this->resetPage();
+    // }
 
     public function openModal()
     {
