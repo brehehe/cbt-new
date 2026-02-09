@@ -135,7 +135,7 @@
             <!-- Grid Nomor Soal -->
             <div class="p-4 overflow-y-auto" style="height: calc(100vh - 350px); min-height: 300px;">
                 <div class="grid grid-cols-7 gap-2">
-                    @foreach ($questionNavigations['numbers'] as $key => $detail)
+                    @foreach (($questionNavigations['numbers'] ?? []) as $key => $detail)
                         @php
                             $isCurrent = $questionNavigationId === $detail['id'];
                             $isAnswered = $detail['timetable_answer_id'];
