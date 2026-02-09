@@ -887,19 +887,21 @@ class AdminExamDetailIndex extends Component
             $this->images = collect(json_decode($images ?? '[]', true));
             $this->number = 1;
             $this->timetable_answer_id = $firstQuestion->timetable_answer_id;
-        }
-            $answers = $firstQuestion->timetableQuestion
-                ->answers()
-                ->orderBy('order', 'asc')
-                ->get();
+            $this->question_answers = [];
+            if ($firstQuestion->timetableQuestion) {
+                $answers = $firstQuestion->timetableQuestion
+                    ->answers()
+                    ->orderBy('order', 'asc')
+                    ->get();
 
-            foreach ($answers as $index => $answer) {
-                $this->question_answers[] = [
-                    'id'       => $answer->id,
-                    'alphabet' => chr(64 + $index + 1),
-                    'context'  => $answer->context,
-                    'images'   => collect(json_decode($images, true)),
-                ];
+                foreach ($answers as $index => $answer) {
+                    $this->question_answers[] = [
+                        'id'       => $answer->id,
+                        'alphabet' => chr(64 + $index + 1),
+                        'context'  => $answer->context,
+                        'images'   => collect(json_decode($images, true)),
+                    ];
+                }
             }
 
             $this->refreshQuestionData();
@@ -1047,6 +1049,14 @@ class AdminExamDetailIndex extends Component
             $this->timetable_answer_id = $currentQuestion->timetable_answer_id ? (string) $currentQuestion->timetable_answer_id : null;
 
             $questionModel = $currentQuestion->timetableQuestion;
+            if (!$questionModel) {
+                $this->question = 'Tidak ada soal yang tersedia.';
+                $this->description = '';
+                $this->images = collect();
+                $this->question_answers = [];
+                return;
+            }
+
             $this->question = $questionModel->question;
             $this->description = $questionModel->description;
             $images = $questionModel->images;
