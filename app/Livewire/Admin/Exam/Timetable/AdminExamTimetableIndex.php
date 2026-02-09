@@ -128,6 +128,8 @@ class AdminExamTimetableIndex extends Component
                 $modulesQuestions = $query->get();
             }
 
+            dd($moduleQuestion);
+
             $UserTimetable = UserTimetable::create([
                 'user_id' => Auth::id(),
                 'timetable_id' => $timeTable->id,

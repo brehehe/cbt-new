@@ -881,13 +881,13 @@ class AdminExamDetailIndex extends Component
         if ($firstQuestion) {
             $this->questionNavigationId = $firstQuestion->id;
             $this->isMark = $firstQuestion->is_mark;
-            $this->question = $firstQuestion->timetableQuestion->question;
-            $this->description = $firstQuestion->timetableQuestion->description;
-            $images = $firstQuestion->timetableQuestion->images;
-            $this->images = collect(json_decode($images, true));
+            $this->question = $firstQuestion->timetableQuestion?->question;
+            $this->description = $firstQuestion->timetableQuestion?->description;
+            $images = $firstQuestion->timetableQuestion?->images;
+            $this->images = collect(json_decode($images ?? '[]', true));
             $this->number = 1;
             $this->timetable_answer_id = $firstQuestion->timetable_answer_id;
-
+        }
             $answers = $firstQuestion->timetableQuestion
                 ->answers()
                 ->orderBy('order', 'asc')
