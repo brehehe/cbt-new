@@ -113,6 +113,8 @@ class Timetable extends Model
                             $now = now();
                             $questionUpserts = [];
 
+                            $companyId = $timetableModule->company_id ?? auth()->user()?->company_id;
+
                             foreach ($moduleQuestions as $moduleQuestion) {
                                 $question = $moduleQuestion->question;
                                 if (!$question) {
@@ -122,6 +124,7 @@ class Timetable extends Model
                                 $questionUpserts[] = [
                                     'timetable_module_id' => $timetableModule->id,
                                     'question_id' => $question->id,
+                                    'company_id' => $companyId,
                                     'study_id' => $question->study_id,
                                     'user_id' => $question->user_id,
                                     'topic_id' => $question->topic_id,
@@ -145,6 +148,7 @@ class Timetable extends Model
                                     $questionUpserts,
                                     ['timetable_module_id', 'question_id'],
                                     [
+                                        'company_id',
                                         'study_id',
                                         'user_id',
                                         'topic_id',
@@ -170,6 +174,7 @@ class Timetable extends Model
 
                                 $answerUpserts = [];
                                 foreach ($moduleQuestions as $moduleQuestion) {
+
                                     $question = $moduleQuestion->question;
                                     if (!$question) {
                                         continue;
@@ -184,6 +189,7 @@ class Timetable extends Model
                                         $answerUpserts[] = [
                                             'timetable_question_id' => $timetableQuestion->id,
                                             'answer_id' => $answer->id,
+                                            'company_id' => $companyId,
                                             'alphabet' => $answer->alphabet,
                                             'context' => $answer->context,
                                             'images' => $answer->images,
@@ -198,7 +204,7 @@ class Timetable extends Model
                                     TimetableAnswer::upsert(
                                         $answerUpserts,
                                         ['timetable_question_id', 'answer_id'],
-                                        ['alphabet', 'context', 'images', 'is_correct', 'updated_at']
+                                        ['company_id', 'alphabet', 'context', 'images', 'is_correct', 'updated_at']
                                     );
                                 }
                             }
