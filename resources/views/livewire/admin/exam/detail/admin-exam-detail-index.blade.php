@@ -2,8 +2,12 @@
     @php
         use App\Models\User\UserModuleQuestion;
 
-        $first = UserModuleQuestion::where('id', '<', $questionNavigationId)->exists();
-        $last = UserModuleQuestion::where('id', '>', $questionNavigationId)->exists();
+        $first = $questionNavigationId
+            ? UserModuleQuestion::where('id', '<', $questionNavigationId)->exists()
+            : false;
+        $last = $questionNavigationId
+            ? UserModuleQuestion::where('id', '>', $questionNavigationId)->exists()
+            : false;
     @endphp
 
     <!-- Hidden elements untuk video recording -->
