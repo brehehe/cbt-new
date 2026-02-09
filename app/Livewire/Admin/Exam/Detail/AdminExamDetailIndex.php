@@ -1122,7 +1122,7 @@ class AdminExamDetailIndex extends Component
     {
         $answers = $this->getUserQuestions()->whereNotNull('timetable_answer_id')->count();
         $total = $this->getUserQuestions()->count();
-        $this->percentage = ($answers / $total) * 100;
+        $this->percentage = $total > 0 ? ($answers / $total) * 100 : 0;
     }
 
     private function handleSessionMessages()
