@@ -97,15 +97,15 @@
                     class="hidden mb-2 font-semibold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-600' : 'text-orange-600' }} lg:block">
                     Navigasi Soal</h3>
                 <div class="text-sm text-gray-600">
-                    <span>Total: {{ $questionNavigations['total'] }} soal</span>
+                    <span>Total: {{ $questionNavigations['total'] ?? 0 }} soal</span>
                     <div class="flex flex-wrap gap-2 mt-2 lg:space-x-4 lg:flex-nowrap">
                         <span
                             class="text-xs {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-600' : 'text-orange-600' }} lg:text-sm">Dijawab:
-                            {{ $questionNavigations['answered'] }}</span>
+                            {{ $questionNavigations['answered'] ?? 0 }}</span>
                         <span class="text-xs text-yellow-600 lg:text-sm">Ditandai:
-                            {{ $questionNavigations['marked'] }}</span>
+                            {{ $questionNavigations['marked'] ?? 0 }}</span>
                         <span class="text-xs text-red-600 lg:text-sm">Belum:
-                            {{ $questionNavigations['unanswered'] }}</span>
+                            {{ $questionNavigations['unanswered'] ?? 0 }}</span>
                     </div>
                 </div>
             </div>
