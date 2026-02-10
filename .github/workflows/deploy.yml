@@ -1,0 +1,135 @@
+name: Deploy CBT Application
+
+on:
+  push:
+    branches:
+      - main
+      - production
+  workflow_dispatch:
+    inputs:
+      target_instance:
+        description: 'Target instance (leave empty for all)'
+        required: false
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          TARGET_INSTANCE: ${{ inputs.target_instance }}
+        run: |
+          ssh $SERVER_USER@$SERVER_HOST << 'ENDSSH'
+            set -e
+
+            echo "=== CBT Deployment Started ==="
+
+            # Pull latest code to source directory
+            cd /var/www/html/cbt-new
+            git pull origin main
+
+            # Determine which instances to update
+            if [ -z "$TARGET_INSTANCE" ]; then
+              instances=$(find /var/www/html -maxdepth 1 -type d -name "*_procbt_id")
+              echo "Updating all instances..."
+            else
+              instances="/var/www/html/$TARGET_INSTANCE"
+              echo "Updating specific instance: $TARGET_INSTANCE"
+            fi
+
+            # Update each instance
+            for instance_dir in $instances; do
+              instance_name=$(basename "$instance_dir")
+              echo ""
+              echo "=== Updating: $instance_name ==="
+
+              # Sync code (excluding .env and storage)
+              rsync -av --exclude='.env' \
+                --exclude='storage' \
+                --exclude='node_modules' \
+                --exclude='vendor' \
+                /var/www/html/cbt-new/ $instance_dir/
+
+              cd $instance_dir
+
+              # Install dependencies
+              echo "Installing Composer dependencies..."
+              sudo -u procbt composer install --optimize-autoloader --no-interaction
+
+              echo "Installing NPM dependencies..."
+              sudo -u procbt npm install
+
+              # Build assets
+              echo "Building frontend assets..."
+              sudo -u procbt npm run build
+
+              # Run migrations
+              echo "Running migrations..."
+              sudo -u procbt php artisan migrate --force
+
+              # Seed database if empty
+              company_count=$(sudo -u procbt php artisan tinker --execute="echo App\Models\Company\Company::count();" 2>/dev/null || echo "0")
+              if [ "$company_count" = "0" ]; then
+                echo "Seeding database..."
+                sudo -u procbt php artisan db:seed --force || echo "Partial seed OK"
+              fi
+
+              # Publish vendor assets
+              echo "Publishing vendor assets..."
+              sudo -u procbt php artisan vendor:publish --tag=tallstackui.config --force 2>/dev/null || true
+              sudo -u procbt php artisan livewire:publish --force 2>/dev/null || true
+
+              # Storage link
+              sudo -u procbt php artisan storage:link 2>/dev/null || echo "Link exists"
+
+              # Clear and rebuild cache
+              echo "Optimizing application..."
+              sudo -u procbt php artisan config:clear
+              sudo -u procbt php artisan cache:clear
+              sudo -u procbt php artisan config:cache
+              sudo -u procbt php artisan route:cache
+              sudo -u procbt php artisan view:cache 2>/dev/null || true
+
+              # Restart workers
+              worker_name="cbt-${instance_name}-worker"
+              echo "Restarting workers..."
+              sudo supervisorctl restart ${worker_name}:* 2>/dev/null || echo "Worker restart queued"
+
+              echo "✓ Updated: $instance_name"
+            done
+
+            # Reload Nginx
+            echo ""
+            echo "Reloading Nginx..."
+            sudo systemctl reload nginx
+
+            echo ""
+            echo "=== Deployment Completed Successfully ==="
+          ENDSSH
+
+      - name: Deployment notification
+        if: always()
+        run: |
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "✅ Deployment successful!"
+          else
+            echo "❌ Deployment failed!"
+            exit 1
+          fi

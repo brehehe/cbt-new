@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Livewire Method Call</title>
+</head>
+<body>
+    <h1>Test Livewire Method Call</h1>
+    <div id="status">Ready to test...</div>
+
+    <button onclick="testLivewireCall()">Test Livewire Call</button>
+
+    <script>
+        function testLivewireCall() {
+            console.log('Testing Livewire method call...');
+
+            // Test 1: Check if Livewire is available
+            if (!window.Livewire) {
+                alert('❌ window.Livewire not available');
+                return;
+            }
+            console.log('✅ window.Livewire available');
+
+            // Test 2: Find wire:id element
+            const wireElement = document.querySelector('[wire\\:id]');
+            if (!wireElement) {
+                alert('❌ No wire:id element found');
+                return;
+            }
+            console.log('✅ wire:id element found:', wireElement);
+
+            // Test 3: Get wire:id attribute
+            const wireId = wireElement.getAttribute('wire:id');
+            console.log('✅ wire:id:', wireId);
+
+            // Test 4: Find Livewire component
+            const component = Livewire.find(wireId);
+            if (!component) {
+                alert('❌ Livewire component not found');
+                return;
+            }
+            console.log('✅ Livewire component found:', component);
+
+            // Test 5: Check if method exists
+            if (typeof component.call !== 'function') {
+                alert('❌ component.call is not a function');
+                return;
+            }
+            console.log('✅ component.call is available');
+
+            alert('✅ All tests passed! Livewire method call should work.');
+        }
+    </script>
+</body>
+</html>

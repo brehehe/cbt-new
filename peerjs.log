@@ -1,0 +1,29 @@
+✅ PeerJS Server started on port 9000
+   Path: /peerjs
+   Access via Nginx HTTPS proxy: https://peer.toti.my.id/peerjs
+node:events:486
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use 0.0.0.0:9000
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at node:net:2206:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+Emitted 'error' event at:
+    at $9cd36c423c7aa5b9$export$f47674b57e51ee3b.<anonymous> (file:///var/www/html/cbt-new-streaming/node_modules/peer/dist/module.mjs:555:13)
+    at $9cd36c423c7aa5b9$export$f47674b57e51ee3b.emit (node:events:508:28)
+    at $9cd36c423c7aa5b9$export$f47674b57e51ee3b._onSocketError (file:///var/www/html/cbt-new-streaming/node_modules/peer/dist/module.mjs:313:14)
+    at WebSocketServer.<anonymous> (file:///var/www/html/cbt-new-streaming/node_modules/peer/dist/module.mjs:270:18)
+    at WebSocketServer.emit (node:events:508:28)
+    at Server.emit (node:events:508:28)
+    at emitErrorNT (node:net:1976:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:89:21) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 9000
+}
+
+Node.js v24.12.0

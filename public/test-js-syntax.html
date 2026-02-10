@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Syntax Test</title>
+</head>
+<body>
+    <h1>JavaScript Syntax Test</h1>
+    <div id="status">Testing...</div>
+
+    <script>
+        console.log('Testing JavaScript syntax...');
+
+        // Test basic functionality
+        function testBasicJS() {
+            console.log('Basic JS works');
+            return true;
+        }
+
+        // Test timer
+        function testTimer() {
+            let count = 3;
+            const interval = setInterval(() => {
+                console.log('Timer:', count);
+                count--;
+                if (count <= 0) {
+                    clearInterval(interval);
+                    console.log('Timer complete');
+                }
+            }, 1000);
+        }
+
+        // Test camera access (will ask for permission)
+        async function testCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                console.log('Camera access granted:', stream);
+
+                // Stop the stream immediately for testing
+                stream.getTracks().forEach(track => track.stop());
+                return true;
+            } catch (error) {
+                console.error('Camera access failed:', error);
+                return false;
+            }
+        }
+
+        // Run tests
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, running tests...');
+
+            testBasicJS();
+            testTimer();
+
+            document.getElementById('status').innerHTML = `
+                <p>✅ Basic JavaScript: Working</p>
+                <p>✅ Timer: Working</p>
+                <p>🔄 Camera: Click button to test</p>
+                <button onclick="testCamera().then(result => alert('Camera test: ' + (result ? 'Success' : 'Failed')))">
+                    Test Camera
+                </button>
+            `;
+        });
+    </script>
+</body>
+</html>

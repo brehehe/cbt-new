@@ -1,0 +1,9 @@
+{
+  "ssl": true,
+  "sites": {
+    "cbt-test": {
+      "ssl": true,
+      "secure": true
+    }
+  }
+}
