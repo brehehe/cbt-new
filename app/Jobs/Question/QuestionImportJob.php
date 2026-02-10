@@ -41,85 +41,103 @@ class QuestionImportJob implements ShouldQueue
     {
         //
         try {
-            foreach ($this->collections as $key => $value) {
+            foreach ($this->collections as $key => $row) {
+                $value = $this->normalizeRow($row);
+                if ($value === null) {
+                    Log::warning('Data soal tidak bisa diproses, format baris tidak valid', [
+                        'collection' => $row,
+                    ]);
+                    continue;
+                }
                 if ($key == 0) {
                     continue;
                 }
 
-                if (!$value[0] || !$value[1] || !$value[4] || !$value[5] || !$value[6]) {
+                $studyName = $this->valueAt($value, 0);
+                $topicName = $this->valueAt($value, 1);
+                $typeName = $this->valueAt($value, 4);
+                $questionText = $this->valueAt($value, 5);
+                $description = $this->valueAt($value, 6);
+                $categoryName = $this->valueAt($value, 13);
+
+                if (!$studyName || !$topicName || !$typeName || !$questionText) {
                     Log::warning("Data soal tidak bisa masuk, ada field yang kosong", [
                         'collection' => $value,
                     ]);
                     continue;
                 }
 
-                $question_type = QuestionType::withoutGlobalScopes()->whereLike('name', "%$value[4]%")->first();
+                $question_type = QuestionType::withoutGlobalScopes()->whereLike('name', "%{$typeName}%")->first();
 
                 if (!$question_type) {
-                     Log::warning("Data soal tidak bisa masuk, karena Tipe Soal tidak ditemukan", [
+                    Log::warning("Data soal tidak bisa masuk, karena Tipe Soal tidak ditemukan", [
                         'collection' => $value,
                     ]);
                     continue;
-                };
+                }
 
-                for ($j = 8; $j < 11; $j++) {
-                    if (!$value[$j]) {
+                for ($j = 7; $j < 11; $j++) {
+                    if (!$this->valueAt($value, $j)) {
                         Log::warning("Data soal tidak bisa masuk, karena jawaban kosong ", [
                             'collection' => $value,
                         ]);
-                        continue;
+                        continue 2;
                     }
                 }
 
-                $study = Study::withoutGlobalScopes()->whereLike('name', "%{$value[0]}%")->first();
+                $study = Study::withoutGlobalScopes()->whereLike('name', "%{$studyName}%")->first();
 
-                if (!$study && $value[0]) {
+                if (!$study && $studyName) {
                     $study = Study::create([
                         'company_id' => $this->user?->company?->id,
-                        'name'       => $value[0]
+                        'name'       => $studyName
                     ]);
                 }
 
-                $topic = $study?->topics()->withoutGlobalScopes()->whereLike('name', "%{$value[1]}%")->first();
+                $topic = $study?->topics()->withoutGlobalScopes()->whereLike('name', "%{$topicName}%")->first();
 
-                if (!$topic && $value[1]) {
+                if (!$topic && $topicName) {
                     $topic = Topic::create([
                         'company_id' => $this->user?->company?->id,
                         'study_id'   => $study?->id,
-                        'name'       => $value[1]
+                        'name'       => $topicName
                     ]);
                 }
 
-                $material_category = $topic?->materialCategories()->withoutGlobalScopes()->whereLike('name', "%$value[2]%")->first();
+                $materialCategoryName = $this->valueAt($value, 2);
+                $material_category = $topic?->materialCategories()->withoutGlobalScopes()->whereLike('name', "%{$materialCategoryName}%")->first();
 
-                if (!$material_category && $value[2]) {
+                if (!$material_category && $materialCategoryName) {
                     $material_category = MaterialCategory::create([
                         'company_id' => $this->user?->company?->id,
                         'topic_id'   => $topic?->id,
-                        'name'       => $value[2]
+                        'name'       => $materialCategoryName
                     ]);
                 }
 
-                $material = $material_category?->materials()->withoutGlobalScopes()->whereLike('name', "%$value[3]%")->first();
+                $materialName = $this->valueAt($value, 3);
+                $material = $material_category?->materials()->withoutGlobalScopes()->whereLike('name', "%{$materialName}%")->first();
 
-                if (!$material && $value[3]) {
+                if (!$material && $materialName) {
                     Material::create([
                         'company_id'           => $this->user?->company?->id,
                         'topic_id'             => $topic?->id,
                         'material_category_id' => $material_category?->id,
                         'level'                => 1,
-                        'name'                 => $value[3],
+                        'name'                 => $materialName,
                     ]);
                 }
 
-                $category_question = CategoryQuestion::withoutGlobalScopes()->whereLike('name', "%$value[5]%")->first();
-
-                if (!$category_question && $value[5]) {
-                    CategoryQuestion::create([
-                        'company_id' => $this->user?->company?->id,
-                        'name'       => $value[5]
-                    ]);
-                };
+                $categoryQuestion = null;
+                if ($categoryName) {
+                    $categoryQuestion = CategoryQuestion::withoutGlobalScopes()->whereLike('name', "%{$categoryName}%")->first();
+                    if (!$categoryQuestion) {
+                        $categoryQuestion = CategoryQuestion::create([
+                            'company_id' => $this->user?->company?->id,
+                            'name'       => $categoryName
+                        ]);
+                    }
+                }
 
                 $request_question = [
                     'user_id'              => $this->user?->id,
@@ -129,11 +147,11 @@ class QuestionImportJob implements ShouldQueue
                     'material_category_id' => $material_category?->id,
                     'material_id'          => $material?->id,
                     'question_type_id'     => $question_type?->id,
-                    'category_question_id' => $category_question?->id,
-                    'question'             => $value[6],
+                    'category_question_id' => $categoryQuestion?->id,
+                    'question'             => $questionText,
                     'images'               => null,
                     'old_images'           => null,
-                    'description'          => $value[7],
+                    'description'          => $description,
                     'weight_correct'       => null,
                     'weight_incorrect'     => null,
                 ];
@@ -143,15 +161,17 @@ class QuestionImportJob implements ShouldQueue
                     throw new Exception("Ada kesalahaan saat QuestionImportJob => QuestionService => updateOrCreate", 500);
                 }
 
-                for ($i = 8; $i <= 12; $i++) {
-                    if (!$value[$i]) continue;
+                $correctKey = $this->valueAt($value, 12);
+                for ($i = 7; $i <= 11; $i++) {
+                    $answerText = $this->valueAt($value, $i);
+                    if (!$answerText) continue;
                     $request_answer = [
                         'company_id' => $this->user?->company?->id,
                         'alphabet'   => null,
-                        'context'    => $value[$i],
+                        'context'    => $answerText,
                         'images'     => null,
                         'old_images' => null,
-                        'is_correct' => $i == $this->letterToValue($value[12]) ? true : false,
+                        'is_correct' => $i == $this->letterToValue($correctKey) ? true : false,
                     ];
 
                     $answer = app(AnswerService::class)->updateOrCreate($question, $request_answer);
@@ -174,12 +194,55 @@ class QuestionImportJob implements ShouldQueue
     function letterToValue(?string $ch): ?int
     {
         static $map = [
-            'A'=>8,
-            'B'=>9,
-            'C'=>10,
-            'D'=>11,
-            'E'=>12
+            'A'=>7,
+            'B'=>8,
+            'C'=>9,
+            'D'=>10,
+            'E'=>11
         ];
         return $map[strtoupper(trim((string)$ch))] ?? null;
+    }
+
+    private function valueAt($row, int $index): ?string
+    {
+        if ($row instanceof \Illuminate\Support\Collection) {
+            $row = $row->toArray();
+        } elseif ($row instanceof \Traversable || $row instanceof \ArrayAccess) {
+            $row = collect($row)->toArray();
+        }
+
+        if (!is_array($row) || !array_key_exists($index, $row)) {
+            return null;
+        }
+
+        $value = $row[$index];
+        if (is_string($value)) {
+            $value = trim($value);
+        }
+
+        return $value === '' ? null : $value;
+    }
+
+    private function normalizeRow($row): ?array
+    {
+        if ($row instanceof \Illuminate\Support\Collection) {
+            $row = $row->toArray();
+        } elseif ($row instanceof \Traversable || $row instanceof \ArrayAccess) {
+            $row = collect($row)->toArray();
+        } elseif (!is_array($row)) {
+            return null;
+        }
+
+        // Jika kolom soal kosong (index 5) tapi kolom setelahnya terisi, geser ke kiri
+        if (array_key_exists(5, $row) && ($row[5] === null || $row[5] === '') && array_key_exists(6, $row)) {
+            array_splice($row, 5, 1);
+        }
+
+        // Pastikan minimal 14 kolom (Kategori Soal opsional di index 13)
+        if (count($row) < 14) {
+            $row = array_pad($row, 14, null);
+        }
+
+        return $row;
     }
 }
