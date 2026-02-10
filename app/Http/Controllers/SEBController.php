@@ -230,7 +230,7 @@ class SEBController extends Controller
 
         // Quit settings
         $this->addPlistBool($dict, 'allowQuit', $allowQuit);
-        $this->addPlistBool($dict, 'ignoreExitKeys', true);
+        $this->addPlistBool($dict, 'ignoreExitKeys', true); 
         $this->addPlistString($dict, 'hashedQuitPassword', hash('sha256', $quitPassword));
         $this->addPlistString($dict, 'quitURL', '');
         $this->addPlistBool($dict, 'quitURLConfirm', true);
