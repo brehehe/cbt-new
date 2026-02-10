@@ -104,7 +104,7 @@ class QuestionImportJob implements ShouldQueue
                     ]);
                 }
 
-                $materialCategoryName = $this->valueAt($value, 3);
+                $materialCategoryName = $this->valueAt($value, 2);
                 $material_category = $topic?->materialCategories()->withoutGlobalScopes()->whereLike('name', "%{$materialCategoryName}%")->first();
 
                 if (!$material_category && $materialCategoryName) {
