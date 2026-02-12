@@ -76,14 +76,21 @@ class AdminExamTimetableIndex extends Component
 
             $transactionModule = $timeTable->timetableModule;
 
+            $questionPickType = $transactionModule?->module?->question_pick_type ?? 'manual';
             $categorySettings = $transactionModule?->module?->category_question_settings ?? [];
+            $topicSettings = $transactionModule?->module?->topic_question_settings ?? [];
+
             if (is_string($categorySettings)) {
                 $categorySettings = json_decode($categorySettings, true) ?? [];
             }
 
-            if (!empty($categorySettings)) {
-                $modulesQuestions = collect();
+            if (is_string($topicSettings)) {
+                $topicSettings = json_decode($topicSettings, true) ?? [];
+            }
 
+            $modulesQuestions = collect();
+
+            if ($questionPickType === 'category' && !empty($categorySettings)) {
                 foreach ($categorySettings as $categoryId => $settings) {
                     foreach (['default', 'easy', 'medium', 'hard'] as $difficulty) {
                         $take = (int) ($settings[$difficulty] ?? 0);
@@ -114,7 +121,40 @@ class AdminExamTimetableIndex extends Component
                         $modulesQuestions = $modulesQuestions->merge($query->limit($take)->get());
                     }
                 }
-            } else {
+            } elseif ($questionPickType === 'topic' && !empty($topicSettings)) {
+                foreach ($topicSettings as $topicId => $settings) {
+                    foreach (['default', 'easy', 'medium', 'hard'] as $difficulty) {
+                        $take = (int) ($settings[$difficulty] ?? 0);
+                        if ($take <= 0) {
+                            continue;
+                        }
+
+                        $query = TimetableQuestion::withoutGlobalScope('user_scope')
+                            ->select('id', 'study_id')
+                            ->where('timetable_module_id', $transactionModule->id)
+                            ->where('topic_id', $topicId);
+
+                        if ($difficulty === 'default') {
+                            $query->where(function ($q) {
+                                $q->where('difficulty', 'default')
+                                    ->orWhereNull('difficulty');
+                            });
+                        } else {
+                            $query->where('difficulty', $difficulty);
+                        }
+
+                        if ($transactionModule->random_question) {
+                            $query->inRandomOrder();
+                        } else {
+                            $query->orderBy('id');
+                        }
+
+                        $modulesQuestions = $modulesQuestions->merge($query->limit($take)->get());
+                    }
+                }
+            }
+
+            if ($modulesQuestions->isEmpty()) {
                 $query = TimetableQuestion::withoutGlobalScope('user_scope')
                     ->select('id', 'study_id')
                     ->where('timetable_module_id', $transactionModule->id);

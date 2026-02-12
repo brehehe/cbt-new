@@ -18,6 +18,7 @@ class Module extends Model
     protected $guarded = ['id'];
     protected $casts = [
         'category_question_settings' => 'array',
+        'topic_question_settings' => 'array',
     ];
 
     public function company()

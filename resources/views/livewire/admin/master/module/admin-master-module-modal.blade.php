@@ -37,6 +37,18 @@
                         @enderror
                     </div>
                     <div class="mb-4">
+                        <label for="question_pick_type" class="block text-sm font-medium text-gray-700">Tipe Pengambilan Soal <span
+                                class="text-red-600">*</span></label>
+                        <select id="question_pick_type" class="mt-1 form-control" wire:model.live="question_pick_type">
+                            <option value="manual">Manual</option>
+                            <option value="category">Kategori Soal</option>
+                            <option value="topic">Topik</option>
+                        </select>
+                        @error('question_pick_type')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div class="mb-4">
                         <label for="name" class="block text-sm font-medium text-gray-700">Nama Modul Soal <span
                                 class="text-red-600">*</span></label>
                         <input type="text" id="name" wire:model.defer="name" placeholder="Nama Modul Soal"
@@ -125,87 +137,168 @@
                         @endif
                     </div>
                 </div>
-                <div class="mb-4">
-                    <div class="flex items-center justify-between mb-2">
-                        <label class="block text-sm font-medium text-gray-700">Pengaturan Kategori Soal</label>
-                        <span class="text-sm text-gray-600">
-                            Total soal: <span class="font-semibold text-blue-600">{{ $this->totalQuestions }}</span>
-                        </span>
-                    </div>
-                    <div class="overflow-x-auto border rounded-lg">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th rowspan="2">Pilih</th>
-                                    <th rowspan="2">Kategori Soal</th>
-                                    <th colspan="4">Difficulty</th>
-                                </tr>
-                                <tr>
-                                    <th>Default</th>
-                                    <th>Easy</th>
-                                    <th>Medium</th>
-                                    <th>Hard</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($category_questions as $category_question)
-                                    @php
-                                        $settings = $category_question_settings[$category_question->id] ?? ['enabled' => false];
-                                        $limits = $category_question_limits[$category_question->id] ?? ['default' => 0, 'easy' => 0, 'medium' => 0, 'hard' => 0];
-                                    @endphp
+                @if ($question_pick_type === 'category')
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-sm font-medium text-gray-700">Pengaturan Kategori Soal</label>
+                            <span class="text-sm text-gray-600">
+                                Total soal: <span class="font-semibold text-blue-600">{{ $this->totalQuestions }}</span>
+                            </span>
+                        </div>
+                        <div class="overflow-x-auto border rounded-lg">
+                            <table class="table">
+                                <thead>
                                     <tr>
-                                        <td class="center">
-                                            <input type="checkbox"
-                                                wire:model.live="category_question_settings.{{ $category_question->id }}.enabled">
-                                        </td>
-                                        <td>{{ $category_question->name }}</td>
-                                        <td class="center">
-                                            <input type="number" min="0"
-                                                class="mt-1 form-control w-24 text-center"
-                                                wire:model.live="category_question_settings.{{ $category_question->id }}.default"
-                                                max="{{ $limits['default'] ?? 0 }}"
-                                                @disabled(!($settings['enabled'] ?? false) || ($limits['default'] ?? 0) === 0)>
-                                            <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['default'] ?? 0 }}</div>
-                                        </td>
-                                        <td class="center">
-                                            <input type="number" min="0"
-                                                class="mt-1 form-control w-24 text-center"
-                                                wire:model.live="category_question_settings.{{ $category_question->id }}.easy"
-                                                max="{{ $limits['easy'] ?? 0 }}"
-                                                @disabled(!($settings['enabled'] ?? false) || ($limits['easy'] ?? 0) === 0)>
-                                            <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['easy'] ?? 0 }}</div>
-                                        </td>
-                                        <td class="center">
-                                            <input type="number" min="0"
-                                                class="mt-1 form-control w-24 text-center"
-                                                wire:model.live="category_question_settings.{{ $category_question->id }}.medium"
-                                                max="{{ $limits['medium'] ?? 0 }}"
-                                                @disabled(!($settings['enabled'] ?? false) || ($limits['medium'] ?? 0) === 0)>
-                                            <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['medium'] ?? 0 }}</div>
-                                        </td>
-                                        <td class="center">
-                                            <input type="number" min="0"
-                                                class="mt-1 form-control w-24 text-center"
-                                                wire:model.live="category_question_settings.{{ $category_question->id }}.hard"
-                                                max="{{ $limits['hard'] ?? 0 }}"
-                                                @disabled(!($settings['enabled'] ?? false) || ($limits['hard'] ?? 0) === 0)>
-                                            <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['hard'] ?? 0 }}</div>
-                                        </td>
+                                        <th rowspan="2">Pilih</th>
+                                        <th rowspan="2">Kategori Soal</th>
+                                        <th colspan="4">Difficulty</th>
                                     </tr>
-                                    <!-- <tr>
-                                        <td colspan="6" class="text-xs text-gray-500">
-                                            Soal tanpa difficulty: {{ $limits['default'] ?? 0 }}
-                                        </td>
-                                    </tr> -->
-                                @empty
                                     <tr>
-                                        <td colspan="6" class="no-data">Tidak ada kategori soal</td>
+                                        <th>Default</th>
+                                        <th>Easy</th>
+                                        <th>Medium</th>
+                                        <th>Hard</th>
                                     </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @forelse ($category_questions as $category_question)
+                                        @php
+                                            $settings = $category_question_settings[$category_question->id] ?? ['enabled' => false];
+                                            $limits = $category_question_limits[$category_question->id] ?? ['default' => 0, 'easy' => 0, 'medium' => 0, 'hard' => 0];
+                                        @endphp
+                                        <tr>
+                                            <td class="center">
+                                                <input type="checkbox"
+                                                    wire:model.live="category_question_settings.{{ $category_question->id }}.enabled">
+                                            </td>
+                                            <td>{{ $category_question->name }}</td>
+                                            <td class="center">
+                                                <input type="number" min="0"
+                                                    class="mt-1 form-control w-24 text-center"
+                                                    wire:model.live="category_question_settings.{{ $category_question->id }}.default"
+                                                    max="{{ $limits['default'] ?? 0 }}"
+                                                    @disabled(!($settings['enabled'] ?? false) || ($limits['default'] ?? 0) === 0)>
+                                                <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['default'] ?? 0 }}</div>
+                                            </td>
+                                            <td class="center">
+                                                <input type="number" min="0"
+                                                    class="mt-1 form-control w-24 text-center"
+                                                    wire:model.live="category_question_settings.{{ $category_question->id }}.easy"
+                                                    max="{{ $limits['easy'] ?? 0 }}"
+                                                    @disabled(!($settings['enabled'] ?? false) || ($limits['easy'] ?? 0) === 0)>
+                                                <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['easy'] ?? 0 }}</div>
+                                            </td>
+                                            <td class="center">
+                                                <input type="number" min="0"
+                                                    class="mt-1 form-control w-24 text-center"
+                                                    wire:model.live="category_question_settings.{{ $category_question->id }}.medium"
+                                                    max="{{ $limits['medium'] ?? 0 }}"
+                                                    @disabled(!($settings['enabled'] ?? false) || ($limits['medium'] ?? 0) === 0)>
+                                                <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['medium'] ?? 0 }}</div>
+                                            </td>
+                                            <td class="center">
+                                                <input type="number" min="0"
+                                                    class="mt-1 form-control w-24 text-center"
+                                                    wire:model.live="category_question_settings.{{ $category_question->id }}.hard"
+                                                    max="{{ $limits['hard'] ?? 0 }}"
+                                                    @disabled(!($settings['enabled'] ?? false) || ($limits['hard'] ?? 0) === 0)>
+                                                <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['hard'] ?? 0 }}</div>
+                                            </td>
+                                        </tr>
+                                        <!-- <tr>
+                                            <td colspan="6" class="text-xs text-gray-500">
+                                                Soal tanpa difficulty: {{ $limits['default'] ?? 0 }}
+                                            </td>
+                                        </tr> -->
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="no-data">Tidak ada kategori soal</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
+                @endif
+
+                @if ($question_pick_type === 'topic')
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-sm font-medium text-gray-700">Pengaturan Topik Soal</label>
+                            <span class="text-sm text-gray-600">
+                                Total soal: <span class="font-semibold text-blue-600">{{ $this->totalTopicQuestions }}</span>
+                            </span>
+                        </div>
+                        <div class="overflow-x-auto border rounded-lg">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2">Pilih</th>
+                                        <th rowspan="2">Topik</th>
+                                        <th colspan="4">Difficulty</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Default</th>
+                                        <th>Easy</th>
+                                        <th>Medium</th>
+                                        <th>Hard</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($topics as $topic)
+                                        @php
+                                            $settings = $topic_question_settings[$topic->id] ?? ['enabled' => false];
+                                            $limits = $topic_question_limits[$topic->id] ?? ['default' => 0, 'easy' => 0, 'medium' => 0, 'hard' => 0];
+                                        @endphp
+                                        <tr>
+                                            <td class="center">
+                                                <input type="checkbox"
+                                                    wire:model.live="topic_question_settings.{{ $topic->id }}.enabled">
+                                            </td>
+                                            <td>{{ $topic->name }}</td>
+                                            <td class="center">
+                                                <input type="number" min="0"
+                                                    class="mt-1 form-control w-24 text-center"
+                                                    wire:model.live="topic_question_settings.{{ $topic->id }}.default"
+                                                    max="{{ $limits['default'] ?? 0 }}"
+                                                    @disabled(!($settings['enabled'] ?? false) || ($limits['default'] ?? 0) === 0)>
+                                                <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['default'] ?? 0 }}</div>
+                                            </td>
+                                            <td class="center">
+                                                <input type="number" min="0"
+                                                    class="mt-1 form-control w-24 text-center"
+                                                    wire:model.live="topic_question_settings.{{ $topic->id }}.easy"
+                                                    max="{{ $limits['easy'] ?? 0 }}"
+                                                    @disabled(!($settings['enabled'] ?? false) || ($limits['easy'] ?? 0) === 0)>
+                                                <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['easy'] ?? 0 }}</div>
+                                            </td>
+                                            <td class="center">
+                                                <input type="number" min="0"
+                                                    class="mt-1 form-control w-24 text-center"
+                                                    wire:model.live="topic_question_settings.{{ $topic->id }}.medium"
+                                                    max="{{ $limits['medium'] ?? 0 }}"
+                                                    @disabled(!($settings['enabled'] ?? false) || ($limits['medium'] ?? 0) === 0)>
+                                                <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['medium'] ?? 0 }}</div>
+                                            </td>
+                                            <td class="center">
+                                                <input type="number" min="0"
+                                                    class="mt-1 form-control w-24 text-center"
+                                                    wire:model.live="topic_question_settings.{{ $topic->id }}.hard"
+                                                    max="{{ $limits['hard'] ?? 0 }}"
+                                                    @disabled(!($settings['enabled'] ?? false) || ($limits['hard'] ?? 0) === 0)>
+                                                <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['hard'] ?? 0 }}</div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="no-data">Tidak ada topik soal</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
 

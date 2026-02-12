@@ -40,7 +40,7 @@ class AdminMasterQuestionUpdate extends Component
 
     public function render()
     {
-        $answers = $this->get_question->answers()->orderBy('order', 'asc')->search($this->search)->get();
+        $answers = $this->get_question->answers()->orderBy('order', 'asc')->orderBy('alphabet', 'asc')->search($this->search)->get();
         return view('livewire.admin.master.question.admin-master-question-update', [
             'answers' => $answers
         ])->extends('layout.app')->section('content');
@@ -50,6 +50,7 @@ class AdminMasterQuestionUpdate extends Component
     {
         $this->get_question         = Question::findOrFail($id);
         $this->data_id              = $this->get_question?->id;
+        $this->normalizeAnswerAlphabet($this->data_id);
         $this->topic_id             = $this->get_question?->topic_id;
         $this->material_category_id = $this->get_question?->material_category_id;
         $this->material_id          = $this->get_question?->material_id;
@@ -93,6 +94,34 @@ class AdminMasterQuestionUpdate extends Component
         $this->study_id = $this->get_question?->study_id;
 
         // dd($this->old_images, $this->images);
+    }
+
+    private function normalizeAnswerAlphabet(string $questionId): void
+    {
+        $answers = Answer::withoutGlobalScope('user_scope')
+            ->where('question_id', $questionId)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $needsUpdate = $answers->contains(function ($answer) {
+            return empty($answer->alphabet) || (int) $answer->order <= 0;
+        });
+
+        if (!$needsUpdate) {
+            return;
+        }
+
+        foreach ($answers as $index => $answer) {
+            $order = $index + 1;
+            $alphabet = chr(64 + $order);
+
+            if ((int) $answer->order !== $order || $answer->alphabet !== $alphabet) {
+                $answer->forceFill([
+                    'order' => $order,
+                    'alphabet' => $alphabet,
+                ])->saveQuietly();
+            }
+        }
     }
 
     public function updated()
@@ -264,7 +293,7 @@ class AdminMasterQuestionUpdate extends Component
             $request = [
                 'id'         => $this->answer_id,
                 'company_id' => Auth::user()?->company?->id,
-                'alphabet'   => null,
+                'alphabet'   => $this->answer_alphabet,
                 'context'    => $this->answer_context,
                 'images'     => $this->answer_images,
                 'old_images' => $this->old_answer_images,
@@ -296,6 +325,7 @@ class AdminMasterQuestionUpdate extends Component
     {
         $result               = Answer::findOrFail($id);
         $this->answer_id      = $result?->id;
+        $this->answer_alphabet = $result?->alphabet;
         $this->answer_context = $result?->context;
         $this->answer_correct = $result?->is_correct;
         $this->openModal();
@@ -303,11 +333,9 @@ class AdminMasterQuestionUpdate extends Component
 
     public function toggleAnswerCorrect($id)
     {
-        $result               = Answer::findOrFail($id);
-        $this->answer_id      = $result?->id;
-        $this->answer_context = $result?->context;
-        $this->answer_correct = true;
-        $this->submitAnswer();
+        $answer = Answer::withoutGlobalScope('user_scope')->findOrFail($id);
+        $answer->is_correct = true;
+        $answer->save();
     }
 
     public function modalAnswerImage($id, $alphabet)

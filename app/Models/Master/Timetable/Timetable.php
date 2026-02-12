@@ -133,6 +133,7 @@ class Timetable extends Model
                                     'question_type_id' => $question->question_type_id,
                                     'category_question_id' => $question->category_question_id,
                                     'difficulty' => $question->difficulty ?? 'default',
+                                    'order' => $question->order ?? 0,
                                     'question' => $question->question,
                                     'images' => $question->images,
                                     'description' => $question->description,
@@ -157,6 +158,7 @@ class Timetable extends Model
                                         'question_type_id',
                                         'category_question_id',
                                         'difficulty',
+                                        'order',
                                         'question',
                                         'images',
                                         'description',
@@ -185,15 +187,34 @@ class Timetable extends Model
                                         continue;
                                     }
 
-                                    foreach ($question->answers as $answer) {
+                                    $answers = $question->answers
+                                        ->sortBy([
+                                            ['order', 'asc'],
+                                            ['created_at', 'asc'],
+                                            ['alphabet', 'asc'],
+                                        ])
+                                        ->values();
+
+                                    foreach ($answers as $index => $answer) {
+                                        $answerOrder = (int) ($answer->order ?? 0);
+                                        if ($answerOrder <= 0) {
+                                            $answerOrder = $index + 1;
+                                        }
+
+                                        $alphabet = $answer->alphabet;
+                                        if ($alphabet === null || $alphabet === '') {
+                                            $alphabet = chr(64 + $answerOrder);
+                                        }
+
                                         $answerUpserts[] = [
                                             'timetable_question_id' => $timetableQuestion->id,
                                             'answer_id' => $answer->id,
                                             'company_id' => $companyId,
-                                            'alphabet' => $answer->alphabet,
+                                            'alphabet' => $alphabet,
                                             'context' => $answer->context,
                                             'images' => $answer->images,
                                             'is_correct' => $answer->is_correct,
+                                            'order' => $answerOrder,
                                             'created_at' => $now,
                                             'updated_at' => $now,
                                         ];
@@ -204,7 +225,7 @@ class Timetable extends Model
                                     TimetableAnswer::upsert(
                                         $answerUpserts,
                                         ['timetable_question_id', 'answer_id'],
-                                        ['company_id', 'alphabet', 'context', 'images', 'is_correct', 'updated_at']
+                                        ['company_id', 'alphabet', 'context', 'images', 'is_correct', 'order', 'updated_at']
                                     );
                                 }
                             }

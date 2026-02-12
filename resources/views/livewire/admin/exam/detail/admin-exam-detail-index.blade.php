@@ -3,10 +3,10 @@
         use App\Models\User\UserModuleQuestion;
 
         $first = $questionNavigationId
-            ? UserModuleQuestion::where('id', '<', $questionNavigationId)->exists()
+            ? UserModuleQuestion::where('id', '<', $questionNavigationId)->where('user_timetable_id',$userTimetableId)->exists()
             : false;
         $last = $questionNavigationId
-            ? UserModuleQuestion::where('id', '>', $questionNavigationId)->exists()
+            ? UserModuleQuestion::where('id', '>', $questionNavigationId)->where('user_timetable_id',$userTimetableId)->exists()
             : false;
     @endphp
 

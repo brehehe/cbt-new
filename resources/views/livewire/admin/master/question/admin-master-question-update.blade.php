@@ -210,10 +210,10 @@
                     <tbody>
                         @forelse ($answers as $index => $result)
                             <tr>
-                                <td class="center">{{ chr(64 + $loop->iteration) }} </td>
+                                <td class="center">{{ $result?->alphabet ?? chr(64 + $loop->iteration) }} </td>
                                 <td>
                                     <button class="bg-[{{ $companyData->color_primary }}] text-white px-2 py-1 rounded"
-                                        wire:click="modalAnswerImage('{{ $result?->id }}', '{{ chr(64 + $loop->iteration) }}')">Gambar</button>
+                                        wire:click="modalAnswerImage('{{ $result?->id }}', '{{ $result?->alphabet ?? chr(64 + $loop->iteration) }}')">Gambar</button>
                                 </td>
                                 <td>{{ $result?->context }}</td>
                                 <td>

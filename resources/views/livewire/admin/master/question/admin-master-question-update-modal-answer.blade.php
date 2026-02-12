@@ -42,13 +42,6 @@
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
             </div>
-            <div class="mb-4">
-                <label for="answer_images" class="block text-sm font-medium text-gray-700">Gambar</label>
-                <x-filepond::upload wire:model="answer_images" multiple accept=".jpg,.jpeg,.png" />
-                @error('answer_images')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                @enderror
-            </div>
             {{-- <div class="mb-4">
                 <label for="answer_description" class="block text-sm font-medium text-gray-700">Deskripsi Jawaban</label>
                 <textarea id="answer_description" wire:model.defer="answer_description" placeholder="" class="mt-1 form-control"></textarea>

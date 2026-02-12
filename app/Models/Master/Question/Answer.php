@@ -43,7 +43,9 @@ class Answer extends Model
 
         static::saved(function ($model) {
             if ($model->is_correct) {
-                Answer::where('question_id', $model?->question?->id)->whereNot('id', $model?->id)->update(['is_correct' => false]);
+                Answer::where('question_id', $model?->question_id)
+                    ->whereNot('id', $model?->id)
+                    ->update(['is_correct' => false]);
             }
         });
     }
