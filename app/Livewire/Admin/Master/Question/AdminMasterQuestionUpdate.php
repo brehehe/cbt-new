@@ -27,14 +27,16 @@ use App\Models\Study\Study;
 class AdminMasterQuestionUpdate extends Component
 {
     use WithFileUploads, WithFilePond;
-    protected $search;
+    public $search;
+
+    public $isEditingAnswer = false;
 
     public $get_question;
-    public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id, $question, $description, $weight_correct, $weight_incorrect,$category_question_id;
+    public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id, $question, $description, $latex, $weight_correct, $weight_incorrect,$category_question_id;
     public $topics = [], $material_categories = [], $materials = [], $question_types = [], $category_questions = [];
     public $images = [], $old_images = [];
 
-    public $answer_id, $answer_context, $answer_description, $answer_correct, $answer_alphabet;
+    public $answer_id, $answer_context, $answer_description, $answer_latex, $answer_correct, $answer_alphabet;
     public $answer_images = [], $old_answer_images = [];
     public $studys = [], $study_id;
 
@@ -57,6 +59,7 @@ class AdminMasterQuestionUpdate extends Component
         $this->question_type_id     = $this->get_question?->question_type_id;
         $this->question             = $this->get_question?->question;
         $this->description          = $this->get_question?->description;
+        $this->latex                = $this->get_question?->latex;
         $this->weight_correct       = $this->get_question?->weight_correct;
         $this->weight_incorrect     = $this->get_question?->weight_incorrect;
         $this->category_question_id = $this->get_question?->category_question_id;
@@ -139,6 +142,43 @@ class AdminMasterQuestionUpdate extends Component
             ->get();
     }
 
+    public function confirmDelete($id)
+    {
+        return AlertHelper::confirmDelete('delete', 'Anda yakin ingin menghapus jawaban ini?', $id);
+    }
+
+    public function delete($id)
+    {
+        $answerId = is_array($id) ? ($id[0] ?? null) : $id;
+        if (!$answerId) {
+            return AlertHelper::error('Gagal', 'ID jawaban tidak valid.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            Answer::withoutGlobalScope('user_scope')
+                ->where('question_id', $this->data_id)
+                ->where('id', $answerId)
+                ->delete();
+
+            $this->normalizeAnswerAlphabet($this->data_id);
+
+            DB::commit();
+        } catch (Exception | Throwable $th) {
+            DB::rollBack();
+            $error = [
+                'message' => $th->getMessage(),
+                'file'    => $th->getFile(),
+                'line'    => $th->getLine(),
+            ];
+            Log::error('Ada Kesalahaan saat AdminMasterQuestionUpdate => delete', $error);
+            return AlertHelper::error('Gagal', 'Ada kesalahan saat menghapus jawaban');
+        }
+
+        return AlertHelper::success('Berhasil', 'Jawaban berhasil dihapus.');
+    }
+
     public function updatedMaterialCategoryId($value)
     {
         $value = !$value ? null : $value;
@@ -161,6 +201,7 @@ class AdminMasterQuestionUpdate extends Component
                 // 'images.*'             => 'nullable|image|mimes:jpg,jpeg,png',
                 'description'          => 'nullable',
                 'category_question_id'  => 'required|exists:category_questions,id',
+                    'latex'                => 'nullable',
             ],
             [
                 'study_id.required'           => 'Prodi wajib diisi.',
@@ -202,6 +243,7 @@ class AdminMasterQuestionUpdate extends Component
                 'weight_correct'       => $this->weight_correct,
                 'weight_incorrect'     => $this->weight_incorrect,
                 'category_question_id' => $this->category_question_id,
+                    'latex'                => $this->latex,
             ];
 
             $question = app(QuestionService::class)->updateOrCreate($request);
@@ -227,6 +269,11 @@ class AdminMasterQuestionUpdate extends Component
 
     public function openModal()
     {
+        $this->isEditingAnswer = false;
+        $this->reset(['answer_id', 'answer_context', 'answer_description', 'answer_latex', 'answer_correct', 'answer_images', 'old_answer_images', 'answer_alphabet']);
+        $this->answer_correct = false;
+        $this->dispatch('reset-answer-latex-preview');
+        $this->dispatch('sync-answer-latex-preview');
         return $this->dispatch('open-modal', ['id' => 'modal']);
     }
 
@@ -243,7 +290,7 @@ class AdminMasterQuestionUpdate extends Component
             $this->images[]     = $path;
         }
         
-        $this->reset(['answer_id', 'answer_context', 'answer_description', 'answer_correct', 'answer_images', 'old_answer_images', 'answer_alphabet']);
+        $this->reset(['answer_id', 'answer_context', 'answer_description', 'answer_latex', 'answer_correct', 'answer_images', 'old_answer_images', 'answer_alphabet']);
         $this->dispatch('close-modal', ['id' => 'modal-images']);
         $this->dispatch('close-modal', ['id' => 'modal-answer-images']);
         return $this->dispatch('close-modal', ['id' => 'modal']);
@@ -266,11 +313,13 @@ class AdminMasterQuestionUpdate extends Component
 
     public function submitAnswer()
     {
+        $this->answer_correct = (bool) $this->answer_correct;
         $this->validate(
             [
                 'answer_context'     => 'required',
                 // 'answer_images.*'    => 'nullable|image|mimes:jpg,jpeg,png',
                 'answer_description' => 'nullable',
+                    'answer_latex'       => 'nullable',
             ],
             [
                 'answer_context.required' => 'Konteks jawaban wajib diisi.',
@@ -297,7 +346,8 @@ class AdminMasterQuestionUpdate extends Component
                 'context'    => $this->answer_context,
                 'images'     => $this->answer_images,
                 'old_images' => $this->old_answer_images,
-                'is_correct' => $this->answer_correct,
+                'is_correct' => (bool) $this->answer_correct,
+                    'latex'      => $this->answer_latex,
             ];
 
             $answer = app(AnswerService::class)->updateOrCreate($this->get_question, $request);
@@ -327,8 +377,11 @@ class AdminMasterQuestionUpdate extends Component
         $this->answer_id      = $result?->id;
         $this->answer_alphabet = $result?->alphabet;
         $this->answer_context = $result?->context;
+        $this->answer_latex   = $result?->latex;
         $this->answer_correct = $result?->is_correct;
-        $this->openModal();
+        $this->isEditingAnswer = true;
+        $this->dispatch('open-modal', ['id' => 'modal']);
+        return $this->dispatch('sync-answer-latex-preview');
     }
 
     public function toggleAnswerCorrect($id)
@@ -344,6 +397,7 @@ class AdminMasterQuestionUpdate extends Component
         $this->answer_alphabet = $alphabet;
         $this->answer_id       = $result?->id;
         $this->answer_context  = $result?->context;
+        $this->answer_latex    = $result?->latex;
         $this->answer_correct  = $result?->is_correct;
         
         // Reset dan reload gambar dari database agar filepond menampilkan state terbaru

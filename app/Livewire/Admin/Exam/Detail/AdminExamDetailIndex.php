@@ -34,6 +34,8 @@ class AdminExamDetailIndex extends Component
     public $description;
     public $number;
     public $question_answers = [];
+    public $question_latex = null;
+    public $question_latex_preview_png = null;
     public $currentRecording = null;
     public $alertCount = 0;
     public $liveSession = null;
@@ -885,6 +887,8 @@ class AdminExamDetailIndex extends Component
             $this->description = $firstQuestion->timetableQuestion?->description;
             $images = $firstQuestion->timetableQuestion?->images;
             $this->images = collect(json_decode($images ?? '[]', true));
+            $this->question_latex = $firstQuestion->timetableQuestion?->latex;
+            $this->question_latex_preview_png = $firstQuestion->timetableQuestion?->latex_preview_png;
             $this->number = 1;
             $this->timetable_answer_id = $firstQuestion->timetable_answer_id;
             $this->question_answers = [];
@@ -900,6 +904,8 @@ class AdminExamDetailIndex extends Component
                         'alphabet' => chr(64 + $index + 1),
                         'context'  => $answer->context,
                         'images'   => collect(json_decode($images, true)),
+                        'latex'    => $answer->latex,
+                        'latex_preview_png' => $answer->latex_preview_png,
                     ];
                 }
             }
@@ -1059,6 +1065,8 @@ class AdminExamDetailIndex extends Component
 
             $this->question = $questionModel->question;
             $this->description = $questionModel->description;
+            $this->question_latex = $questionModel->latex;
+            $this->question_latex_preview_png = $questionModel->latex_preview_png;
             $images = $questionModel->images;
             $this->images = collect(json_decode($images, true));
 
@@ -1075,6 +1083,8 @@ class AdminExamDetailIndex extends Component
                     'alphabet' => chr(65 + $i),
                     'context' => $ans->context,
                     'images' => collect(json_decode($ans->images, true)),
+                    'latex' => $ans->latex,
+                    'latex_preview_png' => $ans->latex_preview_png,
                 ]
             )->all();
         }

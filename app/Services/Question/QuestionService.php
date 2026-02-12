@@ -92,6 +92,7 @@ class QuestionService
                     'material_id'          => $request['material_id'] ?? null,
                     'question_type_id'     => $request['question_type_id'] ?? null,
                     'question'             => $request['question'] ?? null,
+                    'latex'                => $request['latex'] ?? null,
                     'images'               => json_encode($imagePaths),
                     'weight_correct'       => $request['weight_correct'] ?? null,
                     'weight_incorrect'     => $request['weight_incorrect'] ?? null,

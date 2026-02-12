@@ -36,7 +36,14 @@ class Answer extends Model
         });
 
         static::creating(function ($modelCreate) {
-            $lastOrder = static::max('order');
+            if (!empty($modelCreate->order)) {
+                return;
+            }
+
+            $lastOrder = static::withoutGlobalScope('user_scope')
+                ->where('question_id', $modelCreate->question_id)
+                ->max('order');
+
             $modelCreate->order = $lastOrder ? $lastOrder + 1 : 1;
             // $modelCreate->company_id = $modelCreate->company_id ?? auth()->user()->company_id;
         });

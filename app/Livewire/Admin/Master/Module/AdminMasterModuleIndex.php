@@ -39,7 +39,7 @@ class AdminMasterModuleIndex extends Component
 
     public function render()
     {
-        $modules = Module::withoutGlobalScope('user_scope')->search($this->search)->select('id', 'question_type_id', 'name', 'duration', 'description', 'random_question', 'studys')
+        $modules = Module::withoutGlobalScope('user_scope')->search($this->search)->select('id', 'question_type_id', 'name', 'duration', 'description', 'random_question', 'studys','question_pick_type')
             ->with([
                 'questionType:id,name'
             ])

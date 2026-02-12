@@ -123,8 +123,23 @@ class AnswerService
                 ? $request['is_correct']
                 : ($existingAnswer?->is_correct ?? false);
 
-            if (($alphabet === null || $alphabet === '') && !$existingAnswer) {
-                $alphabet = $this->resolveAlphabet($existingAnswer, $question);
+            $order = null;
+            if ($existingAnswer?->order) {
+                $order = (int) $existingAnswer->order;
+            } elseif ($existingAnswer?->alphabet) {
+                $order = ord($existingAnswer->alphabet) - 64;
+            }
+
+            if (array_key_exists('order', $request) && $request['order'] !== null && $request['order'] !== '') {
+                $order = (int) $request['order'];
+            }
+
+            if (!$order || $order <= 0) {
+                $order = $this->resolveNextOrder($question);
+            }
+
+            if ($alphabet === null || $alphabet === '') {
+                $alphabet = chr(64 + $order);
             }
 
             // 🔹 Simpan ke database
@@ -136,7 +151,9 @@ class AnswerService
                         'question_id' => $question->id,
                         'company_id' => $request['company_id'] ?? null,
                         'alphabet'   => $alphabet,
+                        'order'      => $order,
                         'context'    => $context,
+                        'latex'      => $request['latex'] ?? ($existingAnswer?->latex ?? null),
                         'images'     => json_encode($imagePaths),
                         'is_correct' => $isCorrect,
                     ]
@@ -166,6 +183,15 @@ class AnswerService
         $nextOrder = $nextOrder > 0 ? $nextOrder + 1 : 1;
 
         return chr(64 + $nextOrder);
+    }
+
+    private function resolveNextOrder($question): int
+    {
+        $nextOrder = (int) Answer::withoutGlobalScope('user_scope')
+            ->where('question_id', $question->id)
+            ->max('order');
+
+        return $nextOrder > 0 ? $nextOrder + 1 : 1;
     }
 
 }

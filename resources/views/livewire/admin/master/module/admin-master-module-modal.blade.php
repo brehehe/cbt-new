@@ -1,7 +1,7 @@
 <div wire:ignore.self id="modal"
     class="fixed inset-0 bg-overlay hidden items-center justify-center z-50 transition-opacity duration-300 ease-in-out">
     <div class="bg-white rounded-2xl shadow-2xl w-full transform transition-all scale-95 duration-300 ease-out animate-fade-in"
-        style="max-width: 150vh;">
+        style="max-width: 100vh;">
         <!-- Header -->
         <div class="flex justify-between items-center p-6 border-b">
             <div class="flex items-center gap-2">
@@ -10,7 +10,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M13 16h-1v-4h-1m1-4h.01M12 20.5C6.753 20.5 2.5 16.247 2.5 11S6.753 1.5 12 1.5 21.5 5.753 21.5 11 17.247 20.5 12 20.5z" />
                 </svg>
-                <h2 class="text-xl font-semibold text-gray-800">Modal Modul Soal</h2>
+                <h2 class="text-xl font-semibold text-gray-800">Modul Soal</h2>
             </div>
             <button wire:click="closeModal()"
                 class="text-gray-500 hover:text-red-500 transition-colors text-2xl leading-none cursor-pointer">
@@ -20,7 +20,7 @@
 
         <!-- Body -->
         <div class="px-6 py-4 text-gray-600" style="max-height: 80vh; overflow-y: auto;">
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 gap-4">
                 <div class="mb-4">
                     <div class="mb-4">
                         <label for="question_type_id" class="block text-sm font-medium text-gray-700">Tipe Ujian <span

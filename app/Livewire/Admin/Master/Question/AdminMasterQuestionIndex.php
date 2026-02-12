@@ -34,7 +34,7 @@ class AdminMasterQuestionIndex extends Component
     public $selectAll = false;
     public $bulkCategoryQuestionId;
 
-    public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id, $question, $description, $weight_correct, $weight_incorrect, $category_question_id;
+    public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id, $question, $description, $latex, $weight_correct, $weight_incorrect, $category_question_id;
     public $topics = [], $material_categories = [], $materials = [], $question_types = [], $category_questions = [];
     public $images = [], $old_images = [], $studys = [], $study_id;
     public $filterStudyId, $filterQuestionTypeId, $filterTopicId, $filterDifficulty, $filterCategoryQuestionId;
@@ -248,7 +248,7 @@ class AdminMasterQuestionIndex extends Component
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['data_id', 'study_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'images', 'weight_correct', 'weight_incorrect', 'study_id_import', 'file_import', 'category_question_id']);
+        $this->reset(['data_id', 'study_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'latex', 'images', 'weight_correct', 'weight_incorrect', 'study_id_import', 'file_import', 'category_question_id']);
         $this->dispatch('close-modal', ['id' => 'modal-import-question']);
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
@@ -264,6 +264,7 @@ class AdminMasterQuestionIndex extends Component
                 'material_id'          => 'nullable|exists:materials,id',
                 'question_type_id'     => 'required|exists:question_types,id',
                 'question'             => 'required',
+                'latex'                => 'nullable',
                 'images.*'             => 'nullable|file|mimetypes:image/jpg,image/jpeg,image/png',
                 'description'          => 'nullable',
             ],
@@ -293,6 +294,7 @@ class AdminMasterQuestionIndex extends Component
                 'material_id'          => $this->material_id,
                 'question_type_id'     => $this->question_type_id,
                 'question'             => $this->question,
+                'latex'                => $this->latex,
                 'images'               => $this->images,
                 'old_images'           => $this->old_images,
                 'description'          => $this->description,

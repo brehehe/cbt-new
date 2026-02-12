@@ -60,6 +60,7 @@
                         <th>Modul</th>
                         <th>Durasi</th>
                         <th>Soal Acak</th>
+                        <th>Tipe Pengambilan Soal</th>
                         <th>Deskripsi</th>
                         <th class="w-1 center">Aksi</th>
                     </tr>
@@ -82,6 +83,7 @@
                                     </label>
                                 </div>
                             </td>
+                            <td>{{ $result?->question_pick_type == 'category' ? 'Kategori Soal' : ($result?->question_pick_type == 'topic' ? 'Topik' : 'Manual') }}</td>
                             <td>{{ $result?->description }}</td>
                             <td class="center">
                                 <div class="flex items-center">

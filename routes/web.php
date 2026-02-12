@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Print\PrintController;
+use App\Http\Controllers\Admin\LatexPreviewController;
 use App\Http\Middleware\CheckUserTimetable;
 use App\Http\Middleware\BlockBots;
 use App\Livewire\Admin\Master\Classmate\AdminMasterClassmateIndex;
@@ -169,6 +170,9 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
             Route::get('/berita-acara/{session_id}', [PrintController::class, 'printBeritaAcara'])
                 ->name('admin.print.berita-acara');
         });
+
+        Route::post('/latex/preview', [LatexPreviewController::class, 'preview'])
+            ->name('admin.latex.preview');
     });
 
     // Dosen Dashboard Routes

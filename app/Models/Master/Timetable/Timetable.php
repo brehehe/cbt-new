@@ -137,6 +137,9 @@ class Timetable extends Model
                                     'question' => $question->question,
                                     'images' => $question->images,
                                     'description' => $question->description,
+                                    'latex' => $question->latex,
+                                    'latex_preview_pdf' => $question->latex_preview_pdf,
+                                    'latex_preview_png' => $question->latex_preview_png,
                                     'weight_correct' => $question->weight_correct,
                                     'weight_incorrect' => $question->weight_incorrect,
                                     'created_at' => $now,
@@ -162,6 +165,9 @@ class Timetable extends Model
                                         'question',
                                         'images',
                                         'description',
+                                        'latex',
+                                        'latex_preview_pdf',
+                                        'latex_preview_png',
                                         'weight_correct',
                                         'weight_incorrect',
                                         'updated_at',
@@ -213,6 +219,9 @@ class Timetable extends Model
                                             'alphabet' => $alphabet,
                                             'context' => $answer->context,
                                             'images' => $answer->images,
+                                            'latex' => $answer->latex,
+                                            'latex_preview_pdf' => $answer->latex_preview_pdf,
+                                            'latex_preview_png' => $answer->latex_preview_png,
                                             'is_correct' => $answer->is_correct,
                                             'order' => $answerOrder,
                                             'created_at' => $now,
@@ -225,7 +234,7 @@ class Timetable extends Model
                                     TimetableAnswer::upsert(
                                         $answerUpserts,
                                         ['timetable_question_id', 'answer_id'],
-                                        ['company_id', 'alphabet', 'context', 'images', 'is_correct', 'order', 'updated_at']
+                                        ['company_id', 'alphabet', 'context', 'images', 'latex', 'latex_preview_pdf', 'latex_preview_png', 'is_correct', 'order', 'updated_at']
                                     );
                                 }
                             }

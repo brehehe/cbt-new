@@ -28,8 +28,10 @@
     <div class="space-y-6">
         <div class="p-4 bg-white shadow rounded-lg">
             <h2 class="text-lg font-semibold text-gray-800 mb-3">Detail Soal</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div >
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2 mb-4">
+                <div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
                     <label for="study_id" class="block text-sm font-medium text-gray-700">Prodi <span
                             class="text-red-600">*</span></label>
                     <select class="mt-1 form-control" wire:model.lazy='study_id'>
@@ -42,7 +44,7 @@
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-                <div >
+                <div>
                     <label for="category_question_id" class="block text-sm font-medium text-gray-700">Kategori Soal <span
                             class="text-red-600">*</span></label>
                     <select class="mt-1 form-control" wire:model.lazy='category_question_id'>
@@ -167,6 +169,28 @@
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
+                </div>
+                </div>
+                <div>
+                    <label for="latex" class="block text-sm font-medium text-gray-700">LaTeX (Opsional)</label>
+                    <textarea id="latex" wire:model="latex" placeholder="Tulis LaTeX di sini..." class="mt-1 form-control" data-autosize="true" style="overflow:hidden;resize:none;" x-data x-init="$el.style.height='auto';$el.style.height=$el.scrollHeight+'px'" @input="$el.style.height='auto';$el.style.height=$el.scrollHeight+'px'"
+                        data-latex-input="server"></textarea>
+                    <p class="mt-1 text-xs text-gray-500">Disimpan sebagai source LaTeX terpisah.</p>
+                    <div class="mt-2 flex items-center gap-2">
+                        <button type="button" class="btn btn-primary"
+                            data-latex-render data-latex-source="#latex" data-latex-target="#latexPreviewUpdate"
+                            data-latex-type="question" data-latex-id="{{ $data_id }}">
+                            Render LaTeX
+                        </button>
+                        <span class="text-xs text-gray-500">Preview akan muncul di bawah.</span>
+                    </div>
+                    <div id="latexPreviewUpdate" class="mt-2 rounded border bg-gray-50 p-3 text-sm text-gray-700" wire:ignore>
+                        <div class="text-xs text-gray-400">Belum ada preview.</div>
+                    </div>
+                    @error('latex')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
         </div>
         {{-- card --}}
@@ -276,27 +300,159 @@
             });
         }
 
-        FilePond.registerPlugin(
-            FilePondPluginImagePreview,
-            FilePondPluginFileValidateType
-        );
+        async function renderLatexPreview(sourceSelector, targetSelector, meta = {}) {
+            const sourceEl = document.querySelector(sourceSelector);
+            const targetEl = document.querySelector(targetSelector);
+            if (!sourceEl || !targetEl) return;
 
-        const imagesPond = FilePond.create(document.querySelector('#images'), {
-            allowMultiple: true,
-            acceptedFileTypes: ['image/png', 'image/jpeg', 'image/webp'],
+            const latex = sourceEl.value || '';
+            if (!latex.trim()) {
+                targetEl.innerHTML = '<div class="text-xs text-gray-400">LaTeX kosong.</div>';
+                return;
+            }
+
+            targetEl.innerHTML = '<div class="text-xs text-gray-500">Rendering...</div>';
+
+            const csrf = document.querySelector('meta[name="csrf-token"]');
+            const token = csrf ? csrf.getAttribute('content') : '';
+
+            try {
+                const response = await fetch("{{ url('/admin/latex/preview') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        latex,
+                        target_type: meta.targetType || null,
+                        target_id: meta.targetId || null
+                    })
+                });
+                const data = await response.json();
+                if (!response.ok || !data.ok) {
+                    targetEl.innerHTML = `<div class="text-xs text-red-600">${data.message || 'Render gagal.'}</div>`;
+                    return;
+                }
+
+                const pngUrl = data.png_url || '';
+                if (pngUrl) {
+                    targetEl.innerHTML = `<img src="${pngUrl}" class="w-full h-auto rounded" alt="Preview" />`;
+                } else {
+                    targetEl.innerHTML = '<div class="text-xs text-gray-500">Preview gambar tidak tersedia.</div>';
+                }
+            } catch (err) {
+                targetEl.innerHTML = '<div class="text-xs text-red-600">Render gagal. Coba lagi.</div>';
+            }
+        }
+
+        if (window.FilePond) {
+            if (window.FilePondPluginImagePreview && window.FilePondPluginFileValidateType) {
+                FilePond.registerPlugin(
+                    FilePondPluginImagePreview,
+                    FilePondPluginFileValidateType
+                );
+            } else if (window.FilePondPluginImagePreview) {
+                FilePond.registerPlugin(FilePondPluginImagePreview);
+            }
+
+            const imagesInput = document.querySelector('#images');
+            if (imagesInput && !window.imagesPond) {
+                window.imagesPond = FilePond.create(imagesInput, {
+                    allowMultiple: true,
+                    acceptedFileTypes: ['image/png', 'image/jpeg', 'image/webp'],
+                });
+            }
+
+            const answerImagesInput = document.querySelector('#answer_images');
+            if (answerImagesInput && !window.answerImagesPond) {
+                window.answerImagesPond = FilePond.create(answerImagesInput, {
+                    allowMultiple: true,
+                    acceptedFileTypes: ['image/png', 'image/jpeg', 'image/webp'],
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initTextareaAutosize();
         });
-
-        const answerImagesPond = FilePond.create(document.querySelector('#answer_images'), {
-            allowMultiple: true,
-            acceptedFileTypes: ['image/png', 'image/jpeg', 'image/webp'],
+        document.addEventListener('livewire:load', function() {
+            initTextareaAutosize();
         });
-
-        document.addEventListener('DOMContentLoaded', initTextareaAutosize);
-        document.addEventListener('livewire:load', initTextareaAutosize);
         if (typeof Livewire !== 'undefined') {
             Livewire.hook('message.processed', () => {
                 initTextareaAutosize();
             });
         }
+
+        function autoRenderLatexPreviews() {
+            document.querySelectorAll('[data-latex-render]').forEach((btn) => {
+                const sourceSelector = btn.getAttribute('data-latex-source');
+                const targetSelector = btn.getAttribute('data-latex-target');
+                if (!sourceSelector || !targetSelector) return;
+
+                const sourceEl = document.querySelector(sourceSelector);
+                const targetEl = document.querySelector(targetSelector);
+                if (!sourceEl || !targetEl) return;
+
+                const latex = (sourceEl.value || '').trim();
+                if (!latex) return;
+
+                if (targetEl.dataset.rendered === '1') return;
+                targetEl.dataset.rendered = '1';
+                renderLatexPreview(sourceSelector, targetSelector, {
+                    targetType: btn.getAttribute('data-latex-type'),
+                    targetId: btn.getAttribute('data-latex-id')
+                });
+            });
+        }
+
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('[data-latex-render]');
+            if (!btn) return;
+            const sourceSelector = btn.getAttribute('data-latex-source');
+            const targetSelector = btn.getAttribute('data-latex-target');
+            if (!sourceSelector || !targetSelector) return;
+            renderLatexPreview(sourceSelector, targetSelector, {
+                targetType: btn.getAttribute('data-latex-type'),
+                targetId: btn.getAttribute('data-latex-id')
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', autoRenderLatexPreviews);
+        document.addEventListener('livewire:load', autoRenderLatexPreviews);
+        document.addEventListener('livewire:navigated', autoRenderLatexPreviews);
+        if (typeof Livewire !== 'undefined') {
+            Livewire.hook('message.processed', autoRenderLatexPreviews);
+        }
+
+        document.addEventListener('reset-answer-latex-preview', function() {
+            const targetEl = document.querySelector('#answerLatexPreviewModal');
+            if (!targetEl) return;
+            targetEl.dataset.rendered = '0';
+            targetEl.innerHTML = '<div class="text-xs text-gray-400">Belum ada preview.</div>';
+        });
+
+        document.addEventListener('sync-answer-latex-preview', function() {
+            const sourceEl = document.querySelector('#answer_latex');
+            const targetEl = document.querySelector('#answerLatexPreviewModal');
+            if (!sourceEl || !targetEl) return;
+
+            const latex = (sourceEl.value || '').trim();
+            if (!latex) {
+                targetEl.dataset.rendered = '0';
+                targetEl.innerHTML = '<div class="text-xs text-gray-400">Belum ada preview.</div>';
+                return;
+            }
+
+            const btn = document.querySelector('[data-latex-render][data-latex-source="#answer_latex"]');
+            targetEl.dataset.rendered = '0';
+            renderLatexPreview('#answer_latex', '#answerLatexPreviewModal', {
+                targetType: btn ? btn.getAttribute('data-latex-type') : null,
+                targetId: btn ? btn.getAttribute('data-latex-id') : null
+            });
+        });
     </script>
 @endpush

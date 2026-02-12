@@ -220,28 +220,14 @@
                         </div>
 
                         @if (!empty($images) && collect($images)->isNotEmpty())
-                            <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-4">
+                            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 @foreach ($images as $image)
                                     <div
-                                        class="overflow-hidden rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300 aspect-square">
+                                        class="overflow-hidden rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
                                         <img src="{{ asset('storage/' . $image) }}" alt="Gambar soal"
-                                            class="w-full h-full object-cover cursor-zoom-in js-zoomable"
-                                            data-zoom-src="{{ asset('storage/' . $image) }}">
+                                            class="w-full h-auto object-cover">
                                     </div>
                                 @endforeach
-                            </div>
-                        @endif
-
-                        <!-- LaTeX Preview untuk Soal -->
-                        @if ($question_latex_preview_png)
-                            <div class="mt-4">
-                                <div class="p-2 bg-gray-50 rounded-lg border border-gray-200 flex">
-                                    <img src="{{ asset('storage/' . $question_latex_preview_png) }}" 
-                                         alt="LaTeX preview" 
-                                         class="cursor-zoom-in js-zoomable"
-                                        style="width: 400px; height: 600px;"
-                                         data-zoom-src="{{ asset('storage/' . $question_latex_preview_png) }}">
-                                </div>
                             </div>
                         @endif
 
@@ -274,25 +260,11 @@
                                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                             @foreach ($question_answer['images'] as $image)
                                                 <div
-                                                    class="overflow-hidden transition-shadow duration-300 border border-gray-200 shadow-sm rounded-xl hover:shadow-md aspect-square">
+                                                    class="overflow-hidden transition-shadow duration-300 border border-gray-200 shadow-sm rounded-xl hover:shadow-md">
                                                     <img src="{{ asset('storage/' . $image) }}" alt="Gambar soal"
-                                                        class="object-cover w-full h-full cursor-zoom-in js-zoomable"
-                                                        data-zoom-src="{{ asset('storage/' . $image) }}">
+                                                        class="object-cover w-full h-auto">
                                                 </div>
                                             @endforeach
-                                        </div>
-                                    </div>
-                                @endif
-
-                                <!-- LaTeX Preview untuk Jawaban -->
-                                @if ($question_answer['latex_preview_png'])
-                                    <div class="mt-3 ml-6 lg:ml-8">
-                                        <div class="p-2 bg-gray-50 rounded border border-gray-200 flex">
-                                            <img src="{{ asset('storage/' . $question_answer['latex_preview_png']) }}" 
-                                                 alt="LaTeX preview" 
-                                                 class="cursor-zoom-in js-zoomable"
-                                                 style="width: 400px; height: 600px;"
-                                                 data-zoom-src="{{ asset('storage/' . $question_answer['latex_preview_png']) }}">
                                         </div>
                                     </div>
                                 @endif
@@ -463,30 +435,6 @@
         </div>
     </div>
 
-    <!-- Image Zoom Modal -->
-    <div id="imageZoomModal" wire:ignore
-        class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/70 p-4">
-        <div class="absolute inset-0" id="imageZoomBackdrop"></div>
-        <div class="relative z-10 w-full h-full">
-            <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center gap-2">
-                    <button type="button" id="imageZoomOut"
-                        class="px-3 py-1.5 text-xs font-medium bg-white/90 rounded shadow hover:bg-white">-</button>
-                    <button type="button" id="imageZoomIn"
-                        class="px-3 py-1.5 text-xs font-medium bg-white/90 rounded shadow hover:bg-white">+</button>
-                    <button type="button" id="imageZoomReset"
-                        class="px-3 py-1.5 text-xs font-medium bg-white/90 rounded shadow hover:bg-white">Reset</button>
-                </div>
-                <button type="button" id="imageZoomClose"
-                    class="px-3 py-1.5 text-xs font-medium bg-white/90 rounded shadow hover:bg-white">Tutup</button>
-            </div>
-            <div class="flex items-center justify-center bg-black/30 rounded-lg overflow-hidden h-[85vh]">
-                <img id="imageZoomTarget" src="" alt="Preview"
-                    class="w-full h-full object-contain transition-transform duration-200 select-none" />
-            </div>
-        </div>
-    </div>
-
     <!-- Warning Modal -->
     <div id="warningModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
         <div class="bg-white rounded-lg p-6 max-w-md mx-4">
@@ -529,119 +477,6 @@
     <script src="{{ asset('js/recording-callback-system.js') }}"></script>
 
     <script>
-        // Image zoom modal
-        (function() {
-            const modal = document.getElementById('imageZoomModal');
-            const target = document.getElementById('imageZoomTarget');
-            const backdrop = document.getElementById('imageZoomBackdrop');
-            const btnClose = document.getElementById('imageZoomClose');
-            const btnZoomIn = document.getElementById('imageZoomIn');
-            const btnZoomOut = document.getElementById('imageZoomOut');
-            const btnReset = document.getElementById('imageZoomReset');
-            let scale = 1;
-            let translateX = 0;
-            let translateY = 0;
-            let isDragging = false;
-            let dragStartX = 0;
-            let dragStartY = 0;
-            let lastX = 0;
-            let lastY = 0;
-
-            function applyTransform() {
-                if (!target) return;
-                target.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-                target.style.cursor = scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'zoom-in';
-            }
-
-            function setScale(next) {
-                scale = Math.max(1, Math.min(3, next));
-                applyTransform();
-            }
-
-            function resetTransform() {
-                translateX = 0;
-                translateY = 0;
-                applyTransform();
-            }
-
-            function openModal(src) {
-                if (!modal || !target) return;
-                target.src = src;
-                scale = 1;
-                resetTransform();
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            }
-
-            function closeModal() {
-                if (!modal || !target) return;
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                target.src = '';
-                scale = 1;
-                resetTransform();
-            }
-
-            document.addEventListener('click', function(e) {
-                const img = e.target.closest('.js-zoomable');
-                if (!img) return;
-                const src = img.getAttribute('data-zoom-src') || img.getAttribute('src');
-                if (src) openModal(src);
-            });
-
-            if (btnClose) btnClose.addEventListener('click', closeModal);
-            if (backdrop) backdrop.addEventListener('click', closeModal);
-            if (btnZoomIn) btnZoomIn.addEventListener('click', () => setScale(scale + 0.25));
-            if (btnZoomOut) btnZoomOut.addEventListener('click', () => setScale(scale - 0.25));
-            if (btnReset) btnReset.addEventListener('click', () => {
-                scale = 1;
-                resetTransform();
-            });
-
-            document.addEventListener('keydown', function(e) {
-                if (!modal || modal.classList.contains('hidden')) return;
-                if (e.key === 'Escape') closeModal();
-                if (e.key === '+' || e.key === '=') setScale(scale + 0.25);
-                if (e.key === '-' || e.key === '_') setScale(scale - 0.25);
-            });
-
-            if (target) {
-                target.addEventListener('pointerdown', function(e) {
-                    if (scale <= 1) return;
-                    isDragging = true;
-                    dragStartX = e.clientX;
-                    dragStartY = e.clientY;
-                    lastX = translateX;
-                    lastY = translateY;
-                    target.setPointerCapture(e.pointerId);
-                    applyTransform();
-                });
-
-                target.addEventListener('pointermove', function(e) {
-                    if (!isDragging) return;
-                    const dx = e.clientX - dragStartX;
-                    const dy = e.clientY - dragStartY;
-                    translateX = lastX + dx;
-                    translateY = lastY + dy;
-                    applyTransform();
-                });
-
-                target.addEventListener('pointerup', function(e) {
-                    if (!isDragging) return;
-                    isDragging = false;
-                    target.releasePointerCapture(e.pointerId);
-                    applyTransform();
-                });
-
-                target.addEventListener('pointercancel', function(e) {
-                    if (!isDragging) return;
-                    isDragging = false;
-                    try { target.releasePointerCapture(e.pointerId); } catch (err) {}
-                    applyTransform();
-                });
-            }
-        })();
-
         // Global variables
         const EXAM_CONFIG = {
             isRecording: @json($is_recording),
