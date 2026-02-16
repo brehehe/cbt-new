@@ -110,7 +110,8 @@ class AdminMasterStudentIndex extends Component
     public $photo, $photo_old;
 
     // Import file
-    public $importFile;
+    public $importFileMahasiswa;
+    public $importFileGeneral;
 
     public function openModal()
     {
@@ -761,12 +762,12 @@ class AdminMasterStudentIndex extends Component
     {
         try {
             $this->validate([
-                'importFile' => 'required|mimes:xlsx,xls|max:5120', // max 5MB
+                'importFileMahasiswa' => 'required|mimes:xlsx,xls|max:5120', // max 5MB
             ]);
 
-            Excel::import(new StudentImport(), $this->importFile);
+            Excel::import(new StudentImport('mahasiswa'), $this->importFileMahasiswa);
 
-            $this->reset('importFile');
+            $this->reset('importFileMahasiswa');
             AlertHelper::success('Berhasil', 'Data mahasiswa berhasil diimpor.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             AlertHelper::error('Gagal', 'File tidak valid. Pastikan format file adalah Excel (.xlsx atau .xls).');
@@ -776,15 +777,34 @@ class AdminMasterStudentIndex extends Component
         }
     }
 
+    public function importGeneral()
+    {
+        try {
+            $this->validate([
+                'importFileGeneral' => 'required|mimes:xlsx,xls|max:5120', // max 5MB
+            ]);
+
+            Excel::import(new StudentImport('general'), $this->importFileGeneral);
+
+            $this->reset('importFileGeneral');
+            AlertHelper::success('Berhasil', 'Data general berhasil diimpor.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            AlertHelper::error('Gagal', 'File tidak valid. Pastikan format file adalah Excel (.xlsx atau .xls).');
+        } catch (\Exception $e) {
+            Log::error('General Import Error: ' . $e->getMessage());
+            AlertHelper::error('Gagal', 'Gagal mengimpor data general: ' . $e->getMessage());
+        }
+    }
+
     public function downloadTemplate()
     {
         try {
             // Create a simple template with headers
             $headers = [
-                ['Name', 'NIM', 'Username', 'Email', 'Phone', 'Password', 'Program Studi', 'Type Study', 'Faculty', 'Department', 'Semester', 'Student Status', 'Address', 'Identity Number']
+                ['Name', 'NIM', 'Username', 'Email', 'Phone', 'Password', 'Program Studi', 'Faculty', 'Department', 'Semester', 'Student Status', 'Address', 'Identity Number']
             ];
 
-            $fileName = 'student_template.xlsx';
+            $fileName = 'student_template_mahasiswa.xlsx';
             return Excel::download(new class($headers) implements \Maatwebsite\Excel\Concerns\FromArray {
                 private $data;
                 public function __construct($data) { $this->data = $data; }
@@ -793,6 +813,25 @@ class AdminMasterStudentIndex extends Component
         } catch (\Exception $e) {
             Log::error('Student Template Download Error: ' . $e->getMessage());
             AlertHelper::error('Gagal', 'Gagal mengunduh template.');
+        }
+    }
+
+    public function downloadTemplateGeneral()
+    {
+        try {
+            $headers = [
+                ['Name', 'NIM', 'Username', 'Email', 'Phone', 'Password', 'Address']
+            ];
+
+            $fileName = 'student_template_general.xlsx';
+            return Excel::download(new class($headers) implements \Maatwebsite\Excel\Concerns\FromArray {
+                private $data;
+                public function __construct($data) { $this->data = $data; }
+                public function array(): array { return $this->data; }
+            }, $fileName);
+        } catch (\Exception $e) {
+            Log::error('General Template Download Error: ' . $e->getMessage());
+            AlertHelper::error('Gagal', 'Gagal mengunduh template general.');
         }
     }
 

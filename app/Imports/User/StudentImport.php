@@ -18,6 +18,13 @@ use Exception;
 
 class StudentImport implements ToCollection, WithHeadingRow
 {
+    protected ?string $typeStudy;
+
+    public function __construct(?string $typeStudy = null)
+    {
+        $this->typeStudy = $typeStudy;
+    }
+
     /**
      * @param Collection $rows
      */
@@ -33,9 +40,15 @@ class StudentImport implements ToCollection, WithHeadingRow
                 try {
                     DB::beginTransaction();
 
+                    $resolvedTypeStudy = $this->typeStudy ?? (!empty($row['type_study']) ? $row['type_study'] : 'general');
+
                     // Validate required fields
                     if (empty($row['name']) || empty($row['nim']) || empty($row['email'])) {
                         throw new Exception("Row " . ($index + 2) . ": Name, NIM, and Email are required");
+                    }
+
+                    if ($resolvedTypeStudy === 'general' && empty($row['username'])) {
+                        throw new Exception("Row " . ($index + 2) . ": Username is required for general");
                     }
 
                     // Check if user already exists
@@ -62,7 +75,7 @@ class StudentImport implements ToCollection, WithHeadingRow
 
                     // Default password if not provided
                     $password = !empty($row['password']) ? $row['password'] : 'password123';
-                    $typeStudy = !empty($row['type_study']) ? $row['type_study'] : 'general';
+                    $typeStudy = $resolvedTypeStudy;
 
                     // Create user
                     $user = User::create([

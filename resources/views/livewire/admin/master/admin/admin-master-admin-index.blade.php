@@ -15,13 +15,6 @@
                     Template
                 </button>
 
-                <!-- Export Button -->
-                <button wire:click="export()"
-                    class="btn btn-info">
-                    <i class="fa-solid fa-file-export mr-1"></i>
-                    Export
-                </button>
-
                 <!-- Import Button -->
                 <label class="btn btn-warning cursor-pointer">
                     <i class="fa-solid fa-file-import mr-1"></i>

@@ -9,26 +9,47 @@
                 <p class="text-gray-600">Kelola data mahasiswa dalam sistem CBT</p>
             </div>
             <div class="flex gap-2">
-                <!-- Download Template Button -->
-                <button wire:click="downloadTemplate()"
-                    class="btn btn-success">
-                    <i class="fa-solid fa-file-download mr-1"></i>
-                    Template
-                </button>
+                <!-- Template Dropdown -->
+                <div x-data="{ openTemplate: false }" class="relative">
+                    <button type="button" @click="openTemplate = !openTemplate" @click.away="openTemplate = false"
+                        class="btn btn-success">
+                        <i class="fa-solid fa-file-download mr-1"></i>
+                        Template
+                        <i class="fa-solid fa-chevron-down ml-2"></i>
+                    </button>
+                    <div x-show="openTemplate" x-transition
+                        class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+                        <button type="button" wire:click="downloadTemplate()"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            Template Mahasiswa
+                        </button>
+                        <button type="button" wire:click="downloadTemplateGeneral()"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            Template General
+                        </button>
+                    </div>
+                </div>
 
-                <!-- Export Button -->
-                <button wire:click="export()"
-                    class="btn btn-info">
-                    <i class="fa-solid fa-file-export mr-1"></i>
-                    Export
-                </button>
-
-                <!-- Import Button -->
-                <label class="btn btn-warning cursor-pointer">
-                    <i class="fa-solid fa-file-import mr-1"></i>
-                    Import
-                    <input type="file" wire:model="importFile" accept=".xlsx,.xls" wire:change="import" class="hidden" />
-                </label>
+                <!-- Import Dropdown -->
+                <div x-data="{ openImport: false }" class="relative">
+                    <button type="button" @click="openImport = !openImport" @click.away="openImport = false"
+                        class="btn btn-warning">
+                        <i class="fa-solid fa-file-import mr-1"></i>
+                        Import
+                        <i class="fa-solid fa-chevron-down ml-2"></i>
+                    </button>
+                    <div x-show="openImport" x-transition
+                        class="absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+                        <label class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer block">
+                            Import Mahasiswa
+                            <input type="file" wire:model="importFileMahasiswa" accept=".xlsx,.xls" wire:change="import" class="hidden" />
+                        </label>
+                        <label class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer block">
+                            Import General
+                            <input type="file" wire:model="importFileGeneral" accept=".xlsx,.xls" wire:change="importGeneral" class="hidden" />
+                        </label>
+                    </div>
+                </div>
 
                 <!-- Add Button -->
                 <button wire:click="openModal()"
