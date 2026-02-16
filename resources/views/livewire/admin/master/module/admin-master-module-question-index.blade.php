@@ -2,6 +2,18 @@
 <div>
     {{-- Nothing in the world is as soft and yielding as water. --}}
     @include('livewire.admin.master.module.admin-master-module-question-modal')
+    
+    {{-- Loading Screen --}}
+    <div wire:loading wire:target="submitModule" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+        <div class="flex flex-col items-center justify-center space-y-4">
+            <div class="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-primary"></div>
+            <div class="text-center">
+                <p class="text-lg font-semibold text-gray-800">Menyimpan data dan menyinkronkan soal...</p>
+                <p class="text-sm text-gray-500 mt-2">Harap tunggu, jangan tutup halaman ini</p>
+            </div>
+        </div>
+    </div>
+    
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
@@ -11,13 +23,11 @@
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div>
-                <button wire:click="submitModule()"
+                <button wire:click="submitModule()" wire:loading.attr="disabled" wire:target="submitModule"
                     class="{{ in_array(config('app.name_slug'), ['pro-cbt']) ? 'btn btn-warning' : 'btn btn-primary' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Simpan Perubahan
+                    <span wire:target="submitModule">
+                        Simpan Perubahan
+                    </span>
                 </button>
             </div>
         </div>

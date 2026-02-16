@@ -76,9 +76,27 @@ class AdminExamTimetableIndex extends Component
 
             $transactionModule = $timeTable->timetableModule;
 
-            $questionPickType = $transactionModule?->module?->question_pick_type ?? 'manual';
+            $module = $transactionModule?->module;
+            $questionPickType = $module?->question_pick_type ?? 'manual';
             $categorySettings = $transactionModule?->module?->category_question_settings ?? [];
             $topicSettings = $transactionModule?->module?->topic_question_settings ?? [];
+
+            $allowedQuestionIds = null;
+            if ($module) {
+                $moduleQuestionQuery = ModuleQuestion::withoutGlobalScope('user_scope')
+                    ->where('module_id', $module->id);
+
+                if ($questionPickType === 'manual') {
+                    $moduleQuestionQuery->where(function ($q) {
+                        $q->whereNull('question_pick_type')
+                            ->orWhere('question_pick_type', 'manual');
+                    });
+                } else {
+                    $moduleQuestionQuery->where('question_pick_type', $questionPickType);
+                }
+
+                $allowedQuestionIds = $moduleQuestionQuery->pluck('question_id')->all();
+            }
 
             if (is_string($categorySettings)) {
                 $categorySettings = json_decode($categorySettings, true) ?? [];
@@ -102,6 +120,10 @@ class AdminExamTimetableIndex extends Component
                             ->select('id', 'study_id')
                             ->where('timetable_module_id', $transactionModule->id)
                             ->where('category_question_id', $categoryId);
+
+                        if (is_array($allowedQuestionIds)) {
+                            $query->whereIn('question_id', $allowedQuestionIds);
+                        }
 
                         if ($difficulty === 'default') {
                             $query->where(function ($q) {
@@ -134,6 +156,10 @@ class AdminExamTimetableIndex extends Component
                             ->where('timetable_module_id', $transactionModule->id)
                             ->where('topic_id', $topicId);
 
+                        if (is_array($allowedQuestionIds)) {
+                            $query->whereIn('question_id', $allowedQuestionIds);
+                        }
+
                         if ($difficulty === 'default') {
                             $query->where(function ($q) {
                                 $q->where('difficulty', 'default')
@@ -159,6 +185,10 @@ class AdminExamTimetableIndex extends Component
                     ->select('id', 'study_id')
                     ->where('timetable_module_id', $transactionModule->id);
 
+                if (is_array($allowedQuestionIds)) {
+                    $query->whereIn('question_id', $allowedQuestionIds);
+                }
+
                 if ($transactionModule->random_question) {
                     $query->inRandomOrder();
                 } else {
@@ -166,6 +196,10 @@ class AdminExamTimetableIndex extends Component
                 }
 
                 $modulesQuestions = $query->get();
+            }
+
+            if ($transactionModule->random_question && $modulesQuestions->isNotEmpty()) {
+                $modulesQuestions = $modulesQuestions->shuffle()->values();
             }
 
             $UserTimetable = UserTimetable::create([

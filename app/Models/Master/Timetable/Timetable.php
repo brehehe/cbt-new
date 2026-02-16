@@ -107,7 +107,17 @@ class Timetable extends Model
                         ],
                     );
 
+                    $questionPickType = $module->question_pick_type ?? 'manual';
+
                     ModuleQuestion::where('module_id', $module->id)
+                        ->when($questionPickType === 'manual', function ($query) {
+                            $query->where(function ($q) {
+                                $q->whereNull('question_pick_type')
+                                    ->orWhere('question_pick_type', 'manual');
+                            });
+                        }, function ($query) use ($questionPickType) {
+                            $query->where('question_pick_type', $questionPickType);
+                        })
                         ->with(['question.answers'])
                         ->chunkById(200, function ($moduleQuestions) use ($timetableModule) {
                             $now = now();

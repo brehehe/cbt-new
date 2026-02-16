@@ -125,6 +125,7 @@
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
+                    {{-- 
                     @if ($module_id)
                         <div class="bg-white/80">
                             <div class="table-container">
@@ -149,6 +150,7 @@
                             </div>
                         </div>
                     @endif
+                    --}}
                 </div>
                 <div class="space-y-4">
                     <div>

@@ -72,10 +72,9 @@ class ModuleService
     private function syncModuleQuestionsByCategory(Module $module, array $categoryQuestionSettings, ?string $companyId): void
     {
         $enabledCategoryIds = array_keys($categoryQuestionSettings);
-        $allCategoryIds = CategoryQuestion::pluck('id')->toArray();
-        $disabledCategoryIds = array_values(array_diff($allCategoryIds, $enabledCategoryIds));
 
-        DB::transaction(function () use ($module, $enabledCategoryIds, $disabledCategoryIds, $companyId) {
+        DB::transaction(function () use ($module, $enabledCategoryIds, $companyId) {
+            // Add questions from enabled categories
             if (!empty($enabledCategoryIds)) {
                 $questions = Question::withoutGlobalScope('user_scope')
                     ->whereIn('category_question_id', $enabledCategoryIds)
@@ -90,26 +89,33 @@ class ModuleService
                         [
                             'company_id' => $companyId,
                             'study_id' => $question->study_id,
+                            'question_pick_type' => 'category',
                         ]
                     );
 
-                    
                     if ($moduleQuestion->trashed()) {
                         $moduleQuestion->restore();
                     }
                 }
             }
 
+            // Delete module_questions from disabled (unchecked) categories
+            $disabledCategoryIds = CategoryQuestion::pluck('id')
+                ->diff($enabledCategoryIds)
+                ->toArray();
+
             if (!empty($disabledCategoryIds)) {
-                $questionIdsToDisable = Question::withoutGlobalScope('user_scope')
+                $questionIdsToDelete = Question::withoutGlobalScope('user_scope')
                     ->whereIn('category_question_id', $disabledCategoryIds)
                     ->pluck('id')
                     ->toArray();
 
-                if (!empty($questionIdsToDisable)) {
-                    ModuleQuestion::where('module_id', $module->id)
-                        ->whereIn('question_id', $questionIdsToDisable)
-                        ->delete();
+                if (!empty($questionIdsToDelete)) {
+                    ModuleQuestion::withoutGlobalScope('user_scope')
+                        ->where('module_id', $module->id)
+                        ->whereIn('question_id', $questionIdsToDelete)
+                        ->where('question_pick_type', 'category')
+                        ->forceDelete();
                 }
             }
         });
@@ -118,10 +124,9 @@ class ModuleService
     private function syncModuleQuestionsByTopic(Module $module, array $topicQuestionSettings, ?string $companyId): void
     {
         $enabledTopicIds = array_keys($topicQuestionSettings);
-        $allTopicIds = Topic::pluck('id')->toArray();
-        $disabledTopicIds = array_values(array_diff($allTopicIds, $enabledTopicIds));
 
-        DB::transaction(function () use ($module, $enabledTopicIds, $disabledTopicIds, $companyId) {
+        DB::transaction(function () use ($module, $enabledTopicIds, $companyId) {
+            // Add questions from enabled topics
             if (!empty($enabledTopicIds)) {
                 $questions = Question::withoutGlobalScope('user_scope')
                     ->whereIn('topic_id', $enabledTopicIds)
@@ -136,6 +141,7 @@ class ModuleService
                         [
                             'company_id' => $companyId,
                             'study_id' => $question->study_id,
+                            'question_pick_type' => 'topic',
                         ]
                     );
 
@@ -145,16 +151,23 @@ class ModuleService
                 }
             }
 
+            // Delete module_questions from disabled (unchecked) topics
+            $disabledTopicIds = Topic::pluck('id')
+                ->diff($enabledTopicIds)
+                ->toArray();
+
             if (!empty($disabledTopicIds)) {
-                $questionIdsToDisable = Question::withoutGlobalScope('user_scope')
+                $questionIdsToDelete = Question::withoutGlobalScope('user_scope')
                     ->whereIn('topic_id', $disabledTopicIds)
                     ->pluck('id')
                     ->toArray();
 
-                if (!empty($questionIdsToDisable)) {
-                    ModuleQuestion::where('module_id', $module->id)
-                        ->whereIn('question_id', $questionIdsToDisable)
-                        ->delete();
+                if (!empty($questionIdsToDelete)) {
+                    ModuleQuestion::withoutGlobalScope('user_scope')
+                        ->where('module_id', $module->id)
+                        ->whereIn('question_id', $questionIdsToDelete)
+                        ->where('question_pick_type', 'topic')
+                        ->forceDelete();
                 }
             }
         });

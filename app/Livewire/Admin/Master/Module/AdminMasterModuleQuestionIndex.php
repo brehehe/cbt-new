@@ -44,13 +44,31 @@ class AdminMasterModuleQuestionIndex extends Component
 
     public function render()
     {
-        $module_questions = $this->get_module?->moduleQuestions()
-            ->select('id', 'module_id', 'question_id', 'study_id')
-            ->orderBy('id', 'desc')
-            ->paginate($this->perPageModule, ['*'], 'module_questions_page');
+        $questionPickType = $this->get_module?->question_pick_type ?? 'manual';
+        $module_questions = collect();
+        $moduleQuestionIds = [];
+
+        if ($this->get_module) {
+            $moduleQuestionsQuery = $this->get_module->moduleQuestions()
+                ->select('id', 'module_id', 'question_id', 'study_id');
+
+            if ($questionPickType === 'manual') {
+                $moduleQuestionsQuery->where(function ($q) {
+                    $q->whereNull('question_pick_type')
+                        ->orWhere('question_pick_type', 'manual');
+                });
+            } else {
+                $moduleQuestionsQuery->where('question_pick_type', $questionPickType);
+            }
+
+            $moduleQuestionIds = $moduleQuestionsQuery->pluck('question_id')->toArray();
+            $module_questions = $moduleQuestionsQuery
+                ->orderBy('id', 'desc')
+                ->paginate($this->perPageModule, ['*'], 'module_questions_page');
+        }
 
         $questions = Question::select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect', 'study_id')
-            ->whereNotIn('id', $this->get_module?->moduleQuestions()->pluck('question_id')->toArray() ?? [])
+            ->whereNotIn('id', $moduleQuestionIds)
             ->whereIn('study_id', $this->get_studys ? array_keys($this->get_studys) : [])
             ->search($this->search);
 
@@ -299,6 +317,40 @@ class AdminMasterModuleQuestionIndex extends Component
             $module = app(ModuleService::class)->updateOrCreate($request);
             if (!$module) {
                 throw new Exception("Ada kesalahaan saat ModuleService => updateOrCreate", 500);
+            }
+
+            if ($this->question_pick_type === 'category' && !empty($request['category_question_settings'])) {
+                $categoryIds = array_keys($request['category_question_settings']);
+                $questionIds = Question::withoutGlobalScope('user_scope')
+                    ->whereIn('category_question_id', $categoryIds)
+                    ->pluck('id')
+                    ->toArray();
+
+                if (!empty($questionIds)) {
+                    ModuleQuestion::withoutGlobalScope('user_scope')
+                        ->where('module_id', $module->id)
+                        ->whereIn('question_id', $questionIds)
+                        ->update([
+                            'company_id' => Auth::user()?->company?->id,
+                            'question_pick_type' => 'category',
+                        ]);
+                }
+            } elseif ($this->question_pick_type === 'topic' && !empty($request['topic_question_settings'])) {
+                $topicIds = array_keys($request['topic_question_settings']);
+                $questionIds = Question::withoutGlobalScope('user_scope')
+                    ->whereIn('topic_id', $topicIds)
+                    ->pluck('id')
+                    ->toArray();
+
+                if (!empty($questionIds)) {
+                    ModuleQuestion::withoutGlobalScope('user_scope')
+                        ->where('module_id', $module->id)
+                        ->whereIn('question_id', $questionIds)
+                        ->update([
+                            'company_id' => Auth::user()?->company?->id,
+                            'question_pick_type' => 'topic',
+                        ]);
+                }
             }
 
             $this->get_module = $module;

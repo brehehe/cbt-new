@@ -32,7 +32,7 @@
             </div>
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
                 <div class="text-center sm:text-right" wire:ignore>
-                    <span class="font-mono text-base font-bold text-white sm:text-lg" id="countdown"> 00:00:00
+                    <span class="font-mono font-bold sm:text-lg" id="countdown" style="color: #ffffff !important;"> 00:00:00
                     </span>
                 </div>
                 <div class="flex gap-2">
@@ -220,12 +220,12 @@
                         </div>
 
                         @if (!empty($images) && collect($images)->isNotEmpty())
-                            <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-4">
+                            <div class="mt-4 flex flex-wrap gap-3">
                                 @foreach ($images as $image)
                                     <div
-                                        class="overflow-hidden rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300 aspect-square">
+                                        class="overflow-hidden rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
                                         <img src="{{ asset('storage/' . $image) }}" alt="Gambar soal"
-                                            class="w-full h-full object-cover cursor-zoom-in js-zoomable"
+                                            class="object-contain cursor-zoom-in js-zoomable" style="max-width: 250px; max-height: 200px;"
                                             data-zoom-src="{{ asset('storage/' . $image) }}">
                                     </div>
                                 @endforeach
@@ -235,11 +235,10 @@
                         <!-- LaTeX Preview untuk Soal -->
                         @if ($question_latex_preview_png)
                             <div class="mt-4">
-                                <div class="p-2 bg-gray-50 rounded-lg border border-gray-200 flex">
+                                <div class="p-2 bg-gray-50 rounded-lg border border-gray-200 inline-block">
                                     <img src="{{ asset('storage/' . $question_latex_preview_png) }}" 
                                          alt="LaTeX preview" 
-                                         class="cursor-zoom-in js-zoomable"
-                                        style="width: 400px; height: 600px;"
+                                         class="cursor-zoom-in js-zoomable object-contain" style="max-width: 280px; max-height: 180px;"
                                          data-zoom-src="{{ asset('storage/' . $question_latex_preview_png) }}">
                                 </div>
                             </div>
@@ -270,13 +269,13 @@
 
                                 {{-- Row 2: Images (Indented below text) --}}
                                 @if (!empty($question_answer['images']) && collect($question_answer['images'])->isNotEmpty())
-                                    <div class="mt-3 ml-6 lg:ml-8">
-                                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                    <div class="mt-2 ml-6 lg:ml-8">
+                                        <div class="flex flex-wrap gap-2">
                                             @foreach ($question_answer['images'] as $image)
                                                 <div
-                                                    class="overflow-hidden transition-shadow duration-300 border border-gray-200 shadow-sm rounded-xl hover:shadow-md aspect-square">
+                                                    class="overflow-hidden transition-shadow duration-300 border border-gray-200 shadow-sm rounded-lg hover:shadow-md">
                                                     <img src="{{ asset('storage/' . $image) }}" alt="Gambar soal"
-                                                        class="object-cover w-full h-full cursor-zoom-in js-zoomable"
+                                                        class="object-contain cursor-zoom-in js-zoomable" style="max-width: 180px; max-height: 150px;"
                                                         data-zoom-src="{{ asset('storage/' . $image) }}">
                                                 </div>
                                             @endforeach
@@ -286,12 +285,11 @@
 
                                 <!-- LaTeX Preview untuk Jawaban -->
                                 @if ($question_answer['latex_preview_png'])
-                                    <div class="mt-3 ml-6 lg:ml-8">
-                                        <div class="p-2 bg-gray-50 rounded border border-gray-200 flex">
+                                    <div class="mt-2 ml-6 lg:ml-8">
+                                        <div class="p-2 bg-gray-50 rounded-lg border border-gray-200 inline-block">
                                             <img src="{{ asset('storage/' . $question_answer['latex_preview_png']) }}" 
                                                  alt="LaTeX preview" 
-                                                 class="cursor-zoom-in js-zoomable"
-                                                 style="width: 400px; height: 600px;"
+                                                 class="cursor-zoom-in js-zoomable object-contain" style="max-width: 220px; max-height: 150px;"
                                                  data-zoom-src="{{ asset('storage/' . $question_answer['latex_preview_png']) }}">
                                         </div>
                                     </div>
