@@ -188,8 +188,15 @@ class AdminMasterQuestionUpdate extends Component
             ->get();
     }
 
+    public function updatedCategoryQuestionId($value)
+    {
+        $this->category_question_id = !$value ? null : $value;
+    }
+
     public function submitQuestion()
     {
+        $this->category_question_id = $this->category_question_id ?: null;
+
         $this->validate(
             [
                 'topic_id'             => 'required|exists:topics,id',
@@ -200,7 +207,7 @@ class AdminMasterQuestionUpdate extends Component
                 'study_id'             => 'required|exists:studies,id',
                 // 'images.*'             => 'nullable|image|mimes:jpg,jpeg,png',
                 'description'          => 'nullable',
-                'category_question_id'  => 'required|exists:category_questions,id',
+                'category_question_id'  => 'nullable|exists:category_questions,id',
                     'latex'                => 'nullable',
             ],
             [

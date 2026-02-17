@@ -66,6 +66,9 @@ class AdminExamDetailIndex extends Component
         $this->handleSessionMessages();
         $this->initializeRecording();
         $this->initializeLiveSession();
+        
+        // Ensure frontend initializes properly
+        $this->js('if(typeof initializeExamFrontend === "function") { initializeExamFrontend(); } else { console.warn("initializeExamFrontend not found"); }');
     }
 
     private function initializeLiveSession()
@@ -965,7 +968,8 @@ class AdminExamDetailIndex extends Component
 
         if (!is_null($this->userTimetable->paused_at)) {
             $pausedAt = Carbon::parse($this->userTimetable->paused_at);
-            $delta = now()->diffInSeconds($pausedAt);
+            // Ensure delta is a positive integer
+            $delta = (int) abs(now()->diffInSeconds($pausedAt));
             $newTotal = (int) ($this->userTimetable->pause_total_seconds ?? 0) + $delta;
 
             $this->userTimetable->update([

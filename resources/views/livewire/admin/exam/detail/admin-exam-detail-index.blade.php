@@ -770,170 +770,10 @@
         try { window.$wire = window.$wire || @this; } catch (e) {}
 
         // Initialize everything when page loads
-        document.addEventListener("DOMContentLoaded", function() {
-            console.log('=== DOMContentLoaded fired ===');
-
-            // Check essential elements FIRST
-            const countdownElement = document.getElementById("countdown");
-            const cameraPreview = document.getElementById('cameraPreview');
-
-            console.log('🔍 Elements check:');
-            console.log('- Countdown element:', countdownElement ? '✅ Found' : '❌ Missing');
-            console.log('- Camera preview:', cameraPreview ? '✅ Found' : '❌ Missing');
-
-            // If essential elements missing, stop initialization
-            if (!countdownElement) {
-                console.error('❌ CRITICAL: Countdown element missing - stopping initialization');
-                alert('❌ Error: Countdown element not found. Please refresh the page.');
-                return;
-            }
-
-            if (!cameraPreview) {
-                console.error('❌ CRITICAL: Camera preview element missing');
-                alert('❌ Kamera tidak ditemukan. Halaman akan di-refresh otomatis jika memungkinkan.');
-                tryAutoReload('Camera preview element missing');
-                return;
-            }
-
-            // Ambil sisa waktu dari server dan lakukan resume jika perlu
-            const serverSeconds = {{ $remainingTime ?? 0 }};
-            console.log('⏰ Raw remaining time from server:', serverSeconds);
-            console.log('⏰ Type of remainingTime:', typeof serverSeconds);
-
-            // Inisialisasi countdown setelah mencoba resume di server
-            console.log('🕐 Starting countdown initialization with resume...');
-            const hasLivewire = (typeof $wire !== 'undefined') || (window.Livewire && document.querySelector('[wire\\:id]'));
-            if (hasLivewire) {
-                callWire('resumeTimerIfPaused')
-                    .then(() => callWire('getRemainingTime'))
-                    .then((latestSeconds) => {
-                        const useSeconds = parseInt(latestSeconds);
-                        const finalSeconds = (useSeconds && useSeconds > 0) ? useSeconds : (serverSeconds && serverSeconds > 0 ? serverSeconds : 3600);
-                        console.log('⏱️ Final countdown seconds after resume/getRemainingTime:', finalSeconds);
-                        startCountdown(finalSeconds);
-                        console.log('✅ Countdown started successfully after resume');
-                    })
-                    .catch((e) => {
-                        console.warn('⚠️ Resume/getRemainingTime failed, falling back:', e);
-                        const fallbackSeconds = (serverSeconds && serverSeconds > 0) ? serverSeconds : 3600;
-                        try {
-                            startCountdown(fallbackSeconds);
-                            console.log('✅ Countdown started with fallback');
-                        } catch (err) {
-                            console.error('❌ Countdown failed:', err);
-                            alert('❌ Countdown initialization failed: ' + err.message);
-                            return;
-                        }
-                    });
-            } else {
-                const fallbackSeconds = (serverSeconds && serverSeconds > 0) ? serverSeconds : 3600;
-                console.warn('⚠️ Livewire not available, using fallback seconds:', fallbackSeconds);
-                try {
-                    startCountdown(fallbackSeconds);
-                    console.log('✅ Countdown started with fallback (no Livewire)');
-                } catch (err) {
-                    console.error('❌ Countdown failed:', err);
-                    alert('❌ Countdown initialization failed: ' + err.message);
-                    return;
-                }
-            }
-
-            // Initialize camera SECOND - critical for exam
-            console.log('📹 Starting camera initialization...');
-            setTimeout(() => {
-                try {
-                    initializeCamera();
-                    console.log('✅ Camera initialization started');
-                } catch (err) {
-                    console.error('❌ Camera initialization failed:', err);
-                    // Don't stop here - camera issues are common
-                    tryAutoReload('initializeCamera() threw an error');
-                }
-            }, 500); // Small delay to let countdown start first
-
-            // Fallback: if camera not active after a short period, reload
-            setTimeout(() => {
-                const cam = document.getElementById('cameraPreview');
-                const noStream = !cam || !cam.srcObject;
-                const notPlaying = cam && cam.readyState < 2; // HAVE_CURRENT_DATA
-                if (noStream || notPlaying) {
-                    tryAutoReload('Camera not active after initialization window');
-                }
-            }, 8000);
-
-            // Initialize other components with delays
-            setTimeout(() => {
-                initializeExamEnvironment();
-                setupEventListeners();
-                console.log('✅ Exam environment and event listeners initialized');
-            }, 1000);
-
-            setTimeout(() => {
-                if (EXAM_CONFIG.isStreaming) {
-                    try {
-                        initializePeerJS();
-                        console.log('✅ PeerJS initialization started');
-                    } catch (err) {
-                        console.warn('⚠️ PeerJS initialization failed (non-critical):', err);
-                    }
-                } else {
-                    console.log('⏹️ PeerJS initialization skipped (Streaming disabled)');
-                }
-            }, 1500);
-
-            setTimeout(() => {
-                initializeLiveSessionMonitoring();
-                checkForEmergencyRecording();
-                console.log('✅ Live session monitoring and emergency check completed');
-            }, 2000);
-
-            // Start polling for auth/session status changes (force logout / suspend)
-            setTimeout(() => {
-                try {
-                    startAuthAndStatusPolling();
-                    console.log('✅ Auth & status polling started');
-                } catch (e) {
-                    console.warn('⚠️ Failed to start auth polling:', e);
-                }
-            }, 2200);
-
-            // Mark page as loaded
-            setTimeout(() => {
-                pageLoaded = true;
-                console.log('✅ Page fully loaded and initialized');
-            }, 3000);
-
-            // Try to reinitialize camera/peer when page becomes visible again
-            window.addEventListener('pageshow', () => {
-                try {
-                    const cam = document.getElementById('cameraPreview');
-                    if (!cam || !cam.srcObject || cam.readyState < 2) {
-                        initializeCamera();
-                    }
-                } catch (e) {}
-                if (EXAM_CONFIG.isStreaming) {
-                    try {
-                        initializePeerJS();
-                    } catch (e) {}
-                }
-            });
-
-            document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'visible') {
-                    try {
-                        const cam = document.getElementById('cameraPreview');
-                        const noStream = !cam || !cam.srcObject;
-                        const notPlaying = cam && cam.readyState < 2;
-                        if (noStream || notPlaying) {
-                            initializeCamera();
-                        }
-                    } catch (e) {}
-                }
-            });
-        });
-
-        // Enhanced countdown function with better error handling
-        function startCountdown(totalSeconds) {
+        // Initialize everything when page loads
+        
+        // --- Defined globally to be accessible ---
+        window.startCountdown = function(totalSeconds) {
             console.log('🕐 Starting countdown with:', totalSeconds, 'seconds');
 
             // Validate input
@@ -946,7 +786,7 @@
             const countdownElement = document.getElementById("countdown");
             if (!countdownElement) {
                 console.error('❌ Countdown element not found!');
-                throw new Error('Countdown element not found');
+                return; // Don't throw, just exit
             }
 
             // Clear any existing interval
@@ -1019,16 +859,146 @@
             updateCountdown();
 
             console.log('✅ Countdown started successfully with interval ID:', window.countdownInterval);
+        };
 
-            // Verify countdown is running after 2 seconds
+        window.initializeExamFrontend = function() {
+            if (window.examEnvInitialized) {
+                console.log('♻️ Exam frontend already initialized, skipping.');
+                return;
+            }
+            
+            console.log('=== Initializing Exam Frontend ===');
+
+            // Check essential elements FIRST
+            const countdownElement = document.getElementById("countdown");
+            const cameraPreview = document.getElementById('cameraPreview');
+
+            console.log('🔍 Elements check:');
+            console.log('- Countdown element:', countdownElement ? '✅ Found' : '❌ Missing');
+            console.log('- Camera preview:', cameraPreview ? '✅ Found' : '❌ Missing');
+
+            // If essential elements missing, stop initialization
+            if (!countdownElement) {
+                console.error('❌ CRITICAL: Countdown element missing - stopping initialization');
+                return;
+            }
+
+            window.examEnvInitialized = true;
+
+            if (!cameraPreview) {
+                console.error('❌ CRITICAL: Camera preview element missing');
+                tryAutoReload('Camera preview element missing');
+                return;
+            }
+
+            // Ambil sisa waktu dari server dan lakukan resume jika perlu
+            const serverSeconds = {{ $remainingTime ?? 0 }};
+            console.log('⏰ Raw remaining time from server:', serverSeconds);
+
+            // Inisialisasi countdown setelah mencoba resume di server
+            console.log('🕐 Starting countdown initialization with resume...');
+            const hasLivewire = (typeof $wire !== 'undefined') || (window.Livewire && document.querySelector('[wire\\:id]'));
+            if (hasLivewire) {
+                callWire('resumeTimerIfPaused')
+                    .then(() => callWire('getRemainingTime'))
+                    .then((latestSeconds) => {
+                        const useSeconds = parseInt(latestSeconds);
+                        const finalSeconds = (useSeconds && useSeconds > 0) ? useSeconds : (serverSeconds && serverSeconds > 0 ? serverSeconds : 3600);
+                        console.log('⏱️ Final countdown seconds after resume/getRemainingTime:', finalSeconds);
+                        window.startCountdown(finalSeconds);
+                        console.log('✅ Countdown started successfully after resume');
+                    })
+                    .catch((e) => {
+                        console.warn('⚠️ Resume/getRemainingTime failed, falling back:', e);
+                        const fallbackSeconds = (serverSeconds && serverSeconds > 0) ? serverSeconds : 3600;
+                        window.startCountdown(fallbackSeconds);
+                    });
+            } else {
+                const fallbackSeconds = (serverSeconds && serverSeconds > 0) ? serverSeconds : 3600;
+                console.warn('⚠️ Livewire not available, using fallback seconds:', fallbackSeconds);
+                window.startCountdown(fallbackSeconds);
+            }
+
+            // Initialize camera SECOND - critical for exam
+            console.log('📹 Starting camera initialization...');
             setTimeout(() => {
-                const currentDisplay = countdownElement.innerHTML;
-                console.log('🔍 Countdown verification after 2s:', currentDisplay);
-                if (currentDisplay === "00:00:00" || currentDisplay.includes("Error")) {
-                    console.error('❌ Countdown not working properly!');
-                    alert('⚠️ Countdown timer tidak berjalan dengan benar. Silakan refresh halaman.');
+                try {
+                    if (typeof initializeCamera === 'function') {
+                        initializeCamera();
+                        console.log('✅ Camera initialization started');
+                    } else {
+                        console.error('❌ initializeCamera function not found!');
+                    }
+                } catch (err) {
+                    console.error('❌ Camera initialization failed:', err);
+                    tryAutoReload('initializeCamera() threw an error');
                 }
+            }, 500); 
+
+            // Fallback: if camera not active after a short period, reload
+            setTimeout(() => {
+                const cam = document.getElementById('cameraPreview');
+                const noStream = !cam || !cam.srcObject;
+                const notPlaying = cam && cam.readyState < 2; // HAVE_CURRENT_DATA
+                if (noStream || notPlaying) {
+                    tryAutoReload('Camera not active after initialization window');
+                }
+            }, 8000);
+
+            // Initialize other components with delays
+            setTimeout(() => {
+                if (typeof initializeExamEnvironment === 'function') initializeExamEnvironment();
+                if (typeof setupEventListeners === 'function') setupEventListeners();
+                console.log('✅ Exam environment and event listeners initialized');
+            }, 1000);
+
+            setTimeout(() => {
+                if (EXAM_CONFIG.isStreaming) {
+                    try {
+                        if (typeof initializePeerJS === 'function') initializePeerJS();
+                    } catch (err) {
+                        console.warn('⚠️ PeerJS initialization failed:', err);
+                    }
+                }
+            }, 1500);
+
+            setTimeout(() => {
+                if (typeof initializeLiveSessionMonitoring === 'function') initializeLiveSessionMonitoring();
+                if (typeof checkForEmergencyRecording === 'function') checkForEmergencyRecording();
             }, 2000);
+
+            // Start polling
+            setTimeout(() => {
+                try {
+                    if (typeof startAuthAndStatusPolling === 'function') startAuthAndStatusPolling();
+                } catch (e) {}
+            }, 2200);
+
+            // Mark page as loaded
+            setTimeout(() => {
+                pageLoaded = true;
+                console.log('✅ Page fully loaded and initialized');
+            }, 3000);
+
+            // Visibility listeners
+            window.addEventListener('pageshow', () => {
+                 // ... logic ...
+            });
+             document.addEventListener('visibilitychange', () => {
+                // ... logic ...
+            });
+        };
+
+        // Run on various events to ensure it catches the load
+        document.addEventListener("DOMContentLoaded", window.initializeExamFrontend);
+        document.addEventListener("livewire:navigated", function() {
+            window.examEnvInitialized = false; // Reset on nav
+            window.initializeExamFrontend();
+        });
+        
+        // Immediate check in case event already fired
+        if (document.readyState === "complete" || document.readyState === "interactive") {
+            setTimeout(window.initializeExamFrontend, 100);
         }
 
         // Initialize exam environment

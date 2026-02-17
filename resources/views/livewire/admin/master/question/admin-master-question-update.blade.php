@@ -45,8 +45,7 @@
                     @enderror
                 </div>
                 <div>
-                    <label for="category_question_id" class="block text-sm font-medium text-gray-700">Kategori Soal <span
-                            class="text-red-600">*</span></label>
+                    <label for="category_question_id" class="block text-sm font-medium text-gray-700">Kategori Soal</label>
                     <select class="mt-1 form-control" wire:model.lazy='category_question_id'>
                         <option value="">Pilih kategori soal</option>
                         @foreach ($category_questions as $key_category_question => $category_question)

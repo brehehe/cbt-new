@@ -117,7 +117,7 @@ class AdminExamTimetableIndex extends Component
                         }
 
                         $query = TimetableQuestion::withoutGlobalScope('user_scope')
-                            ->select('id', 'study_id')
+                            ->select('id', 'study_id', 'question_id')
                             ->where('timetable_module_id', $transactionModule->id)
                             ->where('category_question_id', $categoryId);
 
@@ -152,7 +152,7 @@ class AdminExamTimetableIndex extends Component
                         }
 
                         $query = TimetableQuestion::withoutGlobalScope('user_scope')
-                            ->select('id', 'study_id')
+                            ->select('id', 'study_id', 'question_id')
                             ->where('timetable_module_id', $transactionModule->id)
                             ->where('topic_id', $topicId);
 
@@ -182,7 +182,7 @@ class AdminExamTimetableIndex extends Component
 
             if ($modulesQuestions->isEmpty()) {
                 $query = TimetableQuestion::withoutGlobalScope('user_scope')
-                    ->select('id', 'study_id')
+                    ->select('id', 'study_id', 'question_id')
                     ->where('timetable_module_id', $transactionModule->id);
 
                 if (is_array($allowedQuestionIds)) {
@@ -200,6 +200,26 @@ class AdminExamTimetableIndex extends Component
 
             if ($transactionModule->random_question && $modulesQuestions->isNotEmpty()) {
                 $modulesQuestions = $modulesQuestions->shuffle()->values();
+            }
+
+            if ($modulesQuestions->isNotEmpty()) {
+                $modulesQuestions = $modulesQuestions->unique('id')->values();
+
+                $selectedTimetableQuestionIds = $modulesQuestions->pluck('id')->filter()->values();
+                $selectedQuestionIds = $modulesQuestions->pluck('question_id')->filter()->values();
+
+                if ($selectedTimetableQuestionIds->isNotEmpty()) {
+                    TimetableQuestion::withoutGlobalScope('user_scope')
+                        ->whereIn('id', $selectedTimetableQuestionIds)
+                        ->update(['is_check' => true]);
+                }
+
+                if ($module && $selectedQuestionIds->isNotEmpty()) {
+                    ModuleQuestion::withoutGlobalScope('user_scope')
+                        ->where('module_id', $module->id)
+                        ->whereIn('question_id', $selectedQuestionIds)
+                        ->update(['is_check' => true]);
+                }
             }
 
             $UserTimetable = UserTimetable::create([

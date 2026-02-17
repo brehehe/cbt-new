@@ -19,6 +19,7 @@ use App\Livewire\Admin\Master\Question\AdminMasterQuestionUpdate;
 use App\Livewire\Admin\Master\QuestionType\AdminMasterQuestionTypeIndex;
 use App\Livewire\Admin\Master\Topic\AdminMasterTopicIndex;
 use App\Livewire\Admin\Report\ItemAnalysis\AdminReportItemAnalysisIndex;
+use App\Livewire\Admin\Report\ItemAnalysis\AdminReportItemAnalysisAllIndex;
 use App\Livewire\Admin\Report\ItemAnalysis\Detail\AdminReportItemAnalysisDetailIndex;
 use App\Livewire\Admin\Report\Question\AdminReportQuestionIndex;
 use App\Livewire\Admin\Report\Timetable\AdminReportTimetable;
@@ -159,6 +160,7 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
             Route::get('/timetable-detail/{id}', AdminReportTimetableDetail::class)->name('admin.report.timetable-detail');
             Route::get('/question', AdminReportQuestionIndex::class)->name('admin.report.question');
             Route::get('/item-analysis', AdminReportItemAnalysisIndex::class)->name('admin.report.item-analysis');
+            Route::get('/item-analysis-all', AdminReportItemAnalysisAllIndex::class)->name('admin.report.item-analysis-all');
             Route::get('/item-analysis/{id}/detail', AdminReportItemAnalysisDetailIndex::class)->name('admin.report.item-analysis.detail');
         });
 
@@ -346,7 +348,6 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
     });
 
     Route::post('/clearallsession/confirm', function () {
-
         if (!session('clearsession_verified')) {
             return redirect('/clearallsession')->with('error', 'Tidak diizinkan.');
         }
@@ -355,22 +356,64 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
             return "Tidak ada session yang dipilih.";
         }
 
+        // Ambil user_id dari session yang akan dihapus
+        $sessions = DB::table('sessions')->whereIn('id', request()->sessions)->get();
+        $userIds = $sessions->pluck('user_id')->filter()->unique();
+
+        if ($userIds->isNotEmpty()) {
+            try {
+                // 1. Putuskan live session untuk user-user tersebut
+                \App\Models\Exam\ExamLiveSession::whereIn('user_id', $userIds)
+                    ->update([
+                        'is_active' => false,
+                        'connection_status' => 'disconnected',
+                        'last_activity' => now(),
+                        'end_time' => now(),
+                    ]);
+
+                // 2. Pause timer ujian untuk user-user tersebut
+                \App\Models\User\UserTimetable::whereIn('user_id', $userIds)
+                    ->whereIn('status', ['exam', 'warning'])
+                    ->whereNull('paused_at')
+                    ->update(['paused_at' => now()]);
+            } catch (\Throwable $e) {
+                \Log::error("ClearSession Confirm Error: " . $e->getMessage());
+            }
+        }
+
         DB::table('sessions')
             ->whereIn('id', request()->sessions)
             ->delete();
 
-        return redirect('/clearallsession')->with('message', 'Session terpilih telah dihapus.');
+        return redirect('/clearallsession')->with('message', 'Session terpilih telah dihapus. Status ujian & live session telah disesuaikan.');
     });
 
 
     Route::post('/clearallsession/clearall', function () {
-
         if (!session('clearsession_verified')) {
             return redirect('/clearallsession')->with('error', 'Tidak diizinkan.');
         }
 
+        try {
+            // 1. Putuskan semua live session yang aktif
+            \App\Models\Exam\ExamLiveSession::where('is_active', true)
+                ->update([
+                    'is_active' => false,
+                    'connection_status' => 'disconnected',
+                    'last_activity' => now(),
+                    'end_time' => now(),
+                ]);
+
+            // 2. Pause semua ujian yang sedang berjalan
+            \App\Models\User\UserTimetable::whereIn('status', ['exam', 'warning'])
+                ->whereNull('paused_at')
+                ->update(['paused_at' => now()]);
+        } catch (\Throwable $e) {
+            \Log::error("ClearSession ClearAll Error: " . $e->getMessage());
+        }
+
         DB::table('sessions')->truncate();
 
-        return redirect('/clearallsession')->with('message', 'Semua session telah dihapus. Semua user telah logout.');
+        return redirect('/clearallsession')->with('message', 'Semua session telah dihapus. Semua user logout, exam dipause & live session diputus.');
     });
 });

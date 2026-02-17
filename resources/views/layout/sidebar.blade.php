@@ -79,7 +79,7 @@
                             [
                                 'label' => 'Riwayat Ujian',
                                 'url' => '/admin/exam/history-timetable',
-                                'pattern' => 'admin/exam/history-timetable',
+                                'pattern' => ['admin/exam/history-timetable', 'admin/exam/history-timetable/*'],
                                 'icon' => 'fa-clock-rotate-left',
                             ],
                         ];
@@ -87,9 +87,16 @@
 
                     @foreach ($exams as $exam)
                         @php
-                            $active = Request::is(ltrim($exam['pattern'], '/'));
+                            $rawPattern = $exam['pattern'] ?? ($exam['url'] ?? '');
+                            $patterns = is_array($rawPattern) ? $rawPattern : [$rawPattern];
+                            $patterns = array_map(fn($pattern) => ltrim($pattern, '/'), $patterns);
+                            $active = Request::is(...$patterns);
+                            $url = $exam['url'] ?? (is_array($rawPattern)
+                                ? ('/' . ltrim($rawPattern[0] ?? '', '/'))
+                                : ('/' . ltrim($rawPattern, '/')));
                         @endphp
-                        <a href="{{ $exam['url'] }}"
+                        @if (!empty($url))
+                            <a href="{{ $url }}"
                             class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
                             {{ $active
                                 ? "bg-[#C3D4EC]/50 $brandColor active-menu"
@@ -100,7 +107,8 @@
                                     {{ $active ? $brandColor : 'text-gray-400 group-hover:' . $brandColor }}"></i>
                                 <span class="sidebar-text">{{ $exam['label'] }}</span>
                             </div>
-                        </a>
+                            </a>
+                        @endif
                     @endforeach
                 @endif
 
@@ -365,14 +373,20 @@ if (auth()->check()) {
                             [
                                 'label' => 'Riwayat Jadwal Ujian',
                                 'route' => route('admin.report.timetable'),
-                                'match' => 'admin/report/timetable',
+                                'match' => ['admin/report/timetable', 'admin/report/timetable-detail/*'],
                                 'icon' => 'fa-file-alt',
                             ],
                             [
                                 'label' => 'Analisis Butir Soal',
                                 'route' => route('admin.report.item-analysis'),
-                                'match' => 'admin/report/item-analysis',
+                                'match' => ['admin/report/item-analysis', 'admin/report/item-analysis/*'],
                                 'icon' => 'fa-chart-line',
+                            ],
+                            [
+                                'label' => 'Analisis Butir Soal (Semua)',
+                                'route' => route('admin.report.item-analysis-all'),
+                                'match' => 'admin/report/item-analysis-all',
+                                'icon' => 'fa-chart-simple',
                             ],
                         ];
                     @endphp
