@@ -12,11 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('questions', function (Blueprint $table) {
-            $table->enum('difficulty', ['default', 'easy', 'medium', 'hard'])
-                ->default('default')
-                ->after('question_type_id')
-                ->comment('tingkat kesulitan soal');
+            if (!Schema::hasColumn('questions', 'difficulty')) {
+                $table->enum('difficulty', ['default', 'easy', 'medium', 'hard'])
+                    ->default('default')
+                    ->after('question_type_id')
+                    ->comment('tingkat kesulitan soal');
+            }
+            if (!Schema::hasColumn('questions', 'category_question_id')) {
                 $table->foreignUuid('category_question_id')->nullable();
+            }
         });
     }
 

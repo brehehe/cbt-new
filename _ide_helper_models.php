@@ -11,6 +11,22 @@
  */
 
 
+namespace App\Models\Category{
+/**
+ * @property-read \App\Models\Company\Company|null $company
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Question\Question> $questions
+ * @property-read int|null $questions_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryQuestion newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryQuestion newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryQuestion onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryQuestion query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryQuestion search($term)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryQuestion withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryQuestion withoutTrashed()
+ */
+	class CategoryQuestion extends \Eloquent {}
+}
+
 namespace App\Models\Classmate{
 /**
  * @property string $id
@@ -858,8 +874,10 @@ namespace App\Models\Master\Question{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $difficulty
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Question\Answer> $answers
  * @property-read int|null $answers_count
+ * @property-read \App\Models\Category\CategoryQuestion|null $categoryQuestion
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Master\Question\Material|null $material
  * @property-read \App\Models\Master\Question\MaterialCategory|null $materialCategory
@@ -878,6 +896,7 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereDifficulty($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereImages($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereMaterialCategoryId($value)
@@ -1538,6 +1557,7 @@ namespace App\Models\Timetable{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Timetable\TimetableAnswer> $answers
  * @property-read int|null $answers_count
  * @property-read \App\Models\Company\Company|null $company
+ * @property-read \App\Models\Master\Question\Module|null $module
  * @property-read \App\Models\Master\Question\QuestionType|null $questionType
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Timetable\TimetableQuestion> $questions
  * @property-read int|null $questions_count
@@ -1592,6 +1612,7 @@ namespace App\Models\Timetable{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Timetable\TimetableAnswer> $answers
  * @property-read int|null $answers_count
+ * @property-read \App\Models\Category\CategoryQuestion|null $categoryQuestion
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Timetable\TimetableModule|null $timetableModule
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion newModelQuery()
