@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\Exam\HistoryTimetable;
 
+use App\Models\Master\RatingScale\RatingScale;
 use App\Models\Master\Timetable\Timetable;
 use App\Models\User\UserTimetable;
 use Auth;
@@ -27,6 +28,18 @@ class AdminExamHistoryTimetableIndex extends Component
     public function mount()
     {
         $this->timetables = Timetable::select('id', 'name')->get()->pluck('name', 'id')->toArray();
+    }
+
+    public function getGradeDetail($mark)
+    {
+        if ($mark === null) {
+            return null;
+        }
+
+        return RatingScale::where('min_score', '<=', $mark)
+            ->where('max_score', '>=', $mark)
+            ->orderBy('order')
+            ->first();
     }
 
     public function render()

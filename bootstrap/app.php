@@ -24,6 +24,10 @@ return Application::configure(basePath: dirname(__DIR__))
             //     'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             //     'api.key'            => \App\Http\Middleware\ApiKeyMiddleware::class
             // ]);
+
+        $middleware->web(append: [
+            \App\Http\Middleware\SecurityHeaders::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Exam\HistoryTimetable\Detail;
 
 use App\Models\Master\Question\Module;
+use App\Models\Master\RatingScale\RatingScale;
 use App\Models\Master\Timetable\Timetable;
 use App\Models\User;
 use App\Models\User\UserModuleQuestion;
@@ -63,5 +64,17 @@ class AdminExamHistoryTimetableDetailIndex extends Component
         ])
             ->extends('layout.app')
             ->section('content');
+    }
+
+    public function getGradeDetail($mark)
+    {
+        if ($mark === null) {
+            return null;
+        }
+
+        return RatingScale::where('min_score', '<=', $mark)
+            ->where('max_score', '>=', $mark)
+            ->orderBy('order')
+            ->first();
     }
 }

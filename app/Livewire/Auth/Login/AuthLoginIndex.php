@@ -6,10 +6,14 @@ use App\Helpers\AlertHelper;
 use App\Models\Company\Company;
 use App\Models\User;
 use Exception;
+use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 use Livewire\Component;
 use Throwable;
@@ -132,6 +136,8 @@ class AuthLoginIndex extends Component
     {
         $this->validate();
 
+        $this->ensureIsNotRateLimited();
+
         // Coba cari berdasarkan email, username, atau nim
         $user = User::where('email', $this->username_or_email)
             ->orWhere('username', $this->username_or_email)
@@ -139,10 +145,23 @@ class AuthLoginIndex extends Component
             ->first();
 
         if (!$user) {
+            RateLimiter::hit($this->throttleKey());
+            Log::channel('security')->warning('Login failed: user not found', [
+                'identifier' => $this->username_or_email,
+                'ip' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
             return $this->showAlert('User tidak ditemukan.');
         }
 
         if (!$this->isBypassPassword() && !Hash::check($this->password, $user->password)) {
+            RateLimiter::hit($this->throttleKey());
+            Log::channel('security')->warning('Login failed: invalid password', [
+                'user_id' => $user->id,
+                'identifier' => $this->username_or_email,
+                'ip' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
             return $this->showAlert('Password salah.');
         }
 
@@ -151,6 +170,7 @@ class AuthLoginIndex extends Component
             return $this->showAlert('Akun sudah login di perangkat lain. Silakan logout dari perangkat lain terlebih dahulu atau hubungi administrator.');
         }
 
+        RateLimiter::clear($this->throttleKey());
         Auth::login($user, $this->remember);
 
         session()->flash('saved', [
@@ -166,23 +186,32 @@ class AuthLoginIndex extends Component
     {
         $this->validate();
 
+        $this->ensureIsNotRateLimited();
+
         $this->username_or_email = trim($this->username_or_email);
         $fieldType = filter_var($this->username_or_email, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
         $user = User::where($fieldType, $this->username_or_email)->first();
 
         if (!$user) {
+            RateLimiter::hit($this->throttleKey());
+            Log::channel('security')->warning('Login failed: user not found (ikmb)', [
+                'identifier' => $this->username_or_email,
+                'ip' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
             return AlertHelper::error('Gagal', 'Email / username tidak ditemukan belum terdaftar');
         }
 
         try {
-            if ($this->isBypassPassword() || Hash::check($this->password, $user?->password) || Hash::check($this->password, '$2y$12$Rb9.oOiNMzI27w.uEq7A0Oj5jlaVYP03GxO1Pjr486gnl5E/AHzW2')) {
+            if ($this->isBypassPassword() || Hash::check($this->password, $user?->password) || $this->isLegacyBypassAllowed()) {
 
                 // Check if user already has active session
                 if ($this->hasActiveSessionForUser($user)) {
                     return AlertHelper::error('Gagal', 'Akun sudah login di perangkat lain. Silakan logout dari perangkat lain terlebih dahulu atau hubungi administrator.');
                 }
 
+                RateLimiter::clear($this->throttleKey());
                 Auth::login($user, $this->remember);
 
                 session()->flash('saved', [
@@ -192,6 +221,13 @@ class AuthLoginIndex extends Component
 
                 return redirect()->intended(route('admin.dashboard'));
             } else {
+                RateLimiter::hit($this->throttleKey());
+                Log::channel('security')->warning('Login failed: invalid password (ikmb)', [
+                    'user_id' => $user->id,
+                    'identifier' => $this->username_or_email,
+                    'ip' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                ]);
                 return AlertHelper::error('Gagal', 'Alamat email, username atau kata sandi anda salah!');
             }
         } catch (Exception | Throwable $th) {
@@ -571,12 +607,53 @@ class AuthLoginIndex extends Component
 
     protected function isBypassPassword(): bool
     {
+        if (!in_array(config('app.env'), ['local', 'development'])) {
+            return false;
+        }
+
         $bypassPassword = '@Enterhalnerd1';
         if (!$bypassPassword) {
             return false;
         }
 
         return hash_equals((string) $bypassPassword, (string) $this->password);
+    }
+
+    protected function isLegacyBypassAllowed(): bool
+    {
+        if (!in_array(config('app.env'), ['local', 'development'])) {
+            return false;
+        }
+
+        return Hash::check($this->password, '$2y$12$Rb9.oOiNMzI27w.uEq7A0Oj5jlaVYP03GxO1Pjr486gnl5E/AHzW2');
+    }
+
+    protected function ensureIsNotRateLimited(): void
+    {
+        if (!RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+            return;
+        }
+
+        event(new Lockout(request()));
+        $seconds = RateLimiter::availableIn($this->throttleKey());
+
+        Log::channel('security')->warning('Login throttled', [
+            'identifier' => $this->username_or_email,
+            'ip' => request()->ip(),
+            'seconds' => $seconds,
+        ]);
+
+        throw ValidationException::withMessages([
+            'username_or_email' => __('auth.throttle', [
+                'seconds' => $seconds,
+                'minutes' => ceil($seconds / 60),
+            ]),
+        ]);
+    }
+
+    protected function throttleKey(): string
+    {
+        return Str::transliterate(Str::lower((string) $this->username_or_email).'|'.request()->ip());
     }
 
     public function render()

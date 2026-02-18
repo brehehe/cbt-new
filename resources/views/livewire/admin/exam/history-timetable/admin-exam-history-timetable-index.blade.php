@@ -46,6 +46,10 @@
                         <th>Durasi</th>
                         <th>Jam Mulai</th>
                         <th>Jam Akhir</th>
+                        @if($companyData->is_mark)
+                        <th>Nilai</th>
+                        <th>Skala Penilaian</th>
+                        @endif
                         <th style="width: 1%" class="center">Aksi</th>
                     </tr>
                 </thead>
@@ -60,6 +64,16 @@
                             </td>
                             <td>{{ Carbon\Carbon::parse($userTimetable?->timetable?->end_time)->format('d F Y H:i') ?? '-' }}
                             </td>
+                            @if($companyData->is_mark)
+                            @php($gradeDetail = $this->getGradeDetail($userTimetable->mark))
+                            <td>{{ $userTimetable->mark ?? '-' }}</td>
+                            <td>
+                                <div class="flex flex-col">
+                                    <span class="font-semibold">{{ $gradeDetail?->grade_letter ?? '-' }}</span>
+                                    <span class="text-xs text-gray-500">{{ $gradeDetail?->description ?? '-' }}</span>
+                                </div>
+                            </td>
+                            @endif
                             <td>
                                 <div class="flex justify-end items-center">
                                     <a href="/admin/exam/history-timetable/{{ $userTimetable->timetable_id }}/{{ $userTimetable->id }}"
@@ -71,7 +85,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="no-data">Tidak ada data</td>
+                            <td colspan="{{ $companyData->is_mark ? 8 : 6 }}" class="no-data">Tidak ada data</td>
                         </tr>
                     @endforelse
                 </tbody>
