@@ -158,4 +158,7 @@ return [
     */
 
     'pagination_theme' => 'tailwind',
+    'payload' => [
+        'max_size' => 15 * 1024 * 1024, // 15MB
+    ],
 ];
