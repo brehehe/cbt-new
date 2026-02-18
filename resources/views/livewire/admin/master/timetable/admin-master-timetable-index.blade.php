@@ -166,6 +166,13 @@
                                                         </a>
                                                     </li>
                                                     <li>
+                                                        <button wire:click="printCard('{{ $timetable->id }}')"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                            <i class="fa-solid fa-id-card mr-2 text-purple-600"></i>
+                                                            Cetak Kartu Peserta
+                                                        </button>
+                                                    </li>
+                                                    <li>
                                                         <button wire:click="edit('{{ $timetable->id }}')"
                                                             class="w-full text-left px-4 py-2 hover:bg-gray-100">
                                                             <i class="fa-solid fa-pen-to-square mr-2 text-blue-600"></i>
@@ -226,6 +233,13 @@
                                                                 class="fa-solid fa-file-signature mr-2 text-green-600"></i>
                                                             Cetak Berita Acara
                                                         </a>
+                                                    </li>
+                                                    <li>
+                                                        <button wire:click="printCard('{{ $timetable->id }}')"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                            <i class="fa-solid fa-id-card mr-2 text-purple-600"></i>
+                                                            Cetak Kartu Peserta
+                                                        </button>
                                                     </li>
                                                     <li>
                                                         <button wire:click="confirmDetail('{{ $timetable->id }}')"

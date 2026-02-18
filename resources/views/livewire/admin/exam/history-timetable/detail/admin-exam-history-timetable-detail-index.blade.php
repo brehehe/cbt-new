@@ -61,7 +61,9 @@
             </div>
         </div>
         @if($companyData->is_mark)
-            @php($gradeDetail = $this->getGradeDetail($user_timetable->mark))
+            @php
+                $gradeDetail = $this->getGradeDetail($user_timetable->mark);
+            @endphp
             <div>
                 <label for="nilai" class="block text-sm font-medium text-gray-700">Nilai</label>
                 <input disabled type="text" id="nilai" value="{{ $user_timetable->mark ?? '-' }}" placeholder="Masukkan"
@@ -69,12 +71,8 @@
             </div>
             <div class="md:col-span-3">
                 <label for="rating_scale" class="block text-sm font-medium text-gray-700">Skala Penilaian</label>
-                <div id="rating_scale" class="mt-1 form-control bg-gray-50">
-                    <div class="flex flex-col">
-                        <span class="font-semibold">{{ $gradeDetail?->grade_letter ?? '-' }}</span>
-                        <span class="text-xs text-gray-500">{{ $gradeDetail?->description ?? '-' }}</span>
-                    </div>
-                </div>
+                <input disabled type="text" id="rating_scale" value="{{ $gradeDetail?->grade_letter ?? '-' }}" placeholder="Masukkan"
+                    class="mt-1 form-control">
             </div>
         @endif
     </div>

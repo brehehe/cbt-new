@@ -104,7 +104,7 @@
                         @endphp
                         <tr class="h-6">
                             <td class="border border-gray-400">{{ $loop->iteration }}</td>
-                            <td class="border border-gray-400">{{ $class->user->nim }}</td>
+                            <td class="border border-gray-400">{{ $class?->user?->nim ?? $class?->user?->username }}</td>
                             <td class="border border-gray-400 text-left pl-2">{{ $class->user->name }}</td>
                             <td class="border border-gray-400 p-1">
                                 <img src="{{ $profile }}" alt="Foto Peserta" class="mx-auto object-cover"

@@ -21,4 +21,76 @@ class AdminReportTimetableIndex extends Component
             'timetables' => $timetables
         ])->extends('layout.app')->section('content');
     }
+    public function printOfficialReport($timetableId)
+    {
+        $timetable = Timetable::with(['module', 'userTimetables'])->find($timetableId);
+        if (!$timetable) return;
+
+        $company = \Illuminate\Support\Facades\Auth::user()->company()->with('companyDetail')->first();
+        
+        $totalStudents = $timetable->userTimetables->count();
+        $presentStudents = $timetable->userTimetables->whereNotNull('start_exam')->count();
+        $absentStudents = $totalStudents - $presentStudents;
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('livewire.admin.report.timetable.admin-report-timetable-official-pdf', [
+            'timetable' => $timetable,
+            'company' => $company,
+            'stats' => [
+                'total' => $totalStudents,
+                'present' => $presentStudents,
+                'absent' => $absentStudents
+            ]
+        ])->setPaper('a4', 'portrait');
+
+        return response()->streamDownload(
+            fn () => print($pdf->output()),
+            'berita-acara-' . $timetable->name . '.pdf'
+        );
+    }
+
+    public function printAttendanceList($timetableId)
+    {
+        $timetable = Timetable::with(['module', 'userTimetables.user'])->find($timetableId);
+        if (!$timetable) return;
+
+        $company = \Illuminate\Support\Facades\Auth::user()->company()->with('companyDetail')->first();
+
+        // Sort by name
+        $timetable->userTimetables = $timetable->userTimetables->sortBy(function($ut) {
+            return $ut->user->name;
+        });
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('livewire.admin.report.timetable.admin-report-timetable-attendance-pdf', [
+            'timetable' => $timetable,
+            'company' => $company
+        ])->setPaper('a4', 'portrait');
+
+        return response()->streamDownload(
+            fn () => print($pdf->output()),
+            'daftar-hadir-' . $timetable->name . '.pdf'
+        );
+    }
+
+    public function printParticipantCards($timetableId)
+    {
+        $timetable = Timetable::with(['module', 'userTimetables.user'])->find($timetableId);
+        if (!$timetable) return;
+
+        $company = \Illuminate\Support\Facades\Auth::user()->company()->with('companyDetail')->first();
+
+         // Sort by name
+         $timetable->userTimetables = $timetable->userTimetables->sortBy(function($ut) {
+            return $ut->user->name;
+        });
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('livewire.admin.report.timetable.admin-report-timetable-card-pdf', [
+            'timetable' => $timetable,
+            'company' => $company
+        ])->setPaper('a4', 'portrait');
+
+        return response()->streamDownload(
+            fn () => print($pdf->output()),
+            'kartu-peserta-' . $timetable->name . '.pdf'
+        );
+    }
 }

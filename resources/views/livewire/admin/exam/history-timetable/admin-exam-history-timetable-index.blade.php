@@ -65,7 +65,9 @@
                             <td>{{ Carbon\Carbon::parse($userTimetable?->timetable?->end_time)->format('d F Y H:i') ?? '-' }}
                             </td>
                             @if($companyData->is_mark)
-                            @php($gradeDetail = $this->getGradeDetail($userTimetable->mark))
+                            @php
+                                $gradeDetail = $this->getGradeDetail($userTimetable->mark);
+                            @endphp
                             <td>{{ $userTimetable->mark ?? '-' }}</td>
                             <td>
                                 <div class="flex flex-col">

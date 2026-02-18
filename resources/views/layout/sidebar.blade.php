@@ -377,6 +377,24 @@ if (auth()->check()) {
                                 'icon' => 'fa-file-alt',
                             ],
                             [
+                                'label' => 'Laporan Hasil Ujian',
+                                'route' => route('admin.report.exam-result'),
+                                'match' => ['admin/report/exam-result'],
+                                'icon' => 'fa-clipboard-list',
+                            ],
+                            // [
+                            //    'label' => 'Laporan Hasil Lengkap',
+                            //    'route' => route('admin.report.full-exam-result'),
+                            //    'match' => ['admin/report/full-exam-result'],
+                            //    'icon' => 'fa-list-alt',
+                            // ],
+                            [
+                                'label' => 'Laporan Statistik Jawaban',
+                                'route' => route('admin.report.answer-statistics'),
+                                'match' => ['admin/report/answer-statistics'],
+                                'icon' => 'fa-chart-pie',
+                            ],
+                            [
                                 'label' => 'Analisis Butir Soal',
                                 'route' => route('admin.report.item-analysis'),
                                 'match' => ['admin/report/item-analysis', 'admin/report/item-analysis/*'],

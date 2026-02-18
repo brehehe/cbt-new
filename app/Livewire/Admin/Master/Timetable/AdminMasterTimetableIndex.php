@@ -12,6 +12,7 @@ use App\Models\Master\Question\Module;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Master\Timetable\Timetable;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\User\UserTimetable;
 use App\Models\Study\Study;
 use App\Models\User;
@@ -416,6 +417,34 @@ class AdminMasterTimetableIndex extends Component
             DB::rollBack();
             AlertHelper::error('Gagal', 'Suspend sesi ujian gagal dilakukan.');
             Log::error('Gagal suspend jadwal', [
+                'error' => $th->getMessage(),
+                'trace' => $th->getTraceAsString(),
+            ]);
+        }
+    }
+    
+    public function printCard($id)
+    {
+        try {
+            $timetable = Timetable::with(['classmate' => function ($q) {
+                $q->with(['classmateStudents.user.userDetail']);
+            }])->findOrFail($id);
+            
+            $company = Auth::user()->company()->with('companyDetail')->first();
+
+            $pdf = Pdf::loadView('livewire.admin.master.timetable.admin-master-timetable-card-pdf', [
+                'timetable' => $timetable,
+                'company' => $company,
+            ])->setPaper('a4', 'portrait');
+
+            return response()->streamDownload(
+                fn () => print($pdf->output()),
+                'kartu-peserta-' . \Str::slug($timetable->name) . '.pdf'
+            );
+
+        } catch (\Throwable $th) {
+            AlertHelper::error('Gagal', 'Gagal mencetak kartu peserta.');
+            Log::error('Gagal cetak kartu peserta', [
                 'error' => $th->getMessage(),
                 'trace' => $th->getTraceAsString(),
             ]);

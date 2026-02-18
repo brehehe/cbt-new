@@ -21,6 +21,7 @@ use App\Livewire\Admin\Master\Topic\AdminMasterTopicIndex;
 use App\Livewire\Admin\Report\ItemAnalysis\AdminReportItemAnalysisIndex;
 use App\Livewire\Admin\Report\ItemAnalysis\AdminReportItemAnalysisAllIndex;
 use App\Livewire\Admin\Report\ItemAnalysis\Detail\AdminReportItemAnalysisDetailIndex;
+use App\Livewire\Admin\Report\ExamResult\AdminReportExamResultIndex;
 use App\Livewire\Admin\Report\Question\AdminReportQuestionIndex;
 use App\Livewire\Admin\Report\Timetable\AdminReportTimetable;
 use App\Livewire\Admin\Report\Timetable\AdminReportTimetableDetail;
@@ -162,6 +163,14 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
             Route::get('/item-analysis', AdminReportItemAnalysisIndex::class)->name('admin.report.item-analysis');
             Route::get('/item-analysis-all', AdminReportItemAnalysisAllIndex::class)->name('admin.report.item-analysis-all');
             Route::get('/item-analysis/{id}/detail', AdminReportItemAnalysisDetailIndex::class)->name('admin.report.item-analysis.detail');
+            Route::get('/exam-result', AdminReportExamResultIndex::class)->name('admin.report.exam-result');
+            
+            // New Reports
+            Route::get('/official', \App\Livewire\Admin\Report\Official\AdminReportOfficialIndex::class)->name('admin.report.official');
+            Route::get('/attendance', \App\Livewire\Admin\Report\Attendance\AdminReportAttendanceIndex::class)->name('admin.report.attendance');
+            Route::get('/card', \App\Livewire\Admin\Report\Card\AdminReportCardIndex::class)->name('admin.report.card');
+            Route::get('/full-exam-result', \App\Livewire\Admin\Report\FullExamResult\AdminReportFullExamResultIndex::class)->name('admin.report.full-exam-result');
+            Route::get('/answer-statistics', \App\Livewire\Admin\Report\AnswerStatistics\AdminReportAnswerStatisticsIndex::class)->name('admin.report.answer-statistics');
         });
 
         // Print previews (temporary demo routes)
