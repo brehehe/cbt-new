@@ -32,7 +32,7 @@
                     wire:loading.attr="disabled"
                     class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:border-indigo-900 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                 <i class="fa-solid fa-wand-magic-sparkles mr-2 animate-pulse"></i>
-                <span wire:loading.remove wire:target="generateAll">Generate All Difficulty</span>
+                <span wire:loading.remove wire:target="generateAll">Generate Difficulty</span>
                 <span wire:loading wire:target="generateAll">Generating...</span>
             </button>
         </div>
@@ -45,7 +45,7 @@
     @endphp
 
     <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Total Soal -->
         <div class="glass-card rounded-xl p-6 transition-all duration-300 hover:shadow-lg border-l-4 border-l-blue-500 group">
             <div class="flex items-center justify-between">
@@ -57,21 +57,6 @@
                 </div>
                 <div class="p-3 bg-blue-50 rounded-full group-hover:bg-blue-100 transition-colors">
                     <i class="fas fa-list text-xl text-blue-500"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Total Percobaan -->
-        <div class="glass-card rounded-xl p-6 transition-all duration-300 hover:shadow-lg border-l-4 border-l-emerald-500 group">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-500">Total Percobaan</p>
-                    <p class="mt-2 text-3xl font-bold text-gray-900 group-hover:text-emerald-600 transition-colors">
-                        {{ \Illuminate\Support\Number::format($pageAttempts) }}
-                    </p>
-                </div>
-                <div class="p-3 bg-emerald-50 rounded-full group-hover:bg-emerald-100 transition-colors">
-                    <i class="fas fa-users text-xl text-emerald-500"></i>
                 </div>
             </div>
         </div>
@@ -101,7 +86,7 @@
                     </p>
                 </div>
                 <div class="p-3 bg-purple-50 rounded-full group-hover:bg-purple-100 transition-colors">
-                    <i class="fas fa-chart-line text-xl text-purple-500"></i>
+                    <i class="fas fa-chart-line Index Ptext-xl text-purple-500"></i>
                 </div>
             </div>
         </div>
@@ -121,9 +106,6 @@
                         <option value="50">50</option>
                         <option value="100">100</option>
                     </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                        <i class="fas fa-chevron-down text-xs"></i>
-                    </div>
                 </div>
                 <span class="text-sm text-gray-500 font-medium whitespace-nowrap">data per halaman</span>
             </div>
