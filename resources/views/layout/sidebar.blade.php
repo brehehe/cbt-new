@@ -395,6 +395,12 @@ if (auth()->check()) {
                                 'icon' => 'fa-chart-pie',
                             ],
                             [
+                                'label' => 'Laporan Hasil Ujian Siswa',
+                                'route' => route('admin.report.student-exam-result'),
+                                'match' => ['admin/report/student-exam-result'],
+                                'icon' => 'fa-clipboard-list',
+                            ],
+                            [
                                 'label' => 'Analisis Butir Soal',
                                 'route' => route('admin.report.item-analysis'),
                                 'match' => ['admin/report/item-analysis', 'admin/report/item-analysis/*'],

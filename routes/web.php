@@ -171,6 +171,7 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
             Route::get('/card', \App\Livewire\Admin\Report\Card\AdminReportCardIndex::class)->name('admin.report.card');
             Route::get('/full-exam-result', \App\Livewire\Admin\Report\FullExamResult\AdminReportFullExamResultIndex::class)->name('admin.report.full-exam-result');
             Route::get('/answer-statistics', \App\Livewire\Admin\Report\AnswerStatistics\AdminReportAnswerStatisticsIndex::class)->name('admin.report.answer-statistics');
+            Route::get('/student-exam-result', \App\Livewire\Admin\Report\StudentExamResult\AdminReportStudentExamResultIndex::class)->name('admin.report.student-exam-result');
         });
 
         // Print previews (temporary demo routes)
