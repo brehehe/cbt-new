@@ -372,15 +372,15 @@
 <div>
     <!-- Header Section -->
     <div class="mb-6">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="text-center md:text-left w-full md:w-auto">
+                <h1 class="text-2xl md:text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
                     Selamat datang kembali,
                     {{ Auth::user()->name ?? 'Admin' }}!</h1>
-                <p class="text-gray-600 mt-1">Berikut aktivitas sistem CBT Anda hari ini.</p>
+                <p class="text-gray-600 mt-1 text-sm md:text-base">Berikut aktivitas sistem CBT Anda hari ini.</p>
                 {{-- <p class="text-sm text-gray-500">{{ \Carbon\Carbon::now()->format('l, F j, Y') }}</p> --}}
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 w-full md:w-auto justify-center md:justify-end">
                 <!-- Auto Refresh Toggle -->
                 {{-- <label class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" id="autoRefresh" class="sr-only peer" checked>
@@ -398,7 +398,7 @@
 
                 <!-- Refresh Button -->
                 <button wire:click="refreshData" id="refreshButton"
-                    class="inline-flex items-center px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_primary }}] text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                    class="inline-flex items-center px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_primary }}] text-white text-sm font-medium rounded-lg transition-colors duration-200 w-full md:w-auto justify-center">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">

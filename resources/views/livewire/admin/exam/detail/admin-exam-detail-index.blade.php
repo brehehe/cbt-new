@@ -1,4 +1,6 @@
-<div id="exam-container" class="flex flex-col min-h-screen bg-white">
+<div id="exam-container" class="flex flex-col min-h-screen bg-white"
+    x-data="{ mobileSidebarOpen: false, rightSidebarOpen: false }"
+    x-effect="document.body.classList.toggle('overflow-hidden', mobileSidebarOpen || rightSidebarOpen)">
     @php
         use App\Models\User\UserModuleQuestion;
 
@@ -16,28 +18,40 @@
 
     <!-- Header Fixed -->
     <header
-        class="flex-none p-2 text-white bg-[{{$companyData->color_primary}}] shadow-lg z-50 relative">
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-                <div
-                    class="px-2 py-1 bg-[{{$companyData->color_primary}}] rounded sm:px-3">
-                    <span class="text-xs sm:text-sm">Modul: {{ $userTimetable->timetable->module->name ?? '-' }}</span>
+        class="flex-none p-3 text-white bg-[{{$companyData->color_primary}}] shadow-lg z-50 relative">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            
+            {{-- Top Row / Left Side: Module Info --}}
+            <div class="flex items-center justify-between md:justify-start gap-4">
+                <div class="flex items-center gap-2 overflow-hidden">
+                    <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-lg whitespace-nowrap">
+                        <span class="text-xs md:text-sm font-medium">Modul: {{ Str::limit($userTimetable->timetable->module->name ?? '-', 20) }}</span>
+                    </div>
                 </div>
+                
+                {{-- Mobile Timer (Visible only on small screens) --}}
+                <div class="md:hidden font-mono font-bold text-lg" wire:ignore id="countdown-mobile" style="color: #ffffff !important;">
+                    00:00:00
+                </div>
+
                 <!-- Alert Counter -->
                 @if ($alertCount > 0)
-                    <div class="px-2 py-1 bg-red-600 rounded sm:px-3">
-                        <span class="text-xs sm:text-sm">⚠️ Peringatan: {{ $alertCount }}</span>
+                    <div class="px-3 py-1 bg-red-500/90 text-white rounded-lg animate-pulse">
+                        <span class="text-xs md:text-sm font-bold">⚠️ {{ $alertCount }}</span>
                     </div>
                 @endif
             </div>
-            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-                <div class="text-center sm:text-right" wire:ignore>
-                    <span class="font-mono font-bold sm:text-lg" id="countdown" style="color: #ffffff !important;"> 00:00:00
-                    </span>
+
+            {{-- Bottom Row / Right Side: Timer & Actions --}}
+            <div class="flex items-center justify-between md:gap-4">
+                {{-- Desktop Timer --}}
+                <div class="hidden md:block text-right" wire:ignore>
+                    <span class="font-mono font-bold text-xl tracking-wider" id="countdown" style="color: #ffffff !important;"> 00:00:00</span>
                 </div>
-                <div class="flex gap-2">
+
+                <div class="flex gap-2 w-full md:w-auto">
                     <button wire:click='confirmFinishExam'
-                        class="px-3 py-2 text-xs font-medium transition-colors bg-green-600 rounded hover:bg-green-700">
+                        class="flex-1 md:flex-none px-4 py-2 text-xs md:text-sm font-bold transition-all bg-white/20 hover:bg-white/30 text-white rounded-lg border border-white/30 shadow-sm backdrop-blur-sm">
                         Selesai Ujian
                     </button>
 
@@ -54,14 +68,14 @@
     <!-- Mobile Menu Toggle Button -->
     <div class="flex-none p-4 bg-white border-b border-gray-200 lg:hidden">
         <div class="flex items-center justify-between">
-            <button id="toggleLeftSidebar"
+            <button id="toggleLeftSidebar" @click="mobileSidebarOpen = !mobileSidebarOpen"
                 class="flex items-center text-[{{$companyData->color_primary}}] hover:text-[{{$companyData->color_primary}}]">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
                 Navigasi Soal
             </button>
-            <button id="toggleRightSidebar"
+            <button id="toggleRightSidebar" @click="rightSidebarOpen = !rightSidebarOpen"
                 class="flex items-center text-[{{$companyData->color_primary}}] hover:text-[{{$companyData->color_primary}}]">
                 Profil & Camera
                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,13 +90,14 @@
     <div class="relative flex flex-1 overflow-hidden">
         <!-- Sidebar Kiri - Navigasi Soal -->
         <div id="leftSidebar"
+            :class="{ '-translate-x-full': !mobileSidebarOpen, 'translate-x-0': mobileSidebarOpen }"
             class="fixed z-30 h-full overflow-y-auto transition-transform duration-300 ease-in-out transform -translate-x-full bg-white border-r border-gray-200 shadow-sm lg:relative w-80 lg:w-80 lg:h-auto lg:translate-x-0">
             <div
                 class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-50' : 'bg-orange-50' }}">
                 <h3
                     class="font-semibold text-[{{$companyData->color_primary}}]">
                     Navigasi Soal</h3>
-                <button id="closeLeftSidebar" class="text-gray-500 hover:text-gray-700">
+                <button id="closeLeftSidebar" @click="mobileSidebarOpen = false" class="text-gray-500 hover:text-gray-700">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
@@ -166,7 +181,10 @@
         </div>
 
         <!-- Overlay untuk mobile -->
-        <div id="overlay" class="fixed inset-0 z-20 hidden bg-black bg-opacity-50 lg:hidden"></div>
+        <div id="overlay"
+            :class="{ 'hidden': !mobileSidebarOpen && !rightSidebarOpen }"
+            @click="mobileSidebarOpen = false; rightSidebarOpen = false"
+            class="fixed inset-0 z-20 hidden bg-black bg-opacity-50 lg:hidden"></div>
 
         <!-- Konten Tengah - Area Soal -->
         <div class="flex flex-col flex-1 h-full overflow-hidden bg-white">
@@ -208,7 +226,7 @@
             </div>
 
             <!-- Konten Soal -->
-            <div class="flex-1 p-2 lg:p-4">
+            <div class="flex-1 p-2 lg:p-4 overflow-y-auto custom-scrollbar" style="-webkit-overflow-scrolling: touch;">
                 <div>
                     <!-- Pertanyaan -->
                     <div class="mb-4">
@@ -247,53 +265,56 @@
                     </div>
 
                     <!-- Pilihan Jawaban -->
-                    <div class="space-y-4" wire:key="question-{{ $questionNavigationId }}">
+                    <div class="space-y-3" wire:key="question-{{ $questionNavigationId }}">
                         @foreach ($question_answers as $question_answer)
                             <label
-                                class="block p-2 transition-all border border-gray-200 rounded-lg cursor-pointer lg:p-3 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'hover:bg-blue-50 hover:border-blue-300' : 'hover:bg-orange-50 hover:border-orange-300' }}">
+                                class="relative flex items-start p-3 transition-all border rounded-xl cursor-pointer hover:shadow-md group
+                                {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) 
+                                    ? 'hover:bg-blue-50 hover:border-blue-300' 
+                                    : 'hover:bg-orange-50 hover:border-orange-300' }}
+                                {{ $timetable_answer_id == $question_answer['id'] 
+                                    ? (in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500' : 'bg-orange-50 border-orange-500 ring-1 ring-orange-500')
+                                    : 'border-gray-200 bg-white' }}">
 
-                                {{-- Row 1: Radio + Text (Aligned Center) --}}
-                                <div class="flex items-center">
+                                <div class="flex items-center h-5 mt-1">
                                     <input type="radio" name="timetable_answer_id"
                                         wire:model.live="timetable_answer_id" value="{{ $question_answer['id'] }}"
-                                        class="flex-shrink-0 mr-2 text-[{{$companyData->color_primary}}] lg:mr-4">
-
-                                    <div class="flex-1">
-                                        <p class="text-sm text-gray-700 lg:text-base">
-                                            <span
-                                                class="font-medium {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-800' : 'text-orange-800' }}">{{ $question_answer['alphabet'] }}.</span>
-                                            <span class="ml-2">{{ $question_answer['context'] }}</span>
-                                        </p>
-                                    </div>
+                                        class="w-4 h-4 text-[{{$companyData->color_primary}}] border-gray-300 focus:ring-[{{$companyData->color_primary}}]">
                                 </div>
 
-                                {{-- Row 2: Images (Indented below text) --}}
-                                @if (!empty($question_answer['images']) && collect($question_answer['images'])->isNotEmpty())
-                                    <div class="mt-2 ml-6 lg:ml-8">
-                                        <div class="flex flex-wrap gap-2">
-                                            @foreach ($question_answer['images'] as $image)
-                                                <div
-                                                    class="overflow-hidden transition-shadow duration-300 border border-gray-200 shadow-sm rounded-lg hover:shadow-md">
-                                                    <img src="{{ asset('storage/' . $image) }}" alt="Gambar soal"
-                                                        class="object-contain cursor-zoom-in js-zoomable" style="max-width: 180px; max-height: 150px;"
-                                                        data-zoom-src="{{ asset('storage/' . $image) }}">
+                                <div class="flex-1 ml-3">
+                                    <div class="flex flex-col">
+                                        <div class="text-sm font-medium text-gray-900 lg:text-base flex gap-2">
+                                            <span class="flex-none font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-700' : 'text-orange-700' }}">{{ $question_answer['alphabet'] }}.</span>
+                                            <span class="text-gray-800 leading-relaxed">{{ $question_answer['context'] }}</span>
+                                        </div>
+                                        
+                                        {{-- Images --}}
+                                        @if (!empty($question_answer['images']) && collect($question_answer['images'])->isNotEmpty())
+                                            <div class="mt-3 grid grid-cols-2 md:grid-cols-3 gap-2">
+                                                @foreach ($question_answer['images'] as $image)
+                                                    <div class="overflow-hidden rounded-lg border border-gray-200 shadow-sm">
+                                                        <img src="{{ asset('storage/' . $image) }}" alt="Gambar jawaban"
+                                                            class="w-full h-auto object-contain cursor-zoom-in js-zoomable max-h-40 bg-gray-50 bg-opacity-50"
+                                                            data-zoom-src="{{ asset('storage/' . $image) }}">
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                        
+                                        {{-- LaTeX Preview --}}
+                                        @if ($question_answer['latex_preview_png'])
+                                            <div class="mt-3">
+                                                <div class="p-2 bg-gray-50 rounded-lg border border-gray-200 inline-block">
+                                                    <img src="{{ asset('storage/' . $question_answer['latex_preview_png']) }}" 
+                                                         alt="LaTeX preview" 
+                                                         class="cursor-zoom-in js-zoomable object-contain max-h-24"
+                                                         data-zoom-src="{{ asset('storage/' . $question_answer['latex_preview_png']) }}">
                                                 </div>
-                                            @endforeach
-                                        </div>
+                                            </div>
+                                        @endif
                                     </div>
-                                @endif
-
-                                <!-- LaTeX Preview untuk Jawaban -->
-                                @if ($question_answer['latex_preview_png'])
-                                    <div class="mt-2 ml-6 lg:ml-8">
-                                        <div class="p-2 bg-gray-50 rounded-lg border border-gray-200 inline-block">
-                                            <img src="{{ asset('storage/' . $question_answer['latex_preview_png']) }}" 
-                                                 alt="LaTeX preview" 
-                                                 class="cursor-zoom-in js-zoomable object-contain" style="max-width: 220px; max-height: 150px;"
-                                                 data-zoom-src="{{ asset('storage/' . $question_answer['latex_preview_png']) }}">
-                                        </div>
-                                    </div>
-                                @endif
+                                </div>
                             </label>
                         @endforeach
                     </div>
@@ -346,13 +367,14 @@
 
         <!-- Sidebar Kanan - Camera dan Profile -->
         <div id="rightSidebar"
+            :class="{ 'translate-x-full': !rightSidebarOpen, 'translate-x-0': rightSidebarOpen }"
             class="fixed right-0 z-30 h-full overflow-y-auto transition-transform duration-300 ease-in-out transform translate-x-full bg-white border-l border-gray-200 shadow-sm lg:relative w-80 lg:w-80 lg:h-auto lg:translate-x-0">
             <div
                 class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-50' : 'bg-orange-50' }}">
                 <h3
                     class="font-semibold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-800' : 'text-orange-800' }}">
                     Profil & Camera</h3>
-                <button id="closeRightSidebar" class="text-gray-500 hover:text-gray-700">
+                <button id="closeRightSidebar" @click="rightSidebarOpen = false" class="text-gray-500 hover:text-gray-700">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
@@ -782,6 +804,7 @@
             }
 
             const countdownElement = document.getElementById("countdown");
+            
             if (!countdownElement) {
                 console.error('❌ Countdown element not found!');
                 return; // Don't throw, just exit
@@ -798,9 +821,26 @@
 
             function updateCountdown() {
                 try {
+                    // Re-fetch mobile element in case of DOM updates
+                    const countdownMobileElement = document.getElementById("countdown-mobile");
+
+                    const hours = Math.floor(remainingTime / 3600);
+                    const minutes = Math.floor((remainingTime % 3600) / 60);
+                    const seconds = remainingTime % 60;
+
+                    const timeString =
+                        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
                     if (remainingTime <= 0) {
-                        countdownElement.innerHTML = "⏰ Waktu Habis";
+                        const expiredText = "⏰ Waktu Habis";
+                        countdownElement.innerHTML = expiredText;
                         countdownElement.style.color = "red";
+                        
+                        if (countdownMobileElement) {
+                            countdownMobileElement.innerHTML = expiredText;
+                            countdownMobileElement.style.color = "red";
+                        }
+                        
                         clearInterval(window.countdownInterval);
                         console.log('⏰ Time expired, stopping recording...');
 
@@ -818,22 +858,25 @@
                         return;
                     }
 
-                    const hours = Math.floor(remainingTime / 3600);
-                    const minutes = Math.floor((remainingTime % 3600) / 60);
-                    const seconds = remainingTime % 60;
-
-                    const timeString =
-                        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
                     countdownElement.innerHTML = timeString;
+                    if (countdownMobileElement) {
+                        countdownMobileElement.innerHTML = timeString;
+                        // Match color style
+                        countdownMobileElement.style.color = countdownElement.style.color || "#ffffff"; 
+                        // Note: desktop timer uses style attribute for color updates in some logic below
+                    }
 
                     // Color coding for urgency
+                    let color = "";
                     if (remainingTime <= 300) { // 5 minutes
-                        countdownElement.style.color = "red";
+                        color = "red";
                     } else if (remainingTime <= 900) { // 15 minutes
-                        countdownElement.style.color = "orange";
-                    } else {
-                        countdownElement.style.color = "";
+                        color = "orange";
+                    }
+
+                    countdownElement.style.color = color;
+                    if (countdownMobileElement) {
+                        countdownMobileElement.style.color = color;
                     }
 
                     // Log every 5 minutes for debugging (reduced frequency)
@@ -1156,53 +1199,10 @@
                 }
             });
 
-            // Sidebar toggles
-            setupSidebarToggles();
+
         }
 
-        // Setup sidebar toggles
-        function setupSidebarToggles() {
-            const toggleLeftSidebar = document.getElementById('toggleLeftSidebar');
-            const toggleRightSidebar = document.getElementById('toggleRightSidebar');
-            const closeLeftSidebar = document.getElementById('closeLeftSidebar');
-            const closeRightSidebar = document.getElementById('closeRightSidebar');
-            const leftSidebar = document.getElementById('leftSidebar');
-            const rightSidebar = document.getElementById('rightSidebar');
-            const overlay = document.getElementById('overlay');
 
-            function showLeftSidebar() {
-                leftSidebar.classList.remove('-translate-x-full');
-                overlay.classList.remove('hidden');
-                document.body.classList.add('overflow-hidden');
-            }
-
-            function hideLeftSidebar() {
-                leftSidebar.classList.add('-translate-x-full');
-                overlay.classList.add('hidden');
-                document.body.classList.remove('overflow-hidden');
-            }
-
-            function showRightSidebar() {
-                rightSidebar.classList.remove('translate-x-full');
-                overlay.classList.remove('hidden');
-                document.body.classList.add('overflow-hidden');
-            }
-
-            function hideRightSidebar() {
-                rightSidebar.classList.add('translate-x-full');
-                overlay.classList.add('hidden');
-                document.body.classList.remove('overflow-hidden');
-            }
-
-            if (toggleLeftSidebar) toggleLeftSidebar.addEventListener('click', showLeftSidebar);
-            if (toggleRightSidebar) toggleRightSidebar.addEventListener('click', showRightSidebar);
-            if (closeLeftSidebar) closeLeftSidebar.addEventListener('click', hideLeftSidebar);
-            if (closeRightSidebar) closeRightSidebar.addEventListener('click', hideRightSidebar);
-            if (overlay) overlay.addEventListener('click', function() {
-                hideLeftSidebar();
-                hideRightSidebar();
-            });
-        }
 
         // Enhanced camera initialization with step-by-step debugging
         async function initializeCamera() {
