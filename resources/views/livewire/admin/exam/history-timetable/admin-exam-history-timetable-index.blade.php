@@ -36,7 +36,9 @@
     </div>
     <!-- Table Section -->
     <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
-        <div class="table-container">
+        
+        <!-- Desktop Table View -->
+        <div class="hidden md:block table-container">
             <table class="table">
                 <thead>
                     <tr>
@@ -92,6 +94,52 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        <!-- Mobile Card View -->
+        <div class="md:hidden space-y-4 p-4">
+            @forelse ($userTimetables as $index => $userTimetable)
+                <div class="bg-white rounded-lg shadow border border-gray-200 p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                             <h3 class="font-bold text-lg text-gray-800">{{ $userTimetable->timetable->name ?? '-' }}</h3>
+                             <div class="text-sm text-gray-500">
+                                {{ Carbon\Carbon::parse($userTimetable?->timetable?->start_time)->format('d M Y H:i') }} - 
+                                {{ Carbon\Carbon::parse($userTimetable?->timetable?->end_time)->format('H:i') }}
+                             </div>
+                        </div>
+                         @if($companyData->is_mark)
+                            @php
+                                $gradeDetail = $this->getGradeDetail($userTimetable->mark);
+                            @endphp
+                            <div class="text-right">
+                                <span class="block text-2xl font-bold text-[{{ $companyData->color_primary ?? '#2b7fff' }}]">
+                                    {{ $userTimetable->mark ?? '-' }}
+                                </span>
+                                <span class="text-sm font-semibold text-gray-600">{{ $gradeDetail?->grade_letter ?? '-' }}</span>
+                            </div>
+                        @endif
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-2 text-sm text-gray-600 mb-3">
+                        <div>
+                            <span class="block text-xs text-gray-400">Durasi</span>
+                            {{ $userTimetable?->timetable?->module?->duration ?? 0 }} Menit
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-2 border-t border-gray-100">
+                         <a href="/admin/exam/history-timetable/{{ $userTimetable->timetable_id }}/{{ $userTimetable->id }}"
+                            class="w-full btn text-blue-600 btn-sm flex justify-center items-center gap-2 bg-blue-50 hover:bg-blue-100 py-2 rounded-md">
+                            <i class="fas fa-eye"></i> Detail
+                        </a>
+                    </div>
+                </div>
+            @empty
+                <div class="text-center p-8 text-gray-500">
+                    Tidak ada data
+                </div>
+            @endforelse
         </div>
 
         <!-- Pagination -->

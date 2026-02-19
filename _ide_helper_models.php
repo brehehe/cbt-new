@@ -13,6 +13,14 @@
 
 namespace App\Models\Category{
 /**
+ * @property string $id
+ * @property string $name nama kategori soal
+ * @property string|null $description deskripsi kategori soal
+ * @property string|null $company_id
+ * @property int $order
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Question\Question> $questions
  * @property-read int|null $questions_count
@@ -21,6 +29,14 @@ namespace App\Models\Category{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryQuestion onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryQuestion query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryQuestion search($term)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryQuestion whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryQuestion whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryQuestion whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryQuestion whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryQuestion whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryQuestion whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryQuestion whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryQuestion whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryQuestion withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryQuestion withoutTrashed()
  */
@@ -145,6 +161,10 @@ namespace App\Models\Company{
  * @property bool $seb_allow_spell_check
  * @property bool $seb_enable_private_clipboard
  * @property string|null $seb_browser_exam_key
+ * @property string|null $app_windows
+ * @property string|null $app_mac
+ * @property string|null $app_android
+ * @property string|null $app_ios
  * @property-read Company|null $company
  * @property-read \App\Models\Company\CompanyDetail|null $companyDetail
  * @property-read \App\Models\User|null $user
@@ -152,6 +172,10 @@ namespace App\Models\Company{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereAppAndroid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereAppIos($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereAppMac($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereAppWindows($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereBackgroundLogin($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereCodeName($value)
@@ -669,6 +693,9 @@ namespace App\Models\Master\Question{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $latex latex source for answer
+ * @property string|null $latex_preview_pdf latex preview pdf path
+ * @property string|null $latex_preview_png latex preview png path
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Master\Question\Question|null $question
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Answer newModelQuery()
@@ -684,6 +711,9 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Answer whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Answer whereImages($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Answer whereIsCorrect($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Answer whereLatex($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Answer whereLatexPreviewPdf($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Answer whereLatexPreviewPng($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Answer whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Answer whereQuestionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Answer whereUpdatedAt($value)
@@ -791,6 +821,9 @@ namespace App\Models\Master\Question{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property array<array-key, mixed>|null $category_question_settings pengaturan jumlah soal per kategori & difficulty
+ * @property string $question_pick_type tipe pengambilan soal: manual/category/topic
+ * @property array<array-key, mixed>|null $topic_question_settings pengaturan jumlah soal per topik & difficulty
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Question\ModuleQuestion> $moduleQuestions
  * @property-read int|null $module_questions_count
@@ -800,6 +833,7 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module search($term)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereCategoryQuestionSettings($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereCompanyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereDeletedAt($value)
@@ -809,9 +843,11 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereIsAllStudy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereQuestionPickType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereQuestionTypeId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereRandomQuestion($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereStudys($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereTopicQuestionSettings($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module withTrashed(bool $withTrashed = true)
@@ -831,6 +867,8 @@ namespace App\Models\Master\Question{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property bool $is_check menandai soal sudah dicek atau belum
+ * @property string|null $question_pick_type
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Master\Question\Module|null $module
  * @property-read \App\Models\Master\Question\Question|null $question
@@ -844,9 +882,11 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion whereIsCheck($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion whereModuleId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion whereQuestionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion whereQuestionPickType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion whereStudyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModuleQuestion withTrashed(bool $withTrashed = true)
@@ -874,7 +914,11 @@ namespace App\Models\Master\Question{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $difficulty
+ * @property string $difficulty tingkat kesulitan soal
+ * @property string|null $category_question_id
+ * @property string|null $latex latex source for question
+ * @property string|null $latex_preview_pdf latex preview pdf path
+ * @property string|null $latex_preview_png latex preview png path
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Question\Answer> $answers
  * @property-read int|null $answers_count
  * @property-read \App\Models\Category\CategoryQuestion|null $categoryQuestion
@@ -892,6 +936,7 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question search($term)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereCategoryQuestionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereCompanyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereDeletedAt($value)
@@ -899,6 +944,9 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereDifficulty($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereImages($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereLatex($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereLatexPreviewPdf($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereLatexPreviewPng($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereMaterialCategoryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereMaterialId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereOrder($value)
@@ -1510,6 +1558,9 @@ namespace App\Models\Timetable{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $latex LaTeX content for answer
+ * @property string|null $latex_preview_pdf LaTeX preview PDF path
+ * @property string|null $latex_preview_png LaTeX preview PNG path
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Timetable\TimetableModule|null $timetableModule
  * @property-read \App\Models\Timetable\TimetableQuestion|null $timetableQuestion
@@ -1527,6 +1578,9 @@ namespace App\Models\Timetable{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAnswer whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAnswer whereImages($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAnswer whereIsCorrect($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAnswer whereLatex($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAnswer whereLatexPreviewPdf($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAnswer whereLatexPreviewPng($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAnswer whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAnswer whereTimetableQuestionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAnswer whereUpdatedAt($value)
@@ -1610,6 +1664,12 @@ namespace App\Models\Timetable{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string $difficulty tingkat kesulitan soal
+ * @property string|null $category_question_id
+ * @property bool $is_check menandai soal sudah dicek atau belum
+ * @property string|null $latex LaTeX content for question
+ * @property string|null $latex_preview_pdf LaTeX preview PDF path
+ * @property string|null $latex_preview_png LaTeX preview PNG path
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Timetable\TimetableAnswer> $answers
  * @property-read int|null $answers_count
  * @property-read \App\Models\Category\CategoryQuestion|null $categoryQuestion
@@ -1620,12 +1680,18 @@ namespace App\Models\Timetable{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion search($term)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereCategoryQuestionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereCompanyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereDifficulty($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereImages($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereIsCheck($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereLatex($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereLatexPreviewPdf($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereLatexPreviewPng($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereMaterialCategoryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereMaterialId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereOrder($value)

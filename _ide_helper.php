@@ -25984,6 +25984,55 @@ namespace App\Livewire\Admin\Report\ItemAnalysis\Detail {
             }
     }
 
+namespace App\Livewire\Admin\Report\ExamResult {
+    /**
+     */
+    class AdminReportExamResultIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Report\Official {
+    /**
+     */
+    class AdminReportOfficialIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Report\Attendance {
+    /**
+     */
+    class AdminReportAttendanceIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Report\Card {
+    /**
+     */
+    class AdminReportCardIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Report\FullExamResult {
+    /**
+     */
+    class AdminReportFullExamResultIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Report\AnswerStatistics {
+    /**
+     */
+    class AdminReportAnswerStatisticsIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Report\StudentExamResult {
+    /**
+     */
+    class AdminReportStudentExamResultIndex extends \Livewire\Component {
+            }
+    }
+
 namespace App\Livewire\Dosen\Dashboard {
     /**
      */

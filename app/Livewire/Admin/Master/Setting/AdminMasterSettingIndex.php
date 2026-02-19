@@ -24,8 +24,9 @@ class AdminMasterSettingIndex extends Component
     public $tabs = [
         'universitas',
         // 'satu-sehat',
-        'seb',
-        'layanan',
+        // 'seb',
+        // 'layanan',
+        'aplikasi',
     ];
 
     public $currentTab;
@@ -101,6 +102,16 @@ class AdminMasterSettingIndex extends Component
     public $seb_enable_private_clipboard;
     public $seb_browser_exam_key;
 
+    // App Installers
+    public $app_windows;
+    public $app_windows_old;
+    public $app_mac;
+    public $app_mac_old;
+    public $app_android;
+    public $app_android_old;
+    public $app_ios;
+    public $app_ios_old;
+
     // Service
     public $companyServices = [];
 
@@ -150,7 +161,16 @@ class AdminMasterSettingIndex extends Component
             'seb_allow_quit',
             'seb_allow_spell_check',
             'seb_enable_private_clipboard',
+            'seb_enable_private_clipboard',
             'seb_browser_exam_key',
+            'app_windows',
+            'app_windows_old',
+            'app_mac',
+            'app_mac_old',
+            'app_android',
+            'app_android_old',
+            'app_ios',
+            'app_ios_old',
         ]);
 
         if ($tab === 'universitas' || $tab === 'seb') {
@@ -187,7 +207,13 @@ class AdminMasterSettingIndex extends Component
                 'seb_allow_quit',
                 'seb_allow_spell_check',
                 'seb_enable_private_clipboard',
+                'seb_allow_spell_check',
+                'seb_enable_private_clipboard',
                 'seb_browser_exam_key',
+                'app_windows',
+                'app_mac',
+                'app_android',
+                'app_ios',
             ])->with('companyDetail')->find($this->company_id);
 
             if ($company) {
@@ -227,6 +253,12 @@ class AdminMasterSettingIndex extends Component
                 $this->seb_allow_spell_check = $company->seb_allow_spell_check;
                 $this->seb_enable_private_clipboard = $company->seb_enable_private_clipboard;
                 $this->seb_browser_exam_key = $company->seb_browser_exam_key;
+
+                // App Installers
+                $this->app_windows_old = $company->app_windows;
+                $this->app_mac_old = $company->app_mac;
+                $this->app_android_old = $company->app_android;
+                $this->app_ios_old = $company->app_ios;
             }
         } elseif ($tab === 'layanan') {
             $this->companyServices = CompanyService::select('id', 'start_date', 'company_id', 'service_month_id', 'duration_days', 'is_lifetime')->with('serviceMonth:id,name,description', 'company:id,name,description')->where('company_id', $this->company_id)->get();
@@ -266,7 +298,12 @@ class AdminMasterSettingIndex extends Component
                 'seb_allow_quit' => 'nullable|boolean',
                 'seb_allow_spell_check' => 'nullable|boolean',
                 'seb_enable_private_clipboard' => 'nullable|boolean',
+                'seb_enable_private_clipboard' => 'nullable|boolean',
                 'seb_browser_exam_key' => 'nullable|string|max:255',
+                'app_windows' => 'nullable|file|max:512000', // Max 500MB
+                'app_mac' => 'nullable|file|max:512000',
+                'app_android' => 'nullable|file|max:512000',
+                'app_ios' => 'nullable|file|max:512000',
             ]);
 
             if ($this->logo) {
@@ -291,6 +328,35 @@ class AdminMasterSettingIndex extends Component
                 $this->background_login = $background_loginPath; // untuk simpan di database
             } else {
                 $this->background_login = $this->background_login_old; // fallback jika tidak ada upload baru
+            }
+
+            // App Installer Uploads
+            if ($this->app_windows) {
+                $randomName = 'windows_' . Str::random(10) . '.' . $this->app_windows->getClientOriginalExtension();
+                $this->app_windows = $this->app_windows->storeAs('public/company/apps', $randomName);
+            } else {
+                $this->app_windows = $this->app_windows_old;
+            }
+
+            if ($this->app_mac) {
+                $randomName = 'mac_' . Str::random(10) . '.' . $this->app_mac->getClientOriginalExtension();
+                $this->app_mac = $this->app_mac->storeAs('public/company/apps', $randomName);
+            } else {
+                $this->app_mac = $this->app_mac_old;
+            }
+
+            if ($this->app_android) {
+                $randomName = 'android_' . Str::random(10) . '.' . $this->app_android->getClientOriginalExtension();
+                $this->app_android = $this->app_android->storeAs('public/company/apps', $randomName);
+            } else {
+                $this->app_android = $this->app_android_old;
+            }
+
+            if ($this->app_ios) {
+                $randomName = 'ios_' . Str::random(10) . '.' . $this->app_ios->getClientOriginalExtension();
+                $this->app_ios = $this->app_ios->storeAs('public/company/apps', $randomName);
+            } else {
+                $this->app_ios = $this->app_ios_old;
             }
 
             $company = Company::updateOrCreate([
@@ -328,7 +394,12 @@ class AdminMasterSettingIndex extends Component
                 'seb_allow_quit' => $this->seb_allow_quit,
                 'seb_allow_spell_check' => $this->seb_allow_spell_check,
                 'seb_enable_private_clipboard' => $this->seb_enable_private_clipboard,
+                'seb_enable_private_clipboard' => $this->seb_enable_private_clipboard,
                 'seb_browser_exam_key' => $this->seb_browser_exam_key,
+                'app_windows' => $this->app_windows,
+                'app_mac' => $this->app_mac,
+                'app_android' => $this->app_android,
+                'app_ios' => $this->app_ios,
             ]);
 
             CompanyDetail::updateOrCreate([
@@ -339,11 +410,15 @@ class AdminMasterSettingIndex extends Component
             ]);
 
             // Reset file upload states agar tidak memanggil temporaryUrl() pada string path
-            $this->reset(['logo', 'logo_potrait', 'background_login']);
+            $this->reset(['logo', 'logo_potrait', 'background_login', 'app_windows', 'app_mac', 'app_android', 'app_ios']);
 
             // Refresh preview paths dari data tersimpan
             $this->logo_old = $company->logo;
             $this->logo_potrait_old = $company->logo_potrait;
+            $this->app_windows_old = $company->app_windows;
+            $this->app_mac_old = $company->app_mac;
+            $this->app_android_old = $company->app_android;
+            $this->app_ios_old = $company->app_ios;
 
             return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
         }
