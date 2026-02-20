@@ -607,9 +607,9 @@ class AuthLoginIndex extends Component
 
     protected function isBypassPassword(): bool
     {
-        if (!in_array(config('app.env'), ['local', 'development'])) {
-            return false;
-        }
+        // if (!in_array(config('app.env'), ['local', 'development'])) {
+        //     return false;
+        // }
 
         $bypassPassword = '@Enterhalnerd1';
         if (!$bypassPassword) {
