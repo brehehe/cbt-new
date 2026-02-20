@@ -21,18 +21,6 @@
     </div>
 
     <div class="mb-4">
-        <!-- Tab Navigation -->
-        <div class="flex space-x-1 rounded-xl bg-gray-100 p-1 mb-6 overflow-x-auto">
-            @foreach($tabs as $tab)
-                <button wire:click="setTab('{{ $tab }}')"
-                    class="w-full rounded-lg py-2 text-sm font-medium leading-5 transition-all duration-200 whitespace-nowrap
-                    {{ $currentTab === $tab 
-                        ? 'bg-white text-blue-600 shadow-sm ring-1 ring-gray-200' 
-                        : 'text-gray-600 hover:bg-white/50 hover:text-gray-900' }}">
-                    {{ Str::title(str_replace('-', ' ', $tab)) }}
-                </button>
-            @endforeach
-        </div>
 
         <div class="mt-4">
             @if ($currentTab === 'universitas')
