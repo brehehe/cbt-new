@@ -102,6 +102,9 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
         Route::get('/students', \App\Livewire\Admin\StudentManagement::class)->name('admin.students');
         Route::get('/lecturers', \App\Livewire\Admin\LecturerManagement::class)->name('admin.lecturers');
 
+        // Session Management Route
+        Route::get('/session', \App\Livewire\Admin\Session\AdminSessionIndex::class)->name('admin.session');
+
         Route::group(['namespace' => 'ChangePassword', 'prefix' => 'change-password'], function () {
             Route::get('/change-password', 'AdminChangePasswordIndex')->name('user.change-password.change-password');
         });

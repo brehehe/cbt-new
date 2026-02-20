@@ -241,6 +241,12 @@ if (auth()->check()) {
                 'icon' => 'fa-database',
             ],
             [
+                'label' => 'Manajemen Sesi',
+                'url' => route('admin.session'),
+                'pattern' => ['admin/session', 'admin/session/*'],
+                'icon' => 'fa-users-gear',
+            ],
+            [
                 'label' => 'Seting',
                 'url' => route('admin.master.setting'),
                 'pattern' => ['admin/master/setting', 'admin/master/setting/*'],
