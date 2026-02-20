@@ -447,8 +447,9 @@ class AdminMasterStudentIndex extends Component
                 // Update user detail
                 $this->updateUserDetail($user, $validatedData);
             } else {
+                $profilePath = $this->data_id ? User::find($this->data_id)->profile : null;
                 if ($this->profile && $this->profile instanceof \Illuminate\Http\UploadedFile) {
-                    $profile = $this->profile->store('profiles', 'public');
+                    $profilePath = $this->profile->store('profiles', 'public');
                 }
 
                 $user = User::updateOrCreate(
@@ -463,7 +464,7 @@ class AdminMasterStudentIndex extends Component
                         'study_id' => $this->study_id,
                         'company_id' => $currentCompanyId,
                         'type_user' => 'employee',
-                        'profile' => $profile,
+                        'profile' => $profilePath,
                         'type_study' => $this->type_study ?? 'general',
                     ]
                 );
