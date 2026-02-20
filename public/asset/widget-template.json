@@ -1,0 +1,12 @@
+{
+    "type": "AdaptiveCard",
+    "version": "1.4",
+    "body": [
+        {
+            "type": "TextBlock",
+            "text": "ProCBT Dashbord Widget",
+            "size": "Medium",
+            "weight": "Bolder"
+        }
+    ]
+}

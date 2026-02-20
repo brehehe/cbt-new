@@ -1,21 +1,159 @@
 {
     "name": "CBT Procbt",
     "short_name": "ProCBT",
-    "start_url": "/login",
+    "id": "/login",
+    "description": "Platform ujian berbasis komputer (CBT) profesional.",
+    "start_url": "https://procbt.id/login",
     "display": "standalone",
+    "display_override": [
+        "tabbed",
+        "window-controls-overlay",
+        "standalone",
+        "minimal-ui"
+    ],
     "background_color": "#ffffff",
     "theme_color": "#1E3A8A",
     "orientation": "portrait-primary",
-    "icons": [
+    "dir": "ltr",
+    "lang": "id",
+    "scope": "/",
+    "scope_extensions": [
         {
-            "src": "/asset/img/logo-procbt.png",
-            "sizes": "192x192",
-            "type": "image/png"
+            "origin": "https://auth.procbt.id"
         },
         {
-            "src": "/asset/img/logo-procbt.png",
+            "origin": "https://api.procbt.id"
+        }
+    ],
+    "categories": [
+        "education",
+        "productivity"
+    ],
+    "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+    "prefer_related_applications": false,
+    "related_applications": [
+        {
+            "platform": "play",
+            "url": "https://play.google.com/store/apps/details?id=id.procbt.app",
+            "id": "id.procbt.app"
+        }
+    ],
+    "launch_handler": {
+        "client_mode": [
+            "navigate-existing",
+            "auto"
+        ]
+    },
+    "note_taking": {
+        "new_note_url": "/login"
+    },
+    "edge_side_panel": {
+        "preferred_width": 400
+    },
+    "widgets": [
+        {
+            "name": "ProCBT Widgets",
+            "short_name": "ProCBT",
+            "description": "A widget to monitor active exams",
+            "tag": "procbt-dashboard",
+            "ms_ac_template": "/asset/widget-template.json",
+            "data": "/asset/widget-data.json",
+            "type": "application/json",
+            "screenshots": [
+                {
+                    "src": "/asset/img/logo-1280x720.png",
+                    "sizes": "1280x720",
+                    "label": "Dashboard Widget"
+                }
+            ],
+            "icons": [
+                {
+                    "src": "/asset/img/logo-192x192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ],
+    "file_handlers": [
+        {
+            "action": "/login",
+            "accept": {
+                "application/pdf": [
+                    ".pdf"
+                ],
+                "image/png": [
+                    ".png"
+                ],
+                "image/jpeg": [
+                    ".jpg",
+                    ".jpeg"
+                ]
+            }
+        }
+    ],
+    "protocol_handlers": [
+        {
+            "protocol": "web+procbt",
+            "url": "/login?action=%s"
+        }
+    ],
+    "share_target": {
+        "action": "/login",
+        "method": "GET",
+        "enctype": "application/x-www-form-urlencoded",
+        "params": {
+            "title": "title",
+            "text": "text",
+            "url": "url"
+        }
+    },
+    "icons": [
+        {
+            "src": "/asset/img/logo-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/asset/img/logo-256x256.png",
+            "sizes": "256x256",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/asset/img/logo-512x512.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/asset/img/logo-1280x720.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/asset/img/logo-750x1334.png",
+            "sizes": "750x1334",
+            "type": "image/png",
+            "form_factor": "narrow"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Mulai Ujian",
+            "short_name": "Ujian",
+            "description": "Buka halaman ujian sekarang",
+            "url": "https://procbt.id/login",
+            "icons": [
+                {
+                    "src": "/asset/img/logo-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
         }
     ]
 }
