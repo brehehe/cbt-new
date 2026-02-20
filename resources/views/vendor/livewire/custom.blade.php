@@ -1,9 +1,5 @@
 @props(['paginator', 'elements', 'companyData'])
 
-@php
-    $pageName = $paginator->getPageName();
-@endphp
-
 <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
 
     {{-- Tombol Previous --}}
@@ -17,7 +13,7 @@
             </svg>
         </span>
     @else
-        <button wire:click="previousPage('{{ $pageName }}')" rel="prev"
+        <button wire:click="previousPage" rel="prev"
             class="relative inline-flex items-center px-3 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50">
             <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd"
@@ -45,7 +41,7 @@
                         {{ $page }}
                     </span>
                 @else
-                    <button wire:click="gotoPage({{ $page }}, '{{ $pageName }}')"
+                    <button wire:click="gotoPage({{ $page }})"
                         class="relative inline-flex items-center px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-100">
                         {{ $page }}
                     </button>
@@ -56,7 +52,7 @@
 
     {{-- Tombol Next --}}
     @if ($paginator->hasMorePages())
-        <button wire:click="nextPage('{{ $pageName }}')" rel="next"
+        <button wire:click="nextPage" rel="next"
             class="relative inline-flex items-center px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50">
             <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd"
