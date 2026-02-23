@@ -379,7 +379,6 @@ class AdminMasterTimetableIndex extends Component
                 $session->update([
                     'is_active' => false,
                     'connection_status' => 'disconnected',
-                    'end_time' => Carbon::now(),
                 ]);
             }
 

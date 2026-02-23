@@ -178,7 +178,7 @@ class AuthLoginIndex extends Component
             'text' => 'Anda berhasil login ke sistem!',
         ]);
 
-        return $this->redirect(route('admin.dashboard'), navigate: true);
+        return $this->redirect(route('admin.dashboard'));
     }
 
 

@@ -73,7 +73,6 @@ class AdminSessionIndex extends Component
                     'is_active' => false,
                     'connection_status' => 'disconnected',
                     'last_activity' => Carbon::now(),
-                    'end_time' => Carbon::now(),
                 ]);
             }
 
@@ -118,7 +117,6 @@ class AdminSessionIndex extends Component
                         'is_active' => false,
                         'connection_status' => 'disconnected',
                         'last_activity' => Carbon::now(),
-                        'end_time' => Carbon::now(),
                     ]);
 
                 // Pause ujian

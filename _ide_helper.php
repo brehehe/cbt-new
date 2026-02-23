@@ -25677,6 +25677,13 @@ namespace App\Livewire\Admin {
             }
     }
 
+namespace App\Livewire\Admin\Session {
+    /**
+     */
+    class AdminSessionIndex extends \Livewire\Component {
+            }
+    }
+
 namespace App\Livewire\Admin\ChangePassword {
     /**
      */
