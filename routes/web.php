@@ -124,6 +124,9 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
             Route::get('/live-stream', \App\Livewire\Admin\Exam\LiveStream\AdminExamLiveStreamIndex::class)->name('admin.exam.live-stream');
         });
 
+        // Backup Download Route (outside master group)
+        Route::get('/backup/download', [\App\Http\Controllers\BackupController::class, 'download'])->name('admin.backup.download');
+
         Route::group(['namespace' => 'Master', 'prefix' => 'master'], function () {
             Route::get('/role', 'Role\AdminMasterRoleIndex')->name('admin.master.role');
             Route::get('/user', 'User\AdminMasterUserIndex')->name('admin.master.user');
