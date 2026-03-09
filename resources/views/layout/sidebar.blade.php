@@ -252,6 +252,12 @@ if (auth()->check()) {
                 'pattern' => ['admin/master/setting', 'admin/master/setting/*'],
                 'icon' => 'fa-cog',
             ],
+            [
+                'label' => 'Backup Database',
+                'url' => route('admin.master.backup'),
+                'pattern' => ['admin/master/backup', 'admin/master/backup/*'],
+                'icon' => 'fa-database',
+            ],
         ];
     }
 

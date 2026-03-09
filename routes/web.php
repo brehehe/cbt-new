@@ -18,6 +18,7 @@ use App\Livewire\Admin\Master\Question\AdminMasterQuestionIndex;
 use App\Livewire\Admin\Master\Question\AdminMasterQuestionUpdate;
 use App\Livewire\Admin\Master\QuestionType\AdminMasterQuestionTypeIndex;
 use App\Livewire\Admin\Master\Topic\AdminMasterTopicIndex;
+use App\Livewire\Admin\Master\Backup\AdminMasterBackupIndex;
 use App\Livewire\Admin\Report\ItemAnalysis\AdminReportItemAnalysisIndex;
 use App\Livewire\Admin\Report\ItemAnalysis\AdminReportItemAnalysisAllIndex;
 use App\Livewire\Admin\Report\ItemAnalysis\Detail\AdminReportItemAnalysisDetailIndex;
@@ -131,6 +132,7 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
             Route::get('/role', 'Role\AdminMasterRoleIndex')->name('admin.master.role');
             Route::get('/user', 'User\AdminMasterUserIndex')->name('admin.master.user');
             Route::get('/setting', 'Setting\AdminMasterSettingIndex')->name('admin.master.setting');
+            Route::get('/backup', AdminMasterBackupIndex::class)->name('admin.master.backup');
             Route::get('/topic-question', AdminMasterTopicIndex::class)->name('admin.master.topic');
             Route::get('/material-category', AdminMasterMaterialCategoryIndex::class)->name('admin.master.material-category');
             Route::get('/rating-scale', 'RatingScale\AdminMasterRatingScaleIndex')->name('admin.master.rating-scale');
