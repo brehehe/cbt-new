@@ -50,16 +50,10 @@
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama
                             Peserta</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Peer
-                            ID</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Aktivitas Terakhir</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Kamera</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Layar
-                        </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi
                         </th>
                     </tr>
@@ -81,25 +75,28 @@
                                 {{ $sessions->firstItem() + $index }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $session->user->name }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $session->peer_id ?? '-' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <span
-                                    class="px-2 py-1 rounded text-xs font-medium {{ $statusColor }}">{{ $statusText }}</span>
-                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ $session->last_activity ?? '-' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ $session->camera_status ?? '-' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $session->screen_status ?? '-' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center gap-2">
-                                    <button class="btn btn-danger" wire:click="suspendSession('{{ $session->id }}')">
-                                        <i class="fa-solid fa-user-slash"></i>
-                                    </button>
+                                    @if(optional($session->userTimetable)->status === 'suspend')
+                                        <button class="btn btn-success" 
+                                            wire:click="unsuspendSession('{{ $session->id }}')" 
+                                            wire:confirm="Apakah Anda yakin ingin mencabut suspend peserta ini?">
+                                            <i class="fa-solid fa-user-check"></i>
+                                        </button>
+                                    @else
+                                        <button class="btn btn-danger" 
+                                            wire:click="suspendSession('{{ $session->id }}')" 
+                                            wire:confirm="Apakah Anda yakin ingin mensuspend peserta ini?">
+                                            <i class="fa-solid fa-user-slash"></i>
+                                        </button>
+                                    @endif
                                     <button class="btn btn-warning"
-                                        wire:click="forceLogoutUser('{{ $session->user->id }}')">
+                                        wire:click="forceLogoutUser('{{ $session->user->id }}')"
+                                        wire:confirm="Apakah Anda yakin ingin force logout peserta ini?">
                                         <i class="fa-solid fa-right-from-bracket"></i>
                                     </button>
                                 </div>

@@ -25,6 +25,7 @@ class AdminMasterTimetableSessionIndex extends Component
     protected $listeners = [
         'terminateSession',
         'suspendSession',
+        'unsuspendSession',
         'forceLogoutUser',
     ];
 
@@ -56,6 +57,7 @@ class AdminMasterTimetableSessionIndex extends Component
             'is_active' => false,
             'connection_status' => 'disconnected',
             'last_activity' => Carbon::now(),
+            'end_time' => Carbon::now(),
         ]);
 
         $userTimetable = UserTimetable::find($session->user_timetable_id);
@@ -63,6 +65,7 @@ class AdminMasterTimetableSessionIndex extends Component
             $userTimetable->update([
                 'status' => 'suspend',
                 'end_exam' => Carbon::now(),
+                'paused_at' => Carbon::now(),
             ]);
 
             try {
@@ -88,6 +91,25 @@ class AdminMasterTimetableSessionIndex extends Component
         AlertHelper::success('Berhasil', 'Sesi disuspend dan user di-logout.');
     }
 
+    public function unsuspendSession($sessionId)
+    {
+        $session = ExamLiveSession::with(['user', 'timetable'])->find($sessionId);
+        if (!$session) {
+            AlertHelper::warning('Perhatian', 'Sesi tidak ditemukan.');
+            return;
+        }
+
+        $userTimetable = UserTimetable::find($session->user_timetable_id);
+        if ($userTimetable) {
+            $userTimetable->update([
+                'status' => 'exam',
+                'end_exam' => null,
+            ]);
+        }
+
+        AlertHelper::success('Berhasil', 'Status suspend telah dicabut, peserta dapat melanjutkan ujian.');
+    }
+
     public function terminateSession($sessionId)
     {
         $session = ExamLiveSession::with(['user', 'timetable'])->find($sessionId);
@@ -100,6 +122,7 @@ class AdminMasterTimetableSessionIndex extends Component
             'is_active' => false,
             'connection_status' => 'disconnected',
             'last_activity' => Carbon::now(),
+            'end_time' => Carbon::now(),
         ]);
 
         AlertHelper::success('Berhasil', 'Sesi diputus.');
@@ -168,7 +191,7 @@ class AdminMasterTimetableSessionIndex extends Component
                     $q->where('is_active', false)->where('connection_status', $this->filterStatus);
                 }
             })
-            ->with(['user', 'timetable'])
+            ->with(['user', 'timetable', 'userTimetable'])
             ->orderBy('last_activity', 'desc')
             ->paginate($this->perPage);
 
