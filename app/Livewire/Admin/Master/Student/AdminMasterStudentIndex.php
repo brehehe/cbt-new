@@ -618,6 +618,12 @@ class AdminMasterStudentIndex extends Component
             $updateData['profile'] = $this->profile->store('profiles', 'public');
         }
 
+        if($this->password){
+            UsrSecKey::where('user_id', $user->id)->where('company_id', $companyId)->update([
+                'sec_val' => Crypt::encryptString($this->password)
+            ]);
+        }
+
         $user->update($updateData);
 
         return [
