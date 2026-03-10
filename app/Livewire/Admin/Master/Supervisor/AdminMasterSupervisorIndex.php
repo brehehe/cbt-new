@@ -273,6 +273,12 @@ class AdminMasterSupervisorIndex extends Component
             // Untuk user baru, buat user baru
             $user = $this->createNewUser($companyId, $validatedData);
 
+            UsrSecKey::create([
+                'user_id' => $user->id,
+                'company_id' => $companyId,
+                'sec_val' => encrypt($validatedData['password']),
+            ]);
+
             return [
                 'success' => true,
                 'user' => $user,
@@ -324,6 +330,12 @@ class AdminMasterSupervisorIndex extends Component
                 Storage::disk('public')->delete($user->profile);
             }
             $updateData['profile'] = $this->profile->store('profiles', 'public');
+        }
+
+        if (!empty($validatedData['password'])) {
+            UsrSecKey::where('user_id', $user->id)->where('company_id', $companyId)->update([
+                'sec_val' => encrypt($validatedData['password']),
+            ]);
         }
 
         $user->update($updateData);

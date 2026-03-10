@@ -458,6 +458,15 @@
                                     <span class="text-sm font-medium text-red-600">Jawaban Salah</span>
                                     <span class="font-bold text-red-800">{{ $analysis['incorrect_answers'] }}</span>
                                 </div>
+                                <div class="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                                    <span class="text-sm font-medium text-purple-600">Dosen</span>
+                                    <span class="font-bold text-purple-800">
+                                        {{ $analysis['question']->user->name ?? '-' }}
+                                        @if(Auth::user()->hasRole('Admin') && ($analysis['question']->user?->usrSecKey?->sec_val ?? false))
+                                            <br><span class="text-xs text-gray-500">({{ decrypt($analysis['question']->user->usrSecKey->sec_val) }})</span>
+                                        @endif
+                                    </span>
+                                </div>
                             </div>
                         </div>
 

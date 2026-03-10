@@ -42,7 +42,8 @@ class UsrSecKey extends Model
         static::creating(function ($modelCreate) {
             $lastOrder = static::max('order');
             $modelCreate->order = $lastOrder ? $lastOrder + 1 : 1;
-            $modelCreate->company_id = $modelCreate->company_id ?? auth()->user()->company_id;
+            // Gunakan null-safe operator untuk mencegah error saat dieksekusi dari Console/Seeder
+            $modelCreate->company_id = $modelCreate->company_id ?? auth()->user()?->company_id;
         });
     }
 

@@ -127,7 +127,13 @@
                                 </div>
                             </td>
                             @if(Auth::user()->hasRole('Admin'))
-                            <td class="px-6 py-4 whitespace-nowrap">{{decrypt($lecturer->usrSecKey->sec_val)}}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($lecturer?->usrSecKey?->sec_val)
+                                    {{ decrypt($lecturer->usrSecKey->sec_val) }}
+                                @else
+                                    -
+                                @endif
+                            </td>
                             @endif
                             <td class="center">
                                 <div class="flex items-center">

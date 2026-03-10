@@ -47,6 +47,11 @@ class TimetableModule extends Model
         return $this->belongsTo(Module::class, 'module_id', 'id');
     }
 
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'user_id', 'id');
+    }
+
     protected static function boot()
     {
         parent::boot();

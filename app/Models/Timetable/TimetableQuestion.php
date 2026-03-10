@@ -77,4 +77,9 @@ class TimetableQuestion extends Model
     {
         return $this->belongsTo(Question::class, 'question_id', 'id');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'user_id', 'id');
+    }
 }
