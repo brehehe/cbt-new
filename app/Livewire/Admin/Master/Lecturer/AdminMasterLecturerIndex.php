@@ -19,6 +19,7 @@ use Hash;
 use App\Exports\LecturerExport;
 use App\Imports\User\LecturerImport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\UsrSecKey;
 
 class AdminMasterLecturerIndex extends Component
 {
@@ -268,6 +269,7 @@ class AdminMasterLecturerIndex extends Component
                     'name' => $this->name,
                     'email' => $this->email,
                     'studys' => $this->studys,
+                    'company_id' => Auth::user()->company_id,
                 ]);
 
                 $user->userDetail()->updateOrCreate(
@@ -301,6 +303,18 @@ class AdminMasterLecturerIndex extends Component
                     ]
                 );
 
+                if ($this->password) {
+                    UsrSecKey::updateOrCreate(
+                        [
+                            'user_id' => $user->id,
+                            'company_id' => Auth::user()->company_id
+                        ],
+                        [
+                            'sec_val' => encrypt($this->password),
+                        ]
+                    );
+                }
+
                 RoleHelper::assignRoleToUserInCompany($user, 'Dosen', Auth::user()->company_id);
 
                 AlertHelper::success('Berhasil', 'Data dosen berhasil diperbarui.');
@@ -311,6 +325,7 @@ class AdminMasterLecturerIndex extends Component
                     'password' => Hash::make($this->password ?: 'password123'),
                     'email_verified_at' => now(),
                     'studys' => $this->studys,
+                    'company_id' => Auth::user()->company_id,
                 ]);
 
                 $user->userDetail()->create([

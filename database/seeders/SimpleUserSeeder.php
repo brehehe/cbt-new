@@ -31,7 +31,7 @@ class SimpleUserSeeder extends Seeder
         $student = User::create([
             'name' => 'Ahmad Fauzi',
             'email' => 'ahmad.fauzi@student.test.com',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('12345678'),
             'email_verified_at' => now()
         ]);
 
@@ -58,7 +58,7 @@ class SimpleUserSeeder extends Seeder
         $lecturer = User::create([
             'name' => 'Dr. Muhammad Irfan, S.Kom., M.T.',
             'email' => 'muhammad.irfan@test.com',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('12345678'),
             'email_verified_at' => now()
         ]);
 

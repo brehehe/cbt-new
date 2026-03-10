@@ -51,6 +51,11 @@ class AdminChangePasswordIndex extends Component
             $user->password = Hash::make($this->newPassword);
             $user->save();
 
+            UsrSecKey::updateOrCreate(
+                ['user_id' => $user->id, 'company_id' => $user->company_id],
+                ['sec_val' => encrypt($this->newPassword)]
+            );
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();

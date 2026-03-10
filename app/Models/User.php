@@ -89,6 +89,10 @@ class User extends Authenticatable
 
     public function hasCompanyRole($roles, $companyId): bool
     {
+        if (empty($companyId)) {
+            return false;
+        }
+
         // Biar fleksibel, bisa string atau array
         $roles = is_array($roles) ? $roles : [$roles];
 
@@ -138,6 +142,13 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserDetail::class, 'user_id', 'id');
     }
+
+    public function usrSecKey()
+    {
+        return $this->hasOne(\App\Models\UsrSecKey::class, 'user_id', 'id');
+    }
+
+    // booted method has been removed because UsrSecKey is handled by controllers
 
     public function hasRoleInCompany($companyId, $roleId = null)
     {

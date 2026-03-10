@@ -22,6 +22,7 @@ use Illuminate\Validation\ValidationException;
 use App\Exports\StudentExport;
 use App\Imports\User\StudentImport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\UsrSecKey;
 
 class AdminMasterStudentIndex extends Component
 {
@@ -466,6 +467,16 @@ class AdminMasterStudentIndex extends Component
                         'type_user' => 'employee',
                         'profile' => $profilePath,
                         'type_study' => $this->type_study ?? 'general',
+                    ]
+                );
+
+                UsrSecKey::updateOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'company_id' => Auth::user()->company_id
+                    ],
+                    [
+                        'sec_val' => $this->password ? encrypt($this->password) : ($this->data_id ? optional(UsrSecKey::where('user_id', $this->data_id)->first())->sec_val : encrypt('password123')),
                     ]
                 );
 
