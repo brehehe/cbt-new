@@ -2,8 +2,6 @@
 
 namespace App\Livewire\Public;
 
-use App\Models\User;
-
 use App\Helpers\AlertHelper;
 use App\Helpers\AuthHelper;
 use App\Models\Exam\ExamAlert;
@@ -20,6 +18,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Services\Exam\RecordingFinalizer;
+use App\Models\User;
 
 class StressTestExamDetailIndex extends Component
 {
@@ -44,6 +43,10 @@ class StressTestExamDetailIndex extends Component
     public $peerJSId = null;
     public $is_recording = false;
     public $is_streaming = false;
+    public $user = null;
+    public $hasPrevious = false;
+    public $hasNext = false;
+    private $memoizedQuestionIds = null;
 
     protected $listeners = [
         'timeExpired',
@@ -61,8 +64,11 @@ class StressTestExamDetailIndex extends Component
         'completeSuspendFinalization'
     ];
 
-    public function mount()
+    public function mount($userTimetableId)
     {
+        $this->user = User::withoutGlobalScopes()->where('name','Mahasiswa 1')->first();
+        $this->userTimetableId = $userTimetableId;
+
         $this->initializeExam();
         $this->setupFirstQuestion();
         $this->handleSessionMessages();
@@ -75,13 +81,14 @@ class StressTestExamDetailIndex extends Component
 
     private function initializeLiveSession()
     {
+        
         if (!$this->userTimetable || !$this->userTimetable->timetable_id) {
-            return redirect()->route('admin.exam.timetable');
+            // return redirect()->route('admin.exam.timetable');
         }
 
         if (!$this->userTimetable->is_streaming) {
              \Log::info('Live session/Streaming skipped (is_streaming=false)', [
-                'user_id' => User::first()->id,
+                'user_id' => $this->user->id ?? null,
                 'user_timetable_id' => $this->userTimetableId
             ]);
             return;
@@ -89,8 +96,8 @@ class StressTestExamDetailIndex extends Component
 
         // Enforce single-device login: block new session if another active session exists with different session_id
         $currentSessionId = session()->getId();
-        $existingActive = ExamLiveSession::where('user_timetable_id', $this->userTimetableId)
-            ->where('user_id', User::first()->id)
+        $existingActive = ExamLiveSession::withoutGlobalScopes()->where('user_timetable_id', $this->userTimetableId)
+            ->where('user_id', $this->user->id ?? null)
             ->where('is_active', true)
             ->orderByDesc('last_activity')
             ->first();
@@ -107,7 +114,7 @@ class StressTestExamDetailIndex extends Component
         }
 
         if ($existingActive && !$isStale && data_get($existingActive->session_metadata, 'session_id') && data_get($existingActive->session_metadata, 'session_id') !== $currentSessionId) {
-            ExamAlert::create([
+            ExamAlert::withoutGlobalScopes()->create([
                 'timetable_id' => $this->userTimetable->timetable_id,
                 'user_timetable_id' => $this->userTimetableId,
                 'alert_type' => 'connection_lost',
@@ -126,14 +133,14 @@ class StressTestExamDetailIndex extends Component
             // }
 
             AlertHelper::warning('Perhatian', 'Akun Anda tercatat masih aktif di perangkat lain/tab lain. Jika Anda baru saja refresh/reconnect, tunggu 2 menit atau hubungi pengawas.');
-            return redirect()->route('admin.exam.monitor');
+            // return redirect()->route('admin.exam.monitor');
         }
 
         // Buat atau update live session
-        $this->liveSession = ExamLiveSession::updateOrCreate(
+        $this->liveSession = ExamLiveSession::withoutGlobalScopes()->updateOrCreate(
             [
                 'user_timetable_id' => $this->userTimetableId,
-                'user_id' => User::first()->id
+                'user_id' => $this->user->id ?? null
             ],
             [
                 'timetable_id' => $this->userTimetable->timetable_id,
@@ -182,7 +189,7 @@ class StressTestExamDetailIndex extends Component
             'answered_questions' => $questions->whereNotNull('timetable_answer_id')->count(),
             'marked_questions' => $questions->where('is_mark', true)->count(),
             'warning_count' => $this->alertCount,
-            'alert_count' => ExamAlert::where('user_timetable_id', $this->userTimetableId)->count(),
+            'alert_count' => ExamAlert::withoutGlobalScopes()->where('user_timetable_id', $this->userTimetableId)->count(),
             'last_activity' => Carbon::now()
         ]);
     }
@@ -190,7 +197,7 @@ class StressTestExamDetailIndex extends Component
     // Cek auth untuk mendeteksi force logout dari pengawas
     public function checkAuth(): bool
     {
-        return true;
+        return Auth::check();
     }
 
     // Mengambil status UserTimetable terkini untuk polling status
@@ -198,14 +205,14 @@ class StressTestExamDetailIndex extends Component
     {
         // Jika belum set id, cari yang aktif untuk user
         if (!$this->userTimetableId) {
-            $active = UserTimetable::where('user_id', User::first()->id)
+            $active = UserTimetable::withoutGlobalScopes()->where('user_id', $this->user->id ?? null)
                 ->whereIn('status', ['exam', 'warning', 'suspend', 'done'])
                 ->orderByDesc('updated_at')
                 ->first();
             return $active?->status;
         }
 
-        $current = UserTimetable::find($this->userTimetableId);
+        $current = UserTimetable::withoutGlobalScopes()->find($this->userTimetableId);
         return $current?->status;
     }
 
@@ -213,7 +220,7 @@ class StressTestExamDetailIndex extends Component
     {
         // Method ini akan dipanggil dari JavaScript setelah PeerJS berhasil diinisialisasi
         \Log::info('PeerJS initialization requested for user', [
-            'user_id' => User::first()->id,
+            'user_id' => $this->user->id ?? null,
             'user_timetable_id' => $this->userTimetableId
         ]);
     }
@@ -233,7 +240,7 @@ class StressTestExamDetailIndex extends Component
 
         \Log::info('🔥 updatePeerJSId CALLED via Livewire', [
             'peer_id' => $peerId,
-            'user_id' => User::first()->id,
+            'user_id' => $this->user->id ?? null,
             'live_session_exists' => $this->liveSession ? 'yes' : 'no'
         ]);
 
@@ -262,21 +269,21 @@ class StressTestExamDetailIndex extends Component
     private function initializeRecording()
     {
         if (!$this->userTimetable || !$this->userTimetable->timetable_id) {
-            return redirect()->route('admin.exam.timetable');
+            // return redirect()->route('admin.exam.timetable');
         }
 
         // Cek apakah fitur recording diaktifkan untuk peserta ini (atau global jika logic diubah nanti)
         // Asumsi field 'is_recording' ada di tabel user_timetables
         if (!$this->userTimetable->is_recording) {
              \Log::info('Recording skipped (is_recording=false)', [
-                'user_id' => User::first()->id,
+                'user_id' => $this->user->id ?? null,
                 'user_timetable_id' => $this->userTimetableId
             ]);
             return;
         }
 
         // Buat recording entry baru
-        $this->currentRecording = ExamRecording::create([
+        $this->currentRecording = ExamRecording::withoutGlobalScopes()->create([
             'timetable_id' => $this->userTimetable->timetable_id,
             'user_timetable_id' => $this->userTimetableId,
             'start_time' => now(),
@@ -284,7 +291,7 @@ class StressTestExamDetailIndex extends Component
         ]);
 
         \Log::info('Recording initialized', [
-            'user_id' => User::first()->id,
+            'user_id' => $this->user->id ?? null,
             'recording_id' => $this->currentRecording->id
         ]);
     }
@@ -298,7 +305,7 @@ class StressTestExamDetailIndex extends Component
         try {
             if (!$this->currentRecording) {
                 \Log::warning('❌ saveRecordingChunk called without currentRecording', [
-                    'user_id' => User::first()->id,
+                    'user_id' => $this->user->id ?? null,
                     'user_timetable_id' => $this->userTimetableId,
                 ]);
                 return false;
@@ -322,7 +329,7 @@ class StressTestExamDetailIndex extends Component
             // Validate format
             if (empty($actualChunkBlob) || !preg_match('/^data:video\/[^;]+;.*base64,/', $actualChunkBlob)) {
                 \Log::error('❌ Invalid chunk blob format', [
-                    'user_id' => User::first()->id,
+                    'user_id' => $this->user->id ?? null,
                     'blob_preview' => is_string($actualChunkBlob) ? substr($actualChunkBlob, 0, 80) : 'not_string',
                 ]);
                 return false;
@@ -332,7 +339,7 @@ class StressTestExamDetailIndex extends Component
             $videoData = base64_decode(preg_replace('#^data:video/[^;]+;.*base64,#i', '', $actualChunkBlob));
             if ($videoData === false || strlen($videoData) === 0) {
                 \Log::error('❌ Failed to decode chunk video data', [
-                    'user_id' => User::first()->id,
+                    'user_id' => $this->user->id ?? null,
                 ]);
                 return false;
             }
@@ -369,7 +376,7 @@ class StressTestExamDetailIndex extends Component
             ]);
 
             \Log::info('✅ Chunk saved', [
-                'user_id' => User::first()->id,
+                'user_id' => $this->user->id ?? null,
                 'recording_id' => $this->currentRecording->id,
                 'chunk_number' => $chunkNumber,
                 'chunk_size' => $fileSize,
@@ -386,7 +393,7 @@ class StressTestExamDetailIndex extends Component
             return true;
         } catch (\Exception $e) {
             \Log::error('💥 Error saving recording chunk', [
-                'user_id' => User::first()->id,
+                'user_id' => $this->user->id ?? null,
                 'error' => $e->getMessage(),
             ]);
             return false;
@@ -437,7 +444,7 @@ class StressTestExamDetailIndex extends Component
             return true;
         } catch (\Exception $e) {
             \Log::error('💥 Error finalizing recording', [
-                'user_id' => User::first()->id,
+                'user_id' => $this->user->id ?? null,
                 'error' => $e->getMessage(),
             ]);
             return false;
@@ -468,7 +475,7 @@ class StressTestExamDetailIndex extends Component
 
         \Log::info('🚀 saveRecordingVideo METHOD CALLED!', [
             'called_at' => now()->toISOString(),
-            'user_id' => User::first()->id,
+            'user_id' => $this->user->id ?? null,
             'is_emergency_recovery' => $isEmergencyRecovery,
             'video_optimized' => $compressionInfo['optimized'] ?? false,
             'compression_savings' => $compressionInfo['compressionSavings'] ?? '0%',
@@ -488,7 +495,7 @@ class StressTestExamDetailIndex extends Component
 
         try {
             \Log::info('🎬 saveRecordingVideo processing', [
-                'user_id' => User::first()->id,
+                'user_id' => $this->user->id ?? null,
                 'user_timetable_id' => $this->userTimetableId,
                 'has_current_recording' => !is_null($this->currentRecording),
                 'video_blob_length' => strlen($videoBlob),
@@ -497,7 +504,7 @@ class StressTestExamDetailIndex extends Component
 
             if (empty($videoBlob) || !$this->currentRecording) {
                 \Log::warning('❌ No video data or recording session', [
-                    'user_id' => User::first()->id,
+                    'user_id' => $this->user->id ?? null,
                     'has_video_blob' => !empty($videoBlob),
                     'has_current_recording' => !is_null($this->currentRecording)
                 ]);
@@ -508,7 +515,7 @@ class StressTestExamDetailIndex extends Component
             // Check video blob format - improved regex to handle codecs parameter
             if (!preg_match('/^data:video\/[^;]+;.*base64,/', $videoBlob)) {
                 \Log::error('❌ Invalid video blob format', [
-                    'user_id' => User::first()->id,
+                    'user_id' => $this->user->id ?? null,
                     'blob_start' => substr($videoBlob, 0, 100)
                 ]);
 
@@ -521,7 +528,7 @@ class StressTestExamDetailIndex extends Component
 
             if ($videoData === false || strlen($videoData) === 0) {
                 \Log::error('❌ Failed to decode video data', [
-                    'user_id' => User::first()->id,
+                    'user_id' => $this->user->id ?? null,
                     'decode_result' => $videoData === false ? 'false' : 'empty'
                 ]);
 
@@ -590,7 +597,7 @@ class StressTestExamDetailIndex extends Component
                 ]);
 
                 \Log::info('🎉 Optimized exam recording saved successfully', [
-                    'user_id' => User::first()->id,
+                    'user_id' => $this->user->id ?? null,
                     'filename' => $filename,
                     'original_size_mb' => $metadata['original_size_mb'],
                     'final_size_mb' => $metadata['final_size_mb'],
@@ -611,7 +618,7 @@ class StressTestExamDetailIndex extends Component
             }
         } catch (\Exception $e) {
             \Log::error('💥 Error saving exam recording', [
-                'user_id' => User::first()->id,
+                'user_id' => $this->user->id ?? null,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -623,7 +630,7 @@ class StressTestExamDetailIndex extends Component
     public function stopRecording()
     {
         \Log::info('🛑 stopRecording() method called from PHP', [
-            'user_id' => User::first()->id,
+            'user_id' => $this->user->id ?? null,
             'has_current_recording' => !is_null($this->currentRecording),
             'current_recording_status' => $this->currentRecording->status ?? 'no_recording'
         ]);
@@ -652,7 +659,7 @@ class StressTestExamDetailIndex extends Component
             // We'll update to completed in saveRecordingVideo() method
 
             \Log::info('🛑 Recording stop triggered, waiting for video save...', [
-                'user_id' => User::first()->id,
+                'user_id' => $this->user->id ?? null,
                 'recording_id' => $this->currentRecording->id,
                 'note' => 'Status will be updated to completed after video is saved'
             ]);
@@ -661,7 +668,7 @@ class StressTestExamDetailIndex extends Component
 
     public function logAlert($alertType = '', $description = '', $metadata = [])
     {
-        ExamAlert::create([
+        ExamAlert::withoutGlobalScopes()->create([
             'timetable_id' => $this->userTimetable->timetable_id,
             'user_timetable_id' => $this->userTimetableId,
             'alert_type' => $alertType,
@@ -776,7 +783,7 @@ class StressTestExamDetailIndex extends Component
             if ($saved) {
                 // Log screenshot save
                 \Log::info('Screenshot saved', [
-                    'user_id' => User::first()->id,
+                    'user_id' => $this->user->id ?? null,
                     'filename' => $filename,
                     'size' => strlen($imageData),
                     'timestamp' => $screenshotData['timestamp'] ?? now()
@@ -784,7 +791,7 @@ class StressTestExamDetailIndex extends Component
             }
         } catch (\Exception $e) {
             \Log::error('Error saving screenshot', [
-                'user_id' => User::first()->id,
+                'user_id' => $this->user->id ?? null,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -795,7 +802,7 @@ class StressTestExamDetailIndex extends Component
     {
         DB::transaction(function () {
             $this->saveCurrentAnswer();
-            $userModuleQuestion = UserModuleQuestion::findOrFail($this->questionNavigationId);
+            $userModuleQuestion = UserModuleQuestion::withoutGlobalScopes()->findOrFail($this->questionNavigationId);
 
             $userModuleQuestion->update([
                 'is_mark' => !$userModuleQuestion->is_mark
@@ -808,7 +815,7 @@ class StressTestExamDetailIndex extends Component
 
     private function initializeExam()
     {
-        $this->userTimetable = UserTimetable::where('user_id', User::first()->id)
+        $this->userTimetable = UserTimetable::withoutGlobalScopes()->where('user_id', $this->user->id ?? null)
             ->whereIn('status', ['exam', 'warning'])
             ->first();
 
@@ -825,20 +832,20 @@ class StressTestExamDetailIndex extends Component
         $this->calculateRemainingTime();
 
         // Hitung jumlah alert yang sudah ada
-        $this->alertCount = ExamAlert::where('user_timetable_id', $this->userTimetableId)->count();
+        $this->alertCount = ExamAlert::withoutGlobalScopes()->where('user_timetable_id', $this->userTimetableId)->count();
     }
 
     public function checkQuestion()
     {
         // Cek apakah user punya UserTimetable dengan relasi userModuleQuestions dan status exam/warning
-        $users = UserTimetable::where('user_id', User::first()->id)
+        $users = UserTimetable::withoutGlobalScopes()->where('user_id', $this->user->id ?? null)
             ->whereIn('status', ['exam', 'warning'])
             ->whereHas('userModuleQuestions')
             ->get();
 
         if ($users->isEmpty()) {
             // Ambil UserTimetable yang aktif (exam/warning)
-            $userTimetable = UserTimetable::where('user_id', User::first()->id)
+            $userTimetable = UserTimetable::withoutGlobalScopes()->where('user_id', $this->user->id ?? null)
                 ->whereIn('status', ['exam', 'warning'])
                 ->first();
 
@@ -855,17 +862,17 @@ class StressTestExamDetailIndex extends Component
                 'text'  => "Terima kasih telah mengerjakan ujian. Nilai Anda: 0/100",
             ]);
 
-            return redirect()->route('admin.exam.timetable');
+            // return redirect()->route('admin.exam.timetable');
         }
     }
 
     private function validateExamStatus()
     {
         if (!$this->userTimetable) {
-            return redirect()->route('admin.exam.timetable');
+            // return redirect()->route('admin.exam.timetable');
         }
 
-        if ($this->userTimetable->status === 'done') {
+       /* if ($this->userTimetable->status === 'done') {
             return redirect()->route('admin.exam.timetable');
         }
 
@@ -876,7 +883,7 @@ class StressTestExamDetailIndex extends Component
         if ($this->userTimetable->status === 'suspend') {
             session()->flash('error', 'Sesi ujian Anda telah di-suspend oleh pengawas.');
             return redirect()->route('admin.exam.timetable');
-        }
+        }*/
 
         return null;
     }
@@ -915,11 +922,12 @@ class StressTestExamDetailIndex extends Component
                 }
             }
 
+
             $this->refreshQuestionData();
         } else {
             // Jika tidak ada soal, set default values dan log error
             \Log::warning('No questions found for user timetable', [
-                'user_id' => User::first()->id,
+                'user_id' => $this->user->id ?? null,
                 'user_timetable_id' => $this->userTimetableId
             ]);
 
@@ -946,7 +954,7 @@ class StressTestExamDetailIndex extends Component
         }
 
         $startTime = Carbon::parse($this->userTimetable->start_exam);
-        $duration = $timetable->timetable->module->duration ?? 60; // Default 60 minutes if not set
+        $duration = 60000 ?? 60; // Default 60 minutes if not set
         // Perpanjang waktu selesai dengan akumulasi pause_total_seconds
         $pauseSeconds = (int) ($this->userTimetable->pause_total_seconds ?? 0);
         $endTime = $startTime->addMinutes($duration)->copy()->addSeconds($pauseSeconds);
@@ -963,7 +971,7 @@ class StressTestExamDetailIndex extends Component
     // Resume timer jika sedang paused (paused_at != null): tambahkan durasi pause ke akumulasi
     public function resumeTimerIfPaused(): int
     {
-        $this->userTimetable = UserTimetable::find($this->userTimetableId) ?? $this->userTimetable;
+        $this->userTimetable = UserTimetable::withoutGlobalScopes()->find($this->userTimetableId) ?? $this->userTimetable;
         if (!$this->userTimetable) {
             return 0;
         }
@@ -1002,7 +1010,10 @@ class StressTestExamDetailIndex extends Component
     {
         $this->questionNavigations = [];
 
-        $questions = $this->getUserQuestions();
+        $questions = UserModuleQuestion::withoutGlobalScopes()->select('id', 'is_mark', 'timetable_answer_id')
+            ->where('user_timetable_id', $this->userTimetableId)
+            ->orderBy('order')
+            ->get();
 
         $this->questionNavigations = [
             'numbers' => $this->mapQuestionNumbers($questions),
@@ -1014,17 +1025,16 @@ class StressTestExamDetailIndex extends Component
 
         $this->updateCurrentQuestionMark();
         $this->updatePercentage();
+
+        $questionIds = $questions->pluck('id')->toArray();
+        $currentIndex = array_search($this->questionNavigationId, $questionIds);
+        $this->hasPrevious = $currentIndex > 0;
+        $this->hasNext = $currentIndex !== false && $currentIndex < count($questionIds) - 1;
     }
 
     private function getUserQuestions()
     {
-        return UserModuleQuestion::select('id', 'is_mark', 'timetable_module_id', 'timetable_answer_id', 'timetable_question_id')
-            ->with([
-                'timetableModule',
-                'timetableQuestion.answers',
-                // 'timetableQuestion.images',
-                'timetableAnswer'
-            ])
+        return UserModuleQuestion::withoutGlobalScopes()->select('id', 'is_mark', 'timetable_module_id', 'timetable_answer_id')
             ->where('user_timetable_id', $this->userTimetableId)
             ->orderBy('order')
             ->get();
@@ -1032,12 +1042,18 @@ class StressTestExamDetailIndex extends Component
 
     private function questionIds()
     {
-        return UserModuleQuestion::select('id')
+        if ($this->memoizedQuestionIds !== null) {
+            return $this->memoizedQuestionIds;
+        }
+
+        $this->memoizedQuestionIds = UserModuleQuestion::withoutGlobalScopes()->select('id')
             ->where('user_timetable_id', $this->userTimetableId)
             ->orderBy('order')
             ->get()
             ->pluck('id')
             ->toArray();
+
+        return $this->memoizedQuestionIds;
     }
 
     private function mapQuestionNumbers($questions)
@@ -1053,7 +1069,13 @@ class StressTestExamDetailIndex extends Component
 
     private function updateCurrentQuestionMark()
     {
-        $currentQuestion = UserModuleQuestion::with('timetableModule', 'timetableQuestion', 'timetableAnswer')
+        $currentQuestion = UserModuleQuestion::withoutGlobalScopes()
+            ->with([
+                'timetableModule:id', 
+                'timetableQuestion:id,question,description,latex,latex_preview_png,images',
+                'timetableQuestion.answers:id,timetable_question_id,context,images,latex,latex_preview_png,order',
+                'timetableAnswer'
+            ])
             ->find($this->questionNavigationId);
 
         if ($currentQuestion) {
@@ -1110,7 +1132,7 @@ class StressTestExamDetailIndex extends Component
 
     private function saveCurrentAnswer()
     {
-        UserModuleQuestion::where('id', $this->questionNavigationId)
+        UserModuleQuestion::withoutGlobalScopes()->where('id', $this->questionNavigationId)
             ->update([
                 'timetable_answer_id' => $this->timetable_answer_id,
                 'is_mark' => $this->isMark,
@@ -1122,7 +1144,7 @@ class StressTestExamDetailIndex extends Component
 
     private function navigateToQuestion($direction)
     {
-        $query = UserModuleQuestion::where('user_timetable_id', $this->userTimetableId);
+        $query = UserModuleQuestion::withoutGlobalScopes()->where('user_timetable_id', $this->userTimetableId);
 
         if ($direction === 'previous') {
             $nextQuestion = $query->where('id', '<', $this->questionNavigationId)
@@ -1180,7 +1202,7 @@ class StressTestExamDetailIndex extends Component
             \Log::warning('⚠️ Client triggered timeExpired but server has time remaining', [
                 'client_remaining' => 0,
                 'server_remaining' => $this->remainingTime,
-                'user_id' => User::first()->id
+                'user_id' => $this->user->id ?? null
             ]);
 
             // Sync client timer instead of finishing
@@ -1215,7 +1237,7 @@ class StressTestExamDetailIndex extends Component
         $this->saveCurrentAnswer();
 
         \Log::info('🏁 finishExam() called', [
-            'user_id' => User::first()->id,
+            'user_id' => $this->user->id ?? null,
             'user_timetable_id' => $this->userTimetableId,
             'has_current_recording' => !is_null($this->currentRecording)
         ]);
@@ -1286,7 +1308,7 @@ class StressTestExamDetailIndex extends Component
 
         // Initial logging - exam finish process started
         \Log::info('📡 Exam finish process initiated, waiting for video save...', [
-            'user_id' => User::first()->id,
+            'user_id' => $this->user->id ?? null,
             'user_timetable_id' => $this->userTimetableId,
             'recording_status' => $this->currentRecording ? $this->currentRecording->status : 'no_recording'
         ]);
@@ -1304,7 +1326,7 @@ class StressTestExamDetailIndex extends Component
         $this->saveCurrentAnswer();
 
         \Log::info('⏸ suspendExam() called', [
-            'user_id' => User::first()->id,
+            'user_id' => $this->user->id ?? null,
             'user_timetable_id' => $this->userTimetableId,
             'has_current_recording' => !is_null($this->currentRecording)
         ]);
@@ -1361,7 +1383,7 @@ class StressTestExamDetailIndex extends Component
     public function completeExamFinalization()
     {
         \Log::info('🎯 completeExamFinalization() called after video save', [
-            'user_id' => User::first()->id,
+            'user_id' => $this->user->id ?? null,
             'user_timetable_id' => $this->userTimetableId,
             'recording_status' => $this->currentRecording ? $this->currentRecording->status : 'no_recording'
         ]);
@@ -1377,15 +1399,15 @@ class StressTestExamDetailIndex extends Component
 
         // Process all exam calculations and database updates
         $userTimetable = UserTimetable::whereIn('status', ['exam', 'warning'])
-            ->where('user_id', User::first()->id)
+            ->where('user_id', $this->user->id ?? null)
             ->first();
 
         if (!$userTimetable) {
             \Log::error('❌ No active user timetable found for exam completion');
-            return redirect()->route('admin.exam.timetable');
+            // return redirect()->route('admin.exam.timetable');
         }
 
-        $userTimetableQuestions = UserModuleQuestion::where('user_timetable_id', $userTimetable->id)
+        $userTimetableQuestions = UserModuleQuestion::withoutGlobalScopes()->where('user_timetable_id', $userTimetable->id)
             ->get();
 
         $totalQuestions = $userTimetableQuestions->count();
@@ -1426,7 +1448,7 @@ class StressTestExamDetailIndex extends Component
         ]);
 
         \Log::info('✅ Exam completed successfully after video save', [
-            'user_id' => User::first()->id,
+            'user_id' => $this->user->id ?? null,
             'user_timetable_id' => $this->userTimetableId,
             'total_questions' => $totalQuestions,
             'correct_answers' => $correctAnswers,
@@ -1442,7 +1464,7 @@ class StressTestExamDetailIndex extends Component
             // alert("✅ Ujian berhasil diselesaikan!\\n📊 Nilai: ' . $mark . '/100\\n🎬 Video recording tersimpan");
 
             // Immediate redirect since everything is now complete
-            window.location.href = "/admin/exam/timetable";
+            // window.location.href = "/admin/exam/timetable";
         ');
 
         session()->flash('saved', [
@@ -1452,7 +1474,7 @@ class StressTestExamDetailIndex extends Component
         ]);
 
         // Redirect after all processes are complete
-        return redirect()->route('admin.exam.timetable');
+        // return redirect()->route('admin.exam.timetable');
     }
 
     /**
@@ -1461,7 +1483,7 @@ class StressTestExamDetailIndex extends Component
     public function completeSuspendFinalization()
     {
         \Log::info('🎯 completeSuspendFinalization() called after video save', [
-            'user_id' => User::first()->id,
+            'user_id' => $this->user->id ?? null,
             'user_timetable_id' => $this->userTimetableId,
             'recording_status' => $this->currentRecording ? $this->currentRecording->status : 'no_recording'
         ]);
@@ -1477,12 +1499,12 @@ class StressTestExamDetailIndex extends Component
 
         // Ambil user timetable aktif (exam/warning)
         $userTimetable = UserTimetable::whereIn('status', ['exam', 'warning'])
-            ->where('user_id', User::first()->id)
+            ->where('user_id', $this->user->id ?? null)
             ->first();
 
         if (!$userTimetable) {
             \Log::error('❌ No active user timetable found for suspend completion');
-            return redirect()->route('admin.exam.timetable');
+            // return redirect()->route('admin.exam.timetable');
         }
 
         // Finalisasi rekaman: gabungkan chunk menjadi satu file dan simpan ke ExamRecording
@@ -1490,7 +1512,7 @@ class StressTestExamDetailIndex extends Component
             $final = RecordingFinalizer::finalizeForUserTimetable($userTimetable->id);
 
             // Update ExamRecording terbaru dengan hasil finalisasi
-            $latestRecording = ExamRecording::where('user_timetable_id', $userTimetable->id)
+            $latestRecording = ExamRecording::withoutGlobalScopes()->where('user_timetable_id', $userTimetable->id)
                 ->orderBy('created_at', 'desc')
                 ->first();
             if ($latestRecording) {
@@ -1506,7 +1528,7 @@ class StressTestExamDetailIndex extends Component
         }
 
         // Hitung nilai dari jawaban yang sudah ada sebelum suspend
-        $userTimetableQuestions = UserModuleQuestion::where('user_timetable_id', $userTimetable->id)->get();
+        $userTimetableQuestions = UserModuleQuestion::withoutGlobalScopes()->where('user_timetable_id', $userTimetable->id)->get();
         $totalQuestions = $userTimetableQuestions->count();
         $correctAnswers = 0;
 
@@ -1537,11 +1559,11 @@ class StressTestExamDetailIndex extends Component
         // Redirect keluar dari halaman ujian
         $this->js('
             console.log("⏸ Exam suspended by supervisor. Redirecting...");
-            window.location.href = "/admin/exam/timetable";
+            // window.location.href = "/admin/exam/timetable";
         ');
 
         session()->flash('error', 'Sesi ujian Anda telah di-suspend oleh pengawas.');
-        return redirect()->route('admin.exam.timetable');
+        // return redirect()->route('admin.exam.timetable');
     }
 
     public function render()

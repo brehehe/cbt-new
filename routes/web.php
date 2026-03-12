@@ -48,7 +48,6 @@ Route::middleware(['auth', CheckUserTimetable::class])->group(function () {
 require __DIR__ . '/auth.php';
 
 // Public Stress Test Route (Only for testing purposes)
-Route::get('/stress-test/exam/{userTimetableId}', \App\Livewire\Public\StressTestExamDetailIndex::class)->name('public.stress-test.exam');
 
 // Safe Exam Browser Routes
 Route::prefix('seb')->name('seb.')->group(function () {
@@ -438,3 +437,6 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
         return redirect('/clearallsession')->with('message', 'Semua session telah dihapus. Semua user logout, exam dipause & live session diputus.');
     });
 });
+
+
+Route::get('/stress-test/exam/{userTimetableId}', \App\Livewire\Public\StressTestExamDetailIndex::class)->name('public.stress-test.exam');

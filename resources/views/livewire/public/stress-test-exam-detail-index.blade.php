@@ -2,14 +2,8 @@
     x-data="{ mobileSidebarOpen: false, rightSidebarOpen: false }"
     x-effect="document.body.classList.toggle('overflow-hidden', mobileSidebarOpen || rightSidebarOpen)">
     @php
-        use App\Models\User\UserModuleQuestion;
-
-        $first = $questionNavigationId
-            ? UserModuleQuestion::where('id', '<', $questionNavigationId)->where('user_timetable_id',$userTimetableId)->exists()
-            : false;
-        $last = $questionNavigationId
-            ? UserModuleQuestion::where('id', '>', $questionNavigationId)->where('user_timetable_id',$userTimetableId)->exists()
-            : false;
+        $first = $hasPrevious;
+        $last = $hasNext;
     @endphp
 
     <!-- Hidden elements untuk video recording -->
@@ -389,11 +383,11 @@
                     <div
                         class="flex items-center justify-center w-16 h-16 mx-auto mb-3 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-600' : 'bg-orange-600' }} rounded-full lg:w-20 lg:h-20">
                         <span
-                            class="text-lg font-bold text-white lg:text-xl">{{ strtoupper(substr(App\Models\User::first()->name, 0, 2)) }}</span>
+                            class="text-lg font-bold text-white lg:text-xl">{{ strtoupper(substr($userTimetable->user->name ?? '?', 0, 2)) }}</span>
                     </div>
-                    <h3 class="font-semibold text-gray-800">{{ App\Models\User::first()->name }}</h3>
+                    <h3 class="font-semibold text-gray-800">{{ $userTimetable->user->name ?? 'Siswa' }}</h3>
                     <p class="text-sm text-gray-600">NIM:
-                        {{ App\Models\User::first()->nim ?? (App\Models\User::first()->username ?? 'Tidak Diketahui') }}</p>
+                        {{ $userTimetable->user->nim ?? ($userTimetable->user->username ?? 'Tidak Diketahui') }}</p>
                 </div>
             </div>
 
@@ -1278,14 +1272,30 @@
                 try {
                     stream = await navigator.mediaDevices.getUserMedia(constraints);
                     console.log('✅ Camera stream obtained!');
-                    console.log('📊 Stream info:', {
-                        active: stream.active,
-                        id: stream.id,
-                        tracks: stream.getTracks().length
-                    });
                 } catch (streamError) {
-                    console.error('❌ Stream request failed:', streamError);
-                    throw streamError;
+                    console.error('❌ Stream request failed with constraints:', streamError);
+                    
+                    // FALLBACK: Try without deviceId constraints if initial attempt failed
+                    if (constraints.video.deviceId) {
+                        console.log('🔄 Attempting fallback: Any available camera...');
+                        try {
+                            const fallbackConstraints = {
+                                video: {
+                                    width: { ideal: 640, min: 320 },
+                                    height: { ideal: 480, min: 240 },
+                                    facingMode: 'user'
+                                },
+                                audio: false
+                            };
+                            stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
+                            console.log('✅ Fallback camera stream obtained!');
+                        } catch (fallbackError) {
+                            console.error('❌ Fallback stream request failed:', fallbackError);
+                            throw fallbackError;
+                        }
+                    } else {
+                        throw streamError;
+                    }
                 }
 
                 updateRecordingStatus('Connecting', 'Stream obtained');
@@ -1688,7 +1698,7 @@
                     const isAuth = await callWire('checkAuth');
                     if (!isAuth) {
                         console.warn('🔒 Session invalidated by supervisor, redirecting to login');
-                        safeRedirect('/login');
+                        // safeRedirect('/login');
                         return;
                     }
 
@@ -1713,21 +1723,21 @@
                             // Server-side method will trigger redirect via JS after finalization
                         } catch (e) {
                             console.warn('⚠️ suspendExam call failed, fallback redirect');
-                            safeRedirect('/admin/exam/timetable');
+                            // safeRedirect('/admin/exam/timetable');
                         }
                         return;
                     }
 
                     if (status === 'done') {
                         console.warn('✅ Status changed to done — redirecting');
-                        safeRedirect('/admin/exam/timetable');
+                        // safeRedirect('/admin/exam/timetable');
                         return;
                     }
                 } catch (err) {
                     console.warn('⚠️ Auth/status polling error:', err);
                     const msg = (err && (err.message || err.status || '')) + '';
                     if (/401|Unauthenticated|Unauthorized/i.test(msg)) {
-                        safeRedirect('/login');
+                        // safeRedirect('/login');
                     }
                 }
             }, POLL_MS);

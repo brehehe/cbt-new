@@ -8,6 +8,8 @@ use App\Models\Master\Question\Question;
 use App\Models\Category\CategoryQuestion;
 use App\Models\Master\Question\Topic;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class ModuleService
 {
@@ -72,50 +74,57 @@ class ModuleService
     private function syncModuleQuestionsByCategory(Module $module, array $categoryQuestionSettings, ?string $companyId): void
     {
         $enabledCategoryIds = array_keys($categoryQuestionSettings);
+        $now = Carbon::now();
 
-        DB::transaction(function () use ($module, $enabledCategoryIds, $companyId) {
-            // Add questions from enabled categories
-            if (!empty($enabledCategoryIds)) {
-                $questions = Question::withoutGlobalScope('user_scope')
-                    ->whereIn('category_question_id', $enabledCategoryIds)
-                    ->get(['id', 'study_id', 'category_question_id']);
+        $targetQuestions = Question::withoutGlobalScope('user_scope')
+            ->whereIn('category_question_id', $enabledCategoryIds)
+            ->get(['id', 'study_id']);
 
-                foreach ($questions as $question) {
-                    $moduleQuestion = ModuleQuestion::withTrashed()->firstOrCreate(
-                        [
-                            'module_id' => $module->id,
-                            'question_id' => $question->id,
-                        ],
-                        [
-                            'company_id' => $companyId,
-                            'study_id' => $question->study_id,
-                            'question_pick_type' => 'category',
-                        ]
-                    );
+        $targetQuestionIds = $targetQuestions->pluck('id')->toArray();
 
-                    if ($moduleQuestion->trashed()) {
-                        $moduleQuestion->restore();
-                    }
-                }
+        DB::transaction(function () use ($module, $targetQuestionIds, $targetQuestions, $companyId, $now) {
+            // Get existing questions in this module for this pick type
+            $existingModuleQuestions = ModuleQuestion::withoutGlobalScope('user_scope')
+                ->where('module_id', $module->id)
+                ->where('question_pick_type', 'category')
+                ->get(['id', 'question_id']);
+
+            $existingQuestionIds = $existingModuleQuestions->pluck('question_id')->toArray();
+
+            // 1. Identify questions to remove (exist in DB but not in target)
+            $toRemoveIds = array_diff($existingQuestionIds, $targetQuestionIds);
+            if (!empty($toRemoveIds)) {
+                ModuleQuestion::withoutGlobalScope('user_scope')
+                    ->where('module_id', $module->id)
+                    ->whereIn('question_id', $toRemoveIds)
+                    ->where('question_pick_type', 'category')
+                    ->forceDelete();
             }
 
-            // Delete module_questions from disabled (unchecked) categories
-            $disabledCategoryIds = CategoryQuestion::pluck('id')
-                ->diff($enabledCategoryIds)
-                ->toArray();
+            // 2. Identify questions to add (exist in target but not in DB)
+            $toAddQuestionIds = array_diff($targetQuestionIds, $existingQuestionIds);
+            if (!empty($toAddQuestionIds)) {
+                $lastOrder = ModuleQuestion::withoutGlobalScope('user_scope')->max('order') ?? 0;
+                $newRecords = [];
+                $targetQuestionsMap = $targetQuestions->keyBy('id');
 
-            if (!empty($disabledCategoryIds)) {
-                $questionIdsToDelete = Question::withoutGlobalScope('user_scope')
-                    ->whereIn('category_question_id', $disabledCategoryIds)
-                    ->pluck('id')
-                    ->toArray();
+                foreach ($toAddQuestionIds as $qId) {
+                    $questionData = $targetQuestionsMap->get($qId);
+                    $newRecords[] = [
+                        'id' => (string) Str::uuid(),
+                        'module_id' => $module->id,
+                        'question_id' => $qId,
+                        'company_id' => $companyId,
+                        'study_id' => $questionData->study_id,
+                        'question_pick_type' => 'category',
+                        'order' => ++$lastOrder,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
 
-                if (!empty($questionIdsToDelete)) {
-                    ModuleQuestion::withoutGlobalScope('user_scope')
-                        ->where('module_id', $module->id)
-                        ->whereIn('question_id', $questionIdsToDelete)
-                        ->where('question_pick_type', 'category')
-                        ->forceDelete();
+                foreach (array_chunk($newRecords, 200) as $chunk) {
+                    ModuleQuestion::insert($chunk);
                 }
             }
         });
@@ -124,50 +133,57 @@ class ModuleService
     private function syncModuleQuestionsByTopic(Module $module, array $topicQuestionSettings, ?string $companyId): void
     {
         $enabledTopicIds = array_keys($topicQuestionSettings);
+        $now = Carbon::now();
 
-        DB::transaction(function () use ($module, $enabledTopicIds, $companyId) {
-            // Add questions from enabled topics
-            if (!empty($enabledTopicIds)) {
-                $questions = Question::withoutGlobalScope('user_scope')
-                    ->whereIn('topic_id', $enabledTopicIds)
-                    ->get(['id', 'study_id', 'topic_id']);
+        $targetQuestions = Question::withoutGlobalScope('user_scope')
+            ->whereIn('topic_id', $enabledTopicIds)
+            ->get(['id', 'study_id']);
 
-                foreach ($questions as $question) {
-                    $moduleQuestion = ModuleQuestion::withTrashed()->firstOrCreate(
-                        [
-                            'module_id' => $module->id,
-                            'question_id' => $question->id,
-                        ],
-                        [
-                            'company_id' => $companyId,
-                            'study_id' => $question->study_id,
-                            'question_pick_type' => 'topic',
-                        ]
-                    );
+        $targetQuestionIds = $targetQuestions->pluck('id')->toArray();
 
-                    if ($moduleQuestion->trashed()) {
-                        $moduleQuestion->restore();
-                    }
-                }
+        DB::transaction(function () use ($module, $targetQuestionIds, $targetQuestions, $companyId, $now) {
+            // Get existing questions in this module for this pick type
+            $existingModuleQuestions = ModuleQuestion::withoutGlobalScope('user_scope')
+                ->where('module_id', $module->id)
+                ->where('question_pick_type', 'topic')
+                ->get(['id', 'question_id']);
+
+            $existingQuestionIds = $existingModuleQuestions->pluck('question_id')->toArray();
+
+            // 1. Identify questions to remove
+            $toRemoveIds = array_diff($existingQuestionIds, $targetQuestionIds);
+            if (!empty($toRemoveIds)) {
+                ModuleQuestion::withoutGlobalScope('user_scope')
+                    ->where('module_id', $module->id)
+                    ->whereIn('question_id', $toRemoveIds)
+                    ->where('question_pick_type', 'topic')
+                    ->forceDelete();
             }
 
-            // Delete module_questions from disabled (unchecked) topics
-            $disabledTopicIds = Topic::pluck('id')
-                ->diff($enabledTopicIds)
-                ->toArray();
+            // 2. Identify questions to add
+            $toAddQuestionIds = array_diff($targetQuestionIds, $existingQuestionIds);
+            if (!empty($toAddQuestionIds)) {
+                $lastOrder = ModuleQuestion::withoutGlobalScope('user_scope')->max('order') ?? 0;
+                $newRecords = [];
+                $targetQuestionsMap = $targetQuestions->keyBy('id');
 
-            if (!empty($disabledTopicIds)) {
-                $questionIdsToDelete = Question::withoutGlobalScope('user_scope')
-                    ->whereIn('topic_id', $disabledTopicIds)
-                    ->pluck('id')
-                    ->toArray();
+                foreach ($toAddQuestionIds as $qId) {
+                    $questionData = $targetQuestionsMap->get($qId);
+                    $newRecords[] = [
+                        'id' => (string) Str::uuid(),
+                        'module_id' => $module->id,
+                        'question_id' => $qId,
+                        'company_id' => $companyId,
+                        'study_id' => $questionData->study_id,
+                        'question_pick_type' => 'topic',
+                        'order' => ++$lastOrder,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
 
-                if (!empty($questionIdsToDelete)) {
-                    ModuleQuestion::withoutGlobalScope('user_scope')
-                        ->where('module_id', $module->id)
-                        ->whereIn('question_id', $questionIdsToDelete)
-                        ->where('question_pick_type', 'topic')
-                        ->forceDelete();
+                foreach (array_chunk($newRecords, 200) as $chunk) {
+                    ModuleQuestion::insert($chunk);
                 }
             }
         });

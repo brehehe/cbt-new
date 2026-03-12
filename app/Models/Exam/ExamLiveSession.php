@@ -66,7 +66,7 @@ class ExamLiveSession extends Model
         });
 
         static::creating(function ($model) {
-            $model->company_id = $model->company_id ?? auth()->user()?->company_id;
+            $model->company_id = $model->company_id ?? (auth()->user() ? auth()->user()->company_id : Company::first()->id);
             $model->session_token = $model->session_token ?? Str::random(32);
         });
     }

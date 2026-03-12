@@ -931,6 +931,7 @@ namespace App\Models\Master\Question{
  * @property-read \App\Models\Study\Study|null $study
  * @property-read \App\Models\Timetable\TimetableQuestion|null $timetableQuestion
  * @property-read \App\Models\Master\Question\Topic|null $topic
+ * @property-read \App\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question onlyTrashed()
@@ -1616,6 +1617,7 @@ namespace App\Models\Timetable{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Timetable\TimetableQuestion> $questions
  * @property-read int|null $questions_count
  * @property-read \App\Models\Master\Timetable\Timetable|null $timetable
+ * @property-read \App\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule onlyTrashed()
@@ -1675,6 +1677,7 @@ namespace App\Models\Timetable{
  * @property-read \App\Models\Category\CategoryQuestion|null $categoryQuestion
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Timetable\TimetableModule|null $timetableModule
+ * @property-read \App\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion onlyTrashed()
@@ -1752,6 +1755,7 @@ namespace App\Models{
  * @property-read \App\Models\Study\Study|null $study
  * @property-read User|null $user
  * @property-read \App\Models\User\UserDetail|null $userDetail
+ * @property-read \App\Models\UsrSecKey|null $usrSecKey
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User active()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User companyChoice($companyId, $is_head = false)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User companyRole($roleName, $companyId)
@@ -2142,5 +2146,36 @@ namespace App\Models\User{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable withoutTrashed()
  */
 	class UserTimetable extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property string $id
+ * @property string|null $company_id
+ * @property string|null $user_id
+ * @property string|null $sec_val
+ * @property int $order
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Company\Company|null $company
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey search($term)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey whereSecVal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey withoutTrashed()
+ */
+	class UsrSecKey extends \Eloquent {}
 }
 

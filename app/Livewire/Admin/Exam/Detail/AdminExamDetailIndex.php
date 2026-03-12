@@ -42,6 +42,8 @@ class AdminExamDetailIndex extends Component
     public $peerJSId = null;
     public $is_recording = false;
     public $is_streaming = false;
+    public $hasPrevious = false;
+    public $hasNext = false;
 
     protected $listeners = [
         'timeExpired',
@@ -66,6 +68,7 @@ class AdminExamDetailIndex extends Component
         $this->handleSessionMessages();
         $this->initializeRecording();
         $this->initializeLiveSession();
+        $this->updateNavigationStatus();
         
         // Ensure frontend initializes properly
         $this->js('if(typeof initializeExamFrontend === "function") { initializeExamFrontend(); } else { console.warn("initializeExamFrontend not found"); }');
@@ -87,7 +90,8 @@ class AdminExamDetailIndex extends Component
 
         // Enforce single-device login: block new session if another active session exists with different session_id
         $currentSessionId = session()->getId();
-        $existingActive = ExamLiveSession::where('user_timetable_id', $this->userTimetableId)
+        $existingActive = ExamLiveSession::select('id', 'user_timetable_id', 'user_id', 'is_active', 'last_activity', 'session_metadata')
+            ->where('user_timetable_id', $this->userTimetableId)
             ->where('user_id', Auth::id())
             ->where('is_active', true)
             ->orderByDesc('last_activity')
@@ -203,7 +207,7 @@ class AdminExamDetailIndex extends Component
             return $active?->status;
         }
 
-        $current = UserTimetable::find($this->userTimetableId);
+        $current = UserTimetable::select('id', 'status')->find($this->userTimetableId);
         return $current?->status;
     }
 
@@ -801,12 +805,30 @@ class AdminExamDetailIndex extends Component
 
             $this->isMark = $userModuleQuestion->is_mark;
             $this->refreshQuestionData();
+            $this->updateNavigationStatus();
         });
+    }
+
+    private function updateNavigationStatus()
+    {
+        $this->hasPrevious = UserModuleQuestion::where('user_timetable_id', $this->userTimetableId)
+            ->where('id', '<', $this->questionNavigationId)
+            ->exists();
+
+        $this->hasNext = UserModuleQuestion::where('user_timetable_id', $this->userTimetableId)
+            ->where('id', '>', $this->questionNavigationId)
+            ->exists();
     }
 
     private function initializeExam()
     {
-        $this->userTimetable = UserTimetable::where('user_id', Auth::id())
+        $this->userTimetable = UserTimetable::select('id', 'user_id', 'status', 'start_exam', 'pause_total_seconds', 'is_recording', 'is_streaming', 'company_id', 'timetable_id')
+            ->with([
+                'timetable:id,module_id,company_id',
+                'timetable.module:id,name,duration',
+                'timetable.timetableModule:id,timetable_id,duration'
+            ])
+            ->where('user_id', Auth::id())
             ->whereIn('status', ['exam', 'warning'])
             ->first();
 
@@ -836,7 +858,8 @@ class AdminExamDetailIndex extends Component
 
         if ($users->isEmpty()) {
             // Ambil UserTimetable yang aktif (exam/warning)
-            $userTimetable = UserTimetable::where('user_id', Auth::id())
+            $userTimetable = UserTimetable::select('id', 'status', 'user_id')
+                ->where('user_id', Auth::id())
                 ->whereIn('status', ['exam', 'warning'])
                 ->first();
 
@@ -934,7 +957,7 @@ class AdminExamDetailIndex extends Component
 
     private function calculateRemainingTime()
     {
-        $timetable = $this->userTimetable->load(['timetable.timetableModule:id,duration']);
+        $timetable = $this->userTimetable;
 
 
         // Check if start_exam is set, otherwise set it to now
@@ -961,7 +984,7 @@ class AdminExamDetailIndex extends Component
     // Resume timer jika sedang paused (paused_at != null): tambahkan durasi pause ke akumulasi
     public function resumeTimerIfPaused(): int
     {
-        $this->userTimetable = UserTimetable::find($this->userTimetableId) ?? $this->userTimetable;
+        $this->userTimetable = UserTimetable::select('id', 'paused_at', 'pause_total_seconds')->find($this->userTimetableId) ?? $this->userTimetable;
         if (!$this->userTimetable) {
             return 0;
         }
@@ -1016,13 +1039,7 @@ class AdminExamDetailIndex extends Component
 
     private function getUserQuestions()
     {
-        return UserModuleQuestion::select('id', 'is_mark', 'timetable_module_id', 'timetable_answer_id', 'timetable_question_id')
-            ->with([
-                'timetableModule',
-                'timetableQuestion.answers',
-                // 'timetableQuestion.images',
-                'timetableAnswer'
-            ])
+        return UserModuleQuestion::select('id', 'is_mark', 'timetable_module_id', 'timetable_answer_id', 'timetable_question_id', 'order')
             ->where('user_timetable_id', $this->userTimetableId)
             ->orderBy('order')
             ->get();
@@ -1051,7 +1068,11 @@ class AdminExamDetailIndex extends Component
 
     private function updateCurrentQuestionMark()
     {
-        $currentQuestion = UserModuleQuestion::with('timetableModule', 'timetableQuestion', 'timetableAnswer')
+        $currentQuestion = UserModuleQuestion::select('id', 'is_mark', 'timetable_answer_id', 'timetable_question_id')
+            ->with([
+                'timetableQuestion:id,question,description,latex,latex_preview_png,images',
+                'timetableQuestion.answers:id,timetable_question_id,context,images,latex,latex_preview_png,order'
+            ])
             ->find($this->questionNavigationId);
 
         if ($currentQuestion) {
@@ -1123,11 +1144,13 @@ class AdminExamDetailIndex extends Component
         $query = UserModuleQuestion::where('user_timetable_id', $this->userTimetableId);
 
         if ($direction === 'previous') {
-            $nextQuestion = $query->where('id', '<', $this->questionNavigationId)
+            $nextQuestion = $query->select('id', 'order')
+                ->where('id', '<', $this->questionNavigationId)
                 ->orderBy('order', 'desc')
                 ->first();
         } else {
-            $nextQuestion = $query->where('id', '>', $this->questionNavigationId)
+            $nextQuestion = $query->select('id', 'order')
+                ->where('id', '>', $this->questionNavigationId)
                 ->orderBy('order', 'asc')
                 ->first();
         }
@@ -1137,6 +1160,7 @@ class AdminExamDetailIndex extends Component
             $this->refreshQuestionData();
             $this->updateCurrentQuestionMark();
             $this->updatePercentage();
+            $this->updateNavigationStatus();
         }
 
         return;
@@ -1166,6 +1190,7 @@ class AdminExamDetailIndex extends Component
         $this->questionNavigationId = $id;
         $this->updateCurrentQuestionMark();
         $this->updatePercentage();
+        $this->updateNavigationStatus();
         $this->updateLiveSessionProgress(); // Update live session
     }
 
@@ -1383,34 +1408,45 @@ class AdminExamDetailIndex extends Component
             return redirect()->route('admin.exam.timetable');
         }
 
-        $userTimetableQuestions = UserModuleQuestion::where('user_timetable_id', $userTimetable->id)
+        $userTimetableQuestions = UserModuleQuestion::select('id', 'user_timetable_id', 'timetable_answer_id', 'status')
+            ->with(['timetableAnswer:id,is_correct'])
+            ->where('user_timetable_id', $userTimetable->id)
             ->get();
-
+        
         $totalQuestions = $userTimetableQuestions->count();
         $correctAnswers = 0;
         $wrongAnswers = 0;
         $unansweredQuestions = 0;
 
+        $correctIds = [];
+        $wrongIds = [];
+        $unansweredIds = [];
+
         foreach ($userTimetableQuestions as $question) {
             if ($question->timetable_answer_id) {
-                $answer = TimetableAnswer::find($question->timetable_answer_id);
+                $answer = $question->timetableAnswer;
                 if ($answer && $answer->is_correct) {
-                    $question->update([
-                        'status' => 'correct',
-                    ]);
+                    $correctIds[] = $question->id;
                     $correctAnswers++;
                 } else {
-                    $question->update([
-                        'status' => 'wrong',
-                    ]);
+                    $wrongIds[] = $question->id;
                     $wrongAnswers++;
                 }
             } else {
-                $question->update([
-                    'status' => 'unanswered',
-                ]);
+                $unansweredIds[] = $question->id;
                 $unansweredQuestions++;
             }
+        }
+
+        // Bulk update statuses
+        if (!empty($correctIds)) {
+            UserModuleQuestion::whereIn('id', $correctIds)->update(['status' => 'correct']);
+        }
+        if (!empty($wrongIds)) {
+            UserModuleQuestion::whereIn('id', $wrongIds)->update(['status' => 'wrong']);
+        }
+        if (!empty($unansweredIds)) {
+            UserModuleQuestion::whereIn('id', $unansweredIds)->update(['status' => 'unanswered']);
         }
 
         $mark = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100, 2) : 0;
@@ -1488,7 +1524,8 @@ class AdminExamDetailIndex extends Component
             $final = RecordingFinalizer::finalizeForUserTimetable($userTimetable->id);
 
             // Update ExamRecording terbaru dengan hasil finalisasi
-            $latestRecording = ExamRecording::where('user_timetable_id', $userTimetable->id)
+            $latestRecording = ExamRecording::select('id', 'user_timetable_id', 'video_path', 'file_size', 'status')
+                ->where('user_timetable_id', $userTimetable->id)
                 ->orderBy('created_at', 'desc')
                 ->first();
             if ($latestRecording) {
@@ -1504,22 +1541,41 @@ class AdminExamDetailIndex extends Component
         }
 
         // Hitung nilai dari jawaban yang sudah ada sebelum suspend
-        $userTimetableQuestions = UserModuleQuestion::where('user_timetable_id', $userTimetable->id)->get();
+        $userTimetableQuestions = UserModuleQuestion::select('id', 'user_timetable_id', 'timetable_answer_id', 'status')
+            ->with(['timetableAnswer:id,is_correct'])
+            ->where('user_timetable_id', $userTimetable->id)
+            ->get();
+            
         $totalQuestions = $userTimetableQuestions->count();
         $correctAnswers = 0;
 
+        $correctIds = [];
+        $wrongIds = [];
+        $unansweredIds = [];
+
         foreach ($userTimetableQuestions as $question) {
             if ($question->timetable_answer_id) {
-                $answer = TimetableAnswer::find($question->timetable_answer_id);
+                $answer = $question->timetableAnswer;
                 if ($answer && $answer->is_correct) {
-                    $question->update(['status' => 'correct']);
+                    $correctIds[] = $question->id;
                     $correctAnswers++;
                 } else {
-                    $question->update(['status' => 'wrong']);
+                    $wrongIds[] = $question->id;
                 }
             } else {
-                $question->update(['status' => 'unanswered']);
+                $unansweredIds[] = $question->id;
             }
+        }
+
+        // Bulk update statuses
+        if (!empty($correctIds)) {
+            UserModuleQuestion::whereIn('id', $correctIds)->update(['status' => 'correct']);
+        }
+        if (!empty($wrongIds)) {
+            UserModuleQuestion::whereIn('id', $wrongIds)->update(['status' => 'wrong']);
+        }
+        if (!empty($unansweredIds)) {
+            UserModuleQuestion::whereIn('id', $unansweredIds)->update(['status' => 'unanswered']);
         }
 
         $mark = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100, 2) : 0;

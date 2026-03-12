@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Session;
 
 class AdminExamTimetableIndex extends Component
@@ -65,7 +66,8 @@ class AdminExamTimetableIndex extends Component
 
         try {
             DB::begintransaction();
-            $timeTable = Timetable::where('code', $this->code)
+            $timeTable = Timetable::select('id', 'code', 'company_id', 'studys', 'is_recording', 'is_streaming')
+                ->where('code', $this->code)
                 ->where('company_id', Auth::user()->company_id)
                 ->find($this->data_id);
 
@@ -231,13 +233,30 @@ class AdminExamTimetableIndex extends Component
                 'is_streaming' => $timeTable?->is_streaming ?? false,
             ]);
 
-            foreach ($modulesQuestions as $moduleQuestion) {
-                UserModuleQuestion::create([
+            $userModuleQuestionsData = [];
+            $now = Carbon::now();
+            $companyId = Auth::user()->company_id;
+
+            foreach ($modulesQuestions as $index => $moduleQuestion) {
+                $userModuleQuestionsData[] = [
+                    'id' => (string) Str::uuid(),
                     'user_timetable_id' => $UserTimetable->id,
                     'timetable_module_id' => $transactionModule->id,
                     'timetable_question_id' => $moduleQuestion->id,
                     'study_id' => $moduleQuestion->study_id,
-                ]);
+                    'company_id' => $companyId,
+                    'order' => $index + 1,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            }
+
+            if (!empty($userModuleQuestionsData)) {
+                // Bulk insert in chunks to avoid single query limits if very large
+                $chunks = array_chunk($userModuleQuestionsData, 200);
+                foreach ($chunks as $chunk) {
+                    UserModuleQuestion::insert($chunk);
+                }
             }
 
             DB::commit();

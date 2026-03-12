@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class Timetable extends Model
 {
@@ -86,7 +87,8 @@ class Timetable extends Model
         static::saved(function ($model) {
             if ($model->module_id) {
                 DB::transaction(function () use ($model) {
-                    $module = Module::find($model->module_id);
+                    $module = Module::select('id', 'studys', 'user_id', 'question_type_id', 'name', 'description', 'duration', 'random_question', 'question_pick_type')
+                        ->find($model->module_id);
                     if (!$module) {
                         return;
                     }
@@ -118,12 +120,28 @@ class Timetable extends Model
                         }, function ($query) use ($questionPickType) {
                             $query->where('question_pick_type', $questionPickType);
                         })
-                        ->with(['question.answers'])
+                        ->with([
+                            'question' => function ($q) {
+                                $q->withoutGlobalScope('user_scope')->select('id', 'study_id', 'user_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'category_question_id', 'difficulty', 'order', 'question', 'images', 'description', 'latex', 'latex_preview_pdf', 'latex_preview_png', 'weight_correct', 'weight_incorrect');
+                            },
+                            'question.answers' => function ($q) {
+                                $q->withoutGlobalScope('user_scope')->select('id', 'question_id', 'alphabet', 'context', 'images', 'latex', 'latex_preview_pdf', 'latex_preview_png', 'is_correct', 'order');
+                            }
+                        ])
                         ->chunkById(200, function ($moduleQuestions) use ($timetableModule) {
                             $now = now();
                             $questionUpserts = [];
+                            $answerUpserts = [];
 
                             $companyId = $timetableModule->company_id ?? auth()->user()?->company_id;
+
+                            // Pre-fetch existing TimetableQuestion IDs to avoid breaking relations and duplicate keys
+                            $questionIdsInChunk = $moduleQuestions->pluck('question_id')->all();
+                            $existingTqs = TimetableQuestion::withoutGlobalScope('user_scope')
+                                ->where('timetable_module_id', $timetableModule->id)
+                                ->whereIn('question_id', $questionIdsInChunk)
+                                ->get(['id', 'question_id'])
+                                ->keyBy('question_id');
 
                             foreach ($moduleQuestions as $moduleQuestion) {
                                 $question = $moduleQuestion->question;
@@ -131,7 +149,11 @@ class Timetable extends Model
                                     continue;
                                 }
 
+                                // Use existing ID if found, otherwise generate a new UUID
+                                $tqId = $existingTqs->has($question->id) ? $existingTqs->get($question->id)->id : (string) Str::uuid();
+
                                 $questionUpserts[] = [
+                                    'id' => $tqId,
                                     'timetable_module_id' => $timetableModule->id,
                                     'question_id' => $question->id,
                                     'company_id' => $companyId,
@@ -155,90 +177,53 @@ class Timetable extends Model
                                     'created_at' => $now,
                                     'updated_at' => $now,
                                 ];
+
+                                // Process answers
+                                $answers = $question->answers
+                                    ->sortBy([
+                                        ['order', 'asc'],
+                                        ['created_at', 'asc'],
+                                        ['alphabet', 'asc'],
+                                    ])
+                                    ->values();
+
+                                foreach ($answers as $index => $answer) {
+                                    $answerOrder = (int) ($answer->order ?? 0);
+                                    if ($answerOrder <= 0) {
+                                        $answerOrder = $index + 1;
+                                    }
+
+                                    $alphabet = $answer->alphabet;
+                                    if ($alphabet === null || $alphabet === '') {
+                                        $alphabet = chr(64 + $answerOrder);
+                                    }
+
+                                    $answerUpserts[] = [
+                                        'timetable_question_id' => $tqId,
+                                        'answer_id' => $answer->id,
+                                        'company_id' => $companyId,
+                                        'alphabet' => $alphabet,
+                                        'context' => $answer->context,
+                                        'images' => $answer->images,
+                                        'latex' => $answer->latex,
+                                        'latex_preview_pdf' => $answer->latex_preview_pdf,
+                                        'latex_preview_png' => $answer->latex_preview_png,
+                                        'is_correct' => $answer->is_correct,
+                                        'order' => $answerOrder,
+                                        'created_at' => $now,
+                                        'updated_at' => $now,
+                                    ];
+                                }
                             }
 
                             if (!empty($questionUpserts)) {
                                 TimetableQuestion::upsert(
                                     $questionUpserts,
-                                    ['timetable_module_id', 'question_id'],
+                                    ['id'],
                                     [
-                                        'company_id',
-                                        'study_id',
-                                        'user_id',
-                                        'topic_id',
-                                        'material_category_id',
-                                        'material_id',
-                                        'question_type_id',
-                                        'category_question_id',
-                                        'difficulty',
-                                        'order',
-                                        'question',
-                                        'images',
-                                        'description',
-                                        'latex',
-                                        'latex_preview_pdf',
-                                        'latex_preview_png',
-                                        'weight_correct',
-                                        'weight_incorrect',
-                                        'updated_at',
+                                        'company_id', 'study_id', 'user_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'category_question_id', 'difficulty', 'order', 'question', 'images', 'description', 'latex', 'latex_preview_pdf', 'latex_preview_png', 'weight_correct', 'weight_incorrect', 'updated_at',
                                     ]
                                 );
-
-                                $questionIds = collect($questionUpserts)->pluck('question_id')->all();
-                                $timetableQuestions = TimetableQuestion::where('timetable_module_id', $timetableModule->id)
-                                    ->whereIn('question_id', $questionIds)
-                                    ->get(['id', 'question_id'])
-                                    ->keyBy('question_id');
-
-                                $answerUpserts = [];
-                                foreach ($moduleQuestions as $moduleQuestion) {
-
-                                    $question = $moduleQuestion->question;
-                                    if (!$question) {
-                                        continue;
-                                    }
-
-                                    $timetableQuestion = $timetableQuestions->get($question->id);
-                                    if (!$timetableQuestion) {
-                                        continue;
-                                    }
-
-                                    $answers = $question->answers
-                                        ->sortBy([
-                                            ['order', 'asc'],
-                                            ['created_at', 'asc'],
-                                            ['alphabet', 'asc'],
-                                        ])
-                                        ->values();
-
-                                    foreach ($answers as $index => $answer) {
-                                        $answerOrder = (int) ($answer->order ?? 0);
-                                        if ($answerOrder <= 0) {
-                                            $answerOrder = $index + 1;
-                                        }
-
-                                        $alphabet = $answer->alphabet;
-                                        if ($alphabet === null || $alphabet === '') {
-                                            $alphabet = chr(64 + $answerOrder);
-                                        }
-
-                                        $answerUpserts[] = [
-                                            'timetable_question_id' => $timetableQuestion->id,
-                                            'answer_id' => $answer->id,
-                                            'company_id' => $companyId,
-                                            'alphabet' => $alphabet,
-                                            'context' => $answer->context,
-                                            'images' => $answer->images,
-                                            'latex' => $answer->latex,
-                                            'latex_preview_pdf' => $answer->latex_preview_pdf,
-                                            'latex_preview_png' => $answer->latex_preview_png,
-                                            'is_correct' => $answer->is_correct,
-                                            'order' => $answerOrder,
-                                            'created_at' => $now,
-                                            'updated_at' => $now,
-                                        ];
-                                    }
-                                }
 
                                 if (!empty($answerUpserts)) {
                                     TimetableAnswer::upsert(

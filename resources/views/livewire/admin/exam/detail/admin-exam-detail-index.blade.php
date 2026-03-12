@@ -3,13 +3,6 @@
     x-effect="document.body.classList.toggle('overflow-hidden', mobileSidebarOpen || rightSidebarOpen)">
     @php
         use App\Models\User\UserModuleQuestion;
-
-        $first = $questionNavigationId
-            ? UserModuleQuestion::where('id', '<', $questionNavigationId)->where('user_timetable_id',$userTimetableId)->exists()
-            : false;
-        $last = $questionNavigationId
-            ? UserModuleQuestion::where('id', '>', $questionNavigationId)->where('user_timetable_id',$userTimetableId)->exists()
-            : false;
     @endphp
 
     <!-- Hidden elements untuk video recording -->
@@ -196,12 +189,12 @@
 
                         <!-- Mobile Top Navigation -->
                         <div class="flex gap-2 sm:hidden">
-                            @if ($first)
+                            @if ($hasPrevious)
                                 <button wire:click="previousQuestion" class="p-1 text-gray-600 bg-white border border-gray-300 rounded hover:bg-gray-100">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
                                 </button>
                             @endif
-                            @if ($last)
+                            @if ($hasNext)
                                 <button wire:click="nextQuestion" class="p-1 text-gray-600 bg-white border border-gray-300 rounded hover:bg-gray-100">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                                 </button>
@@ -325,7 +318,7 @@
                 <div class="flex items-center justify-between max-w-7xl mx-auto">
                     <!-- Tombol Soal Sebelumnya -->
                     <div class="flex">
-                        @if ($first)
+                        @if ($hasPrevious)
                             <button wire:click="previousQuestion" type="button"
                                 class="flex items-center px-5 py-2.5 text-sm font-medium text-gray-700 transition-all bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 shadow-sm">
                                 <svg class="w-5 h-5 mr-2 -ml-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -339,7 +332,7 @@
 
                     <!-- Tombol Soal Selanjutnya / Selesai Ujian -->
                     <div class="flex">
-                        @if ($last)
+                        @if ($hasNext)
                             <button type="button" wire:click="nextQuestion"
                                 class="flex items-center px-5 py-2.5 text-sm font-medium text-white transition-all rounded-lg shadow-sm
                             bg-[{{$companyData->color_primary}}] hover:bg-[{{$companyData->color_primary}}] ring-[{{$companyData->color_primary}}] hover:shadow-md focus:ring-4">
@@ -1061,11 +1054,11 @@
                 if (!['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
                     // Navigation: Left/Right Arrows
                     if (e.key === 'ArrowRight') {
-                        @if ($last) Livewire.dispatch('nextQuestion'); @endif
+                        @if ($hasNext) Livewire.dispatch('nextQuestion'); @endif
                         return;
                     }
                     if (e.key === 'ArrowLeft') {
-                        @if ($first) Livewire.dispatch('previousQuestion'); @endif
+                        @if ($hasPrevious) Livewire.dispatch('previousQuestion'); @endif
                         return;
                     }
 
