@@ -186,25 +186,26 @@ class AdminMasterQuestionIndex extends Component
         $this->topics         = Topic::select('id', 'name')->get();
         $this->question_types = QuestionType::select('id', 'name')->get();
         $this->category_questions = CategoryQuestion::select('id', 'name')->get();
-        if (Auth::user()?->hasRole('Dosen')) {
-            $studyIds = Auth::user()?->studys ?? [];
+        // if (Auth::user()?->hasRole('Dosen')) {   
+        //     $studyIds = Auth::user()?->studys ?? [];
 
-            // Ensure $studyIds is always an array
-            if (is_string($studyIds)) {
-                $studyIds = json_decode($studyIds, true) ?? [];
-            }
+        //     // Ensure $studyIds is always an array
+        //     if (is_string($studyIds)) {
+        //         $studyIds = json_decode($studyIds, true) ?? [];
+        //     }
 
-            // Ensure it's an array and not null
-            $studyIds = is_array($studyIds) ? $studyIds : [];
+        //     // Ensure it's an array and not null
+        //     $studyIds = is_array($studyIds) ? $studyIds : [];
 
-            $this->studys = Study::whereIn('id', $studyIds)
-                ->orderBy('name', 'asc')
-                ->pluck('name', 'id')
-                ->toArray();
-            $this->study_id = array_key_first($this->studys);
-        } else {
-            $this->studys = Study::orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
-        }
+        //     $this->studys = Study::whereIn('id', $studyIds)
+        //         ->orderBy('name', 'asc')
+        //         ->pluck('name', 'id')
+        //         ->toArray();
+        //     $this->study_id = array_key_first($this->studys);
+        // } else {
+        //     $this->studys = Study::orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
+        // }
+        $this->studys = Study::orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
     }
 
     public function updatedImages($value)

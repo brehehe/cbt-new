@@ -225,7 +225,7 @@
                             </td>
                             @if(Auth::user()->hasRole('Admin'))
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @if($admin->usrSecKey->sec_val)
+                                @if($admin?->usrSecKey?->sec_val)
                                     {{ decrypt($admin->usrSecKey->sec_val) }}
                                 @else
                                     -

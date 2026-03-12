@@ -75,24 +75,25 @@ class AdminMasterQuestionUpdate extends Component
             $this->images[]     = $path;
         }
 
-        if (Auth::user()?->hasRole('Dosen')) {
-            $studyIds = Auth::user()?->studys ?? [];
+        // if (Auth::user()?->hasRole('Dosen')) {
+        //     $studyIds = Auth::user()?->studys ?? [];
 
-            // Ensure $studyIds is always an array
-            if (is_string($studyIds)) {
-                $studyIds = json_decode($studyIds, true) ?? [];
-            }
+        //     // Ensure $studyIds is always an array
+        //     if (is_string($studyIds)) {
+        //         $studyIds = json_decode($studyIds, true) ?? [];
+        //     }
 
-            // Ensure it's an array and not null
-            $studyIds = is_array($studyIds) ? $studyIds : [];
+        //     // Ensure it's an array and not null
+        //     $studyIds = is_array($studyIds) ? $studyIds : [];
 
-            $this->studys = Study::whereIn('id', $studyIds)
-                ->orderBy('name', 'asc')
-                ->pluck('name', 'id')
-                ->toArray();
-        } else {
-            $this->studys = Study::orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
-        }
+        //     $this->studys = Study::whereIn('id', $studyIds)
+        //         ->orderBy('name', 'asc')
+        //         ->pluck('name', 'id')
+        //         ->toArray();
+        // } else {
+        //     $this->studys = Study::orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
+        // }
+        $this->studys = Study::orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
 
         $this->study_id = $this->get_question?->study_id;
 

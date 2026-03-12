@@ -291,6 +291,12 @@ if (auth()->check()) {
                 'icon' => 'fa-list-ol',
             ],
             [
+                'label' => 'Kategori Soal',
+                'url' => route('admin.master.category-question'),
+                'pattern' => 'admin/master/category-question',
+                'icon' => 'fa-list-ul',
+            ],
+            [
                 'label' => 'Modul Soal',
                 'url' => route('admin.master.module'),
                 'pattern' => ['admin/master/module-question', 'admin/master/module-question/*'],
