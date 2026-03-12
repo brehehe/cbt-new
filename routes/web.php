@@ -47,6 +47,9 @@ Route::middleware(['auth', CheckUserTimetable::class])->group(function () {
 
 require __DIR__ . '/auth.php';
 
+// Public Stress Test Route (Only for testing purposes)
+Route::get('/stress-test/exam/{userTimetableId}', \App\Livewire\Public\StressTestExamDetailIndex::class)->name('public.stress-test.exam');
+
 // Safe Exam Browser Routes
 Route::prefix('seb')->name('seb.')->group(function () {
     // Generic config - no timetable required, just login page
