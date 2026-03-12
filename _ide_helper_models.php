@@ -914,7 +914,7 @@ namespace App\Models\Master\Question{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string $difficulty tingkat kesulitan soal
+ * @property string|null $difficulty
  * @property string|null $category_question_id
  * @property string|null $latex latex source for question
  * @property string|null $latex_preview_pdf latex preview pdf path
