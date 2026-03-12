@@ -44,6 +44,7 @@ class AdminExamDetailIndex extends Component
     public $is_streaming = false;
     public $hasPrevious = false;
     public $hasNext = false;
+    public $questionNavigationOrder;
 
     protected $listeners = [
         'timeExpired',
@@ -811,12 +812,17 @@ class AdminExamDetailIndex extends Component
 
     private function updateNavigationStatus()
     {
+        if ($this->questionNavigationOrder === null) {
+            $current = UserModuleQuestion::where('id', $this->questionNavigationId)->select('order')->first();
+            $this->questionNavigationOrder = $current?->order;
+        }
+
         $this->hasPrevious = UserModuleQuestion::where('user_timetable_id', $this->userTimetableId)
-            ->where('id', '<', $this->questionNavigationId)
+            ->where('order', '<', $this->questionNavigationOrder)
             ->exists();
 
         $this->hasNext = UserModuleQuestion::where('user_timetable_id', $this->userTimetableId)
-            ->where('id', '>', $this->questionNavigationId)
+            ->where('order', '>', $this->questionNavigationOrder)
             ->exists();
     }
 
@@ -908,6 +914,7 @@ class AdminExamDetailIndex extends Component
 
         if ($firstQuestion) {
             $this->questionNavigationId = $firstQuestion->id;
+            $this->questionNavigationOrder = $firstQuestion->order;
             $this->isMark = $firstQuestion->is_mark;
             $this->question = $firstQuestion->timetableQuestion?->question;
             $this->description = $firstQuestion->timetableQuestion?->description;
@@ -1145,18 +1152,19 @@ class AdminExamDetailIndex extends Component
 
         if ($direction === 'previous') {
             $nextQuestion = $query->select('id', 'order')
-                ->where('id', '<', $this->questionNavigationId)
+                ->where('order', '<', $this->questionNavigationOrder)
                 ->orderBy('order', 'desc')
                 ->first();
         } else {
             $nextQuestion = $query->select('id', 'order')
-                ->where('id', '>', $this->questionNavigationId)
+                ->where('order', '>', $this->questionNavigationOrder)
                 ->orderBy('order', 'asc')
                 ->first();
         }
 
         if ($nextQuestion) {
             $this->questionNavigationId = $nextQuestion->id;
+            $this->questionNavigationOrder = $nextQuestion->order;
             $this->refreshQuestionData();
             $this->updateCurrentQuestionMark();
             $this->updatePercentage();
@@ -1188,6 +1196,10 @@ class AdminExamDetailIndex extends Component
     {
         $this->saveCurrentAnswer();
         $this->questionNavigationId = $id;
+        
+        $current = UserModuleQuestion::where('id', $id)->select('order')->first();
+        $this->questionNavigationOrder = $current?->order;
+
         $this->updateCurrentQuestionMark();
         $this->updatePercentage();
         $this->updateNavigationStatus();
