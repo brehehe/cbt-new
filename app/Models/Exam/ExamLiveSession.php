@@ -41,7 +41,8 @@ class ExamLiveSession extends Model
         'session_metadata',
         'browser_info',
         'device_info',
-        'location_info'
+        'location_info',
+        'end_time'
     ];
 
     protected $casts = [
@@ -50,7 +51,8 @@ class ExamLiveSession extends Model
         'session_metadata' => 'array',
         'browser_info' => 'array',
         'device_info' => 'array',
-        'location_info' => 'array'
+        'location_info' => 'array',
+        'end_time' => 'datetime'
     ];
 
     protected static function boot()

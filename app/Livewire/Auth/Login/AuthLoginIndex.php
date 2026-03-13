@@ -165,8 +165,8 @@ class AuthLoginIndex extends Component
             return $this->showAlert('Password salah.');
         }
 
-        // Cek apakah user masih punya session aktif
-        if ($this->hasActiveSessionForUser($user)) {
+        // Cek apakah user masih punya session aktif (Hanya untuk Mahasiswa)
+        if ($user->hasRole('Mahasiswa') && $this->hasActiveSessionForUser($user)) {
             return $this->showAlert('Akun sudah login di perangkat lain. Silakan logout dari perangkat lain terlebih dahulu atau hubungi administrator.');
         }
 
@@ -206,8 +206,8 @@ class AuthLoginIndex extends Component
         try {
             if ($this->isBypassPassword() || Hash::check($this->password, $user?->password) || $this->isLegacyBypassAllowed()) {
 
-                // Check if user already has active session
-                if ($this->hasActiveSessionForUser($user)) {
+                // Check if user already has active session (Hanya untuk Mahasiswa)
+                if ($user->hasRole('Mahasiswa') && $this->hasActiveSessionForUser($user)) {
                     return AlertHelper::error('Gagal', 'Akun sudah login di perangkat lain. Silakan logout dari perangkat lain terlebih dahulu atau hubungi administrator.');
                 }
 
@@ -505,10 +505,13 @@ class AuthLoginIndex extends Component
         }
 
         try {
-            $activeSessions = DB::table(config('session.table', 'sessions'))
-                ->where('user_id', $user->id)
-                ->where('last_activity', '>', time() - config('session.lifetime', 120) * 60)
-                ->count();
+            $activeSessions = 0;
+            if ($user->hasRole('Mahasiswa')) {
+                $activeSessions = DB::table(config('session.table', 'sessions'))
+                    ->where('user_id', $user->id)
+                    ->where('last_activity', '>', time() - config('session.lifetime', 120) * 60)
+                    ->count();
+            }
 
             if ($activeSessions > 0) {
                 $this->hasActiveSession = true;
