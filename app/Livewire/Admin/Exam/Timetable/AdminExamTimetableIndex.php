@@ -224,9 +224,10 @@ class AdminExamTimetableIndex extends Component
                 }
             }
 
-            $UserTimetable = UserTimetable::create([
+            $UserTimetable = UserTimetable::firstOrCreate([
                 'user_id' => Auth::id(),
                 'timetable_id' => $timeTable->id,
+            ], [
                 'start_process' => Carbon::now(),
                 'studys' => $timeTable->studys,
                 'is_recording' => $timeTable?->is_recording ?? false,
