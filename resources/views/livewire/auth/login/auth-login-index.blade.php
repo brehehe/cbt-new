@@ -98,7 +98,7 @@
                                 </div>
 
                                 <!-- Active Session Error -->
-                                @if ($hasActiveSession && $activeSessionInfo)
+                                {{-- @if ($hasActiveSession && $activeSessionInfo)
                                     <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
                                         <div class="flex items-start">
                                             <div class="flex-shrink-0">
@@ -122,7 +122,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                @endif
+                                @endif --}}
 
                                 <!-- Login Form -->
                                 <form class="space-y-4 lg:space-y-6" wire:submit="login">
