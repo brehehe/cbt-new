@@ -1,72 +1,78 @@
 <div wire:ignore.self id="modal-rating-scale"
     class="fixed inset-0 bg-overlay hidden items-center justify-center z-50 transition-opacity duration-300 ease-in-out">
-    <div class="bg-white rounded-2xl shadow-2xl w-full transform transition-all scale-95 duration-300 ease-out animate-fade-in"
-        style="max-width: 100vh">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg transform transition-all scale-95 duration-300 ease-out animate-fade-in overflow-hidden">
         <!-- Header -->
-        <div class="flex justify-between items-center p-6 border-b">
-            <div class="flex items-center gap-2">
-                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" stroke-width="2"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M13 16h-1v-4h-1m1-4h.01M12 20.5C6.753 20.5 2.5 16.247 2.5 11S6.753 1.5 12 1.5 21.5 5.753 21.5 11 17.247 20.5 12 20.5z" />
-                </svg>
-                <h2 class="text-xl font-semibold text-gray-800">Skala Penilaian</h2>
+        <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/30">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-[{{ $companyData->color_primary ?? '#2b7fff' }}] bg-opacity-10 flex items-center justify-center">
+                        <i class="fa-solid fa-sliders text-xl text-[{{ $companyData->color_primary ?? '#2b7fff' }}]"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800">Skala Penilaian</h2>
+                        <p class="text-sm text-gray-500">Atur parameter grade nilai</p>
+                    </div>
+                </div>
+                <button wire:click="closeModal()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
-            <button wire:click="closeModal()"
-                class="text-gray-500 hover:text-red-500 transition-colors text-2xl leading-none cursor-pointer">
-                &times;
-            </button>
         </div>
 
         <!-- Body -->
-        <div class="px-6 py-4 text-gray-600">
-            <div class="mb-4">
-                <label for="grade_letter" class="block text-sm font-medium text-gray-700">Nama Grade Letter <span
-                        class="text-red-600">*</span></label>
-                <input type="text" id="grade_letter" wire:model.defer="grade_letter" placeholder="Contoh : A"
-                    class="mt-1 form-control">
+        <div class="p-8 space-y-6">
+            <div class="space-y-2">
+                <label for="grade_letter" class="block text-sm font-bold text-gray-700">Nama Grade Letter <span class="text-red-500">*</span></label>
+                <div class="relative group">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[{{ $companyData->color_primary ?? '#2b7fff' }}] transition-colors">
+                        <i class="fa-solid fa-font"></i>
+                    </div>
+                    <input type="text" id="grade_letter" wire:model.defer="grade_letter" placeholder="Contoh : A"
+                        class="!pl-12 w-full form-control focus:ring-2 focus:ring-[{{ $companyData->color_primary ?? '#2b7fff' }}] focus:ring-opacity-20 border-gray-200">
+                </div>
                 @error('grade_letter')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    <p class="text-xs text-red-500 font-medium ml-1">{{ $message }}</p>
                 @enderror
             </div>
-            <div class="mb-4">
-                <label for="min_score" class="block text-sm font-medium text-gray-700">Nilai Minimum <span
-                        class="text-red-600">*</span></label>
-                <input type="number" id="min_score" wire:model.defer="min_score" placeholder="Masukkan Nilai Minimum"
-                    class="mt-1 form-control">
-                @error('min_score')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                @enderror
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label for="min_score" class="block text-sm font-bold text-gray-700">Nilai Minimum <span class="text-red-500">*</span></label>
+                    <input type="number" id="min_score" wire:model.defer="min_score" placeholder="0"
+                        class="w-full form-control focus:ring-2 focus:ring-[{{ $companyData->color_primary ?? '#2b7fff' }}] focus:ring-opacity-20 border-gray-200">
+                    @error('min_score')
+                        <p class="text-xs text-red-500 font-medium ml-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div class="space-y-2">
+                    <label for="max_score" class="block text-sm font-bold text-gray-700">Nilai Maksimum <span class="text-red-500">*</span></label>
+                    <input type="number" id="max_score" wire:model.defer="max_score" placeholder="100"
+                        class="w-full form-control focus:ring-2 focus:ring-[{{ $companyData->color_primary ?? '#2b7fff' }}] focus:ring-opacity-20 border-gray-200">
+                    @error('max_score')
+                        <p class="text-xs text-red-500 font-medium ml-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
-            <div class="mb-4">
-                <label for="max_score" class="block text-sm font-medium text-gray-700">Nilai Maksimum <span
-                        class="text-red-600">*</span></label>
-                <input type="number" id="max_score" wire:model.defer="max_score" placeholder="Masukkan Nilai Maksimum"
-                    class="mt-1 form-control">
-                @error('max_score')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-            <div class="mb-4">
-                <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi <span
-                        class="text-red-600">*</span></label>
-                <input type="text" id="description" wire:model.defer="description" placeholder="Masukkan Deskripsi"
-                    class="mt-1 form-control">
+
+            <div class="space-y-2">
+                <label for="description" class="block text-sm font-bold text-gray-700">Deskripsi <span class="text-red-500">*</span></label>
+                <textarea id="description" wire:model.defer="description" rows="3" placeholder="Masukkan deskripsi..."
+                    class="w-full form-control focus:ring-2 focus:ring-[{{ $companyData->color_primary ?? '#2b7fff' }}] focus:ring-opacity-20 border-gray-200 py-3"></textarea>
                 @error('description')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    <p class="text-xs text-red-500 font-medium ml-1">{{ $message }}</p>
                 @enderror
             </div>
         </div>
 
         <!-- Footer -->
-        <div class="flex justify-end gap-2 px-6 py-4 border-t">
+        <div class="px-8 py-6 bg-gray-50/50 border-t border-gray-50 flex justify-end gap-3">
             <button wire:click="closeModal()"
-                class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow transition cursor-pointer">
+                class="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all cursor-pointer">
                 Batal
             </button>
             <button wire:click='submit'
-                class="px-4 py-2 bg-[{{ $companyData->color_primary ?? '#2b7fff' }}] hover:bg-[{{ $companyData->color_primary ?? '#2b7fff' }}] text-white rounded-lg shadow transition">
-                Simpan
+                class="px-8 py-2.5 bg-[{{ $companyData->color_primary ?? '#2b7fff' }}] text-white font-bold rounded-xl shadow-lg shadow-[{{ $companyData->color_primary ?? '#2b7fff' }}]/20 hover:opacity-90 active:scale-95 transition-all">
+                Simpan Perubahan
             </button>
         </div>
     </div>

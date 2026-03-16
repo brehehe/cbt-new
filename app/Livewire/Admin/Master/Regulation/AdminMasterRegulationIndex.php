@@ -11,10 +11,7 @@ use Livewire\WithPagination;
 
 class AdminMasterRegulationIndex extends Component
 {
-    use WithPagination;
-    protected $paginationTheme = 'bootstrap';
     public $search = '';
-    public $perPage = 5;
     public $data_id;
     public $description;
     public $type;
@@ -89,6 +86,16 @@ class AdminMasterRegulationIndex extends Component
         }
     }
 
+    public function openInfoModal()
+    {
+        $this->dispatch('openModalRegulationInfo');
+    }
+
+    public function closeInfoModal()
+    {
+        $this->dispatch('closeModalRegulationInfo');
+    }
+
     public function render()
     {
         $regulation = Regulation::query()
@@ -96,7 +103,7 @@ class AdminMasterRegulationIndex extends Component
                 $query->where('description', 'ilike', '%' . $search . '%');
             })
             ->orderBy('order', 'asc')
-            ->paginate($this->perPage);
+            ->get();
 
         return view('livewire.admin.master.regulation.admin-master-regulation-index', [
             'regulations' => $regulation,

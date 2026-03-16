@@ -28,4 +28,19 @@ class RatingScale extends Model
             $modelCreate->company_id = $modelCreate->company_id ?? auth()->user()->company_id;
         });
     }
+
+    public static function getGrade($mark, $companyId = null)
+    {
+        if ($mark === null) {
+            return null;
+        }
+
+        return self::where('min_score', '<=', $mark)
+            ->where('max_score', '>=', $mark)
+            ->when($companyId, function ($query) use ($companyId) {
+                $query->where('company_id', $companyId);
+            })
+            ->orderBy('order')
+            ->first();
+    }
 }

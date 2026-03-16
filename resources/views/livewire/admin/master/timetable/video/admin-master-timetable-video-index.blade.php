@@ -20,9 +20,21 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1
-                    class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
-                    Video Recording</h1>
+                <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
+                    Video Recording
+                </h1>
+            </div>
+            <div class="flex gap-3">
+                <button wire:click="downloadZip"
+                    class="btn btn-primary !bg-blue-600 !border-blue-700 shadow-sm hover:!bg-blue-700 transition-all rounded-xl">
+                    <i class="fa-solid fa-file-zipper mr-2"></i>
+                    Download ZIP (Semua Video)
+                </button>
+                <button wire:click="confirmDeleteAll"
+                    class="btn btn-danger !bg-red-600 !border-red-700 shadow-sm hover:!bg-red-700 transition-all rounded-xl">
+                    <i class="fa-solid fa-trash-can mr-2"></i>
+                    Hapus Semua Video
+                </button>
             </div>
         </div>
     </div>

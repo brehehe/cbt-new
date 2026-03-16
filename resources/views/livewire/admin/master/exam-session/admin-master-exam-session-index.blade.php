@@ -26,7 +26,7 @@
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
         <div class="flex items-center">
             <span class="text-sm text-gray-700 mr-2">Tampil</span>
-            <select class="mt-1 form-control" wire:model.live='perPage'>
+            <select class="mt-1 form-control w-24" wire:model.live='perPage'>
                 <option value="5">5</option>
                 <option value="10">10</option>
                 <option value="25">25</option>

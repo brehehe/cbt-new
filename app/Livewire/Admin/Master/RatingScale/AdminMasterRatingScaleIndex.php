@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Livewire\Admin\Master\RatingScale;
 
 use App\Helpers\AlertHelper;
@@ -12,10 +11,7 @@ use Illuminate\Support\Facades\Validator;
 
 class AdminMasterRatingScaleIndex extends Component
 {
-    use WithPagination;
-    protected $paginationTheme = 'bootstrap';
     public $search = '';
-    public $perPage = 5;
     public $data_id;
     public $grade_letter;
     public $min_score;
@@ -75,10 +71,36 @@ class AdminMasterRatingScaleIndex extends Component
     {
         $this->validate([
             'grade_letter' => 'required',
-            'min_score' => 'required',
-            'max_score' => 'required',
+            'min_score' => 'required|numeric|min:0',
+            'max_score' => 'required|numeric|min:0|gte:min_score',
             'description' => 'required',
+        ], [
+            'max_score.gte' => 'Nilai Maksimum harus lebih besar atau sama dengan Nilai Minimum.',
         ]);
+
+        // Check for overlapping ranges
+        $overlap = RatingScale::where(function ($query) {
+            $query->where(function ($q) {
+                $q->where('min_score', '<=', $this->min_score)
+                    ->where('max_score', '>=', $this->min_score);
+            })->orWhere(function ($q) {
+                $q->where('min_score', '<=', $this->max_score)
+                    ->where('max_score', '>=', $this->max_score);
+            })->orWhere(function ($q) {
+                $q->where('min_score', '>=', $this->min_score)
+                    ->where('max_score', '<=', $this->max_score);
+            });
+        })
+            ->when($this->data_id, function ($query) {
+                $query->where('id', '!=', $this->data_id);
+            })
+            ->where('company_id', auth()->user()->company_id)
+            ->first();
+
+        if ($overlap) {
+            $this->addError('min_score', 'Rentang nilai tumpang tindih dengan Grade ' . $overlap->grade_letter . ' (' . $overlap->min_score . '-' . $overlap->max_score . ')');
+            return;
+        }
 
         try {
             DB::beginTransaction();
@@ -89,6 +111,7 @@ class AdminMasterRatingScaleIndex extends Component
                 'min_score' => $this->min_score,
                 'max_score' => $this->max_score,
                 'description' => $this->description,
+                'company_id' => auth()->user()->company_id,
             ]);
             DB::commit();
             AlertHelper::success('Berhasil', 'Data berhasil disimpan!');
@@ -96,8 +119,18 @@ class AdminMasterRatingScaleIndex extends Component
         } catch (\Throwable $th) {
             DB::rollback();
             AlertHelper::error('Gagal', 'Data gagal disimpan!');
-            return Log::info('Gagal Menyimpan Data Role : ' . $th);
+            return Log::info('Gagal Menyimpan Data Rating Scale : ' . $th);
         }
+    }
+
+    public function openInfoModal()
+    {
+        $this->dispatch('openModalRatingScaleInfo');
+    }
+
+    public function closeInfoModal()
+    {
+        $this->dispatch('closeModalRatingScaleInfo');
     }
 
     public function render()
@@ -110,7 +143,7 @@ class AdminMasterRatingScaleIndex extends Component
                     ->orWhere('description', 'ilike', '%' . $search . '%');
             })
             ->orderBy('order', 'asc')
-            ->paginate($this->perPage);
+            ->get();
 
         return view('livewire.admin.master.rating-scale.admin-master-rating-scale-index', [
             'datas' => $data,
