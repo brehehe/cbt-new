@@ -30,68 +30,98 @@
 
     @php
         $count_question = $timetable_questions->count();
+        $chunkSize = 35; // Number of questions per table section
+        $chunks = $timetable_questions->chunk($chunkSize);
     @endphp
 
-    <table>
-        <thead>
-            <tr>
-                <th rowspan="3" class="col-no">No</th>
-                <th rowspan="3" class="col-name text-left">Nama Mahasiswa</th>
-                <th colspan="{{ $count_question }}">Daftar Soal ({{ $count_question }})</th>
-                <th rowspan="3" class="col-score">JB</th>
-                <th rowspan="3" class="col-score">Nilai</th>
-            </tr>
-            <tr>
-                @foreach ($timetable_questions as $index => $q)
-                    <th>{{ $index + 1 }}</th>
-                @endforeach
-            </tr>
-            <tr>
-                @foreach ($timetable_questions as $q)
-                    <!-- Displaying Correct Answer Key if available, else dash -->
-                    <th style="font-size: 8px;">{{ $answerMap[$q->id] ?? '-' }}</th>
-                @endforeach
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($user_timetables as $index => $user_timetable)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td class="text-left">
-                        <div style="font-weight: bold;">{{ $user_timetable->user?->name ?? '-' }}</div>
-                        <div style="font-size: 8px; color: #6b7280;">{{ $user_timetable->user?->username ?? '' }}</div>
-                    </td>
-                    @foreach ($timetable_questions as $question)
-                        @php
-                            $status = $userQuestionStatuses[$user_timetable->id][$question->id] ?? null;
-                            $isCorrect = $status === 'correct';
-                            $hasAnswered = !is_null($status);
-                            
-                            $class = '';
-                            $content = '-';
-                            
-                            if ($hasAnswered) {
-                                if ($isCorrect) {
-                                    $class = 'badge-ok';
-                                    $content = '1';
-                                } else {
-                                    $class = 'badge-no';
-                                    $content = '0';
-                                }
-                            }
-                        @endphp
-                        <td class="{{ $class }}">{{ $content }}</td>
+    @php
+        $count_question = $timetable_questions->count();
+        $chunkSize = 25; // Smaller chunks for PDF readability
+        $chunks = $timetable_questions->chunk($chunkSize);
+    @endphp
+
+    @foreach ($chunks as $chunkIndex => $questionChunk)
+        <div style="margin-bottom: 25px; page-break-inside: avoid;">
+            <div style="background-color: #f9fafb; padding: 10px; border-radius: 8px; border-left: 4px solid #3b82f6; margin-bottom: 15px;">
+                <h3 style="font-size: 14px; margin: 0; color: #1e40af;">
+                    BAGIAN {{ $chunkIndex + 1 }}: Soal {{ ($chunkIndex * $chunkSize) + 1 }} - {{ min(($chunkIndex + 1) * $chunkSize, $count_question) }}
+                </h3>
+            </div>
+            
+            <table style="width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 10px;">
+                <thead>
+                    <tr>
+                        <th style="width: 30px;">No</th>
+                        <th class="text-left" style="width: 150px;">Nama Mahasiswa</th>
+                        @foreach ($questionChunk as $index => $q)
+                            <th style="font-size: 8px;">{{ ($chunkIndex * $chunkSize) + $loop->iteration }}</th>
+                        @endforeach
+                    </tr>
+                    <tr>
+                        <th colspan="2" style="background-color: #f3f4f6; font-size: 8px; text-align: right;">Kunci:</th>
+                        @foreach ($questionChunk as $q)
+                            <th style="font-size: 8px; background-color: #f3f4f6; font-weight: bold;">{{ $answerMap[$q->id] ?? '-' }}</th>
+                        @endforeach
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($user_timetables as $uIndex => $user_timetable)
+                        <tr>
+                            <td style="font-size: 8px;">{{ $uIndex + 1 }}</td>
+                            <td class="text-left" style="font-size: 8px; font-weight: bold; overflow: hidden;">
+                                {{ \Illuminate\Support\Str::limit($user_timetable->user?->name ?? '-', 25) }}
+                            </td>
+                            @foreach ($questionChunk as $question)
+                                @php
+                                    $status = $userQuestionStatuses[$user_timetable->id][$question->id] ?? null;
+                                    $isCorrect = $status === 'correct';
+                                    $hasAnswered = !is_null($status);
+                                    
+                                    $class = '';
+                                    $content = '-';
+                                    
+                                    if ($hasAnswered) {
+                                        if ($isCorrect) {
+                                            $class = 'badge-ok';
+                                            $content = '1';
+                                        } else {
+                                            $class = 'badge-no';
+                                            $content = '0';
+                                        }
+                                    }
+                                @endphp
+                                <td class="{{ $class }}" style="font-size: 8px;">{{ $content }}</td>
+                            @endforeach
+                        </tr>
                     @endforeach
-                    <td style="font-weight: bold;">{{ $correctCounts[$user_timetable->id] ?? 0 }}</td>
-                    <td style="font-weight: bold; color: #2563eb;">{{ $user_timetable->mark ?? '-' }}</td>
-                </tr>
-            @empty
+                </tbody>
+            </table>
+        </div>
+    @endforeach
+
+    <div style="margin-top: 20px; page-break-inside: avoid;">
+        <h3 style="font-size: 14px; border-bottom: 2px solid #e5e7eb; padding-bottom: 5px;">Ringkasan Nilai Akhir</h3>
+        <table style="width: 50%; border-collapse: collapse;">
+            <thead>
                 <tr>
-                    <td colspan="{{ $count_question + 4 }}" style="padding: 20px; color: #6b7280;">Tidak ada data ujian found.</td>
+                    <th style="width: 30px;">No</th>
+                    <th class="text-left">Nama Mahasiswa</th>
+                    <th style="width: 50px;">JB</th>
+                    <th style="width: 50px;">Nilai</th>
                 </tr>
-            @endforelse
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach ($user_timetables as $uIndex => $user_timetable)
+                    <tr>
+                        <td>{{ $uIndex + 1 }}</td>
+                        <td class="text-left" style="font-weight: bold;">{{ $user_timetable->user?->name ?? '-' }}</td>
+                        <td style="font-weight: bold;">{{ $correctCounts[$user_timetable->id] ?? 0 }}</td>
+                        <td style="font-weight: bold; color: #2563eb;">{{ $user_timetable->mark ?? '-' }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 
     <div class="page-break"></div>
 

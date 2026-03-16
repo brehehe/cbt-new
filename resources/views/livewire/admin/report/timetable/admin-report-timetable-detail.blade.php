@@ -1,4 +1,4 @@
-    @section('title', 'Detail Riwayat Jadwal Ujian')
+@section('title', 'Detail Riwayat Jadwal Ujian')
 <div>
     {{-- Be like water. --}}
     <div class="mb-4">
@@ -43,108 +43,104 @@
         </div>
     </div>
     <!-- Table Section -->
-    <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
-        <div class="table-container overflow-x-auto relative">
-            <table class="w-full text-xs text-left text-gray-500 border-collapse">
-                <thead class="bg-gray-50 text-xs text-gray-700 uppercase sticky top-0 z-10">
-                    <tr>
-                        <th rowspan="2" class="px-2 py-2 sticky left-0 z-20 bg-gray-50 border-b border-r border-gray-200 w-12 text-center shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">No</th>
-                        <th rowspan="2" class="px-3 py-2 sticky left-12 z-20 bg-gray-50 border-b border-r border-gray-200 w-48 min-w-[12rem] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Nama Mahasiswa</th>
-                        <th colspan="{{ $timetable_questions->count() }}" class="px-2 py-1 text-center border-b border-gray-200 bg-gray-100 font-semibold tracking-wider">
-                            Daftar Soal ({{ $timetable_questions->count() }})
-                        </th>
-                        <th rowspan="2" class="px-2 py-2 text-center border-b border-l border-gray-200 bg-gray-50 w-16">JB</th>
-                        <th rowspan="2" class="px-2 py-2 text-center border-b border-gray-200 bg-gray-50 w-16">Nilai</th>
-                    </tr>
-                    <tr>
-                        @foreach ($timetable_questions as $index => $question)
-                            <th class="px-1 py-1 text-center border-b border-gray-200 min-w-[2.5rem] relative group cursor-help hover:bg-gray-100 transition-colors">
-                                <span class="font-bold text-gray-600 block mb-1">{{ $index + 1 }}</span>
-                                <div class="text-[10px] items-center justify-center hidden group-hover:flex absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-2 py-1 rounded shadow-lg whitespace-nowrap z-50">
-                                    {{ \Illuminate\Support\Str::limit(strip_tags($question->question?->question ?? $question->question ?? ''), 30) }}
-                                </div>
-                            </th>
-                        @endforeach
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200 bg-white">
-                    @forelse ($user_timetables as $index => $user_timetable)
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-2 py-1 text-center sticky left-0 z-10 bg-white border-r border-gray-100 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] group-hover:bg-gray-50">
-                                {{ $user_timetables->firstItem() + $index }}
-                            </td>
-                            <td class="px-3 py-1 sticky left-12 z-10 bg-white border-r border-gray-100 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] group-hover:bg-gray-50">
-                                <div class="flex flex-col">
-                                    <span class="font-medium text-gray-900 truncate max-w-[11rem]" title="{{ $user_timetable->user?->name ?? '-' }}">
-                                        {{ $user_timetable->user?->name ?? '-' }}
-                                    </span>
-                                    <span class="text-[10px] text-gray-500">{{ $user_timetable->user?->username ?? '' }}</span>
-                                </div>
-                            </td>
-                            
-                            @foreach ($timetable_questions as $question)
-                                @php
-                                    $userAnswer = $user_timetable->userModuleQuestions
-                                        ->firstWhere('timetable_question_id', $question->id);
-                                    $status = $userAnswer?->status;
-                                    $isCorrect = $status === 'correct';
-                                    $hasAnswered = !is_null($status);
-                                    
-                                    $bgClass = '';
-                                    $textClass = 'text-gray-400';
-                                    $content = '-';
-                                    
-                                    if ($hasAnswered) {
-                                        if ($isCorrect) {
-                                            $bgClass = 'bg-green-50 text-green-700 font-bold';
-                                            $content = '1';
-                                        } else {
-                                            $bgClass = 'bg-red-50 text-red-700';
-                                            $content = '0';
-                                        }
-                                    }
-                                @endphp
-                                <td class="px-1 py-1 text-center border-r border-gray-50 {{ $bgClass }} {{ !$hasAnswered ? $textClass : '' }}">
-                                    {{ $content }}
-                                </td>
-                            @endforeach
-
-                            <td class="px-2 py-1 text-center font-bold text-gray-700 border-l border-gray-100 bg-gray-50/50">
+    <!-- Results Card List -->
+    <div class="space-y-6">
+        @forelse ($user_timetables as $index => $user_timetable)
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300">
+                <!-- Card Header: Student Info -->
+                <div class="p-6 border-b border-gray-50 bg-gray-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-[{{ $companyData->color_primary }}]/10 flex items-center justify-center text-[{{ $companyData->color_primary }}] font-bold text-lg">
+                            {{ $user_timetables->firstItem() + $index }}
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-gray-900 leading-tight">
+                                {{ $user_timetable->user?->name ?? '-' }}
+                            </h3>
+                            <p class="text-sm text-gray-500 font-medium">NIM: {{ $user_timetable->user?->nim ?? ($user_timetable->user?->username ?? '-') }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div class="px-4 py-2 rounded-xl bg-green-50 border border-green-100 flex flex-col items-center min-w-[80px]">
+                            <span class="text-[10px] uppercase tracking-wider font-bold text-green-600">Benar (JB)</span>
+                            <span class="text-lg font-black text-green-700">
                                 {{ $user_timetable->userModuleQuestions->where('status', 'correct')->count() }}
-                            </td>
-                            <td class="px-2 py-1 text-center font-bold text-blue-600 bg-gray-50/50">
-                                {{ $user_timetable->mark ?? '-' }}
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="{{ $timetable_questions->count() + 4 }}" class="px-6 py-10 text-center text-gray-500">
-                                <div class="flex flex-col items-center justify-center">
-                                    <i class="fas fa-inbox text-3xl text-gray-300 mb-2"></i>
-                                    <span class="text-sm">Tidak ada data partisipan ujian.</span>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Pagination -->
-        <div class="px-5 py-4 bg-gray-50/80 border-t border-gray-200">
-            <div class="flex items-center justify-between">
-                <div class="text-sm text-gray-700">
-                    Menampilkan <span class="font-medium">{{ $user_timetables->firstItem() }}</span> sampai <span
-                        class="font-medium">{{ $user_timetables->lastItem() }}</span> dari <span
-                        class="font-medium">{{ $user_timetables->total() }}</span> hasil
+                            </span>
+                        </div>
+                        <div class="px-4 py-2 rounded-xl bg-red-50 border border-red-100 flex flex-col items-center min-w-[80px]">
+                            <span class="text-[10px] uppercase tracking-wider font-bold text-red-600">Salah</span>
+                            <span class="text-lg font-black text-red-700">
+                                {{ $user_timetable->userModuleQuestions->where('status', 'wrong')->count() }}
+                            </span>
+                        </div>
+                        <div class="px-4 py-2 rounded-xl bg-blue-600 flex flex-col items-center min-w-[100px] shadow-lg shadow-blue-200">
+                            <span class="text-[10px] uppercase tracking-wider font-bold text-blue-50">Nilai Akhir</span>
+                            <span class="text-xl font-black text-white">
+                                {{ $user_timetable->mark ?? '0' }}
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        {{ $user_timetables->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
-                    </nav>
+
+                <!-- Card Body: Answer Pattern Grid -->
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-braille text-gray-400"></i>
+                        <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wide">Pola Jawaban</h4>
+                        <span class="px-2 py-0.5 rounded-full bg-gray-100 text-[10px] font-bold text-gray-500">
+                            {{ $timetable_questions->count() }} Soal
+                        </span>
+                    </div>
+                    
+                    @php
+                        // Optimize lookup by keying the collection
+                        $userAnswers = $user_timetable->userModuleQuestions->keyBy('timetable_question_id');
+                    @endphp
+
+                    <div class="flex flex-wrap gap-1.5 overflow-hidden">
+                        @foreach ($timetable_questions as $qIndex => $question)
+                            @php
+                                $userAnswer = $userAnswers[$question->id] ?? null;
+                                $status = $userAnswer?->status;
+                                $isCorrect = $status === 'correct';
+                                $hasAnswered = !is_null($status);
+                                
+                                $bgClass = 'bg-gray-100 text-gray-400';
+                                if ($hasAnswered) {
+                                    $bgClass = $isCorrect ? 'bg-green-500 text-white shadow-sm shadow-green-100' : 'bg-red-500 text-white shadow-sm shadow-red-100';
+                                }
+                            @endphp
+                            <div class="w-8 h-8 md:w-9 md:h-9 rounded-lg {{ $bgClass }} flex flex-col items-center justify-center transition-all hover:scale-110 cursor-default group relative"
+                                 title="Soal {{ $qIndex + 1 }}: {{ $hasAnswered ? ($isCorrect ? 'Benar' : 'Salah') : 'Belum Dijawab' }}">
+                                <span class="text-[8px] opacity-70 font-bold leading-none mb-0.5">{{ $qIndex + 1 }}</span>
+                                <span class="text-[11px] font-black leading-none">
+                                    @if(!$hasAnswered) - @elseif($isCorrect) 1 @else 0 @endif
+                                </span>
+                                
+                                <!-- Tooltip -->
+                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 transition-opacity">
+                                    Soal {{ $qIndex + 1 }}: {{ \Illuminate\Support\Str::limit(strip_tags($question->question?->question ?? $question->question ?? ''), 20) }}
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
-        </div>
+        @empty
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
+                <div class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-inbox text-3xl text-gray-300"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Tidak ada data</h3>
+                <p class="text-gray-500">Belum ada partisipan yang mengikuti ujian ini.</p>
+            </div>
+        @endforelse
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-8">
+        {{ $user_timetables->links('vendor.livewire.custom') }}
     </div>
 
 

@@ -6,10 +6,14 @@
                     class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
                     Nilai Ujian</h1>
             </div>
-            <div>
-                <button wire:click="exportPdf" class="btn btn-primary">
+            <div class="flex gap-2">
+                <button wire:click="exportPdf" class="btn btn-primary !bg-red-600 !border-red-700 hover:!bg-red-700">
                     <i class="fa-solid fa-file-pdf mr-2"></i>
                     Export PDF
+                </button>
+                <button wire:click="exportExcel" class="btn btn-primary !bg-green-600 !border-green-700 hover:!bg-green-700">
+                    <i class="fa-solid fa-file-excel mr-2"></i>
+                    Export Excel
                 </button>
             </div>
         </div>

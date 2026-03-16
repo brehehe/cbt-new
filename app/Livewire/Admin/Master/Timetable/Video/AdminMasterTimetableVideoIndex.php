@@ -11,12 +11,18 @@ use App\Models\User;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use App\Helpers\AlertHelper;
 
 class AdminMasterTimetableVideoIndex extends Component
 {
     use WithPagination;
     public $timetable_id, $timetable, $modules = [], $supervisors = [], $module_id, $getSupervisors = [];
     public $search = '', $perPage = 5, $start_time, $end_time;
+
+    protected $listeners = [
+        'deleteAllRecordings',
+        'deleteRecording'
+    ];
 
     public function mount($timetable_id = null)
     {
@@ -84,12 +90,7 @@ class AdminMasterTimetableVideoIndex extends Component
 
     public function confirmDeleteAll()
     {
-        $this->dispatch('swal:confirm', [
-            'title' => 'Hapus Semua Video?',
-            'text' => 'Semua file video dan rekaman untuk ujian ini akan dihapus permanen!',
-            'type' => 'warning',
-            'method' => 'deleteAllRecordings',
-        ]);
+        AlertHelper::confirmWarning('deleteAllRecordings', 'Semua file video dan rekaman untuk ujian ini akan dihapus permanen!', null);
     }
 
     public function deleteAllRecordings()
@@ -105,23 +106,44 @@ class AdminMasterTimetableVideoIndex extends Component
                         unlink($filePath);
                     }
                 }
-                $recording->delete(); // Soft delete because of model trait
+                $recording->delete(); 
             }
 
             \DB::commit();
-            $this->dispatch('swal:alert', [
-                'type' => 'success',
-                'title' => 'Berhasil',
-                'text' => 'Semua video dan rekaman berhasil dihapus.',
-            ]);
+            AlertHelper::success('Berhasil', 'Semua video dan rekaman berhasil dihapus.');
         } catch (\Throwable $th) {
             \DB::rollback();
             Log::error('Gagal menghapus semua rekaman: ' . $th->getMessage());
-            $this->dispatch('swal:alert', [
-                'type' => 'error',
-                'title' => 'Gagal',
-                'text' => 'Terjadi kesalahan saat menghapus data.',
-            ]);
+            AlertHelper::error('Gagal', 'Terjadi kesalahan saat menghapus data.');
+        }
+    }
+
+    public function confirmDelete($id)
+    {
+        AlertHelper::confirmDelete('deleteRecording', 'Anda yakin ingin menghapus rekaman video ini?', $id);
+    }
+
+    public function deleteRecording($id)
+    {
+        try {
+            \DB::beginTransaction();
+            $recording = ExamRecording::find($id[0]);
+            
+            if ($recording->video_path) {
+                $filePath = storage_path('app/public/' . $recording->video_path);
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+            }
+            
+            $recording->delete();
+            \DB::commit();
+            
+            AlertHelper::success('Berhasil', 'Rekaman video berhasil dihapus.');
+        } catch (\Throwable $th) {
+            \DB::rollback();
+            Log::error('Gagal menghapus rekaman: ' . $th->getMessage());
+            AlertHelper::error('Gagal', 'Gagal menghapus rekaman.');
         }
     }
 

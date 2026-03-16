@@ -118,4 +118,22 @@ class AdminMasterTimetableDetailIndex extends Component
             echo $pdf->output();
         }, $fileName);
     }
+
+    public function exportExcel()
+    {
+        try {
+            $fileName = 'nilai-ujian-' . ($this->timetable['name'] ?? 'detail') . '-' . date('YmdHis') . '.xlsx';
+            return \Maatwebsite\Excel\Facades\Excel::download(
+                new \App\Exports\TimetableDetailExport($this->timetable_id, $this->search),
+                $fileName
+            );
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Timetable Detail Export Error: ' . $e->getMessage());
+            $this->dispatch('swal:alert', [
+                'type' => 'error',
+                'title' => 'Gagal',
+                'text' => 'Gagal mengekspor data ke Excel.',
+            ]);
+        }
+    }
 }

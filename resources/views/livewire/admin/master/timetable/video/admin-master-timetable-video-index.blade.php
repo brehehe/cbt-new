@@ -154,11 +154,17 @@
                             <td>{{ $examRecording->file_size ? formatBytes($examRecording->file_size) : '-' }}</td>
                             <td>{{ $examRecording->status ?? '-' }}</td>
                             <td>
-                                <div class="flex items-center">
+                                <div class="flex items-center gap-2">
                                     <a target="_blank" href="{{ asset('storage/' . $examRecording->video_path) }}"
-                                        class="btn btn-icon text-green-600 hover:text-green-800 transition-colors edit-btn">
-                                        <i class="fa-solid fa-video"></i> <!-- atau fa-edit (versi lama) -->
+                                        class="w-9 h-9 flex items-center justify-center rounded-xl text-green-600 hover:bg-green-50 transition-all active:scale-90"
+                                        title="Play Video">
+                                        <i class="fa-solid fa-video"></i>
                                     </a>
+                                    <button wire:click="confirmDelete('{{ $examRecording->id }}')"
+                                        class="w-9 h-9 flex items-center justify-center rounded-xl text-red-600 hover:bg-red-50 transition-all active:scale-90"
+                                        title="Hapus Video">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
