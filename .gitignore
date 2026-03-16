@@ -23,6 +23,11 @@ yarn-error.log
 /.zed
 logs/*.log
 
+# Laravel IDE Helper
+_ide_helper.php
+_ide_helper_models.php
+.phpstorm.meta.php
+
 **/caddy
 frankenphp
 frankenphp-worker.php
