@@ -68,9 +68,6 @@
                         <th>Nama</th>
                         <th>Email</th>
                         <th>Username</th>
-                        @if(Auth::user()->hasRole('Admin'))
-                            <th>Key</th>
-                        @endif
                         <th class="w-1 center">Aksi</th>
                     </tr>
                 </thead>
@@ -81,15 +78,6 @@
                             <td>{{ $admin->name ?? '-' }}</td>
                             <td>{{ $admin->email ?? '-' }}</td>
                             <td>{{ $admin->username ?? '-' }}</td>
-                            @if(Auth::user()->hasRole('Admin'))
-                                <td>
-                                    @if($admin->usrSecKey->sec_val)
-                                        {{decrypt($admin->usrSecKey->sec_val)}}
-                                    @else
-                                        -
-                                    @endif
-                                </td>
-                            @endif
                             {{-- <td>{{ $admin->phone ?? '-' }}</td> --}}
                             <td class="center">
                                 <div class="flex items-center">

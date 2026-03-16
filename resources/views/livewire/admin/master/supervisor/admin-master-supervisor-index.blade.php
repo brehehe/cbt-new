@@ -66,11 +66,6 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Status
                         </th>
-                        @if(Auth::user()->HasRole('Admin'))
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Key
-                            </th>
-                        @endif
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Aksi
                         </th>
@@ -132,17 +127,6 @@
                                     </span>
                                 @endif
                             </td>
-                            @if(Auth::user()->HasRole('Admin'))
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">
-                                        @if($supervisor->usrSecKey->sec_val)
-                                            {{ decrypt($supervisor->usrSecKey->sec_val) }}
-                                        @else
-                                            -
-                                        @endif
-                                    </div>
-                                </td>
-                            @endif
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <button

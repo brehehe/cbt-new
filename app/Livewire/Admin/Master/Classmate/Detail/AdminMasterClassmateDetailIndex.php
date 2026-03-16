@@ -88,8 +88,7 @@ class AdminMasterClassmateDetailIndex extends Component
     public function toggleSelectAllOnPage($selectAll = true)
     {
         $query = User::role(['Mahasiswa'])
-            ->search($this->search)
-            ->whereNotIn('id', ClassmateStudent::select('user_id')->get()->pluck('user_id')->toArray() ?? []);
+            ->search($this->search);
 
         $pageResults = $query->paginate($this->perPage);
 
@@ -107,7 +106,6 @@ class AdminMasterClassmateDetailIndex extends Component
         // Ambil semua ID sesuai filter aktif tanpa memuat data berat
         $ids = User::role(['Mahasiswa'])
             ->search($this->search)
-            ->whereNotIn('id', ClassmateStudent::select('user_id')->get()->pluck('user_id')->toArray() ?? [])
             ->pluck('id');
 
         foreach ($ids as $id) {
@@ -159,7 +157,6 @@ class AdminMasterClassmateDetailIndex extends Component
         return view('livewire.admin.master.classmate.detail.admin-master-classmate-detail-index', [
             'mahasiswas' => $this->openStudentModal ? User::role(['Mahasiswa'])
                 ->search($this->search)
-                ->whereNotIn('id', ClassmateStudent::select('user_id')->get()->pluck('user_id')->toArray() ?? [])
                 ->paginate($this->perPage) : [],
             'classmateStudents' => $classmateStudents,
         ])

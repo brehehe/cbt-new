@@ -87,9 +87,6 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             NIP
                         </th>
-                        @if(Auth::user()->hasRole('Admin'))
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Key</th>
-                        @endif
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Aksi
                         </th>
@@ -126,15 +123,6 @@
                                 <div class="text-sm text-gray-900">{{ $lecturer->userDetail->lecturer_nip ?? '-' }}
                                 </div>
                             </td>
-                            @if(Auth::user()->hasRole('Admin'))
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                @if($lecturer?->usrSecKey?->sec_val)
-                                    {{ decrypt($lecturer->usrSecKey->sec_val) }}
-                                @else
-                                    -
-                                @endif
-                            </td>
-                            @endif
                             <td class="center">
                                 <div class="flex items-center">
                                     <button
