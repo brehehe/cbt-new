@@ -44,7 +44,7 @@ class AdminMasterModuleQuestionIndex extends Component
 
     public function render()
     {
-        $questionPickType = $this->get_module?->question_pick_type ?? 'manual';
+        $questionPickType = $this->question_pick_type ?? 'manual';
         $module_questions = collect();
         $moduleQuestionIds = [];
 
