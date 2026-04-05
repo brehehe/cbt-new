@@ -1,6 +1,6 @@
 <div>
     <div class="mb-4">
-        <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#000' }}]">Laporan Statistik Jawaban</h1>
+        <h1 class="text-2xl font-bold text-primary">Laporan Statistik Jawaban</h1>
         <p class="text-gray-600">Analisis sebaran jawaban peserta per soal.</p>
     </div>
 

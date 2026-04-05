@@ -54,7 +54,7 @@
         <!-- Footer -->
         <div class="px-8 py-6 bg-gray-50/50 border-t border-gray-50 flex justify-end">
             <button wire:click="closeInfoModal()"
-                class="px-8 py-3 bg-[{{ $companyData->color_primary ?? '#2b7fff' }}] text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-[{{ $companyData->color_primary ?? '#2b7fff' }}]/20 hover:opacity-90 active:scale-95 transition-all cursor-pointer">
+                class="px-8 py-3 bg-primary text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all cursor-pointer">
                 Mengerti
             </button>
         </div>

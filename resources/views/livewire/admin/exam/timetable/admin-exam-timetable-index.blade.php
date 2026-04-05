@@ -3,7 +3,7 @@
     <div class="mb-6">
         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="text-center md:text-left">
-                <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#2b7fff' }}]">
+                <h1 class="text-2xl font-bold text-primary">
                     Daftar Ujian
                 </h1>
                 <p class="text-gray-600 text-sm mt-1">Kelola dan pantau jadwal ujian yang tersedia.</p>
@@ -31,7 +31,7 @@
                     <i class="fas fa-search text-gray-400"></i>
                 </div>
                 <input type="text" 
-                    class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[{{ $companyData->color_primary ?? '#2b7fff' }}] focus:border-[{{ $companyData->color_primary ?? '#2b7fff' }}] sm:text-sm transition duration-150 ease-in-out" 
+                    class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition duration-150 ease-in-out" 
                     placeholder="Cari Ujian, Modul..."
                     wire:model.live='search'>
             </div>
@@ -83,7 +83,7 @@
                                     </button>
                                 @else
                                     <button
-                                        class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-[{{ $companyData->color_primary ?? '#2b7fff' }}] hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[{{ $companyData->color_primary ?? '#2b7fff' }}] transition-all shadow-md hover:shadow-lg"
+                                        class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-primary hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all shadow-md hover:shadow-lg"
                                         wire:click="confirmBackExam('{{ $timetable->userTimetable->id }}')">
                                         <i class="fa-regular fa-book-open-cover mr-1.5"></i> Kembali
                                     </button>
@@ -151,7 +151,7 @@
                         </button>
                     @else
                         <button
-                            class="w-full flex justify-center items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-[{{ $companyData->color_primary ?? '#2b7fff' }}] hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[{{ $companyData->color_primary ?? '#2b7fff' }}] transition-all"
+                            class="w-full flex justify-center items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all"
                             wire:click="confirmBackExam('{{ $timetable->userTimetable->id }}')">
                             <i class="fa-regular fa-book-open-cover mr-2"></i> Kembali Ujian
                         </button>

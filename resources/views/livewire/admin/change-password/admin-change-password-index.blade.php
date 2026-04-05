@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1
-                    class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#2b7fff' }}]">
+                    class="text-2xl font-bold text-primary">
                     Ubah Password</h1>
             </div>
             <div>

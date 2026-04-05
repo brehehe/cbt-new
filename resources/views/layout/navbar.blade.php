@@ -7,7 +7,7 @@
                     alt="Company Logo"
                     class="h-9 w-auto mr-2">
                 <button id="toggleSidebar"
-                    class="p-2 rounded-xl text-[{{ $companyData->color_primary ?? '#f58634' }}]
+                    class="p-2 rounded-xl text-primary
  hover:bg-[#C3D4EC]/20 transition-all duration-200 cursor-pointer">
                     <i class="fas fa-bars text-lg"></i>
                 </button>
@@ -45,10 +45,10 @@
                                         lalu</p>
                                 </div>
                             @elseif($isExpiringSoon)
-                                <i class="fas fa-clock text-[{{ $companyData->color_primary ?? '#f58634' }}]
+                                <i class="fas fa-clock text-primary
 "></i>
                                 <div class="text-left">
-                                    <p class="text-xs text-[{{ $companyData->color_primary ?? '#f58634' }}]
+                                    <p class="text-xs text-primary
  font-medium">Berakhir Dalam {{ $daysLeft }}
                                         hari lagi</p>
                                 </div>
@@ -71,7 +71,7 @@
                 <!-- Notifications -->
                 <!-- <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open"
-                        class="p-2 rounded-xl text-gray-500 hover:bg-[#C3D4EC]/20 hover:text-[{{ $companyData->color_primary ?? '#f58634' }}]
+                        class="p-2 rounded-xl text-gray-500 hover:bg-[#C3D4EC]/20 hover:text-primary
  transition-all duration-200 relative">
                         <i class="fas fa-bell text-lg"></i>
                         <span
@@ -132,13 +132,13 @@
                         </div>
                         <div class="p-2">
                             <!-- <a href="/admin/profile/profile"
-                                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-[{{ $companyData->color_primary ?? '#f58634' }}]
+                                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-primary
  rounded-lg transition-all duration-200">
                                 <i class="fas fa-user w-4"></i>
                                 <span>Profile</span>
                             </a> -->
                             <a href="/admin/change-password/change-password"
-                                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-[{{ $companyData->color_primary ?? '#f58634' }}]
+                                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-primary
  rounded-lg transition-all duration-200">
                                 <i class="fas fa-lock w-4"></i>
                                 <span>Rubah Password</span>

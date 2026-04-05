@@ -7,7 +7,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                <h1 class="text-2xl font-bold text-primary">
                     Ubah Data Soal</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
@@ -170,7 +170,7 @@
                             <label for="question" class="block text-sm font-medium text-gray-700">Gambar<span
                                     class="text-red-600">*</span></label>
                             <button
-                                class="bg-[{{ $companyData->color_primary ?? '#f58634' }}] text-white px-2 py-1 rounded"
+                                class="bg-primary text-white px-2 py-1 rounded"
                                 wire:click='modalImages()'>Gambar</button>
                         </div>
                         <div class="md:col-span-2" wire:ignore>
@@ -266,7 +266,7 @@
                                 <td class="center">{{ $result?->alphabet ?? chr(64 + $loop->iteration) }} </td>
                                 <td>
                                     <button
-                                        class="bg-[{{ $companyData->color_primary ?? '#f58634' }}] text-white px-2 py-1 rounded"
+                                        class="bg-primary text-white px-2 py-1 rounded"
                                         wire:click="modalAnswerImage('{{ $result?->id }}', '{{ $result?->alphabet ?? chr(64 + $loop->iteration) }}')">Gambar</button>
                                 </td>
                                 <td>{{ $result?->context }}</td>

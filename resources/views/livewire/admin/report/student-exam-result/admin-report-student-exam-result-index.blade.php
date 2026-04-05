@@ -1,6 +1,6 @@
 <div>
     <div class="mb-4">
-        <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#000' }}]">Laporan Hasil Ujian Siswa</h1>
+        <h1 class="text-2xl font-bold text-primary">Laporan Hasil Ujian Siswa</h1>
         <p class="text-gray-600">Lihat semua hasil ujian untuk siswa tertentu.</p>
     </div>
 

@@ -16,11 +16,11 @@
 
     <!-- Header Fixed -->
     <header
-        class="flex-none p-2 text-white bg-[{{$companyData->color_primary}}] shadow-lg z-50 relative">
+        class="flex-none p-2 text-white bg-primary shadow-lg z-50 relative">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
                 <div
-                    class="px-2 py-1 bg-[{{$companyData->color_primary}}] rounded sm:px-3">
+                    class="px-2 py-1 bg-primary rounded sm:px-3">
                     <span class="text-xs sm:text-sm">Modul: {{ $userTimetable->timetable->module->name ?? '-' }}</span>
                 </div>
                 <!-- Alert Counter -->
@@ -341,7 +341,7 @@
                 class="p-4 border-b border-gray-200 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-50' : 'bg-orange-50' }}">
                 <div class="text-center">
                     <div
-                        class="flex items-center justify-center w-16 h-16 mx-auto mb-3 bg-[{{$companyData->color_primary}}] rounded-full lg:w-20 lg:h-20">
+                        class="flex items-center justify-center w-16 h-16 mx-auto mb-3 bg-primary rounded-full lg:w-20 lg:h-20">
                         <span
                             class="text-lg font-bold text-white lg:text-xl">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</span>
                     </div>
@@ -356,7 +356,7 @@
                 <div class="flex items-center justify-between mb-3">
                     <h4 class="font-medium text-gray-800">Monitor Camera</h4>
                     <button @click="showCamera = !showCamera"
-                        class="px-2 py-1 text-xs text-white {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-500' : 'bg-orange-500' }} rounded hover:bg-[{{$companyData->color_primary}}]">
+                        class="px-2 py-1 text-xs text-white {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-500' : 'bg-orange-500' }} rounded hover:bg-primary">
                         <span x-text="showCamera ? 'Hide' : 'Show'"></span>
                     </button>
                     {{-- <button id="cameraRefreshButton"

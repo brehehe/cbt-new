@@ -6,7 +6,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1
-                    class="text-2xl font-bold bg-[{{ $companyData->color_primary ?? '#f58634' }}] hover:bg-[{{ $companyData->color_primary ?? '#f58634' }}] text-white rounded-lg shadow transition">
+                    class="text-2xl font-bold bg-primary hover:bg-primary text-white rounded-lg shadow transition">
                     Data Modul</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
@@ -213,7 +213,7 @@
                     </select>
                     <span class="text-sm text-gray-700 ml-2">data</span>
                     <div>
-                        <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                        <h1 class="text-2xl font-bold text-primary">
                             Data Soal</h1>
                         <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p>
                     </div>

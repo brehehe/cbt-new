@@ -7,7 +7,7 @@
             <div class="flex flex-col items-center text-center">
                 {{-- Avatar --}}
                 <div
-                    class="w-20 h-20 bg-white rounded-full flex items-center justify-center text-[{{ $companyData->color_primary ?? '#f58634' }}] text-3xl font-bold mb-3">
+                    class="w-20 h-20 bg-white rounded-full flex items-center justify-center text-primary text-3xl font-bold mb-3">
                     {{ strtoupper(substr($userProfile['user']->name ?? 'U', 0, 1)) }}
                 </div>
                 {{-- User Info --}}
@@ -59,7 +59,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-4">
                     <div
-                        class="p-4 bg-blue-50 rounded-lg border-l-4 border-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                        class="p-4 bg-blue-50 rounded-lg border-l-4 border-primary">
                         <label class="text-xs text-gray-500 uppercase">NIM</label>
                         <p class="text-lg font-semibold text-gray-800">
                             {{ $userProfile['user']->userDetail->nim ?? '-' }}
@@ -92,17 +92,17 @@
             </div>
 
             {{-- Info Message for Mahasiswa --}}
-            <div class="mt-6 p-4 bg-blue-50 border-l-4 border-[{{ $companyData->color_primary ?? '#f58634' }}] rounded-r">
+            <div class="mt-6 p-4 bg-blue-50 border-l-4 border-primary rounded-r">
                 <div class="flex items-start">
-                    <svg class="w-5 h-5 text-[{{ $companyData->color_primary ?? '#f58634' }}] mt-0.5 mr-3" fill="none"
+                    <svg class="w-5 h-5 text-primary mt-0.5 mr-3" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     <div>
-                        <h4 class="text-sm font-semibold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                        <h4 class="text-sm font-semibold text-primary">
                             Informasi Penting</h4>
-                        <p class="text-sm text-[{{ $companyData->color_primary ?? '#f58634' }}] mt-1">
+                        <p class="text-sm text-primary mt-1">
                             Anda login sebagai <strong>Mahasiswa</strong>. Informasi profil pribadi Anda hanya dapat
                             dilihat oleh Anda sendiri.
                             Jika ada kesalahan data, silakan hubungi administrator.
@@ -115,7 +115,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-4">
                     <div
-                        class="p-4 bg-blue-50 rounded-lg border-l-4 border-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                        class="p-4 bg-blue-50 rounded-lg border-l-4 border-primary">
                         <label class="text-xs text-gray-500 uppercase">Nama Lengkap</label>
                         <p class="text-lg font-semibold text-gray-800">
                             {{ $userProfile['user']->name ?? '-' }}
@@ -150,17 +150,17 @@
             </div>
 
             {{-- Info Message for Non-Mahasiswa --}}
-            <div class="mt-6 p-4 bg-blue-50 border-l-4 border-[{{ $companyData->color_primary ?? '#f58634' }}] rounded-r">
+            <div class="mt-6 p-4 bg-blue-50 border-l-4 border-primary rounded-r">
                 <div class="flex items-start">
-                    <svg class="w-5 h-5 text-[{{ $companyData->color_primary ?? '#f58634' }}] mt-0.5 mr-3" fill="none"
+                    <svg class="w-5 h-5 text-primary mt-0.5 mr-3" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     <div>
-                        <h4 class="text-sm font-semibold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                        <h4 class="text-sm font-semibold text-primary">
                             Informasi</h4>
-                        <p class="text-sm text-[{{ $companyData->color_primary ?? '#f58634' }}] mt-1">
+                        <p class="text-sm text-primary mt-1">
                             Anda login sebagai <strong>{{ $userProfile['role'] }}</strong>. Informasi profil Anda dapat
                             diubah melalui menu pengaturan.
                         </p>
@@ -173,7 +173,7 @@
         <div class="mt-6 pt-6 border-t border-gray-200">
             <div class="flex flex-wrap gap-3">
                 <a href="{{ route('user.profile.profile') }}"
-                    class="inline-flex items-center px-4 py-2 bg-[{{ $companyData->color_primary ?? '#f58634' }}] hover:bg-[{{ $companyData->color_secondary }}] text-white rounded-lg text-sm transition-colors duration-200">
+                    class="inline-flex items-center px-4 py-2 bg-primary hover:bg-secondary text-white rounded-lg text-sm transition-colors duration-200">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">

@@ -371,7 +371,7 @@
                 <div class="flex flex-col items-center mb-6">
                     <img src="{{ asset('asset/img/logo.png') }}" alt="{{ config('app.name') }} Logo"
                         class="h-12 drop-shadow-md">
-                    <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                    <h1 class="text-2xl font-bold text-primary">
                         Buat Akun Anda</h1>
                     <p class="text-gray-600 text-sm">Daftar untuk mengakses dashboard Anda</p>
                 </div>
@@ -389,23 +389,23 @@
                         <!-- Step Labels -->
                         <div class="flex justify-between text-sm text-gray-600 mb-2 font-medium">
                             <span :class="step >= 1 ?
-                                        'text-[{{ $companyData->color_primary ?? '#f58634' }}] font-semibold' :
+                                        'text-primary font-semibold' :
                                         ''">Step
                                 1</span>
                             <span :class="step >= 2 ?
-                                        'text-[{{ $companyData->color_primary ?? '#f58634' }}] font-semibold' :
+                                        'text-primary font-semibold' :
                                         ''">Step
                                 2</span>
                             <span :class="step >= 3 ?
-                                        'text-[{{ $companyData->color_primary ?? '#f58634' }}] font-semibold' :
+                                        'text-primary font-semibold' :
                                         ''">Step
                                 3</span>
                             <span :class="step >= 4 ?
-                                        'text-[{{ $companyData->color_primary ?? '#f58634' }}] font-semibold' :
+                                        'text-primary font-semibold' :
                                         ''">Step
                                 4</span>
                             <span :class="step >= 5 ?
-                                        'text-[{{ $companyData->color_primary ?? '#f58634' }}] font-semibold' :
+                                        'text-primary font-semibold' :
                                         ''">Step
                                 5</span>
                         </div>
@@ -871,7 +871,7 @@
                     <p class="text-sm text-gray-600">
                         Sudah punya akun?
                         <a href="{{ route('login') }}"
-                            class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:underline font-semibold">Login
+                            class="text-primary hover:underline font-semibold">Login
                             di
                             sini</a>
                     </p>

@@ -183,7 +183,7 @@
                                 'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
                                 'bg-red-100 text-red-800' => $session->risk_level === 'high',
                                 'bg-yellow-100 text-yellow-800' => $session->risk_level === 'medium',
-                                'bg-[{{ $companyData->color_primary ?? '#2b7fff' }}] text-[{{ $companyData->color_primary ?? '#2b7fff' }}]' =>
+                                'bg-primary text-primary' =>
                                     $session->risk_level === 'low',
                                 'bg-green-100 text-green-800' => $session->risk_level === 'none',
                             ])>
@@ -219,7 +219,7 @@
                                                 'window_blur',
                                                 'page_reload',
                                             ]),
-                                            'bg-[{{ $companyData->color_primary ?? '#2b7fff' }}] text-[{{ $companyData->color_primary ?? '#2b7fff' }}]' => in_array(
+                                            'bg-primary text-primary' => in_array(
                                                 $alert->alert_type,
                                                 ['camera_error', 'right_click']),
                                         ])>

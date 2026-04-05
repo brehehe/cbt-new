@@ -374,7 +374,7 @@
     <div class="mb-6">
         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="text-center md:text-left w-full md:w-auto">
-                <h1 class="text-2xl md:text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                <h1 class="text-2xl md:text-3xl font-bold text-primary">
                     Selamat datang kembali,
                     {{ Auth::user()->name ?? 'Admin' }}!</h1>
                 <p class="text-gray-600 mt-1 text-sm md:text-base">Berikut aktivitas sistem CBT Anda hari ini.</p>
@@ -385,7 +385,7 @@
                 {{-- <label class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" id="autoRefresh" class="sr-only peer" checked>
                     <div
-                        class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#f58634]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[{{ $companyData->color_primary }}]">
+                        class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#f58634]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
                     </div>
                     <span class="ml-3 text-sm font-medium text-gray-600">Segarkan Otomatis</span>
                 </label> --}}
@@ -398,7 +398,7 @@
 
                 <!-- Refresh Button -->
                 <button wire:click="refreshData" id="refreshButton"
-                    class="inline-flex items-center px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_primary }}] text-white text-sm font-medium rounded-lg transition-colors duration-200 w-full md:w-auto justify-center">
+                    class="inline-flex items-center px-4 py-2 bg-primary hover:bg-primary text-white text-sm font-medium rounded-lg transition-colors duration-200 w-full md:w-auto justify-center">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
@@ -430,7 +430,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 mb-1">Total Pengguna</p>
-                        <h3 class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                        <h3 class="text-3xl font-bold text-primary">
                             {{ number_format($totalUsers) }}</h3>
                         <div class="flex items-center mt-2">
                             <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
@@ -443,7 +443,7 @@
                         </div>
                     </div>
                     <div class="bg-gradient-to-br from-[#f58634]/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
-                        <svg class="w-8 h-8 text-[{{ $companyData->color_primary ?? '#f58634' }}]" fill="none"
+                        <svg class="w-8 h-8 text-primary" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -458,7 +458,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 mb-1">Ujian Hari Ini</p>
-                        <h3 class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                        <h3 class="text-3xl font-bold text-primary">
                             {{ $todayExams }}</h3>
                         <div class="flex items-center mt-2">
                             <div class="w-2 h-2 bg-blue-500 rounded-full pulse-dot mr-2"></div>
@@ -480,15 +480,15 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 mb-1">Ujian Aktif</p>
-                        <h3 class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                        <h3 class="text-3xl font-bold text-primary">
                             {{ $activeExams }}</h3>
                         <div class="flex items-center mt-2">
                             @if ($activeExams > 0)
                                 <div
                                     class="w-2 h-2 rounded-full pulse-dot mr-2
-                                    bg-[{{ $companyData->color_primary }}]">
+                                    bg-primary">
                                 </div>
-                                <span class="text-xs text-[{{ $companyData->color_primary }}]">Sedang
+                                <span class="text-xs text-primary">Sedang
                                     berlangsung</span>
                             @else
                                 <span class="text-xs text-gray-500">Tidak ada ujian aktif</span>
@@ -496,7 +496,7 @@
                         </div>
                     </div>
                     <div class="bg-gradient-to-br from-orange-500/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
-                        <svg class="w-8 h-8 text-[{{ $companyData->color_primary }}]" fill="none"
+                        <svg class="w-8 h-8 text-primary" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -511,7 +511,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 mb-1">Peringatan Keamanan</p>
-                        <h3 class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                        <h3 class="text-3xl font-bold text-primary">
                             {{ $examAlerts }}</h3>
                         <div class="flex items-center mt-2">
                             @if ($examAlerts > 0)
@@ -624,7 +624,7 @@
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-semibold text-gray-800">Tren Ujian Mingguan</h3>
                     <div class="flex items-center space-x-2">
-                        <div class="w-3 h-3 bg-[{{ $companyData->color_primary }}] rounded-full">
+                        <div class="w-3 h-3 bg-primary rounded-full">
                         </div>
                         <span class="text-sm text-gray-600">Ujian Dimulai</span>
                     </div>
@@ -702,7 +702,7 @@
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-semibold text-gray-800">Pemantauan Sesi Langsung</h3>
                     <a href="{{ route('admin.exam.live-stream') }}"
-                        class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-[#2d8c5b] text-sm font-medium">
+                        class="text-primary hover:text-[#2d8c5b] text-sm font-medium">
                         Lihat Semua →
                     </a>
                 </div>
@@ -726,12 +726,12 @@
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-600">Masalah Kamera</span>
                             <span
-                                class="font-medium text-[{{ $companyData->color_primary }}]">{{ $liveSessionStats['camera_issues'] ?? 0 }}</span>
+                                class="font-medium text-primary">{{ $liveSessionStats['camera_issues'] ?? 0 }}</span>
                         </div>
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-600">Masalah Koneksi</span>
                             <span
-                                class="font-medium text-[{{ $companyData->color_primary }}]">{{ $liveSessionStats['connection_issues'] ?? 0 }}</span>
+                                class="font-medium text-primary">{{ $liveSessionStats['connection_issues'] ?? 0 }}</span>
                         </div>
                     </div>
                 @else
@@ -753,7 +753,7 @@
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-semibold text-gray-800">Peringatan Kritis (24 Jam Terakhir)</h3>
                     <a href="{{ route('admin.exam.monitor') }}"
-                        class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-[#2d8c5b] text-sm font-medium">
+                        class="text-primary hover:text-[#2d8c5b] text-sm font-medium">
                         View All →
                     </a>
                 </div>
@@ -802,7 +802,7 @@
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-semibold text-gray-800">Ujian Mendatang</h3>
                     <a href="{{ route('admin.exam.timetable') }}"
-                        class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-[#2d8c5b] text-sm font-medium">
+                        class="text-primary hover:text-[#2d8c5b] text-sm font-medium">
                         Kelola →
                     </a>
                 </div>
@@ -845,7 +845,7 @@
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-semibold text-gray-800">Hasil Ujian Terbaru</h3>
                     <a href="{{ route('admin.report.item-analysis') }}"
-                        class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-[#2d8c5b] text-sm font-medium">
+                        class="text-primary hover:text-[#2d8c5b] text-sm font-medium">
                         Lihat Laporan →
                     </a>
                 </div>

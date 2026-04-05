@@ -12,7 +12,7 @@
 
     <!-- Header Fixed -->
     <header
-        class="flex-none p-3 text-white bg-[{{$companyData->color_primary}}] shadow-lg z-50 relative">
+        class="flex-none p-3 text-white bg-primary shadow-lg z-50 relative">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             
             {{-- Top Row / Left Side: Module Info --}}
@@ -63,14 +63,14 @@
     <div class="flex-none p-4 bg-white border-b border-gray-200 lg:hidden">
         <div class="flex items-center justify-between">
             <button id="toggleLeftSidebar" @click="mobileSidebarOpen = !mobileSidebarOpen"
-                class="flex items-center text-[{{$companyData->color_primary}}] hover:text-[{{$companyData->color_primary}}]">
+                class="flex items-center text-primary hover:text-primary">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
                 Navigasi Soal
             </button>
             <button id="toggleRightSidebar" @click="rightSidebarOpen = !rightSidebarOpen"
-                class="flex items-center text-[{{$companyData->color_primary}}] hover:text-[{{$companyData->color_primary}}]">
+                class="flex items-center text-primary hover:text-primary">
                 Profil & Camera
                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -89,7 +89,7 @@
             <div
                 class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-50' : 'bg-orange-50' }}">
                 <h3
-                    class="font-semibold text-[{{$companyData->color_primary}}]">
+                    class="font-semibold text-primary">
                     Navigasi Soal</h3>
                 <button id="closeLeftSidebar" @click="mobileSidebarOpen = false" class="text-gray-500 hover:text-gray-700">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -103,13 +103,13 @@
             <div
                 class="p-4 border-b border-gray-200 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-50' : 'bg-orange-50' }}">
                 <h3
-                    class="hidden mb-2 font-semibold text-[{{$companyData->color_primary}}] lg:block">
+                    class="hidden mb-2 font-semibold text-primary lg:block">
                     Navigasi Soal</h3>
                 <div class="text-sm text-gray-600">
                     <span>Total: {{ $questionNavigations['total'] ?? 0 }} soal</span>
                     <div class="flex flex-wrap gap-2 mt-2 lg:space-x-4 lg:flex-nowrap">
                         <span
-                            class="text-xs text-[{{$companyData->color_primary}}] lg:text-sm">Dijawab:
+                            class="text-xs text-primary lg:text-sm">Dijawab:
                             {{ $questionNavigations['answered'] ?? 0 }}</span>
                         <span class="text-xs text-yellow-600 lg:text-sm">Ditandai:
                             {{ $questionNavigations['marked'] ?? 0 }}</span>
@@ -273,7 +273,7 @@
                                 <div class="flex items-center h-5 mt-1">
                                     <input type="radio" name="timetable_answer_id"
                                         wire:model.live="timetable_answer_id" value="{{ $question_answer['id'] }}"
-                                        class="w-4 h-4 text-[{{$companyData->color_primary}}] border-gray-300 focus:ring-[{{$companyData->color_primary}}]">
+                                        class="w-4 h-4 text-primary border-gray-300 focus:ring-primary">
                                 </div>
 
                                 <div class="flex-1 ml-3">
@@ -336,7 +336,7 @@
                         @if ($last)
                             <button type="button" wire:click="nextQuestion"
                                 class="flex items-center px-5 py-2.5 text-sm font-medium text-white transition-all rounded-lg shadow-sm
-                            bg-[{{$companyData->color_primary}}] hover:bg-[{{$companyData->color_primary}}] ring-[{{$companyData->color_primary}}] hover:shadow-md focus:ring-4">
+                            bg-primary hover:bg-primary ring-primary hover:shadow-md focus:ring-4">
                                 Selanjutnya
                                 <svg class="w-5 h-5 ml-2 -mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

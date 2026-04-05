@@ -5,8 +5,8 @@
         <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/30">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-[{{ $companyData->color_primary ?? '#2b7fff' }}] bg-opacity-10 flex items-center justify-center border border-[{{ $companyData->color_primary ?? '#2b7fff' }}] border-opacity-20 shadow-sm">
-                        <i class="fa-solid fa-book-open-reader text-xl text-[{{ $companyData->color_primary ?? '#2b7fff' }}]"></i>
+                    <div class="w-12 h-12 rounded-2xl bg-primary bg-opacity-10 flex items-center justify-center border border-primary border-opacity-20 shadow-sm">
+                        <i class="fa-solid fa-book-open-reader text-xl text-primary"></i>
                     </div>
                     <div>
                         <h2 class="text-xl font-black text-gray-800 tracking-tight">Regulasi</h2>
@@ -24,7 +24,7 @@
             <div class="space-y-2">
                 <label for="description" class="block text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Nama Regulasi <span class="text-red-500">*</span></label>
                 <textarea id="description" wire:model.defer="description" rows="4" placeholder="Masukkan deskripsi regulasi..."
-                    class="w-full form-control !rounded-2xl focus:ring-4 focus:ring-[{{ $companyData->color_primary ?? '#2b7fff' }}] focus:ring-opacity-10 border-gray-100 transition-all"></textarea>
+                    class="w-full form-control !rounded-2xl focus:ring-4 focus:ring-primary focus:ring-opacity-10 border-gray-100 transition-all"></textarea>
                 @error('description')
                     <p class="text-[10px] text-red-500 font-bold uppercase tracking-wider ml-1 mt-1">{{ $message }}</p>
                 @enderror
@@ -33,7 +33,7 @@
             <div class="space-y-2">
                 <label for="type" class="block text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Tipe Regulasi <span class="text-red-500">*</span></label>
                 <div class="relative">
-                    <select id="type" wire:model.defer="type" class="w-full form-control !rounded-2xl !py-3 focus:ring-4 focus:ring-[{{ $companyData->color_primary ?? '#2b7fff' }}] focus:ring-opacity-10 border-gray-100 transition-all appearance-none">
+                    <select id="type" wire:model.defer="type" class="w-full form-control !rounded-2xl !py-3 focus:ring-4 focus:ring-primary focus:ring-opacity-10 border-gray-100 transition-all appearance-none">
                         <option value="">-- Pilih Tipe --</option>
                         <option value="prohibition">Larangan</option>
                         <option value="licensing">Wajib</option>
@@ -55,7 +55,7 @@
                 Batal
             </button>
             <button wire:click='submit'
-                class="px-8 py-3 bg-[{{ $companyData->color_primary ?? '#2b7fff' }}] text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-[{{ $companyData->color_primary ?? '#2b7fff' }}]/20 hover:opacity-90 active:scale-95 transition-all">
+                class="px-8 py-3 bg-primary text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all">
                 Simpan Data
             </button>
         </div>

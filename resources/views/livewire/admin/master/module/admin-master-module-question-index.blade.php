@@ -18,7 +18,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                <h1 class="text-2xl font-bold text-primary">
                     Data Modul</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
@@ -293,7 +293,7 @@
     @if ($question_pick_type === 'manual')
         <div class="p-5 bg-white shadow rounded-lg mt-4">
             <div>
-                <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">Data Soal</h1>
+                <h1 class="text-2xl font-bold text-primary">Data Soal</h1>
                 <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p>
             </div>
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">

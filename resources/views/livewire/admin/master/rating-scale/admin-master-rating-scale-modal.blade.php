@@ -5,8 +5,8 @@
         <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/30">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-[{{ $companyData->color_primary ?? '#2b7fff' }}] bg-opacity-10 flex items-center justify-center">
-                        <i class="fa-solid fa-sliders text-xl text-[{{ $companyData->color_primary ?? '#2b7fff' }}]"></i>
+                    <div class="w-12 h-12 rounded-2xl bg-primary bg-opacity-10 flex items-center justify-center">
+                        <i class="fa-solid fa-sliders text-xl text-primary"></i>
                     </div>
                     <div>
                         <h2 class="text-xl font-bold text-gray-800">Skala Penilaian</h2>
@@ -24,11 +24,11 @@
             <div class="space-y-2">
                 <label for="grade_letter" class="block text-sm font-bold text-gray-700">Nama Grade Letter <span class="text-red-500">*</span></label>
                 <div class="relative group">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[{{ $companyData->color_primary ?? '#2b7fff' }}] transition-colors">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
                         <i class="fa-solid fa-font"></i>
                     </div>
                     <input type="text" id="grade_letter" wire:model.defer="grade_letter" placeholder="Contoh : A"
-                        class="!pl-12 w-full form-control focus:ring-2 focus:ring-[{{ $companyData->color_primary ?? '#2b7fff' }}] focus:ring-opacity-20 border-gray-200">
+                        class="!pl-12 w-full form-control focus:ring-2 focus:ring-primary focus:ring-opacity-20 border-gray-200">
                 </div>
                 @error('grade_letter')
                     <p class="text-xs text-red-500 font-medium ml-1">{{ $message }}</p>
@@ -39,7 +39,7 @@
                 <div class="space-y-2">
                     <label for="min_score" class="block text-sm font-bold text-gray-700">Nilai Minimum <span class="text-red-500">*</span></label>
                     <input type="number" id="min_score" wire:model.defer="min_score" placeholder="0"
-                        class="w-full form-control focus:ring-2 focus:ring-[{{ $companyData->color_primary ?? '#2b7fff' }}] focus:ring-opacity-20 border-gray-200">
+                        class="w-full form-control focus:ring-2 focus:ring-primary focus:ring-opacity-20 border-gray-200">
                     @error('min_score')
                         <p class="text-xs text-red-500 font-medium ml-1">{{ $message }}</p>
                     @enderror
@@ -47,7 +47,7 @@
                 <div class="space-y-2">
                     <label for="max_score" class="block text-sm font-bold text-gray-700">Nilai Maksimum <span class="text-red-500">*</span></label>
                     <input type="number" id="max_score" wire:model.defer="max_score" placeholder="100"
-                        class="w-full form-control focus:ring-2 focus:ring-[{{ $companyData->color_primary ?? '#2b7fff' }}] focus:ring-opacity-20 border-gray-200">
+                        class="w-full form-control focus:ring-2 focus:ring-primary focus:ring-opacity-20 border-gray-200">
                     @error('max_score')
                         <p class="text-xs text-red-500 font-medium ml-1">{{ $message }}</p>
                     @enderror
@@ -57,7 +57,7 @@
             <div class="space-y-2">
                 <label for="description" class="block text-sm font-bold text-gray-700">Deskripsi <span class="text-red-500">*</span></label>
                 <textarea id="description" wire:model.defer="description" rows="3" placeholder="Masukkan deskripsi..."
-                    class="w-full form-control focus:ring-2 focus:ring-[{{ $companyData->color_primary ?? '#2b7fff' }}] focus:ring-opacity-20 border-gray-200 py-3"></textarea>
+                    class="w-full form-control focus:ring-2 focus:ring-primary focus:ring-opacity-20 border-gray-200 py-3"></textarea>
                 @error('description')
                     <p class="text-xs text-red-500 font-medium ml-1">{{ $message }}</p>
                 @enderror
@@ -71,7 +71,7 @@
                 Batal
             </button>
             <button wire:click='submit'
-                class="px-8 py-2.5 bg-[{{ $companyData->color_primary ?? '#2b7fff' }}] text-white font-bold rounded-xl shadow-lg shadow-[{{ $companyData->color_primary ?? '#2b7fff' }}]/20 hover:opacity-90 active:scale-95 transition-all">
+                class="px-8 py-2.5 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all">
                 Simpan Perubahan
             </button>
         </div>

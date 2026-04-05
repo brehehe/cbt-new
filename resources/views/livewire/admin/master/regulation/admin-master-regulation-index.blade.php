@@ -5,7 +5,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1
-                    class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#2b7fff' }}]">
+                    class="text-2xl font-bold text-primary">
                     Regulasi</h1>
             </div>
             <div class="flex gap-3">
@@ -33,7 +33,7 @@
         </div>
 
         <div class="relative w-full sm:w-80">
-            <input type="text" class="form-control-search !rounded-xl !border-gray-100 !bg-white focus:!border-[{{ $companyData->color_primary ?? '#2b7fff' }}]" placeholder="Cari regulasi..."
+            <input type="text" class="form-control-search !rounded-xl !border-gray-100 !bg-white focus:!border-primary" placeholder="Cari regulasi..."
                 wire:model.live='search'>
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <i class="fas fa-search h-3 w-3 text-gray-400"></i>

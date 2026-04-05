@@ -2,7 +2,7 @@
     <div class="mb-6">
         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="text-center md:text-left">
-                <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#2b7fff' }}]">
+                <h1 class="text-2xl font-bold text-primary">
                     Detail Riwayat Ujian
                 </h1>
                 <p class="text-gray-600 text-sm mt-1">Lihat detail hasil ujian dan statistik pengerjaan Anda.</p>
@@ -98,7 +98,7 @@
                     <i class="fas fa-search text-gray-400"></i>
                 </div>
                 <input type="text" 
-                    class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[{{ $companyData->color_primary ?? '#2b7fff' }}] focus:border-[{{ $companyData->color_primary ?? '#2b7fff' }}] sm:text-sm transition duration-150 ease-in-out" 
+                    class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition duration-150 ease-in-out" 
                     placeholder="Cari Sesuatu..."
                     wire:model.live='search'>
             </div>

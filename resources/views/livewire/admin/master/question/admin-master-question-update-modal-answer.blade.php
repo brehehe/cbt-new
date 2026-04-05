@@ -91,7 +91,7 @@
             </button>
             <button wire:click="submitAnswer"
                 class="px-4 py-2
-        bg-[{{$companyData->color_primary}}] hover:bg-[{{$companyData->color_primary}}]
+        bg-primary hover:bg-primary
         text-white rounded-lg shadow transition">
                 Simpan
             </button>

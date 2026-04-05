@@ -4,7 +4,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1
-                    class="text-2xl font-bold text-[{{$companyData->color_primary}}]">
+                    class="text-2xl font-bold text-primary">
                     Data Peserta Detail</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
@@ -126,7 +126,7 @@ $brandBorder = "border-[{$companyData->color_primary}]";
                     <span class="text-sm text-gray-700 ml-2">data</span> --}}
                     <div>
                         <h1
-                            class="text-2xl font-bold text-[{{$companyData->color_primary}}]">
+                            class="text-2xl font-bold text-primary">
                             Data Mahasiswa</h1>
                         {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
                     </div>

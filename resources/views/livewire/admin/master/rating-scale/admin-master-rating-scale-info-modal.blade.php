@@ -5,8 +5,8 @@
         <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/30">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-[{{ $companyData->color_primary ?? '#2b7fff' }}] bg-opacity-10 flex items-center justify-center border border-[{{ $companyData->color_primary ?? '#2b7fff' }}] border-opacity-20 shadow-sm">
-                        <i class="fa-solid fa-circle-info text-xl text-[{{ $companyData->color_primary ?? '#2b7fff' }}]"></i>
+                    <div class="w-12 h-12 rounded-2xl bg-primary bg-opacity-10 flex items-center justify-center border border-primary border-opacity-20 shadow-sm">
+                        <i class="fa-solid fa-circle-info text-xl text-primary"></i>
                     </div>
                     <div>
                         <h2 class="text-xl font-black text-gray-800 tracking-tight">Panduan Penilaian</h2>
@@ -21,13 +21,13 @@
 
         <!-- Body -->
         <div class="p-8">
-            <div class="bg-blue-50 border-l-4 border-[{{ $companyData->color_primary ?? '#2b7fff' }}] p-6 rounded-r-2xl shadow-sm">
+            <div class="bg-blue-50 border-l-4 border-primary p-6 rounded-r-2xl shadow-sm">
                 <div class="flex items-start gap-5">
-                    <div class="w-12 h-12 rounded-full bg-[{{ $companyData->color_primary ?? '#2b7fff' }}] bg-opacity-10 flex items-center justify-center flex-shrink-0">
-                        <i class="fa-solid fa-circle-info text-[{{ $companyData->color_primary ?? '#2b7fff' }}] text-lg"></i>
+                    <div class="w-12 h-12 rounded-full bg-primary bg-opacity-10 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-circle-info text-primary text-lg"></i>
                     </div>
                     <div>
-                        <h3 class="text-sm font-bold text-[{{ $companyData->color_primary ?? '#2b7fff' }}] uppercase tracking-widest">Catatan Penting Penilaian</h3>
+                        <h3 class="text-sm font-bold text-primary uppercase tracking-widest">Catatan Penting Penilaian</h3>
                         <p class="text-sm text-gray-600 mt-2 leading-relaxed font-medium">
                             Sistem menentukan Grade mahasiswa secara otomatis berdasarkan rentang skor yang Anda buat.
                         </p>
@@ -75,7 +75,7 @@
         <!-- Footer -->
         <div class="px-8 py-6 bg-gray-50/50 border-t border-gray-50 flex justify-end">
             <button wire:click="closeInfoModal()"
-                class="px-8 py-3 bg-[{{ $companyData->color_primary ?? '#2b7fff' }}] text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-[{{ $companyData->color_primary ?? '#2b7fff' }}]/20 hover:opacity-90 active:scale-95 transition-all cursor-pointer">
+                class="px-8 py-3 bg-primary text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all cursor-pointer">
                 Mengerti
             </button>
         </div>

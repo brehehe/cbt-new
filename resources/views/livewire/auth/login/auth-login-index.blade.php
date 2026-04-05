@@ -579,7 +579,7 @@
                                     <div class="flex items-center justify-between pt-2">
                                         <x-ts-checkbox class="text-xs lg:text-sm" id="remember" label="Ingat saya"
                                             wire:model="remember" />
-                                        <!-- <a class="text-xs font-medium text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-green-700 lg:text-sm"
+                                        <!-- <a class="text-xs font-medium text-primary hover:text-green-700 lg:text-sm"
                                                 href="#">
                                                 Lupa Password?
                                             </a> -->
@@ -592,14 +592,14 @@
                                             <x-slot:text>Masuk</x-slot:text>
                                         </x-ts-button>
                                         {{-- <button
-                                            class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base text-black bg-[{{ $company->color_primary }}]">
+                                            class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base text-black bg-primary">
                                             Masuk
                                         </button> --}}
                                     </div>
                                 </form>
                                 <div class="mt-4 text-center">
                                     <a href="{{ route('register') }}"
-                                        class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-[#317354] text-sm">Buat
+                                        class="text-primary hover:text-[#317354] text-sm">Buat
                                         Akun ?</a>
                                 </div>
 
@@ -1126,7 +1126,7 @@
                 <!-- Logo & Welcome -->
                 <div class="flex flex-col items-center mb-6">
                     <img src="{{ asset('asset/img/LogoPROCBT.png') }}" alt="Logo PRO CBT" class="h-12 drop-shadow-md mb-4">
-                    <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                    <h1 class="text-2xl font-bold text-primary">
                         Selamat Datang Kembali!</h1>
                     <p class="text-gray-600 text-sm">Akses dashboard admin Anda dengan aman</p>
                 </div>
@@ -1231,12 +1231,12 @@
                     <div class="flex items-center justify-between">
                         <label class="flex items-center">
                             <input autocomplete="off" type="checkbox" name="remember"
-                                class="rounded border-gray-300 text-[{{ $companyData->color_primary ?? '#f58634' }}] focus:ring-[#1E3A8A]/20"
+                                class="rounded border-gray-300 text-primary focus:ring-[#1E3A8A]/20"
                                 wire:model='remember'>
                             <span class="ml-2 text-sm text-gray-600">Ingat saya</span>
                         </label>
                         <a href="#"
-                            class="text-sm text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-[#2563EB] transition-colors">Lupa
+                            class="text-sm text-primary hover:text-[#2563EB] transition-colors">Lupa
                             kata
                             sandi?</a>
                     </div>
@@ -1252,7 +1252,7 @@
                         <p class="text-sm text-gray-600">
                             Belum punya akun?
                             <a href="{{ route('register') }}"
-                                class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:underline font-semibold">Daftar
+                                class="text-primary hover:underline font-semibold">Daftar
                                 di
                                 sini</a>
                         </p>

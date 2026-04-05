@@ -113,7 +113,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                <h1 class="text-2xl font-bold text-primary">
                     Detail Analisis Butir Soal</h1>
                 <p class="text-gray-600 mt-2">
                     Ujian: <strong>{{ $timetable->name ?? 'Tidak diketahui' }}</strong> |
@@ -505,10 +505,10 @@
 
                                 <div class="p-3 bg-orange-50 rounded-lg">
                                     <div class="flex justify-between items-center">
-                                        <span class="text-sm font-medium text-[{{$companyData->color_primary}}]">Kontribusi
+                                        <span class="text-sm font-medium text-primary">Kontribusi
                                             Reliabilitas</span>
                                         <span
-                                            class="font-bold text-[{{$companyData->color_primary}}]">{{ $analysis['reliability_contribution'] }}</span>
+                                            class="font-bold text-primary">{{ $analysis['reliability_contribution'] }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -924,8 +924,8 @@
 
                                 <div class="p-3 bg-orange-50 rounded-lg">
                                     <div class="flex justify-between items-center">
-                                        <span class="text-sm font-medium text-[{{$companyData->color_primary}}]">Kontribusi Reliabilitas</span>
-                                        <span class="font-bold text-[{{$companyData->color_primary}}]">${analysis.reliability_contribution}</span>
+                                        <span class="text-sm font-medium text-primary">Kontribusi Reliabilitas</span>
+                                        <span class="font-bold text-primary">${analysis.reliability_contribution}</span>
                                     </div>
                                 </div>
                             </div>

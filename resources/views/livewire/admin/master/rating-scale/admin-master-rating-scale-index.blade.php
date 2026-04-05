@@ -5,7 +5,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1
-                    class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#2b7fff' }}]">
+                    class="text-2xl font-bold text-primary">
                     Data Skala Penilaian</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
@@ -60,7 +60,7 @@
                         <tr>
                             <td class="center">{{ $index + 1 }}</td>
                             <td>
-                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-[{{ $companyData->color_primary ?? '#2b7fff' }}] text-white">
+                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-primary text-white">
                                     {{ $data->grade_letter }}
                                 </span>
                             </td>
@@ -111,7 +111,7 @@
             <div class="bg-white rounded-xl shadow-md border border-gray-100 p-4 space-y-3">
                 <div class="flex justify-between items-start">
                     <div class="flex items-center gap-3">
-                        <span class="flex items-center justify-center w-10 h-10 rounded-lg bg-[{{ $companyData->color_primary ?? '#2b7fff' }}] bg-opacity-10 text-[{{ $companyData->color_primary ?? '#2b7fff' }}] font-bold text-xl">
+                        <span class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary bg-opacity-10 text-primary font-bold text-xl">
                             {{ $data->grade_letter }}
                         </span>
                         <div>
