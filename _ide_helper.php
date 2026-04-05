@@ -13471,45 +13471,47 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
-         * Migrate the delayed jobs that are ready to the regular queue.
+         * Release a reserved job back onto the queue after (n) seconds.
          *
-         * @param string $from
-         * @param string $to
-         * @return array
+         * @param string $queue
+         * @param \Illuminate\Queue\Jobs\DatabaseJobRecord $job
+         * @param int $delay
+         * @return mixed
          * @static
          */
-        public static function migrateExpiredJobs($from, $to)
+        public static function release($queue, $job, $delay)
         {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
-            return $instance->migrateExpiredJobs($from, $to);
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            return $instance->release($queue, $job, $delay);
         }
 
         /**
          * Delete a reserved job from the queue.
          *
          * @param string $queue
-         * @param \Illuminate\Queue\Jobs\RedisJob $job
+         * @param string $id
          * @return void
+         * @throws \Throwable
          * @static
          */
-        public static function deleteReserved($queue, $job)
+        public static function deleteReserved($queue, $id)
         {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
-            $instance->deleteReserved($queue, $job);
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            $instance->deleteReserved($queue, $id);
         }
 
         /**
          * Delete a reserved job from the reserved queue and release it.
          *
          * @param string $queue
-         * @param \Illuminate\Queue\Jobs\RedisJob $job
+         * @param \Illuminate\Queue\Jobs\DatabaseJob $job
          * @param int $delay
          * @return void
          * @static
          */
         public static function deleteAndRelease($queue, $job, $delay)
         {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             $instance->deleteAndRelease($queue, $job, $delay);
         }
 
@@ -13522,7 +13524,7 @@ namespace Illuminate\Support\Facades {
          */
         public static function clear($queue)
         {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->clear($queue);
         }
 
@@ -13535,32 +13537,20 @@ namespace Illuminate\Support\Facades {
          */
         public static function getQueue($queue)
         {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getQueue($queue);
         }
 
         /**
-         * Get the connection for the queue.
+         * Get the underlying database instance.
          *
-         * @return \Illuminate\Redis\Connections\Connection
+         * @return \Illuminate\Database\Connection
          * @static
          */
-        public static function getConnection()
+        public static function getDatabase()
         {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
-            return $instance->getConnection();
-        }
-
-        /**
-         * Get the underlying Redis instance.
-         *
-         * @return \Illuminate\Contracts\Redis\Factory
-         * @static
-         */
-        public static function getRedis()
-        {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
-            return $instance->getRedis();
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            return $instance->getDatabase();
         }
 
         /**
@@ -13573,7 +13563,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobTries($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getJobTries($job);
         }
 
@@ -13587,7 +13577,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobBackoff($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getJobBackoff($job);
         }
 
@@ -13601,7 +13591,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobExpiration($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getJobExpiration($job);
         }
 
@@ -13615,7 +13605,7 @@ namespace Illuminate\Support\Facades {
         public static function createPayloadUsing($callback)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            \Illuminate\Queue\RedisQueue::createPayloadUsing($callback);
+            \Illuminate\Queue\DatabaseQueue::createPayloadUsing($callback);
         }
 
         /**
@@ -13627,7 +13617,7 @@ namespace Illuminate\Support\Facades {
         public static function getConfig()
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getConfig();
         }
 
@@ -13635,13 +13625,13 @@ namespace Illuminate\Support\Facades {
          * Set the queue configuration array.
          *
          * @param array $config
-         * @return \Illuminate\Queue\RedisQueue
+         * @return \Illuminate\Queue\DatabaseQueue
          * @static
          */
         public static function setConfig($config)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->setConfig($config);
         }
 
@@ -13654,7 +13644,7 @@ namespace Illuminate\Support\Facades {
         public static function getContainer()
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getContainer();
         }
 
@@ -13668,7 +13658,7 @@ namespace Illuminate\Support\Facades {
         public static function setContainer($container)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             $instance->setContainer($container);
         }
 
@@ -25870,443 +25860,6 @@ namespace Illuminate\Testing {
             return \Illuminate\Testing\TestResponse::assertDontSeeVolt($component);
         }
 
-            }
-    }
-
-namespace App\Livewire\Admin\Profile {
-    /**
-     */
-    class AdminProfileIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Auth\Login {
-    /**
-     */
-    class AuthLoginIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Auth\Register {
-    /**
-     */
-    class AuthRegisterIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Dashboard {
-    /**
-     */
-    class AdminDashboardIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin {
-    /**
-     */
-    class StudentManagement extends \Livewire\Component {
-            }
-    /**
-     */
-    class LecturerManagement extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Session {
-    /**
-     */
-    class AdminSessionIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\ChangePassword {
-    /**
-     */
-    class AdminChangePasswordIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Exam\Timetable {
-    /**
-     */
-    class AdminExamTimetableIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Exam\HistoryTimetable {
-    /**
-     */
-    class AdminExamHistoryTimetableIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Exam\HistoryTimetable\Detail {
-    /**
-     */
-    class AdminExamHistoryTimetableDetailIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Exam\Warning {
-    /**
-     */
-    class AdminExamWarningIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Exam\Detail {
-    /**
-     */
-    class AdminExamDetailIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Exam\Monitor {
-    /**
-     */
-    class AdminExamMonitorIndex extends \Livewire\Component {
-            }
-    /**
-     */
-    class AdminExamMonitorDetailIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Exam\LiveStream {
-    /**
-     */
-    class AdminExamLiveStreamIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Role {
-    /**
-     */
-    class AdminMasterRoleIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\User {
-    /**
-     */
-    class AdminMasterUserIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Setting {
-    /**
-     */
-    class AdminMasterSettingIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Backup {
-    /**
-     */
-    class AdminMasterBackupIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Topic {
-    /**
-     */
-    class AdminMasterTopicIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\MaterialCategory {
-    /**
-     */
-    class AdminMasterMaterialCategoryIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\RatingScale {
-    /**
-     */
-    class AdminMasterRatingScaleIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Regulation {
-    /**
-     */
-    class AdminMasterRegulationIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Admin {
-    /**
-     */
-    class AdminMasterAdminIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Lecturer {
-    /**
-     */
-    class AdminMasterLecturerIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Student {
-    /**
-     */
-    class AdminMasterStudentIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Supervisor {
-    /**
-     */
-    class AdminMasterSupervisorIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Study {
-    /**
-     */
-    class AdminMasterStudyIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Timetable {
-    /**
-     */
-    class AdminMasterTimetableIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Timetable\Detail {
-    /**
-     */
-    class AdminMasterTimetableDetailIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Timetable\Video {
-    /**
-     */
-    class AdminMasterTimetableVideoIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Timetable\Alert {
-    /**
-     */
-    class AdminMasterTimetableAlertIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Timetable\Streaming {
-    /**
-     */
-    class AdminMasterTimetableStreamingIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Timetable\Session {
-    /**
-     */
-    class AdminMasterTimetableSessionIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Timetable\Answer {
-    /**
-     */
-    class AdminMasterTimetableAnswerIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Material {
-    /**
-     */
-    class AdminMasterMaterialIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\QuestionType {
-    /**
-     */
-    class AdminMasterQuestionTypeIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\CategoryQuestion {
-    /**
-     */
-    class AdminMasterCategoryQuestionIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\ExamType {
-    /**
-     */
-    class AdminMasterExamTypeIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\ExamRoom {
-    /**
-     */
-    class AdminMasterExamRoomIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\ExamSession {
-    /**
-     */
-    class AdminMasterExamSessionIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Module {
-    /**
-     */
-    class AdminMasterModuleIndex extends \Livewire\Component {
-            }
-    /**
-     */
-    class AdminMasterModuleQuestionIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Question {
-    /**
-     */
-    class AdminMasterQuestionIndex extends \Livewire\Component {
-            }
-    /**
-     */
-    class AdminMasterQuestionUpdate extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Classmate {
-    /**
-     */
-    class AdminMasterClassmateIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Master\Classmate\Detail {
-    /**
-     */
-    class AdminMasterClassmateDetailIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Report\Timetable {
-    /**
-     */
-    class AdminReportTimetableIndex extends \Livewire\Component {
-            }
-    /**
-     */
-    class AdminReportTimetableDetail extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Report\Question {
-    /**
-     */
-    class AdminReportQuestionIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Report\ItemAnalysis {
-    /**
-     */
-    class AdminReportItemAnalysisIndex extends \Livewire\Component {
-            }
-    /**
-     */
-    class AdminReportItemAnalysisAllIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Report\ItemAnalysis\Detail {
-    /**
-     */
-    class AdminReportItemAnalysisDetailIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Report\ExamResult {
-    /**
-     */
-    class AdminReportExamResultIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Report\Official {
-    /**
-     */
-    class AdminReportOfficialIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Report\Attendance {
-    /**
-     */
-    class AdminReportAttendanceIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Report\Card {
-    /**
-     */
-    class AdminReportCardIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Report\FullExamResult {
-    /**
-     */
-    class AdminReportFullExamResultIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Report\AnswerStatistics {
-    /**
-     */
-    class AdminReportAnswerStatisticsIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Admin\Report\StudentExamResult {
-    /**
-     */
-    class AdminReportStudentExamResultIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Dosen\Dashboard {
-    /**
-     */
-    class DosenDashboardIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Mahasiswa\Dashboard {
-    /**
-     */
-    class MahasiswaDashboardIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Pengawas\Dashboard {
-    /**
-     */
-    class PengawasDashboardIndex extends \Livewire\Component {
-            }
-    }
-
-namespace App\Livewire\Public {
-    /**
-     */
-    class StressTestExamDetailIndex extends \Livewire\Component {
             }
     }
 
