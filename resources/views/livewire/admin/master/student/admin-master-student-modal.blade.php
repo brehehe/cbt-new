@@ -54,8 +54,8 @@
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700">Nama Lengkap <span
                                     class="text-red-600">*</span></label>
-                            <input id="name" type="text" wire:model.defer="name"
-                                placeholder="Contoh: Ahmad Fauzi" class="mt-1 form-control">
+                            <input id="name" type="text" wire:model.defer="name" placeholder="Contoh: Ahmad Fauzi"
+                                class="mt-1 form-control">
                             @error('name')
                                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                             @enderror
@@ -90,8 +90,7 @@
                                 <input :type="show ? 'text' : 'password'" id="password" wire:model.defer="password"
                                     placeholder="Minimum 8 karakter" class="mt-1 form-control">
                                 <button type="button" @click="show = !show"
-                                    class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"
-                                    tabindex="-1">
+                                    class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500" tabindex="-1">
                                     <i :class="show ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
                                 </button>
                             </div>
@@ -101,8 +100,8 @@
                         </div>
                         <div>
                             <label for="phone" class="block text-sm font-medium text-gray-700">No. Telepon</label>
-                            <input id="phone" type="tel" wire:model.defer="phone"
-                                placeholder="Contoh: 081234567890" class="mt-1 form-control">
+                            <input id="phone" type="tel" wire:model.defer="phone" placeholder="Contoh: 081234567890"
+                                class="mt-1 form-control">
                             @error('phone')
                                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                             @enderror
@@ -114,14 +113,12 @@
                     <div class="{{ $profile || $profile_old ? null : 'md:col-span-2' }}">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Foto</label>
 
-                        <input type="file" wire:model.live="profile"
-                            class="block text-sm text-gray-500 w-full
-                                           file:px-2 file:py-1 file:rounded-md
-                                           file:border file:border-gray-300
-                                           file:text-xs file:font-medium
-                                           file:bg-blue-50 file:text-blue-700
-                                           hover:file:bg-blue-100"
-                            accept="image/*" />
+                        <input type="file" wire:model.live="profile" class="block text-sm text-gray-500 w-full
+                                               file:px-2 file:py-1 file:rounded-md
+                                               file:border file:border-gray-300
+                                               file:text-xs file:font-medium
+                                               file:bg-blue-50 file:text-blue-700
+                                               hover:file:bg-blue-100" accept="image/*" />
                         <div wire:loading wire:target="profile" class="text-sm text-gray-500 mt-1">
                             Uploading profile...
                         </div>
@@ -197,8 +194,8 @@
                         <div>
                             <label for="birth_place" class="block text-sm font-medium text-gray-700">Tempat
                                 Lahir</label>
-                            <input id="birth_place" type="text" wire:model.defer="birth_place"
-                                placeholder="Contoh: Jakarta" class="mt-1 form-control">
+                            <input id="birth_place" type="text" wire:model.defer="birth_place" placeholder="Contoh: Jakarta"
+                                class="mt-1 form-control">
                             @error('birth_place')
                                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                             @enderror
@@ -206,8 +203,7 @@
                         <div>
                             <label for="birth_date" class="block text-sm font-medium text-gray-700">Tanggal
                                 Lahir</label>
-                            <input id="birth_date" type="date" wire:model.defer="birth_date"
-                                class="mt-1 form-control">
+                            <input id="birth_date" type="date" wire:model.defer="birth_date" class="mt-1 form-control">
                             @error('birth_date')
                                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                             @enderror
@@ -240,8 +236,7 @@
                             @enderror
                         </div>
                         <div>
-                            <label for="nationality"
-                                class="block text-sm font-medium text-gray-700">Kewarganegaraan</label>
+                            <label for="nationality" class="block text-sm font-medium text-gray-700">Kewarganegaraan</label>
                             <input id="nationality" type="text" wire:model.defer="nationality"
                                 placeholder="Contoh: Indonesian" class="mt-1 form-control">
                             @error('nationality')
@@ -305,32 +300,33 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="md:col-span-2">
                             <label for="address" class="block text-sm font-medium text-gray-700">Alamat Lengkap</label>
-                            <textarea id="address" wire:model.defer="address" placeholder="Contoh: Jl. Raya No. 123, RT 01/RW 02"
-                                class="mt-1 form-control" rows="3"></textarea>
+                            <textarea id="address" wire:model.defer="address"
+                                placeholder="Contoh: Jl. Raya No. 123, RT 01/RW 02" class="mt-1 form-control"
+                                rows="3"></textarea>
                             @error('address')
                                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                             @enderror
                         </div>
                         <div>
                             <label for="city" class="block text-sm font-medium text-gray-700">Kota</label>
-                            <input id="city" type="text" wire:model.defer="city"
-                                placeholder="Contoh: Jakarta" class="mt-1 form-control">
+                            <input id="city" type="text" wire:model.defer="city" placeholder="Contoh: Jakarta"
+                                class="mt-1 form-control">
                             @error('city')
                                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                             @enderror
                         </div>
                         <div>
                             <label for="province" class="block text-sm font-medium text-gray-700">Provinsi</label>
-                            <input id="province" type="text" wire:model.defer="province"
-                                placeholder="Contoh: DKI Jakarta" class="mt-1 form-control">
+                            <input id="province" type="text" wire:model.defer="province" placeholder="Contoh: DKI Jakarta"
+                                class="mt-1 form-control">
                             @error('province')
                                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                             @enderror
                         </div>
                         <div>
                             <label for="postal_code" class="block text-sm font-medium text-gray-700">Kode Pos</label>
-                            <input id="postal_code" type="text" wire:model.defer="postal_code"
-                                placeholder="Contoh: 12345" class="mt-1 form-control">
+                            <input id="postal_code" type="text" wire:model.defer="postal_code" placeholder="Contoh: 12345"
+                                class="mt-1 form-control">
                             @error('postal_code')
                                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                             @enderror
@@ -353,9 +349,8 @@
                         <div>
                             <label for="emergency_contact_name" class="block text-sm font-medium text-gray-700">Nama
                                 Kontak Darurat</label>
-                            <input id="emergency_contact_name" type="text"
-                                wire:model.defer="emergency_contact_name" placeholder="Contoh: Ayah/Ibu"
-                                class="mt-1 form-control">
+                            <input id="emergency_contact_name" type="text" wire:model.defer="emergency_contact_name"
+                                placeholder="Contoh: Ayah/Ibu" class="mt-1 form-control">
                             @error('emergency_contact_name')
                                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                             @enderror
@@ -363,9 +358,8 @@
                         <div>
                             <label for="emergency_contact_phone" class="block text-sm font-medium text-gray-700">No.
                                 Telepon Darurat</label>
-                            <input id="emergency_contact_phone" type="tel"
-                                wire:model.defer="emergency_contact_phone" placeholder="Contoh: 08123456789"
-                                class="mt-1 form-control">
+                            <input id="emergency_contact_phone" type="tel" wire:model.defer="emergency_contact_phone"
+                                placeholder="Contoh: 08123456789" class="mt-1 form-control">
                             @error('emergency_contact_phone')
                                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                             @enderror
@@ -420,8 +414,8 @@
                 <div class="mb-4">
                     <label for="email" class="block text-sm font-medium text-gray-700">Email <span
                             class="text-red-600">*</span></label>
-                    <input id="email" type="email" wire:model.defer="email"
-                        placeholder="Contoh : admin@gmail.com" class="mt-1 form-control">
+                    <input id="email" type="email" wire:model.defer="email" placeholder="Contoh : admin@gmail.com"
+                        class="mt-1 form-control">
                     @error('email')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -430,14 +424,12 @@
                     <div class="{{ $profile || $profile_old ? null : 'md:col-span-2' }}">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Foto</label>
 
-                        <input type="file" wire:model.live="profile"
-                            class="block text-sm text-gray-500 w-full
-                                           file:px-2 file:py-1 file:rounded-md
-                                           file:border file:border-gray-300
-                                           file:text-xs file:font-medium
-                                           file:bg-blue-50 file:text-blue-700
-                                           hover:file:bg-blue-100"
-                            accept="image/*" />
+                        <input type="file" wire:model.live="profile" class="block text-sm text-gray-500 w-full
+                                               file:px-2 file:py-1 file:rounded-md
+                                               file:border file:border-gray-300
+                                               file:text-xs file:font-medium
+                                               file:bg-blue-50 file:text-blue-700
+                                               hover:file:bg-blue-100" accept="image/*" />
                         <div wire:loading wire:target="profile" class="text-sm text-gray-500 mt-1">
                             Uploading profile...
                         </div>
@@ -465,8 +457,8 @@
                 </div>
                 <div class="mb-4">
                     <label for="phone" class="block text-sm font-medium text-gray-700">Nomor Telepon</label>
-                    <input id="phone" type="number" wire:model.defer="phone"
-                        placeholder="Contoh : 081234567890" class="mt-1 form-control">
+                    <input id="phone" type="number" wire:model.defer="phone" placeholder="Contoh : 081234567890"
+                        class="mt-1 form-control">
                     @error('phone')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -474,8 +466,8 @@
 
                 <div class="mb-4">
                     <label for="password" class="block text-sm font-medium text-gray-700">Password @if (!$data_id)
-                            <span class="text-red-600">*</span>
-                        @else
+                        <span class="text-red-600">*</span>
+                    @else
                         @endif
                     </label>
                     <div x-data="{ show: false }" class="relative">
@@ -510,7 +502,7 @@
                 Batal
             </button>
             <button wire:click='submit'
-                class="px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_primary }}] text-white rounded-lg shadow transition">
+                class="px-4 py-2 bg-[{{ $companyData->color_primary ?? '#f58634' }}] hover:bg-[{{ $companyData->color_primary ?? '#f58634' }}] text-white rounded-lg shadow transition">
                 {{ $data_id ? 'Update' : 'Simpan' }}
             </button>
         </div>

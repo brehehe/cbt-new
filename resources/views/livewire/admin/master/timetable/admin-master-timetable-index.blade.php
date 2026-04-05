@@ -4,7 +4,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1
-                    class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
+                    class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
                     Jadwal</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>

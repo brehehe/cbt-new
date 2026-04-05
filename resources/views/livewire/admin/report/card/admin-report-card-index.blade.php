@@ -4,8 +4,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1
-                    class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
+                <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
                     Cetak Kartu Peserta</h1>
             </div>
         </div>
@@ -53,9 +52,10 @@
                             <td class="center">{{ $timetables->firstItem() + $index }}</td>
                             <td>{{ $timetable->name ?? '-' }}</td>
                             <td>{{ $timetable->module->name ?? '-' }}</td>
-                            <td>{{ $timetable->start_time?->format('d F Y H:i') }} - {{ $timetable->end_time?->format('H:i') }}</td>
+                            <td>{{ $timetable->start_time?->format('d F Y H:i') }} -
+                                {{ $timetable->end_time?->format('H:i') }}</td>
                             <td class="center">
-                                <button wire:click="printParticipantCards('{{ $timetable->id }}')" 
+                                <button wire:click="printParticipantCards('{{ $timetable->id }}')"
                                     class="btn btn-sm btn-primary">
                                     <i class="bi bi-printer me-2"></i> Cetak Kartu
                                 </button>

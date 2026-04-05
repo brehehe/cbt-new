@@ -2,9 +2,10 @@
 <div>
     {{-- Nothing in the world is as soft and yielding as water. --}}
     @include('livewire.admin.master.module.admin-master-module-question-modal')
-    
+
     {{-- Loading Screen --}}
-    <div wire:loading wire:target="submitModule" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+    <div wire:loading wire:target="submitModule"
+        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
         <div class="flex flex-col items-center justify-center space-y-4">
             <div class="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-primary"></div>
             <div class="text-center">
@@ -13,12 +14,11 @@
             </div>
         </div>
     </div>
-    
+
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1
-                    class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
+                <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
                     Data Modul</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
@@ -47,9 +47,7 @@
                             onChange: function(e) {
                                 @this.set('question_type_id', e ? e : '');
                             }
-                        });"
-                            wire:model.live="question_type_id" id="question_type_id"
-                            {{ !empty($module_questions) ? 'disabled' : '' }}>
+                        });" wire:model.live="question_type_id" id="question_type_id" {{ !empty($module_questions) ? 'disabled' : '' }}>
                             <option value="">Pilih Topik Soal</option>
                             @foreach ($question_types as $question_type)
                                 <option value="{{ $question_type?->id }}">{{ $question_type?->name }}</option>
@@ -61,8 +59,8 @@
                     @enderror
                 </div>
                 <div>
-                    <label for="question_pick_type" class="block text-sm font-medium text-gray-700">Tipe Pengambilan Soal<span
-                            class="text-red-600">*</span></label>
+                    <label for="question_pick_type" class="block text-sm font-medium text-gray-700">Tipe Pengambilan
+                        Soal<span class="text-red-600">*</span></label>
                     <select id="question_pick_type" class="mt-1 form-control" wire:model.live="question_pick_type">
                         <option value="manual">Manual</option>
                         <option value="category">Kategori Soal</option>
@@ -115,7 +113,8 @@
                 <div class="md:col-span-2">
                     <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi Modul
                         Soal</label>
-                    <textarea id="description" wire:model="description" placeholder="Deskripsi modul soal..." class="mt-1 form-control"></textarea>
+                    <textarea id="description" wire:model="description" placeholder="Deskripsi modul soal..."
+                        class="mt-1 form-control"></textarea>
                     @error('description')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -142,13 +141,12 @@
                             class="text-red-600">*</span></label>
                     <div wire:key="select-{{ rand() }}">
                         <select disabled class="mt-1 form-control w-full" x-data x-ref="input" x-init="$($refs.input).selectize({
-                            dropdownParent: 'body',
-                            allowClear: true,
-                            onChange: function(e) {
-                                @this.set('studys', e ? e : '');
-                            }
-                        });"
-                            wire:model.live="studys" id="studys" multiple>
+                                dropdownParent: 'body',
+                                allowClear: true,
+                                onChange: function(e) {
+                                    @this.set('studys', e ? e : '');
+                                }
+                            });" wire:model.live="studys" id="studys" multiple>
                             <option value="">Pilih Prodi</option>
                             @foreach ($get_studys as $key_get_study => $get_study)
                                 <option value="{{ $key_get_study }}">{{ $get_study }}</option>
@@ -190,35 +188,27 @@
                                         </td>
                                         <td>{{ $category_question->name }}</td>
                                         <td class="center">
-                                            <input type="number" min="0"
-                                                class="mt-1 form-control w-24 text-center"
+                                            <input type="number" min="0" class="mt-1 form-control w-24 text-center"
                                                 wire:model.live="category_question_settings.{{ $category_question->id }}.default"
-                                                max="{{ $limits['default'] ?? 0 }}"
-                                                @disabled(!($settings['enabled'] ?? false) || ($limits['default'] ?? 0) === 0)>
+                                                max="{{ $limits['default'] ?? 0 }}" @disabled(!($settings['enabled'] ?? false) || ($limits['default'] ?? 0) === 0)>
                                             <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['default'] ?? 0 }}</div>
                                         </td>
                                         <td class="center">
-                                            <input type="number" min="0"
-                                                class="mt-1 form-control w-24 text-center"
+                                            <input type="number" min="0" class="mt-1 form-control w-24 text-center"
                                                 wire:model.live="category_question_settings.{{ $category_question->id }}.easy"
-                                                max="{{ $limits['easy'] ?? 0 }}"
-                                                @disabled(!($settings['enabled'] ?? false) || ($limits['easy'] ?? 0) === 0)>
+                                                max="{{ $limits['easy'] ?? 0 }}" @disabled(!($settings['enabled'] ?? false) || ($limits['easy'] ?? 0) === 0)>
                                             <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['easy'] ?? 0 }}</div>
                                         </td>
                                         <td class="center">
-                                            <input type="number" min="0"
-                                                class="mt-1 form-control w-24 text-center"
+                                            <input type="number" min="0" class="mt-1 form-control w-24 text-center"
                                                 wire:model.live="category_question_settings.{{ $category_question->id }}.medium"
-                                                max="{{ $limits['medium'] ?? 0 }}"
-                                                @disabled(!($settings['enabled'] ?? false) || ($limits['medium'] ?? 0) === 0)>
+                                                max="{{ $limits['medium'] ?? 0 }}" @disabled(!($settings['enabled'] ?? false) || ($limits['medium'] ?? 0) === 0)>
                                             <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['medium'] ?? 0 }}</div>
                                         </td>
                                         <td class="center">
-                                            <input type="number" min="0"
-                                                class="mt-1 form-control w-24 text-center"
+                                            <input type="number" min="0" class="mt-1 form-control w-24 text-center"
                                                 wire:model.live="category_question_settings.{{ $category_question->id }}.hard"
-                                                max="{{ $limits['hard'] ?? 0 }}"
-                                                @disabled(!($settings['enabled'] ?? false) || ($limits['hard'] ?? 0) === 0)>
+                                                max="{{ $limits['hard'] ?? 0 }}" @disabled(!($settings['enabled'] ?? false) || ($limits['hard'] ?? 0) === 0)>
                                             <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['hard'] ?? 0 }}</div>
                                         </td>
                                     </tr>
@@ -263,35 +253,27 @@
                                         </td>
                                         <td>{{ $topic->name }}</td>
                                         <td class="center">
-                                            <input type="number" min="0"
-                                                class="mt-1 form-control w-24 text-center"
+                                            <input type="number" min="0" class="mt-1 form-control w-24 text-center"
                                                 wire:model.live="topic_question_settings.{{ $topic->id }}.default"
-                                                max="{{ $limits['default'] ?? 0 }}"
-                                                @disabled(!($settings['enabled'] ?? false) || ($limits['default'] ?? 0) === 0)>
+                                                max="{{ $limits['default'] ?? 0 }}" @disabled(!($settings['enabled'] ?? false) || ($limits['default'] ?? 0) === 0)>
                                             <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['default'] ?? 0 }}</div>
                                         </td>
                                         <td class="center">
-                                            <input type="number" min="0"
-                                                class="mt-1 form-control w-24 text-center"
+                                            <input type="number" min="0" class="mt-1 form-control w-24 text-center"
                                                 wire:model.live="topic_question_settings.{{ $topic->id }}.easy"
-                                                max="{{ $limits['easy'] ?? 0 }}"
-                                                @disabled(!($settings['enabled'] ?? false) || ($limits['easy'] ?? 0) === 0)>
+                                                max="{{ $limits['easy'] ?? 0 }}" @disabled(!($settings['enabled'] ?? false) || ($limits['easy'] ?? 0) === 0)>
                                             <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['easy'] ?? 0 }}</div>
                                         </td>
                                         <td class="center">
-                                            <input type="number" min="0"
-                                                class="mt-1 form-control w-24 text-center"
+                                            <input type="number" min="0" class="mt-1 form-control w-24 text-center"
                                                 wire:model.live="topic_question_settings.{{ $topic->id }}.medium"
-                                                max="{{ $limits['medium'] ?? 0 }}"
-                                                @disabled(!($settings['enabled'] ?? false) || ($limits['medium'] ?? 0) === 0)>
+                                                max="{{ $limits['medium'] ?? 0 }}" @disabled(!($settings['enabled'] ?? false) || ($limits['medium'] ?? 0) === 0)>
                                             <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['medium'] ?? 0 }}</div>
                                         </td>
                                         <td class="center">
-                                            <input type="number" min="0"
-                                                class="mt-1 form-control w-24 text-center"
+                                            <input type="number" min="0" class="mt-1 form-control w-24 text-center"
                                                 wire:model.live="topic_question_settings.{{ $topic->id }}.hard"
-                                                max="{{ $limits['hard'] ?? 0 }}"
-                                                @disabled(!($settings['enabled'] ?? false) || ($limits['hard'] ?? 0) === 0)>
+                                                max="{{ $limits['hard'] ?? 0 }}" @disabled(!($settings['enabled'] ?? false) || ($limits['hard'] ?? 0) === 0)>
                                             <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['hard'] ?? 0 }}</div>
                                         </td>
                                     </tr>
@@ -310,10 +292,10 @@
 
     @if ($question_pick_type === 'manual')
         <div class="p-5 bg-white shadow rounded-lg mt-4">
-              <div>
-                        <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">Data Soal</h1>
-                        <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p>
-                    </div>
+            <div>
+                <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">Data Soal</h1>
+                <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p>
+            </div>
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
                 <div class="flex flex-col gap-2">
                     <div class="flex items-center gap-2">
@@ -393,19 +375,19 @@
                 </table>
             </div>
             <div class="px-5 py-4 bg-gray-50/80 border-t border-gray-200">
-            <div class="flex items-center justify-between">
-                <div class="text-sm text-gray-700">
-                    Menampilkan <span class="font-medium">{{ $module_questions->firstItem() }}</span> sampai <span
-                        class="font-medium">{{ $module_questions->lastItem() }}</span> dari <span
-                        class="font-medium">{{ $module_questions->total() }}</span> hasil
-                </div>
-                <div>
-                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        {{ $module_questions->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
-                    </nav>
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-gray-700">
+                        Menampilkan <span class="font-medium">{{ $module_questions->firstItem() }}</span> sampai <span
+                            class="font-medium">{{ $module_questions->lastItem() }}</span> dari <span
+                            class="font-medium">{{ $module_questions->total() }}</span> hasil
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            {{ $module_questions->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
+                        </nav>
+                    </div>
                 </div>
             </div>
-        </div>
         </div>
     @endif
 </div>

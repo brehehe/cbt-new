@@ -9,8 +9,7 @@
             </div>
 
             <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-2xl">
-                <div
-                    class="bg-white py-8 px-6 shadow-2xl sm:rounded-2xl sm:px-10 border border-gray-200 backdrop-blur-sm">
+                <div class="bg-white py-8 px-6 shadow-2xl sm:rounded-2xl sm:px-10 border border-gray-200 backdrop-blur-sm">
                     <!-- Enhanced Step Indicator -->
                     <div class="mb-10">
                         <!-- Progress Bar Background -->
@@ -69,8 +68,7 @@
                                         class="icon icon-tabler icons-tabler-outline icon-tabler-files w-4 h-4 sm:w-5 sm:h-5">
                                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                         <path d="M15 3v4a1 1 0 0 0 1 1h4" />
-                                        <path
-                                            d="M18 17h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h4l5 5v7a2 2 0 0 1 -2 2z" />
+                                        <path d="M18 17h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h4l5 5v7a2 2 0 0 1 -2 2z" />
                                         <path d="M16 17v2a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h2" />
                                     </svg>
                                 </div>
@@ -123,10 +121,9 @@
                                 </div>
                                 <div class="grid grid-cols-1 gap-4">
                                     <div>
-                                        <label for="name"
-                                            class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                                            <svg class="w-5 h-5 mr-2 text-green-400" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                        <label for="name" class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                                            <svg class="w-5 h-5 mr-2 text-green-400" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
                                                 </path>
@@ -144,9 +141,9 @@
                                         <div>
                                             <label for="birth_place"
                                                 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                                    fill="none" stroke="currentColor" stroke-width="2"
-                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                    stroke-linejoin="round"
                                                     class="icon icon-tabler icons-tabler-outline icon-tabler-cake w-5 h-5 mr-2 text-green-400">
                                                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                                     <path d="M3 20h18v-8a3 3 0 0 0 -3 -3h-12a3 3 0 0 0 -3 3v8z" />
@@ -177,11 +174,10 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <label for="email"
-                                            class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                                fill="none" stroke="currentColor" stroke-width="2"
-                                                stroke-linecap="round" stroke-linejoin="round"
+                                        <label for="email" class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round"
                                                 class="icon icon-tabler icons-tabler-outline icon-tabler-mail w-5 h-5 mr-2 text-green-400">
                                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                                 <path
@@ -210,8 +206,7 @@
                                     class="mt-8 w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none transform hover:scale-[1.02] shadow-lg hover:shadow-xl">
                                     <span class="flex items-center justify-center">
                                         Lanjutkan
-                                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                                         </svg>
@@ -227,8 +222,7 @@
                                 </div>
                                 <div class="grid grid-cols-1 gap-4 mb-8">
                                     <div>
-                                        <label for="nim"
-                                            class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                                        <label for="nim" class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
                                             <i class="ti ti-id-badge-2 text-xl mr-2 text-green-400"></i>
                                             NIM <span class="text-red-500">*</span>
                                         </label>
@@ -280,8 +274,7 @@
                                     <button type="button" id="prev-step2" wire:click="prevStep()"
                                         class="flex-1 bg-gray-100 hover:bg-gray-200-600 text-gray-700 py-3 px-6 rounded-xl font-semibold transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg">
                                         <span class="flex items-center justify-center">
-                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
+                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M11 17l-5-5m0 0l5-5m-5 5h12"></path>
                                             </svg>
@@ -292,8 +285,7 @@
                                         class="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none transform hover:scale-[1.02] shadow-lg hover:shadow-xl">
                                         <span class="flex items-center justify-center">
                                             Lanjutkan
-                                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
+                                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                                             </svg>
@@ -330,8 +322,7 @@
                                         </label>
                                         <input type="file" id="payment_registration" name="payment_registration"
                                             class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500-all duration-300 hover:border-green-300"
-                                            placeholder="Masukkan nama lengkap"
-                                            wire:model.defer="payment_registration">
+                                            placeholder="Masukkan nama lengkap" wire:model.defer="payment_registration">
                                         @error('payment_registration')
                                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                                         @enderror
@@ -341,8 +332,7 @@
                                     <button type="button" id="prev-step2" wire:click="prevStep()"
                                         class="flex-1 bg-gray-100 hover:bg-gray-200-600 text-gray-700 py-3 px-6 rounded-xl font-semibold transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg">
                                         <span class="flex items-center justify-center">
-                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
+                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M11 17l-5-5m0 0l5-5m-5 5h12"></path>
                                             </svg>
@@ -353,8 +343,7 @@
                                         class="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none transform hover:scale-[1.02] shadow-lg hover:shadow-xl">
                                         <span class="flex items-center justify-center">
                                             Daftar
-                                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
+                                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                                             </svg>
@@ -375,15 +364,14 @@
         </div>
     @else
         <div class="min-h-screen flex items-center justify-center p-4">
-            <div
-                class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-lg p-6 relative overflow-hidden">
+            <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-lg p-6 relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#1E3A8A] to-[#C3D4EC]"></div>
 
                 <!-- Logo & Title -->
                 <div class="flex flex-col items-center mb-6">
-                    <img src="{{ asset('asset/img/logo.png') }}" alt="{{ config('app.name') }} Logo" class="h-12 drop-shadow-md">
-                    <h1
-                        class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
+                    <img src="{{ asset('asset/img/logo.png') }}" alt="{{ config('app.name') }} Logo"
+                        class="h-12 drop-shadow-md">
+                    <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
                         Buat Akun Anda</h1>
                     <p class="text-gray-600 text-sm">Daftar untuk mengakses dashboard Anda</p>
                 </div>
@@ -400,30 +388,25 @@
                     <div class="w-full mb-8">
                         <!-- Step Labels -->
                         <div class="flex justify-between text-sm text-gray-600 mb-2 font-medium">
-                            <span
-                                :class="step >= 1 ?
-                                    'text-[{{ $companyData->color_primary }}] font-semibold' :
-                                    ''">Step
+                            <span :class="step >= 1 ?
+                                        'text-[{{ $companyData->color_primary ?? '#f58634' }}] font-semibold' :
+                                        ''">Step
                                 1</span>
-                            <span
-                                :class="step >= 2 ?
-                                    'text-[{{ $companyData->color_primary }}] font-semibold' :
-                                    ''">Step
+                            <span :class="step >= 2 ?
+                                        'text-[{{ $companyData->color_primary ?? '#f58634' }}] font-semibold' :
+                                        ''">Step
                                 2</span>
-                            <span
-                                :class="step >= 3 ?
-                                    'text-[{{ $companyData->color_primary }}] font-semibold' :
-                                    ''">Step
+                            <span :class="step >= 3 ?
+                                        'text-[{{ $companyData->color_primary ?? '#f58634' }}] font-semibold' :
+                                        ''">Step
                                 3</span>
-                            <span
-                                :class="step >= 4 ?
-                                    'text-[{{ $companyData->color_primary }}] font-semibold' :
-                                    ''">Step
+                            <span :class="step >= 4 ?
+                                        'text-[{{ $companyData->color_primary ?? '#f58634' }}] font-semibold' :
+                                        ''">Step
                                 4</span>
-                            <span
-                                :class="step >= 5 ?
-                                    'text-[{{ $companyData->color_primary }}] font-semibold' :
-                                    ''">Step
+                            <span :class="step >= 5 ?
+                                        'text-[{{ $companyData->color_primary ?? '#f58634' }}] font-semibold' :
+                                        ''">Step
                                 5</span>
                         </div>
 
@@ -510,8 +493,7 @@
                         </div>
 
                         <div class="flex justify-end mt-6">
-                            <button type="button" wire:click="nextStep"
-                                class="btn-primary cursor-pointer">Lanjut</button>
+                            <button type="button" wire:click="nextStep" class="btn-primary cursor-pointer">Lanjut</button>
                         </div>
                     </div>
 
@@ -607,8 +589,7 @@
 
                         <div class="flex justify-between mt-6">
                             <button type="button" wire:click="prevStep" class="btn-secondary">Kembali</button>
-                            <button type="button" wire:click="nextStep"
-                                class="btn-primary cursor-pointer">Lanjut</button>
+                            <button type="button" wire:click="nextStep" class="btn-primary cursor-pointer">Lanjut</button>
                         </div>
                     </div>
 
@@ -618,15 +599,14 @@
                             <!-- Upload Logo -->
                             <div class="group">
                                 <div x-data="{ logoName: '', logoPreview: '' }" class="relative">
-                                    <input autocomplete="off" type="file" wire:model="logo" class="hidden"
-                                        id="upload-logo" accept="image/*">
+                                    <input autocomplete="off" type="file" wire:model="logo" class="hidden" id="upload-logo"
+                                        accept="image/*">
 
                                     <label for="upload-logo"
                                         class="inline-flex items-center px-4 py-2 bg-[#1E3A8A] text-white rounded-xl cursor-pointer hover:bg-[#1E3A8A] transition-all">
                                         Upload Logo
                                         <!-- Optional: Icon next to text -->
-                                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12v8m0-8l-3 3m3-3l3 3M12 4v4" />
                                         </svg>
@@ -654,8 +634,7 @@
                                         placeholder="NPWP / Tax ID">
                                     <div class="absolute inset-y-0 right-3 flex items-center text-gray-400">
                                         <!-- Icon document -->
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M9 12h6m-6 4h6M12 4v4m-4 4h8M4 6a2 2 0 012-2h8l4 4v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" />
                                         </svg>
@@ -671,8 +650,7 @@
                                         placeholder="Industri">
                                     <div class="absolute inset-y-0 right-3 flex items-center text-gray-400">
                                         <!-- Icon briefcase -->
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M10 9V7a2 2 0 012-2h0a2 2 0 012 2v2m-8 4h12m-12 0v6a2 2 0 002 2h8a2 2 0 002-2v-6M4 13h16" />
                                         </svg>
@@ -688,8 +666,7 @@
 
                         <div class="flex justify-between mt-6">
                             <button type="button" wire:click="prevStep" class="btn-secondary">Kembali</button>
-                            <button type="button" wire:click="nextStep"
-                                class="btn-primary cursor-pointer">Lanjut</button>
+                            <button type="button" wire:click="nextStep" class="btn-primary cursor-pointer">Lanjut</button>
                         </div>
                     </div>
 
@@ -759,8 +736,7 @@
                         </div>
                         <div class="flex justify-between mt-6">
                             <button type="button" wire:click="prevStep" class="btn-secondary">Kembali</button>
-                            <button type="button" wire:click="nextStep"
-                                class="btn-primary cursor-pointer">Lanjut</button>
+                            <button type="button" wire:click="nextStep" class="btn-primary cursor-pointer">Lanjut</button>
                         </div>
                     </div>
 
@@ -769,16 +745,19 @@
                         <div class="grid grid-cols-1 gap-4">
                             {{-- <div class="group">
                                 <div class="relative">
-                                    <input autocomplete="off" type="email" wire:model.defer="email" class="input-style w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white/50 focus:ring-2 focus:ring-[#1E3A8A]/20 focus:border-[#1E3A8A] transition-all" placeholder="Email Login">
+                                    <input autocomplete="off" type="email" wire:model.defer="email"
+                                        class="input-style w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white/50 focus:ring-2 focus:ring-[#1E3A8A]/20 focus:border-[#1E3A8A] transition-all"
+                                        placeholder="Email Login">
                                     <div class="absolute inset-y-0 right-3 flex items-center text-gray-400">
                                         <!-- Icon mail -->
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12l-4-4-4 4m0 0l4 4 4-4m-4 4V8" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M16 12l-4-4-4 4m0 0l4 4 4-4m-4 4V8" />
                                         </svg>
                                     </div>
                                 </div>
                                 @error('email')
-                                    <span class="text-sm text-red-500">{{ $message }}</span>
+                                <span class="text-sm text-red-500">{{ $message }}</span>
                                 @enderror
                             </div> --}}
 
@@ -789,8 +768,7 @@
                                         placeholder="Username">
                                     <div class="absolute inset-y-0 right-3 flex items-center text-gray-400">
                                         <!-- Icon user -->
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M5.121 17.804A9 9 0 1118.88 6.196 9 9 0 015.12 17.804zM12 12a3 3 0 100-6 3 3 0 000 6z" />
                                         </svg>
@@ -810,17 +788,15 @@
                                             class="input-style pr-10" placeholder="Password (min. 8 karakter)">
                                         <button type="button" @click="show = !show"
                                             class="absolute right-3 top-1/2 -translate-y-1/2 transform text-gray-500 focus:outline-none">
-                                            <svg x-show="show" x-cloak xmlns="http://www.w3.org/2000/svg"
-                                                class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor">
+                                            <svg x-show="show" x-cloak xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
-                                            <svg x-show="!show" x-cloak xmlns="http://www.w3.org/2000/svg"
-                                                class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor">
+                                            <svg x-show="!show" x-cloak xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.985 9.985 0 012.241-3.715M6.633 6.633A9.978 9.978 0 0112 5c4.477 0 8.268 2.943 9.542 7a9.978 9.978 0 01-1.348 2.708M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -846,16 +822,14 @@
                                         <button type="button" @click="showConfirm = !showConfirm"
                                             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 focus:outline-none">
                                             <svg x-show="showConfirm" x-cloak xmlns="http://www.w3.org/2000/svg"
-                                                class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor">
+                                                class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
                                             <svg x-show="!showConfirm" x-cloak xmlns="http://www.w3.org/2000/svg"
-                                                class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor">
+                                                class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.985 9.985 0 012.241-3.715M6.633 6.633A9.978 9.978 0 0112 5c4.477 0 8.268 2.943 9.542 7a9.978 9.978 0 01-1.348 2.708M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -878,10 +852,10 @@
                             <button type="submit" wire:loading.attr="disabled" class="btn-submit">
                                 <span wire:loading.remove>Daftar</span>
                                 <span wire:loading>
-                                    <svg class="animate-spin h-5 w-5 text-white mx-auto"
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10"
-                                            stroke="currentColor" stroke-width="4"></circle>
+                                    <svg class="animate-spin h-5 w-5 text-white mx-auto" xmlns="http://www.w3.org/2000/svg"
+                                        fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                            stroke-width="4"></circle>
                                         <path class="opacity-75" fill="currentColor"
                                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                                     </svg>
@@ -897,7 +871,7 @@
                     <p class="text-sm text-gray-600">
                         Sudah punya akun?
                         <a href="{{ route('login') }}"
-                            class="text-[{{ $companyData->color_primary }}] hover:underline font-semibold">Login
+                            class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:underline font-semibold">Login
                             di
                             sini</a>
                     </p>

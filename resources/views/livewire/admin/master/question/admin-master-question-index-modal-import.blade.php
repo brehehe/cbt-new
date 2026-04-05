@@ -26,11 +26,11 @@
                 <select class="mt-1 form-control" wire:model='study_id_import'>
                     <option value="">Pilih prodi</option>
                     @foreach ($studys as $key_study => $study)
-                        <option value="{{ $key_study }}">{{ $study }}</option>
+                    <option value="{{ $key_study }}">{{ $study }}</option>
                     @endforeach
                 </select>
                 @error('study_id_import')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
             </div> --}}
             <div class="mb-4">
@@ -40,7 +40,8 @@
                         class="block text-sm font-medium text-gray-500">Download Template</a>
                     {{-- <label for="file_import" class="block text-sm font-medium text-gray-700">File</label> --}}
                 </div>
-                {{-- <input type="file" id="file_import" wire:model.defer="file_import" placeholder="" class="mt-1 form-control"> --}}
+                {{-- <input type="file" id="file_import" wire:model.defer="file_import" placeholder=""
+                    class="mt-1 form-control"> --}}
                 <x-filepond::upload wire:model="file_import" accept="" />
                 @error('file_import')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
@@ -55,7 +56,7 @@
                 Batal
             </button>
             <button wire:click='importQuestion()'
-                class="px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_primary }}] text-white rounded-lg shadow transition">
+                class="px-4 py-2 bg-[{{ $companyData->color_primary ?? '#f58634' }}] hover:bg-[{{ $companyData->color_primary ?? '#f58634' }}] text-white rounded-lg shadow transition">
                 Simpan
             </button>
         </div>

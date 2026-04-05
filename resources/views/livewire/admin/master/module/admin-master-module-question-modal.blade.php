@@ -6,7 +6,8 @@
         <!-- Header -->
         <div class="flex justify-between items-center p-6 border-b flex-shrink-0">
             <div class="flex items-center gap-2">
-                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M13 16h-1v-4h-1m1-4h.01M12 20.5C6.753 20.5 2.5 16.247 2.5 11S6.753 1.5 12 1.5 21.5 5.753 21.5 11 17.247 20.5 12 20.5z" />
                 </svg>
@@ -72,7 +73,8 @@
                                             class="px-4 py-2 text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                             <div class="flex items-center justify-between">
                                                 <span>Topik: {{ $topicName ?? 'Tanpa Topik' }}</span>
-                                                <span class="text-[11px] text-gray-500">{{ $topicQuestions->count() }} soal</span>
+                                                <span class="text-[11px] text-gray-500">{{ $topicQuestions->count() }}
+                                                    soal</span>
                                             </div>
                                         </td>
                                     </tr>
@@ -121,7 +123,7 @@
                     Batal
                 </button>
                 <button wire:click='submitModuleQuestion()'
-                    class="px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_primary }}] text-white rounded-lg shadow transition">
+                    class="px-4 py-2 bg-[{{ $companyData->color_primary ?? '#f58634' }}] hover:bg-[{{ $companyData->color_primary ?? '#f58634' }}] text-white rounded-lg shadow transition">
                     Simpan
                 </button>
             </div>

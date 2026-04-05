@@ -24,8 +24,8 @@
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700">Nama Pengawas <span
                             class="text-red-600">*</span></label>
-                    <input id="name" type="text" wire:model.defer="name"
-                        placeholder="Contoh : Dr. Ahmad Pengawas" class="mt-1 form-control">
+                    <input id="name" type="text" wire:model.defer="name" placeholder="Contoh : Dr. Ahmad Pengawas"
+                        class="mt-1 form-control">
                     @error('name')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -42,8 +42,8 @@
                 <div>
                     <label for="supervisor_id" class="block text-sm font-medium text-gray-700">ID Pengawas <span
                             class="text-red-600">*</span></label>
-                    <input id="supervisor_id" type="text" wire:model.defer="supervisor_id"
-                        placeholder="Contoh : SUP001" class="mt-1 form-control">
+                    <input id="supervisor_id" type="text" wire:model.defer="supervisor_id" placeholder="Contoh : SUP001"
+                        class="mt-1 form-control">
                     @error('supervisor_id')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -51,8 +51,8 @@
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700">Email <span
                             class="text-red-600">*</span></label>
-                    <input id="email" type="email" wire:model.defer="email"
-                        placeholder="Contoh : supervisor@gmail.com" class="mt-1 form-control">
+                    <input id="email" type="email" wire:model.defer="email" placeholder="Contoh : supervisor@gmail.com"
+                        class="mt-1 form-control">
                     @error('email')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -68,8 +68,8 @@
                 </div>
                 <div>
                     <label for="password" class="block text-sm font-medium text-gray-700">Password @if (!$data_id)
-                            <span class="text-red-600">*</span>
-                        @else
+                        <span class="text-red-600">*</span>
+                    @else
                         @endif
                     </label>
                     <div x-data="{ show: false }" class="relative">
@@ -97,7 +97,8 @@
                 <div class="md:col-span-2">
                     <label for="address" class="block text-sm font-medium text-gray-700">Alamat <span
                             class="text-red-600">*</span></label>
-                    <textarea id="address" wire:model.defer="address" placeholder="Contoh : Jl. Raya No. 123" class="mt-1 form-control"></textarea>
+                    <textarea id="address" wire:model.defer="address" placeholder="Contoh : Jl. Raya No. 123"
+                        class="mt-1 form-control"></textarea>
                     @error('address')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -116,7 +117,7 @@
                 Batal
             </button>
             <button wire:click='submit'
-                class="px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_primary }}] text-white rounded-lg shadow transition">
+                class="px-4 py-2 bg-[{{ $companyData->color_primary ?? '#f58634' }}] hover:bg-[{{ $companyData->color_primary ?? '#f58634' }}] text-white rounded-lg shadow transition">
                 Simpan
             </button>
         </div>

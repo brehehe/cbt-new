@@ -3,15 +3,13 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1
-                    class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
+                <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
                     Manajemen Data Pengawas</h1>
                 <p class="text-gray-600">Kelola data pengawas dalam sistem CBT</p>
             </div>
             <div class="flex gap-2">
                 <!-- Download Template Button -->
-                <button wire:click="downloadTemplate()"
-                    class="btn btn-success">
+                <button wire:click="downloadTemplate()" class="btn btn-success">
                     <i class="fa-solid fa-file-download mr-1"></i>
                     Template
                 </button>
@@ -20,7 +18,8 @@
                 <label class="btn btn-warning cursor-pointer">
                     <i class="fa-solid fa-file-import mr-1"></i>
                     Import
-                    <input type="file" wire:model="importFile" accept=".xlsx,.xls" wire:change="import" class="hidden" />
+                    <input type="file" wire:model="importFile" accept=".xlsx,.xls" wire:change="import"
+                        class="hidden" />
                 </label>
 
                 <!-- Add Button -->
@@ -79,11 +78,9 @@
                                     <div class="flex-shrink-0 h-10 w-10">
                                         @if ($supervisor->profile)
                                             <img src="{{ asset('storage/' . $supervisor->profile) }}"
-                                                alt="Foto {{ $supervisor->name }}"
-                                                class="h-10 w-10 rounded-full object-cover">
+                                                alt="Foto {{ $supervisor->name }}" class="h-10 w-10 rounded-full object-cover">
                                         @else
-                                            <div
-                                                class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                                            <div class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
                                                 <span class="text-sm font-medium text-purple-700">
                                                     {{ substr($supervisor->name, 0, 2) }}
                                                 </span>

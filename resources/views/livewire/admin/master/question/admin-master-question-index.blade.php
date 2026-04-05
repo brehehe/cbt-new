@@ -6,8 +6,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1
-                    class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
+                <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
                     Data Bank Soal</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
@@ -17,9 +16,9 @@
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="icon icon-tabler icons-tabler-outline icon-tabler-file-import h-4 w-4"">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                            <path d="M5 13v-8a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-5.5m-9.5 -2h7m-3 -3l3 3l-3 3" />
+                                <path stroke=" none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                        <path d="M5 13v-8a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-5.5m-9.5 -2h7m-3 -3l3 3l-3 3" />
                         </svg>
                         Import
                     </button>
@@ -93,10 +92,12 @@
     {{-- Remove global alert --}}
 
     <!-- Table Controls -->
-   <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <div class="flex items-center bg-white rounded-lg shadow-sm border border-gray-200 px-3 py-2 w-full md:w-auto">
             <span class="text-sm text-gray-600 mr-2">Tampil</span>
-            <select class="form-select text-sm border-none focus:ring-0 p-0 text-gray-700 font-semibold bg-transparent w-12" wire:model.live='perPage'>
+            <select
+                class="form-select text-sm border-none focus:ring-0 p-0 text-gray-700 font-semibold bg-transparent w-12"
+                wire:model.live='perPage'>
                 <option value="5">5</option>
                 <option value="10">10</option>
                 <option value="25">25</option>
@@ -111,10 +112,9 @@
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <i class="fas fa-search text-gray-400"></i>
                 </div>
-                <input type="text" 
-                    class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[{{ $companyData->color_primary ?? '#2b7fff' }}] focus:border-[{{ $companyData->color_primary ?? '#2b7fff' }}] sm:text-sm transition duration-150 ease-in-out" 
-                    placeholder="Cari Sesuatu..."
-                    wire:model.live='search'>
+                <input type="text"
+                    class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[{{ $companyData->color_primary ?? '#2b7fff' }}] focus:border-[{{ $companyData->color_primary ?? '#2b7fff' }}] sm:text-sm transition duration-150 ease-in-out"
+                    placeholder="Cari Sesuatu..." wire:model.live='search'>
             </div>
         </div>
     </div>
@@ -152,7 +152,8 @@
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Topik
                             Soal</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori Soal
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Kategori Soal
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Pertanyaan</th>
@@ -174,7 +175,8 @@
                                     value="{{ $result->id }}" {{ $isRestricted ? 'disabled' : '' }}>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $globalIndex }}</td>
+                                {{ $globalIndex }}
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 <div class="{{ $isRestricted ? 'blur-[3px] select-none' : '' }}">
                                     {{ $result?->study?->name }}
@@ -193,7 +195,8 @@
                             <td class="px-6 py-4 text-sm text-gray-900 max-w-xs relative">
                                 @if ($isRestricted)
                                     <div class="absolute inset-0 flex items-center justify-center z-10 px-2 text-center">
-                                        <span class="text-[10px] font-bold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded shadow-sm">
+                                        <span
+                                            class="text-[10px] font-bold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded shadow-sm">
                                             HUBUNGI ADMIN JIKA INGIN MELIHAT SOAL
                                         </span>
                                     </div>
@@ -202,9 +205,11 @@
                                     </div>
                                 @else
                                     <div x-data="{ expanded: false }">
-                                        <span x-show="!expanded" class="block truncate">{{ Str::limit($result?->question, 50) }}</span>
+                                        <span x-show="!expanded"
+                                            class="block truncate">{{ Str::limit($result?->question, 50) }}</span>
                                         <span x-show="expanded" class="block">{{ $result?->question }}</span>
-                                        <button type="button" class="mt-1 text-xs text-blue-600 hover:text-blue-800" @click="expanded = !expanded">
+                                        <button type="button" class="mt-1 text-xs text-blue-600 hover:text-blue-800"
+                                            @click="expanded = !expanded">
                                             <span x-show="!expanded">Show</span>
                                             <span x-show="expanded">Hide</span>
                                         </button>
@@ -219,8 +224,10 @@
                             <td class="center">
                                 @if ($isRestricted)
                                     <div class="flex items-center justify-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-300" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                         </svg>
                                     </div>
                                 @else
@@ -275,7 +282,7 @@
 
 @push('scripts')
     <script>
-        (function() {
+        (function () {
             if (window.__latexServerPreviewInit) return;
             window.__latexServerPreviewInit = true;
 
@@ -349,7 +356,7 @@
                 });
             }
 
-            document.addEventListener('click', function(e) {
+            document.addEventListener('click', function (e) {
                 const btn = e.target.closest('[data-latex-render]');
                 if (!btn) return;
                 const sourceSelector = btn.getAttribute('data-latex-source');

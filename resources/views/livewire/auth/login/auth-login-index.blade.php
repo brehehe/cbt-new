@@ -31,7 +31,7 @@
                 <div class="group relative hidden w-0 overflow-hidden lg:block lg:w-3/5">
                     <!-- Background with modern clip-path -->
                     <div class="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 transition-all duration-1000 hover:from-blue-500 hover:via-blue-600 hover:to-blue-800"
-                        style="clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); background-image: url('{{ $company->background_login ? asset('storage/'.$company->background_login) : asset('asset/img/auth-pro-cbt.webp') }}'); background-size: cover; background-position: center;">
+                        style="clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); background-image: url('{{ $company->background_login ? asset('storage/' . $company->background_login) : asset('asset/img/auth-pro-cbt.webp') }}'); background-size: cover; background-position: center;">
                     </div>
 
                     <!-- Subtle pattern overlay -->
@@ -49,7 +49,7 @@
                             <div class="group/brand flex items-center space-x-3">
                                 <div class="relative">
                                     <img alt="Logo" class="object-contain" style="width: 215px;" loading="lazy"
-                                        src="{{ $company->logo ? asset('storage/'.$company->logo) : asset('asset/img/logo-procbt.png') }}">
+                                        src="{{ $company->logo ? asset('storage/' . $company->logo) : asset('asset/img/logo-procbt.png') }}">
                                 </div>
                             </div>
                         </div>
@@ -64,8 +64,7 @@
                             class="inline-flex items-center space-x-3 rounded-2xl border border-gray-200/50 bg-white/90 px-4 py-2 shadow-xl backdrop-blur-xl">
                             <div
                                 class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600">
-                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
+                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11"
                                         stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
                                 </svg>
@@ -90,45 +89,45 @@
                                 <!-- Header -->
                                 <div class="mb-4 text-center lg:mb-6">
                                     <div class="relative inline-block">
-                                        <img src="{{ $company->logo_potrait ? asset('storage/'.$company->logo_potrait) : asset('asset/img/logo-procbt.png') }}" class="w-32 h-24 object-contain" alt="">
+                                        <img src="{{ $company->logo_potrait ? asset('storage/' . $company->logo_potrait) : asset('asset/img/logo-procbt.png') }}"
+                                            class="w-32 h-24 object-contain" alt="">
                                     </div>
 
-                                    <h2 class="mb-1 text-xl font-bold text-gray-800 lg:mb-2 lg:text-1xl">{{ $company->name }}</h2>
+                                    <h2 class="mb-1 text-xl font-bold text-gray-800 lg:mb-2 lg:text-1xl">
+                                        {{ $company->name }}</h2>
                                     <p class="text-sm text-gray-600 lg:text-base">Masuk ke sistem CBT</p>
                                 </div>
 
                                 <!-- Active Session Error -->
                                 {{-- @if ($hasActiveSession && $activeSessionInfo)
-                                    <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
-                                        <div class="flex items-start">
-                                            <div class="flex-shrink-0">
-                                                <svg class="h-5 w-5 text-red-400" fill="currentColor"
-                                                    viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd"
-                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                                        clip-rule="evenodd"></path>
-                                                </svg>
-                                            </div>
-                                            <div class="ml-3">
-                                                <h3 class="text-sm font-medium text-red-800">
-                                                    Login Tidak Diizinkan
-                                                </h3>
-                                                <div class="mt-2 text-sm text-red-700">
-                                                    <p>Akun <strong>{{ $activeSessionInfo['username'] }}</strong> sudah
-                                                        login di perangkat lain.</p>
-                                                    <p class="mt-1">Silakan logout dari perangkat lain terlebih
-                                                        dahulu atau hubungi administrator untuk bantuan.</p>
-                                                </div>
+                                <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0">
+                                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd"
+                                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                        </div>
+                                        <div class="ml-3">
+                                            <h3 class="text-sm font-medium text-red-800">
+                                                Login Tidak Diizinkan
+                                            </h3>
+                                            <div class="mt-2 text-sm text-red-700">
+                                                <p>Akun <strong>{{ $activeSessionInfo['username'] }}</strong> sudah
+                                                    login di perangkat lain.</p>
+                                                <p class="mt-1">Silakan logout dari perangkat lain terlebih
+                                                    dahulu atau hubungi administrator untuk bantuan.</p>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
                                 @endif --}}
 
                                 <!-- Login Form -->
                                 <form class="space-y-4 lg:space-y-6" wire:submit="login">
                                     <div class="space-y-4 lg:space-y-6">
-                                        <x-ts-input class="text-sm lg:text-base" icon="user"
-                                            label="Username / Email / NIM"
+                                        <x-ts-input class="text-sm lg:text-base" icon="user" label="Username / Email / NIM"
                                             placeholder="Masukkan username, email, atau NIM" required type="text"
                                             wire:model="username_or_email"
                                             wire:keyup.debounce.500ms="checkExistingSession" />
@@ -141,9 +140,9 @@
                                         <x-ts-checkbox class="text-xs lg:text-sm" id="remember" label="Ingat saya"
                                             wire:model="remember" />
                                         <!-- <a class="text-xs font-medium text-[#2b7fff] hover:text-blue-700 lg:text-sm"
-                                            href="#">
-                                            Lupa Password?
-                                        </a> -->
+                                                href="#">
+                                                Lupa Password?
+                                            </a> -->
                                     </div>
 
                                     <div class="pt-2">
@@ -166,40 +165,62 @@
                                     @endif
                                 </form>
                                 <!-- <div class="mt-4 text-center">
-                                    <a href="{{ route('register') }}"
-                                        class="text-[#2b7fff] hover:text-[#317354] text-sm">Buat Akun ?</a>
-                                </div> -->
-                                
+                                        <a href="{{ route('register') }}"
+                                            class="text-[#2b7fff] hover:text-[#317354] text-sm">Buat Akun ?</a>
+                                    </div> -->
+
                                 @if($company->app_windows || $company->app_mac || $company->app_android || $company->app_ios)
-                                <div class="mt-6 border-t border-gray-100 pt-4">
-                                    <h3 class="text-xs font-semibold text-gray-500 text-center mb-3 uppercase tracking-wider">Download Aplikasi</h3>
-                                    <div class="flex justify-center flex-wrap gap-2">
-                                        @if($company->app_windows)
-                                            <a href="{{ Storage::url($company->app_windows) }}" class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                                                Windows
-                                            </a>
-                                        @endif
-                                        @if($company->app_mac)
-                                            <a href="{{ Storage::url($company->app_mac) }}" class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                                                Mac
-                                            </a>
-                                        @endif
-                                        @if($company->app_android)
-                                            <a href="{{ Storage::url($company->app_android) }}" class="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-xs font-medium hover:bg-green-100 transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6026 12.0253L13.7118 16.9946L16.2737 21.432C16.5959 20.9126 17.0628 20.4862 17.6186 20.1983C18.1744 19.9103 18.7951 19.7728 19.4211 19.8021C20.0471 19.8315 20.6517 20.0264 21.1628 20.3638L21.8491 20.8166C21.7259 20.5746 21.6575 20.3065 21.6526 20.0353V3.96464C21.6575 3.69345 21.7259 3.42531 21.8491 3.18337L21.1628 3.63618C20.6517 3.97354 20.0471 4.16843 19.4211 4.19782C18.7951 4.2272 18.1744 4.08972 17.6186 3.80173C17.0628 3.51374 16.5959 3.08731 16.2737 2.56793L13.7118 7.00532L16.6026 11.9746V12.0253Z"/></svg>
-                                                Android
-                                            </a>
-                                        @endif
-                                         @if($company->app_ios)
-                                            <a href="{{ Storage::url($company->app_ios) }}" class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-800 rounded-lg text-xs font-medium hover:bg-gray-200 transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.79-1.31.02-2.3-1.23-3.14-2.47-1.72-2.5-3.03-7.07-1.26-10.13 0.88-1.5 2.45-2.47 4.16-2.5 1.3 0 2.52.88 3.3.88 0.77 0 2.22-1.09 3.73-0.93 0.64.03 2.43.26 3.58 1.94-0.09.06-2.14 1.25-2.12 3.72 0.03 2.96 2.59 3.96 2.65 4-0.02.06-0.41 1.41-1.37 2.82h0ZM13 3.5c.67-.82 1.13-1.95 1.01-3.09-0.97.04-2.14.65-2.83 1.46-.61.7-1.12 1.83-0.99 3.05 1.08.08 2.18-.59 2.81-1.42h0Z"/></svg>
-                                                iOS
-                                            </a>
-                                        @endif
+                                    <div class="mt-6 border-t border-gray-100 pt-4">
+                                        <h3
+                                            class="text-xs font-semibold text-gray-500 text-center mb-3 uppercase tracking-wider">
+                                            Download Aplikasi</h3>
+                                        <div class="flex justify-center flex-wrap gap-2">
+                                            @if($company->app_windows)
+                                                <a href="{{ Storage::url($company->app_windows) }}"
+                                                    class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                                    </svg>
+                                                    Windows
+                                                </a>
+                                            @endif
+                                            @if($company->app_mac)
+                                                <a href="{{ Storage::url($company->app_mac) }}"
+                                                    class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                                    </svg>
+                                                    Mac
+                                                </a>
+                                            @endif
+                                            @if($company->app_android)
+                                                <a href="{{ Storage::url($company->app_android) }}"
+                                                    class="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-xs font-medium hover:bg-green-100 transition-colors">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24"
+                                                        fill="currentColor">
+                                                        <path
+                                                            d="M16.6026 12.0253L13.7118 16.9946L16.2737 21.432C16.5959 20.9126 17.0628 20.4862 17.6186 20.1983C18.1744 19.9103 18.7951 19.7728 19.4211 19.8021C20.0471 19.8315 20.6517 20.0264 21.1628 20.3638L21.8491 20.8166C21.7259 20.5746 21.6575 20.3065 21.6526 20.0353V3.96464C21.6575 3.69345 21.7259 3.42531 21.8491 3.18337L21.1628 3.63618C20.6517 3.97354 20.0471 4.16843 19.4211 4.19782C18.7951 4.2272 18.1744 4.08972 17.6186 3.80173C17.0628 3.51374 16.5959 3.08731 16.2737 2.56793L13.7118 7.00532L16.6026 11.9746V12.0253Z" />
+                                                    </svg>
+                                                    Android
+                                                </a>
+                                            @endif
+                                            @if($company->app_ios)
+                                                <a href="{{ Storage::url($company->app_ios) }}"
+                                                    class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-800 rounded-lg text-xs font-medium hover:bg-gray-200 transition-colors">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24"
+                                                        fill="currentColor">
+                                                        <path
+                                                            d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.79-1.31.02-2.3-1.23-3.14-2.47-1.72-2.5-3.03-7.07-1.26-10.13 0.88-1.5 2.45-2.47 4.16-2.5 1.3 0 2.52.88 3.3.88 0.77 0 2.22-1.09 3.73-0.93 0.64.03 2.43.26 3.58 1.94-0.09.06-2.14 1.25-2.12 3.72 0.03 2.96 2.59 3.96 2.65 4-0.02.06-0.41 1.41-1.37 2.82h0ZM13 3.5c.67-.82 1.13-1.95 1.01-3.09-0.97.04-2.14.65-2.83 1.46-.61.7-1.12 1.83-0.99 3.05 1.08.08 2.18-.59 2.81-1.42h0Z" />
+                                                    </svg>
+                                                    iOS
+                                                </a>
+                                            @endif
+                                        </div>
                                     </div>
-                                </div>
                                 @endif
                             </div>
                         </div>
@@ -230,8 +251,8 @@
 
                             <!-- Footer -->
                             <!-- <p class="text-xs font-medium text-gray-500">
-                                © {{ date('Y') }} PRO CBT
-                            </p> -->
+                                    © {{ date('Y') }} PRO CBT
+                                </p> -->
                         </div>
                     </div>
                 </div>
@@ -289,7 +310,8 @@
                                 {{-- <div class="relative">
                                     <div
                                         class="flex h-2 w-2 cursor-pointer items-center justify-center rounded-full border border-white bg-white p-1.5 backdrop-blur-sm transition-all duration-500 hover:rotate-6 hover:scale-110 hover:bg-white">
-                                        <img alt="Logo" class="w-full object-contain" loading="lazy" src="{{ asset('asset/img/logo-ikmb.png') }}">
+                                        <img alt="Logo" class="w-full object-contain" loading="lazy"
+                                            src="{{ asset('asset/img/logo-ikmb.png') }}">
                                     </div>
                                 </div> --}}
                                 <div>
@@ -302,21 +324,21 @@
                             <!-- Main Value Proposition -->
                             {{-- <div class="max-w-xl space-y-4 mt-[25%]">
                                 <!-- <h2 class="text-2xl font-bold leading-tight tracking-tight xl:text-3xl">
-                                    <span
-                                        class="block cursor-default text-white transition-colors duration-300 hover:text-green-200">Misi</span>
-                                    <span
-                                        class="inline-block cursor-default text-white/90 transition-all duration-300 hover:translate-x-2 hover:text-white">Bisnis
-                                        &</span>
-                                    <span
-                                        class="inline-block cursor-default text-white/80 transition-all duration-300 hover:translate-x-4 hover:text-white">Pemeliharaan</span>
-                                </h2>
+                                        <span
+                                            class="block cursor-default text-white transition-colors duration-300 hover:text-green-200">Misi</span>
+                                        <span
+                                            class="inline-block cursor-default text-white/90 transition-all duration-300 hover:translate-x-2 hover:text-white">Bisnis
+                                            &</span>
+                                        <span
+                                            class="inline-block cursor-default text-white/80 transition-all duration-300 hover:translate-x-4 hover:text-white">Pemeliharaan</span>
+                                    </h2>
 
-                                <p
-                                    class="cursor-default text-sm leading-relaxed text-white/90 transition-colors duration-300 hover:text-white xl:text-base">
-                                    Perusahaan layanan fasilitas bisnis dan pemeliharaan yang profesional & berpengalaman
-                                    sejak tahun 2004. Kami berkomitmen memberikan layanan terbaik untuk mengoptimalkan
-                                    pertumbuhan bisnis Anda dengan berbagai jenis layanan terintegrasi.
-                                </p> -->
+                                    <p
+                                        class="cursor-default text-sm leading-relaxed text-white/90 transition-colors duration-300 hover:text-white xl:text-base">
+                                        Perusahaan layanan fasilitas bisnis dan pemeliharaan yang profesional & berpengalaman
+                                        sejak tahun 2004. Kami berkomitmen memberikan layanan terbaik untuk mengoptimalkan
+                                        pertumbuhan bisnis Anda dengan berbagai jenis layanan terintegrasi.
+                                    </p> -->
 
 
 
@@ -353,9 +375,12 @@
                                         <div class="flex items-start space-x-3">
                                             <div
                                                 class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
-                                                <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"  fill="none"  stroke="currentColor" class="icon icon-tabler icons-tabler-outline icon-tabler-school h-6 w-6">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                    <path d="M22 9l-10 -4l-10 4l10 4l10 -4v6" /><path d="M6 10.6v5.4a6 3 0 0 0 12 0v-5.4" />
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor"
+                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-school h-6 w-6">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                    <path d="M22 9l-10 -4l-10 4l10 4l10 -4v6" />
+                                                    <path d="M6 10.6v5.4a6 3 0 0 0 12 0v-5.4" />
                                                 </svg>
                                             </div>
                                             <div>
@@ -375,8 +400,25 @@
                                         <div class="flex items-start space-x-3">
                                             <div
                                                 class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-green-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-green-400">
-                                                <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"  fill="none"  stroke="currentColor" class="icon icon-tabler icons-tabler-outline icon-tabler-laurel-wreath h-6 w-6">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6.436 8a8.6 8.6 0 0 0 -.436 2.727c0 4.017 2.686 7.273 6 7.273s6 -3.256 6 -7.273a8.6 8.6 0 0 0 -.436 -2.727" /><path d="M14.5 21s-.682 -3 -2.5 -3s-2.5 3 -2.5 3" /><path d="M18.52 5.23c.292 1.666 -1.02 2.77 -1.02 2.77s-1.603 -.563 -1.895 -2.23c-.292 -1.666 1.02 -2.77 1.02 -2.77s1.603 .563 1.895 2.23" /><path d="M21.094 12.14c-1.281 1.266 -3.016 .76 -3.016 .76s-.454 -1.772 .828 -3.04c1.28 -1.266 3.016 -.76 3.016 -.76s.454 1.772 -.828 3.04" /><path d="M17.734 18.826c-1.5 -.575 -1.734 -2.19 -1.734 -2.19s1.267 -1.038 2.767 -.462c1.5 .575 1.733 2.19 1.733 2.19s-1.267 1.038 -2.767 .462" /><path d="M6.267 18.826c1.5 -.575 1.733 -2.19 1.733 -2.19s-1.267 -1.038 -2.767 -.462c-1.5 .575 -1.733 2.19 -1.733 2.19s1.267 1.038 2.767 .462" /><path d="M2.906 12.14c1.281 1.266 3.016 .76 3.016 .76s.454 -1.772 -.828 -3.04c-1.281 -1.265 -3.016 -.76 -3.016 -.76s-.454 1.772 .828 3.04" /><path d="M5.48 5.23c-.292 1.666 1.02 2.77 1.02 2.77s1.603 -.563 1.895 -2.23c.292 -1.666 -1.02 -2.77 -1.02 -2.77s-1.603 .563 -1.895 2.23" />
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor"
+                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-laurel-wreath h-6 w-6">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                    <path
+                                                        d="M6.436 8a8.6 8.6 0 0 0 -.436 2.727c0 4.017 2.686 7.273 6 7.273s6 -3.256 6 -7.273a8.6 8.6 0 0 0 -.436 -2.727" />
+                                                    <path d="M14.5 21s-.682 -3 -2.5 -3s-2.5 3 -2.5 3" />
+                                                    <path
+                                                        d="M18.52 5.23c.292 1.666 -1.02 2.77 -1.02 2.77s-1.603 -.563 -1.895 -2.23c-.292 -1.666 1.02 -2.77 1.02 -2.77s1.603 .563 1.895 2.23" />
+                                                    <path
+                                                        d="M21.094 12.14c-1.281 1.266 -3.016 .76 -3.016 .76s-.454 -1.772 .828 -3.04c1.28 -1.266 3.016 -.76 3.016 -.76s.454 1.772 -.828 3.04" />
+                                                    <path
+                                                        d="M17.734 18.826c-1.5 -.575 -1.734 -2.19 -1.734 -2.19s1.267 -1.038 2.767 -.462c1.5 .575 1.733 2.19 1.733 2.19s-1.267 1.038 -2.767 .462" />
+                                                    <path
+                                                        d="M6.267 18.826c1.5 -.575 1.733 -2.19 1.733 -2.19s-1.267 -1.038 -2.767 -.462c-1.5 .575 -1.733 2.19 -1.733 2.19s1.267 1.038 2.767 .462" />
+                                                    <path
+                                                        d="M2.906 12.14c1.281 1.266 3.016 .76 3.016 .76s.454 -1.772 -.828 -3.04c-1.281 -1.265 -3.016 -.76 -3.016 -.76s-.454 1.772 .828 3.04" />
+                                                    <path
+                                                        d="M5.48 5.23c-.292 1.666 1.02 2.77 1.02 2.77s1.603 -.563 1.895 -2.23c.292 -1.666 -1.02 -2.77 -1.02 -2.77s-1.603 .563 -1.895 2.23" />
                                                 </svg>
                                             </div>
                                             <div>
@@ -480,8 +522,7 @@
                             class="inline-flex items-center space-x-3 rounded-2xl border border-gray-200/50 bg-white/90 px-4 py-2 shadow-xl backdrop-blur-xl">
                             <div
                                 class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-green-600">
-                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
+                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11"
                                         stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
                                 </svg>
@@ -509,11 +550,11 @@
                                         <div
                                             class="mx-auto flex h-16 w-16 items-center justify-center rounded-full shadow-xl lg:h-20 lg:w-20">
                                             <!-- <svg class="h-8 w-8 text-white lg:h-10 lg:w-10" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                <path
-                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                                    stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
-                                            </svg> -->
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path
+                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                                </svg> -->
                                             <img src="{{ asset('asset/img/logo-ikmb.png') }}" alt="">
                                         </div>
                                     </div> --}}
@@ -527,8 +568,7 @@
                                 <!-- Login Form -->
                                 <form class="space-y-4 lg:space-y-6" wire:submit="login">
                                     <div class="space-y-4 lg:space-y-6">
-                                        <x-ts-input class="text-sm lg:text-base" icon="user"
-                                            label="Username / Email / NIM"
+                                        <x-ts-input class="text-sm lg:text-base" icon="user" label="Username / Email / NIM"
                                             placeholder="Masukkan username, email, atau NIM" required type="text"
                                             wire:model="username_or_email" />
 
@@ -539,10 +579,10 @@
                                     <div class="flex items-center justify-between pt-2">
                                         <x-ts-checkbox class="text-xs lg:text-sm" id="remember" label="Ingat saya"
                                             wire:model="remember" />
-                                        <!-- <a class="text-xs font-medium text-[{{ $companyData->color_primary }}] hover:text-green-700 lg:text-sm"
-                                            href="#">
-                                            Lupa Password?
-                                        </a> -->
+                                        <!-- <a class="text-xs font-medium text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-green-700 lg:text-sm"
+                                                href="#">
+                                                Lupa Password?
+                                            </a> -->
                                     </div>
 
                                     <div class="pt-4">
@@ -551,47 +591,70 @@
                                             icon="arrow-right" position="right" type="submit" loading="login">
                                             <x-slot:text>Masuk</x-slot:text>
                                         </x-ts-button>
-                                        {{-- <button class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base text-black bg-[{{ $company->color_primary }}]">
+                                        {{-- <button
+                                            class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base text-black bg-[{{ $company->color_primary }}]">
                                             Masuk
                                         </button> --}}
                                     </div>
                                 </form>
                                 <div class="mt-4 text-center">
                                     <a href="{{ route('register') }}"
-                                        class="text-[{{ $companyData->color_primary }}] hover:text-[#317354] text-sm">Buat
+                                        class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-[#317354] text-sm">Buat
                                         Akun ?</a>
                                 </div>
-                                
+
                                 @if($company->app_windows || $company->app_mac || $company->app_android || $company->app_ios)
-                                <div class="mt-6 border-t border-gray-100 pt-4">
-                                    <h3 class="text-xs font-semibold text-gray-500 text-center mb-3 uppercase tracking-wider">Download Aplikasi</h3>
-                                    <div class="flex justify-center flex-wrap gap-2">
-                                        @if($company->app_windows)
-                                            <a href="{{ Storage::url($company->app_windows) }}" class="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-xs font-medium hover:bg-green-100 transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                                                Windows
-                                            </a>
-                                        @endif
-                                        @if($company->app_mac)
-                                            <a href="{{ Storage::url($company->app_mac) }}" class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                                                Mac
-                                            </a>
-                                        @endif
-                                        @if($company->app_android)
-                                            <a href="{{ Storage::url($company->app_android) }}" class="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-xs font-medium hover:bg-green-100 transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6026 12.0253L13.7118 16.9946L16.2737 21.432C16.5959 20.9126 17.0628 20.4862 17.6186 20.1983C18.1744 19.9103 18.7951 19.7728 19.4211 19.8021C20.0471 19.8315 20.6517 20.0264 21.1628 20.3638L21.8491 20.8166C21.7259 20.5746 21.6575 20.3065 21.6526 20.0353V3.96464C21.6575 3.69345 21.7259 3.42531 21.8491 3.18337L21.1628 3.63618C20.6517 3.97354 20.0471 4.16843 19.4211 4.19782C18.7951 4.2272 18.1744 4.08972 17.6186 3.80173C17.0628 3.51374 16.5959 3.08731 16.2737 2.56793L13.7118 7.00532L16.6026 11.9746V12.0253Z"/></svg>
-                                                Android
-                                            </a>
-                                        @endif
-                                         @if($company->app_ios)
-                                            <a href="{{ Storage::url($company->app_ios) }}" class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-800 rounded-lg text-xs font-medium hover:bg-gray-200 transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.79-1.31.02-2.3-1.23-3.14-2.47-1.72-2.5-3.03-7.07-1.26-10.13 0.88-1.5 2.45-2.47 4.16-2.5 1.3 0 2.52.88 3.3.88 0.77 0 2.22-1.09 3.73-0.93 0.64.03 2.43.26 3.58 1.94-0.09.06-2.14 1.25-2.12 3.72 0.03 2.96 2.59 3.96 2.65 4-0.02.06-0.41 1.41-1.37 2.82h0ZM13 3.5c.67-.82 1.13-1.95 1.01-3.09-0.97.04-2.14.65-2.83 1.46-.61.7-1.12 1.83-0.99 3.05 1.08.08 2.18-.59 2.81-1.42h0Z"/></svg>
-                                                iOS
-                                            </a>
-                                        @endif
+                                    <div class="mt-6 border-t border-gray-100 pt-4">
+                                        <h3
+                                            class="text-xs font-semibold text-gray-500 text-center mb-3 uppercase tracking-wider">
+                                            Download Aplikasi</h3>
+                                        <div class="flex justify-center flex-wrap gap-2">
+                                            @if($company->app_windows)
+                                                <a href="{{ Storage::url($company->app_windows) }}"
+                                                    class="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-xs font-medium hover:bg-green-100 transition-colors">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                                    </svg>
+                                                    Windows
+                                                </a>
+                                            @endif
+                                            @if($company->app_mac)
+                                                <a href="{{ Storage::url($company->app_mac) }}"
+                                                    class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                                    </svg>
+                                                    Mac
+                                                </a>
+                                            @endif
+                                            @if($company->app_android)
+                                                <a href="{{ Storage::url($company->app_android) }}"
+                                                    class="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-xs font-medium hover:bg-green-100 transition-colors">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24"
+                                                        fill="currentColor">
+                                                        <path
+                                                            d="M16.6026 12.0253L13.7118 16.9946L16.2737 21.432C16.5959 20.9126 17.0628 20.4862 17.6186 20.1983C18.1744 19.9103 18.7951 19.7728 19.4211 19.8021C20.0471 19.8315 20.6517 20.0264 21.1628 20.3638L21.8491 20.8166C21.7259 20.5746 21.6575 20.3065 21.6526 20.0353V3.96464C21.6575 3.69345 21.7259 3.42531 21.8491 3.18337L21.1628 3.63618C20.6517 3.97354 20.0471 4.16843 19.4211 4.19782C18.7951 4.2272 18.1744 4.08972 17.6186 3.80173C17.0628 3.51374 16.5959 3.08731 16.2737 2.56793L13.7118 7.00532L16.6026 11.9746V12.0253Z" />
+                                                    </svg>
+                                                    Android
+                                                </a>
+                                            @endif
+                                            @if($company->app_ios)
+                                                <a href="{{ Storage::url($company->app_ios) }}"
+                                                    class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-800 rounded-lg text-xs font-medium hover:bg-gray-200 transition-colors">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24"
+                                                        fill="currentColor">
+                                                        <path
+                                                            d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.79-1.31.02-2.3-1.23-3.14-2.47-1.72-2.5-3.03-7.07-1.26-10.13 0.88-1.5 2.45-2.47 4.16-2.5 1.3 0 2.52.88 3.3.88 0.77 0 2.22-1.09 3.73-0.93 0.64.03 2.43.26 3.58 1.94-0.09.06-2.14 1.25-2.12 3.72 0.03 2.96 2.59 3.96 2.65 4-0.02.06-0.41 1.41-1.37 2.82h0ZM13 3.5c.67-.82 1.13-1.95 1.01-3.09-0.97.04-2.14.65-2.83 1.46-.61.7-1.12 1.83-0.99 3.05 1.08.08 2.18-.59 2.81-1.42h0Z" />
+                                                    </svg>
+                                                    iOS
+                                                </a>
+                                            @endif
+                                        </div>
                                     </div>
-                                </div>
                                 @endif
                             </div>
                         </div>
@@ -684,7 +747,8 @@
                                 {{-- <div class="relative">
                                     <div
                                         class="flex h-2 w-2 cursor-pointer items-center justify-center rounded-full border border-white bg-white p-1.5 backdrop-blur-sm transition-all duration-500 hover:rotate-6 hover:scale-110 hover:bg-white">
-                                        <img alt="Logo" class="w-full object-contain" loading="lazy" src="{{ asset('asset/img/logo-ikmb.png') }}">
+                                        <img alt="Logo" class="w-full object-contain" loading="lazy"
+                                            src="{{ asset('asset/img/logo-ikmb.png') }}">
                                     </div>
                                 </div> --}}
                                 <div class="">
@@ -699,21 +763,21 @@
                             <!-- Main Value Proposition -->
                             {{-- <div class="max-w-xl space-y-4 mt-[25%]">
                                 <!-- <h2 class="text-2xl font-bold leading-tight tracking-tight xl:text-3xl">
-                                    <span
-                                        class="block cursor-default text-white transition-colors duration-300 hover:text-green-200">Misi</span>
-                                    <span
-                                        class="inline-block cursor-default text-white/90 transition-all duration-300 hover:translate-x-2 hover:text-white">Bisnis
-                                        &</span>
-                                    <span
-                                        class="inline-block cursor-default text-white/80 transition-all duration-300 hover:translate-x-4 hover:text-white">Pemeliharaan</span>
-                                </h2>
+                                        <span
+                                            class="block cursor-default text-white transition-colors duration-300 hover:text-green-200">Misi</span>
+                                        <span
+                                            class="inline-block cursor-default text-white/90 transition-all duration-300 hover:translate-x-2 hover:text-white">Bisnis
+                                            &</span>
+                                        <span
+                                            class="inline-block cursor-default text-white/80 transition-all duration-300 hover:translate-x-4 hover:text-white">Pemeliharaan</span>
+                                    </h2>
 
-                                <p
-                                    class="cursor-default text-sm leading-relaxed text-white/90 transition-colors duration-300 hover:text-white xl:text-base">
-                                    Perusahaan layanan fasilitas bisnis dan pemeliharaan yang profesional & berpengalaman
-                                    sejak tahun 2004. Kami berkomitmen memberikan layanan terbaik untuk mengoptimalkan
-                                    pertumbuhan bisnis Anda dengan berbagai jenis layanan terintegrasi.
-                                </p> -->
+                                    <p
+                                        class="cursor-default text-sm leading-relaxed text-white/90 transition-colors duration-300 hover:text-white xl:text-base">
+                                        Perusahaan layanan fasilitas bisnis dan pemeliharaan yang profesional & berpengalaman
+                                        sejak tahun 2004. Kami berkomitmen memberikan layanan terbaik untuk mengoptimalkan
+                                        pertumbuhan bisnis Anda dengan berbagai jenis layanan terintegrasi.
+                                    </p> -->
 
 
 
@@ -750,9 +814,12 @@
                                         <div class="flex items-start space-x-3">
                                             <div
                                                 class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-purple-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-purple-400">
-                                                <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"  fill="none"  stroke="currentColor" class="icon icon-tabler icons-tabler-outline icon-tabler-school h-6 w-6">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                    <path d="M22 9l-10 -4l-10 4l10 4l10 -4v6" /><path d="M6 10.6v5.4a6 3 0 0 0 12 0v-5.4" />
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor"
+                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-school h-6 w-6">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                    <path d="M22 9l-10 -4l-10 4l10 4l10 -4v6" />
+                                                    <path d="M6 10.6v5.4a6 3 0 0 0 12 0v-5.4" />
                                                 </svg>
                                             </div>
                                             <div>
@@ -772,8 +839,25 @@
                                         <div class="flex items-start space-x-3">
                                             <div
                                                 class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-green-500 transition-all duration-300 group-hover/card:scale-110 group-hover/card:bg-green-400">
-                                                <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"  fill="none"  stroke="currentColor" class="icon icon-tabler icons-tabler-outline icon-tabler-laurel-wreath h-6 w-6">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6.436 8a8.6 8.6 0 0 0 -.436 2.727c0 4.017 2.686 7.273 6 7.273s6 -3.256 6 -7.273a8.6 8.6 0 0 0 -.436 -2.727" /><path d="M14.5 21s-.682 -3 -2.5 -3s-2.5 3 -2.5 3" /><path d="M18.52 5.23c.292 1.666 -1.02 2.77 -1.02 2.77s-1.603 -.563 -1.895 -2.23c-.292 -1.666 1.02 -2.77 1.02 -2.77s1.603 .563 1.895 2.23" /><path d="M21.094 12.14c-1.281 1.266 -3.016 .76 -3.016 .76s-.454 -1.772 .828 -3.04c1.28 -1.266 3.016 -.76 3.016 -.76s.454 1.772 -.828 3.04" /><path d="M17.734 18.826c-1.5 -.575 -1.734 -2.19 -1.734 -2.19s1.267 -1.038 2.767 -.462c1.5 .575 1.733 2.19 1.733 2.19s-1.267 1.038 -2.767 .462" /><path d="M6.267 18.826c1.5 -.575 1.733 -2.19 1.733 -2.19s-1.267 -1.038 -2.767 -.462c-1.5 .575 -1.733 2.19 -1.733 2.19s1.267 1.038 2.767 .462" /><path d="M2.906 12.14c1.281 1.266 3.016 .76 3.016 .76s.454 -1.772 -.828 -3.04c-1.281 -1.265 -3.016 -.76 -3.016 -.76s-.454 1.772 .828 3.04" /><path d="M5.48 5.23c-.292 1.666 1.02 2.77 1.02 2.77s1.603 -.563 1.895 -2.23c.292 -1.666 -1.02 -2.77 -1.02 -2.77s-1.603 .563 -1.895 2.23" />
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor"
+                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-laurel-wreath h-6 w-6">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                    <path
+                                                        d="M6.436 8a8.6 8.6 0 0 0 -.436 2.727c0 4.017 2.686 7.273 6 7.273s6 -3.256 6 -7.273a8.6 8.6 0 0 0 -.436 -2.727" />
+                                                    <path d="M14.5 21s-.682 -3 -2.5 -3s-2.5 3 -2.5 3" />
+                                                    <path
+                                                        d="M18.52 5.23c.292 1.666 -1.02 2.77 -1.02 2.77s-1.603 -.563 -1.895 -2.23c-.292 -1.666 1.02 -2.77 1.02 -2.77s1.603 .563 1.895 2.23" />
+                                                    <path
+                                                        d="M21.094 12.14c-1.281 1.266 -3.016 .76 -3.016 .76s-.454 -1.772 .828 -3.04c1.28 -1.266 3.016 -.76 3.016 -.76s.454 1.772 -.828 3.04" />
+                                                    <path
+                                                        d="M17.734 18.826c-1.5 -.575 -1.734 -2.19 -1.734 -2.19s1.267 -1.038 2.767 -.462c1.5 .575 1.733 2.19 1.733 2.19s-1.267 1.038 -2.767 .462" />
+                                                    <path
+                                                        d="M6.267 18.826c1.5 -.575 1.733 -2.19 1.733 -2.19s-1.267 -1.038 -2.767 -.462c-1.5 .575 -1.733 2.19 -1.733 2.19s1.267 1.038 2.767 .462" />
+                                                    <path
+                                                        d="M2.906 12.14c1.281 1.266 3.016 .76 3.016 .76s.454 -1.772 -.828 -3.04c-1.281 -1.265 -3.016 -.76 -3.016 -.76s-.454 1.772 .828 3.04" />
+                                                    <path
+                                                        d="M5.48 5.23c-.292 1.666 1.02 2.77 1.02 2.77s1.603 -.563 1.895 -2.23c.292 -1.666 -1.02 -2.77 -1.02 -2.77s-1.603 .563 -1.895 2.23" />
                                                 </svg>
                                             </div>
                                             <div>
@@ -889,19 +973,19 @@
                                         <div
                                             class="mx-auto flex h-16 w-16 items-center justify-center rounded-full shadow-xl lg:h-20 lg:w-20">
                                             <!-- <svg class="h-8 w-8 text-white lg:h-10 lg:w-10" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                <path
-                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                                    stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
-                                            </svg> -->
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path
+                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                                </svg> -->
                                             <img src="{{ asset('asset/img/logo-ikmb.png') }}" alt="">
                                         </div>
                                     </div> --}}
 
-                                    {{-- <h2 class="mb-1 text-xl font-bold text-gray-800 lg:mb-2 lg:text-2xl">PRO CBT</h2> --}}
+                                    {{-- <h2 class="mb-1 text-xl font-bold text-gray-800 lg:mb-2 lg:text-2xl">PRO CBT</h2>
+                                    --}}
                                     <div class="flex justify-center">
-                                        <img src="{{ asset('asset/img/logo-procbt.png') }}" alt=""
-                                            srcset="" class="w-48">
+                                        <img src="{{ asset('asset/img/logo-procbt.png') }}" alt="" srcset="" class="w-48">
                                     </div>
                                     {{-- <p class="text-sm text-gray-600 lg:text-base">Masuk ke sistem CBT</p> --}}
                                 </div>
@@ -910,8 +994,7 @@
                                 <!-- Login Form -->
                                 <form class="space-y-4 lg:space-y-6" wire:submit="login">
                                     <div class="space-y-4 lg:space-y-6">
-                                        <x-ts-input class="text-sm lg:text-base" icon="user"
-                                            label="Username / Email / NIM"
+                                        <x-ts-input class="text-sm lg:text-base" icon="user" label="Username / Email / NIM"
                                             placeholder="Masukkan username, email, atau NIM" required type="text"
                                             wire:model="username_or_email" />
 
@@ -923,9 +1006,9 @@
                                         <x-ts-checkbox class="text-xs lg:text-sm" id="remember" label="Ingat saya"
                                             wire:model="remember" />
                                         <!-- <a class="text-xs font-medium text-orange-500 hover:text-orange-700 lg:text-sm"
-                                            href="#">
-                                            Lupa Password?
-                                        </a> -->
+                                                href="#">
+                                                Lupa Password?
+                                            </a> -->
                                     </div>
 
                                     <div class="pt-4">
@@ -934,46 +1017,69 @@
                                             icon="arrow-right" position="right" type="submit" loading="login">
                                             <x-slot:text>Masuk</x-slot:text>
                                         </x-ts-button>
-                                        {{-- <button class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base text-black bg-[#3BA172]">
+                                        {{-- <button
+                                            class="w-full gap-x-2 rounded-xl text-sm font-semibold shadow-xl lg:text-base text-black bg-[#3BA172]">
                                             Masuk
                                         </button> --}}
                                     </div>
                                 </form>
                                 <!-- <div class="mt-4 text-center">
-                                    <a href="{{ route('register') }}"
-                                        class="text-orange-500 hover:text-orange-700 text-sm">Buat Akun ?</a>
-                                </div> -->
+                                        <a href="{{ route('register') }}"
+                                            class="text-orange-500 hover:text-orange-700 text-sm">Buat Akun ?</a>
+                                    </div> -->
 
                                 @if($company->app_windows || $company->app_mac || $company->app_android || $company->app_ios)
-                                <div class="mt-6 border-t border-gray-100 pt-4">
-                                    <h3 class="text-xs font-semibold text-gray-500 text-center mb-3 uppercase tracking-wider">Download Aplikasi</h3>
-                                    <div class="flex justify-center flex-wrap gap-2">
-                                        @if($company->app_windows)
-                                            <a href="{{ Storage::url($company->app_windows) }}" class="flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 text-orange-700 rounded-lg text-xs font-medium hover:bg-orange-100 transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                                                Windows
-                                            </a>
-                                        @endif
-                                        @if($company->app_mac)
-                                            <a href="{{ Storage::url($company->app_mac) }}" class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                                                Mac
-                                            </a>
-                                        @endif
-                                        @if($company->app_android)
-                                            <a href="{{ Storage::url($company->app_android) }}" class="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-xs font-medium hover:bg-green-100 transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6026 12.0253L13.7118 16.9946L16.2737 21.432C16.5959 20.9126 17.0628 20.4862 17.6186 20.1983C18.1744 19.9103 18.7951 19.7728 19.4211 19.8021C20.0471 19.8315 20.6517 20.0264 21.1628 20.3638L21.8491 20.8166C21.7259 20.5746 21.6575 20.3065 21.6526 20.0353V3.96464C21.6575 3.69345 21.7259 3.42531 21.8491 3.18337L21.1628 3.63618C20.6517 3.97354 20.0471 4.16843 19.4211 4.19782C18.7951 4.2272 18.1744 4.08972 17.6186 3.80173C17.0628 3.51374 16.5959 3.08731 16.2737 2.56793L13.7118 7.00532L16.6026 11.9746V12.0253Z"/></svg>
-                                                Android
-                                            </a>
-                                        @endif
-                                         @if($company->app_ios)
-                                            <a href="{{ Storage::url($company->app_ios) }}" class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-800 rounded-lg text-xs font-medium hover:bg-gray-200 transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.79-1.31.02-2.3-1.23-3.14-2.47-1.72-2.5-3.03-7.07-1.26-10.13 0.88-1.5 2.45-2.47 4.16-2.5 1.3 0 2.52.88 3.3.88 0.77 0 2.22-1.09 3.73-0.93 0.64.03 2.43.26 3.58 1.94-0.09.06-2.14 1.25-2.12 3.72 0.03 2.96 2.59 3.96 2.65 4-0.02.06-0.41 1.41-1.37 2.82h0ZM13 3.5c.67-.82 1.13-1.95 1.01-3.09-0.97.04-2.14.65-2.83 1.46-.61.7-1.12 1.83-0.99 3.05 1.08.08 2.18-.59 2.81-1.42h0Z"/></svg>
-                                                iOS
-                                            </a>
-                                        @endif
+                                    <div class="mt-6 border-t border-gray-100 pt-4">
+                                        <h3
+                                            class="text-xs font-semibold text-gray-500 text-center mb-3 uppercase tracking-wider">
+                                            Download Aplikasi</h3>
+                                        <div class="flex justify-center flex-wrap gap-2">
+                                            @if($company->app_windows)
+                                                <a href="{{ Storage::url($company->app_windows) }}"
+                                                    class="flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 text-orange-700 rounded-lg text-xs font-medium hover:bg-orange-100 transition-colors">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                                    </svg>
+                                                    Windows
+                                                </a>
+                                            @endif
+                                            @if($company->app_mac)
+                                                <a href="{{ Storage::url($company->app_mac) }}"
+                                                    class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                                    </svg>
+                                                    Mac
+                                                </a>
+                                            @endif
+                                            @if($company->app_android)
+                                                <a href="{{ Storage::url($company->app_android) }}"
+                                                    class="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-xs font-medium hover:bg-green-100 transition-colors">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24"
+                                                        fill="currentColor">
+                                                        <path
+                                                            d="M16.6026 12.0253L13.7118 16.9946L16.2737 21.432C16.5959 20.9126 17.0628 20.4862 17.6186 20.1983C18.1744 19.9103 18.7951 19.7728 19.4211 19.8021C20.0471 19.8315 20.6517 20.0264 21.1628 20.3638L21.8491 20.8166C21.7259 20.5746 21.6575 20.3065 21.6526 20.0353V3.96464C21.6575 3.69345 21.7259 3.42531 21.8491 3.18337L21.1628 3.63618C20.6517 3.97354 20.0471 4.16843 19.4211 4.19782C18.7951 4.2272 18.1744 4.08972 17.6186 3.80173C17.0628 3.51374 16.5959 3.08731 16.2737 2.56793L13.7118 7.00532L16.6026 11.9746V12.0253Z" />
+                                                    </svg>
+                                                    Android
+                                                </a>
+                                            @endif
+                                            @if($company->app_ios)
+                                                <a href="{{ Storage::url($company->app_ios) }}"
+                                                    class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-800 rounded-lg text-xs font-medium hover:bg-gray-200 transition-colors">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24"
+                                                        fill="currentColor">
+                                                        <path
+                                                            d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.79-1.31.02-2.3-1.23-3.14-2.47-1.72-2.5-3.03-7.07-1.26-10.13 0.88-1.5 2.45-2.47 4.16-2.5 1.3 0 2.52.88 3.3.88 0.77 0 2.22-1.09 3.73-0.93 0.64.03 2.43.26 3.58 1.94-0.09.06-2.14 1.25-2.12 3.72 0.03 2.96 2.59 3.96 2.65 4-0.02.06-0.41 1.41-1.37 2.82h0ZM13 3.5c.67-.82 1.13-1.95 1.01-3.09-0.97.04-2.14.65-2.83 1.46-.61.7-1.12 1.83-0.99 3.05 1.08.08 2.18-.59 2.81-1.42h0Z" />
+                                                    </svg>
+                                                    iOS
+                                                </a>
+                                            @endif
+                                        </div>
                                     </div>
-                                </div>
                                 @endif
 
                             </div>
@@ -1014,16 +1120,13 @@
         </div>
     @else
         <div class="min-h-screen flex items-center justify-center p-4">
-            <div
-                class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-lg p-6 relative overflow-hidden">
+            <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-lg p-6 relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#1E3A8A] to-[#C3D4EC]"></div>
 
                 <!-- Logo & Welcome -->
                 <div class="flex flex-col items-center mb-6">
-                    <img src="{{ asset('asset/img/LogoPROCBT.png') }}" alt="Logo PRO CBT"
-                        class="h-12 drop-shadow-md mb-4">
-                    <h1
-                        class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
+                    <img src="{{ asset('asset/img/LogoPROCBT.png') }}" alt="Logo PRO CBT" class="h-12 drop-shadow-md mb-4">
+                    <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
                         Selamat Datang Kembali!</h1>
                     <p class="text-gray-600 text-sm">Akses dashboard admin Anda dengan aman</p>
                 </div>
@@ -1055,8 +1158,7 @@
                     <!-- Email -->
                     <div>
                         <div class="relative">
-                            <input autocomplete="off" type="text" name="username_or_email"
-                                wire:model='username_or_email'
+                            <input autocomplete="off" type="text" name="username_or_email" wire:model='username_or_email'
                                 class="input-style w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1E3A8A]/20 focus:border-[#1E3A8A] transition-all bg-white/50"
                                 placeholder="Username or Email">
                             <div class="absolute inset-y-0 right-3 flex items-center text-gray-400">
@@ -1086,9 +1188,8 @@
                                         d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    <path class="eye-line" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2" d="M3 3l18 18"
-                                        :style="showPassword ? 'opacity: 0' : 'opacity: 1'" />
+                                    <path class="eye-line" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 3l18 18" :style="showPassword ? 'opacity: 0' : 'opacity: 1'" />
                                 </svg>
                             </button>
                         </div>
@@ -1116,9 +1217,8 @@
                                             str_pad(dechex(rand(0, 255)), 2, '0', STR_PAD_LEFT) .
                                             str_pad(dechex(rand(0, 255)), 2, '0', STR_PAD_LEFT);
                                     @endphp
-                                    <span class="font-bold tracking-wider select-none"
-                                        style="color: {{ $randomColor }};" oncontextmenu="return false"
-                                        onselectstart="return false">{{ $char }}</span>
+                                    <span class="font-bold tracking-wider select-none" style="color: {{ $randomColor }};"
+                                        oncontextmenu="return false" onselectstart="return false">{{ $char }}</span>
                                 @endforeach
                             </div>
                         </div>
@@ -1131,12 +1231,12 @@
                     <div class="flex items-center justify-between">
                         <label class="flex items-center">
                             <input autocomplete="off" type="checkbox" name="remember"
-                                class="rounded border-gray-300 text-[{{ $companyData->color_primary }}] focus:ring-[#1E3A8A]/20"
+                                class="rounded border-gray-300 text-[{{ $companyData->color_primary ?? '#f58634' }}] focus:ring-[#1E3A8A]/20"
                                 wire:model='remember'>
                             <span class="ml-2 text-sm text-gray-600">Ingat saya</span>
                         </label>
                         <a href="#"
-                            class="text-sm text-[{{ $companyData->color_primary }}] hover:text-[#2563EB] transition-colors">Lupa
+                            class="text-sm text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:text-[#2563EB] transition-colors">Lupa
                             kata
                             sandi?</a>
                     </div>
@@ -1152,42 +1252,63 @@
                         <p class="text-sm text-gray-600">
                             Belum punya akun?
                             <a href="{{ route('register') }}"
-                                class="text-[{{ $companyData->color_primary }}] hover:underline font-semibold">Daftar
+                                class="text-[{{ $companyData->color_primary ?? '#f58634' }}] hover:underline font-semibold">Daftar
                                 di
                                 sini</a>
                         </p>
                     </div>
 
                     @if($company->app_windows || $company->app_mac || $company->app_android || $company->app_ios)
-                    <div class="mt-6 border-t border-gray-100 pt-4">
-                        <h3 class="text-xs font-semibold text-gray-500 text-center mb-3 uppercase tracking-wider">Download Aplikasi</h3>
-                        <div class="flex justify-center flex-wrap gap-2">
-                            @if($company->app_windows)
-                                <a href="{{ Storage::url($company->app_windows) }}" class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                                    Windows
-                                </a>
-                            @endif
-                            @if($company->app_mac)
-                                <a href="{{ Storage::url($company->app_mac) }}" class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                                    Mac
-                                </a>
-                            @endif
-                            @if($company->app_android)
-                                <a href="{{ Storage::url($company->app_android) }}" class="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-xs font-medium hover:bg-green-100 transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6026 12.0253L13.7118 16.9946L16.2737 21.432C16.5959 20.9126 17.0628 20.4862 17.6186 20.1983C18.1744 19.9103 18.7951 19.7728 19.4211 19.8021C20.0471 19.8315 20.6517 20.0264 21.1628 20.3638L21.8491 20.8166C21.7259 20.5746 21.6575 20.3065 21.6526 20.0353V3.96464C21.6575 3.69345 21.7259 3.42531 21.8491 3.18337L21.1628 3.63618C20.6517 3.97354 20.0471 4.16843 19.4211 4.19782C18.7951 4.2272 18.1744 4.08972 17.6186 3.80173C17.0628 3.51374 16.5959 3.08731 16.2737 2.56793L13.7118 7.00532L16.6026 11.9746V12.0253Z"/></svg>
-                                    Android
-                                </a>
-                            @endif
+                        <div class="mt-6 border-t border-gray-100 pt-4">
+                            <h3 class="text-xs font-semibold text-gray-500 text-center mb-3 uppercase tracking-wider">Download
+                                Aplikasi</h3>
+                            <div class="flex justify-center flex-wrap gap-2">
+                                @if($company->app_windows)
+                                    <a href="{{ Storage::url($company->app_windows) }}"
+                                        class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                        Windows
+                                    </a>
+                                @endif
+                                @if($company->app_mac)
+                                    <a href="{{ Storage::url($company->app_mac) }}"
+                                        class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                        Mac
+                                    </a>
+                                @endif
+                                @if($company->app_android)
+                                    <a href="{{ Storage::url($company->app_android) }}"
+                                        class="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-xs font-medium hover:bg-green-100 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24"
+                                            fill="currentColor">
+                                            <path
+                                                d="M16.6026 12.0253L13.7118 16.9946L16.2737 21.432C16.5959 20.9126 17.0628 20.4862 17.6186 20.1983C18.1744 19.9103 18.7951 19.7728 19.4211 19.8021C20.0471 19.8315 20.6517 20.0264 21.1628 20.3638L21.8491 20.8166C21.7259 20.5746 21.6575 20.3065 21.6526 20.0353V3.96464C21.6575 3.69345 21.7259 3.42531 21.8491 3.18337L21.1628 3.63618C20.6517 3.97354 20.0471 4.16843 19.4211 4.19782C18.7951 4.2272 18.1744 4.08972 17.6186 3.80173C17.0628 3.51374 16.5959 3.08731 16.2737 2.56793L13.7118 7.00532L16.6026 11.9746V12.0253Z" />
+                                        </svg>
+                                        Android
+                                    </a>
+                                @endif
                                 @if($company->app_ios)
-                                <a href="{{ Storage::url($company->app_ios) }}" class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-800 rounded-lg text-xs font-medium hover:bg-gray-200 transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.79-1.31.02-2.3-1.23-3.14-2.47-1.72-2.5-3.03-7.07-1.26-10.13 0.88-1.5 2.45-2.47 4.16-2.5 1.3 0 2.52.88 3.3.88 0.77 0 2.22-1.09 3.73-0.93 0.64.03 2.43.26 3.58 1.94-0.09.06-2.14 1.25-2.12 3.72 0.03 2.96 2.59 3.96 2.65 4-0.02.06-0.41 1.41-1.37 2.82h0ZM13 3.5c.67-.82 1.13-1.95 1.01-3.09-0.97.04-2.14.65-2.83 1.46-.61.7-1.12 1.83-0.99 3.05 1.08.08 2.18-.59 2.81-1.42h0Z"/></svg>
-                                    iOS
-                                </a>
-                            @endif
+                                    <a href="{{ Storage::url($company->app_ios) }}"
+                                        class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-800 rounded-lg text-xs font-medium hover:bg-gray-200 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24"
+                                            fill="currentColor">
+                                            <path
+                                                d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.79-1.31.02-2.3-1.23-3.14-2.47-1.72-2.5-3.03-7.07-1.26-10.13 0.88-1.5 2.45-2.47 4.16-2.5 1.3 0 2.52.88 3.3.88 0.77 0 2.22-1.09 3.73-0.93 0.64.03 2.43.26 3.58 1.94-0.09.06-2.14 1.25-2.12 3.72 0.03 2.96 2.59 3.96 2.65 4-0.02.06-0.41 1.41-1.37 2.82h0ZM13 3.5c.67-.82 1.13-1.95 1.01-3.09-0.97.04-2.14.65-2.83 1.46-.61.7-1.12 1.83-0.99 3.05 1.08.08 2.18-.59 2.81-1.42h0Z" />
+                                        </svg>
+                                        iOS
+                                    </a>
+                                @endif
+                            </div>
                         </div>
-                    </div>
                     @endif
                 </form>
 

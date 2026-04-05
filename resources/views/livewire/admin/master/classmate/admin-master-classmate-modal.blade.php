@@ -67,14 +67,13 @@
                             class="text-red-600">*</span></label>
                     <div wire:key="select-{{ rand() }}">
                         <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
-                            dropdownParent: 'body',
-                            allowClear: true,
-                            plugins: ['clear_button'],
-                            onChange: function(e) {
-                                @this.set('user_id', e ? e : '');
-                            }
-                        });"
-                            wire:model.lazy="user_id" id="user_id">
+                                dropdownParent: 'body',
+                                allowClear: true,
+                                plugins: ['clear_button'],
+                                onChange: function(e) {
+                                    @this.set('user_id', e ? e : '');
+                                }
+                            });" wire:model.lazy="user_id" id="user_id">
                             <option value="">-- Pilih Dosen --</option>
                             @foreach ($users as $key_user => $user)
                                 <option value="{{ $key_user }}">{{ $user }}</option>
@@ -87,7 +86,8 @@
                 </div>
                 <div class="mb-4">
                     <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
-                    <textarea id="description" wire:model.defer="description" placeholder="Deskripsi Peserta" class="mt-1 form-control"></textarea>
+                    <textarea id="description" wire:model.defer="description" placeholder="Deskripsi Peserta"
+                        class="mt-1 form-control"></textarea>
                     @error('description')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -104,7 +104,8 @@
                 </div>
                 <div class="mb-4">
                     <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
-                    <textarea id="description" wire:model.defer="description" placeholder="Deskripsi Peserta" class="mt-1 form-control"></textarea>
+                    <textarea id="description" wire:model.defer="description" placeholder="Deskripsi Peserta"
+                        class="mt-1 form-control"></textarea>
                     @error('description')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -119,7 +120,7 @@
                 Batal
             </button>
             <button wire:click='submit'
-                class="px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_primary }}] text-white rounded-lg shadow transition">
+                class="px-4 py-2 bg-[{{ $companyData->color_primary ?? '#f58634' }}] hover:bg-[{{ $companyData->color_primary ?? '#f58634' }}] text-white rounded-lg shadow transition">
                 Simpan
             </button>
         </div>

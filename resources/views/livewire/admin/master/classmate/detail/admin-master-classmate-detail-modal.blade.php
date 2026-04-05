@@ -6,7 +6,8 @@
         <!-- Header -->
         <div class="flex justify-between items-center p-6 border-b flex-shrink-0">
             <div class="flex items-center gap-2">
-                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M13 16h-1v-4h-1m1-4h.01M12 20.5C6.753 20.5 2.5 16.247 2.5 11S6.753 1.5 12 1.5 21.5 5.753 21.5 11 17.247 20.5 12 20.5z" />
                 </svg>
@@ -33,8 +34,12 @@
                 <!-- Table Section -->
                 <div class="bg-white rounded-lg shadow border">
                     <div class="flex items-center justify-end gap-2 px-5 py-3 border-b bg-gray-50/70">
-                        {{-- <button type="button" wire:click="toggleSelectAllOnPage(true)" class="px-3 py-1.5 text-sm rounded-md bg-green-600 text-white hover:bg-green-700 focus:outline-none">Pilih Semua</button>
-                        <button type="button" wire:click="toggleSelectAllOnPage(false)" class="px-3 py-1.5 text-sm rounded-md bg-gray-600 text-white hover:bg-gray-700 focus:outline-none">Batalkan Semua</button>
+                        {{-- <button type="button" wire:click="toggleSelectAllOnPage(true)"
+                            class="px-3 py-1.5 text-sm rounded-md bg-green-600 text-white hover:bg-green-700 focus:outline-none">Pilih
+                            Semua</button>
+                        <button type="button" wire:click="toggleSelectAllOnPage(false)"
+                            class="px-3 py-1.5 text-sm rounded-md bg-gray-600 text-white hover:bg-gray-700 focus:outline-none">Batalkan
+                            Semua</button>
                         <span class="mx-2 text-gray-400">|</span> --}}
                         <button type="button" wire:click="toggleSelectAllAllPages(true)"
                             class="px-3 py-1.5 text-sm rounded-md bg-emerald-600 text-white hover:bg-emerald-700 focus:outline-none">Pilih
@@ -117,7 +122,7 @@
                     Batal
                 </button>
                 <button wire:click='submitModuleStudent()'
-                    class="px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_primary }}] text-white rounded-lg shadow transition">
+                    class="px-4 py-2 bg-[{{ $companyData->color_primary ?? '#f58634' }}] hover:bg-[{{ $companyData->color_primary ?? '#f58634' }}] text-white rounded-lg shadow transition">
                     Simpan
                 </button>
             </div>

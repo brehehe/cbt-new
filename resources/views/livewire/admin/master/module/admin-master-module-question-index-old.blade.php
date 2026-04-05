@@ -6,7 +6,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1
-                    class="text-2xl font-bold bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_primary }}] text-white rounded-lg shadow transition">
+                    class="text-2xl font-bold bg-[{{ $companyData->color_primary ?? '#f58634' }}] hover:bg-[{{ $companyData->color_primary ?? '#f58634' }}] text-white rounded-lg shadow transition">
                     Data Modul</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
@@ -37,9 +37,7 @@
                             onChange: function(e) {
                                 @this.set('question_type_id', e ? e : '');
                             }
-                        });"
-                            wire:model.live="question_type_id" id="question_type_id"
-                            {{ !empty($module_questions) ? 'disabled' : '' }}>
+                        });" wire:model.live="question_type_id" id="question_type_id" {{ !empty($module_questions) ? 'disabled' : '' }}>
                             <option value="">Pilih Topik Soal</option>
                             @foreach ($question_types as $question_type)
                                 <option value="{{ $question_type?->id }}">{{ $question_type?->name }}</option>
@@ -93,7 +91,8 @@
                 <div class="md:col-span-2">
                     <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi Modul
                         Soal</label>
-                    <textarea id="description" wire:model="description" placeholder="Deskripsi modul soal..." class="mt-1 form-control"></textarea>
+                    <textarea id="description" wire:model="description" placeholder="Deskripsi modul soal..."
+                        class="mt-1 form-control"></textarea>
                     @error('description')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -120,13 +119,12 @@
                             class="text-red-600">*</span></label>
                     <div wire:key="select-{{ rand() }}">
                         <select disabled class="mt-1 form-control w-full" x-data x-ref="input" x-init="$($refs.input).selectize({
-                            dropdownParent: 'body',
-                            allowClear: true,
-                            onChange: function(e) {
-                                @this.set('studys', e ? e : '');
-                            }
-                        });"
-                            wire:model.live="studys" id="studys" multiple>
+                                dropdownParent: 'body',
+                                allowClear: true,
+                                onChange: function(e) {
+                                    @this.set('studys', e ? e : '');
+                                }
+                            });" wire:model.live="studys" id="studys" multiple>
                             <option value="">Pilih Prodi</option>
                             @foreach ($get_studys as $key_get_study => $get_study)
                                 <option value="{{ $key_get_study }}">{{ $get_study }}</option>
@@ -167,35 +165,27 @@
                                     </td>
                                     <td>{{ $category_question->name }}</td>
                                     <td class="center">
-                                        <input type="number" min="0"
-                                            class="mt-1 form-control w-24 text-center"
+                                        <input type="number" min="0" class="mt-1 form-control w-24 text-center"
                                             wire:model.live="category_question_settings.{{ $category_question->id }}.default"
-                                            max="{{ $limits['default'] ?? 0 }}"
-                                            @disabled(!($settings['enabled'] ?? false) || ($limits['default'] ?? 0) === 0)>
+                                            max="{{ $limits['default'] ?? 0 }}" @disabled(!($settings['enabled'] ?? false) || ($limits['default'] ?? 0) === 0)>
                                         <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['default'] ?? 0 }}</div>
                                     </td>
                                     <td class="center">
-                                        <input type="number" min="0"
-                                            class="mt-1 form-control w-24 text-center"
+                                        <input type="number" min="0" class="mt-1 form-control w-24 text-center"
                                             wire:model.live="category_question_settings.{{ $category_question->id }}.easy"
-                                            max="{{ $limits['easy'] ?? 0 }}"
-                                            @disabled(!($settings['enabled'] ?? false) || ($limits['easy'] ?? 0) === 0)>
+                                            max="{{ $limits['easy'] ?? 0 }}" @disabled(!($settings['enabled'] ?? false) || ($limits['easy'] ?? 0) === 0)>
                                         <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['easy'] ?? 0 }}</div>
                                     </td>
                                     <td class="center">
-                                        <input type="number" min="0"
-                                            class="mt-1 form-control w-24 text-center"
+                                        <input type="number" min="0" class="mt-1 form-control w-24 text-center"
                                             wire:model.live="category_question_settings.{{ $category_question->id }}.medium"
-                                            max="{{ $limits['medium'] ?? 0 }}"
-                                            @disabled(!($settings['enabled'] ?? false) || ($limits['medium'] ?? 0) === 0)>
+                                            max="{{ $limits['medium'] ?? 0 }}" @disabled(!($settings['enabled'] ?? false) || ($limits['medium'] ?? 0) === 0)>
                                         <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['medium'] ?? 0 }}</div>
                                     </td>
                                     <td class="center">
-                                        <input type="number" min="0"
-                                            class="mt-1 form-control w-24 text-center"
+                                        <input type="number" min="0" class="mt-1 form-control w-24 text-center"
                                             wire:model.live="category_question_settings.{{ $category_question->id }}.hard"
-                                            max="{{ $limits['hard'] ?? 0 }}"
-                                            @disabled(!($settings['enabled'] ?? false) || ($limits['hard'] ?? 0) === 0)>
+                                            max="{{ $limits['hard'] ?? 0 }}" @disabled(!($settings['enabled'] ?? false) || ($limits['hard'] ?? 0) === 0)>
                                         <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['hard'] ?? 0 }}</div>
                                     </td>
                                 </tr>
@@ -221,10 +211,9 @@
                         <option value="50">50</option>
                         <option value="100">100</option>
                     </select>
-                    <span class="text-sm text-gray-700 ml-2">data</span>                    
+                    <span class="text-sm text-gray-700 ml-2">data</span>
                     <div>
-                        <h1
-                            class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
+                        <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
                             Data Soal</h1>
                         <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p>
                     </div>

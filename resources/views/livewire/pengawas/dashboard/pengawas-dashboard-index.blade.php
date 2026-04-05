@@ -189,8 +189,7 @@
     <div class="mb-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1
-                    class="text-3xl font-bold text-[{{ $companyData->color_primary }}]">
+                <h1 class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
                     Monitoring Center - {{ Auth::user()->name ?? 'Pengawas' }}
                 </h1>
                 <p class="text-gray-600 mt-1">Pantau ujian dan deteksi pelanggaran secara real-time</p>
@@ -212,7 +211,7 @@
                 <label class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" id="autoRefresh" class="sr-only peer" checked>
                     <div
-                        class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#f58634]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[{{ $companyData->color_primary }}] ">
+                        class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#f58634]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[{{ $companyData->color_primary ?? '#f58634' }}] ">
                     </div>
                     <span class="ml-3 text-sm font-medium text-gray-600">Auto Refresh</span>
                 </label>
@@ -234,17 +233,17 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Peserta Aktif</p>
-                    <h3
-                        class="text-3xl font-bold text-[{{ $companyData->color_primary }}]">
-                        {{ $activeExaminees ?? 0 }}</h3>
+                    <h3 class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                        {{ $activeExaminees ?? 0 }}
+                    </h3>
                     <div class="flex items-center mt-2">
                         <div class="w-2 h-2 bg-green-500 rounded-full pulse-dot mr-2"></div>
                         <span class="text-xs text-green-600">{{ $onlineStudents ?? 0 }} online</span>
                     </div>
                 </div>
                 <div class="bg-gradient-to-br from-[#f58634]/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
-                    <svg class="w-8 h-8 text-[{{ $companyData->color_primary }}]"
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-8 h-8 text-[{{ $companyData->color_primary ?? '#f58634' }}]" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
                         </path>
@@ -259,9 +258,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Peringatan Keamanan</p>
-                    <h3
-                        class="text-3xl font-bold text-[{{ $companyData->color_primary }}]">
-                        {{ $securityAlerts ?? 0 }}</h3>
+                    <h3 class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                        {{ $securityAlerts ?? 0 }}
+                    </h3>
                     <div class="flex items-center mt-2">
                         @if (($criticalAlerts ?? 0) > 0)
                             <div class="w-2 h-2 bg-red-500 rounded-full pulse-dot mr-2"></div>
@@ -287,9 +286,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Masalah Kamera</p>
-                    <h3
-                        class="text-3xl font-bold text-[{{ $companyData->color_primary }}]">
-                        {{ $cameraIssues ?? 0 }}</h3>
+                    <h3 class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                        {{ $cameraIssues ?? 0 }}
+                    </h3>
                     <div class="flex items-center mt-2">
                         <span class="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
                             {{ $workingCameras ?? 0 }} berfungsi
@@ -312,9 +311,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Ruang Ujian Aktif</p>
-                    <h3
-                        class="text-3xl font-bold text-[{{ $companyData->color_primary }}]">
-                        {{ $activeRooms ?? 0 }}</h3>
+                    <h3 class="text-3xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
+                        {{ $activeRooms ?? 0 }}
+                    </h3>
                     <div class="flex items-center mt-2">
                         <span class="text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded-full">
                             {{ $totalRooms ?? 0 }} total ruang
@@ -416,8 +415,7 @@
                         <div class="camera-preview">
                             @if ($student['camera_status'] === 'online')
                                 <div class="text-white text-xs text-center">
-                                    <svg class="w-6 h-6 mx-auto mb-1" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
+                                    <svg class="w-6 h-6 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
                                         </path>
@@ -426,8 +424,7 @@
                                 </div>
                             @else
                                 <div class="text-gray-400 text-xs text-center">
-                                    <svg class="w-6 h-6 mx-auto mb-1" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
+                                    <svg class="w-6 h-6 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18 21l-3-3m-12.728-12.728L3 3l3 3">
                                         </path>
@@ -455,8 +452,7 @@
                             @if (isset($student['alerts']) && count($student['alerts']) > 0)
                                 <div class="mt-2">
                                     @foreach ($student['alerts'] as $alert)
-                                        <span
-                                            class="inline-block bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full mr-1 mb-1">
+                                        <span class="inline-block bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full mr-1 mb-1">
                                             {{ $alert }}
                                         </span>
                                     @endforeach
@@ -515,8 +511,7 @@
             @else
                 <div class="text-center text-gray-500 py-8">
                     <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
@@ -539,21 +534,18 @@
                                 <div
                                     class="w-8 h-8 {{ $status['status'] === 'normal' ? 'bg-green-100' : ($status['status'] === 'warning' ? 'bg-yellow-100' : 'bg-red-100') }} rounded-lg flex items-center justify-center">
                                     @if ($status['status'] === 'normal')
-                                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M5 13l4 4L19 7"></path>
                                         </svg>
                                     @elseif($status['status'] === 'warning')
-                                        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z">
                                             </path>
                                         </svg>
                                     @else
-                                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M6 18L18 6M6 6l12 12"></path>
                                         </svg>
@@ -600,7 +592,7 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Initialize Monitoring Chart
             const ctx = document.getElementById('monitoringChart');
             if (ctx) {
@@ -688,7 +680,7 @@
             }
 
             if (autoRefreshToggle) {
-                autoRefreshToggle.addEventListener('change', function() {
+                autoRefreshToggle.addEventListener('change', function () {
                     if (this.checked) {
                         startAutoRefresh();
                     } else {
@@ -710,7 +702,7 @@
 
             // Student tile click handlers
             document.querySelectorAll('.student-tile').forEach(tile => {
-                tile.addEventListener('click', function() {
+                tile.addEventListener('click', function () {
                     // Open detailed monitoring view for student
                     console.log('Opening detailed view for student');
                 });
@@ -718,7 +710,7 @@
 
             // Quick action button handlers
             document.querySelectorAll('.quick-action-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     // Handle quick actions
                     console.log('Quick action clicked:', this.textContent);
                 });

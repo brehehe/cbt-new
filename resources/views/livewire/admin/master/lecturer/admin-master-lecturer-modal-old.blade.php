@@ -58,8 +58,8 @@
             </div>
             <div class="mb-4">
                 <label for="password" class="block text-sm font-medium text-gray-700">Password @if (!$data_id)
-                        <span class="text-red-600">*</span>
-                    @else
+                    <span class="text-red-600">*</span>
+                @else
                     @endif
                 </label>
                 <div x-data="{ show: false }" class="relative">
@@ -84,9 +84,10 @@
             {{-- <div class="mb-4">
                 <label for="address" class="block text-sm font-medium text-gray-700">Alamat <span
                         class="text-red-600">*</span></label>
-                <textarea id="address" wire:model.defer="address" placeholder="Contoh : Jl. Raya No. 123" class="mt-1 form-control"></textarea>
+                <textarea id="address" wire:model.defer="address" placeholder="Contoh : Jl. Raya No. 123"
+                    class="mt-1 form-control"></textarea>
                 @error('address')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
             </div> --}}
         </div>
@@ -98,7 +99,7 @@
                 Batal
             </button>
             <button wire:click='submit'
-                class="px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_primary }}] text-white rounded-lg shadow transition">
+                class="px-4 py-2 bg-[{{ $companyData->color_primary ?? '#f58634' }}] hover:bg-[{{ $companyData->color_primary ?? '#f58634' }}] text-white rounded-lg shadow transition">
                 Simpan
             </button>
         </div>

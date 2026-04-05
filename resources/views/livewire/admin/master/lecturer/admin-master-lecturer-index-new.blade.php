@@ -3,8 +3,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1
-                    class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
+                <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
                     Manajemen Data Dosen</h1>
                 <p class="text-gray-600">Kelola data dosen dalam sistem CBT</p>
             </div>
@@ -113,8 +112,7 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-10 w-10">
-                                        <div
-                                            class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                        <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
                                             <span class="text-sm font-medium text-blue-700">
                                                 {{ substr($lecturer->name, 0, 2) }}
                                             </span>
@@ -130,19 +128,23 @@
                                 <div class="text-sm text-gray-900">{{ $lecturer->userDetail->lecturer_id ?? '-' }}
                                 </div>
                                 <div class="text-sm text-gray-500">NIDN:
-                                    {{ $lecturer->userDetail->lecturer_nidn ?? '-' }}</div>
+                                    {{ $lecturer->userDetail->lecturer_nidn ?? '-' }}
+                                </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">
-                                    {{ $lecturer->userDetail->lecturer_department ?? '-' }}</div>
+                                    {{ $lecturer->userDetail->lecturer_department ?? '-' }}
+                                </div>
                                 <div class="text-sm text-gray-500">{{ $lecturer->userDetail->lecturer_faculty ?? '-' }}
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">
-                                    {{ $lecturer->userDetail->lecturer_position ?? '-' }}</div>
+                                    {{ $lecturer->userDetail->lecturer_position ?? '-' }}
+                                </div>
                                 <div class="text-sm text-gray-500">
-                                    {{ $lecturer->userDetail->lecturer_education_level ?? '-' }}</div>
+                                    {{ $lecturer->userDetail->lecturer_education_level ?? '-' }}
+                                </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ $lecturer->userDetail->lecturer_specialization ?? '-' }}

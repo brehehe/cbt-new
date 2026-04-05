@@ -25,8 +25,8 @@
                 <div class="mb-4">
                     <label for="name" class="block text-sm font-medium text-gray-700">Nama Lengkap <span
                             class="text-red-600">*</span></label>
-                    <input id="name" type="text" wire:model.defer="name"
-                        placeholder="Contoh : Dr. Ahmad Suharto" class="mt-1 form-control">
+                    <input id="name" type="text" wire:model.defer="name" placeholder="Contoh : Dr. Ahmad Suharto"
+                        class="mt-1 form-control">
                     @error('name')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -93,8 +93,7 @@
                             onChange: function(e) {
                                 @this.set('studys', e ? e : '');
                             }
-                        });"
-                            wire:model.live="studys" id="studys" multiple>
+                        });" wire:model.live="studys" id="studys" multiple>
                             <option value="">Pilih Prodi</option>
                             @foreach ($getStudys as $key_get_study => $getStudy)
                                 <option value="{{ $key_get_study }}">{{ $getStudy }}</option>
@@ -108,9 +107,8 @@
                 <div class="mb-4">
                     <label for="lecturer_functional_position" class="block text-sm font-medium text-gray-700">Jabatan
                         Fungsional</label>
-                    <input id="lecturer_functional_position" type="text"
-                        wire:model.defer="lecturer_functional_position" placeholder="Contoh : Pengajar Ahli Utama"
-                        class="mt-1 form-control">
+                    <input id="lecturer_functional_position" type="text" wire:model.defer="lecturer_functional_position"
+                        placeholder="Contoh : Pengajar Ahli Utama" class="mt-1 form-control">
                     @error('lecturer_functional_position')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -153,8 +151,7 @@
                 <div class="mb-4">
                     <label for="lecturer_research_interest" class="block text-sm font-medium text-gray-700">Minat
                         Penelitian</label>
-                    <input id="lecturer_research_interest" type="text"
-                        wire:model.defer="lecturer_research_interest"
+                    <input id="lecturer_research_interest" type="text" wire:model.defer="lecturer_research_interest"
                         placeholder="Contoh : Natural Language Processing" class="mt-1 form-control">
                     @error('lecturer_research_interest')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
@@ -187,8 +184,8 @@
                 <div class="mb-4">
                     <label for="birth_place" class="block text-sm font-medium text-gray-700">Tempat Lahir <span
                             class="text-red-600">*</span></label>
-                    <input id="birth_place" type="text" wire:model.defer="birth_place"
-                        placeholder="Contoh : Jakarta" class="mt-1 form-control">
+                    <input id="birth_place" type="text" wire:model.defer="birth_place" placeholder="Contoh : Jakarta"
+                        class="mt-1 form-control">
                     @error('birth_place')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -234,8 +231,8 @@
 
                 <div class="mb-4">
                     <label for="nationality" class="block text-sm font-medium text-gray-700">Kewarganegaraan</label>
-                    <input id="nationality" type="text" wire:model.defer="nationality"
-                        placeholder="Contoh : Indonesia" class="mt-1 form-control">
+                    <input id="nationality" type="text" wire:model.defer="nationality" placeholder="Contoh : Indonesia"
+                        class="mt-1 form-control">
                     @error('nationality')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -272,8 +269,8 @@
                 <div class="mb-4">
                     <label for="province" class="block text-sm font-medium text-gray-700">Provinsi <span
                             class="text-red-600">*</span></label>
-                    <input id="province" type="text" wire:model.defer="province"
-                        placeholder="Contoh : DKI Jakarta" class="mt-1 form-control">
+                    <input id="province" type="text" wire:model.defer="province" placeholder="Contoh : DKI Jakarta"
+                        class="mt-1 form-control">
                     @error('province')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -281,8 +278,8 @@
 
                 <div class="mb-4">
                     <label for="phone" class="block text-sm font-medium text-gray-700">Telepon</label>
-                    <input id="phone" type="text" wire:model.defer="phone"
-                        placeholder="Contoh : 021-12345678" class="mt-1 form-control">
+                    <input id="phone" type="text" wire:model.defer="phone" placeholder="Contoh : 021-12345678"
+                        class="mt-1 form-control">
                     @error('phone')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -307,8 +304,7 @@
                                 placeholder="Minimal 8 karakter"
                                 class="mt-1 block w-full rounded-md border-gray-300 px-4 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 pr-10">
                             <button type="button" @click="show = !show"
-                                class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"
-                                tabindex="-1">
+                                class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500" tabindex="-1">
                                 <i :class="show ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
                             </button>
                         </div>
@@ -327,7 +323,7 @@
                 Batal
             </button>
             <button wire:click="submit"
-                class="px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_primary }}] text-white rounded-lg shadow transition">
+                class="px-4 py-2 bg-[{{ $companyData->color_primary ?? '#f58634' }}] hover:bg-[{{ $companyData->color_primary ?? '#f58634' }}] text-white rounded-lg shadow transition">
                 Simpan
             </button>
         </div>

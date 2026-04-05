@@ -4,13 +4,13 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1
-                    class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
+                <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
                     Analisis Butir Soal</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             {{-- <div>
-                <button wire:click="openModal()" class="{{in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'btn btn-primary' : 'btn btn-warning'}}">
+                <button wire:click="openModal()"
+                    class="{{in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'btn btn-primary' : 'btn btn-warning'}}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -24,7 +24,9 @@
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <div class="flex items-center bg-white rounded-lg shadow-sm border border-gray-200 px-3 py-2 w-full md:w-auto">
             <span class="text-sm text-gray-600 mr-2">Tampil</span>
-            <select class="form-select text-sm border-none focus:ring-0 p-0 text-gray-700 font-semibold bg-transparent w-12" wire:model.live='perPage'>
+            <select
+                class="form-select text-sm border-none focus:ring-0 p-0 text-gray-700 font-semibold bg-transparent w-12"
+                wire:model.live='perPage'>
                 <option value="5">5</option>
                 <option value="10">10</option>
                 <option value="25">25</option>
@@ -39,10 +41,9 @@
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <i class="fas fa-search text-gray-400"></i>
                 </div>
-                <input type="text" 
-                    class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[{{ $companyData->color_primary ?? '#2b7fff' }}] focus:border-[{{ $companyData->color_primary ?? '#2b7fff' }}] sm:text-sm transition duration-150 ease-in-out" 
-                    placeholder="Cari Sesuatu..."
-                    wire:model.live='search'>
+                <input type="text"
+                    class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[{{ $companyData->color_primary ?? '#2b7fff' }}] focus:border-[{{ $companyData->color_primary ?? '#2b7fff' }}] sm:text-sm transition duration-150 ease-in-out"
+                    placeholder="Cari Sesuatu..." wire:model.live='search'>
             </div>
         </div>
     </div>
@@ -72,8 +73,7 @@
                             <td class="center">
                                 <a href="{{ route('admin.report.item-analysis.detail', $result?->id) }}"
                                     class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors delete-btn"
-                                    data-bs-toggle="tooltip" title="Lihat data detail"><i
-                                        class="fa-solid fa-eye"></i></a>
+                                    data-bs-toggle="tooltip" title="Lihat data detail"><i class="fa-solid fa-eye"></i></a>
                             </td>
                         </tr>
                     @empty

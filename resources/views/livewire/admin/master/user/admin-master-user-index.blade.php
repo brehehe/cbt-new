@@ -3,8 +3,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1
-                    class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
+                <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
                     User</h1>
             </div>
             <div>
@@ -35,8 +34,7 @@
         </div>
 
         <div class="relative w-full sm:w-64">
-            <input type="text" class="mt-1 form-control-search" placeholder="Cari Sesuatu..."
-                wire:model.live='search'>
+            <input type="text" class="mt-1 form-control-search" placeholder="Cari Sesuatu..." wire:model.live='search'>
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <i class="fas fa-search h-3 w-3 text-gray-400"></i>
             </div>

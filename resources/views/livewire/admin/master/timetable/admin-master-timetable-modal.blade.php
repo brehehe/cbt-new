@@ -42,8 +42,7 @@
                                 onChange: function(e) {
                                     @this.set('classmate_id', e ? e : '');
                                 }
-                            });"
-                                wire:model.lazy="classmate_id" id="classmate_id">
+                            });" wire:model.lazy="classmate_id" id="classmate_id">
                                 <option value="">-- Pilih Peserta --</option>
                                 @foreach ($classmates as $key_cl => $classmate)
                                     <option value="{{ $key_cl }}">{{ $classmate }}</option>
@@ -65,8 +64,7 @@
                                 onChange: function(e) {
                                     @this.set('module_id', e ? e : '');
                                 }
-                            });"
-                                wire:model.lazy="module_id" id="module_id">
+                            });" wire:model.lazy="module_id" id="module_id">
                                 <option value="">-- Pilih Modul --</option>
                                 @foreach ($modules as $key_module => $module)
                                     <option value="{{ $key_module }}">{{ $module }}</option>
@@ -88,8 +86,7 @@
                                 onChange: function(e) {
                                     @this.set('exam_room_id', e ? e : '');
                                 }
-                            });"
-                                wire:model.lazy="exam_room_id" id="exam_room_id">
+                            });" wire:model.lazy="exam_room_id" id="exam_room_id">
                                 <option value="">-- Pilih Ruang Ujian --</option>
                                 @foreach ($examRooms as $key => $value)
                                     <option value="{{ $value->id }}">{{ $value->name }} -
@@ -112,8 +109,7 @@
                                 onChange: function(e) {
                                     @this.set('exam_session_id', e ? e : '');
                                 }
-                            });"
-                                wire:model.lazy="exam_session_id" id="exam_session_id">
+                            });" wire:model.lazy="exam_session_id" id="exam_session_id">
                                 <option value="">-- Pilih Sesi Ujian --</option>
                                 @foreach ($examSessions as $key => $value)
                                     <option value="{{ $value->id }}">{{ $value->name }} -
@@ -125,30 +121,30 @@
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-                    {{-- 
+                    {{--
                     @if ($module_id)
-                        <div class="bg-white/80">
-                            <div class="table-container">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Prodi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($studys as $index => $study)
-                                            <tr>
-                                                <td>{{ $study ?? '-' }}</td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td class="center" colspan="2">Tidak ada data</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
+                    <div class="bg-white/80">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Prodi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($studys as $index => $study)
+                                    <tr>
+                                        <td>{{ $study ?? '-' }}</td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td class="center" colspan="2">Tidak ada data</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
+                    </div>
                     @endif
                     --}}
                 </div>
@@ -164,8 +160,7 @@
                                 onChange: function(e) {
                                     @this.set('supervisors', e ? e : '');
                                 }
-                            });"
-                                wire:model.lazy="supervisors" id="supervisors" multiple>
+                            });" wire:model.lazy="supervisors" id="supervisors" multiple>
                                 <option value="">-- Pilih Pengawas --</option>
                                 @foreach ($getSupervisors as $key_getSupervisor => $getSupervisor)
                                     <option value="{{ $key_getSupervisor }}">{{ $getSupervisor }}</option>
@@ -179,8 +174,8 @@
                     <div>
                         <label for="start_time" class="block text-sm font-medium text-gray-700">Waktu Mulai <span
                                 class="text-red-600">*</span></label>
-                        <input type="datetime-local" id="start_time" wire:model.live="start_time"
-                            placeholder="Masukkan" class="mt-1 form-control">
+                        <input type="datetime-local" id="start_time" wire:model.live="start_time" placeholder="Masukkan"
+                            class="mt-1 form-control">
                         @error('start_time')
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
@@ -188,8 +183,8 @@
                     <div>
                         <label for="end_time" class="block text-sm font-medium text-gray-700">Waktu Selesai <span
                                 class="text-red-600">*</span></label>
-                        <input type="datetime-local" id="end_time" wire:model.live="end_time"
-                            placeholder="Masukkan" class="mt-1 form-control">
+                        <input type="datetime-local" id="end_time" wire:model.live="end_time" placeholder="Masukkan"
+                            class="mt-1 form-control">
                         @error('end_time')
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
@@ -200,12 +195,14 @@
                             class="mt-1 form-control"></textarea>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
-                        <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer">
+                        <label
+                            class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer">
                             <input type="checkbox" wire:model.defer="is_recording"
                                 class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2">
                             <span class="text-sm font-medium text-gray-700">Recording</span>
                         </label>
-                        <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer">
+                        <label
+                            class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer">
                             <input type="checkbox" wire:model.defer="is_streaming"
                                 class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2">
                             <span class="text-sm font-medium text-gray-700">Streaming</span>
@@ -230,7 +227,7 @@
                 Batal
             </button>
             <button wire:click='submit'
-                class="px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_primary }}] text-white rounded-lg shadow transition">
+                class="px-4 py-2 bg-[{{ $companyData->color_primary ?? '#f58634' }}] hover:bg-[{{ $companyData->color_primary ?? '#f58634' }}] text-white rounded-lg shadow transition">
                 Simpan
             </button>
         </div>

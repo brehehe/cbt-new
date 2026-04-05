@@ -2,8 +2,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1
-                    class="text-2xl font-bold text-[{{ $companyData->color_primary }}]">
+                <h1 class="text-2xl font-bold text-[{{ $companyData->color_primary ?? '#f58634' }}]">
                     Nilai Ujian Detail</h1>
             </div>
             <div>
@@ -29,8 +28,7 @@
                     onChange: function(e) {
                         @this.set('module_id', e ? e : '');
                     }
-                });"
-                    wire:model='module_id' id="module_id">
+                });" wire:model='module_id' id="module_id">
                     <option value="">-- Pilih Modul --</option>
                     @foreach ($modules as $key_module => $module)
                         <option value="{{ $key_module }}">{{ $module }}</option>
@@ -57,8 +55,7 @@
                     onChange: function(e) {
                         @this.set('supervisors', e ? e : '');
                     }
-                });"
-                    wire:model.lazy="supervisors" id="supervisors" multiple>
+                });" wire:model.lazy="supervisors" id="supervisors" multiple>
                     <option value="">-- Pilih Pengawas --</option>
                     @foreach ($getSupervisors as $key_getSupervisor => $getSupervisor)
                         <option value="{{ $key_getSupervisor }}">{{ $getSupervisor }}</option>
@@ -106,7 +103,9 @@
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <div class="flex items-center bg-white rounded-lg shadow-sm border border-gray-200 px-3 py-2 w-full md:w-auto">
             <span class="text-sm text-gray-600 mr-2">Tampil</span>
-            <select class="form-select text-sm border-none focus:ring-0 p-0 text-gray-700 font-semibold bg-transparent w-12" wire:model.live='perPage'>
+            <select
+                class="form-select text-sm border-none focus:ring-0 p-0 text-gray-700 font-semibold bg-transparent w-12"
+                wire:model.live='perPage'>
                 <option value="5">5</option>
                 <option value="10">10</option>
                 <option value="25">25</option>
@@ -121,10 +120,9 @@
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <i class="fas fa-search text-gray-400"></i>
                 </div>
-                <input type="text" 
-                    class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[{{ $companyData->color_primary ?? '#2b7fff' }}] focus:border-[{{ $companyData->color_primary ?? '#2b7fff' }}] sm:text-sm transition duration-150 ease-in-out" 
-                    placeholder="Cari Sesuatu..."
-                    wire:model.live='search'>
+                <input type="text"
+                    class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[{{ $companyData->color_primary ?? '#2b7fff' }}] focus:border-[{{ $companyData->color_primary ?? '#2b7fff' }}] sm:text-sm transition duration-150 ease-in-out"
+                    placeholder="Cari Sesuatu..." wire:model.live='search'>
             </div>
         </div>
     </div>
@@ -182,8 +180,7 @@
                             </td>
                             <td class="whitespace-nowrap">
                                 @if ($userModuleQuestion->status === 'correct')
-                                    <span
-                                        class="px-2 py-1 rounded bg-green-100 text-green-700 font-semibold">Benar</span>
+                                    <span class="px-2 py-1 rounded bg-green-100 text-green-700 font-semibold">Benar</span>
                                 @elseif ($userModuleQuestion->status === 'wrong')
                                     <span class="px-2 py-1 rounded bg-red-100 text-red-700 font-semibold">Salah</span>
                                 @else

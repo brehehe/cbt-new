@@ -31,8 +31,10 @@
             </div>
             <div class="mb-4">
                 <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi Tipe Ujian</label>
-                {{-- <input type="text" id="description" wire:model.defer="description" placeholder="Deskripsi Kategori Materi" class="mt-1 form-control"> --}}
-                <textarea id="description" wire:model.defer="description" placeholder="" class="mt-1 form-control"></textarea>
+                {{-- <input type="text" id="description" wire:model.defer="description"
+                    placeholder="Deskripsi Kategori Materi" class="mt-1 form-control"> --}}
+                <textarea id="description" wire:model.defer="description" placeholder=""
+                    class="mt-1 form-control"></textarea>
                 @error('description')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
@@ -46,7 +48,7 @@
                 Batal
             </button>
             <button wire:click='submit'
-                class="px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_primary }}] text-white rounded-lg shadow transition">
+                class="px-4 py-2 bg-[{{ $companyData->color_primary ?? '#f58634' }}] hover:bg-[{{ $companyData->color_primary ?? '#f58634' }}] text-white rounded-lg shadow transition">
                 Simpan
             </button>
         </div>
