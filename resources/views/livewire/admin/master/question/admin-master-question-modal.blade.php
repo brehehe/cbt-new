@@ -37,8 +37,8 @@
                             @enderror
                         </div>
                         <div>
-                            <label for="category_question_id" class="block text-sm font-medium text-gray-700">Kategori Soal <span
-                                    class="text-red-600">*</span></label>
+                            <label for="category_question_id" class="block text-sm font-medium text-gray-700">Kategori
+                                Soal <span class="text-red-600">*</span></label>
                             <select class="mt-1 form-control" wire:model.lazy='category_question_id'>
                                 <option value="">Pilih kategori soal</option>
                                 @foreach ($category_questions as $key_category_question => $category_question)
@@ -88,8 +88,8 @@
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="question_type_id" class="block text-sm font-medium text-gray-700">Tipe Ujian <span
-                                    class="text-red-600">*</span></label>
+                            <label for="question_type_id" class="block text-sm font-medium text-gray-700">Tipe Ujian
+                                <span class="text-red-600">*</span></label>
                             <select class="mt-1 form-control" wire:model.lazy='question_type_id'>
                                 <option value="">Pilih Tipe Ujian</option>
                                 @foreach ($question_types as $question_type)
@@ -121,8 +121,7 @@
                                     @this.set('question', contents);
                                 }
                             }
-                        });"
-                            class="mt-1 form-control"></textarea>
+                        });" class="mt-1 form-control"></textarea>
                     </div>
                     <div class="mb-4">
                         <label for="images" class="block text-sm font-medium text-gray-700">Gambar</label>
@@ -132,7 +131,8 @@
                         @enderror
                     </div>
                     <div class="mb-4" wire:ignore>
-                        <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi pertanyaan</label>
+                        <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi
+                            pertanyaan</label>
                         <textarea id="description" x-data x-init="$($el).summernote({
                             height: 150,
                             placeholder: 'Tulis deskripsi di sini...',
@@ -148,8 +148,7 @@
                                     @this.set('description', contents);
                                 }
                             }
-                        });"
-                            class="mt-1 form-control"></textarea>
+                        });" class="mt-1 form-control"></textarea>
                     </div>
                 </div>
                 <div>
@@ -158,14 +157,14 @@
                         class="mt-1 form-control" data-latex-input="server" data-autoresize></textarea>
                     <p class="mt-1 text-xs text-gray-500">Disimpan sebagai source LaTeX terpisah.</p>
                     <div class="mt-2 flex items-center gap-2">
-                        <button type="button" class="btn btn-primary"
-                            data-latex-render data-latex-source="#latex" data-latex-target="#latexPreviewCreate"
-                            data-latex-type="question">
+                        <button type="button" class="btn btn-primary" data-latex-render data-latex-source="#latex"
+                            data-latex-target="#latexPreviewCreate" data-latex-type="question">
                             Render LaTeX
                         </button>
                         <span class="text-xs text-gray-500">Preview akan muncul di bawah.</span>
                     </div>
-                    <div id="latexPreviewCreate" class="mt-2 rounded border bg-gray-50 p-3 text-sm text-gray-700" wire:ignore>
+                    <div id="latexPreviewCreate" class="mt-2 rounded border bg-gray-50 p-3 text-sm text-gray-700"
+                        wire:ignore>
                         <div class="text-xs text-gray-400">Belum ada preview.</div>
                     </div>
                     @error('latex')
@@ -182,8 +181,7 @@
                 Batal
             </button>
             <button wire:click='submit'
-                style="background-color: {{ $companyData->color_primary ?? '#880c24' }};"
-                class="px-4 py-2 text-white rounded-lg shadow transition hover:opacity-90">
+                class="px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_primary }}] text-white rounded-lg shadow transition">
                 Simpan
             </button>
         </div>
