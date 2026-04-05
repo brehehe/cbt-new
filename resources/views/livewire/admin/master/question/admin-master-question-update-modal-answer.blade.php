@@ -22,13 +22,26 @@
         <div class="px-6 py-4 text-gray-600" style="max-height: 85vh; overflow-y: auto;">
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                    <div class="mb-4">
+                    <div class="mb-4" wire:ignore>
                         <label for="answer_context" class="block text-sm font-medium text-gray-700">Konteks Jawaban <span
                                 class="text-red-600">*</span></label>
-                        <textarea id="answer_context" wire:model.defer="answer_context" placeholder="" class="mt-1 form-control" data-autosize="true" rows="3" style="overflow:hidden;resize:none;" x-data x-init="$nextTick(() => { $el.style.height='auto'; $el.style.height=$el.scrollHeight+'px'; })" @focus="$el.style.height='auto';$el.style.height=$el.scrollHeight+'px'" @input="$el.style.height='auto';$el.style.height=$el.scrollHeight+'px'"></textarea>
-                        @error('answer_context')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
+                        <textarea id="answer_context" x-data x-init="$($el).summernote({
+                            height: 150,
+                            placeholder: 'Tulis jawaban di sini...',
+                            toolbar: [
+                                ['font', ['bold', 'underline', 'clear']],
+                                ['para', ['ul', 'ol', 'paragraph']],
+                                ['insert', ['link', 'picture']],
+                                ['view', ['codeview']]
+                            ],
+                            callbacks: {
+                                onChange: function(contents, $editable) {
+                                    @this.set('answer_context', contents);
+                                }
+                            }
+                        });
+                        $($el).summernote('code', @this.get('answer_context'));" 
+                            class="mt-1 form-control"></textarea>
                     </div>
                     <div class="mb-4">
                         <label for="answer_correct" class="block text-sm font-medium text-gray-700">Jawaban yang benar</label>

@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <title>Daftar Hadir Peserta Tes Substantif</title>
-        <script src="https://cdn.tailwindcss.com"></script>
+        @vite(['resources/css/app.css'])
         <style>
             @media print {
                 @page {

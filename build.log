@@ -1,0 +1,21 @@
+
+> mediction@1.0.0 build
+> vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 4 modules transformed.
+x Build failed in 133ms
+error during build:
+[vite]: Rollup failed to resolve import "lucide-react" from "/var/www/html/procbt_id/resources/js/Exam/ExamContainer.jsx".
+This is most likely unintended because it can break your application at runtime.
+If you do want to externalize this module explicitly add it to
+`build.rollupOptions.external`
+    at viteWarn (file:///var/www/html/procbt_id/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:65855:17)
+    at onwarn (file:///var/www/html/procbt_id/node_modules/@vitejs/plugin-react/dist/index.js:90:7)
+    at onRollupWarning (file:///var/www/html/procbt_id/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:65885:5)
+    at onwarn (file:///var/www/html/procbt_id/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:65550:7)
+    at file:///var/www/html/procbt_id/node_modules/rollup/dist/es/shared/node-entry.js:20925:13
+    at Object.logger [as onLog] (file:///var/www/html/procbt_id/node_modules/rollup/dist/es/shared/node-entry.js:22797:9)
+    at ModuleLoader.handleInvalidResolvedId (file:///var/www/html/procbt_id/node_modules/rollup/dist/es/shared/node-entry.js:21541:26)
+    at file:///var/www/html/procbt_id/node_modules/rollup/dist/es/shared/node-entry.js:21499:26

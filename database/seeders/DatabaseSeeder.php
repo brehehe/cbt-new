@@ -33,19 +33,19 @@ class DatabaseSeeder extends Seeder
             CompanySeeder::class,
 
             //Master
-            QuestionTypeSeeder::class,
+            // QuestionTypeSeeder::class,
 
             // Question
         ]);
         if (env('QUESTION_DUMMY') === true) {
             $this->call([
-                QuestionSeeder::class,
+                // QuestionSeeder::class,
             ]);
         }
         $this->call([
             StudySeeder::class,
             UserDetailSeeder::class,
-            QuestionPaketSeeder::class,
+            // QuestionPaketSeeder::class,
         ]);
     }
 }

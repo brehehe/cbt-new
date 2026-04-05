@@ -88,7 +88,9 @@ class CheckUserTimetable
             }
 
             if ($userTimetable->status === 'exam') {
-                return redirect()->route('admin.exam.detail');
+                return redirect()->route('admin.exam.detail.react', [
+                    'userTimetableId' => $userTimetable->id,
+                ]);
             }
 
             if ($userTimetable->status === 'warning') {

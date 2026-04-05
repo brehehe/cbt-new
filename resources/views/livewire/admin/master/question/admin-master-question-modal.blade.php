@@ -101,14 +101,28 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="mb-4">
+                    <div class="mb-4" wire:ignore>
                         <label for="question" class="block text-sm font-medium text-gray-700">Pertanyaan <span
                                 class="text-red-600">*</span></label>
-                        <textarea id="question" wire:model.defer="question" placeholder="" class="mt-1 form-control"
-                            data-autoresize></textarea>
-                        @error('question')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
+                        <textarea id="question" x-data x-init="$($el).summernote({
+                            height: 200,
+                            placeholder: 'Tulis pertanyaan di sini...',
+                            toolbar: [
+                                ['style', ['style']],
+                                ['font', ['bold', 'underline', 'clear']],
+                                ['color', ['color']],
+                                ['para', ['ul', 'ol', 'paragraph']],
+                                ['table', ['table']],
+                                ['insert', ['link', 'picture', 'video']],
+                                ['view', ['fullscreen', 'codeview', 'help']]
+                            ],
+                            callbacks: {
+                                onChange: function(contents, $editable) {
+                                    @this.set('question', contents);
+                                }
+                            }
+                        });"
+                            class="mt-1 form-control"></textarea>
                     </div>
                     <div class="mb-4">
                         <label for="images" class="block text-sm font-medium text-gray-700">Gambar</label>
@@ -117,13 +131,25 @@
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div class="mb-4">
+                    <div class="mb-4" wire:ignore>
                         <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi pertanyaan</label>
-                        <textarea id="description" wire:model.defer="description" placeholder="" class="mt-1 form-control"
-                            data-autoresize></textarea>
-                        @error('description')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
+                        <textarea id="description" x-data x-init="$($el).summernote({
+                            height: 150,
+                            placeholder: 'Tulis deskripsi di sini...',
+                            toolbar: [
+                                ['style', ['style']],
+                                ['font', ['bold', 'underline', 'clear']],
+                                ['para', ['ul', 'ol', 'paragraph']],
+                                ['insert', ['link', 'picture']],
+                                ['view', ['codeview']]
+                            ],
+                            callbacks: {
+                                onChange: function(contents, $editable) {
+                                    @this.set('description', contents);
+                                }
+                            }
+                        });"
+                            class="mt-1 form-control"></textarea>
                     </div>
                 </div>
                 <div>

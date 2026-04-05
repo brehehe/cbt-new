@@ -90,6 +90,8 @@
             </div>
         </div>
     </div>
+    {{-- Remove global alert --}}
+
     <!-- Table Controls -->
    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <div class="flex items-center bg-white rounded-lg shadow-sm border border-gray-200 px-3 py-2 w-full md:w-auto">
@@ -162,48 +164,86 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse ($questions as $index => $result)
-                        <tr class="hover:bg-gray-50">
+                        @php
+                            $globalIndex = $questions->firstItem() + $index;
+                            $isRestricted = config('app.limit_question_view') && $globalIndex > config('app.limit_question_count', 5);
+                        @endphp
+                        <tr class="hover:bg-gray-50 {{ $isRestricted ? 'bg-gray-50/50' : '' }} relative">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 <input type="checkbox" class="form-checkbox" wire:model.live="selectedQuestions"
-                                    value="{{ $result->id }}">
+                                    value="{{ $result->id }}" {{ $isRestricted ? 'disabled' : '' }}>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $questions->firstItem() + $index }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $result?->study?->name }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $result?->topic?->name }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $result?->categoryQuestion?->name ?? '-' }}
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-900 max-w-xs" x-data="{ expanded: false }">
-                                <span x-show="!expanded" class="block truncate">{{ Str::limit($result?->question, 50) }}</span>
-                                <span x-show="expanded" class="block">{{ $result?->question }}</span>
-                                <button type="button" class="mt-1 text-xs text-blue-600 hover:text-blue-800" @click="expanded = !expanded">
-                                    <span x-show="!expanded">Show</span>
-                                    <span x-show="expanded">Hide</span>
-                                </button>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $result?->difficulty == 'default' ? '-' : ucfirst($result?->difficulty) }}
-                            <td class="center">
-                                <div class="flex items-center">
-                                    <a class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn"
-                                        href="{{ route('admin.master.question.update', $result) }}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                        </svg>
-                                    </a>
-                                    <button
-                                        class="btn btn-icon text-red-600 hover:text-red-800 transition-colors delete-btn"
-                                        wire:click="confirmDelete('{{ $result->id }}')">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                    </button>
+                                {{ $globalIndex }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <div class="{{ $isRestricted ? 'blur-[3px] select-none' : '' }}">
+                                    {{ $result?->study?->name }}
                                 </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <div class="{{ $isRestricted ? 'blur-[3px] select-none' : '' }}">
+                                    {{ $result?->topic?->name }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <div class="{{ $isRestricted ? 'blur-[3px] select-none' : '' }}">
+                                    {{ $result?->categoryQuestion?->name ?? '-' }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-900 max-w-xs relative">
+                                @if ($isRestricted)
+                                    <div class="absolute inset-0 flex items-center justify-center z-10 px-2 text-center">
+                                        <span class="text-[10px] font-bold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded shadow-sm">
+                                            HUBUNGI ADMIN JIKA INGIN MELIHAT SOAL
+                                        </span>
+                                    </div>
+                                    <div class="blur-[5px] select-none">
+                                        {{ Str::limit($result?->question, 50) }}
+                                    </div>
+                                @else
+                                    <div x-data="{ expanded: false }">
+                                        <span x-show="!expanded" class="block truncate">{{ Str::limit($result?->question, 50) }}</span>
+                                        <span x-show="expanded" class="block">{{ $result?->question }}</span>
+                                        <button type="button" class="mt-1 text-xs text-blue-600 hover:text-blue-800" @click="expanded = !expanded">
+                                            <span x-show="!expanded">Show</span>
+                                            <span x-show="expanded">Hide</span>
+                                        </button>
+                                    </div>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <div class="{{ $isRestricted ? 'blur-[3px] select-none' : '' }}">
+                                    {{ $result?->difficulty == 'default' ? '-' : ucfirst($result?->difficulty) }}
+                                </div>
+                            </td>
+                            <td class="center">
+                                @if ($isRestricted)
+                                    <div class="flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                    </div>
+                                @else
+                                    <div class="flex items-center">
+                                        <a class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn"
+                                            href="{{ route('admin.master.question.update', $result) }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                        </a>
+                                        <button
+                                            class="btn btn-icon text-red-600 hover:text-red-800 transition-colors delete-btn"
+                                            wire:click="confirmDelete('{{ $result->id }}')">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                @endif
                             </td>
                         </tr>
                     @empty

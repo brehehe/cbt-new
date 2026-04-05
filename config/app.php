@@ -124,5 +124,7 @@ return [
     ],
 
     'name_slug' => env('APP_SLUG_NAME'),
-    'import_question' => env('IMPORT_QUESTION', false)
+    'import_question' => env('IMPORT_QUESTION', false),
+    'limit_question_view' => env('LIMIT_QUESTION_VIEW', false),
+    'limit_question_count' => env('LIMIT_QUESTION_COUNT', 5),
 ];

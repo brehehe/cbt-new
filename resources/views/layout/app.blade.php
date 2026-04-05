@@ -15,7 +15,7 @@
 
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
             rel="stylesheet">
-        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
         
         <link rel="icon" type="image/png"
             href="{{asset('storage/' . $company->logo_potrait)}}" />
@@ -28,6 +28,8 @@
             integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" /> --}}
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+        <!-- Summernote Lite CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
 
         {{-- file pond --}}
         <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet" />
@@ -83,19 +85,36 @@
                 position: relative;
                 z-index: 10;
             }
+
+            /* Disable text selection */
+            body {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+
+            /* Re-enable selection for inputs and textareas */
+            input, textarea {
+                -webkit-user-select: text;
+                -moz-user-select: text;
+                -ms-user-select: text;
+                user-select: text;
+            }
+
         </style>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
     </head>
 
     <body class="bg-white">
-        <!-- Watermark Logo (Background) -->
-        {{-- <div class="watermark-logo">
-            <img src="https://ikmb.ac.id/wp-content/uploads/2020/04/Screen-Shot-2020-04-14-at-13.16.27.png" alt="Watermark Logo" style="width: 750px; height: 150px" />
-            {{ Auth::user()->name . ' - ' . (Auth::user()->nim ?? (Auth::user()->username ?? '-')) }}
-        </div> --}}
 
-        {{-- @auth
+        <div class="watermark-logo">
+            <img src="{{ !empty($companyData?->logo) ? asset('storage/'.$companyData->logo) : asset('asset/img/logo-procbt.png') }}" alt="Watermark Logo" style="width: 750px; height: 150px" />
+            {{ Auth::user()->name . ' - ' . (Auth::user()->nim ?? (Auth::user()->username ?? '-')) }}
+        </div>
+
+        @auth
             <div class="watermark-user">
                 <div class="flex items-center space-x-2">
                     <i class="fas fa-user text-blue-500"></i>
@@ -104,7 +123,7 @@
                     <span class="text-xs">{{ now()->format('d/m/Y H:i') }}</span>
                 </div>
             </div>
-        @endauth --}}
+        @endauth
 
         @include('layout.navbar')
         @include('layout.sidebar')
@@ -137,6 +156,8 @@
             integrity="sha512-IOebNkvA/HZjMM7MxL0NYeLYEalloZ8ckak+NDtOViP7oiYzG5vn6WVXyrJDiJPhl4yRdmNAG49iuLmhkUdVsQ=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <!-- Summernote Lite JS -->
+        <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
 
         <!-- file pond -->
         <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
@@ -146,6 +167,19 @@
             FilePond.registerPlugin(FilePondPluginImagePreview);
 
             // ... FilePond initialisation code here
+        </script>
+
+        <script>
+            @if(!Auth::user()->hasRole(['Admin']))
+            document.addEventListener('contextmenu', event => event.preventDefault());
+            document.addEventListener('copy', event => event.preventDefault());
+            document.addEventListener('cut', event => event.preventDefault());
+            @endif
+
+            // Disable autocomplete on all inputs
+            document.querySelectorAll('input, form').forEach(el => {
+                el.setAttribute('autocomplete', 'off');
+            });
         </script>
 
         @stack('scripts')

@@ -7,136 +7,111 @@ use Illuminate\Support\Facades\Storage;
 class RecordingFinalizer
 {
     /**
-     * Finalize recording chunks for a given UserTimetable ID.
+     * Finalize ALL recording chunks for a specific UserTimetable (across multiple sessions).
      * Returns an array with manifest path, merged video path (if any), total size and chunk count.
      */
-    public static function finalizeForUserTimetable(string $userTimetableId): array
+    public static function finalizeFullExamRecording(string $userTimetableId): array
     {
         $baseDir = 'exam_recordings/chunks/' . $userTimetableId;
         $disk = Storage::disk('public');
 
-        $manifestPath = $baseDir . '/manifest.json';
+        // Fetch all related recording sessions
+        $recordings = \App\Models\Exam\ExamRecording::where('user_timetable_id', $userTimetableId)
+            ->orderBy('start_time', 'asc')
+            ->get();
+
+        $recordingIds = $recordings->pluck('id')->toArray();
+        $manifestPath = $baseDir . '/full_manifest.json';
         $mergedRelPath = null;
         $totalSize = 0;
         $chunkFiles = [];
 
-        if ($disk->exists($baseDir)) {
+        if ($disk->exists($baseDir) && count($recordingIds) > 0) {
             $files = $disk->files($baseDir);
-            $chunkFiles = array_values(array_filter($files, function ($f) {
-                return str_contains($f, '_chunk_') && str_ends_with($f, '.webm');
+            $chunkFiles = array_values(array_filter($files, function ($f) use ($recordingIds) {
+                // Check if file starts with any of our session IDs
+                foreach ($recordingIds as $rid) {
+                    if (str_contains($f, $rid . '_chunk_')) return true;
+                }
+                return false;
             }));
 
-            // Sort by chunk number
-            usort($chunkFiles, function ($a, $b) {
-                $na = (int) preg_replace('/.*_chunk_(\d+)\.webm$/', '$1', $a);
-                $nb = (int) preg_replace('/.*_chunk_(\d+)\.webm$/', '$1', $b);
-                return $na <=> $nb;
-            });
+            // Attempt to merge chunks using ffmpeg
+            try {
+                // Sort by recording session time, then by chunk number
+                usort($chunkFiles, function ($a, $b) use ($recordingIds) {
+                    $ridA = explode('_chunk_', basename($a))[0];
+                    $ridB = explode('_chunk_', basename($b))[0];
 
-            foreach ($chunkFiles as $f) {
-                $totalSize += $disk->size($f);
-            }
-        }
-
-        // Write manifest JSON
-        $manifest = [
-            'user_timetable_id' => $userTimetableId,
-            'chunk_count' => count($chunkFiles),
-            'chunks' => $chunkFiles,
-            'finalized_at' => now()->toISOString(),
-        ];
-        $disk->put($manifestPath, json_encode($manifest));
-
-        // Attempt to merge chunks using ffmpeg, then fallback to byte concat
-        try {
-            if (count($chunkFiles) > 0) {
-                // Use the first chunk's recording id prefix to name merged file
-                $first = $chunkFiles[0];
-                $prefix = basename($first, '.webm');
-                $prefix = preg_replace('/_chunk_\d+$/', '', $prefix);
-                $mergedRelPath = $baseDir . '/' . $prefix . '_merged.webm';
-                $mergedAbsPath = $disk->path($mergedRelPath);
-
-                $ffmpegPath = trim((string) shell_exec('which ffmpeg'));
-                if (!empty($ffmpegPath)) {
-                    // Concat demuxer requires a list file
-                    $concatListPath = $disk->path($baseDir . '/concat.txt');
-                    $listLines = [];
-                    foreach ($chunkFiles as $cf) {
-                        $listLines[] = "file '" . $disk->path($cf) . "'";
+                    if ($ridA !== $ridB) {
+                        $orderA = array_search($ridA, $recordingIds);
+                        $orderB = array_search($ridB, $recordingIds);
+                        return $orderA <=> $orderB;
                     }
-                    file_put_contents($concatListPath, implode(PHP_EOL, $listLines));
 
+                    $na = (int) preg_replace('/.*_chunk_(\d+)\.webm$/', '$1', $a);
+                    $nb = (int) preg_replace('/.*_chunk_(\d+)\.webm$/', '$1', $b);
+                    return $na <=> $nb;
+                });
+
+                foreach ($chunkFiles as $f) {
+                    $totalSize += $disk->size($f);
+                }
+
+                if (count($chunkFiles) > 0) {
+                    $mergedRelPath = $baseDir . '/full_exam_recording.webm';
+                    $mergedAbsPath = $disk->path($mergedRelPath);
                     @unlink($mergedAbsPath);
-                    $cmd = escapeshellcmd($ffmpegPath) . ' -y -f concat -safe 0 -i ' . escapeshellarg($concatListPath) . ' -c copy ' . escapeshellarg($mergedAbsPath) . ' 2>&1';
-                    $output = [];
-                    $ret = 0;
-                    exec($cmd, $output, $ret);
-                    if (!($ret === 0 && file_exists($mergedAbsPath) && filesize($mergedAbsPath) > 0)) {
-                        // Try concat protocol
-                        $protoParts = [];
-                        foreach ($chunkFiles as $cf) {
-                            $protoParts[] = $disk->path($cf);
-                        }
-                        $concatProto = 'concat:' . implode('|', $protoParts);
-                        @unlink($mergedAbsPath);
-                        $output = [];
-                        $ret = 0;
-                        $cmd = escapeshellcmd($ffmpegPath) . ' -y -i ' . escapeshellarg($concatProto) . ' -c copy ' . escapeshellarg($mergedAbsPath) . ' 2>&1';
-                        exec($cmd, $output, $ret);
-                        if (!($ret === 0 && file_exists($mergedAbsPath) && filesize($mergedAbsPath) > 0)) {
-                            // Re-encode to normalize
-                            @unlink($mergedAbsPath);
+
+                    if (count($chunkFiles) === 1) {
+                        // Only 1 chunk, no need to merge, just copy it
+                        copy($disk->path($chunkFiles[0]), $mergedAbsPath);
+                    } else {
+                        $ffmpegPath = trim((string) shell_exec('which ffmpeg'));
+                        if (!empty($ffmpegPath)) {
+                            $concatListPath = $disk->path($baseDir . '/concat.txt');
+                            $listLines = [];
+                            foreach ($chunkFiles as $cf) {
+                                $listLines[] = "file '" . $disk->path($cf) . "'";
+                            }
+                            file_put_contents($concatListPath, implode(PHP_EOL, $listLines));
+
+                            $cmd = escapeshellcmd($ffmpegPath) . ' -y -f concat -safe 0 -i ' . escapeshellarg($concatListPath) . ' -fflags +genpts -c:v libvpx-vp9 -speed 6 -crf 32 -b:v 0 -c:a libvorbis -b:a 128k ' . escapeshellarg($mergedAbsPath) . ' 2>&1';
                             $output = [];
                             $ret = 0;
-                            $cmd = escapeshellcmd($ffmpegPath) . ' -y -f concat -safe 0 -i ' . escapeshellarg($concatListPath) . ' -fflags +genpts -c:v libvpx -b:v 2M -c:a libvorbis -b:a 128k ' . escapeshellarg($mergedAbsPath) . ' 2>&1';
                             exec($cmd, $output, $ret);
+
                             if (!($ret === 0 && file_exists($mergedAbsPath) && filesize($mergedAbsPath) > 0)) {
-                                $mergedRelPath = null;
+                                // Fallback raw concat if transcoding failed (rare)
+                                @unlink($mergedAbsPath);
+                                foreach ($chunkFiles as $cf) {
+                                    file_put_contents($mergedAbsPath, file_get_contents($disk->path($cf)), FILE_APPEND);
+                                }
+                            }
+                        } else {
+                            // Fallback raw concat if ffmpeg missing
+                            foreach ($chunkFiles as $cf) {
+                                file_put_contents($mergedAbsPath, file_get_contents($disk->path($cf)), FILE_APPEND);
                             }
                         }
                     }
-                }
 
-                // Fallback to byte-concat if ffmpeg failed/unavailable
-                if ($mergedRelPath === null) {
-                    $ebmlHeader = "\x1A\x45\xDF\xA3";
-                    $startIndex = 0;
-                    foreach ($chunkFiles as $idx => $cf) {
-                        $abs = $disk->path($cf);
-                        $firstBytes = @file_get_contents($abs, false, null, 0, 32);
-                        if ($firstBytes !== false && strpos($firstBytes, $ebmlHeader) !== false) {
-                            $startIndex = $idx;
-                            break;
-                        }
-                    }
-
-                    @unlink($mergedAbsPath ?? $disk->path($baseDir . '/merged.webm'));
-                    $targetPath = $mergedAbsPath ?? $disk->path($baseDir . '/merged.webm');
-                    for ($i = $startIndex; $i < count($chunkFiles); $i++) {
-                        $srcAbs = $disk->path($chunkFiles[$i]);
-                        $data = @file_get_contents($srcAbs);
-                        if ($data === false) {
-                            continue;
-                        }
-                        file_put_contents($targetPath, $data, FILE_APPEND);
-                    }
-
-                    if (file_exists($targetPath) && filesize($targetPath) > 0) {
-                        $mergedRelPath = str_replace($disk->path(''), '', $targetPath);
+                    if (!file_exists($mergedAbsPath) || filesize($mergedAbsPath) == 0) {
+                        $mergedRelPath = null;
                     }
                 }
+            } catch (\Throwable $t) {
+                // Swallow errors and fallback to manifest only
+                $mergedRelPath = null;
             }
-        } catch (\Throwable $t) {
-            // Swallow errors and fallback to manifest only
-            $mergedRelPath = null;
         }
 
-        // Update manifest with merged video if available
-        if ($mergedRelPath) {
-            $manifest['merged_video'] = $mergedRelPath;
-            $disk->put($manifestPath, json_encode($manifest));
-        }
+        // Update all related recording records for this timetable
+        \App\Models\Exam\ExamRecording::where('user_timetable_id', $userTimetableId)->update([
+            'video_path' => $mergedRelPath ?: $manifestPath,
+            'file_size' => $totalSize,
+            'status' => 'completed',
+        ]);
 
         return [
             'manifest' => $manifestPath,

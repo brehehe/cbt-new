@@ -479,6 +479,7 @@ namespace App\Models\Exam{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $peer_id
  * @property string|null $camera_device_id
+ * @property \Illuminate\Support\Carbon|null $end_time
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Exam\ExamAlert> $examAlerts
  * @property-read int|null $exam_alerts_count
@@ -511,6 +512,7 @@ namespace App\Models\Exam{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereCurrentQuestionNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereDeviceInfo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereEndTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereLastActivity($value)
@@ -2150,6 +2152,14 @@ namespace App\Models\User{
 
 namespace App\Models{
 /**
+ * @property string $id
+ * @property string|null $company_id
+ * @property string|null $user_id
+ * @property string|null $sec_val
+ * @property int $order
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey newModelQuery()
@@ -2157,6 +2167,14 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey search($term)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey whereSecVal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey withoutTrashed()
  */

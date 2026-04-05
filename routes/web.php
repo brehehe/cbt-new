@@ -436,7 +436,29 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
 
         return redirect('/clearallsession')->with('message', 'Semua session telah dihapus. Semua user logout, exam dipause & live session diputus.');
     });
+
+    // React-based Exam Detail Migration
+    Route::get('/exam/detail/{userTimetableId}/react', function($userTimetableId) {
+        return view('exam-react', ['userTimetableId' => $userTimetableId]);
+    })->name('admin.exam.detail.react')->middleware(['auth']);
+
+    // Exam API Routes (using web middleware for session persistence)
+    Route::prefix('api/exam')->middleware('auth')->group(function () {
+        Route::get('/{user_timetable_id}/data', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'getInitialState']);
+        Route::post('/save-answer', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'saveAnswer']);
+        Route::post('/toggle-mark', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'toggleMark']);
+        Route::post('/log-alert', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'logAlert']);
+        Route::post('/recording/chunk', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'uploadChunk']);
+        Route::post('/recording/finalize/{user_timetable_id}', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'finalizeRecording']);
+        Route::get('/live-session/{user_timetable_id}/update', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'updateLiveSession']);
+        Route::get('/live-session/{user_timetable_id}/token', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'getLiveKitToken']);
+        
+        // Admin Monitoring API
+        Route::get('/admin/monitoring/{timetable_id}/sessions', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'getMonitoringSessions']);
+        Route::get('/admin/monitoring/{timetable_id}/token', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'getMonitoringToken']);
+        
+        Route::post('/{user_timetable_id}/finish', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'finishExam']);
+    });
+
+    Route::get('/stress-test/exam/{userTimetableId}', \App\Livewire\Public\StressTestExamDetailIndex::class)->name('public.stress-test.exam');
 });
-
-
-Route::get('/stress-test/exam/{userTimetableId}', \App\Livewire\Public\StressTestExamDetailIndex::class)->name('public.stress-test.exam');

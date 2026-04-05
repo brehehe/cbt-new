@@ -22,12 +22,71 @@
     @livewireStyles
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <title>{{ $setting?->website_name ?? 'Burningroom Technology' }}</title>
+    <style>
+        /* Disable text selection */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Re-enable selection for inputs and textareas */
+        input, textarea {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+
+    </style>
 </head>
 
 <body class="bg-gray-100 font-inter">
     {{ $slot }}
 
     @livewireScripts
+    
+    <script>
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('copy', event => event.preventDefault());
+        document.addEventListener('cut', event => event.preventDefault());
+
+
+        // HYPER-AGGRESIVE SHORTCUT DETECTION (Capture Phase)
+        window.addEventListener('keydown', function(e) {
+            // Pengecualian khusus: Izinkan Refresh Halaman (Cmd+Shift+R atau Ctrl+Shift+R atau F5 atau Cmd+R)
+            if (
+                ((e.ctrlKey || e.metaKey) && e.shiftKey && e.keyCode === 82) || // Cmd/Ctrl+Shift+R
+                ((e.ctrlKey || e.metaKey) && e.keyCode === 82) || // Cmd/Ctrl+R
+                e.keyCode === 116 // F5
+            ) {
+                return true; 
+            }
+
+
+            // Disable Ctrl+C, Ctrl+V, Ctrl+U, F12
+            if (
+                (e.ctrlKey && (e.keyCode === 67 || e.keyCode === 86 || e.keyCode === 85 || e.keyCode === 73 || e.keyCode === 74)) ||
+                e.keyCode === 123 ||
+                e.keyCode === 44 // PrintScreen
+            ) {
+                
+                if (e.ctrlKey || e.metaKey || e.keyCode === 123 || e.keyCode === 44) {
+                    e.preventDefault();
+                }
+                return false;
+            }
+        }, true);
+
+        });
+
+        // Disable autocomplete on all inputs
+        document.querySelectorAll('input, form').forEach(el => {
+            el.setAttribute('autocomplete', 'off');
+        });
+    </script>
+
     @stack('scripts')
     @filepondScripts
 

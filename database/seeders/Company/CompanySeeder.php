@@ -136,7 +136,7 @@ class CompanySeeder extends Seeder
                 'name'              => $company->pic_name,
                 'email'             => $company->email_company,
                 'username'          => strtolower(str_replace(' ', '', $company->pic_name)),
-                'password'          => \Illuminate\Support\Facades\Hash::make('password123'),                                     // Default password, should be changed
+                'password'          => \Illuminate\Support\Facades\Hash::make('12345678'),                                     // Default password, should be changed
                 'email_verified_at' => now(),
                 'company_id'        => $company->id,
             ]);

@@ -28,7 +28,7 @@ class AdminMasterQuestionIndex extends Component
 {
     use WithPagination, WithFileUploads, WithFilePond;
     protected $paginationTheme = 'bootstrap';
-    public $perPage = 10, $search;
+    public $perPage = 5, $search;
 
     public $selectedQuestions = [];
     public $selectAll = false;
@@ -39,6 +39,7 @@ class AdminMasterQuestionIndex extends Component
     public $images = [], $old_images = [], $studys = [], $study_id;
     public $filterStudyId, $filterQuestionTypeId, $filterTopicId, $filterDifficulty, $filterCategoryQuestionId;
     public $study_id_import, $file_import;
+    public $isLimited = false;
 
     public function render()
     {

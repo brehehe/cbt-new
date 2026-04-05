@@ -129,6 +129,7 @@ class Timetable extends Model
                             }
                         ])
                         ->chunkById(200, function ($moduleQuestions) use ($timetableModule) {
+                            $moduleQuestions = $moduleQuestions->unique('question_id');
                             $now = now();
                             $questionUpserts = [];
                             $answerUpserts = [];
@@ -219,7 +220,7 @@ class Timetable extends Model
                             if (!empty($questionUpserts)) {
                                 TimetableQuestion::upsert(
                                     $questionUpserts,
-                                    ['id'],
+                                    ['timetable_module_id', 'question_id'],
                                     [
                                         'company_id', 'study_id', 'user_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'category_question_id', 'difficulty', 'order', 'question', 'images', 'description', 'latex', 'latex_preview_pdf', 'latex_preview_png', 'weight_correct', 'weight_incorrect', 'updated_at',
                                     ]

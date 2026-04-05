@@ -162,3 +162,4 @@ Route::get('/metrics/system', [RealTimeMetricsController::class, 'getSystemMetri
 
 Route::get('/metrics/livestream', [RealTimeMetricsController::class, 'getLiveStreamMetrics'])
     ->name('api.metrics.livestream');
+

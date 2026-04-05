@@ -91,7 +91,9 @@ class AdminExamWarningIndex extends Component
             'text' => 'Anda berhasil memulai ujian!',
         ]);
 
-        return redirect()->route('admin.exam.detail');
+        return redirect()->route('admin.exam.detail.react', [
+            'userTimetableId' => $userTimetable->id,
+        ]);
     }
 
     public function render()

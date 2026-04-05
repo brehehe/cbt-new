@@ -147,26 +147,56 @@
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-                <div class="md:col-span-2">
+                <div class="md:col-span-2" wire:ignore>
                     <label for="question" class="block text-sm font-medium text-gray-700">Pertanyaan<span
                             class="text-red-600">*</span></label>
-                    <textarea id="question" wire:model="question" placeholder="Pertanyaan..." class="mt-1 form-control" data-autosize="true" style="overflow:hidden;resize:none;" x-data x-init="$el.style.height='auto';$el.style.height=$el.scrollHeight+'px'" @input="$el.style.height='auto';$el.style.height=$el.scrollHeight+'px'"></textarea>
-                    @error('question')
-                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                    @enderror
+                    <textarea id="question" x-data x-init="$($el).summernote({
+                        height: 300,
+                        placeholder: 'Pertanyaan...',
+                        toolbar: [
+                            ['style', ['style']],
+                            ['font', ['bold', 'underline', 'clear']],
+                            ['color', ['color']],
+                            ['para', ['ul', 'ol', 'paragraph']],
+                            ['table', ['table']],
+                            ['insert', ['link', 'picture', 'video']],
+                            ['view', ['fullscreen', 'codeview', 'help']]
+                        ],
+                        callbacks: {
+                            onChange: function(contents, $editable) {
+                                @this.set('question', contents);
+                            }
+                        }
+                    });
+                    $($el).summernote('code', @this.get('question'));" 
+                        class="mt-1 form-control"></textarea>
                 </div>
                 <div class="md:col-span-2">
                     <label for="question" class="block text-sm font-medium text-gray-700">Gambar<span
                             class="text-red-600">*</span></label>
                     <button class="bg-[{{ $companyData->color_primary }}] text-white px-2 py-1 rounded" wire:click='modalImages()'>Gambar</button>
                 </div>
-                <div class="md:col-span-2">
+                <div class="md:col-span-2" wire:ignore>
                     <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi
                         Pertanyaan</label>
-                    <textarea id="description" wire:model="description" placeholder="Deskripsi pertanyaan..." class="mt-1 form-control" data-autosize="true" style="overflow:hidden;resize:none;" x-data x-init="$el.style.height='auto';$el.style.height=$el.scrollHeight+'px'" @input="$el.style.height='auto';$el.style.height=$el.scrollHeight+'px'"></textarea>
-                    @error('description')
-                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                    @enderror
+                    <textarea id="description" x-data x-init="$($el).summernote({
+                        height: 200,
+                        placeholder: 'Deskripsi pertanyaan...',
+                        toolbar: [
+                            ['style', ['style']],
+                            ['font', ['bold', 'underline', 'clear']],
+                            ['para', ['ul', 'ol', 'paragraph']],
+                            ['insert', ['link', 'picture']],
+                            ['view', ['codeview']]
+                        ],
+                        callbacks: {
+                            onChange: function(contents, $editable) {
+                                @this.set('description', contents);
+                            }
+                        }
+                    });
+                    $($el).summernote('code', @this.get('description'));" 
+                        class="mt-1 form-control"></textarea>
                 </div>
                 </div>
                 </div>
