@@ -182,7 +182,8 @@
                 Batal
             </button>
             <button wire:click='submit'
-                class="px-4 py-2 bg-[{{ $companyData->color_primary }}] hover:bg-[{{ $companyData->color_primary }}] text-white rounded-lg shadow transition">
+                style="background-color: {{ $companyData->color_primary ?? '#880c24' }};"
+                class="px-4 py-2 text-white rounded-lg shadow transition hover:opacity-90">
                 Simpan
             </button>
         </div>
