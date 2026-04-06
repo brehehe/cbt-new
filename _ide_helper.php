@@ -25863,6 +25863,443 @@ namespace Illuminate\Testing {
             }
     }
 
+namespace App\Livewire\Admin\Profile {
+    /**
+     */
+    class AdminProfileIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Auth\Login {
+    /**
+     */
+    class AuthLoginIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Auth\Register {
+    /**
+     */
+    class AuthRegisterIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Dashboard {
+    /**
+     */
+    class AdminDashboardIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin {
+    /**
+     */
+    class StudentManagement extends \Livewire\Component {
+            }
+    /**
+     */
+    class LecturerManagement extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Session {
+    /**
+     */
+    class AdminSessionIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\ChangePassword {
+    /**
+     */
+    class AdminChangePasswordIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Exam\Timetable {
+    /**
+     */
+    class AdminExamTimetableIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Exam\HistoryTimetable {
+    /**
+     */
+    class AdminExamHistoryTimetableIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Exam\HistoryTimetable\Detail {
+    /**
+     */
+    class AdminExamHistoryTimetableDetailIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Exam\Warning {
+    /**
+     */
+    class AdminExamWarningIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Exam\Detail {
+    /**
+     */
+    class AdminExamDetailIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Exam\Monitor {
+    /**
+     */
+    class AdminExamMonitorIndex extends \Livewire\Component {
+            }
+    /**
+     */
+    class AdminExamMonitorDetailIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Exam\LiveStream {
+    /**
+     */
+    class AdminExamLiveStreamIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Role {
+    /**
+     */
+    class AdminMasterRoleIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\User {
+    /**
+     */
+    class AdminMasterUserIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Setting {
+    /**
+     */
+    class AdminMasterSettingIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Backup {
+    /**
+     */
+    class AdminMasterBackupIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Topic {
+    /**
+     */
+    class AdminMasterTopicIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\MaterialCategory {
+    /**
+     */
+    class AdminMasterMaterialCategoryIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\RatingScale {
+    /**
+     */
+    class AdminMasterRatingScaleIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Regulation {
+    /**
+     */
+    class AdminMasterRegulationIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Admin {
+    /**
+     */
+    class AdminMasterAdminIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Lecturer {
+    /**
+     */
+    class AdminMasterLecturerIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Student {
+    /**
+     */
+    class AdminMasterStudentIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Supervisor {
+    /**
+     */
+    class AdminMasterSupervisorIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Study {
+    /**
+     */
+    class AdminMasterStudyIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Timetable {
+    /**
+     */
+    class AdminMasterTimetableIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Timetable\Detail {
+    /**
+     */
+    class AdminMasterTimetableDetailIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Timetable\Video {
+    /**
+     */
+    class AdminMasterTimetableVideoIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Timetable\Alert {
+    /**
+     */
+    class AdminMasterTimetableAlertIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Timetable\Streaming {
+    /**
+     */
+    class AdminMasterTimetableStreamingIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Timetable\Session {
+    /**
+     */
+    class AdminMasterTimetableSessionIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Timetable\Answer {
+    /**
+     */
+    class AdminMasterTimetableAnswerIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Material {
+    /**
+     */
+    class AdminMasterMaterialIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\QuestionType {
+    /**
+     */
+    class AdminMasterQuestionTypeIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\CategoryQuestion {
+    /**
+     */
+    class AdminMasterCategoryQuestionIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\ExamType {
+    /**
+     */
+    class AdminMasterExamTypeIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\ExamRoom {
+    /**
+     */
+    class AdminMasterExamRoomIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\ExamSession {
+    /**
+     */
+    class AdminMasterExamSessionIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Module {
+    /**
+     */
+    class AdminMasterModuleIndex extends \Livewire\Component {
+            }
+    /**
+     */
+    class AdminMasterModuleQuestionIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Question {
+    /**
+     */
+    class AdminMasterQuestionIndex extends \Livewire\Component {
+            }
+    /**
+     */
+    class AdminMasterQuestionUpdate extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Classmate {
+    /**
+     */
+    class AdminMasterClassmateIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Classmate\Detail {
+    /**
+     */
+    class AdminMasterClassmateDetailIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Report\Timetable {
+    /**
+     */
+    class AdminReportTimetableIndex extends \Livewire\Component {
+            }
+    /**
+     */
+    class AdminReportTimetableDetail extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Report\Question {
+    /**
+     */
+    class AdminReportQuestionIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Report\ItemAnalysis {
+    /**
+     */
+    class AdminReportItemAnalysisIndex extends \Livewire\Component {
+            }
+    /**
+     */
+    class AdminReportItemAnalysisAllIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Report\ItemAnalysis\Detail {
+    /**
+     */
+    class AdminReportItemAnalysisDetailIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Report\ExamResult {
+    /**
+     */
+    class AdminReportExamResultIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Report\Official {
+    /**
+     */
+    class AdminReportOfficialIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Report\Attendance {
+    /**
+     */
+    class AdminReportAttendanceIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Report\Card {
+    /**
+     */
+    class AdminReportCardIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Report\FullExamResult {
+    /**
+     */
+    class AdminReportFullExamResultIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Report\AnswerStatistics {
+    /**
+     */
+    class AdminReportAnswerStatisticsIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Report\StudentExamResult {
+    /**
+     */
+    class AdminReportStudentExamResultIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Dosen\Dashboard {
+    /**
+     */
+    class DosenDashboardIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Mahasiswa\Dashboard {
+    /**
+     */
+    class MahasiswaDashboardIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Pengawas\Dashboard {
+    /**
+     */
+    class PengawasDashboardIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Public {
+    /**
+     */
+    class StressTestExamDetailIndex extends \Livewire\Component {
+            }
+    }
+
 
 namespace  {
     class App extends \Illuminate\Support\Facades\App {}

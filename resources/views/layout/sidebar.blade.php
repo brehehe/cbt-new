@@ -3,8 +3,8 @@
 
     $company = Company::first(); // ambil 1 data pertama
 
-    $primary = $company?->color_primary ?? '#f58634';
-    $secondary = $company?->color_secondary ?? '#e88742ff';
+    $primary = '#f58634';
+    $secondary = '#e88742ff';
     $brandColor = "text-[{$primary}]";
 @endphp
 
