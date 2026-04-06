@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Room, RoomEvent, VideoPresets } from 'livekit-client';
 import StudentGrid from './components/StudentGrid';
+import StudentDetailModal from './components/StudentDetailModal';
 
 const AdminMonitorContainer = ({ timetableId }) => {
     const [sessions, setSessions] = useState([]);
@@ -11,6 +12,7 @@ const AdminMonitorContainer = ({ timetableId }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [stats, setStats] = useState({ total: 0, active: 0, warning: 0, error: 0 });
+    const [selectedSession, setSelectedSession] = useState(null);
 
     // 1. Fetch Session Data
     const fetchSessions = useCallback(async () => {
@@ -64,6 +66,13 @@ const AdminMonitorContainer = ({ timetableId }) => {
     }, [timetableId]);
 
     useEffect(() => {
+        if (selectedSession) {
+            const updated = sessions.find(s => s.id === selectedSession.id);
+            if (updated) setSelectedSession(updated);
+        }
+    }, [sessions]);
+
+    useEffect(() => {
         fetchSessions();
         connectToRoom();
 
@@ -115,7 +124,17 @@ const AdminMonitorContainer = ({ timetableId }) => {
             <StudentGrid 
                 sessions={sessions} 
                 room={room} 
+                onDetail={setSelectedSession}
             />
+
+            {/* Modal Detail Overlay */}
+            {selectedSession && (
+                <StudentDetailModal 
+                    session={selectedSession} 
+                    room={room}
+                    onClose={() => setSelectedSession(null)}
+                />
+            )}
         </div>
     );
 };

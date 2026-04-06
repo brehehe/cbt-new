@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Track } from 'livekit-client';
 
-const StudentCard = ({ session, room }) => {
+const StudentCard = ({ session, room, onDetail }) => {
     const videoRef = useRef(null);
     const [participant, setParticipant] = useState(null);
     const [isSubscribed, setIsSubscribed] = useState(false);
@@ -129,11 +129,11 @@ const StudentCard = ({ session, room }) => {
                 </div>
 
                 <div className="flex gap-2">
-                    <button className="flex-1 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-bold rounded-lg transition-colors border border-blue-100">
+                    <button 
+                        onClick={() => onDetail(session)}
+                        className="flex-1 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-bold rounded-lg transition-colors border border-blue-100"
+                    >
                         Detail
-                    </button>
-                    <button className="px-3 py-1.5 bg-gray-50 text-gray-700 hover:bg-gray-100 text-xs font-bold rounded-lg transition-colors border border-gray-100">
-                        Chat
                     </button>
                 </div>
             </div>

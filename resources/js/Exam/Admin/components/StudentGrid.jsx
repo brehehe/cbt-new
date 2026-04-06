@@ -1,7 +1,7 @@
 import React from 'react';
 import StudentCard from './StudentCard';
 
-const StudentGrid = ({ sessions, room }) => {
+const StudentGrid = ({ sessions, room, onDetail }) => {
     if (!sessions || sessions.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center p-12 bg-white rounded-xl shadow-sm border border-gray-100 min-h-[300px]">
@@ -23,6 +23,7 @@ const StudentGrid = ({ sessions, room }) => {
                     key={session.id} 
                     session={session} 
                     room={room} 
+                    onDetail={onDetail}
                 />
             ))}
         </div>
