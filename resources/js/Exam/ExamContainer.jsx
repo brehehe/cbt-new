@@ -23,7 +23,7 @@ const ExamContainer = ({ userTimetableId }) => {
     const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
 
     // Proctoring & Recording Hooks
-    const { isRecording } = useExamRecording(userTimetableId, examData?.isRecordingEnabled);
+    const { isRecording, stopRecording } = useExamRecording(userTimetableId, examData?.isRecordingEnabled);
     const { isBlackout } = useProctoring(userTimetableId, (count) => setAlertCount(count));
     const { connectionStatus } = useLiveSession(userTimetableId, examData?.isStreamingEnabled);
 
@@ -99,7 +99,7 @@ const ExamContainer = ({ userTimetableId }) => {
             text: "Apakah Anda yakin ingin menyelesaikan ujian ini? Jawaban yang sudah disimpan tidak dapat diubah lagi.",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#2563eb',
+            confirmButtonColor: '#f58634',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Ya, Selesai!',
             cancelButtonText: 'Batal'
@@ -108,13 +108,17 @@ const ExamContainer = ({ userTimetableId }) => {
         if (result.isConfirmed) {
             try {
                 Swal.fire({
-                    title: 'Memproses...',
+                    title: 'Memproses Penilaian & Menyimpan Video...',
                     didOpen: () => Swal.showLoading(),
                     allowOutsideClick: false
                 });
 
+                if (examData?.isRecordingEnabled) {
+                    await stopRecording();
+                }
+
                 const response = await axios.post(`/api/exam/${userTimetableId}/finish`);
-                
+
                 // Skip the leave confirmation and the success modal
                 window.isFinishingExam = true;
 
@@ -140,7 +144,7 @@ const ExamContainer = ({ userTimetableId }) => {
     }
 
     const currentQuestion = examData.questions[currentQuestionIndex];
-    const companyColor = examData.userTimetable.company?.color_primary || '#2563eb';
+    const companyColor = examData.userTimetable.company?.color_primary || '#f58634';
 
     return (
         <div className="flex flex-col min-h-screen bg-white font-sans text-gray-900">

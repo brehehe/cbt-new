@@ -190,10 +190,11 @@ class ExamApiController extends Controller
             $userTimetable = UserTimetable::find($userTimetableId);
             if (!$userTimetable) return response()->json(['error' => 'Timetable not found'], 404);
             $currentRecording = ExamRecording::create([
-                'timetable_id' => $userTimetable->timetable_id,
+                'timetable_id'      => $userTimetable->timetable_id,
                 'user_timetable_id' => $userTimetableId,
-                'start_time' => now(),
-                'status' => 'recording'
+                'user_id'           => $userTimetable->user_id,
+                'start_time'        => now(),
+                'status'            => 'recording'
             ]);
         }
 
@@ -225,19 +226,62 @@ class ExamApiController extends Controller
     }
 
     /**
-     * Finalize the recording.
+     * Upload the full recording at the end of the exam.
      */
-    public function finalizeRecording($userTimetableId)
+    public function uploadFullRecording(Request $request)
     {
-        // Launch in background
-        $artisan = base_path('artisan');
-        $cmd = "nohup php {$artisan} tinker --execute=\"\\App\\Services\\Exam\\RecordingFinalizer::finalizeFullExamRecording('$userTimetableId')\" > /dev/null 2>&1 &";
-        shell_exec($cmd);
-
-        return response()->json([
-            'success' => true, 
-            'message' => 'Finalisasi rekaman sedang berjalan di latar belakang.'
+        $request->validate([
+            'user_timetable_id' => 'required',
+            'videoBlob' => 'required', // Handles both File and Base64
         ]);
+
+        $userTimetableId = $request->user_timetable_id;
+        $videoBlob = $request->videoBlob;
+
+        $userTimetable = UserTimetable::find($userTimetableId);
+        if (!$userTimetable) return response()->json(['error' => 'Timetable not found'], 404);
+
+        $currentRecording = ExamRecording::where('user_timetable_id', $userTimetableId)
+            ->where('status', 'recording')
+            ->first();
+
+        if (!$currentRecording) {
+            $currentRecording = ExamRecording::create([
+                'timetable_id' => $userTimetable->timetable_id,
+                'user_timetable_id' => $userTimetableId,
+                'start_time' => now(),
+                'status' => 'recording'
+            ]);
+        }
+
+        // Decode base64 OR handle file upload
+        if ($request->hasFile('videoBlob')) {
+            $videoData = file_get_contents($request->file('videoBlob')->getRealPath());
+        } else {
+            if (!preg_match('/^data:video\/[^;]+/', $videoBlob)) {
+                return response()->json(['error' => 'Invalid video format'], 400);
+            }
+            $videoData = base64_decode(preg_replace('#^data:video/[^;]+;.*base64,#i', '', $videoBlob));
+        }
+        
+        if ($videoData === false || empty($videoData)) {
+             return response()->json(['error' => 'No video data received'], 400);
+        }
+
+        // Save file
+        $baseDir = 'exam_recordings/' . $userTimetableId;
+        $filename = $baseDir . '/' . $currentRecording->id . '_full.webm';
+        Storage::disk('public')->put($filename, $videoData);
+
+        // Save to database directly
+        $currentRecording->update([
+            'video_path' => $filename,
+            'file_size' => strlen($videoData),
+            'end_time' => now(),
+            'status' => 'completed' // Mark as completed since no chunk merging is needed
+        ]);
+
+        return response()->json(['success' => true]);
     }
 
     /**
@@ -268,8 +312,89 @@ class ExamApiController extends Controller
     }
 
     /**
+     * Merge all uploaded chunks into a single video using FFmpeg.
+     * Called after the last chunk has been uploaded (when the exam ends).
+     */
+    public function mergeRecordingChunks(Request $request)
+    {
+        $request->validate([
+            'user_timetable_id' => 'required',
+        ]);
+
+        $userTimetableId = $request->user_timetable_id;
+
+        $currentRecording = ExamRecording::where('user_timetable_id', $userTimetableId)
+            ->where('status', 'recording')
+            ->first();
+
+        if (!$currentRecording) {
+            return response()->json(['error' => 'No active recording found'], 404);
+        }
+
+        $chunksDir = storage_path('app/public/exam_recordings/chunks/' . $userTimetableId);
+        $outputDir = storage_path('app/public/exam_recordings/' . $userTimetableId);
+        $outputFile = $outputDir . '/' . $currentRecording->id . '_merged.webm';
+        $concatFile = $chunksDir . '/concat_list.txt';
+
+        // Ensure output dir exists
+        if (!is_dir($outputDir)) {
+            mkdir($outputDir, 0755, true);
+        }
+
+        // Find all chunk files, sorted numerically
+        $chunkPattern = $chunksDir . '/' . $currentRecording->id . '_chunk_*.webm';
+        $chunkFiles = glob($chunkPattern);
+
+        if (empty($chunkFiles)) {
+            // No chunks found — mark as failed
+            $currentRecording->update(['status' => 'failed', 'end_time' => now()]);
+            return response()->json(['error' => 'No chunks found to merge'], 422);
+        }
+
+        // Sort by chunk number
+        usort($chunkFiles, function ($a, $b) {
+            preg_match('/_chunk_(\d+)\.webm$/', $a, $mA);
+            preg_match('/_chunk_(\d+)\.webm$/', $b, $mB);
+            return (int)($mA[1] ?? 0) <=> (int)($mB[1] ?? 0);
+        });
+
+        // Write FFmpeg concat list
+        $lines = array_map(fn($f) => "file '" . str_replace("'", "'\\''", $f) . "'", $chunkFiles);
+        file_put_contents($concatFile, implode("\n", $lines));
+
+        // Run FFmpeg in the background (non-blocking)
+        $ffmpegBin = '/usr/bin/ffmpeg';
+        $cmd = escapeshellcmd(
+            "$ffmpegBin -y -f concat -safe 0 -i " . escapeshellarg($concatFile) .
+            " -c copy " . escapeshellarg($outputFile)
+        ) . " > /dev/null 2>&1 &";
+
+        exec($cmd);
+
+        // Mark as completed and store final path
+        $relPath = 'exam_recordings/' . $userTimetableId . '/' . $currentRecording->id . '_merged.webm';
+        $currentRecording->update([
+            'status'     => 'merging',
+            'video_path' => $relPath,
+            'end_time'   => now(),
+        ]);
+
+        Log::info('[Recording] FFmpeg merge triggered for recording #' . $currentRecording->id, [
+            'chunks' => count($chunkFiles),
+            'output' => $outputFile,
+        ]);
+
+        return response()->json([
+            'success'     => true,
+            'chunk_count' => count($chunkFiles),
+            'output_path' => $relPath,
+        ]);
+    }
+
+    /**
      * Finish the exam.
      */
+
     public function finishExam($userTimetableId)
     {
         $userTimetable = UserTimetable::where('id', $userTimetableId)
@@ -315,18 +440,7 @@ class ExamApiController extends Controller
             'end_time' => now()
         ]);
 
-        // Finalize all recordings for this timetable in the background
-        try {
-            // Launch background process
-            $artisan = base_path('artisan');
-            $cmd = "nohup php {$artisan} tinker --execute=\"\\App\\Services\\Exam\\RecordingFinalizer::finalizeFullExamRecording('$userTimetableId')\" > /dev/null 2>&1 &";
-            shell_exec($cmd);
-        } catch (\Exception $e) {
-            Log::error('Auto Finalize Recording Failed to launch background process', [
-                'user_timetable_id' => $userTimetableId,
-                'error' => $e->getMessage()
-            ]);
-        }
+        // Finalization background job removed because recording is now saved fully without chunking.
 
         return response()->json([
             'success' => true,

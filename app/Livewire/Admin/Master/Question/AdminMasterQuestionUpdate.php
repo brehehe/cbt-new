@@ -18,15 +18,15 @@ use App\Services\Answer\AnswerService;
 use App\Models\Master\Question\Material;
 use App\Models\Category\CategoryQuestion;
 use App\Models\Master\Question\Question;
-use Spatie\LivewireFilepond\WithFilePond;
 use App\Services\Question\QuestionService;
 use App\Models\Master\Question\QuestionType;
 use App\Models\Master\Question\MaterialCategory;
+use App\Traits\UploadFile;
 use App\Models\Study\Study;
 
 class AdminMasterQuestionUpdate extends Component
 {
-    use WithFileUploads, WithFilePond;
+    use WithFileUploads, UploadFile;
     public $search;
 
     public $isEditingAnswer = false;
@@ -34,10 +34,10 @@ class AdminMasterQuestionUpdate extends Component
     public $get_question;
     public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id, $question, $description, $latex, $weight_correct, $weight_incorrect,$category_question_id;
     public $topics = [], $material_categories = [], $materials = [], $question_types = [], $category_questions = [];
-    public $images = [], $old_images = [];
+    public $images = [], $old_images = [], $new_images = [];
 
     public $answer_id, $answer_context, $answer_description, $answer_latex, $answer_correct, $answer_alphabet;
-    public $answer_images = [], $old_answer_images = [];
+    public $answer_images = [], $old_answer_images = [], $answer_new_images = [];
     public $studys = [], $study_id;
 
     public function render()
@@ -69,10 +69,13 @@ class AdminMasterQuestionUpdate extends Component
         $this->category_questions  = CategoryQuestion::select('id', 'name')->get();
         $this->materials           = Material::select('id', 'material_category_id', 'name')->where('material_category_id', $this->get_question?->material_category_id)->get();
 
-        foreach (json_decode($this->get_question?->images, true) ?? [] as $key => $image) {
-            $path = '/storage/' . ltrim($image, '/');
-            $this->old_images[] = $path;
-            $this->images[]     = $path;
+        foreach (json_decode($this->get_question?->images, true) ?? [] as $image) {
+            // Normalize path to strip /storage/ prefix for internal array handling
+            $cleanPath = Str::after($image, '/storage/');
+            $cleanPath = ltrim($cleanPath, '/');
+            
+            $this->old_images[] = $cleanPath;
+            $this->images[]     = $cleanPath;
         }
 
         // if (Auth::user()?->hasRole('Dosen')) {
@@ -258,6 +261,8 @@ class AdminMasterQuestionUpdate extends Component
             if (!$question) {
                 throw new Exception("Ada kesalahaan saat QuestionService => updateOrCreate", 500);
             }
+            
+            $this->get_question = $question;
 
             DB::commit();
         } catch (Exception | Throwable $th) {
@@ -292,10 +297,11 @@ class AdminMasterQuestionUpdate extends Component
         // Reset gambar ke state database agar perubahan filepond tidak disimpan jika dibatalkan
         $this->images = [];
         $this->old_images = [];
-        foreach (json_decode($this->get_question?->images, true) ?? [] as $key => $image) {
-            $path = '/storage/' . ltrim($image, '/');
-            $this->old_images[] = $path;
-            $this->images[]     = $path;
+        foreach (json_decode($this->get_question?->images, true) ?? [] as $image) {
+            $cleanPath = Str::after($image, '/storage/');
+            $cleanPath = ltrim($cleanPath, '/');
+            $this->old_images[] = $cleanPath;
+            $this->images[]     = $cleanPath;
         }
         
         $this->reset(['answer_id', 'answer_context', 'answer_description', 'answer_latex', 'answer_correct', 'answer_images', 'old_answer_images', 'answer_alphabet']);
@@ -310,10 +316,11 @@ class AdminMasterQuestionUpdate extends Component
         $this->images = [];
         $this->old_images = [];
         
-        foreach (json_decode($this->get_question?->images, true) ?? [] as $key => $image) {
-            $path = '/storage/' . ltrim($image, '/');
-            $this->old_images[] = $path;
-            $this->images[]     = $path;
+        foreach (json_decode($this->get_question?->images, true) ?? [] as $image) {
+            $cleanPath = Str::after($image, '/storage/');
+            $cleanPath = ltrim($cleanPath, '/');
+            $this->old_images[] = $cleanPath;
+            $this->images[]     = $cleanPath;
         }
         
         return $this->dispatch('open-modal', ['id' => 'modal-images']);
@@ -412,13 +419,53 @@ class AdminMasterQuestionUpdate extends Component
         $this->answer_images = [];
         $this->old_answer_images = [];
         
-        foreach (json_decode($result?->images, true) ?? [] as $key => $image) {
-            $path = '/storage/' . ltrim($image, '/');
-            $this->answer_images[]     = $path;
-            $this->old_answer_images[] = $path;
+        foreach (json_decode($result?->images, true) ?? [] as $image) {
+            $cleanPath = Str::after($image, '/storage/');
+            $cleanPath = ltrim($cleanPath, '/');
+            $this->answer_images[]     = $cleanPath;
+            $this->old_answer_images[] = $cleanPath;
         }
         // dd($this->answer_images, $this->old_answer_images);
         // $this->dispatch('initFilepondWithImages', $this->answer_images);
         return $this->dispatch('open-modal', ['id' => 'modal-answer-images']);
+    }
+
+    public function updatedNewImages($value)
+    {
+        $folder = "/public/question/" . \Carbon\Carbon::now()->isoFormat('Y') . '/' . \Carbon\Carbon::now()->isoFormat('MM');
+        
+        foreach ($this->new_images as $new_image) {
+            $upload = $this->uploadFile($new_image, $folder);
+            // $upload[1] is the saved filename (e.g., xxx.webp)
+            $this->images[] = 'question/' . \Carbon\Carbon::now()->isoFormat('Y') . '/' . \Carbon\Carbon::now()->isoFormat('MM') . '/' . $upload[1];
+        }
+        $this->new_images = [];
+    }
+
+    public function removeImage($index)
+    {
+        if (isset($this->images[$index])) {
+            unset($this->images[$index]);
+            $this->images = array_values($this->images);
+        }
+    }
+
+    public function updatedAnswerNewImages($value)
+    {
+        $folder = "/public/answer/" . \Carbon\Carbon::now()->isoFormat('Y') . '/' . \Carbon\Carbon::now()->isoFormat('MM');
+        
+        foreach ($this->answer_new_images as $new_image) {
+            $upload = $this->uploadFile($new_image, $folder);
+            $this->answer_images[] = 'answer/' . \Carbon\Carbon::now()->isoFormat('Y') . '/' . \Carbon\Carbon::now()->isoFormat('MM') . '/' . $upload[1];
+        }
+        $this->answer_new_images = [];
+    }
+
+    public function removeAnswerImage($index)
+    {
+        if (isset($this->answer_images[$index])) {
+            unset($this->answer_images[$index]);
+            $this->answer_images = array_values($this->answer_images);
+        }
     }
 }

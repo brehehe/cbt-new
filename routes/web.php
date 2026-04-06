@@ -448,8 +448,10 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
         Route::post('/save-answer', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'saveAnswer']);
         Route::post('/toggle-mark', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'toggleMark']);
         Route::post('/log-alert', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'logAlert']);
-        Route::post('/recording/chunk', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'uploadChunk']);
-        Route::post('/recording/finalize/{user_timetable_id}', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'finalizeRecording']);
+        Route::post('/recording/upload-full', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'uploadFullRecording']);
+        Route::post('/recording/upload-chunk', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'uploadChunk']);
+        Route::post('/recording/merge', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'mergeRecordingChunks']);
+
         Route::get('/live-session/{user_timetable_id}/update', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'updateLiveSession']);
         Route::get('/live-session/{user_timetable_id}/token', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'getLiveKitToken']);
         

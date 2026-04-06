@@ -21,12 +21,12 @@ use App\Services\Question\QuestionService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\WithFileUploads;
 use Maatwebsite\Excel\Facades\Excel;
-use Spatie\LivewireFilepond\WithFilePond;
 use Throwable;
+use App\Traits\UploadFile;
 
 class AdminMasterQuestionIndex extends Component
 {
-    use WithPagination, WithFileUploads, WithFilePond;
+    use WithPagination, WithFileUploads, UploadFile;
     protected $paginationTheme = 'bootstrap';
     public $perPage = 5, $search;
 
@@ -36,7 +36,7 @@ class AdminMasterQuestionIndex extends Component
 
     public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id, $question, $description, $latex, $weight_correct, $weight_incorrect, $category_question_id;
     public $topics = [], $material_categories = [], $materials = [], $question_types = [], $category_questions = [];
-    public $images = [], $old_images = [], $studys = [], $study_id;
+    public $images = [], $old_images = [], $new_images = [], $studys = [], $study_id;
     public $filterStudyId, $filterQuestionTypeId, $filterTopicId, $filterDifficulty, $filterCategoryQuestionId;
     public $study_id_import, $file_import;
     public $isLimited = false;
@@ -209,10 +209,29 @@ class AdminMasterQuestionIndex extends Component
         $this->studys = Study::orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
     }
 
-    public function updatedImages($value)
+    public function updatedNewImages($value)
     {
-        // Sinkronkan $old_images dengan $images yang sudah diubah
+        // Append chosen temporary files by storing them permanently 
+        $folder = "/public/question/" . \Carbon\Carbon::now()->isoFormat('Y') . '/' . \Carbon\Carbon::now()->isoFormat('MM');
+        
+        foreach ($this->new_images as $new_image) {
+            $upload = $this->uploadFile($new_image, $folder);
+            $this->images[] = 'question/' . \Carbon\Carbon::now()->isoFormat('Y') . '/' . \Carbon\Carbon::now()->isoFormat('MM') . '/' . $upload[1];
+        }
+        
+        // Reset the input model so it fires updated hook on the next upload
+        $this->new_images = [];
         $this->old_images = $this->images;
+    }
+
+    public function removeImage($index)
+    {
+        if (isset($this->images[$index])) {
+            unset($this->images[$index]);
+            // Re-index array
+            $this->images = array_values($this->images);
+            $this->old_images = $this->images;
+        }
     }
 
     public function updated()

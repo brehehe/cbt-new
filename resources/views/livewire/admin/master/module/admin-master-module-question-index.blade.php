@@ -341,8 +341,8 @@
                                 <td class="center">{{ $module_questions->firstItem() + $index }}</td>
                                 <td>{{ $result?->question?->study?->name }}</td>
                                 <td>{{ $result?->question?->questionType?->name }}</td>
-                                <td>{{ $result?->question?->question }}</td>
-                                <td>{{ $result?->question?->description }}</td>
+                                <td>{!! $result?->question?->question !!}</td>
+                                <td>{!! $result?->question?->description !!}</td>
                                 <td class="center">
                                     <div class="flex items-center">
                                         <a class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn"

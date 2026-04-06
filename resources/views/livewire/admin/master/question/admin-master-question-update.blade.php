@@ -1,5 +1,8 @@
-@section('title', 'Ubah Data Soal')
 <div>
+    @section('title', 'Ubah Data Soal')
+    @push('styles')
+        @include('partials.admin-latex-styles')
+    @endpush
     {{-- In work, do what you enjoy. --}}
     @include('livewire.admin.master.question.admin-master-question-update-modal-answer')
     @include('livewire.admin.master.question.admin-master-question-update-modal-answer-images')
@@ -146,53 +149,47 @@
                         <div class="md:col-span-2" wire:ignore>
                             <label for="question" class="block text-sm font-medium text-gray-700">Pertanyaan<span
                                     class="text-red-600">*</span></label>
-                            <textarea id="question" x-data x-init="$($el).summernote({
-                        height: 300,
-                        placeholder: 'Pertanyaan...',
-                        toolbar: [
-                            ['style', ['style']],
-                            ['font', ['bold', 'underline', 'clear']],
-                            ['color', ['color']],
-                            ['para', ['ul', 'ol', 'paragraph']],
-                            ['table', ['table']],
-                            ['insert', ['link', 'picture', 'video']],
-                            ['view', ['fullscreen', 'codeview', 'help']]
-                        ],
-                        callbacks: {
-                            onChange: function(contents, $editable) {
-                                @this.set('question', contents);
-                            }
-                        }
-                    });
-                    $($el).summernote('code', @this.get('question'));" class="mt-1 form-control"></textarea>
+                            <textarea id="question" x-data
+                                x-init="window.initSummernote($el, 'question', { height: 300, initialCode: $wire.question })"
+                                class="mt-1 form-control"></textarea>
+
+                            <!-- Live Preview for Question -->
+                            <div class="mt-4" x-show="$wire.question && $wire.question !== '<p><br></p>'">
+                                <label
+                                    class="block text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-1">Pratinjau
+                                    Pertanyaan:</label>
+                                <div class="p-4 border rounded-xl bg-blue-50/50 shadow-sm transition-all duration-300">
+                                    <div class="prose prose-sm max-w-none text-gray-800 leading-relaxed">
+                                        {!! $question !!}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="md:col-span-2">
                             <label for="question" class="block text-sm font-medium text-gray-700">Gambar<span
                                     class="text-red-600">*</span></label>
-                            <button
-                                class="bg-primary text-white px-2 py-1 rounded"
+                            <button class="bg-primary text-white px-2 py-1 rounded"
                                 wire:click='modalImages()'>Gambar</button>
                         </div>
                         <div class="md:col-span-2" wire:ignore>
                             <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi
                                 Pertanyaan</label>
-                            <textarea id="description" x-data x-init="$($el).summernote({
-                        height: 200,
-                        placeholder: 'Deskripsi pertanyaan...',
-                        toolbar: [
-                            ['style', ['style']],
-                            ['font', ['bold', 'underline', 'clear']],
-                            ['para', ['ul', 'ol', 'paragraph']],
-                            ['insert', ['link', 'picture']],
-                            ['view', ['codeview']]
-                        ],
-                        callbacks: {
-                            onChange: function(contents, $editable) {
-                                @this.set('description', contents);
-                            }
-                        }
-                    });
-                    $($el).summernote('code', @this.get('description'));" class="mt-1 form-control"></textarea>
+                            <textarea id="description" x-data
+                                x-init="window.initSummernote($el, 'description', { height: 200, placeholder: 'Deskripsi pertanyaan...', initialCode: $wire.description })"
+                                class="mt-1 form-control"></textarea>
+
+                            <!-- Live Preview for Description -->
+                            <div class="mt-4" x-show="$wire.description && $wire.description !== '<p><br></p>'">
+                                <label
+                                    class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Pratinjau
+                                    Deskripsi:</label>
+                                <div
+                                    class="p-4 border border-dashed rounded-xl bg-gray-50/50 transition-all duration-300">
+                                    <div class="prose prose-sm max-w-none text-gray-600 leading-relaxed italic">
+                                        {!! $description !!}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -226,15 +223,6 @@
         <div class="p-4 bg-white shadow rounded-lg">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
                 <div class="flex items-center">
-                    {{-- <span class="text-sm text-gray-700 mr-2">Tampil</span>
-                    <select class="mt-1 form-control" wire:model.live='perPage'>
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                    <span class="text-sm text-gray-700 ml-2">data</span> --}}
                 </div>
                 <div class="flex items-center w-full sm:w-auto gap-2">
                     <div class="relative w-full sm:w-64">
@@ -265,8 +253,7 @@
                             <tr>
                                 <td class="center">{{ $result?->alphabet ?? chr(64 + $loop->iteration) }} </td>
                                 <td>
-                                    <button
-                                        class="bg-primary text-white px-2 py-1 rounded"
+                                    <button class="bg-primary text-white px-2 py-1 rounded"
                                         wire:click="modalAnswerImage('{{ $result?->id }}', '{{ $result?->alphabet ?? chr(64 + $loop->iteration) }}')">Gambar</button>
                                 </td>
                                 <td>{{ $result?->context }}</td>
@@ -316,6 +303,7 @@
     </div>
 </div>
 @push('scripts')
+    @include('partials.admin-latex-scripts')
     <script>
         function initTextareaAutosize() {
             const textareas = document.querySelectorAll('textarea[data-autosize="true"]');
@@ -327,81 +315,6 @@
                 textarea.addEventListener('input', autoResize);
                 autoResize();
             });
-        }
-
-        async function renderLatexPreview(sourceSelector, targetSelector, meta = {}) {
-            const sourceEl = document.querySelector(sourceSelector);
-            const targetEl = document.querySelector(targetSelector);
-            if (!sourceEl || !targetEl) return;
-
-            const latex = sourceEl.value || '';
-            if (!latex.trim()) {
-                targetEl.innerHTML = '<div class="text-xs text-gray-400">LaTeX kosong.</div>';
-                return;
-            }
-
-            targetEl.innerHTML = '<div class="text-xs text-gray-500">Rendering...</div>';
-
-            const csrf = document.querySelector('meta[name="csrf-token"]');
-            const token = csrf ? csrf.getAttribute('content') : '';
-
-            try {
-                const response = await fetch("{{ url('/admin/latex/preview') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': token,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({
-                        latex,
-                        target_type: meta.targetType || null,
-                        target_id: meta.targetId || null
-                    })
-                });
-                const data = await response.json();
-                if (!response.ok || !data.ok) {
-                    targetEl.innerHTML = `<div class="text-xs text-red-600">${data.message || 'Render gagal.'}</div>`;
-                    return;
-                }
-
-                const pngUrl = data.png_url || '';
-                if (pngUrl) {
-                    targetEl.innerHTML = `<img src="${pngUrl}" class="w-full h-auto rounded" alt="Preview" />`;
-                } else {
-                    targetEl.innerHTML = '<div class="text-xs text-gray-500">Preview gambar tidak tersedia.</div>';
-                }
-            } catch (err) {
-                targetEl.innerHTML = '<div class="text-xs text-red-600">Render gagal. Coba lagi.</div>';
-            }
-        }
-
-        if (window.FilePond) {
-            if (window.FilePondPluginImagePreview && window.FilePondPluginFileValidateType) {
-                FilePond.registerPlugin(
-                    FilePondPluginImagePreview,
-                    FilePondPluginFileValidateType
-                );
-            } else if (window.FilePondPluginImagePreview) {
-                FilePond.registerPlugin(FilePondPluginImagePreview);
-            }
-
-            const imagesInput = document.querySelector('#images');
-            if (imagesInput && !window.imagesPond) {
-                window.imagesPond = FilePond.create(imagesInput, {
-                    allowMultiple: true,
-                    acceptedFileTypes: ['image/png', 'image/jpeg', 'image/webp'],
-                });
-            }
-
-            const answerImagesInput = document.querySelector('#answer_images');
-            if (answerImagesInput && !window.answerImagesPond) {
-                window.answerImagesPond = FilePond.create(answerImagesInput, {
-                    allowMultiple: true,
-                    acceptedFileTypes: ['image/png', 'image/jpeg', 'image/webp'],
-                });
-            }
         }
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -416,46 +329,18 @@
             });
         }
 
-        function autoRenderLatexPreviews() {
-            document.querySelectorAll('[data-latex-render]').forEach((btn) => {
-                const sourceSelector = btn.getAttribute('data-latex-source');
-                const targetSelector = btn.getAttribute('data-latex-target');
-                if (!sourceSelector || !targetSelector) return;
-
-                const sourceEl = document.querySelector(sourceSelector);
-                const targetEl = document.querySelector(targetSelector);
-                if (!sourceEl || !targetEl) return;
-
-                const latex = (sourceEl.value || '').trim();
-                if (!latex) return;
-
-                if (targetEl.dataset.rendered === '1') return;
-                targetEl.dataset.rendered = '1';
-                renderLatexPreview(sourceSelector, targetSelector, {
-                    targetType: btn.getAttribute('data-latex-type'),
-                    targetId: btn.getAttribute('data-latex-id')
-                });
-            });
-        }
-
         document.addEventListener('click', function (e) {
             const btn = e.target.closest('[data-latex-render]');
             if (!btn) return;
             const sourceSelector = btn.getAttribute('data-latex-source');
             const targetSelector = btn.getAttribute('data-latex-target');
             if (!sourceSelector || !targetSelector) return;
-            renderLatexPreview(sourceSelector, targetSelector, {
+            
+            window.renderLatexPreview(sourceSelector, targetSelector, {
                 targetType: btn.getAttribute('data-latex-type'),
                 targetId: btn.getAttribute('data-latex-id')
             });
         });
-
-        document.addEventListener('DOMContentLoaded', autoRenderLatexPreviews);
-        document.addEventListener('livewire:load', autoRenderLatexPreviews);
-        document.addEventListener('livewire:navigated', autoRenderLatexPreviews);
-        if (typeof Livewire !== 'undefined') {
-            Livewire.hook('message.processed', autoRenderLatexPreviews);
-        }
 
         document.addEventListener('reset-answer-latex-preview', function () {
             const targetEl = document.querySelector('#answerLatexPreviewModal');
@@ -475,12 +360,10 @@
                 targetEl.innerHTML = '<div class="text-xs text-gray-400">Belum ada preview.</div>';
                 return;
             }
-
-            const btn = document.querySelector('[data-latex-render][data-latex-source="#answer_latex"]');
+            
             targetEl.dataset.rendered = '0';
-            renderLatexPreview('#answer_latex', '#answerLatexPreviewModal', {
-                targetType: btn ? btn.getAttribute('data-latex-type') : null,
-                targetId: btn ? btn.getAttribute('data-latex-id') : null
+            window.renderLatexPreview('#answer_latex', '#answerLatexPreviewModal', {
+                targetType: 'answer' // Usually answer in this context
             });
         });
     </script>

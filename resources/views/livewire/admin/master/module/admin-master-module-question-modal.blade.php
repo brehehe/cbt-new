@@ -85,7 +85,7 @@
                                                 {{ $questions->firstItem() + $loop->parent->index + $index }}
                                             </td>
                                             <td class="px-4 py-3 text-sm text-gray-900">{{ $result?->study?->name }}</td>
-                                            <td class="px-4 py-3 text-sm text-gray-900">{{ $result?->question }}</td>
+                                            <td class="px-4 py-3 text-sm text-gray-900">{!! $result?->question !!}</td>
                                         </tr>
                                     @endforeach
                                 @empty

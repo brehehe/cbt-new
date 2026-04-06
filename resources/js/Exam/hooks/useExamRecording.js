@@ -1,13 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 
+const CHUNK_INTERVAL_MS = 30 * 1000; // 30 detik per chunk
+
 export const useExamRecording = (userTimetableId, isEnabled) => {
     const mediaRecorderRef = useRef(null);
-    const [isRecording, setIsRecording] = useState(false);
-    const chunkNumberRef = useRef(1);
     const streamRef = useRef(null);
+    const chunkNumberRef = useRef(1);
     const chunkIntervalRef = useRef(null);
-
+    const mimeTypeRef = useRef('');
+    const isStoppingRef = useRef(false);
+    const [isRecording, setIsRecording] = useState(false);
 
     const getSupportedMimeType = () => {
         const types = [
@@ -18,112 +21,176 @@ export const useExamRecording = (userTimetableId, isEnabled) => {
             'video/mp4'
         ];
         for (const type of types) {
-            if (MediaRecorder.isTypeSupported(type)) {
-                return type;
-            }
+            if (MediaRecorder.isTypeSupported(type)) return type;
         }
         return '';
     };
 
-    const uploadChunk = useCallback(async (blob) => {
+    /**
+     * Upload a single chunk blob to the server.
+     */
+    const uploadChunk = useCallback(async (blob, chunkNumber) => {
         const formData = new FormData();
         formData.append('user_timetable_id', userTimetableId);
-        formData.append('chunkBlob', blob, `chunk_${chunkNumberRef.current}.webm`);
-        formData.append('chunkNumber', chunkNumberRef.current++);
+        formData.append('chunkBlob', blob, `chunk_${chunkNumber}.webm`);
+        formData.append('chunkNumber', chunkNumber);
 
         try {
-            await axios.post('/api/exam/recording/chunk', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
+            await axios.post('/api/exam/recording/upload-chunk', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
-            console.log(`Chunk ${chunkNumberRef.current - 1} uploaded successfully`);
-        } catch (error) {
-            console.error("Failed to upload recording chunk", error);
+            console.log(`[Recording] Chunk ${chunkNumber} uploaded.`);
+        } catch (err) {
+            console.error(`[Recording] Failed to upload chunk ${chunkNumber}:`, err);
         }
     }, [userTimetableId]);
 
+    /**
+     * Create a new MediaRecorder session using the existing stream.
+     */
+    const startNewRecorderSession = useCallback(() => {
+        if (!streamRef.current || isStoppingRef.current) return;
+
+        const mimeType = mimeTypeRef.current;
+        const recorder = new MediaRecorder(streamRef.current, { mimeType });
+        const chunks = [];
+
+        recorder.ondataavailable = (e) => {
+            if (e.data && e.data.size > 0) chunks.push(e.data);
+        };
+
+        recorder.onstop = async () => {
+            if (chunks.length > 0) {
+                const blob = new Blob(chunks, { type: mimeType });
+                const currentChunk = chunkNumberRef.current;
+                chunkNumberRef.current += 1;
+                await uploadChunk(blob, currentChunk);
+            }
+        };
+
+        recorder.start();
+        mediaRecorderRef.current = recorder;
+    }, [uploadChunk]);
+
+    /**
+     * Stop the current recorder session and start a new one (chunking logic).
+     */
+    const rotateChunk = useCallback(() => {
+        if (isStoppingRef.current) return;
+        const recorder = mediaRecorderRef.current;
+        if (recorder && recorder.state === 'recording') {
+            recorder.stop(); // onstop will upload and increment chunkNumber
+        }
+        // Start fresh session after a small delay to let onstop handle data
+        setTimeout(() => {
+            if (!isStoppingRef.current) startNewRecorderSession();
+        }, 200);
+    }, [startNewRecorderSession]);
+
+    /**
+     * Begin recording: get camera stream, start first chunk, set rotation interval.
+     */
     const startRecording = useCallback(async () => {
-        if (!isEnabled) return;
-        
+        if (!isEnabled || isRecording) return;
+        isStoppingRef.current = false;
+
         try {
-            const stream = streamRef.current || await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
             streamRef.current = stream;
-            
+
             const mimeType = getSupportedMimeType();
             if (!mimeType) {
-                console.error("No supported MIME type found for MediaRecorder");
+                console.error('[Recording] No supported MIME type found.');
+                return;
+            }
+            mimeTypeRef.current = mimeType;
+            chunkNumberRef.current = 1;
+
+            startNewRecorderSession();
+            setIsRecording(true);
+            console.log('[Recording] Started. Chunking every 30s with MIME:', mimeType);
+
+            // Set up rotation interval
+            chunkIntervalRef.current = setInterval(rotateChunk, CHUNK_INTERVAL_MS);
+
+        } catch (err) {
+            console.error('[Recording] Error starting recording:', err);
+        }
+    }, [isEnabled, isRecording, startNewRecorderSession, rotateChunk]);
+
+    /**
+     * Stop all recording, upload last chunk, then request server to merge with FFmpeg.
+     */
+    const stopRecording = useCallback(() => {
+        return new Promise((resolve) => {
+            isStoppingRef.current = true;
+
+            // Clear the rotation interval
+            if (chunkIntervalRef.current) {
+                clearInterval(chunkIntervalRef.current);
+                chunkIntervalRef.current = null;
+            }
+
+            const recorder = mediaRecorderRef.current;
+            const mimeType = mimeTypeRef.current;
+
+            const finalize = async () => {
+                // Stop camera tracks
+                streamRef.current?.getTracks().forEach(t => t.stop());
+                streamRef.current = null;
+                setIsRecording(false);
+
+                // Trigger server-side FFmpeg merge
+                try {
+                    console.log('[Recording] Requesting server merge via FFmpeg...');
+                    await axios.post('/api/exam/recording/merge', {
+                        user_timetable_id: userTimetableId
+                    });
+                    console.log('[Recording] Merge request sent successfully.');
+                } catch (err) {
+                    console.error('[Recording] Merge request failed:', err);
+                }
+                resolve();
+            };
+
+            if (!recorder || recorder.state === 'inactive') {
+                finalize();
                 return;
             }
 
-            const startIntervalRecording = () => {
-                const mediaRecorder = new MediaRecorder(stream, { mimeType });
-                
-                mediaRecorder.ondataavailable = (event) => {
-                    if (event.data && event.data.size > 0) {
-                        uploadChunk(event.data);
-                    }
-                };
-
-                mediaRecorder.start();
-                mediaRecorderRef.current = mediaRecorder;
-                setIsRecording(true);
+            // Capture last chunk before stopping
+            const pendingChunks = [];
+            recorder.ondataavailable = (e) => {
+                if (e.data && e.data.size > 0) pendingChunks.push(e.data);
+            };
+            recorder.onstop = async () => {
+                if (pendingChunks.length > 0) {
+                    const blob = new Blob(pendingChunks, { type: mimeType });
+                    await uploadChunk(blob, chunkNumberRef.current);
+                }
+                await finalize();
             };
 
-            // Start first interval
-            startIntervalRecording();
-            console.log("Recording started with MIME type:", mimeType);
+            recorder.stop();
+        });
+    }, [uploadChunk, userTimetableId]);
 
-            // Periodically reset the recorder to create standalone valid chunks
-            chunkIntervalRef.current = setInterval(() => {
-                if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-                    // This triggers ondataavailable synchronously
-                    mediaRecorderRef.current.stop();
-                    // Immediately start a new valid recording chunk
-                    startIntervalRecording();
-                }
-            }, 30000); // Create a new valid chunk every 30 seconds
 
-        } catch (err) {
-            console.error("Error starting recording:", err);
-        }
-    }, [isEnabled, uploadChunk]);
-
-    const stopRecording = useCallback(async () => {
-        if (chunkIntervalRef.current) {
-            clearInterval(chunkIntervalRef.current);
-            chunkIntervalRef.current = null;
-        }
-
-        if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-            // Signal stop - this will trigger one last ondataavailable
-            mediaRecorderRef.current.stop();
-            setIsRecording(false);
-            
-            // Stop all tracks to release camera
-            if (streamRef.current) {
-                streamRef.current.getTracks().forEach(track => track.stop());
-                streamRef.current = null;
-            }
-            
-            // Wait slightly for the last ondataavailable to finish the uploadChunk call
-            // before telling the server to finalize everything.
-            setTimeout(() => {
-                axios.post(`/api/exam/recording/finalize/${userTimetableId}`)
-                    .then(() => console.log("Finalization request sent"))
-                    .catch(err => console.error("Failed to finalize recording", err));
-            }, 1000);
-        }
-    }, [userTimetableId]);
-
+    // Auto-start and cleanup
     useEffect(() => {
         if (isEnabled && !isRecording) {
             startRecording();
         }
+
         return () => {
-            if (isRecording) stopRecording();
+            if (isStoppingRef.current) return;
+            isStoppingRef.current = true;
+            if (chunkIntervalRef.current) clearInterval(chunkIntervalRef.current);
+            const recorder = mediaRecorderRef.current;
+            if (recorder && recorder.state !== 'inactive') recorder.stop();
+            streamRef.current?.getTracks().forEach(t => t.stop());
         };
-    }, [isEnabled, isRecording, startRecording, stopRecording]);
+    }, [isEnabled]);
 
     return { isRecording, stopRecording };
 };

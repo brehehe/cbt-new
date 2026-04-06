@@ -16,7 +16,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="icon icon-tabler icons-tabler-outline icon-tabler-file-import h-4 w-4"">
-                                <path stroke=" none" d="M0 0h24v24H0z" fill="none" />
+                                    <path stroke=" none" d="M0 0h24v24H0z" fill="none" />
                         <path d="M14 3v4a1 1 0 0 0 1 1h4" />
                         <path d="M5 13v-8a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-5.5m-9.5 -2h7m-3 -3l3 3l-3 3" />
                         </svg>
@@ -201,7 +201,7 @@
                                         </span>
                                     </div>
                                     <div class="blur-[5px] select-none">
-                                        {{ Str::limit($result?->question, 50) }}
+                                        {!! Str::limit($result?->question, 50) !!}
                                     </div>
                                 @else
                                     <div x-data="{ expanded: false }">
@@ -280,100 +280,30 @@
     </div>
 </div>
 
+@push('styles')
+    @include('partials.admin-latex-styles')
+@endpush
+
 @push('scripts')
+    @include('partials.admin-latex-scripts')
     <script>
         (function () {
-            if (window.__latexServerPreviewInit) return;
-            window.__latexServerPreviewInit = true;
+            if (window.__latexServerPreviewInitIndex) return;
+            window.__latexServerPreviewInitIndex = true;
 
-            async function renderLatexPreview(sourceSelector, targetSelector, meta = {}) {
-                const sourceEl = document.querySelector(sourceSelector);
-                const targetEl = document.querySelector(targetSelector);
-                if (!sourceEl || !targetEl) return;
-
-                const latex = sourceEl.value || '';
-                if (!latex.trim()) {
-                    targetEl.innerHTML = '<div class="text-xs text-gray-400">LaTeX kosong.</div>';
-                    return;
-                }
-
-                targetEl.innerHTML = '<div class="text-xs text-gray-500">Rendering...</div>';
-
-                const csrf = document.querySelector('meta[name="csrf-token"]');
-                const token = csrf ? csrf.getAttribute('content') : '';
-
-                try {
-                    const response = await fetch("{{ url('/admin/latex/preview') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': token,
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        credentials: 'same-origin',
-                        body: JSON.stringify({
-                            latex,
-                            target_type: meta.targetType || null,
-                            target_id: meta.targetId || null
-                        })
-                    });
-                    const data = await response.json();
-                    if (!response.ok || !data.ok) {
-                        targetEl.innerHTML = `<div class="text-xs text-red-600">${data.message || 'Render gagal.'}</div>`;
-                        return;
-                    }
-
-                    const pngUrl = data.png_url || '';
-                    if (pngUrl) {
-                        targetEl.innerHTML = `<img src="${pngUrl}" class="w-full h-auto rounded" alt="Preview" />`;
-                    } else {
-                        targetEl.innerHTML = '<div class="text-xs text-gray-500">Preview gambar tidak tersedia.</div>';
-                    }
-                } catch (err) {
-                    targetEl.innerHTML = '<div class="text-xs text-red-600">Render gagal. Coba lagi.</div>';
-                }
-            }
-
-            function autoRenderLatexPreviews() {
-                document.querySelectorAll('[data-latex-render]').forEach((btn) => {
-                    const sourceSelector = btn.getAttribute('data-latex-source');
-                    const targetSelector = btn.getAttribute('data-latex-target');
-                    if (!sourceSelector || !targetSelector) return;
-
-                    const sourceEl = document.querySelector(sourceSelector);
-                    const targetEl = document.querySelector(targetSelector);
-                    if (!sourceEl || !targetEl) return;
-
-                    const latex = (sourceEl.value || '').trim();
-                    if (!latex) return;
-
-                    if (targetEl.dataset.rendered === '1') return;
-                    targetEl.dataset.rendered = '1';
-                    renderLatexPreview(sourceSelector, targetSelector, {
-                        targetType: btn.getAttribute('data-latex-type'),
-                        targetId: btn.getAttribute('data-latex-id')
-                    });
-                });
-            }
-
+            // Clicking the render button triggers the shared helper
             document.addEventListener('click', function (e) {
                 const btn = e.target.closest('[data-latex-render]');
                 if (!btn) return;
                 const sourceSelector = btn.getAttribute('data-latex-source');
                 const targetSelector = btn.getAttribute('data-latex-target');
                 if (!sourceSelector || !targetSelector) return;
-                renderLatexPreview(sourceSelector, targetSelector, {
+
+                window.renderLatexPreview(sourceSelector, targetSelector, {
                     targetType: btn.getAttribute('data-latex-type'),
                     targetId: btn.getAttribute('data-latex-id')
                 });
             });
-
-            document.addEventListener('DOMContentLoaded', autoRenderLatexPreviews);
-            document.addEventListener('livewire:load', autoRenderLatexPreviews);
-            document.addEventListener('livewire:navigated', autoRenderLatexPreviews);
-            if (typeof Livewire !== 'undefined') {
-                Livewire.hook('message.processed', autoRenderLatexPreviews);
-            }
         })();
     </script>
 @endpush

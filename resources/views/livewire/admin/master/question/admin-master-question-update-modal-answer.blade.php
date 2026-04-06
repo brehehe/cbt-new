@@ -23,28 +23,27 @@
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                     <div class="mb-4" wire:ignore>
-                        <label for="answer_context" class="block text-sm font-medium text-gray-700">Konteks Jawaban <span
-                                class="text-red-600">*</span></label>
-                        <textarea id="answer_context" x-data x-init="$($el).summernote({
-                            height: 150,
-                            placeholder: 'Tulis jawaban di sini...',
-                            toolbar: [
-                                ['font', ['bold', 'underline', 'clear']],
-                                ['para', ['ul', 'ol', 'paragraph']],
-                                ['insert', ['link', 'picture']],
-                                ['view', ['codeview']]
-                            ],
-                            callbacks: {
-                                onChange: function(contents, $editable) {
-                                    @this.set('answer_context', contents);
-                                }
-                            }
-                        });
-                        $($el).summernote('code', @this.get('answer_context'));" 
+                        <label for="answer_context" class="block text-sm font-medium text-gray-700">Konteks Jawaban
+                            <span class="text-red-600">*</span></label>
+                        <textarea id="answer_context" x-data
+                            x-init="window.initSummernote($el, 'answer_context', { height: 150, placeholder: 'Tulis jawaban di sini...', latexTarget: 'answer_latex', initialCode: $wire.answer_context })"
                             class="mt-1 form-control"></textarea>
                     </div>
+
+                    <!-- Live Preview Box for Answer -->
+                    <div class="mb-4" x-show="$wire.answer_context && $wire.answer_context !== '<p><br></p>'">
+                        <label
+                            class="block text-[10px] font-bold text-green-600 uppercase tracking-widest mb-1">Pratinjau
+                            Jawaban:</label>
+                        <div class="p-3 border rounded-xl bg-green-50 shadow-sm transition-all duration-300">
+                            <div class="prose prose-sm max-w-none text-gray-800 leading-snug">
+                                {!! $answer_context !!}
+                            </div>
+                        </div>
+                    </div>
                     <div class="mb-4">
-                        <label for="answer_correct" class="block text-sm font-medium text-gray-700">Jawaban yang benar</label>
+                        <label for="answer_correct" class="block text-sm font-medium text-gray-700">Jawaban yang
+                            benar</label>
                         <div class="flex items-center mt-2">
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" wire:model="answer_correct" class="sr-only peer">
@@ -60,19 +59,26 @@
                 </div>
                 <div>
                     <div class="mb-4">
-                        <label for="answer_latex" class="block text-sm font-medium text-gray-700">LaTeX (Opsional)</label>
-                        <textarea id="answer_latex" wire:model.defer="answer_latex" placeholder="Tulis LaTeX di sini..." class="mt-1 form-control" data-autosize="true" rows="3" style="overflow:hidden;resize:none;" x-data x-init="$nextTick(() => { $el.style.height='auto'; $el.style.height=$el.scrollHeight+'px'; })" @focus="$el.style.height='auto';$el.style.height=$el.scrollHeight+'px'" @input="$el.style.height='auto';$el.style.height=$el.scrollHeight+'px'"
+                        <label for="answer_latex" class="block text-sm font-medium text-gray-700">LaTeX
+                            (Opsional)</label>
+                        <textarea id="answer_latex" wire:model.defer="answer_latex" placeholder="Tulis LaTeX di sini..."
+                            class="mt-1 form-control" data-autosize="true" rows="3" style="overflow:hidden;resize:none;"
+                            x-data
+                            x-init="$nextTick(() => { $el.style.height='auto'; $el.style.height=$el.scrollHeight+'px'; })"
+                            @focus="$el.style.height='auto';$el.style.height=$el.scrollHeight+'px'"
+                            @input="$el.style.height='auto';$el.style.height=$el.scrollHeight+'px'"
                             data-latex-input="server"></textarea>
                         <p class="mt-1 text-xs text-gray-500">Disimpan sebagai source LaTeX terpisah.</p>
                         <div class="mt-2 flex items-center gap-2">
-                            <button type="button" class="btn btn-primary"
-                                data-latex-render data-latex-source="#answer_latex" data-latex-target="#answerLatexPreviewModal"
+                            <button type="button" class="btn btn-primary" data-latex-render
+                                data-latex-source="#answer_latex" data-latex-target="#answerLatexPreviewModal"
                                 data-latex-type="answer" data-latex-id="{{ $answer_id }}">
                                 Render LaTeX
                             </button>
                             <span class="text-xs text-gray-500">Preview akan muncul di bawah.</span>
                         </div>
-                        <div id="answerLatexPreviewModal" class="mt-2 rounded border bg-gray-50 p-3 text-sm text-gray-700" wire:ignore>
+                        <div id="answerLatexPreviewModal"
+                            class="mt-2 rounded border bg-gray-50 p-3 text-sm text-gray-700" wire:ignore>
                             <div class="text-xs text-gray-400">Belum ada preview.</div>
                         </div>
                         @error('answer_latex')
@@ -89,8 +95,7 @@
                 class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow transition cursor-pointer">
                 Batal
             </button>
-            <button wire:click="submitAnswer"
-                class="px-4 py-2
+            <button wire:click="submitAnswer" class="px-4 py-2
         bg-primary hover:bg-primary
         text-white rounded-lg shadow transition">
                 Simpan

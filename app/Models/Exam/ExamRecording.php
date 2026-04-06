@@ -27,20 +27,12 @@ class ExamRecording extends Model
     {
         parent::boot();
 
-        static::addGlobalScope('user_scope', function (Builder $builder) {
-            $user = Auth::user();
-
-            if (!$user || !$user->hasRole('Anonymous')) {
-                $builder->where('company_id', optional($user?->company)?->id)->orderBy('order', 'asc');
-            }
-
-            $builder->orderBy('order', 'asc');
-        });
-
         static::creating(function ($modelCreate) {
-            $lastOrder = static::max('order');
+            $lastOrder = static::withoutGlobalScopes()->max('order');
             $modelCreate->order = $lastOrder ? $lastOrder + 1 : 1;
-            $modelCreate->company_id = $modelCreate->company_id ?? (auth()->user() ? auth()->user()->company_id : Company::first()->id);
+            if (empty($modelCreate->company_id) && auth()->check()) {
+                $modelCreate->company_id = auth()->user()->company_id;
+            }
         });
     }
 
@@ -57,6 +49,11 @@ class ExamRecording extends Model
         'start_time' => 'datetime',
         'end_time' => 'datetime',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
+    }
 
     public function userTimetable()
     {

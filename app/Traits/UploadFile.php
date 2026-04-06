@@ -48,7 +48,7 @@ trait UploadFile
 
         if (in_array($extension, ['webp'])) {
 
-            $new_file = Webp::make($file);
+            $new_file = Webp::make($file)->quality(80);
             $path     = $new_file->save(storage_path("app{$where}/{$savedFileName}"));
 
         } else {
