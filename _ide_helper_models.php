@@ -552,8 +552,10 @@ namespace App\Models\Exam{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $user_id
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Master\Timetable\Timetable|null $timetable
+ * @property-read \App\Models\User|null $user
  * @property-read \App\Models\User\UserTimetable|null $userTimetable
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording newQuery()
@@ -572,6 +574,7 @@ namespace App\Models\Exam{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereTimetableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereUserTimetableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereVideoPath($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording withTrashed(bool $withTrashed = true)
