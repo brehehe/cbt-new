@@ -41,9 +41,9 @@
             }
 
             :root {
-                --primary-50: {{ $company->color_primary ?? '#16a34a' }}1a; /* 10% opacity fallback */
-                --primary-600: {{ $company->color_primary ?? '#16a34a' }};
-                --color-primary: {{ $company->color_primary ?? '#16a34a' }};
+                --primary-50: {{ $company->color_primary ?? '#f58634' }}; /* 10% opacity fallback */
+                --primary-600: {{ $company->color_primary ?? '#f58634' }};
+                --color-primary: {{ $company->color_primary ?? '#f58634' }};
                 --color-secondary: {{ $company->color_secondary ?? '#4a5568' }};
             }
 
