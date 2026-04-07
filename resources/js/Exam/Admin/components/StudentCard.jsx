@@ -11,16 +11,16 @@ const StudentCard = ({ session, room, onDetail }) => {
         if (!room || !session.identity) return;
 
         const findParticipant = () => {
-             if (!room.remoteParticipants) return;
-             const p = room.remoteParticipants.get(session.identity);
-             if (p) {
+            if (!room.remoteParticipants) return;
+            const p = room.remoteParticipants.get(session.identity);
+            if (p) {
                 setParticipant(p);
                 console.log(`Matched participant for ${session.name}`);
-             }
+            }
         };
 
         findParticipant();
-        
+
         // Listen for new participants joining
         room.on('participantConnected', findParticipant);
         return () => {
@@ -75,14 +75,14 @@ const StudentCard = ({ session, room, onDetail }) => {
         <div className={`bg-white rounded-xl shadow-sm overflow-hidden border transition-all duration-300 ${hasAlerts ? 'border-red-200 ring-1 ring-red-100' : 'border-gray-100'}`}>
             {/* Camera Container */}
             <div className="relative bg-black aspect-video group">
-                <video 
-                    ref={videoRef} 
-                    autoPlay 
-                    muted 
-                    playsInline 
+                <video
+                    ref={videoRef}
+                    autoPlay
+                    muted
+                    playsInline
                     className="w-full h-full object-cover"
                 />
-                
+
                 {!isSubscribed && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900 bg-opacity-80 transition-opacity duration-300">
                         <svg className="w-8 h-8 text-gray-500 mb-2 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -129,9 +129,9 @@ const StudentCard = ({ session, room, onDetail }) => {
                 </div>
 
                 <div className="flex gap-2">
-                    <button 
+                    <button
                         onClick={() => onDetail(session)}
-                        className="flex-1 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-bold rounded-lg transition-colors border border-blue-100"
+                        className="flex-1 px-3 py-1.5 bg-orange-50 text-orange-700 hover:bg-orange-100 text-xs font-bold rounded-lg transition-colors border border-orange-100"
                     >
                         Detail
                     </button>

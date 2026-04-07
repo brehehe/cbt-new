@@ -1,9 +1,8 @@
-    <div>
-        <div class="mb-4">
+<div>
+    <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1
-                    class="text-2xl font-bold text-primary">
+                <h1 class="text-2xl font-bold text-[color:var(--primary)]">
                     Ubah Password</h1>
             </div>
             <div>
@@ -30,13 +29,14 @@
                     <input :type="show ? 'text' : 'password'" id="currentPassword" wire:model.defer="currentPassword"
                         :placeholder="show ? 'password' : '********'"
                         class="mt-1 block w-full rounded-md border-gray-300 px-4 py-2 shadow-sm focus:border-[#f58634] focus:ring-[#f58634] pr-10 hover:border-blue-400 transition-colors">
-        
+
                     <button type="button" @click="show = !show"
-                        class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700" tabindex="-1">
+                        class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700"
+                        tabindex="-1">
                         <i :class="show ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
                     </button>
                 </div>
-        
+
                 @error('currentPassword')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
@@ -50,40 +50,42 @@
                     <input :type="show ? 'text' : 'password'" id="newPassword" wire:model.defer="newPassword"
                         :placeholder="show ? 'password' : '********'"
                         class="mt-1 block w-full rounded-md border-gray-300 px-4 py-2 shadow-sm focus:border-[#f58634] focus:ring-[#f58634] pr-10 hover:border-blue-400 transition-colors">
-        
+
                     <button type="button" @click="show = !show"
-                        class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700" tabindex="-1">
+                        class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700"
+                        tabindex="-1">
                         <i :class="show ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
                     </button>
                 </div>
-        
+
                 @error('newPassword')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
             <div>
-                <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Masukan Konfirmasi Password <span
-                        class="text-red-600">*</span>
+                <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Masukan Konfirmasi Password
+                    <span class="text-red-600">*</span>
                 </label>
                 <div x-data="{ show: false }" class="relative">
                     <input :type="show ? 'text' : 'password'" id="confirmPassword" wire:model.defer="confirmPassword"
                         :placeholder="show ? 'password' : '********'"
                         class="mt-1 block w-full rounded-md border-gray-300 px-4 py-2 shadow-sm focus:border-[#f58634] focus:ring-[#f58634] pr-10 hover:border-blue-400 transition-colors">
-        
+
                     <button type="button" @click="show = !show"
-                        class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700" tabindex="-1">
+                        class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700"
+                        tabindex="-1">
                         <i :class="show ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
                     </button>
                 </div>
-        
+
                 @error('confirmPassword')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
             </div>
         </div>
     </div>
-    </div>
+</div>
 @push('scripts')
     <script>
         document.getElementById("btnPrint").addEventListener("click", async () => {

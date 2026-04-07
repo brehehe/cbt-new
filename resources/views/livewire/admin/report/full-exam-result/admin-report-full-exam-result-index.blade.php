@@ -3,8 +3,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1
-                    class="text-2xl font-bold text-primary">
+                <h1 class="text-2xl font-bold text-[color:var(--primary)]">
                     Laporan Hasil Lengkap</h1>
             </div>
         </div>
@@ -101,7 +100,7 @@
                         @php
                             $stats = $resultStats[$result->id] ?? ['correct' => 0, 'wrong' => 0, 'unanswered' => 0, 'total' => 0, 'answered' => 0];
                             $gradeDetail = $this->getGradeDetail($result->mark);
-                            
+
                             // Calculate duration
                             $start = $result->start_exam ? \Carbon\Carbon::parse($result->start_exam) : null;
                             $end = $result->end_exam ? \Carbon\Carbon::parse($result->end_exam) : null;
@@ -111,7 +110,8 @@
                             <td class="px-4 py-3 center">{{ $examResults->firstItem() + $index }}</td>
                             <td class="px-4 py-3">
                                 <div class="font-semibold">{{ $result->user?->name ?? '-' }}</div>
-                                <div class="text-gray-500 text-xs">{{ $result->user?->nim ?? ($result->user?->username ?? '-') }}</div>
+                                <div class="text-gray-500 text-xs">
+                                    {{ $result->user?->nim ?? ($result->user?->username ?? '-') }}</div>
                             </td>
                             <td class="px-4 py-3">
                                 <div class="font-medium">{{ $result->timetable?->name ?? '-' }}</div>
@@ -119,8 +119,12 @@
                             </td>
                             <td class="px-4 py-3 center">
                                 <div class="text-xs">
-                                    <div>Mulai: {{ $result->start_exam ? \Carbon\Carbon::parse($result->start_exam)->format('d/m/y H:i') : '-' }}</div>
-                                    <div>Selesai: {{ $result->end_exam ? \Carbon\Carbon::parse($result->end_exam)->format('d/m/y H:i') : '-' }}</div>
+                                    <div>Mulai:
+                                        {{ $result->start_exam ? \Carbon\Carbon::parse($result->start_exam)->format('d/m/y H:i') : '-' }}
+                                    </div>
+                                    <div>Selesai:
+                                        {{ $result->end_exam ? \Carbon\Carbon::parse($result->end_exam)->format('d/m/y H:i') : '-' }}
+                                    </div>
                                 </div>
                             </td>
                             <td class="px-4 py-3 center">
@@ -140,37 +144,41 @@
                                         </span>
                                     </div>
                                     @if($stats['check'] > 0 || $stats['unanswered'] > 0)
-                                    <div class="flex items-center space-x-2">
-                                        @if($stats['check'] > 0)
-                                        <span class="px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800" title="Perlu Cek">
-                                            <i class="fas fa-exclamation-circle mr-1"></i>{{ $stats['check'] }}
-                                        </span>
-                                        @endif
-                                        @if($stats['unanswered'] > 0)
-                                        <span class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-800" title="Tidak Dijawab">
-                                            <i class="fas fa-minus mr-1"></i>{{ $stats['unanswered'] }}
-                                        </span>
-                                        @endif
-                                    </div>
+                                        <div class="flex items-center space-x-2">
+                                            @if($stats['check'] > 0)
+                                                <span class="px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800"
+                                                    title="Perlu Cek">
+                                                    <i class="fas fa-exclamation-circle mr-1"></i>{{ $stats['check'] }}
+                                                </span>
+                                            @endif
+                                            @if($stats['unanswered'] > 0)
+                                                <span class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-800"
+                                                    title="Tidak Dijawab">
+                                                    <i class="fas fa-minus mr-1"></i>{{ $stats['unanswered'] }}
+                                                </span>
+                                            @endif
+                                        </div>
                                     @endif
                                 </div>
                             </td>
                             @if($companyData->is_mark)
                                 <td class="px-4 py-3 center">
                                     <div class="text-lg font-bold text-gray-900">{{ $result->mark ?? '-' }}</div>
-                                    <div class="text-xs text-gray-500">{{ $gradeDetail ? $gradeDetail->grade_letter : '' }}</div>
+                                    <div class="text-xs text-gray-500">{{ $gradeDetail ? $gradeDetail->grade_letter : '' }}
+                                    </div>
                                 </td>
                             @endif
                             <td class="px-4 py-3 center">
-                                <a href="{{ route('admin.master.timetable.answer', ['timetable_id' => $result->timetable_id, 'user_timetable_id' => $result->id]) }}" 
-                                   class="btn btn-sm btn-primary" title="Lihat Detail Soal">
+                                <a href="{{ route('admin.master.timetable.answer', ['timetable_id' => $result->timetable_id, 'user_timetable_id' => $result->id]) }}"
+                                    class="btn btn-sm btn-primary" title="Lihat Detail Soal">
                                     <i class="fas fa-eye"></i> Detail
                                 </a>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ $companyData->is_mark ? 8 : 7 }}" class="px-4 py-3 center text-gray-500">Tidak ada data hasil ujian yang sesuai filter.</td>
+                            <td colspan="{{ $companyData->is_mark ? 8 : 7 }}" class="px-4 py-3 center text-gray-500">Tidak
+                                ada data hasil ujian yang sesuai filter.</td>
                         </tr>
                     @endforelse
                 </tbody>

@@ -63,13 +63,9 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
                                 <LatexHTML html={question.timetable_question.question} />
                             </div>
                             {question.timetable_question.description && (
-                                <div className="flex flex-col gap-2 p-3 bg-blue-50/50 rounded-lg border border-blue-100/50">
-                                    <div className="flex items-center gap-2">
-                                        <HelpCircle className="w-4 h-4 text-blue-400" />
-                                        <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">Instruksi / Deskripsi Soal:</span>
-                                    </div>
-                                    <LatexHTML 
-                                        className="text-blue-600/80 text-sm italic leading-snug font-medium prose-sm prose-blue"
+                                <div className="prose prose-xl max-w-none text-gray-900 leading-relaxed font-medium text-justify">
+                                    <LatexHTML
+                                        className="text-orange-600/80 text-sm italic leading-snug font-medium prose-sm prose-orange"
                                         html={question.timetable_question.description}
                                     />
                                 </div>
@@ -97,7 +93,7 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
                                                 />
                                                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-6">
                                                     <div className="bg-white/90 backdrop-blur px-6 py-3 rounded-full flex items-center gap-3 text-sm font-bold text-gray-700 shadow-xl border border-white/50">
-                                                        <ZoomIn className="w-5 h-5 text-blue-600" /> Lihat Gambar Penuh
+                                                        <ZoomIn className="w-5 h-5 text-orange-600" /> Lihat Gambar Penuh
                                                     </div>
                                                 </div>
                                             </div>
@@ -112,7 +108,7 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
                             <div className="flex justify-start -mt-4">
                                 <div
                                     onClick={() => setViewedImage(`/storage/${question.timetable_question.latex_preview_png}`)}
-                                    className="group relative p-6 bg-white rounded-2xl border-2 border-dashed border-gray-200 shadow-sm transition-all hover:border-blue-400 hover:shadow-xl cursor-zoom-in"
+                                    className="group relative p-6 bg-white rounded-2xl border-2 border-dashed border-gray-200 shadow-sm transition-all hover:border-orange-400 hover:shadow-xl cursor-zoom-in"
                                 >
                                     <img
                                         src={`/storage/${question.timetable_question.latex_preview_png}`}
@@ -120,7 +116,7 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
                                         className="w-full h-auto object-contain mx-auto mix-blend-multiply"
                                     />
                                     <div className="absolute inset-x-0 bottom-3 opacity-0 group-hover:opacity-100 transition-opacity flex justify-center">
-                                        <div className="bg-blue-600/90 backdrop-blur px-3 py-1 rounded-full flex items-center gap-2 text-[10px] font-bold text-white shadow-lg uppercase tracking-wider">
+                                        <div className="bg-orange-600/90 backdrop-blur px-3 py-1 rounded-full flex items-center gap-2 text-[10px] font-bold text-white shadow-lg uppercase tracking-wider">
                                             <ZoomIn className="w-3 h-3" /> Lihat Gambar Penuh
                                         </div>
                                     </div>
@@ -134,8 +130,8 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
                                 <label
                                     key={answer.id}
                                     className={`group relative flex items-start gap-5 p-6 rounded-3xl border-2 cursor-pointer transition-all duration-300 ${selectedAnswerId === answer.id
-                                        ? 'border-blue-600 bg-blue-50/30'
-                                        : 'border-gray-100 bg-white hover:border-blue-300 hover:shadow-xl hover:-translate-y-1'
+                                        ? 'border-orange-600 bg-orange-50/30'
+                                        : 'border-gray-100 bg-white hover:border-orange-300 hover:shadow-xl hover:-translate-y-1'
                                         }`}
                                 >
                                     <input
@@ -148,15 +144,15 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
 
                                     {/* Alphabet Circle */}
                                     <div className={`flex-none w-10 h-10 rounded-2xl flex items-center justify-center font-black text-lg transition-all duration-300 shadow-sm border-2 ${selectedAnswerId === answer.id
-                                        ? 'bg-blue-600 border-blue-600 text-white rotate-12 scale-110 shadow-blue-200'
-                                        : 'bg-white border-gray-200 text-gray-400 group-hover:border-blue-400 group-hover:text-blue-500'
+                                        ? 'bg-orange-600 border-orange-600 text-white rotate-12 scale-110 shadow-orange-200'
+                                        : 'bg-white border-gray-200 text-gray-400 group-hover:border-orange-400 group-hover:text-orange-500'
                                         }`}>
                                         {alphabet[i]}
                                     </div>
 
                                     {/* Answer Content */}
                                     <div className="flex-1 space-y-4 pt-1.5">
-                                        <LatexHTML 
+                                        <LatexHTML
                                             className="text-gray-800 text-lg font-bold leading-relaxed"
                                             html={answer.context}
                                         />
@@ -188,11 +184,11 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
                                                     e.stopPropagation();
                                                     setViewedImage(`/storage/${answer.latex_preview_png}`);
                                                 }}
-                                                className="group inline-block p-4 bg-gray-50 rounded-xl border border-gray-100 hover:border-blue-300 hover:bg-white transition-all cursor-zoom-in relative"
+                                                className="group inline-block p-4 bg-gray-50 rounded-xl border border-gray-100 hover:border-orange-300 hover:bg-white transition-all cursor-zoom-in relative"
                                             >
                                                 <img src={`/storage/${answer.latex_preview_png}`} className="max-h-24 object-contain mix-blend-multiply" alt="Option equation" />
                                                 <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <ZoomIn className="w-4 h-4 text-blue-500" />
+                                                    <ZoomIn className="w-4 h-4 text-orange-500" />
                                                 </div>
                                             </div>
                                         )}
@@ -201,7 +197,7 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
                                     {/* Checkmark Indicator */}
                                     <div className={`flex-none w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${selectedAnswerId === answer.id ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
                                         }`}>
-                                        <CheckCircle className="w-8 h-8 fill-blue-600 text-white" />
+                                        <CheckCircle className="w-8 h-8 fill-orange-600 text-white" />
                                     </div>
                                 </label>
                             ))}
@@ -264,7 +260,7 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
                         ) : (
                             <button
                                 onClick={onNext}
-                                className="flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-white transition-all bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200"
+                                className="flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-white transition-all bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-200"
                             >
                                 Selanjutnya <ChevronRight className="w-5 h-5" />
                             </button>

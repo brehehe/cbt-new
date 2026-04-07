@@ -71,7 +71,8 @@
                         <div class="ml-3">
                             <p class="text-sm font-medium text-gray-900">{{ $session->user->name ?? 'Unknown' }}</p>
                             <p class="text-sm text-gray-500">
-                                {{ $session->user->nim ?? ($session->user->username ?? 'N/A') }}</p>
+                                {{ $session->user->nim ?? ($session->user->username ?? 'N/A') }}
+                            </p>
                         </div>
                     </div>
                     <div class="pt-3 border-t border-gray-200">
@@ -148,8 +149,8 @@
                             <span class="text-sm text-gray-900">{{ $session->progress_percentage }}%</span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-blue-600 h-2 rounded-full"
-                                style="width: {{ $session->progress_percentage }}%"></div>
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $session->progress_percentage }}%">
+                            </div>
                         </div>
                         <p class="text-xs text-gray-500 mt-1">
                             {{ $session->current_question_number }} dari {{ $session->total_questions }} soal
@@ -183,7 +184,7 @@
                                 'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
                                 'bg-red-100 text-red-800' => $session->risk_level === 'high',
                                 'bg-yellow-100 text-yellow-800' => $session->risk_level === 'medium',
-                                'bg-primary text-primary' =>
+                                'bg-primary text-[color:var(--primary)]' =>
                                     $session->risk_level === 'low',
                                 'bg-green-100 text-green-800' => $session->risk_level === 'none',
                             ])>
@@ -219,14 +220,14 @@
                                                 'window_blur',
                                                 'page_reload',
                                             ]),
-                                            'bg-primary text-primary' => in_array(
+                                            'bg-primary text-[color:var(--primary)]' => in_array(
                                                 $alert->alert_type,
-                                                ['camera_error', 'right_click']),
+                                                ['camera_error', 'right_click']
+                                            ),
                                         ])>
                                             {{ ucfirst(str_replace('_', ' ', $alert->alert_type)) }}
                                         </span>
-                                        <span
-                                            class="text-xs text-gray-500">{{ $alert->created_at->diffForHumans() }}</span>
+                                        <span class="text-xs text-gray-500">{{ $alert->created_at->diffForHumans() }}</span>
                                     </div>
                                     <p class="text-sm text-gray-700 mt-1">{{ $alert->description }}</p>
                                 </div>
@@ -312,7 +313,8 @@
                                     @if (isset($session->browser_info['user_agent']))
                                         <p><span class="font-medium">User Agent:</span></p>
                                         <p class="text-xs bg-gray-50 p-2 rounded break-all">
-                                            {{ $session->browser_info['user_agent'] }}</p>
+                                            {{ $session->browser_info['user_agent'] }}
+                                        </p>
                                     @endif
                                 </div>
                             </div>
@@ -522,7 +524,7 @@
             if (!s) return;
             try {
                 s.call?.close();
-            } catch {}
+            } catch { }
             activeSessions = activeSessions.filter(x => x.id !== id);
         }
 

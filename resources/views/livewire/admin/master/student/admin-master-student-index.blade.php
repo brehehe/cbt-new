@@ -3,8 +3,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1
-                    class="text-2xl font-bold text-primary">
+                <h1 class="text-2xl font-bold text-[color:var(--primary)]">
                     Manajemen Data Mahasiswa</h1>
                 <p class="text-gray-600">Kelola data mahasiswa dalam sistem CBT</p>
             </div>
@@ -40,13 +39,17 @@
                     </button>
                     <div x-show="openImport" x-transition
                         class="absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
-                        <label class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer block">
+                        <label
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer block">
                             Import Mahasiswa
-                            <input type="file" wire:model="importFileMahasiswa" accept=".xlsx,.xls" wire:change="import" class="hidden" />
+                            <input type="file" wire:model="importFileMahasiswa" accept=".xlsx,.xls" wire:change="import"
+                                class="hidden" />
                         </label>
-                        <label class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer block">
+                        <label
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer block">
                             Import General
-                            <input type="file" wire:model="importFileGeneral" accept=".xlsx,.xls" wire:change="importGeneral" class="hidden" />
+                            <input type="file" wire:model="importFileGeneral" accept=".xlsx,.xls"
+                                wire:change="importGeneral" class="hidden" />
                         </label>
                     </div>
                 </div>
@@ -70,8 +73,7 @@
             <!-- Search -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Cari</label>
-                <input type="text" wire:model.live="search" placeholder="NIM, Nama, Email..."
-                    class="form-control mt-1">
+                <input type="text" wire:model.live="search" placeholder="NIM, Nama, Email..." class="form-control mt-1">
             </div>
 
             <!-- Program Filter -->
@@ -141,12 +143,10 @@
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-10 w-10">
                                         @if ($admin->profile)
-                                            <img src="{{ asset('storage/' . $admin->profile) }}"
-                                                alt="Foto {{ $admin->name }}"
+                                            <img src="{{ asset('storage/' . $admin->profile) }}" alt="Foto {{ $admin->name }}"
                                                 class="h-10 w-10 rounded-full object-cover">
                                         @else
-                                            <div
-                                                class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                            <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
                                                 <span class="text-sm font-medium text-blue-700">
                                                     {{ substr($admin->name, 0, 2) }}
                                                 </span>
@@ -210,8 +210,8 @@
                                     $typeStudy = $admin->type_study;
                                     $isStudentColors =
                                         $typeStudy == 'mahasiswa'
-                                            ? 'bg-green-100 text-green-800'
-                                            : 'bg-blue-100 text-blue-800';
+                                        ? 'bg-green-100 text-green-800'
+                                        : 'bg-blue-100 text-blue-800';
                                     $isStudentLabels = $typeStudy == 'mahasiswa' ? 'Mahasiswa' : 'General';
                                 @endphp
 

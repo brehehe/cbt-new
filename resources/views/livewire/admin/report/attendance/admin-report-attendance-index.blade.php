@@ -4,7 +4,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-primary">
+                <h1 class="text-2xl font-bold text-[color:var(--primary)]">
                     Laporan Daftar Hadir</h1>
             </div>
         </div>
@@ -53,7 +53,8 @@
                             <td>{{ $timetable->name ?? '-' }}</td>
                             <td>{{ $timetable->module->name ?? '-' }}</td>
                             <td>{{ $timetable->start_time?->format('d F Y H:i') }} -
-                                {{ $timetable->end_time?->format('H:i') }}</td>
+                                {{ $timetable->end_time?->format('H:i') }}
+                            </td>
                             <td class="center">
                                 <button wire:click="printAttendanceList('{{ $timetable->id }}')"
                                     class="btn btn-sm btn-primary">

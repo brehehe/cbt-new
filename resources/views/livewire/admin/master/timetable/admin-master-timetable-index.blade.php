@@ -3,8 +3,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1
-                    class="text-2xl font-bold text-primary">
+                <h1 class="text-2xl font-bold text-[color:var(--primary)]">
                     Jadwal</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
@@ -25,7 +24,9 @@
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <div class="flex items-center bg-white rounded-lg shadow-sm border border-gray-200 px-3 py-2 w-full md:w-auto">
             <span class="text-sm text-gray-600 mr-2">Tampil</span>
-            <select class="form-select text-sm border-none focus:ring-0 p-0 text-gray-700 font-semibold bg-transparent w-12" wire:model.live='perPage'>
+            <select
+                class="form-select text-sm border-none focus:ring-0 p-0 text-gray-700 font-semibold bg-transparent w-12"
+                wire:model.live='perPage'>
                 <option value="5">5</option>
                 <option value="10">10</option>
                 <option value="25">25</option>
@@ -40,10 +41,9 @@
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <i class="fas fa-search text-gray-400"></i>
                 </div>
-                <input type="text" 
-                    class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition duration-150 ease-in-out" 
-                    placeholder="Cari Sesuatu..."
-                    wire:model.live='search'>
+                <input type="text"
+                    class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition duration-150 ease-in-out"
+                    placeholder="Cari Sesuatu..." wire:model.live='search'>
             </div>
         </div>
     </div>
@@ -101,22 +101,26 @@
                             </td>
                             <td class="px-3 py-2">
                                 @if($timetable?->is_recording)
-                                    <span class="inline-flex items-center rounded-full bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1">
+                                    <span
+                                        class="inline-flex items-center rounded-full bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1">
                                         Iya
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center rounded-full bg-gray-100 text-gray-600 text-xs font-semibold px-2.5 py-1">
+                                    <span
+                                        class="inline-flex items-center rounded-full bg-gray-100 text-gray-600 text-xs font-semibold px-2.5 py-1">
                                         Tidak
                                     </span>
                                 @endif
                             </td>
                             <td class="px-3 py-2">
                                 @if($timetable?->is_streaming)
-                                    <span class="inline-flex items-center rounded-full bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1">
+                                    <span
+                                        class="inline-flex items-center rounded-full bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1">
                                         Iya
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center rounded-full bg-gray-100 text-gray-600 text-xs font-semibold px-2.5 py-1">
+                                    <span
+                                        class="inline-flex items-center rounded-full bg-gray-100 text-gray-600 text-xs font-semibold px-2.5 py-1">
                                         Tidak
                                     </span>
                                 @endif
@@ -124,14 +128,12 @@
                             <!-- Aksi -->
                             <td class="text-center px-3 py-2 relative">
                                 <div x-data="{ open: false, x: 0, y: 0 }" class="inline-block text-left">
-                                    <button
-                                        @click="
-                                    open = !open;
-                                    const rect = $el.getBoundingClientRect();
-                                    x = rect.right - 200;
-                                    y = rect.bottom + window.scrollY;
-                                "
-                                        class="px-3 py-2 bg-gray-100 rounded-md hover:bg-gray-200 transition text-gray-700">
+                                    <button @click="
+                                        open = !open;
+                                        const rect = $el.getBoundingClientRect();
+                                        x = rect.right - 200;
+                                        y = rect.bottom + window.scrollY;
+                                    " class="px-3 py-2 bg-gray-100 rounded-md hover:bg-gray-200 transition text-gray-700">
                                         <i class="fa-solid fa-ellipsis-vertical"></i>
                                     </button>
 
@@ -144,11 +146,9 @@
                                             <ul class="py-1 text-sm text-gray-700">
                                                 @if (!$timetable->code)
                                                     <li>
-                                                        <button
-                                                            wire:click="confirmGenerateToken('{{ $timetable->id }}')"
+                                                        <button wire:click="confirmGenerateToken('{{ $timetable->id }}')"
                                                             class="w-full text-left px-4 py-2 hover:bg-gray-100">
-                                                            <i
-                                                                class="fa-solid fa-square-binary mr-2 text-green-600"></i>
+                                                            <i class="fa-solid fa-square-binary mr-2 text-green-600"></i>
                                                             Generate Token
                                                         </button>
                                                     </li>
@@ -162,8 +162,7 @@
                                                     <li>
                                                         <a href="{{ route('admin.print.berita-acara', $timetable->id) }}"
                                                             target="_blank" class="block px-4 py-2 hover:bg-gray-100">
-                                                            <i
-                                                                class="fa-solid fa-file-signature mr-2 text-green-600"></i>
+                                                            <i class="fa-solid fa-file-signature mr-2 text-green-600"></i>
                                                             Cetak Berita Acara
                                                         </a>
                                                     </li>
@@ -231,8 +230,7 @@
                                                     <li>
                                                         <a href="{{ route('admin.print.berita-acara', $timetable->id) }}"
                                                             target="_blank" class="block px-4 py-2 hover:bg-gray-100">
-                                                            <i
-                                                                class="fa-solid fa-file-signature mr-2 text-green-600"></i>
+                                                            <i class="fa-solid fa-file-signature mr-2 text-green-600"></i>
                                                             Cetak Berita Acara
                                                         </a>
                                                     </li>
@@ -292,7 +290,7 @@
 @push('scripts')
     <script>
         function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(function() {
+            navigator.clipboard.writeText(text).then(function () {
                 // Tampilkan notifikasi sukses
                 const Toast = Swal.mixin({
                     toast: true,
@@ -306,7 +304,7 @@
                     icon: 'success',
                     title: 'Token berhasil disalin!'
                 });
-            }).catch(function(err) {
+            }).catch(function (err) {
                 // Fallback untuk browser lama
                 const textArea = document.createElement('textarea');
                 textArea.value = text;

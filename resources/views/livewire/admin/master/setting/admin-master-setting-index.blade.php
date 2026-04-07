@@ -2,7 +2,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-primary">
+                <h1 class="text-2xl font-bold text-[color:var(--primary)]">
                     Pengaturan</h1>
                 <p class="text-gray-600">Kelola pengaturan universitas Anda dengan mudah.</p>
             </div>
@@ -27,11 +27,11 @@
             <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                 @foreach($tabs as $tab)
                     <button wire:click="setTab('{{ $tab }}')" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors
-                            @if($currentTab === $tab)
-                                border-primary text-primary
-                            @else
-                                border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300
-                            @endif">
+                                @if($currentTab === $tab)
+                                    border-primary text-[color:var(--primary)]
+                                @else
+                                    border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300
+                                @endif">
                         {{ Str::title(Str::replace('-', ' ', $tab)) }}
                     </button>
                 @endforeach
@@ -124,13 +124,13 @@
                                         class="text-red-600">*</span></label>
                                 <div wire:key="select-{{ rand() }}">
                                     <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
-                                            dropdownParent: 'body',
-                                            allowClear: true,
-                                            plugins: ['clear_button'],
-                                            onChange: function(e) {
-                                                @this.set('country', e ? e : '');
-                                            }
-                                        });" wire:model.live="country" id="country">
+                                                dropdownParent: 'body',
+                                                allowClear: true,
+                                                plugins: ['clear_button'],
+                                                onChange: function(e) {
+                                                    @this.set('country', e ? e : '');
+                                                }
+                                            });" wire:model.live="country" id="country">
                                         <option value="">-- Pilih Negara --</option>
                                         @foreach ($getCountrys as $getCountry)
                                             <option value="{{ $getCountry['code'] }}">{{ $getCountry['name'] }}
@@ -168,11 +168,11 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Logo Universitas</label>
 
                                 <input type="file" wire:model.live="logo" class="block text-sm text-gray-500 w-full
-                                               file:px-2 file:py-1 file:rounded-md
-                                               file:border file:border-gray-300
-                                               file:text-xs file:font-medium
-                                               file:bg-blue-50 file:text-blue-700
-                                               hover:file:bg-blue-100" accept="image/*" />
+                                                   file:px-2 file:py-1 file:rounded-md
+                                                   file:border file:border-gray-300
+                                                   file:text-xs file:font-medium
+                                                   file:bg-blue-50 file:text-blue-700
+                                                   hover:file:bg-blue-100" accept="image/*" />
                                 <div wire:loading wire:target="logo" class="text-sm text-gray-500 mt-1">
                                     Uploading logo...
                                 </div>
@@ -203,11 +203,11 @@
                                     Universitas</label>
 
                                 <input type="file" wire:model.live="logo_potrait" class="block text-sm text-gray-500 w-full
-                                               file:px-2 file:py-1 file:rounded-md
-                                               file:border file:border-gray-300
-                                               file:text-xs file:font-medium
-                                               file:bg-blue-50 file:text-blue-700
-                                               hover:file:bg-blue-100" accept="image/*" />
+                                                   file:px-2 file:py-1 file:rounded-md
+                                                   file:border file:border-gray-300
+                                                   file:text-xs file:font-medium
+                                                   file:bg-blue-50 file:text-blue-700
+                                                   hover:file:bg-blue-100" accept="image/*" />
                                 <div wire:loading wire:target="logo_potrait" class="text-sm text-gray-500 mt-1">
                                     Uploading Logo Potrait...
                                 </div>
@@ -237,11 +237,11 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Background Login</label>
 
                                 <input type="file" wire:model.live="background_login" class="block text-sm text-gray-500 w-full
-                                               file:px-2 file:py-1 file:rounded-md
-                                               file:border file:border-gray-300
-                                               file:text-xs file:font-medium
-                                               file:bg-blue-50 file:text-blue-700
-                                               hover:file:bg-blue-100" accept="image/*" />
+                                                   file:px-2 file:py-1 file:rounded-md
+                                                   file:border file:border-gray-300
+                                                   file:text-xs file:font-medium
+                                                   file:bg-blue-50 file:text-blue-700
+                                                   hover:file:bg-blue-100" accept="image/*" />
                                 <div wire:loading wire:target="background_login" class="text-sm text-gray-500 mt-1">
                                     Uploading Background Login...
                                 </div>
@@ -617,11 +617,11 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Installer Windows
                                     (.exe/.msi)</label>
                                 <input type="file" wire:model.live="app_windows" class="block w-full text-sm text-gray-500
-                                        file:mr-4 file:py-2 file:px-4
-                                        file:rounded-full file:border-0
-                                        file:text-sm file:font-semibold
-                                        file:bg-purple-50 file:text-purple-700
-                                        hover:file:bg-purple-100" accept=".exe,.msi,.zip" />
+                                            file:mr-4 file:py-2 file:px-4
+                                            file:rounded-full file:border-0
+                                            file:text-sm file:font-semibold
+                                            file:bg-purple-50 file:text-purple-700
+                                            hover:file:bg-purple-100" accept=".exe,.msi,.zip" />
                                 <div wire:loading wire:target="app_windows" class="text-xs text-gray-500 mt-1">Uploading...
                                 </div>
                                 @error('app_windows') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
@@ -635,11 +635,11 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Installer Mac
                                     (.dmg/.pkg)</label>
                                 <input type="file" wire:model.live="app_mac" class="block w-full text-sm text-gray-500
-                                        file:mr-4 file:py-2 file:px-4
-                                        file:rounded-full file:border-0
-                                        file:text-sm file:font-semibold
-                                        file:bg-purple-50 file:text-purple-700
-                                        hover:file:bg-purple-100" accept=".dmg,.pkg,.zip,.app" />
+                                            file:mr-4 file:py-2 file:px-4
+                                            file:rounded-full file:border-0
+                                            file:text-sm file:font-semibold
+                                            file:bg-purple-50 file:text-purple-700
+                                            hover:file:bg-purple-100" accept=".dmg,.pkg,.zip,.app" />
                                 <div wire:loading wire:target="app_mac" class="text-xs text-gray-500 mt-1">Uploading...
                                 </div>
                                 @error('app_mac') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
@@ -652,11 +652,11 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Installer Android (.apk)</label>
                                 <input type="file" wire:model.live="app_android" class="block w-full text-sm text-gray-500
-                                        file:mr-4 file:py-2 file:px-4
-                                        file:rounded-full file:border-0
-                                        file:text-sm file:font-semibold
-                                        file:bg-purple-50 file:text-purple-700
-                                        hover:file:bg-purple-100" accept=".apk" />
+                                            file:mr-4 file:py-2 file:px-4
+                                            file:rounded-full file:border-0
+                                            file:text-sm file:font-semibold
+                                            file:bg-purple-50 file:text-purple-700
+                                            hover:file:bg-purple-100" accept=".apk" />
                                 <div wire:loading wire:target="app_android" class="text-xs text-gray-500 mt-1">Uploading...
                                 </div>
                                 @error('app_android') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
@@ -670,11 +670,11 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Installer iOS (.ipa /
                                     Config)</label>
                                 <input type="file" wire:model.live="app_ios" class="block w-full text-sm text-gray-500
-                                        file:mr-4 file:py-2 file:px-4
-                                        file:rounded-full file:border-0
-                                        file:text-sm file:font-semibold
-                                        file:bg-purple-50 file:text-purple-700
-                                        hover:file:bg-purple-100" accept=".ipa,.zip,.mobileconfig" />
+                                            file:mr-4 file:py-2 file:px-4
+                                            file:rounded-full file:border-0
+                                            file:text-sm file:font-semibold
+                                            file:bg-purple-50 file:text-purple-700
+                                            hover:file:bg-purple-100" accept=".ipa,.zip,.mobileconfig" />
                                 <div wire:loading wire:target="app_ios" class="text-xs text-gray-500 mt-1">Uploading...
                                 </div>
                                 @error('app_ios') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror

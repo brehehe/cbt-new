@@ -94,7 +94,8 @@
                                     </div>
 
                                     <h2 class="mb-1 text-xl font-bold text-gray-800 lg:mb-2 lg:text-1xl">
-                                        {{ $company->name }}</h2>
+                                        {{ $company->name }}
+                                    </h2>
                                     <p class="text-sm text-gray-600 lg:text-base">Masuk ke sistem CBT</p>
                                 </div>
 
@@ -140,9 +141,9 @@
                                         <x-ts-checkbox class="text-xs lg:text-sm" id="remember" label="Ingat saya"
                                             wire:model="remember" />
                                         <!-- <a class="text-xs font-medium text-[#2b7fff] hover:text-blue-700 lg:text-sm"
-                                                href="#">
-                                                Lupa Password?
-                                            </a> -->
+                                                    href="#">
+                                                    Lupa Password?
+                                                </a> -->
                                     </div>
 
                                     <div class="pt-2">
@@ -165,9 +166,9 @@
                                     @endif
                                 </form>
                                 <!-- <div class="mt-4 text-center">
-                                        <a href="{{ route('register') }}"
-                                            class="text-[#2b7fff] hover:text-[#317354] text-sm">Buat Akun ?</a>
-                                    </div> -->
+                                            <a href="{{ route('register') }}"
+                                                class="text-[#2b7fff] hover:text-[#317354] text-sm">Buat Akun ?</a>
+                                        </div> -->
 
                                 @if($company->app_windows || $company->app_mac || $company->app_android || $company->app_ios)
                                     <div class="mt-6 border-t border-gray-100 pt-4">
@@ -251,8 +252,8 @@
 
                             <!-- Footer -->
                             <!-- <p class="text-xs font-medium text-gray-500">
-                                    © {{ date('Y') }} PRO CBT
-                                </p> -->
+                                        © {{ date('Y') }} PRO CBT
+                                    </p> -->
                         </div>
                     </div>
                 </div>
@@ -324,21 +325,21 @@
                             <!-- Main Value Proposition -->
                             {{-- <div class="max-w-xl space-y-4 mt-[25%]">
                                 <!-- <h2 class="text-2xl font-bold leading-tight tracking-tight xl:text-3xl">
-                                        <span
-                                            class="block cursor-default text-white transition-colors duration-300 hover:text-green-200">Misi</span>
-                                        <span
-                                            class="inline-block cursor-default text-white/90 transition-all duration-300 hover:translate-x-2 hover:text-white">Bisnis
-                                            &</span>
-                                        <span
-                                            class="inline-block cursor-default text-white/80 transition-all duration-300 hover:translate-x-4 hover:text-white">Pemeliharaan</span>
-                                    </h2>
+                                            <span
+                                                class="block cursor-default text-white transition-colors duration-300 hover:text-green-200">Misi</span>
+                                            <span
+                                                class="inline-block cursor-default text-white/90 transition-all duration-300 hover:translate-x-2 hover:text-white">Bisnis
+                                                &</span>
+                                            <span
+                                                class="inline-block cursor-default text-white/80 transition-all duration-300 hover:translate-x-4 hover:text-white">Pemeliharaan</span>
+                                        </h2>
 
-                                    <p
-                                        class="cursor-default text-sm leading-relaxed text-white/90 transition-colors duration-300 hover:text-white xl:text-base">
-                                        Perusahaan layanan fasilitas bisnis dan pemeliharaan yang profesional & berpengalaman
-                                        sejak tahun 2004. Kami berkomitmen memberikan layanan terbaik untuk mengoptimalkan
-                                        pertumbuhan bisnis Anda dengan berbagai jenis layanan terintegrasi.
-                                    </p> -->
+                                        <p
+                                            class="cursor-default text-sm leading-relaxed text-white/90 transition-colors duration-300 hover:text-white xl:text-base">
+                                            Perusahaan layanan fasilitas bisnis dan pemeliharaan yang profesional & berpengalaman
+                                            sejak tahun 2004. Kami berkomitmen memberikan layanan terbaik untuk mengoptimalkan
+                                            pertumbuhan bisnis Anda dengan berbagai jenis layanan terintegrasi.
+                                        </p> -->
 
 
 
@@ -550,11 +551,11 @@
                                         <div
                                             class="mx-auto flex h-16 w-16 items-center justify-center rounded-full shadow-xl lg:h-20 lg:w-20">
                                             <!-- <svg class="h-8 w-8 text-white lg:h-10 lg:w-10" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path
-                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
-                                                </svg> -->
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path
+                                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                                    </svg> -->
                                             <img src="{{ asset('asset/img/logo-ikmb.png') }}" alt="">
                                         </div>
                                     </div> --}}
@@ -579,10 +580,10 @@
                                     <div class="flex items-center justify-between pt-2">
                                         <x-ts-checkbox class="text-xs lg:text-sm" id="remember" label="Ingat saya"
                                             wire:model="remember" />
-                                        <!-- <a class="text-xs font-medium text-primary hover:text-green-700 lg:text-sm"
-                                                href="#">
-                                                Lupa Password?
-                                            </a> -->
+                                        <!-- <a class="text-xs font-medium text-[color:var(--primary)] hover:text-green-700 lg:text-sm"
+                                                    href="#">
+                                                    Lupa Password?
+                                                </a> -->
                                     </div>
 
                                     <div class="pt-4">
@@ -599,7 +600,7 @@
                                 </form>
                                 <div class="mt-4 text-center">
                                     <a href="{{ route('register') }}"
-                                        class="text-primary hover:text-[#317354] text-sm">Buat
+                                        class="text-[color:var(--primary)] hover:text-[#317354] text-sm">Buat
                                         Akun ?</a>
                                 </div>
 
@@ -763,21 +764,21 @@
                             <!-- Main Value Proposition -->
                             {{-- <div class="max-w-xl space-y-4 mt-[25%]">
                                 <!-- <h2 class="text-2xl font-bold leading-tight tracking-tight xl:text-3xl">
-                                        <span
-                                            class="block cursor-default text-white transition-colors duration-300 hover:text-green-200">Misi</span>
-                                        <span
-                                            class="inline-block cursor-default text-white/90 transition-all duration-300 hover:translate-x-2 hover:text-white">Bisnis
-                                            &</span>
-                                        <span
-                                            class="inline-block cursor-default text-white/80 transition-all duration-300 hover:translate-x-4 hover:text-white">Pemeliharaan</span>
-                                    </h2>
+                                            <span
+                                                class="block cursor-default text-white transition-colors duration-300 hover:text-green-200">Misi</span>
+                                            <span
+                                                class="inline-block cursor-default text-white/90 transition-all duration-300 hover:translate-x-2 hover:text-white">Bisnis
+                                                &</span>
+                                            <span
+                                                class="inline-block cursor-default text-white/80 transition-all duration-300 hover:translate-x-4 hover:text-white">Pemeliharaan</span>
+                                        </h2>
 
-                                    <p
-                                        class="cursor-default text-sm leading-relaxed text-white/90 transition-colors duration-300 hover:text-white xl:text-base">
-                                        Perusahaan layanan fasilitas bisnis dan pemeliharaan yang profesional & berpengalaman
-                                        sejak tahun 2004. Kami berkomitmen memberikan layanan terbaik untuk mengoptimalkan
-                                        pertumbuhan bisnis Anda dengan berbagai jenis layanan terintegrasi.
-                                    </p> -->
+                                        <p
+                                            class="cursor-default text-sm leading-relaxed text-white/90 transition-colors duration-300 hover:text-white xl:text-base">
+                                            Perusahaan layanan fasilitas bisnis dan pemeliharaan yang profesional & berpengalaman
+                                            sejak tahun 2004. Kami berkomitmen memberikan layanan terbaik untuk mengoptimalkan
+                                            pertumbuhan bisnis Anda dengan berbagai jenis layanan terintegrasi.
+                                        </p> -->
 
 
 
@@ -973,11 +974,11 @@
                                         <div
                                             class="mx-auto flex h-16 w-16 items-center justify-center rounded-full shadow-xl lg:h-20 lg:w-20">
                                             <!-- <svg class="h-8 w-8 text-white lg:h-10 lg:w-10" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path
-                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
-                                                </svg> -->
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path
+                                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                                    </svg> -->
                                             <img src="{{ asset('asset/img/logo-ikmb.png') }}" alt="">
                                         </div>
                                     </div> --}}
@@ -1006,9 +1007,9 @@
                                         <x-ts-checkbox class="text-xs lg:text-sm" id="remember" label="Ingat saya"
                                             wire:model="remember" />
                                         <!-- <a class="text-xs font-medium text-orange-500 hover:text-orange-700 lg:text-sm"
-                                                href="#">
-                                                Lupa Password?
-                                            </a> -->
+                                                    href="#">
+                                                    Lupa Password?
+                                                </a> -->
                                     </div>
 
                                     <div class="pt-4">
@@ -1024,9 +1025,9 @@
                                     </div>
                                 </form>
                                 <!-- <div class="mt-4 text-center">
-                                        <a href="{{ route('register') }}"
-                                            class="text-orange-500 hover:text-orange-700 text-sm">Buat Akun ?</a>
-                                    </div> -->
+                                            <a href="{{ route('register') }}"
+                                                class="text-orange-500 hover:text-orange-700 text-sm">Buat Akun ?</a>
+                                        </div> -->
 
                                 @if($company->app_windows || $company->app_mac || $company->app_android || $company->app_ios)
                                     <div class="mt-6 border-t border-gray-100 pt-4">
@@ -1126,7 +1127,7 @@
                 <!-- Logo & Welcome -->
                 <div class="flex flex-col items-center mb-6">
                     <img src="{{ asset('asset/img/LogoPROCBT.png') }}" alt="Logo PRO CBT" class="h-12 drop-shadow-md mb-4">
-                    <h1 class="text-2xl font-bold text-primary">
+                    <h1 class="text-2xl font-bold text-[color:var(--primary)]">
                         Selamat Datang Kembali!</h1>
                     <p class="text-gray-600 text-sm">Akses dashboard admin Anda dengan aman</p>
                 </div>
@@ -1231,12 +1232,11 @@
                     <div class="flex items-center justify-between">
                         <label class="flex items-center">
                             <input autocomplete="off" type="checkbox" name="remember"
-                                class="rounded border-gray-300 text-primary focus:ring-[#1E3A8A]/20"
+                                class="rounded border-gray-300 text-[color:var(--primary)] focus:ring-[#1E3A8A]/20"
                                 wire:model='remember'>
                             <span class="ml-2 text-sm text-gray-600">Ingat saya</span>
                         </label>
-                        <a href="#"
-                            class="text-sm text-primary hover:text-[#2563EB] transition-colors">Lupa
+                        <a href="#" class="text-sm text-[color:var(--primary)] hover:text-[#2563EB] transition-colors">Lupa
                             kata
                             sandi?</a>
                     </div>
@@ -1252,7 +1252,7 @@
                         <p class="text-sm text-gray-600">
                             Belum punya akun?
                             <a href="{{ route('register') }}"
-                                class="text-primary hover:underline font-semibold">Daftar
+                                class="text-[color:var(--primary)] hover:underline font-semibold">Daftar
                                 di
                                 sini</a>
                         </p>

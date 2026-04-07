@@ -189,7 +189,7 @@
     <div class="mb-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-primary">
+                <h1 class="text-3xl font-bold text-[color:var(--primary)]">
                     Monitoring Center - {{ Auth::user()->name ?? 'Pengawas' }}
                 </h1>
                 <p class="text-gray-600 mt-1">Pantau ujian dan deteksi pelanggaran secara real-time</p>
@@ -233,7 +233,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Peserta Aktif</p>
-                    <h3 class="text-3xl font-bold text-primary">
+                    <h3 class="text-3xl font-bold text-[color:var(--primary)]">
                         {{ $activeExaminees ?? 0 }}
                     </h3>
                     <div class="flex items-center mt-2">
@@ -242,8 +242,8 @@
                     </div>
                 </div>
                 <div class="bg-gradient-to-br from-[#f58634]/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
-                    <svg class="w-8 h-8 text-primary" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-8 h-8 text-[color:var(--primary)]" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
                         </path>
@@ -258,7 +258,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Peringatan Keamanan</p>
-                    <h3 class="text-3xl font-bold text-primary">
+                    <h3 class="text-3xl font-bold text-[color:var(--primary)]">
                         {{ $securityAlerts ?? 0 }}
                     </h3>
                     <div class="flex items-center mt-2">
@@ -286,7 +286,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Masalah Kamera</p>
-                    <h3 class="text-3xl font-bold text-primary">
+                    <h3 class="text-3xl font-bold text-[color:var(--primary)]">
                         {{ $cameraIssues ?? 0 }}
                     </h3>
                     <div class="flex items-center mt-2">
@@ -311,7 +311,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Ruang Ujian Aktif</p>
-                    <h3 class="text-3xl font-bold text-primary">
+                    <h3 class="text-3xl font-bold text-[color:var(--primary)]">
                         {{ $activeRooms ?? 0 }}
                     </h3>
                     <div class="flex items-center mt-2">

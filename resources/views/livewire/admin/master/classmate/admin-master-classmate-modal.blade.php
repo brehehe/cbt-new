@@ -25,8 +25,8 @@
                     Tipe <span class="text-red-600">*</span>
                 </label>
                 @php
-                    $brandBg = "bg-[{$companyData->color_primary}]";
-                    $brandBorder = "border-[{$companyData->color_primary}]";
+                    $brandBg = "bg-[color:var(--primary)]";
+                    $brandBorder = "border-[color:var(--primary)]";
                 @endphp
 
                 <div class="mt-2 flex space-x-2">
@@ -37,8 +37,8 @@
                     </button>
 
                     @php
-                        $brandBg2 = "bg-[{$companyData->color_primary}]";
-                        $brandBorder2 = "border-[{$companyData->color_primary}]";
+                        $brandBg2 = "bg-[color:var(--primary)]";
+                        $brandBorder2 = "border-[color:var(--primary)]";
                     @endphp
 
                     <button type="button" wire:click="setType('general')"
@@ -67,13 +67,13 @@
                             class="text-red-600">*</span></label>
                     <div wire:key="select-{{ rand() }}">
                         <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
-                                dropdownParent: 'body',
-                                allowClear: true,
-                                plugins: ['clear_button'],
-                                onChange: function(e) {
-                                    @this.set('user_id', e ? e : '');
-                                }
-                            });" wire:model.lazy="user_id" id="user_id">
+                                        dropdownParent: 'body',
+                                        allowClear: true,
+                                        plugins: ['clear_button'],
+                                        onChange: function(e) {
+                                            @this.set('user_id', e ? e : '');
+                                        }
+                                    });" wire:model.lazy="user_id" id="user_id">
                             <option value="">-- Pilih Dosen --</option>
                             @foreach ($users as $key_user => $user)
                                 <option value="{{ $key_user }}">{{ $user }}</option>

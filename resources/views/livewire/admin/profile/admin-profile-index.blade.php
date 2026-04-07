@@ -3,7 +3,7 @@
 <div class="container mx-auto px-4 py-6">
     <!-- Header -->
     <div class="mb-6">
-        <h1 class="text-3xl font-bold text-primary">
+        <h1 class="text-3xl font-bold text-[color:var(--primary)]">
             Profil Pengguna
         </h1>
         <p class="text-gray-600 mt-1">
@@ -23,7 +23,7 @@
                 <div class="flex items-center space-x-4">
                     <!-- Avatar -->
                     <div
-                        class="w-20 h-20 bg-white rounded-full flex items-center justify-center text-primary text-3xl font-bold">
+                        class="w-20 h-20 bg-white rounded-full flex items-center justify-center text-[color:var(--primary)] text-3xl font-bold">
                         {{ strtoupper(substr($user->name ?? 'U', 0, 1)) }}
                     </div>
                     <!-- User Info -->
@@ -55,8 +55,8 @@
                     <!-- Basic Information -->
                     <div>
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-primary" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 mr-2 text-[color:var(--primary)]" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                             </svg>
@@ -91,8 +91,8 @@
                     <!-- Additional Information -->
                     <div>
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-primary" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 mr-2 text-[color:var(--primary)]" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>

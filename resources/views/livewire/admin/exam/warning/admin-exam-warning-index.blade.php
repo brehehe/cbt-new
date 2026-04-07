@@ -8,11 +8,9 @@
 
             <div class="space-y-6">
                 <div class="p-4 rounded-lg bg-orange-50">
-                    <h2
-                        class="mb-2 font-semibold text-primary">
+                    <h2 class="mb-2 font-semibold text-[color:var(--primary)]">
                         Informasi Ujian</h2>
-                    <div
-                        class="grid grid-cols-2 gap-4 text-sm text-primary">
+                    <div class="grid grid-cols-2 gap-4 text-sm text-[color:var(--primary)]">
                         <div>
                             <p><span class="font-medium">Modul:</span>
                                 {{ $userTimetable->timetable->module->name ?? '-' }}</p>
@@ -67,7 +65,8 @@
 
                     <div class="mb-3" wire:ignore>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Kamera</label>
-                        <select id="videoSource" wire:model="camera_device_id" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        <select id="videoSource" wire:model="camera_device_id"
+                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                             <option value="">Mencari kamera...</option>
                         </select>
                     </div>
@@ -75,7 +74,8 @@
                     <div class="mb-3 overflow-hidden bg-gray-900 rounded-lg aspect-video">
                         <video id="cameraPreview" autoplay playsinline class="object-cover w-full h-full"></video>
                     </div>
-                    <p id="cameraStatus" class="text-sm text-gray-500">Pastikan wajah Anda terlihat jelas pada kamera</p>
+                    <p id="cameraStatus" class="text-sm text-gray-500">Pastikan wajah Anda terlihat jelas pada kamera
+                    </p>
                 </div>
 
                 <script>
@@ -94,10 +94,10 @@
                                 videoSelect.innerHTML = '';
 
                                 if (videoDevices.length === 0) {
-                                     const option = document.createElement('option');
-                                     option.text = 'Tidak ada kamera ditemukan';
-                                     videoSelect.appendChild(option);
-                                     return;
+                                    const option = document.createElement('option');
+                                    option.text = 'Tidak ada kamera ditemukan';
+                                    videoSelect.appendChild(option);
+                                    return;
                                 }
 
                                 videoDevices.forEach((device, index) => {

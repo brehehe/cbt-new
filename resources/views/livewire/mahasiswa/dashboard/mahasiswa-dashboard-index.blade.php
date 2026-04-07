@@ -115,7 +115,7 @@
     <div class="mb-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-primary">
+                <h1 class="text-3xl font-bold text-[color:var(--primary)]">
                     Halo, {{ Auth::user()->name ?? 'Mahasiswa' }}! 👋</h1>
                 <p class="text-gray-600 mt-1">Siap untuk mengikuti ujian hari ini?</p>
                 <p class="text-sm text-gray-500">{{ \Carbon\Carbon::now()->format('l, j F Y') }}</p>
@@ -123,8 +123,7 @@
             <div class="flex items-center gap-3">
                 <!-- Notifications -->
                 <div class="relative">
-                    <button
-                        class="p-2 text-gray-600 hover:text-primary relative">
+                    <button class="p-2 text-gray-600 hover:text-[color:var(--primary)] relative">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15 17h5l-5-5 5-5h-5l-5 5z"></path>
@@ -155,7 +154,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Ujian Hari Ini</p>
-                    <h3 class="text-3xl font-bold text-primary">
+                    <h3 class="text-3xl font-bold text-[color:var(--primary)]">
                         {{ $todayExams ?? 0 }}
                     </h3>
                     <div class="flex items-center mt-2">
@@ -168,8 +167,8 @@
                     </div>
                 </div>
                 <div class="bg-gradient-to-br from-[#f58634]/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
-                    <svg class="w-8 h-8 text-primary" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-8 h-8 text-[color:var(--primary)]" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
@@ -183,7 +182,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Total Ujian</p>
-                    <h3 class="text-3xl font-bold text-primary">
+                    <h3 class="text-3xl font-bold text-[color:var(--primary)]">
                         {{ $totalExams ?? 0 }}
                     </h3>
                     <div class="flex items-center mt-2">
@@ -208,7 +207,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Rata-rata Nilai</p>
-                    <h3 class="text-3xl font-bold text-primary">
+                    <h3 class="text-3xl font-bold text-[color:var(--primary)]">
                         {{ number_format($averageScore ?? 0, 1) }}
                     </h3>
                     <div class="flex items-center mt-2">
@@ -247,7 +246,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Peringkat Peserta</p>
-                    <h3 class="text-3xl font-bold text-primary">
+                    <h3 class="text-3xl font-bold text-[color:var(--primary)]">
                         #{{ $classRank ?? '-' }}</h3>
                     <div class="flex items-center mt-2">
                         <span class="text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded-full">
@@ -394,7 +393,7 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-800">Hasil Ujian Terbaru</h3>
                 <a href="{{ route('student.results') }}"
-                    class="text-primary hover:text-[#2d8c5b] text-sm font-medium">
+                    class="text-[color:var(--primary)] hover:text-[#2d8c5b] text-sm font-medium">
                     Lihat Semua →
                 </a>
             </div>

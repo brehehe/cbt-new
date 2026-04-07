@@ -3,8 +3,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1
-                    class="text-2xl font-bold text-primary">
+                <h1 class="text-2xl font-bold text-[color:var(--primary)]">
                     Data Peserta Detail</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
@@ -27,10 +26,10 @@
                     Tipe <span class="text-red-600">*</span>
                 </label>
 
-               @php
-$brandBg = "bg-[{$companyData->color_primary}]";
-$brandBorder = "border-[{$companyData->color_primary}]";
-@endphp
+                @php
+                    $brandBg = "bg-[color:var(--primary)]";
+                    $brandBorder = "border-[color:var(--primary)]";
+                @endphp
 
 
 
@@ -68,14 +67,13 @@ $brandBorder = "border-[{$companyData->color_primary}]";
                             class="text-red-600">*</span></label>
                     <div wire:key="select-{{ rand() }}">
                         <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
-                            dropdownParent: 'body',
-                            allowClear: true,
-                            plugins: ['clear_button'],
-                            onChange: function(e) {
-                                @this.set('user_id', e ? e : '');
-                            }
-                        });"
-                            wire:model.lazy="user_id" id="user_id">
+                                    dropdownParent: 'body',
+                                    allowClear: true,
+                                    plugins: ['clear_button'],
+                                    onChange: function(e) {
+                                        @this.set('user_id', e ? e : '');
+                                    }
+                                });" wire:model.lazy="user_id" id="user_id">
                             <option value="">-- Pilih Dosen --</option>
                             @foreach ($users as $key_user => $user)
                                 <option value="{{ $key_user }}">{{ $user }}</option>
@@ -88,7 +86,8 @@ $brandBorder = "border-[{$companyData->color_primary}]";
                 </div>
                 <div class="mb-4">
                     <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
-                    <textarea id="description" wire:model.defer="description" placeholder="Deskripsi Peserta" class="mt-1 form-control"></textarea>
+                    <textarea id="description" wire:model.defer="description" placeholder="Deskripsi Peserta"
+                        class="mt-1 form-control"></textarea>
                     @error('description')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -105,7 +104,8 @@ $brandBorder = "border-[{$companyData->color_primary}]";
                 </div>
                 <div class="mb-4">
                     <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
-                    <textarea id="description" wire:model.defer="description" placeholder="Deskripsi Peserta" class="mt-1 form-control"></textarea>
+                    <textarea id="description" wire:model.defer="description" placeholder="Deskripsi Peserta"
+                        class="mt-1 form-control"></textarea>
                     @error('description')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -125,8 +125,7 @@ $brandBorder = "border-[{$companyData->color_primary}]";
                     </select>
                     <span class="text-sm text-gray-700 ml-2">data</span> --}}
                     <div>
-                        <h1
-                            class="text-2xl font-bold text-primary">
+                        <h1 class="text-2xl font-bold text-[color:var(--primary)]">
                             Data Mahasiswa</h1>
                         {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
                     </div>

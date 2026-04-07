@@ -1,9 +1,11 @@
 @php
     use App\Models\Company\Company;
 
-    $company = Company::first(); 
-@endphp
+    $company = Company::first(); // ambil 1 data pertama
 
+    $primary = $company->color_primary;
+    $secondary = $company->color_secondary;
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
@@ -41,18 +43,11 @@
         }
 
         :root {
-            --primary-50:
-                {{ '#f58634' }}
+            --primary:
+                {{ $primary }}
             ;
-            /* 10% opacity fallback */
-            --primary-600:
-                {{ '#f58634' }}
-            ;
-            --color-primary:
-                {{ '#f58634' }}
-            ;
-            --color-secondary:
-                {{ '#4a5568' }}
+            --secondary:
+                {{ $secondary }}
             ;
         }
 

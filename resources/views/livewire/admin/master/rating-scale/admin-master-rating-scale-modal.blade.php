@@ -1,19 +1,21 @@
 <div wire:ignore.self id="modal-rating-scale"
     class="fixed inset-0 bg-overlay hidden items-center justify-center z-50 transition-opacity duration-300 ease-in-out">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg transform transition-all scale-95 duration-300 ease-out animate-fade-in overflow-hidden">
+    <div
+        class="bg-white rounded-3xl shadow-2xl w-full max-w-lg transform transition-all scale-95 duration-300 ease-out animate-fade-in overflow-hidden">
         <!-- Header -->
         <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/30">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 rounded-2xl bg-primary bg-opacity-10 flex items-center justify-center">
-                        <i class="fa-solid fa-sliders text-xl text-primary"></i>
+                        <i class="fa-solid fa-sliders text-xl text-[color:var(--primary)]"></i>
                     </div>
                     <div>
                         <h2 class="text-xl font-bold text-gray-800">Skala Penilaian</h2>
                         <p class="text-sm text-gray-500">Atur parameter grade nilai</p>
                     </div>
                 </div>
-                <button wire:click="closeModal()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all cursor-pointer">
+                <button wire:click="closeModal()"
+                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all cursor-pointer">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -22,9 +24,11 @@
         <!-- Body -->
         <div class="p-8 space-y-6">
             <div class="space-y-2">
-                <label for="grade_letter" class="block text-sm font-bold text-gray-700">Nama Grade Letter <span class="text-red-500">*</span></label>
+                <label for="grade_letter" class="block text-sm font-bold text-gray-700">Nama Grade Letter <span
+                        class="text-red-500">*</span></label>
                 <div class="relative group">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
+                    <div
+                        class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[color:var(--primary)] transition-colors">
                         <i class="fa-solid fa-font"></i>
                     </div>
                     <input type="text" id="grade_letter" wire:model.defer="grade_letter" placeholder="Contoh : A"
@@ -37,7 +41,8 @@
 
             <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-2">
-                    <label for="min_score" class="block text-sm font-bold text-gray-700">Nilai Minimum <span class="text-red-500">*</span></label>
+                    <label for="min_score" class="block text-sm font-bold text-gray-700">Nilai Minimum <span
+                            class="text-red-500">*</span></label>
                     <input type="number" id="min_score" wire:model.defer="min_score" placeholder="0"
                         class="w-full form-control focus:ring-2 focus:ring-primary focus:ring-opacity-20 border-gray-200">
                     @error('min_score')
@@ -45,7 +50,8 @@
                     @enderror
                 </div>
                 <div class="space-y-2">
-                    <label for="max_score" class="block text-sm font-bold text-gray-700">Nilai Maksimum <span class="text-red-500">*</span></label>
+                    <label for="max_score" class="block text-sm font-bold text-gray-700">Nilai Maksimum <span
+                            class="text-red-500">*</span></label>
                     <input type="number" id="max_score" wire:model.defer="max_score" placeholder="100"
                         class="w-full form-control focus:ring-2 focus:ring-primary focus:ring-opacity-20 border-gray-200">
                     @error('max_score')
@@ -55,7 +61,8 @@
             </div>
 
             <div class="space-y-2">
-                <label for="description" class="block text-sm font-bold text-gray-700">Deskripsi <span class="text-red-500">*</span></label>
+                <label for="description" class="block text-sm font-bold text-gray-700">Deskripsi <span
+                        class="text-red-500">*</span></label>
                 <textarea id="description" wire:model.defer="description" rows="3" placeholder="Masukkan deskripsi..."
                     class="w-full form-control focus:ring-2 focus:ring-primary focus:ring-opacity-20 border-gray-200 py-3"></textarea>
                 @error('description')

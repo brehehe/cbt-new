@@ -113,7 +113,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-primary">
+                <h1 class="text-2xl font-bold text-[color:var(--primary)]">
                     Detail Analisis Butir Soal</h1>
                 <p class="text-gray-600 mt-2">
                     Ujian: <strong>{{ $timetable->name ?? 'Tidak diketahui' }}</strong> |
@@ -505,10 +505,10 @@
 
                                 <div class="p-3 bg-orange-50 rounded-lg">
                                     <div class="flex justify-between items-center">
-                                        <span class="text-sm font-medium text-primary">Kontribusi
+                                        <span class="text-sm font-medium text-[color:var(--primary)]">Kontribusi
                                             Reliabilitas</span>
                                         <span
-                                            class="font-bold text-primary">{{ $analysis['reliability_contribution'] }}</span>
+                                            class="font-bold text-[color:var(--primary)]">{{ $analysis['reliability_contribution'] }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -862,171 +862,171 @@
                 (analysis.discrimination_index >= 0.2 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800');
 
             const modalContent = `
-                <div class="space-y-6">
-                    <!-- Question Text -->
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h4 class="font-semibold text-gray-800 mb-2">Soal:</h4>
-                        <div class="text-gray-700">${analysis.question?.question || 'Tidak ada teks soal'}</div>
-                    </div>
+                    <div class="space-y-6">
+                        <!-- Question Text -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-gray-800 mb-2">Soal:</h4>
+                            <div class="text-gray-700">${analysis.question?.question || 'Tidak ada teks soal'}</div>
+                        </div>
 
-                    <!-- Statistics -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div>
-                            <h4 class="font-semibold text-gray-800 mb-3">Statistik Utama</h4>
-                            <div class="space-y-3">
-                                <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                    <span class="text-sm font-medium text-gray-600">Total Peserta</span>
-                                    <span class="font-bold text-gray-800">${analysis.total_participants}</span>
+                        <!-- Statistics -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-semibold text-gray-800 mb-3">Statistik Utama</h4>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                        <span class="text-sm font-medium text-gray-600">Total Peserta</span>
+                                        <span class="font-bold text-gray-800">${analysis.total_participants}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                                        <span class="text-sm font-medium text-green-600">Jawaban Benar</span>
+                                        <span class="font-bold text-green-800">${analysis.correct_answers}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                                        <span class="text-sm font-medium text-red-600">Jawaban Salah</span>
+                                        <span class="font-bold text-red-800">${analysis.incorrect_answers}</span>
+                                    </div>
                                 </div>
-                                <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                                    <span class="text-sm font-medium text-green-600">Jawaban Benar</span>
-                                    <span class="font-bold text-green-800">${analysis.correct_answers}</span>
-                                </div>
-                                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
-                                    <span class="text-sm font-medium text-red-600">Jawaban Salah</span>
-                                    <span class="font-bold text-red-800">${analysis.incorrect_answers}</span>
+                            </div>
+
+                            <div>
+                                <h4 class="font-semibold text-gray-800 mb-3">Indeks Analisis</h4>
+                                <div class="space-y-3">
+                                    <div class="p-3 bg-blue-50 rounded-lg">
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-sm font-medium text-blue-600">Tingkat Kesukaran (P)</span>
+                                            <span class="font-bold text-blue-800">${analysis.difficulty_index}</span>
+                                        </div>
+                                        <div class="mt-1">
+                                            <div class="w-full bg-blue-200 rounded-full h-2">
+                                                <div class="bg-blue-600 h-2 rounded-full" style="width: ${analysis.difficulty_index * 100}%"></div>
+                                            </div>
+                                        </div>
+                                        <span class="inline-block mt-2 px-2 py-1 text-xs font-medium rounded ${difficultyColor}">
+                                            ${analysis.difficulty_level}
+                                        </span>
+                                    </div>
+
+                                    <div class="p-3 bg-purple-50 rounded-lg">
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-sm font-medium text-purple-600">Daya Pembeda (D)</span>
+                                            <span class="font-bold text-purple-800">${analysis.discrimination_index}</span>
+                                        </div>
+                                        <div class="mt-1">
+                                            <div class="w-full bg-purple-200 rounded-full h-2">
+                                                <div class="bg-purple-600 h-2 rounded-full" style="width: ${Math.max(0, analysis.discrimination_index * 100)}%"></div>
+                                            </div>
+                                        </div>
+                                        <span class="inline-block mt-2 px-2 py-1 text-xs font-medium rounded ${discriminationColor}">
+                                            ${analysis.discrimination_level}
+                                        </span>
+                                    </div>
+
+                                    <div class="p-3 bg-orange-50 rounded-lg">
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-sm font-medium text-[color:var(--primary)]">Kontribusi Reliabilitas</span>
+                                            <span class="font-bold text-[color:var(--primary)]">${analysis.reliability_contribution}</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div>
-                            <h4 class="font-semibold text-gray-800 mb-3">Indeks Analisis</h4>
-                            <div class="space-y-3">
-                                <div class="p-3 bg-blue-50 rounded-lg">
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm font-medium text-blue-600">Tingkat Kesukaran (P)</span>
-                                        <span class="font-bold text-blue-800">${analysis.difficulty_index}</span>
-                                    </div>
-                                    <div class="mt-1">
-                                        <div class="w-full bg-blue-200 rounded-full h-2">
-                                            <div class="bg-blue-600 h-2 rounded-full" style="width: ${analysis.difficulty_index * 100}%"></div>
-                                        </div>
-                                    </div>
-                                    <span class="inline-block mt-2 px-2 py-1 text-xs font-medium rounded ${difficultyColor}">
-                                        ${analysis.difficulty_level}
-                                    </span>
-                                </div>
-
-                                <div class="p-3 bg-purple-50 rounded-lg">
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm font-medium text-purple-600">Daya Pembeda (D)</span>
-                                        <span class="font-bold text-purple-800">${analysis.discrimination_index}</span>
-                                    </div>
-                                    <div class="mt-1">
-                                        <div class="w-full bg-purple-200 rounded-full h-2">
-                                            <div class="bg-purple-600 h-2 rounded-full" style="width: ${Math.max(0, analysis.discrimination_index * 100)}%"></div>
-                                        </div>
-                                    </div>
-                                    <span class="inline-block mt-2 px-2 py-1 text-xs font-medium rounded ${discriminationColor}">
-                                        ${analysis.discrimination_level}
-                                    </span>
-                                </div>
-
-                                <div class="p-3 bg-orange-50 rounded-lg">
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm font-medium text-primary">Kontribusi Reliabilitas</span>
-                                        <span class="font-bold text-primary">${analysis.reliability_contribution}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Group Analysis -->
-                    ${analysis.upper_group_total > 0 ? `
-                                                                                                <div class="pt-6 border-t border-gray-200">
-                                                                                                    <h4 class="font-semibold text-gray-800 mb-3">Analisis Kelompok (27% Atas vs 27% Bawah)</h4>
-                                                                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                                                                        <div class="bg-green-50 p-4 rounded-lg">
-                                                                                                            <h5 class="font-medium text-green-800 mb-2">Kelompok Atas</h5>
-                                                                                                            <p class="text-sm text-green-600">
-                                                                                                                ${analysis.upper_group_correct} dari ${analysis.upper_group_total} peserta menjawab benar
-                                                                                                                (${((analysis.upper_group_correct / analysis.upper_group_total) * 100).toFixed(1)}%)
-                                                                                                            </p>
-                                                                                                        </div>
-                                                                                                        <div class="bg-red-50 p-4 rounded-lg">
-                                                                                                            <h5 class="font-medium text-red-800 mb-2">Kelompok Bawah</h5>
-                                                                                                            <p class="text-sm text-red-600">
-                                                                                                                ${analysis.lower_group_correct} dari ${analysis.lower_group_total} peserta menjawab benar
-                                                                                                                (${((analysis.lower_group_correct / analysis.lower_group_total) * 100).toFixed(1)}%)
-                                                                                                            </p>
+                        <!-- Group Analysis -->
+                        ${analysis.upper_group_total > 0 ? `
+                                                                                                    <div class="pt-6 border-t border-gray-200">
+                                                                                                        <h4 class="font-semibold text-gray-800 mb-3">Analisis Kelompok (27% Atas vs 27% Bawah)</h4>
+                                                                                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                                                            <div class="bg-green-50 p-4 rounded-lg">
+                                                                                                                <h5 class="font-medium text-green-800 mb-2">Kelompok Atas</h5>
+                                                                                                                <p class="text-sm text-green-600">
+                                                                                                                    ${analysis.upper_group_correct} dari ${analysis.upper_group_total} peserta menjawab benar
+                                                                                                                    (${((analysis.upper_group_correct / analysis.upper_group_total) * 100).toFixed(1)}%)
+                                                                                                                </p>
+                                                                                                            </div>
+                                                                                                            <div class="bg-red-50 p-4 rounded-lg">
+                                                                                                                <h5 class="font-medium text-red-800 mb-2">Kelompok Bawah</h5>
+                                                                                                                <p class="text-sm text-red-600">
+                                                                                                                    ${analysis.lower_group_correct} dari ${analysis.lower_group_total} peserta menjawab benar
+                                                                                                                    (${((analysis.lower_group_correct / analysis.lower_group_total) * 100).toFixed(1)}%)
+                                                                                                                </p>
+                                                                                                            </div>
                                                                                                         </div>
                                                                                                     </div>
-                                                                                                </div>
-                                                                                                ` : ''}
+                                                                                                    ` : ''}
 
-                    <!-- Option Analysis -->
-                    ${analysis.option_analysis && analysis.option_analysis.length > 0 ? `
-                                                                                                <div class="pt-6 border-t border-gray-200">
-                                                                                                    <h4 class="font-semibold text-gray-800 mb-3">Analisis Opsi Jawaban</h4>
-                                                                                                    <div class="overflow-x-auto">
-                                                                                                        <table class="min-w-full">
-                                                                                                            <thead>
-                                                                                                                <tr class="bg-gray-50">
-                                                                                                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Opsi</th>
-                                                                                                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Jawaban</th>
-                                                                                                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Dipilih</th>
-                                                                                                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Persentase</th>
-                                                                                                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                                                                                                </tr>
-                                                                                                            </thead>
-                                                                                                            <tbody class="divide-y divide-gray-200">
-                                                                                                                ${analysis.option_analysis.map((option, index) => `
-                                        <tr class="${option.is_correct ? 'bg-green-50' : ''}">
-                                            <td class="px-3 py-2 text-sm font-medium text-gray-900">
-                                                ${option.option?.alphabet || String.fromCharCode(65 + index)}
-                                            </td>
-                                            <td class="px-3 py-2 text-sm text-gray-600">
-                                                ${option.option?.context ? option.option.context.substring(0, 50) + (option.option.context.length > 50 ? '...' : '') : ''}
-                                            </td>
-                                            <td class="px-3 py-2 text-sm text-gray-900">${option.selected_count}</td>
-                                            <td class="px-3 py-2 text-sm text-gray-900">
-                                                <div class="flex items-center">
-                                                    <div class="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                                                        <div class="bg-blue-600 h-2 rounded-full" style="width: ${option.percentage}%"></div>
+                        <!-- Option Analysis -->
+                        ${analysis.option_analysis && analysis.option_analysis.length > 0 ? `
+                                                                                                    <div class="pt-6 border-t border-gray-200">
+                                                                                                        <h4 class="font-semibold text-gray-800 mb-3">Analisis Opsi Jawaban</h4>
+                                                                                                        <div class="overflow-x-auto">
+                                                                                                            <table class="min-w-full">
+                                                                                                                <thead>
+                                                                                                                    <tr class="bg-gray-50">
+                                                                                                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Opsi</th>
+                                                                                                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Jawaban</th>
+                                                                                                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Dipilih</th>
+                                                                                                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Persentase</th>
+                                                                                                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                                                                                                    </tr>
+                                                                                                                </thead>
+                                                                                                                <tbody class="divide-y divide-gray-200">
+                                                                                                                    ${analysis.option_analysis.map((option, index) => `
+                                            <tr class="${option.is_correct ? 'bg-green-50' : ''}">
+                                                <td class="px-3 py-2 text-sm font-medium text-gray-900">
+                                                    ${option.option?.alphabet || String.fromCharCode(65 + index)}
+                                                </td>
+                                                <td class="px-3 py-2 text-sm text-gray-600">
+                                                    ${option.option?.context ? option.option.context.substring(0, 50) + (option.option.context.length > 50 ? '...' : '') : ''}
+                                                </td>
+                                                <td class="px-3 py-2 text-sm text-gray-900">${option.selected_count}</td>
+                                                <td class="px-3 py-2 text-sm text-gray-900">
+                                                    <div class="flex items-center">
+                                                        <div class="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                                                            <div class="bg-blue-600 h-2 rounded-full" style="width: ${option.percentage}%"></div>
+                                                        </div>
+                                                        ${option.percentage}%
                                                     </div>
-                                                    ${option.percentage}%
-                                                </div>
-                                            </td>
-                                            <td class="px-3 py-2 text-sm">
-                                                ${option.is_correct ?
+                                                </td>
+                                                <td class="px-3 py-2 text-sm">
+                                                    ${option.is_correct ?
                     '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Benar</span>' :
                     '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Salah</span>'
                 }
-                                            </td>
-                                        </tr>
-                                    `).join('')}
-                                                                                                            </tbody>
-                                                                                                        </table>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                                                                                                </tbody>
+                                                                                                            </table>
+                                                                                                        </div>
                                                                                                     </div>
-                                                                                                </div>
-                                                                                                ` : ''}
+                                                                                                    ` : ''}
 
-                    <!-- Recommendations -->
-                    <div class="pt-6 border-t border-gray-200">
-                        <h4 class="font-semibold text-gray-800 mb-3">Rekomendasi</h4>
-                        <div class="bg-blue-50 p-4 rounded-lg">
-                            <ul class="text-sm text-blue-800 space-y-1">
-                                ${analysis.difficulty_index < 0.3 ?
+                        <!-- Recommendations -->
+                        <div class="pt-6 border-t border-gray-200">
+                            <h4 class="font-semibold text-gray-800 mb-3">Rekomendasi</h4>
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <ul class="text-sm text-blue-800 space-y-1">
+                                    ${analysis.difficulty_index < 0.3 ?
                     '<li>• Soal terlalu sukar, pertimbangkan untuk merevisi atau mengganti dengan soal yang lebih mudah</li>' :
                     analysis.difficulty_index > 0.7 ?
                         '<li>• Soal terlalu mudah, pertimbangkan untuk membuat soal yang lebih menantang</li>' :
                         '<li>• Tingkat kesukaran soal sudah baik (sedang)</li>'
                 }
-                                ${analysis.discrimination_index < 0.2 ?
+                                    ${analysis.discrimination_index < 0.2 ?
                     '<li>• Daya pembeda rendah, soal perlu diperbaiki atau diganti</li>' :
                     analysis.discrimination_index < 0.4 ?
                         '<li>• Daya pembeda cukup, masih bisa ditingkatkan</li>' :
                         '<li>• Daya pembeda sangat baik, soal berkualitas tinggi</li>'
                 }
-                                ${analysis.reliability_contribution < 0.05 ?
+                                    ${analysis.reliability_contribution < 0.05 ?
                     '<li>• Kontribusi terhadap reliabilitas rendah</li>' : ''
                 }
-                            </ul>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
 
             document.getElementById('modalContent').innerHTML = modalContent;
             document.getElementById('questionModal').classList.remove('hidden');
@@ -1124,24 +1124,24 @@
             const styles = document.querySelector('style').innerHTML;
 
             printWindow.document.write(`
-                <html>
-                    <head>
-                        <title>Detail Analisis Butir Soal</title>
-                        <style>${styles}</style>
-                        <style>
-                            @media print {
-                                body { font-size: 12px; }
-                                .no-print { display: none !important; }
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <h2>Detail Analisis Butir Soal</h2>
-                        <p>Ujian: {{ $timetable->name ?? 'Tidak diketahui' }} | Modul: {{ $timetableModule->name ?? 'Tidak diketahui' }}</p>
-                        ${tableHTML}
-                    </body>
-                </html>
-            `);
+                    <html>
+                        <head>
+                            <title>Detail Analisis Butir Soal</title>
+                            <style>${styles}</style>
+                            <style>
+                                @media print {
+                                    body { font-size: 12px; }
+                                    .no-print { display: none !important; }
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <h2>Detail Analisis Butir Soal</h2>
+                            <p>Ujian: {{ $timetable->name ?? 'Tidak diketahui' }} | Modul: {{ $timetableModule->name ?? 'Tidak diketahui' }}</p>
+                            ${tableHTML}
+                        </body>
+                    </html>
+                `);
 
             printWindow.document.close();
             printWindow.print();

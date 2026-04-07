@@ -15,7 +15,7 @@ use Throwable;
 
 class AdminMasterQuestionTypeIndex extends Component
 {
-     use WithPagination;
+    use WithPagination;
     protected $paginationTheme = 'bootstrap';
     public $perPage = 10, $search;
 
@@ -25,11 +25,11 @@ class AdminMasterQuestionTypeIndex extends Component
     {
         $question_types = QuestionType::search($this->search)->select('id', 'name', 'description');
         return view('livewire.admin.master.question-type.admin-master-question-type-index', [
-             'question_types' => $question_types->paginate($this->perPage)
+            'question_types' => $question_types->paginate($this->perPage)
         ])->extends('layout.app')->section('content');
     }
 
-     public function mount()
+    public function mount()
     {
         // dd(Auth::user()?->company);
     }
@@ -55,35 +55,36 @@ class AdminMasterQuestionTypeIndex extends Component
     {
         $this->validate(
             [
-                'name'                 => 'required',
-                'description'          => 'nullable',
+                'name' => 'required',
+                'description' => 'required',
             ],
             [
                 'name.required' => 'Nama tipe ujian wajib diisi.',
+                'description.required' => 'Deskripsi tipe ujian wajib diisi.',
             ]
         );
 
         try {
             DB::beginTransaction();
-                 $request = [
-                    'id'                   => $this->data_id,
-                    'company_id'           => Auth::user()?->company?->id,
-                    'name'                 => $this->name,
-                    'description'          => $this->description,
-                ];
+            $request = [
+                'id' => $this->data_id,
+                'company_id' => Auth::user()?->company?->id,
+                'name' => $this->name,
+                'description' => $this->description,
+            ];
 
-                $exam_type = app(QuestionTypeService::class)->updateOrCreate($request);
-                if (!$exam_type) {
-                    throw new Exception("Ada kesalahaan saat QuestionTypeService => updateOrCreate", 500);
-                }
+            $exam_type = app(QuestionTypeService::class)->updateOrCreate($request);
+            if (!$exam_type) {
+                throw new Exception("Ada kesalahaan saat QuestionTypeService => updateOrCreate", 500);
+            }
 
             DB::commit();
         } catch (Exception | Throwable $th) {
             DB::rollBack();
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterQuestionTypeIndex => submit', $error);
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
@@ -93,12 +94,12 @@ class AdminMasterQuestionTypeIndex extends Component
         return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
     }
 
-     public function edit($id)
+    public function edit($id)
     {
-        $result                     = QuestionType::findOrFail($id);
-        $this->data_id              = $result?->id;
-        $this->name                 = $result?->name;
-        $this->description          = $result?->description;
+        $result = QuestionType::findOrFail($id);
+        $this->data_id = $result?->id;
+        $this->name = $result?->name;
+        $this->description = $result?->description;
         $this->openModal();
     }
 
@@ -114,8 +115,8 @@ class AdminMasterQuestionTypeIndex extends Component
         } catch (Exception | Throwable $th) {
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterQuestionTypeIndex => delete', $error);
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menghapus data');

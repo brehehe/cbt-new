@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  User, Camera, Video, VideoOff, 
-  RefreshCcw, Monitor, ShieldCheck, 
-  X, CheckCircle, Info, Eye, EyeOff 
+import {
+    User, Camera, Video, VideoOff,
+    RefreshCcw, Monitor, ShieldCheck,
+    X, CheckCircle, Info, Eye, EyeOff
 } from 'lucide-react';
 
-const MonitorSidebar = ({ 
-  user, 
-  percentage, 
-  isOpen, 
-  setIsOpen, 
-  companyColor, 
-  isRecording,
-  connectionStatus,
-  userTimetableId 
+const MonitorSidebar = ({
+    user,
+    percentage,
+    isOpen,
+    setIsOpen,
+    companyColor,
+    isRecording,
+    connectionStatus,
+    userTimetableId
 }) => {
     const videoRef = useRef(null);
     const [cameraActive, setCameraActive] = useState(false);
@@ -67,12 +67,12 @@ const MonitorSidebar = ({
 
             {/* Profile Section */}
             <div className="p-6 border-b bg-gray-50/30 flex flex-col items-center">
-                <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg mb-4 ring-4 ring-blue-50">
+                <div className="w-20 h-20 bg-orange-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg mb-4 ring-4 ring-orange-50">
                     {user?.name ? user.name.substring(0, 2).toUpperCase() : 'ST'}
                 </div>
                 <h3 className="font-bold text-gray-800 text-lg text-center line-clamp-2">{user?.name || 'Student'}</h3>
-                <p className="text-sm text-blue-600 font-bold tracking-wider mt-1">{user?.nim || 'Peserta Ujian'}</p>
-                {/* <div className="mt-3 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] uppercase font-bold tracking-wider border border-blue-100 flex items-center gap-1">
+                <p className="text-sm text-orange-600 font-bold tracking-wider mt-1">{user?.nim || 'Peserta Ujian'}</p>
+                {/* <div className="mt-3 px-3 py-1 bg-orange-50 text-orange-700 rounded-full text-[10px] uppercase font-bold tracking-wider border border-orange-100 flex items-center gap-1">
                     <ShieldCheck className="w-3 h-3" /> Akun Terverifikasi
                 </div> */}
             </div>
@@ -81,12 +81,12 @@ const MonitorSidebar = ({
             <div className="p-5 border-b">
                 <div className="flex items-center justify-between mb-4">
                     <h4 className="font-bold text-gray-800 flex items-center gap-2">
-                        <Camera className="w-4 h-4 text-blue-600" /> Monitor Camera
+                        <Camera className="w-4 h-4 text-orange-600" /> Monitor Camera
                     </h4>
                     <div className="flex items-center gap-2">
-                        <button 
+                        <button
                             onClick={() => setCameraVisible(!cameraVisible)}
-                            className="p-1 hover:bg-gray-100 rounded-md transition-colors text-gray-400 hover:text-blue-600"
+                            className="p-1 hover:bg-gray-100 rounded-md transition-colors text-gray-400 hover:text-orange-600"
                             title={cameraVisible ? "Sembunyikan Kamera" : "Tampilkan Kamera"}
                         >
                             {cameraVisible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
@@ -97,11 +97,11 @@ const MonitorSidebar = ({
                     </div>
                 </div>
                 <div className="relative aspect-video bg-black rounded-2xl overflow-hidden shadow-inner group">
-                    <video 
-                        ref={videoRef} 
-                        autoPlay 
-                        muted 
-                        playsInline 
+                    <video
+                        ref={videoRef}
+                        autoPlay
+                        muted
+                        playsInline
                         className={`w-full h-full object-cover transition-opacity duration-500 ${cameraActive && cameraVisible ? 'opacity-100' : 'opacity-0'}`}
                     />
                     {(!cameraActive || !cameraVisible) && (
@@ -113,7 +113,7 @@ const MonitorSidebar = ({
                                 </>
                             ) : (
                                 <>
-                                    <EyeOff className="w-8 h-8 opacity-20 text-blue-600" />
+                                    <EyeOff className="w-8 h-8 opacity-20 text-orange-600" />
                                     <span className="text-xs font-bold opacity-40 uppercase">Preview Hidden</span>
                                 </>
                             )}
@@ -124,19 +124,19 @@ const MonitorSidebar = ({
                         REC • {recordingStatus}
                     </div>
                 </div>
-                <div className="mt-4 p-3 bg-blue-50/50 rounded-xl border border-blue-100/50 flex gap-3">
-                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 flex-none self-center">
+                <div className="mt-4 p-3 bg-orange-50/50 rounded-xl border border-orange-100/50 flex gap-3">
+                    <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center text-orange-600 flex-none self-center">
                         <Monitor className="w-4 h-4" />
                     </div>
                     <div className="flex-1">
                         <div className="text-[10px] text-gray-400 font-bold uppercase">Progres Ujian</div>
                         <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-sm font-bold text-blue-700">{Math.round(percentage)}%</span>
+                            <span className="text-sm font-bold text-orange-700">{Math.round(percentage)}%</span>
                             <span className="text-[10px] text-gray-400 font-medium">Terselesaikan</span>
                         </div>
                         <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                            <div 
-                                className="h-full bg-blue-600 rounded-full transition-all duration-700 ease-out"
+                            <div
+                                className="h-full bg-orange-600 rounded-full transition-all duration-700 ease-out"
                                 style={{ width: `${percentage}%` }}
                             />
                         </div>
@@ -162,7 +162,7 @@ const MonitorSidebar = ({
                         </div>
                     </div>
                     <div className="flex gap-3">
-                        <div className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center flex-none mt-0.5">
+                        <div className="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center flex-none mt-0.5">
                             <RefreshCcw className="w-3.5 h-3.5" />
                         </div>
                         <div>
@@ -176,7 +176,7 @@ const MonitorSidebar = ({
             {/* Sidebar Footer */}
             <div className="p-4 border-t bg-gray-50 flex items-center gap-2">
                 <div className="p-2 bg-white rounded-lg border border-gray-200">
-                    <Info className="w-4 h-4 text-blue-500" />
+                    <Info className="w-4 h-4 text-orange-500" />
                 </div>
                 <p className="text-[10px] text-gray-500 leading-tight">
                     Keamanan ujian dipantau secara real-time. Pastikan wajah terlihat jelas di kamera.

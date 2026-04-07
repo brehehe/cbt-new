@@ -137,7 +137,7 @@ const ExamContainer = ({ userTimetableId }) => {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-                <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
+                <Loader2 className="w-12 h-12 animate-spin text-orange-600" />
                 <span className="ml-3 text-lg font-medium">Memproses data ujian...</span>
             </div>
         );
@@ -182,14 +182,14 @@ const ExamContainer = ({ userTimetableId }) => {
             <div className="lg:hidden flex border-b bg-gray-50">
                 <button
                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                    className="flex-1 p-4 flex items-center justify-center gap-2 text-blue-600 font-medium"
+                    className="flex-1 p-4 flex items-center justify-center gap-2 text-orange-600 font-medium"
                 >
                     <Menu className="w-5 h-5" /> Navigasi Soal
                 </button>
                 <div className="w-px bg-gray-200"></div>
                 <button
                     onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
-                    className="flex-1 p-4 flex items-center justify-center gap-2 text-blue-600 font-medium"
+                    className="flex-1 p-4 flex items-center justify-center gap-2 text-orange-600 font-medium"
                 >
                     Profil & Camera <User className="w-5 h-5" />
                 </button>

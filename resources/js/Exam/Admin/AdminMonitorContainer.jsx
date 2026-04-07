@@ -20,7 +20,7 @@ const AdminMonitorContainer = ({ timetableId }) => {
             const { data } = await axios.get(`/api/exam/admin/monitoring/${timetableId}/sessions`);
             if (data.success) {
                 setSessions(data.sessions);
-                
+
                 // Calculate stats
                 const newStats = data.sessions.reduce((acc, s) => {
                     acc.total++;
@@ -87,7 +87,7 @@ const AdminMonitorContainer = ({ timetableId }) => {
     if (loading && !sessions.length) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
             </div>
         );
     }
@@ -121,16 +121,16 @@ const AdminMonitorContainer = ({ timetableId }) => {
             )}
 
             {/* Student Grid */}
-            <StudentGrid 
-                sessions={sessions} 
-                room={room} 
+            <StudentGrid
+                sessions={sessions}
+                room={room}
                 onDetail={setSelectedSession}
             />
 
             {/* Modal Detail Overlay */}
             {selectedSession && (
-                <StudentDetailModal 
-                    session={selectedSession} 
+                <StudentDetailModal
+                    session={selectedSession}
                     room={room}
                     onClose={() => setSelectedSession(null)}
                 />

@@ -1,19 +1,22 @@
 <div wire:ignore.self id="modal-regulation"
     class="fixed inset-0 bg-overlay hidden items-center justify-center z-50 transition-opacity duration-300 ease-in-out">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg transform transition-all scale-95 duration-300 ease-out animate-fade-in overflow-hidden">
+    <div
+        class="bg-white rounded-3xl shadow-2xl w-full max-w-lg transform transition-all scale-95 duration-300 ease-out animate-fade-in overflow-hidden">
         <!-- Header -->
         <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/30">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-primary bg-opacity-10 flex items-center justify-center border border-primary border-opacity-20 shadow-sm">
-                        <i class="fa-solid fa-book-open-reader text-xl text-primary"></i>
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-primary bg-opacity-10 flex items-center justify-center border border-primary border-opacity-20 shadow-sm">
+                        <i class="fa-solid fa-book-open-reader text-xl text-[color:var(--primary)]"></i>
                     </div>
                     <div>
                         <h2 class="text-xl font-black text-gray-800 tracking-tight">Regulasi</h2>
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Master Data Regulasi</p>
                     </div>
                 </div>
-                <button wire:click="closeModal()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all cursor-pointer">
+                <button wire:click="closeModal()"
+                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all cursor-pointer">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -22,8 +25,10 @@
         <!-- Body -->
         <div class="p-8 space-y-6">
             <div class="space-y-2">
-                <label for="description" class="block text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Nama Regulasi <span class="text-red-500">*</span></label>
-                <textarea id="description" wire:model.defer="description" rows="4" placeholder="Masukkan deskripsi regulasi..."
+                <label for="description" class="block text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Nama
+                    Regulasi <span class="text-red-500">*</span></label>
+                <textarea id="description" wire:model.defer="description" rows="4"
+                    placeholder="Masukkan deskripsi regulasi..."
                     class="w-full form-control !rounded-2xl focus:ring-4 focus:ring-primary focus:ring-opacity-10 border-gray-100 transition-all"></textarea>
                 @error('description')
                     <p class="text-[10px] text-red-500 font-bold uppercase tracking-wider ml-1 mt-1">{{ $message }}</p>
@@ -31,9 +36,11 @@
             </div>
 
             <div class="space-y-2">
-                <label for="type" class="block text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Tipe Regulasi <span class="text-red-500">*</span></label>
+                <label for="type" class="block text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Tipe
+                    Regulasi <span class="text-red-500">*</span></label>
                 <div class="relative">
-                    <select id="type" wire:model.defer="type" class="w-full form-control !rounded-2xl !py-3 focus:ring-4 focus:ring-primary focus:ring-opacity-10 border-gray-100 transition-all appearance-none">
+                    <select id="type" wire:model.defer="type"
+                        class="w-full form-control !rounded-2xl !py-3 focus:ring-4 focus:ring-primary focus:ring-opacity-10 border-gray-100 transition-all appearance-none">
                         <option value="">-- Pilih Tipe --</option>
                         <option value="prohibition">Larangan</option>
                         <option value="licensing">Wajib</option>

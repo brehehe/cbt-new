@@ -31,13 +31,13 @@
                 <div class="mt-2 flex space-x-2">
                     <button type="button" wire:click="$set('type_study', 'mahasiswa')"
                         class="px-4 py-2 rounded-md border
-                            {{ $type_study === 'mahasiswa' ? 'bg-[' . $companyData->color_primary . '] text-white border-[' . $companyData->color_primary . ']' : 'bg-white text-gray-700 border-gray-300' }}">
+                            {{ $type_study === 'mahasiswa' ? 'bg-[color:var(--primary)] text-white border-[color:var(--primary)]' : 'bg-white text-gray-700 border-gray-300' }}">
                         Kelas
                     </button>
 
                     <button type="button" wire:click="$set('type_study', 'general')"
                         class="px-4 py-2 rounded-md border
-                            {{ $type_study === 'general' ? 'bg-[' . $companyData->color_primary . '] text-white border-[' . $companyData->color_primary . ']' : 'bg-white text-gray-700 border-gray-300' }}">
+                            {{ $type_study === 'general' ? 'bg-[color:var(--primary)] text-white border-[color:var(--primary)]' : 'bg-white text-gray-700 border-gray-300' }}">
                         General
                     </button>
                 </div>
@@ -114,11 +114,11 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">Foto</label>
 
                         <input type="file" wire:model.live="profile" class="block text-sm text-gray-500 w-full
-                                               file:px-2 file:py-1 file:rounded-md
-                                               file:border file:border-gray-300
-                                               file:text-xs file:font-medium
-                                               file:bg-blue-50 file:text-blue-700
-                                               hover:file:bg-blue-100" accept="image/*" />
+                                                       file:px-2 file:py-1 file:rounded-md
+                                                       file:border file:border-gray-300
+                                                       file:text-xs file:font-medium
+                                                       file:bg-blue-50 file:text-blue-700
+                                                       hover:file:bg-blue-100" accept="image/*" />
                         <div wire:loading wire:target="profile" class="text-sm text-gray-500 mt-1">
                             Uploading profile...
                         </div>
@@ -425,11 +425,11 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">Foto</label>
 
                         <input type="file" wire:model.live="profile" class="block text-sm text-gray-500 w-full
-                                               file:px-2 file:py-1 file:rounded-md
-                                               file:border file:border-gray-300
-                                               file:text-xs file:font-medium
-                                               file:bg-blue-50 file:text-blue-700
-                                               hover:file:bg-blue-100" accept="image/*" />
+                                                       file:px-2 file:py-1 file:rounded-md
+                                                       file:border file:border-gray-300
+                                                       file:text-xs file:font-medium
+                                                       file:bg-blue-50 file:text-blue-700
+                                                       hover:file:bg-blue-100" accept="image/*" />
                         <div wire:loading wire:target="profile" class="text-sm text-gray-500 mt-1">
                             Uploading profile...
                         </div>

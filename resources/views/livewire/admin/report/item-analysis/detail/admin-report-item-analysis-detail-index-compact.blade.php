@@ -28,7 +28,7 @@
     <div class="mb-3 bg-white rounded-lg p-3 shadow-sm">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-lg font-bold text-primary mb-1">
+                <h1 class="text-lg font-bold text-[color:var(--primary)] mb-1">
                     Analisis Butir Soal</h1>
                 <div class="text-xs text-gray-600">
                     <span class="font-medium">{{ $timetable->name ?? 'N/A' }}</span> •
@@ -151,7 +151,7 @@
                                 @if ($analysis['difficulty_index'] < 0.3)
                                     <span class="text-red-600">Perbaiki soal</span>
                                 @elseif($analysis['difficulty_index'] > 0.7)
-                                    <span class="text-primary">Persulit</span>
+                                    <span class="text-[color:var(--primary)]">Persulit</span>
                                 @else
                                     <span class="text-green-600">Baik</span>
                                 @endif

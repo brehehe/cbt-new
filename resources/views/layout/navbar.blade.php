@@ -3,11 +3,9 @@
         <div class="flex justify-between h-16">
             <!-- Left Section: Logo & Sidebar Toggle -->
             <div class="flex items-center">
-                <img src="{{ $companyData?->logo ? asset('storage/'.$companyData->logo) : asset('asset/img/logo-procbt.png') }}"
-                    alt="Company Logo"
-                    class="h-9 w-auto mr-2">
-                <button id="toggleSidebar"
-                    class="p-2 rounded-xl text-primary
+                <img src="{{ $companyData?->logo ? asset('storage/' . $companyData->logo) : asset('asset/img/logo-procbt.png') }}"
+                    alt="Company Logo" class="h-9 w-auto mr-2">
+                <button id="toggleSidebar" class="p-2 rounded-xl text-[color:var(--primary)]
  hover:bg-[#C3D4EC]/20 transition-all duration-200 cursor-pointer">
                     <i class="fas fa-bars text-lg"></i>
                 </button>
@@ -28,38 +26,37 @@
                     <div class="h-6 w-px bg-gray-300"></div>
                     <div class="flex items-center gap-2">
                         @php
-                            $expiredDate = auth()->user()->company->expired_at ?? now()->addDays(30);
-                            $daysLeft = now()->diffInDays($expiredDate, false);
-                            $isExpired = $daysLeft < 0;
-                            $isExpiringSoon = $daysLeft <= 7 && $daysLeft >= 0;
-                        @endphp
+                        $expiredDate = auth()->user()->company->expired_at ?? now()->addDays(30);
+                        $daysLeft = now()->diffInDays($expiredDate, false);
+                        $isExpired = $daysLeft < 0; $isExpiringSoon=$daysLeft <=7 && $daysLeft>= 0;
+                            @endphp
 
-                        @if (Auth::user()->company->is_lifetime)
+                            @if (Auth::user()->company->is_lifetime)
                             <i class="fas fa-infinity text-green-500"></i>
                             <p class="text-xs text-green-600 font-medium">Seumur Hidup</p>
-                        @else
-                            @if ($isExpired)
-                                <i class="fas fa-exclamation-triangle text-red-500"></i>
-                                <div class="text-left">
-                                    <p class="text-xs text-red-600 font-medium">EXPIRED {{ abs($daysLeft) }} hari yang
-                                        lalu</p>
-                                </div>
-                            @elseif($isExpiringSoon)
-                                <i class="fas fa-clock text-primary
-"></i>
-                                <div class="text-left">
-                                    <p class="text-xs text-primary
- font-medium">Berakhir Dalam {{ $daysLeft }}
-                                        hari lagi</p>
-                                </div>
                             @else
-                                <i class="fas fa-calendar-check text-green-500"></i>
-                                <div class="text-left">
-                                    <p class="text-xs text-green-600 font-medium">Aktif Hingga
-                                        {{ \Carbon\Carbon::parse($expiredDate)->format('d M Y') }}</p>
-                                </div>
+                            @if ($isExpired)
+                            <i class="fas fa-exclamation-triangle text-red-500"></i>
+                            <div class="text-left">
+                                <p class="text-xs text-red-600 font-medium">EXPIRED {{ abs($daysLeft) }} hari yang
+                                    lalu</p>
+                            </div>
+                            @elseif($isExpiringSoon)
+                            <i class="fas fa-clock text-[color:var(--primary)]
+"></i>
+                            <div class="text-left">
+                                <p class="text-xs text-[color:var(--primary)]
+ font-medium">Berakhir Dalam {{ $daysLeft }}
+                                    hari lagi</p>
+                            </div>
+                            @else
+                            <i class="fas fa-calendar-check text-green-500"></i>
+                            <div class="text-left">
+                                <p class="text-xs text-green-600 font-medium">Aktif Hingga
+                                    {{ \Carbon\Carbon::parse($expiredDate)->format('d M Y') }}</p>
+                            </div>
                             @endif
-                        @endif
+                            @endif
                     </div>
                 </div>
             </div> --}}
@@ -71,7 +68,7 @@
                 <!-- Notifications -->
                 <!-- <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open"
-                        class="p-2 rounded-xl text-gray-500 hover:bg-[#C3D4EC]/20 hover:text-primary
+                        class="p-2 rounded-xl text-gray-500 hover:bg-[#C3D4EC]/20 hover:text-[color:var(--primary)]
  transition-all duration-200 relative">
                         <i class="fas fa-bell text-lg"></i>
                         <span
@@ -132,13 +129,12 @@
                         </div>
                         <div class="p-2">
                             <!-- <a href="/admin/profile/profile"
-                                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-primary
+                                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-[color:var(--primary)]
  rounded-lg transition-all duration-200">
                                 <i class="fas fa-user w-4"></i>
                                 <span>Profile</span>
                             </a> -->
-                            <a href="/admin/change-password/change-password"
-                                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-primary
+                            <a href="/admin/change-password/change-password" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-[color:var(--primary)]
  rounded-lg transition-all duration-200">
                                 <i class="fas fa-lock w-4"></i>
                                 <span>Rubah Password</span>

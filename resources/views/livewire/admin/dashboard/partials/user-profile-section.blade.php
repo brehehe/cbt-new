@@ -2,12 +2,11 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
     {{-- Profile Card --}}
     <div class="lg:col-span-1 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-        <div
-            class="bg-gradient-to-r from-[{{ $companyData->color_primary ?? '#f58634' }}] to-[{{ $companyData->color_secondary }}] p-6 text-white">
+        <div class="bg-gradient-to-r from-[color:var(--primary)] to-[color:var(--secondary)] p-6 text-white">
             <div class="flex flex-col items-center text-center">
                 {{-- Avatar --}}
                 <div
-                    class="w-20 h-20 bg-white rounded-full flex items-center justify-center text-primary text-3xl font-bold mb-3">
+                    class="w-20 h-20 bg-white rounded-full flex items-center justify-center text-[color:var(--primary)] text-3xl font-bold mb-3">
                     {{ strtoupper(substr($userProfile['user']->name ?? 'U', 0, 1)) }}
                 </div>
                 {{-- User Info --}}
@@ -58,8 +57,7 @@
             {{-- MAHASISWA: Show academic information --}}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-4">
-                    <div
-                        class="p-4 bg-blue-50 rounded-lg border-l-4 border-primary">
+                    <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-primary">
                         <label class="text-xs text-gray-500 uppercase">NIM</label>
                         <p class="text-lg font-semibold text-gray-800">
                             {{ $userProfile['user']->userDetail->nim ?? '-' }}
@@ -94,15 +92,15 @@
             {{-- Info Message for Mahasiswa --}}
             <div class="mt-6 p-4 bg-blue-50 border-l-4 border-primary rounded-r">
                 <div class="flex items-start">
-                    <svg class="w-5 h-5 text-primary mt-0.5 mr-3" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 text-[color:var(--primary)] mt-0.5 mr-3" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     <div>
-                        <h4 class="text-sm font-semibold text-primary">
+                        <h4 class="text-sm font-semibold text-[color:var(--primary)]">
                             Informasi Penting</h4>
-                        <p class="text-sm text-primary mt-1">
+                        <p class="text-sm text-[color:var(--primary)] mt-1">
                             Anda login sebagai <strong>Mahasiswa</strong>. Informasi profil pribadi Anda hanya dapat
                             dilihat oleh Anda sendiri.
                             Jika ada kesalahan data, silakan hubungi administrator.
@@ -114,8 +112,7 @@
             {{-- NON-MAHASISWA: Show basic information --}}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-4">
-                    <div
-                        class="p-4 bg-blue-50 rounded-lg border-l-4 border-primary">
+                    <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-primary">
                         <label class="text-xs text-gray-500 uppercase">Nama Lengkap</label>
                         <p class="text-lg font-semibold text-gray-800">
                             {{ $userProfile['user']->name ?? '-' }}
@@ -152,15 +149,15 @@
             {{-- Info Message for Non-Mahasiswa --}}
             <div class="mt-6 p-4 bg-blue-50 border-l-4 border-primary rounded-r">
                 <div class="flex items-start">
-                    <svg class="w-5 h-5 text-primary mt-0.5 mr-3" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 text-[color:var(--primary)] mt-0.5 mr-3" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     <div>
-                        <h4 class="text-sm font-semibold text-primary">
+                        <h4 class="text-sm font-semibold text-[color:var(--primary)]">
                             Informasi</h4>
-                        <p class="text-sm text-primary mt-1">
+                        <p class="text-sm text-[color:var(--primary)] mt-1">
                             Anda login sebagai <strong>{{ $userProfile['role'] }}</strong>. Informasi profil Anda dapat
                             diubah melalui menu pengaturan.
                         </p>

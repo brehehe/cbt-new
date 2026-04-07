@@ -1,19 +1,22 @@
 <div wire:ignore.self id="modal-rating-scale-info"
     class="fixed inset-0 bg-overlay hidden items-center justify-center z-[60] transition-opacity duration-300 ease-in-out">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg transform transition-all scale-95 duration-300 ease-out animate-fade-in overflow-hidden">
+    <div
+        class="bg-white rounded-3xl shadow-2xl w-full max-w-lg transform transition-all scale-95 duration-300 ease-out animate-fade-in overflow-hidden">
         <!-- Header -->
         <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/30">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-primary bg-opacity-10 flex items-center justify-center border border-primary border-opacity-20 shadow-sm">
-                        <i class="fa-solid fa-circle-info text-xl text-primary"></i>
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-primary bg-opacity-10 flex items-center justify-center border border-primary border-opacity-20 shadow-sm">
+                        <i class="fa-solid fa-circle-info text-xl text-[color:var(--primary)]"></i>
                     </div>
                     <div>
                         <h2 class="text-xl font-black text-gray-800 tracking-tight">Panduan Penilaian</h2>
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Aturan Rentang Skor</p>
                     </div>
                 </div>
-                <button wire:click="closeInfoModal()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all cursor-pointer">
+                <button wire:click="closeInfoModal()"
+                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all cursor-pointer">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -23,49 +26,64 @@
         <div class="p-8">
             <div class="bg-blue-50 border-l-4 border-primary p-6 rounded-r-2xl shadow-sm">
                 <div class="flex items-start gap-5">
-                    <div class="w-12 h-12 rounded-full bg-primary bg-opacity-10 flex items-center justify-center flex-shrink-0">
-                        <i class="fa-solid fa-circle-info text-primary text-lg"></i>
+                    <div
+                        class="w-12 h-12 rounded-full bg-primary bg-opacity-10 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-circle-info text-[color:var(--primary)] text-lg"></i>
                     </div>
                     <div>
-                        <h3 class="text-sm font-bold text-primary uppercase tracking-widest">Catatan Penting Penilaian</h3>
+                        <h3 class="text-sm font-bold text-[color:var(--primary)] uppercase tracking-widest">Catatan
+                            Penting Penilaian</h3>
                         <p class="text-sm text-gray-600 mt-2 leading-relaxed font-medium">
                             Sistem menentukan Grade mahasiswa secara otomatis berdasarkan rentang skor yang Anda buat.
                         </p>
-                        
+
                         <div class="mt-4 p-4 bg-white rounded-xl border border-blue-100 space-y-3">
-                            <p class="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2 text-center">Contoh Format Penilaian:</p>
+                            <p class="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2 text-center">Contoh
+                                Format Penilaian:</p>
                             <div class="grid grid-cols-1 gap-2">
                                 <div class="flex justify-between items-center p-2 rounded-lg bg-blue-50/50">
                                     <span class="font-mono font-bold text-gray-700">90 - 100</span>
                                     <i class="fa-solid fa-arrow-right text-blue-400"></i>
-                                    <span class="px-3 py-1 bg-white rounded-lg border border-blue-100 font-bold text-blue-600">Grade A</span>
+                                    <span
+                                        class="px-3 py-1 bg-white rounded-lg border border-blue-100 font-bold text-blue-600">Grade
+                                        A</span>
                                 </div>
                                 <div class="flex justify-between items-center p-2 rounded-lg bg-blue-50/50">
                                     <span class="font-mono font-bold text-gray-700">80 - 89</span>
                                     <i class="fa-solid fa-arrow-right text-blue-400"></i>
-                                    <span class="px-3 py-1 bg-white rounded-lg border border-blue-100 font-bold text-blue-600">Grade B</span>
+                                    <span
+                                        class="px-3 py-1 bg-white rounded-lg border border-blue-100 font-bold text-blue-600">Grade
+                                        B</span>
                                 </div>
                                 <div class="flex justify-between items-center p-2 rounded-lg bg-blue-50/50">
                                     <span class="font-mono font-bold text-gray-700">70 - 79</span>
                                     <i class="fa-solid fa-arrow-right text-blue-400"></i>
-                                    <span class="px-3 py-1 bg-white rounded-lg border border-blue-100 font-bold text-blue-600">Grade C</span>
+                                    <span
+                                        class="px-3 py-1 bg-white rounded-lg border border-blue-100 font-bold text-blue-600">Grade
+                                        C</span>
                                 </div>
                                 <div class="flex justify-between items-center p-2 rounded-lg bg-blue-50/50">
                                     <span class="font-mono font-bold text-gray-700">60 - 69</span>
                                     <i class="fa-solid fa-arrow-right text-blue-400"></i>
-                                    <span class="px-3 py-1 bg-white rounded-lg border border-blue-100 font-bold text-blue-600">Grade D</span>
+                                    <span
+                                        class="px-3 py-1 bg-white rounded-lg border border-blue-100 font-bold text-blue-600">Grade
+                                        D</span>
                                 </div>
                                 <div class="flex justify-between items-center p-2 rounded-lg bg-blue-50/50">
                                     <span class="font-mono font-bold text-gray-700">0 - 59</span>
                                     <i class="fa-solid fa-arrow-right text-blue-400"></i>
-                                    <span class="px-3 py-1 bg-white rounded-lg border border-blue-100 font-bold text-blue-600">Grade E</span>
+                                    <span
+                                        class="px-3 py-1 bg-white rounded-lg border border-blue-100 font-bold text-blue-600">Grade
+                                        E</span>
                                 </div>
                             </div>
                         </div>
 
                         <p class="text-xs text-gray-500 mt-4 italic">
                             <i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1"></i>
-                            Pastikan rentang <span class="text-blue-600 font-bold uppercase">Min</span> dan <span class="text-blue-600 font-bold uppercase">Max</span> tidak tumpang tindih untuk akurasi nilai.
+                            Pastikan rentang <span class="text-blue-600 font-bold uppercase">Min</span> dan <span
+                                class="text-blue-600 font-bold uppercase">Max</span> tidak tumpang tindih untuk akurasi
+                            nilai.
                         </p>
                     </div>
                 </div>

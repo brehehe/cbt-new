@@ -11,20 +11,21 @@
     <canvas id="hiddenCanvas" style="display: none;"></canvas>
 
     <!-- Header Fixed -->
-    <header
-        class="flex-none p-3 text-white bg-primary shadow-lg z-50 relative">
+    <header class="flex-none p-3 text-white bg-primary shadow-lg z-50 relative">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            
+
             {{-- Top Row / Left Side: Module Info --}}
             <div class="flex items-center justify-between md:justify-start gap-4">
                 <div class="flex items-center gap-2 overflow-hidden">
                     <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-lg whitespace-nowrap">
-                        <span class="text-xs md:text-sm font-medium">Modul: {{ Str::limit($userTimetable->timetable->module->name ?? '-', 20) }}</span>
+                        <span class="text-xs md:text-sm font-medium">Modul:
+                            {{ Str::limit($userTimetable->timetable->module->name ?? '-', 20) }}</span>
                     </div>
                 </div>
-                
+
                 {{-- Mobile Timer (Visible only on small screens) --}}
-                <div class="md:hidden font-mono font-bold text-lg" wire:ignore id="countdown-mobile" style="color: #ffffff !important;">
+                <div class="md:hidden font-mono font-bold text-lg" wire:ignore id="countdown-mobile"
+                    style="color: #ffffff !important;">
                     00:00:00
                 </div>
 
@@ -40,7 +41,8 @@
             <div class="flex items-center justify-between md:gap-4">
                 {{-- Desktop Timer --}}
                 <div class="hidden md:block text-right" wire:ignore>
-                    <span class="font-mono font-bold text-xl tracking-wider" id="countdown" style="color: #ffffff !important;"> 00:00:00</span>
+                    <span class="font-mono font-bold text-xl tracking-wider" id="countdown"
+                        style="color: #ffffff !important;"> 00:00:00</span>
                 </div>
 
                 <div class="flex gap-2 w-full md:w-auto">
@@ -63,14 +65,14 @@
     <div class="flex-none p-4 bg-white border-b border-gray-200 lg:hidden">
         <div class="flex items-center justify-between">
             <button id="toggleLeftSidebar" @click="mobileSidebarOpen = !mobileSidebarOpen"
-                class="flex items-center text-primary hover:text-primary">
+                class="flex items-center text-[color:var(--primary)] hover:text-[color:var(--primary)]">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
                 Navigasi Soal
             </button>
             <button id="toggleRightSidebar" @click="rightSidebarOpen = !rightSidebarOpen"
-                class="flex items-center text-primary hover:text-primary">
+                class="flex items-center text-[color:var(--primary)] hover:text-[color:var(--primary)]">
                 Profil & Camera
                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -83,15 +85,14 @@
     <!-- Main Content Wrapper (Flex 1 ensures it fills remaining height) -->
     <div class="relative flex flex-1 overflow-hidden">
         <!-- Sidebar Kiri - Navigasi Soal -->
-        <div id="leftSidebar"
-            :class="{ '-translate-x-full': !mobileSidebarOpen, 'translate-x-0': mobileSidebarOpen }"
+        <div id="leftSidebar" :class="{ '-translate-x-full': !mobileSidebarOpen, 'translate-x-0': mobileSidebarOpen }"
             class="fixed z-30 h-full overflow-y-auto transition-transform duration-300 ease-in-out transform -translate-x-full bg-white border-r border-gray-200 shadow-sm lg:relative w-80 lg:w-80 lg:h-auto lg:translate-x-0">
             <div
-                class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-50' : 'bg-orange-50' }}">
-                <h3
-                    class="font-semibold text-primary">
+                class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma', 'unidayan']) ? 'bg-blue-50' : 'bg-orange-50' }}">
+                <h3 class="font-semibold text-[color:var(--primary)]">
                     Navigasi Soal</h3>
-                <button id="closeLeftSidebar" @click="mobileSidebarOpen = false" class="text-gray-500 hover:text-gray-700">
+                <button id="closeLeftSidebar" @click="mobileSidebarOpen = false"
+                    class="text-gray-500 hover:text-gray-700">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
@@ -101,15 +102,13 @@
 
             <!-- Info Ujian -->
             <div
-                class="p-4 border-b border-gray-200 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-50' : 'bg-orange-50' }}">
-                <h3
-                    class="hidden mb-2 font-semibold text-primary lg:block">
+                class="p-4 border-b border-gray-200 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma', 'unidayan']) ? 'bg-blue-50' : 'bg-orange-50' }}">
+                <h3 class="hidden mb-2 font-semibold text-[color:var(--primary)] lg:block">
                     Navigasi Soal</h3>
                 <div class="text-sm text-gray-600">
                     <span>Total: {{ $questionNavigations['total'] ?? 0 }} soal</span>
                     <div class="flex flex-wrap gap-2 mt-2 lg:space-x-4 lg:flex-nowrap">
-                        <span
-                            class="text-xs text-primary lg:text-sm">Dijawab:
+                        <span class="text-xs text-[color:var(--primary)] lg:text-sm">Dijawab:
                             {{ $questionNavigations['answered'] ?? 0 }}</span>
                         <span class="text-xs text-yellow-600 lg:text-sm">Ditandai:
                             {{ $questionNavigations['marked'] ?? 0 }}</span>
@@ -165,8 +164,7 @@
                             }
                         @endphp
 
-                        <button wire:click="changeQuestionNavigation('{{ $detail['id'] }}')"
-                            class="{{ $buttonClass }}">
+                        <button wire:click="changeQuestionNavigation('{{ $detail['id'] }}')" class="{{ $buttonClass }}">
                             {{ $key + 1 }}
                         </button>
                     @endforeach
@@ -175,8 +173,7 @@
         </div>
 
         <!-- Overlay untuk mobile -->
-        <div id="overlay"
-            :class="{ 'hidden': !mobileSidebarOpen && !rightSidebarOpen }"
+        <div id="overlay" :class="{ 'hidden': !mobileSidebarOpen && !rightSidebarOpen }"
             @click="mobileSidebarOpen = false; rightSidebarOpen = false"
             class="fixed inset-0 z-20 hidden bg-black bg-opacity-50 lg:hidden"></div>
 
@@ -191,13 +188,21 @@
                         <!-- Mobile Top Navigation -->
                         <div class="flex gap-2 sm:hidden">
                             @if ($first)
-                                <button wire:click="previousQuestion" class="p-1 text-gray-600 bg-white border border-gray-300 rounded hover:bg-gray-100">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                                <button wire:click="previousQuestion"
+                                    class="p-1 text-gray-600 bg-white border border-gray-300 rounded hover:bg-gray-100">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 19l-7-7 7-7" />
+                                    </svg>
                                 </button>
                             @endif
                             @if ($last)
-                                <button wire:click="nextQuestion" class="p-1 text-gray-600 bg-white border border-gray-300 rounded hover:bg-gray-100">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                <button wire:click="nextQuestion"
+                                    class="p-1 text-gray-600 bg-white border border-gray-300 rounded hover:bg-gray-100">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5l7 7-7 7" />
+                                    </svg>
                                 </button>
                             @endif
                         </div>
@@ -237,7 +242,8 @@
                                     <div
                                         class="overflow-hidden rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
                                         <img src="{{ asset('storage/' . $image) }}" alt="Gambar soal"
-                                            class="object-contain cursor-zoom-in js-zoomable" style="max-width: 250px; max-height: 200px;"
+                                            class="object-contain cursor-zoom-in js-zoomable"
+                                            style="max-width: 250px; max-height: 200px;"
                                             data-zoom-src="{{ asset('storage/' . $image) }}">
                                     </div>
                                 @endforeach
@@ -248,10 +254,10 @@
                         @if ($question_latex_preview_png)
                             <div class="mt-4">
                                 <div class="p-2 bg-gray-50 rounded-lg border border-gray-200 inline-block">
-                                    <img src="{{ asset('storage/' . $question_latex_preview_png) }}" 
-                                         alt="LaTeX preview" 
-                                         class="cursor-zoom-in js-zoomable object-contain" style="max-width: 280px; max-height: 180px;"
-                                         data-zoom-src="{{ asset('storage/' . $question_latex_preview_png) }}">
+                                    <img src="{{ asset('storage/' . $question_latex_preview_png) }}" alt="LaTeX preview"
+                                        class="cursor-zoom-in js-zoomable object-contain"
+                                        style="max-width: 280px; max-height: 180px;"
+                                        data-zoom-src="{{ asset('storage/' . $question_latex_preview_png) }}">
                                 </div>
                             </div>
                         @endif
@@ -261,68 +267,71 @@
                     <!-- Pilihan Jawaban -->
                     <div class="space-y-3" wire:key="question-{{ $questionNavigationId }}">
                         @foreach ($question_answers as $question_answer)
-                            <label
-                                class="relative flex items-start p-3 transition-all border rounded-xl cursor-pointer hover:shadow-md group
-                                {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) 
-                                    ? 'hover:bg-blue-50 hover:border-blue-300' 
-                                    : 'hover:bg-orange-50 hover:border-orange-300' }}
-                                {{ $timetable_answer_id == $question_answer['id'] 
-                                    ? (in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500' : 'bg-orange-50 border-orange-500 ring-1 ring-orange-500')
-                                    : 'border-gray-200 bg-white' }}">
+                                            <label class="relative flex items-start p-3 transition-all border rounded-xl cursor-pointer hover:shadow-md group
+                                                    {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma', 'unidayan'])
+                            ? 'hover:bg-blue-50 hover:border-blue-300'
+                            : 'hover:bg-orange-50 hover:border-orange-300' }}
+                                                    {{ $timetable_answer_id == $question_answer['id']
+                            ? (in_array(config('app.name_slug'), ['ups_tegal', 'unimma', 'unidayan']) ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500' : 'bg-orange-50 border-orange-500 ring-1 ring-orange-500')
+                            : 'border-gray-200 bg-white' }}">
 
-                                <div class="flex items-center h-5 mt-1">
-                                    <input type="radio" name="timetable_answer_id"
-                                        wire:model.live="timetable_answer_id" value="{{ $question_answer['id'] }}"
-                                        class="w-4 h-4 text-primary border-gray-300 focus:ring-primary">
-                                </div>
-
-                                <div class="flex-1 ml-3">
-                                    <div class="flex flex-col">
-                                        <div class="text-sm font-medium text-gray-900 lg:text-base flex gap-2">
-                                            <span class="flex-none font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-700' : 'text-orange-700' }}">{{ $question_answer['alphabet'] }}.</span>
-                                            <span class="text-gray-800 leading-relaxed">{{ $question_answer['context'] }}</span>
-                                        </div>
-                                        
-                                        {{-- Images --}}
-                                        @if (!empty($question_answer['images']) && collect($question_answer['images'])->isNotEmpty())
-                                            <div class="mt-3 grid grid-cols-2 md:grid-cols-3 gap-2">
-                                                @foreach ($question_answer['images'] as $image)
-                                                    <div class="overflow-hidden rounded-lg border border-gray-200 shadow-sm">
-                                                        <img src="{{ asset('storage/' . $image) }}" alt="Gambar jawaban"
-                                                            class="w-full h-auto object-contain cursor-zoom-in js-zoomable max-h-40 bg-gray-50 bg-opacity-50"
-                                                            data-zoom-src="{{ asset('storage/' . $image) }}">
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        @endif
-                                        
-                                        {{-- LaTeX Preview --}}
-                                        @if ($question_answer['latex_preview_png'])
-                                            <div class="mt-3">
-                                                <div class="p-2 bg-gray-50 rounded-lg border border-gray-200 inline-block">
-                                                    <img src="{{ asset('storage/' . $question_answer['latex_preview_png']) }}" 
-                                                         alt="LaTeX preview" 
-                                                         class="cursor-zoom-in js-zoomable object-contain max-h-24"
-                                                         data-zoom-src="{{ asset('storage/' . $question_answer['latex_preview_png']) }}">
+                                                <div class="flex items-center h-5 mt-1">
+                                                    <input type="radio" name="timetable_answer_id" wire:model.live="timetable_answer_id"
+                                                        value="{{ $question_answer['id'] }}"
+                                                        class="w-4 h-4 text-[color:var(--primary)] border-gray-300 focus:ring-primary">
                                                 </div>
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
-                            </label>
+
+                                                <div class="flex-1 ml-3">
+                                                    <div class="flex flex-col">
+                                                        <div class="text-sm font-medium text-gray-900 lg:text-base flex gap-2">
+                                                            <span
+                                                                class="flex-none font-bold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma', 'unidayan']) ? 'text-blue-700' : 'text-orange-700' }}">{{ $question_answer['alphabet'] }}.</span>
+                                                            <span
+                                                                class="text-gray-800 leading-relaxed">{{ $question_answer['context'] }}</span>
+                                                        </div>
+
+                                                        {{-- Images --}}
+                                                        @if (!empty($question_answer['images']) && collect($question_answer['images'])->isNotEmpty())
+                                                            <div class="mt-3 grid grid-cols-2 md:grid-cols-3 gap-2">
+                                                                @foreach ($question_answer['images'] as $image)
+                                                                    <div class="overflow-hidden rounded-lg border border-gray-200 shadow-sm">
+                                                                        <img src="{{ asset('storage/' . $image) }}" alt="Gambar jawaban"
+                                                                            class="w-full h-auto object-contain cursor-zoom-in js-zoomable max-h-40 bg-gray-50 bg-opacity-50"
+                                                                            data-zoom-src="{{ asset('storage/' . $image) }}">
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
+                                                        @endif
+
+                                                        {{-- LaTeX Preview --}}
+                                                        @if ($question_answer['latex_preview_png'])
+                                                            <div class="mt-3">
+                                                                <div class="p-2 bg-gray-50 rounded-lg border border-gray-200 inline-block">
+                                                                    <img src="{{ asset('storage/' . $question_answer['latex_preview_png']) }}"
+                                                                        alt="LaTeX preview"
+                                                                        class="cursor-zoom-in js-zoomable object-contain max-h-24"
+                                                                        data-zoom-src="{{ asset('storage/' . $question_answer['latex_preview_png']) }}">
+                                                                </div>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </label>
                         @endforeach
                     </div>
                 </div>
             </div>
             <!-- Footer Navigasi Soal (Sticky Bottom) -->
-            <div class="sticky bottom-0 z-20 p-4 border-t border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 lg:p-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+            <div
+                class="sticky bottom-0 z-20 p-4 border-t border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 lg:p-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
                 <div class="flex items-center justify-between max-w-7xl mx-auto">
                     <!-- Tombol Soal Sebelumnya -->
                     <div class="flex">
                         @if ($first)
                             <button wire:click="previousQuestion" type="button"
                                 class="flex items-center px-5 py-2.5 text-sm font-medium text-gray-700 transition-all bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 shadow-sm">
-                                <svg class="w-5 h-5 mr-2 -ml-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 mr-2 -ml-1 text-gray-500" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15 19l-7-7 7-7" />
                                 </svg>
@@ -334,9 +343,8 @@
                     <!-- Tombol Soal Selanjutnya / Selesai Ujian -->
                     <div class="flex">
                         @if ($last)
-                            <button type="button" wire:click="nextQuestion"
-                                class="flex items-center px-5 py-2.5 text-sm font-medium text-white transition-all rounded-lg shadow-sm
-                            bg-primary hover:bg-primary ring-primary hover:shadow-md focus:ring-4">
+                            <button type="button" wire:click="nextQuestion" class="flex items-center px-5 py-2.5 text-sm font-medium text-white transition-all rounded-lg shadow-sm
+                                bg-primary hover:bg-primary ring-primary hover:shadow-md focus:ring-4">
                                 Selanjutnya
                                 <svg class="w-5 h-5 ml-2 -mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -360,15 +368,15 @@
         </div>
 
         <!-- Sidebar Kanan - Camera dan Profile -->
-        <div id="rightSidebar"
-            :class="{ 'translate-x-full': !rightSidebarOpen, 'translate-x-0': rightSidebarOpen }"
+        <div id="rightSidebar" :class="{ 'translate-x-full': !rightSidebarOpen, 'translate-x-0': rightSidebarOpen }"
             class="fixed right-0 z-30 h-full overflow-y-auto transition-transform duration-300 ease-in-out transform translate-x-full bg-white border-l border-gray-200 shadow-sm lg:relative w-80 lg:w-80 lg:h-auto lg:translate-x-0">
             <div
-                class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-50' : 'bg-orange-50' }}">
+                class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma', 'unidayan']) ? 'bg-blue-50' : 'bg-orange-50' }}">
                 <h3
-                    class="font-semibold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'text-blue-800' : 'text-orange-800' }}">
+                    class="font-semibold {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma', 'unidayan']) ? 'text-blue-800' : 'text-orange-800' }}">
                     Profil & Camera</h3>
-                <button id="closeRightSidebar" @click="rightSidebarOpen = false" class="text-gray-500 hover:text-gray-700">
+                <button id="closeRightSidebar" @click="rightSidebarOpen = false"
+                    class="text-gray-500 hover:text-gray-700">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
@@ -378,16 +386,17 @@
 
             <!-- Profile Mahasiswa -->
             <div
-                class="p-4 border-b border-gray-200 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-50' : 'bg-orange-50' }}">
+                class="p-4 border-b border-gray-200 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma', 'unidayan']) ? 'bg-blue-50' : 'bg-orange-50' }}">
                 <div class="text-center">
                     <div
-                        class="flex items-center justify-center w-16 h-16 mx-auto mb-3 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-600' : 'bg-orange-600' }} rounded-full lg:w-20 lg:h-20">
+                        class="flex items-center justify-center w-16 h-16 mx-auto mb-3 {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma', 'unidayan']) ? 'bg-blue-600' : 'bg-orange-600' }} rounded-full lg:w-20 lg:h-20">
                         <span
                             class="text-lg font-bold text-white lg:text-xl">{{ strtoupper(substr($userTimetable->user->name ?? '?', 0, 2)) }}</span>
                     </div>
                     <h3 class="font-semibold text-gray-800">{{ $userTimetable->user->name ?? 'Siswa' }}</h3>
                     <p class="text-sm text-gray-600">NIM:
-                        {{ $userTimetable->user->nim ?? ($userTimetable->user->username ?? 'Tidak Diketahui') }}</p>
+                        {{ $userTimetable->user->nim ?? ($userTimetable->user->username ?? 'Tidak Diketahui') }}
+                    </p>
                 </div>
             </div>
 
@@ -396,7 +405,7 @@
                 <div class="flex items-center justify-between mb-3">
                     <h4 class="font-medium text-gray-800">Monitor Camera</h4>
                     <button @click="showCamera = !showCamera"
-                        class="px-2 py-1 text-xs text-white {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'bg-blue-500' : 'bg-orange-500' }} rounded {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma','unidayan']) ? 'hover:bg-blue-700' : 'hover:bg-orange-700' }}">
+                        class="px-2 py-1 text-xs text-white {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma', 'unidayan']) ? 'bg-blue-500' : 'bg-orange-500' }} rounded {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma', 'unidayan']) ? 'hover:bg-blue-700' : 'hover:bg-orange-700' }}">
                         <span x-text="showCamera ? 'Hide' : 'Show'"></span>
                     </button>
                     {{-- <button id="cameraRefreshButton"
@@ -408,8 +417,7 @@
 
                 <div x-show="showCamera" x-transition>
                     <div class="relative mb-3 bg-black rounded-lg aspect-video">
-                        <video id="cameraPreview" class="w-full h-full object-cover rounded-lg" autoplay
-                            muted></video>
+                        <video id="cameraPreview" class="w-full h-full object-cover rounded-lg" autoplay muted></video>
                         <div id="cameraStatus" class="absolute top-2 right-2 flex items-center">
                             <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse mr-1"></div>
                             <span class="text-xs text-white bg-black bg-opacity-50 px-1 rounded">REC</span>
@@ -527,7 +535,7 @@
     <!-- Test PeerJS loading -->
     <script>
         console.log('Script loaded, testing PeerJS availability...');
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             console.log('DOM loaded, PeerJS available:', typeof Peer !== 'undefined');
             if (typeof Peer !== 'undefined') {
                 console.log('PeerJS loaded successfully!');
@@ -542,7 +550,7 @@
 
     <script>
         // Image zoom modal
-        (function() {
+        (function () {
             const modal = document.getElementById('imageZoomModal');
             const target = document.getElementById('imageZoomTarget');
             const backdrop = document.getElementById('imageZoomBackdrop');
@@ -594,7 +602,7 @@
                 resetTransform();
             }
 
-            document.addEventListener('click', function(e) {
+            document.addEventListener('click', function (e) {
                 const img = e.target.closest('.js-zoomable');
                 if (!img) return;
                 const src = img.getAttribute('data-zoom-src') || img.getAttribute('src');
@@ -610,7 +618,7 @@
                 resetTransform();
             });
 
-            document.addEventListener('keydown', function(e) {
+            document.addEventListener('keydown', function (e) {
                 if (!modal || modal.classList.contains('hidden')) return;
                 if (e.key === 'Escape') closeModal();
                 if (e.key === '+' || e.key === '=') setScale(scale + 0.25);
@@ -618,7 +626,7 @@
             });
 
             if (target) {
-                target.addEventListener('pointerdown', function(e) {
+                target.addEventListener('pointerdown', function (e) {
                     if (scale <= 1) return;
                     isDragging = true;
                     dragStartX = e.clientX;
@@ -629,7 +637,7 @@
                     applyTransform();
                 });
 
-                target.addEventListener('pointermove', function(e) {
+                target.addEventListener('pointermove', function (e) {
                     if (!isDragging) return;
                     const dx = e.clientX - dragStartX;
                     const dy = e.clientY - dragStartY;
@@ -638,17 +646,17 @@
                     applyTransform();
                 });
 
-                target.addEventListener('pointerup', function(e) {
+                target.addEventListener('pointerup', function (e) {
                     if (!isDragging) return;
                     isDragging = false;
                     target.releasePointerCapture(e.pointerId);
                     applyTransform();
                 });
 
-                target.addEventListener('pointercancel', function(e) {
+                target.addEventListener('pointercancel', function (e) {
                     if (!isDragging) return;
                     isDragging = false;
-                    try { target.releasePointerCapture(e.pointerId); } catch (err) {}
+                    try { target.releasePointerCapture(e.pointerId); } catch (err) { }
                     applyTransform();
                 });
             }
@@ -703,7 +711,7 @@
                 attempts += 1;
                 try {
                     sessionStorage.setItem('cameraReloadAttempts', attempts.toString());
-                } catch (e) {}
+                } catch (e) { }
                 console.warn(`🔁 Auto reload (${attempts}/${maxAttempts}): ${reason}`);
                 setTimeout(() => {
                     window.location.reload();
@@ -724,10 +732,10 @@
                 // Stop timers
                 try {
                     if (window.authPollInterval) clearInterval(window.authPollInterval);
-                } catch (e) {}
+                } catch (e) { }
                 try {
                     if (window.countdownInterval) clearInterval(window.countdownInterval);
-                } catch (e) {}
+                } catch (e) { }
 
                 // Attempt to stop recording gracefully
                 try {
@@ -741,7 +749,7 @@
                 // Tear down peer connection
                 try {
                     if (window.peer && typeof window.peer.destroy === 'function') window.peer.destroy();
-                } catch (e) {}
+                } catch (e) { }
 
                 // Small delay to allow any pending operations to settle
                 setTimeout(() => {
@@ -760,7 +768,7 @@
                 if (wireEl && window.Livewire && typeof Livewire.find === 'function') {
                     return Livewire.find(wireEl.getAttribute('wire:id'));
                 }
-            } catch (e) {}
+            } catch (e) { }
             return null;
         }
 
@@ -781,13 +789,13 @@
         }
 
         // Try to expose $wire (if available) to avoid undefined errors
-        try { window.$wire = window.$wire || @this; } catch (e) {}
+        try { window.$wire = window.$wire || @this; } catch (e) { }
 
         // Initialize everything when page loads
         // Initialize everything when page loads
-        
+
         // --- Defined globally to be accessible ---
-        window.startCountdown = function(totalSeconds) {
+        window.startCountdown = function (totalSeconds) {
             console.log('🕐 Starting countdown with:', totalSeconds, 'seconds');
 
             // Validate input
@@ -798,7 +806,7 @@
             }
 
             const countdownElement = document.getElementById("countdown");
-            
+
             if (!countdownElement) {
                 console.error('❌ Countdown element not found!');
                 return; // Don't throw, just exit
@@ -829,12 +837,12 @@
                         const expiredText = "⏰ Waktu Habis";
                         countdownElement.innerHTML = expiredText;
                         countdownElement.style.color = "red";
-                        
+
                         if (countdownMobileElement) {
                             countdownMobileElement.innerHTML = expiredText;
                             countdownMobileElement.style.color = "red";
                         }
-                        
+
                         clearInterval(window.countdownInterval);
                         console.log('⏰ Time expired, stopping recording...');
 
@@ -856,7 +864,7 @@
                     if (countdownMobileElement) {
                         countdownMobileElement.innerHTML = timeString;
                         // Match color style
-                        countdownMobileElement.style.color = countdownElement.style.color || "#ffffff"; 
+                        countdownMobileElement.style.color = countdownElement.style.color || "#ffffff";
                         // Note: desktop timer uses style attribute for color updates in some logic below
                     }
 
@@ -896,12 +904,12 @@
             console.log('✅ Countdown started successfully with interval ID:', window.countdownInterval);
         };
 
-        window.initializeExamFrontend = function() {
+        window.initializeExamFrontend = function () {
             if (window.examEnvInitialized) {
                 console.log('♻️ Exam frontend already initialized, skipping.');
                 return;
             }
-            
+
             console.log('=== Initializing Exam Frontend ===');
 
             // Check essential elements FIRST
@@ -968,7 +976,7 @@
                     console.error('❌ Camera initialization failed:', err);
                     tryAutoReload('initializeCamera() threw an error');
                 }
-            }, 500); 
+            }, 500);
 
             // Fallback: if camera not active after a short period, reload
             setTimeout(() => {
@@ -1006,7 +1014,7 @@
             setTimeout(() => {
                 try {
                     if (typeof startAuthAndStatusPolling === 'function') startAuthAndStatusPolling();
-                } catch (e) {}
+                } catch (e) { }
             }, 2200);
 
             // Mark page as loaded
@@ -1017,20 +1025,20 @@
 
             // Visibility listeners
             window.addEventListener('pageshow', () => {
-                 // ... logic ...
+                // ... logic ...
             });
-             document.addEventListener('visibilitychange', () => {
+            document.addEventListener('visibilitychange', () => {
                 // ... logic ...
             });
         };
 
         // Run on various events to ensure it catches the load
         document.addEventListener("DOMContentLoaded", window.initializeExamFrontend);
-        document.addEventListener("livewire:navigated", function() {
+        document.addEventListener("livewire:navigated", function () {
             window.examEnvInitialized = false; // Reset on nav
             window.initializeExamFrontend();
         });
-        
+
         // Immediate check in case event already fired
         if (document.readyState === "complete" || document.readyState === "interactive") {
             setTimeout(window.initializeExamFrontend, 100);
@@ -1050,21 +1058,21 @@
             requestFullscreen();
 
             // Unified Keydown Listener
-            document.addEventListener('keydown', function(e) {
+            document.addEventListener('keydown', function (e) {
                 // --- EXAM SHORTCUTS (Enabled only if not typing in an input) ---
                 if (!['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
                     // Navigation: Left/Right Arrows
                     if (e.key === 'ArrowRight') {
-                        @if ($last) Livewire.dispatch('nextQuestion'); @endif
-                        return;
+                            @if ($last) Livewire.dispatch('nextQuestion'); @endif
+                            return;
                     }
                     if (e.key === 'ArrowLeft') {
-                        @if ($first) Livewire.dispatch('previousQuestion'); @endif
-                        return;
+                            @if ($first) Livewire.dispatch('previousQuestion'); @endif
+                            return;
                     }
 
                     // Answering: A, B, C, D, E
-                    const keyMap = {'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4};
+                    const keyMap = { 'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4 };
                     if (keyMap.hasOwnProperty(e.key) && !e.ctrlKey && !e.altKey && !e.metaKey) {
                         const radios = document.querySelectorAll('input[name="timetable_answer_id"]');
                         const index = keyMap[e.key];
@@ -1133,7 +1141,7 @@
             });
 
             // Disable drag and drop
-            document.addEventListener('dragstart', function(e) {
+            document.addEventListener('dragstart', function (e) {
                 e.preventDefault();
             });
         }
@@ -1141,7 +1149,7 @@
         // Setup event listeners
         function setupEventListeners() {
             // Tab visibility change
-            document.addEventListener('visibilitychange', function() {
+            document.addEventListener('visibilitychange', function () {
                 if (document.hidden) {
                     logAlert('tab_switch', 'Beralih ke tab/aplikasi lain');
                     showWarning('Anda terdeteksi beralih ke tab atau aplikasi lain!');
@@ -1149,7 +1157,7 @@
             });
 
             // Window blur (lost focus)
-            window.addEventListener('blur', function() {
+            window.addEventListener('blur', function () {
                 if (pageLoaded) {
                     logAlert('window_blur', 'Jendela kehilangan fokus');
                     showWarning('Jendela browser kehilangan fokus!');
@@ -1157,7 +1165,7 @@
             });
 
             // Fullscreen change
-            document.addEventListener('fullscreenchange', function() {
+            document.addEventListener('fullscreenchange', function () {
                 if (!document.fullscreenElement) {
                     logAlert('fullscreen_exit', 'Keluar dari mode fullscreen');
                     showWarning('Anda keluar dari mode fullscreen!');
@@ -1169,7 +1177,7 @@
             });
 
             // Page reload/refresh
-            window.addEventListener('beforeunload', function(e) {
+            window.addEventListener('beforeunload', function (e) {
                 if (pageLoaded) {
                     // Save current video chunk before reload
                     if (isRecording && mediaRecorder && mediaRecorder.state === 'recording') {
@@ -1185,7 +1193,7 @@
             });
 
             // Page load (after refresh)
-            window.addEventListener('load', function() {
+            window.addEventListener('load', function () {
                 if (performance.navigation.type === 1) { // Page was refreshed
                     if (window.Livewire) {
                         Livewire.dispatch('pageReloaded');
@@ -1274,7 +1282,7 @@
                     console.log('✅ Camera stream obtained!');
                 } catch (streamError) {
                     console.error('❌ Stream request failed with constraints:', streamError);
-                    
+
                     // FALLBACK: Try without deviceId constraints if initial attempt failed
                     if (constraints.video.deviceId) {
                         console.log('🔄 Attempting fallback: Any available camera...');
@@ -1316,7 +1324,7 @@
                     cameraPreview.muted = true; // allow autoplay in Chrome/Edge
                     cameraPreview.playsInline = true; // iOS Safari inline playback
                     cameraPreview.setAttribute('autoplay', '');
-                } catch (e) {}
+                } catch (e) { }
                 cameraPreview.srcObject = stream;
 
                 // Enhanced video play handling
@@ -1329,7 +1337,7 @@
                             updateRecordingStatus('Preview Active', 'Camera feed working');
                             try {
                                 sessionStorage.removeItem('cameraReloadAttempts');
-                            } catch (e) {}
+                            } catch (e) { }
                         })
                         .catch(e => {
                             console.warn('⚠️ Video autoplay prevented:', e.message);
@@ -1390,7 +1398,7 @@
                         }
                     }, 2000);
                 } else {
-                     console.log('⏹️ Live streaming skipped (Disabled by configuration)');
+                    console.log('⏹️ Live streaming skipped (Disabled by configuration)');
                 }
 
                 console.log('✅ === CAMERA INITIALIZATION SUCCESS ===');
@@ -1474,7 +1482,7 @@
                     if (window.peer && typeof window.peer.destroy === 'function') {
                         window.peer.destroy();
                     }
-                } catch (e) {}
+                } catch (e) { }
                 return;
             }
             console.log("🔄 Initializing PeerJS (optimized)…");
@@ -1641,7 +1649,7 @@
 
                 const constraints = {
                     video: {
-                         deviceId: selectedCameraId ? { exact: selectedCameraId } : undefined,
+                        deviceId: selectedCameraId ? { exact: selectedCameraId } : undefined,
                         facingMode: selectedCameraId ? undefined : 'user',
                         width: {
                             ideal: 480,
@@ -1818,7 +1826,7 @@
             window.currentRecordingBitrate = videoBitrate;
 
             console.log(
-                `🎯 CBT ${compressionLevel.toUpperCase()} Compression: Video ${videoBitrate/1000}kbps + Audio ${audioBitrate/1000}kbps = ${(videoBitrate+audioBitrate)/1000}kbps total`
+                `🎯 CBT ${compressionLevel.toUpperCase()} Compression: Video ${videoBitrate / 1000}kbps + Audio ${audioBitrate / 1000}kbps = ${(videoBitrate + audioBitrate) / 1000}kbps total`
             );
 
             // PROGRESSIVE COMPRESSION - gets more aggressive over time for CBT
@@ -1874,8 +1882,8 @@
 
             console.log('🎯 Final recording settings:', {
                 codec: selectedCodec,
-                videoBitrate: `${videoBitrate/1000} kbps`,
-                audioBitrate: `${audioBitrate/1000} kbps`,
+                videoBitrate: `${videoBitrate / 1000} kbps`,
+                audioBitrate: `${audioBitrate / 1000} kbps`,
                 frameRate: options.videoFrameRate + ' fps',
                 estimatedFileSize: calculateEstimatedFileSize(videoBitrate, audioBitrate)
             });
@@ -1989,13 +1997,13 @@
                         const segmentChunks = [];
                         mediaRecorder = new MediaRecorder(stream, options);
 
-                        mediaRecorder.ondataavailable = function(event) {
+                        mediaRecorder.ondataavailable = function (event) {
                             if (event.data && event.data.size > 0) {
                                 segmentChunks.push(event.data);
                             }
                         };
 
-                        mediaRecorder.onstop = async function() {
+                        mediaRecorder.onstop = async function () {
                             try {
                                 const segmentBlob = new Blob(segmentChunks, {
                                     type: mediaRecorder?.mimeType || 'video/webm'
@@ -2024,12 +2032,12 @@
                             }
                         };
 
-                        mediaRecorder.onerror = function(event) {
+                        mediaRecorder.onerror = function (event) {
                             console.error('❌ MediaRecorder error during SEGMENTED mode:', event.error);
                             updateRecordingStatus('Error', 'Recorder error — restarting segment');
                             try {
                                 mediaRecorder.stop();
-                            } catch (_) {}
+                            } catch (_) { }
                         };
 
                         mediaRecorder.start(); // no timeslice; full chunk produced on stop
@@ -2040,7 +2048,7 @@
                                 if (mediaRecorder && mediaRecorder.state === 'recording') {
                                     mediaRecorder.stop();
                                 }
-                            } catch (_) {}
+                            } catch (_) { }
                         }, segmentDurationMs);
                     }
 
@@ -2059,7 +2067,7 @@
                 let totalSize = 0;
 
                 // Enhanced data collection for long CBT recordings (2-3 hours)
-                mediaRecorder.ondataavailable = function(event) {
+                mediaRecorder.ondataavailable = function (event) {
                     if (event.data.size > 0) {
                         recordedChunks.push(event.data);
                         window.chunkCount++;
@@ -2095,7 +2103,7 @@
                             const projectedFinalSize = totalSize * 2.5; // Project 2.5 hours
                             const withCompression = projectedFinalSize * 0.6; // 40% reduction
                             console.log(
-                                `📈 Projected final size: ${(projectedFinalSize/1024/1024).toFixed(0)}MB → ${(withCompression/1024/1024).toFixed(0)}MB with compression`
+                                `📈 Projected final size: ${(projectedFinalSize / 1024 / 1024).toFixed(0)}MB → ${(withCompression / 1024 / 1024).toFixed(0)}MB with compression`
                             );
                         }
 
@@ -2106,7 +2114,7 @@
                             const projectedFinalSize = totalSize * 1.8; // Project remaining 1.8x growth
                             const withMaxCompression = projectedFinalSize * 0.4; // 60% reduction
                             console.log(
-                                `🎯 MAXIMUM compression target: ${(projectedFinalSize/1024/1024).toFixed(0)}MB → ${(withMaxCompression/1024/1024).toFixed(0)}MB (60% smaller)`
+                                `🎯 MAXIMUM compression target: ${(projectedFinalSize / 1024 / 1024).toFixed(0)}MB → ${(withMaxCompression / 1024 / 1024).toFixed(0)}MB (60% smaller)`
                             );
                         }
 
@@ -2131,7 +2139,7 @@
                 };
 
                 // Enhanced stop handler - only save when exam truly ends
-                mediaRecorder.onstop = function() {
+                mediaRecorder.onstop = function () {
                     console.log('📹 Recording stopped event fired');
 
                     // Check if this is intentional stop (exam end) or unexpected stop
@@ -2149,7 +2157,7 @@
                 };
 
                 // Enhanced error handler with restart capability
-                mediaRecorder.onerror = function(event) {
+                mediaRecorder.onerror = function (event) {
                     console.error('❌ MediaRecorder error during CBT:', event.error);
                     console.error('📝 Error type:', event.error.name);
                     console.error('📝 Error message:', event.error.message);
@@ -2256,7 +2264,7 @@
                     saveFinalVideo();
                 }, 3000); // 3 second fallback
 
-                mediaRecorder.onstop = function() {
+                mediaRecorder.onstop = function () {
                     console.log('MediaRecorder onstop event fired');
                     clearTimeout(fallbackTimeout);
                     saveFinalVideo();
@@ -2266,7 +2274,7 @@
                 // For segmented mode, also clear segment timer
                 try {
                     clearTimeout(window.segmentStopTimeout);
-                } catch (_) {}
+                } catch (_) { }
                 isRecording = false;
                 clearInterval(recordingDurationInterval);
                 stopEnhancedBackup();
@@ -2390,7 +2398,7 @@
             return;
 
             // Apply simple optimization check
-            compressVideoBlob(originalBlob).then(function(finalBlob) {
+            compressVideoBlob(originalBlob).then(function (finalBlob) {
                 const finalSizeInMB = (finalBlob.size / 1024 / 1024).toFixed(2);
                 const compressionSavings = '25'; // Estimated savings from optimal recording settings
 
@@ -2488,7 +2496,7 @@
                         }
                     }
                 }, 500);
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     const base64Data = e.target.result;
                     const base64Length = base64Data.length;
                     console.log('✅ Base64 conversion complete');
@@ -2499,14 +2507,14 @@
                     sendVideoToServer(base64Data, finalSizeInMB, compressionSavings);
                 };
 
-                reader.onerror = function(error) {
+                reader.onerror = function (error) {
                     console.error('❌ Base64 conversion failed:', error);
                     updateRecordingStatus('Error', 'Conversion failed');
                 };
 
                 console.log('🔄 Starting base64 conversion of compressed video...');
                 reader.readAsDataURL(finalBlob);
-            }).catch(function(error) {
+            }).catch(function (error) {
                 console.warn('⚠️ Compression failed, using original video:', error);
 
                 // Fallback to original video if compression fails
@@ -2518,7 +2526,7 @@
 
                 const reader = new FileReader();
 
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     const base64Data = e.target.result;
                     console.log('✅ Base64 conversion complete (fallback)');
                     console.log('Base64 length:', base64Data.length);
@@ -2527,7 +2535,7 @@
                     sendVideoToServer(base64Data, sizeInMB, '0');
                 };
 
-                reader.onerror = function(error) {
+                reader.onerror = function (error) {
                     console.error('❌ Base64 conversion failed:', error);
                     updateRecordingStatus('Error', 'Conversion failed');
                 };
@@ -2707,7 +2715,7 @@
                     const totalChunks = recordedChunks.length;
                     const estimatedSize = calculateTotalRecordingSize();
                     console.log(
-                        `📊 Recording stats: ${totalChunks} chunks, ~${(estimatedSize/1024/1024).toFixed(1)}MB`);
+                        `📊 Recording stats: ${totalChunks} chunks, ~${(estimatedSize / 1024 / 1024).toFixed(1)}MB`);
                 }
             }, 1800000); // Every 30 minutes (1,800,000ms) - better for long exams
         }
@@ -2775,7 +2783,7 @@
             window.dynamicCompressionLevel = level;
 
             console.log(
-                `💾 Dynamic compression ${level}: Reduced bitrate to ${newBitrate/1000}kbps for remaining recording`);
+                `💾 Dynamic compression ${level}: Reduced bitrate to ${newBitrate / 1000}kbps for remaining recording`);
         }
 
         // Get current recording bitrate
@@ -2826,7 +2834,7 @@
             window.currentRecordingBitrate = Math.floor(baseBitrate * bitrateMultiplier);
 
             console.log(
-                `🔧 Updated recording bitrate: ${(window.currentRecordingBitrate/1000).toFixed(0)}kbps (${level} compression)`
+                `🔧 Updated recording bitrate: ${(window.currentRecordingBitrate / 1000).toFixed(0)}kbps (${level} compression)`
             );
 
             return window.currentRecordingBitrate;
@@ -2887,7 +2895,7 @@
                     mediaRecorder = new MediaRecorder(stream, options);
 
                     // Re-setup event handlers
-                    mediaRecorder.ondataavailable = function(event) {
+                    mediaRecorder.ondataavailable = function (event) {
                         if (event.data.size > 0) {
                             recordedChunks.push(event.data);
                             totalRecordingSize += event.data.size;
@@ -3064,20 +3072,20 @@
 
         // Also try when Livewire initializes
         document.addEventListener('livewire:initialized', () => {
-             console.log('🤖 Attempting auto-fullscreen on Livewire init...');
-             setTimeout(enforceFullscreen, 1000);
+            console.log('🤖 Attempting auto-fullscreen on Livewire init...');
+            setTimeout(enforceFullscreen, 1000);
         });
 
 
         // 3. Block Right Click
-        document.addEventListener('contextmenu', function(e) {
+        document.addEventListener('contextmenu', function (e) {
             e.preventDefault();
             logAlert('right_click', 'Attempted Context Menu');
             return false;
         });
 
         // 4. Detect Focus Loss (Alt-Tab detection)
-        window.addEventListener('blur', function() {
+        window.addEventListener('blur', function () {
             // Uncomment to enable strict blurring (might be annoying during dev)
             logAlert('window_blur', 'User switched window/tab (Focus Lost)');
 
@@ -3097,7 +3105,7 @@
                 modal.querySelector('p').textContent = message;
                 modal.classList.remove('hidden');
 
-                stayButton.addEventListener('click', function() {
+                stayButton.addEventListener('click', function () {
                     modal.classList.add('hidden');
                     warningShown = false;
 
@@ -3164,7 +3172,7 @@
                     canvas.toBlob((blob) => {
                         if (blob) {
                             const reader = new FileReader();
-                            reader.onload = function(e) {
+                            reader.onload = function (e) {
                                 if (window.Livewire) {
                                     Livewire.dispatch('saveScreenshot', {
                                         screenshot: e.target.result,
@@ -3182,21 +3190,21 @@
         }
 
         // Monitor connection status
-        window.addEventListener('online', function() {
+        window.addEventListener('online', function () {
             updateLiveSessionActivity();
             logAlert('connection_restored', 'Koneksi internet pulih');
         });
 
-        window.addEventListener('offline', function() {
+        window.addEventListener('offline', function () {
             logAlert('connection_lost', 'Koneksi internet terputus');
         });
 
         // Livewire hooks
-        document.addEventListener('livewire:initialized', function() {
+        document.addEventListener('livewire:initialized', function () {
             console.log('Livewire initialized');
 
             // Event listeners for exam completion
-            Livewire.on('timeExpired', function() {
+            Livewire.on('timeExpired', function () {
                 console.log('🔔 Time expired - stopping recording');
                 stopRecording();
             });
@@ -3215,11 +3223,11 @@
                 // Create peer connection for WebRTC
                 peerConnection = new RTCPeerConnection({
                     iceServers: [{
-                            urls: 'stun:stun.l.google.com:19302'
-                        },
-                        {
-                            urls: 'stun:stun1.l.google.com:19302'
-                        }
+                        urls: 'stun:stun.l.google.com:19302'
+                    },
+                    {
+                        urls: 'stun:stun1.l.google.com:19302'
+                    }
                     ]
                 });
 
@@ -3453,7 +3461,7 @@
         window.manualSaveRecording = manualSaveRecording;
 
         // Enhanced cleanup on page unload
-        window.addEventListener('beforeunload', function() {
+        window.addEventListener('beforeunload', function () {
             console.log('Page unloading, cleaning up...');
 
             // Emergency save if we have recording data
@@ -3468,7 +3476,7 @@
 
                     // Store in sessionStorage as backup
                     const reader = new FileReader();
-                    reader.onload = function() {
+                    reader.onload = function () {
                         try {
                             sessionStorage.setItem('emergencyRecording', reader.result);
                             sessionStorage.setItem('emergencyRecordingTime', Date.now().toString());

@@ -30,7 +30,8 @@
                 @enderror
             </div>
             <div class="mb-4">
-                <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi Tipe Ujian</label>
+                <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi Tipe Ujian <span
+                        class="text-red-600">*</span></label>
                 {{-- <input type="text" id="description" wire:model.defer="description"
                     placeholder="Deskripsi Kategori Materi" class="mt-1 form-control"> --}}
                 <textarea id="description" wire:model.defer="description" placeholder=""

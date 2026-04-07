@@ -50,15 +50,15 @@
 
 :root {
     --primary-50:  #fff7ed;
---primary-100: #ffedd5;
---primary-200: #fed7aa;
---primary-300: #fdba74;
---primary-400: #fb923c;
---primary-500: #f58634; /* base kamu */
---primary-600: #ea6a1a;
---primary-700: #c25512;
---primary-800: #9a4512;
---primary-900: #7c3712;
+    --primary-100: #ffedd5;
+    --primary-200: #fed7aa;
+    --primary-300: #fdba74;
+    --primary-400: #fb923c;
+    --primary-500: #f58634; /* base kamu */
+    --primary-600: #ea6a1a;
+    --primary-700: #c25512;
+    --primary-800: #9a4512;
+    --primary-900: #7c3712;
 
     /* Yellow Palette */
     --yellow-100: #f6e05e;

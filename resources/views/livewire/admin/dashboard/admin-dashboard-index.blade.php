@@ -374,9 +374,10 @@
     <div class="mb-6">
         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="text-center md:text-left w-full md:w-auto">
-                <h1 class="text-2xl md:text-3xl font-bold text-primary">
+                <h1 class="text-2xl md:text-3xl font-bold text-[color:var(--primary)]">
                     Selamat datang kembali,
-                    {{ Auth::user()->name ?? 'Admin' }}!</h1>
+                    {{ Auth::user()->name ?? 'Admin' }}!
+                </h1>
                 <p class="text-gray-600 mt-1 text-sm md:text-base">Berikut aktivitas sistem CBT Anda hari ini.</p>
                 {{-- <p class="text-sm text-gray-500">{{ \Carbon\Carbon::now()->format('l, F j, Y') }}</p> --}}
             </div>
@@ -430,8 +431,9 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 mb-1">Total Pengguna</p>
-                        <h3 class="text-3xl font-bold text-primary">
-                            {{ number_format($totalUsers) }}</h3>
+                        <h3 class="text-3xl font-bold text-[color:var(--primary)]">
+                            {{ number_format($totalUsers) }}
+                        </h3>
                         <div class="flex items-center mt-2">
                             <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
                                 @if (isset($monthlyStats['new_users_this_month']) && $monthlyStats['new_users_this_month'] > 0)
@@ -443,8 +445,8 @@
                         </div>
                     </div>
                     <div class="bg-gradient-to-br from-[#f58634]/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
-                        <svg class="w-8 h-8 text-primary" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-8 h-8 text-[color:var(--primary)]" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
@@ -458,8 +460,9 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 mb-1">Ujian Hari Ini</p>
-                        <h3 class="text-3xl font-bold text-primary">
-                            {{ $todayExams }}</h3>
+                        <h3 class="text-3xl font-bold text-[color:var(--primary)]">
+                            {{ $todayExams }}
+                        </h3>
                         <div class="flex items-center mt-2">
                             <div class="w-2 h-2 bg-blue-500 rounded-full pulse-dot mr-2"></div>
                             <span class="text-xs text-blue-600">Ujian dimulai hari ini</span>
@@ -480,15 +483,15 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 mb-1">Ujian Aktif</p>
-                        <h3 class="text-3xl font-bold text-primary">
-                            {{ $activeExams }}</h3>
+                        <h3 class="text-3xl font-bold text-[color:var(--primary)]">
+                            {{ $activeExams }}
+                        </h3>
                         <div class="flex items-center mt-2">
                             @if ($activeExams > 0)
-                                <div
-                                    class="w-2 h-2 rounded-full pulse-dot mr-2
-                                    bg-primary">
+                                <div class="w-2 h-2 rounded-full pulse-dot mr-2
+                                                    bg-primary">
                                 </div>
-                                <span class="text-xs text-primary">Sedang
+                                <span class="text-xs text-[color:var(--primary)]">Sedang
                                     berlangsung</span>
                             @else
                                 <span class="text-xs text-gray-500">Tidak ada ujian aktif</span>
@@ -496,8 +499,8 @@
                         </div>
                     </div>
                     <div class="bg-gradient-to-br from-orange-500/20 to-[#C3D4EC]/20 p-4 rounded-2xl">
-                        <svg class="w-8 h-8 text-primary" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-8 h-8 text-[color:var(--primary)]" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -511,8 +514,9 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 mb-1">Peringatan Keamanan</p>
-                        <h3 class="text-3xl font-bold text-primary">
-                            {{ $examAlerts }}</h3>
+                        <h3 class="text-3xl font-bold text-[color:var(--primary)]">
+                            {{ $examAlerts }}
+                        </h3>
                         <div class="flex items-center mt-2">
                             @if ($examAlerts > 0)
                                 <div class="w-2 h-2 bg-red-500 rounded-full pulse-dot mr-2"></div>
@@ -572,8 +576,7 @@
             <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
                 <div class="flex items-center justify-between mb-4">
                     <div class="bg-gradient-to-br from-indigo-500/20 to-[#C3D4EC]/20 p-3 rounded-2xl">
-                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                         </svg>
@@ -594,8 +597,7 @@
             <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
                 <div class="flex items-center justify-between mb-4">
                     <div class="bg-gradient-to-br from-yellow-500/20 to-[#C3D4EC]/20 p-3 rounded-2xl">
-                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
                             </path>
@@ -668,11 +670,9 @@
 
                             <div class="flex items-center justify-between p-3 {{ $colors[2] }} rounded-lg">
                                 <div class="flex items-center">
-                                    <div
-                                        class="w-3 h-3 {{ $statusLabels[$status] ?? ucfirst($status) }} rounded-full mr-3">
+                                    <div class="w-3 h-3 {{ $statusLabels[$status] ?? ucfirst($status) }} rounded-full mr-3">
                                     </div>
-                                    <span
-                                        class="text-sm font-medium {{ $colors[1] }} capitalize">{{ $status }}</span>
+                                    <span class="text-sm font-medium {{ $colors[1] }} capitalize">{{ $status }}</span>
                                 </div>
                                 <div class="text-right">
                                     <div class="text-sm font-bold {{ $colors[1] }}">{{ $count }}</div>
@@ -702,7 +702,7 @@
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-semibold text-gray-800">Pemantauan Sesi Langsung</h3>
                     <a href="{{ route('admin.exam.live-stream') }}"
-                        class="text-primary hover:text-[#2d8c5b] text-sm font-medium">
+                        class="text-[color:var(--primary)] hover:text-[#2d8c5b] text-sm font-medium">
                         Lihat Semua →
                     </a>
                 </div>
@@ -726,12 +726,12 @@
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-600">Masalah Kamera</span>
                             <span
-                                class="font-medium text-primary">{{ $liveSessionStats['camera_issues'] ?? 0 }}</span>
+                                class="font-medium text-[color:var(--primary)]">{{ $liveSessionStats['camera_issues'] ?? 0 }}</span>
                         </div>
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-600">Masalah Koneksi</span>
                             <span
-                                class="font-medium text-primary">{{ $liveSessionStats['connection_issues'] ?? 0 }}</span>
+                                class="font-medium text-[color:var(--primary)]">{{ $liveSessionStats['connection_issues'] ?? 0 }}</span>
                         </div>
                     </div>
                 @else
@@ -753,7 +753,7 @@
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-semibold text-gray-800">Peringatan Kritis (24 Jam Terakhir)</h3>
                     <a href="{{ route('admin.exam.monitor') }}"
-                        class="text-primary hover:text-[#2d8c5b] text-sm font-medium">
+                        class="text-[color:var(--primary)] hover:text-[#2d8c5b] text-sm font-medium">
                         View All →
                     </a>
                 </div>
@@ -782,8 +782,7 @@
                 @else
                     <div class="text-center text-gray-500 py-8">
                         <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
@@ -802,7 +801,7 @@
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-semibold text-gray-800">Ujian Mendatang</h3>
                     <a href="{{ route('admin.exam.timetable') }}"
-                        class="text-primary hover:text-[#2d8c5b] text-sm font-medium">
+                        class="text-[color:var(--primary)] hover:text-[#2d8c5b] text-sm font-medium">
                         Kelola →
                     </a>
                 </div>
@@ -845,7 +844,7 @@
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-semibold text-gray-800">Hasil Ujian Terbaru</h3>
                     <a href="{{ route('admin.report.item-analysis') }}"
-                        class="text-primary hover:text-[#2d8c5b] text-sm font-medium">
+                        class="text-[color:var(--primary)] hover:text-[#2d8c5b] text-sm font-medium">
                         Lihat Laporan →
                     </a>
                 </div>
@@ -859,7 +858,8 @@
                                         {{ $result->user->name ?? 'Unknown' }}
                                     </div>
                                     <div class="text-xs text-green-600 mt-1">
-                                        {{ $result->timetable->module->name ?? 'N/A' }}</div>
+                                        {{ $result->timetable->module->name ?? 'N/A' }}
+                                    </div>
                                 </div>
                                 <div class="text-right">
                                     <div class="text-sm font-bold text-green-700">
@@ -974,7 +974,7 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Initialize Real-time Monitor
             if (typeof RealTimeMonitor !== 'undefined') {
                 const monitor = new RealTimeMonitor();
@@ -1047,7 +1047,7 @@
 
             // Manual refresh button
             if (refreshButton) {
-                refreshButton.addEventListener('click', function() {
+                refreshButton.addEventListener('click', function () {
                     updateLastRefreshTime();
                     setIndicatorStatus('active');
 
@@ -1065,7 +1065,7 @@
 
             // Auto refresh toggle
             if (autoRefreshToggle) {
-                autoRefreshToggle.addEventListener('change', function() {
+                autoRefreshToggle.addEventListener('change', function () {
                     if (this.checked) {
                         startAutoRefresh();
                         setIndicatorStatus('active');
@@ -1082,7 +1082,7 @@
             }
 
             // Update last refresh time on Livewire events
-            Livewire.on('dataRefreshed', function() {
+            Livewire.on('dataRefreshed', function () {
                 updateLastRefreshTime();
                 setIndicatorStatus('active');
 
@@ -1094,7 +1094,7 @@
             });
 
             // Listen for Livewire component updates
-            document.addEventListener('livewire:updated', function() {
+            document.addEventListener('livewire:updated', function () {
                 // Re-initialize chart after any Livewire update
                 setTimeout(() => {
                     initializeChart();
@@ -1103,19 +1103,19 @@
             });
 
             // Listen for Livewire component loaded/mounted
-            document.addEventListener('livewire:load', function() {
+            document.addEventListener('livewire:load', function () {
                 initializeChart();
             });
 
             // Ensure chart is initialized when Livewire component navigates
-            document.addEventListener('livewire:navigated', function() {
+            document.addEventListener('livewire:navigated', function () {
                 setTimeout(() => {
                     initializeChart();
                 }, 100);
             });
 
             // Cleanup on page unload
-            window.addEventListener('beforeunload', function() {
+            window.addEventListener('beforeunload', function () {
                 stopAutoRefresh();
 
                 // Destroy chart to prevent memory leaks
@@ -1191,7 +1191,7 @@
         }
 
         // Close modals when clicking outside
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (e.target.id === 'realtimeModal') {
                 closeRealtimeModal();
             }
@@ -1201,7 +1201,7 @@
         });
 
         // Close modals with Escape key
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 closeRealtimeModal();
                 closeUptimeModal();
@@ -1245,7 +1245,7 @@
         window.addEventListener('offline', monitorNetworkStatus);
 
         // Handle window resize to ensure chart responsiveness
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', function () {
             if (weeklyChart) {
                 weeklyChart.resize();
             }
@@ -1275,7 +1275,7 @@
         }
 
         // Error handling for failed requests
-        window.addEventListener('unhandledrejection', function(event) {
+        window.addEventListener('unhandledrejection', function (event) {
             console.error('Unhandled promise rejection:', event.reason);
             document.getElementById('realtimeIndicator')?.classList.add('bg-red-500');
         });
@@ -1304,16 +1304,16 @@
                 notification.className =
                     'fixed top-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg z-50 alert-enter';
                 notification.innerHTML = `
-                    <div class="flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <div>
-                            <div class="font-medium">API Test Successful!</div>
-                            <div class="text-sm">System: ${systemData.status || 'OK'} | Streams: ${streamData.active_sessions || 0} active</div>
-                        </div>
-                    </div>
-                `;
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <div>
+                                    <div class="font-medium">API Test Successful!</div>
+                                    <div class="text-sm">System: ${systemData.status || 'OK'} | Streams: ${streamData.active_sessions || 0} active</div>
+                                </div>
+                            </div>
+                        `;
                 document.body.appendChild(notification);
 
                 // Auto remove notification
@@ -1332,16 +1332,16 @@
                 notification.className =
                     'fixed top-4 right-4 bg-red-500 text-white p-4 rounded-lg shadow-lg z-50 alert-enter';
                 notification.innerHTML = `
-                    <div class="flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                        <div>
-                            <div class="font-medium">API Test Failed!</div>
-                            <div class="text-sm">Check console for details</div>
-                        </div>
-                    </div>
-                `;
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                                <div>
+                                    <div class="font-medium">API Test Failed!</div>
+                                    <div class="text-sm">Check console for details</div>
+                                </div>
+                            </div>
+                        `;
                 document.body.appendChild(notification);
 
                 setTimeout(() => {

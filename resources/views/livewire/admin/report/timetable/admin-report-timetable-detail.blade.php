@@ -4,7 +4,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-primary">
+                <h1 class="text-2xl font-bold text-[color:var(--primary)]">
                     Detail Riwayat Ujian</h1>
                 <p class="text-gray-600 my-2">Rekap Nilai dari "{{$timetable_module->module->name}}"</p>
             </div>
@@ -54,7 +54,7 @@
                     class="p-6 border-b border-gray-50 bg-gray-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div class="flex items-center gap-4">
                         <div
-                            class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
+                            class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-[color:var(--primary)] font-bold text-lg">
                             {{ $user_timetables->firstItem() + $index }}
                         </div>
                         <div>
@@ -62,7 +62,8 @@
                                 {{ $user_timetable->user?->name ?? '-' }}
                             </h3>
                             <p class="text-sm text-gray-500 font-medium">NIM:
-                                {{ $user_timetable->user?->nim ?? ($user_timetable->user?->username ?? '-') }}</p>
+                                {{ $user_timetable->user?->nim ?? ($user_timetable->user?->username ?? '-') }}
+                            </p>
                         </div>
                     </div>
 

@@ -18,7 +18,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-primary">
+                <h1 class="text-2xl font-bold text-[color:var(--primary)]">
                     Data Modul</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
@@ -141,12 +141,12 @@
                             class="text-red-600">*</span></label>
                     <div wire:key="select-{{ rand() }}">
                         <select disabled class="mt-1 form-control w-full" x-data x-ref="input" x-init="$($refs.input).selectize({
-                                dropdownParent: 'body',
-                                allowClear: true,
-                                onChange: function(e) {
-                                    @this.set('studys', e ? e : '');
-                                }
-                            });" wire:model.live="studys" id="studys" multiple>
+                                    dropdownParent: 'body',
+                                    allowClear: true,
+                                    onChange: function(e) {
+                                        @this.set('studys', e ? e : '');
+                                    }
+                                });" wire:model.live="studys" id="studys" multiple>
                             <option value="">Pilih Prodi</option>
                             @foreach ($get_studys as $key_get_study => $get_study)
                                 <option value="{{ $key_get_study }}">{{ $get_study }}</option>
@@ -293,7 +293,7 @@
     @if ($question_pick_type === 'manual')
         <div class="p-5 bg-white shadow rounded-lg mt-4">
             <div>
-                <h1 class="text-2xl font-bold text-primary">Data Soal</h1>
+                <h1 class="text-2xl font-bold text-[color:var(--primary)]">Data Soal</h1>
                 <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p>
             </div>
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">

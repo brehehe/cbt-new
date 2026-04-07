@@ -4,8 +4,7 @@
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
-                <h1
-                    class="text-2xl font-bold text-primary">
+                <h1 class="text-2xl font-bold text-[color:var(--primary)]">
                     Data Skala Penilaian</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
@@ -34,8 +33,8 @@
         </div>
 
         <div class="relative w-full sm:w-80">
-            <input type="text" class="form-control-search !rounded-xl !border-gray-100 !bg-white/50 backdrop-blur-sm" placeholder="Cari grade, skor, atau deskripsi..."
-                wire:model.live='search'>
+            <input type="text" class="form-control-search !rounded-xl !border-gray-100 !bg-white/50 backdrop-blur-sm"
+                placeholder="Cari grade, skor, atau deskripsi..." wire:model.live='search'>
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <i class="fas fa-search h-3 w-3 text-gray-400"></i>
             </div>
@@ -43,7 +42,8 @@
     </div>
 
     <!-- Desktop Table Section -->
-    <div class="hidden md:block bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
+    <div
+        class="hidden md:block bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
         <div class="table-container">
             <table class="table">
                 <thead>
@@ -74,17 +74,13 @@
                             <td class="text-gray-600 italic text-sm">{{ $data->description }}</td>
                             <td class="center">
                                 <div class="flex items-center justify-center gap-2">
-                                    <button
-                                        class="p-2 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
-                                        title="Edit"
-                                        wire:click="edit('{{ $data->id }}')">
+                                    <button class="p-2 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
+                                        title="Edit" wire:click="edit('{{ $data->id }}')">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </button>
 
-                                    <button
-                                        class="p-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
-                                        title="Hapus"
-                                        wire:click="confirmDelete('{{ $data->id }}')">
+                                    <button class="p-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                                        title="Hapus" wire:click="confirmDelete('{{ $data->id }}')">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </div>
@@ -111,7 +107,8 @@
             <div class="bg-white rounded-xl shadow-md border border-gray-100 p-4 space-y-3">
                 <div class="flex justify-between items-start">
                     <div class="flex items-center gap-3">
-                        <span class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary bg-opacity-10 text-primary font-bold text-xl">
+                        <span
+                            class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary bg-opacity-10 text-[color:var(--primary)] font-bold text-xl">
                             {{ $data->grade_letter }}
                         </span>
                         <div>
@@ -145,6 +142,7 @@
 
     <!-- Footer Info -->
     <div class="px-6 py-4 bg-white/50 backdrop-blur-sm rounded-xl border border-gray-100 text-center">
-        <p class="text-xs text-gray-400 font-medium">Total <span class="text-gray-600">{{ count($datas) }}</span> Grade Penilaian Terdaftar</p>
+        <p class="text-xs text-gray-400 font-medium">Total <span class="text-gray-600">{{ count($datas) }}</span> Grade
+            Penilaian Terdaftar</p>
     </div>
 </div>
