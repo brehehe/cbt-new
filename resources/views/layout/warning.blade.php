@@ -110,6 +110,13 @@
 
 <body class="h-full bg-gray-50">
 
+    <div id="blackout-overlay">
+        <h2 class="text-3xl font-bold mb-4">⚠️ Ujian Sedang Berlangsung</h2>
+        <p class="text-xl text-gray-300">Dilarang meninggalkan halaman ujian atau mengambil screenshot!</p>
+        <p class="mt-4 text-sm text-gray-500">Kembali ke halaman untuk melanjutkan.</p>
+        <button class="unlock-button mt-8" onclick="this.parentElement.style.display='none'">Klik untuk Kembali</button>
+    </div>
+
     <div class="watermark-logo">
         <img src="{{ asset('asset/img/logo-procbt.png') }}" alt="Watermark Logo" style="width: 750px; height: 150px" />
         {{ Auth::user()->name . ' - ' . (Auth::user()->nim ?? (Auth::user()->username ?? '-')) }}
@@ -160,6 +167,16 @@
             document.addEventListener('contextmenu', event => event.preventDefault());
             document.addEventListener('copy', event => event.preventDefault());
             document.addEventListener('cut', event => event.preventDefault());
+
+            // Blackout on blur
+            window.addEventListener('blur', () => {
+                document.getElementById('blackout-overlay').style.display = 'flex';
+            });
+            window.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'hidden') {
+                    document.getElementById('blackout-overlay').style.display = 'flex';
+                }
+            });
         @endif
 
 
@@ -178,22 +195,34 @@
                 return true;
             }
 
+            // Immediate blackout on Cmd+Shift or Ctrl+Shift (screenshot combination)
+            if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.keyCode !== 82) { // 82 is R for refresh
+                document.getElementById('blackout-overlay').style.display = 'flex';
+                e.preventDefault();
+                return false;
+            }
 
             // Disable Ctrl+C, Ctrl+V, Ctrl+U, F12, PrintScreen
             if (
                 (e.ctrlKey && (e.keyCode === 67 || e.keyCode === 86 || e.keyCode === 85 || e.keyCode === 73 || e.keyCode === 74)) ||
                 (e.metaKey && (e.keyCode === 67 || e.keyCode === 86)) ||
-                e.keyCode === 123 || e.keyCode === 44
+                e.keyCode === 123 || e.keyCode === 44 || e.key === 'PrintScreen'
             ) {
                 e.preventDefault();
+                // Clear clipboard if PrintScreen pressed
+                if (e.key === 'PrintScreen' || e.keyCode === 44) {
+                    navigator.clipboard.writeText('');
+                }
                 return false;
             }
         }, true);
 
         // Anti-debugger
-        setInterval(function () {
-            (function (a) { return (function (a) { return (Function('debugger'))(); }(a)); }(function () { }));
-        }, 1000);
+        @if(!Auth::user()->hasRole(['Admin', 'Super Admin', 'Pengawas', 'admin']))
+            setInterval(function () {
+                (function (a) { return (function (a) { return (Function('debugger'))(); }(a)); }(function () { }));
+            }, 1000);
+        @endif
 
         // Disable autocomplete on all inputs
         document.querySelectorAll('input, form').forEach(el => {
