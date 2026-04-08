@@ -110,12 +110,12 @@
 
 <body class="h-full bg-gray-50">
 
-    <div id="blackout-overlay">
+    {{-- <div id="blackout-overlay">
         <h2 class="text-3xl font-bold mb-4">⚠️ Ujian Sedang Berlangsung</h2>
         <p class="text-xl text-gray-300">Dilarang meninggalkan halaman ujian atau mengambil screenshot!</p>
         <p class="mt-4 text-sm text-gray-500">Kembali ke halaman untuk melanjutkan.</p>
         <button class="unlock-button mt-8" onclick="this.parentElement.style.display='none'">Klik untuk Kembali</button>
-    </div>
+    </div> --}}
 
     <div class="watermark-logo">
         <img src="{{ asset('asset/img/logo-procbt.png') }}" alt="Watermark Logo" style="width: 750px; height: 150px" />

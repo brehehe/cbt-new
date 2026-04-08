@@ -140,13 +140,13 @@
                             <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
                                 {{ $userModuleQuestions->firstItem() + $index }}</td>
                             <td class="px-6 py-4 text-sm text-gray-900 font-medium whitespace-normal min-w-[200px]">
-                                {{ optional($userModuleQuestion->timetableQuestion)->question ?? '-' }}
+                                {!! optional($userModuleQuestion->timetableQuestion)->question ?? '-' !!}
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-500 whitespace-normal min-w-[150px]">
                                 @if($correctAnswer)
                                     <span
                                         class="font-semibold text-gray-700 inline-block mr-1">{{ $letter($labelCorrect) }}.</span>
-                                    {{ $correctAnswer->context ?? '-' }}
+                                    {!! $correctAnswer->context ?? '-' !!}
                                 @else
                                     -
                                 @endif
@@ -155,7 +155,7 @@
                                 @if($chosenAnswer)
                                     <span
                                         class="font-semibold text-gray-700 inline-block mr-1">{{ $letter($labelChosen) }}.</span>
-                                    {{ $chosenAnswer->context ?? '-' }}
+                                    {!! $chosenAnswer->context ?? '-' !!}
                                 @else
                                     -
                                 @endif

@@ -165,18 +165,18 @@
                             <td class="center">{{ $userModuleQuestions->firstItem() + $index }}</td>
 
                             {{-- Pertanyaan --}}
-                            <td>{{ optional($userModuleQuestion->timetableQuestion)->question ?? '-' }}</td>
+                            <td>{!! optional($userModuleQuestion->timetableQuestion)->question ?? '-' !!}</td>
 
                             {{-- Jawaban benar --}}
                             <td class="whitespace-nowrap">
                                 {{ $letter($labelCorrect) }}.
-                                {{ optional($correctAnswer)->context ?? '-' }}
+                                {!! optional($correctAnswer)->context ?? '-' !!}
                             </td>
 
                             {{-- Jawaban yang dipilih user --}}
                             <td class="whitespace-nowrap">
                                 {{ $letter($labelChosen) }}.
-                                {{ optional($chosenAnswer)->context ?? '-' }}
+                                {!! optional($chosenAnswer)->context ?? '-' !!}
                             </td>
                             <td class="whitespace-nowrap">
                                 @if ($userModuleQuestion->status === 'correct')

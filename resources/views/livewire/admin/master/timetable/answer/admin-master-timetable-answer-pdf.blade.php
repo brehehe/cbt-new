@@ -1,22 +1,65 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <title>Nilai Ujian Detail</title>
     <style>
-        * { font-family: DejaVu Sans, Arial, sans-serif; }
-        body { font-size: 11px; color: #111827; }
-        h1 { font-size: 16px; margin: 0 0 4px; }
-        .subtitle { color: #6b7280; margin-bottom: 12px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #e5e7eb; padding: 6px 8px; text-align: left; vertical-align: top; }
-        th { background: #f3f4f6; font-weight: 600; }
-        .center { text-align: center; }
-        .badge-ok { background: #d1fae5; }
-        .badge-no { background: #fecaca; }
-        .badge-neutral { background: #f3f4f6; }
+        * {
+            font-family: DejaVu Sans, Arial, sans-serif;
+        }
+
+        body {
+            font-size: 11px;
+            color: #111827;
+        }
+
+        h1 {
+            font-size: 16px;
+            margin: 0 0 4px;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #e5e7eb;
+            padding: 6px 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #f3f4f6;
+            font-weight: 600;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .badge-ok {
+            background: #d1fae5;
+        }
+
+        .badge-no {
+            background: #fecaca;
+        }
+
+        .badge-neutral {
+            background: #f3f4f6;
+        }
     </style>
 </head>
+
 <body>
     <h1>Nilai Ujian Detail</h1>
     <div class="subtitle">{{ $timetable['name'] ?? 'Jadwal' }} - {{ $user_timetable->user->name ?? '-' }}</div>
@@ -45,10 +88,11 @@
                 @endphp
                 <tr>
                     <td class="center">{{ $index + 1 }}</td>
-                    <td>{{ optional($userModuleQuestion->timetableQuestion)->question ?? '-' }}</td>
-                    <td>{{ $letter($labelCorrect) }}. {{ optional($correctAnswer)->context ?? '-' }}</td>
-                    <td>{{ $letter($labelChosen) }}. {{ optional($chosenAnswer)->context ?? '-' }}</td>
-                    <td class="center {{ $userModuleQuestion->status === 'correct' ? 'badge-ok' : ($userModuleQuestion->status === 'wrong' ? 'badge-no' : 'badge-neutral') }}">
+                    <td>{!! optional($userModuleQuestion->timetableQuestion)->question ?? '-' !!}</td>
+                    <td>{!! $letter($labelCorrect) !!}. {!! optional($correctAnswer)->context ?? '-' !!}</td>
+                    <td>{!! $letter($labelChosen) !!}. {!! optional($chosenAnswer)->context ?? '-' !!}</td>
+                    <td
+                        class="center {{ $userModuleQuestion->status === 'correct' ? 'badge-ok' : ($userModuleQuestion->status === 'wrong' ? 'badge-no' : 'badge-neutral') }}">
                         {{ $userModuleQuestion->status === 'correct' ? 'Benar' : ($userModuleQuestion->status === 'wrong' ? 'Salah' : 'Tidak Terjawab') }}
                     </td>
                 </tr>
@@ -60,4 +104,5 @@
         </tbody>
     </table>
 </body>
+
 </html>
