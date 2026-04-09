@@ -62,7 +62,7 @@ class AdminReportItemAnalysisAllIndex extends Component
             ->groupBy('questions.id')
             ->select([
                 'questions.id as question_id',
-                DB::raw("count(*) as total_attempts"),
+                DB::raw("sum(case when user_module_questions.status in ('correct', 'wrong') then 1 else 0 end) as total_attempts"),
                 DB::raw("sum(case when user_module_questions.status = 'correct' then 1 else 0 end) as total_correct"),
             ])
             ->get();
@@ -118,7 +118,7 @@ class AdminReportItemAnalysisAllIndex extends Component
                 'questions.id as question_id',
                 'questions.question as question_text',
                 'questions.difficulty as difficulty',
-                DB::raw("count(*) as total_attempts"),
+                DB::raw("sum(case when user_module_questions.status in ('correct', 'wrong') then 1 else 0 end) as total_attempts"),
                 DB::raw("sum(case when user_module_questions.status = 'correct' then 1 else 0 end) as total_correct"),
             ])
             ->orderBy('questions.question');

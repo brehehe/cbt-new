@@ -21,6 +21,10 @@ class Question extends Model
     use SoftDeletes, HasUuids;
     protected $guarded = ['id'];
 
+    const TYPE_SINGLE = 'single';
+    const TYPE_MULTIPLE = 'multiple';
+    const TYPE_ESSAY = 'essay';
+
     protected $casts = [
         'images' => 'array'
     ];

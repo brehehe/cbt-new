@@ -90,10 +90,8 @@
                         <th>Jadwal</th>
                         <th>Mulai</th>
                         <th>Selesai</th>
-                        @if($companyData->is_mark)
                             <th>Nilai</th>
                             <th>Skala Penilaian</th>
-                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -109,7 +107,6 @@
                             <td>{{ $result->timetable?->name ?? '-' }}</td>
                             <td>{{ $result->timetable?->start_time?->format('d F Y H:i') ?? '-' }}</td>
                             <td>{{ $result->timetable?->end_time?->format('d F Y H:i') ?? '-' }}</td>
-                            @if($companyData->is_mark)
                                 <td>{{ $result->mark ?? '-' }}</td>
                                 <td>
                                     <div class="flex flex-col">
@@ -117,7 +114,6 @@
                                         <span class="text-xs text-gray-500">{{ $gradeDetail?->description ?? '-' }}</span>
                                     </div>
                                 </td>
-                            @endif
                         </tr>
                     @empty
                         <tr>

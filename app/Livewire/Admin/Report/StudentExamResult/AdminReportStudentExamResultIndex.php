@@ -27,7 +27,7 @@ class AdminReportStudentExamResultIndex extends Component
 
         $this->users = User::query()
             ->where('company_id', $companyId)
-            ->role('Mahasiswa')
+            // ->role('Mahasiswa')
             ->orderBy('name','asc')
             ->get(['id', 'name', 'nim', 'username']);
     }

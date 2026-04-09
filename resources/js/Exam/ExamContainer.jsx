@@ -69,22 +69,24 @@ const ExamContainer = ({ userTimetableId }) => {
         return [h, m, s].map(v => v < 10 ? "0" + v : v).join(":");
     };
 
-    const handleSaveAnswer = async (answerId, isMarked) => {
+    const handleSaveAnswer = async (answerId, isMarked, essayAnswer = null) => {
         const currentQuestion = examData.questions[currentQuestionIndex];
         try {
             await axios.post('/api/exam/save-answer', {
                 question_navigation_id: currentQuestion.id,
                 timetable_answer_id: answerId,
+                essay_answer: essayAnswer,
                 is_mark: isMarked
             });
 
             // Update local state for navigation
             const newQuestions = [...examData.questions];
             newQuestions[currentQuestionIndex].timetable_answer_id = answerId;
+            newQuestions[currentQuestionIndex].essay_answer = essayAnswer;
             newQuestions[currentQuestionIndex].is_mark = isMarked;
 
             const newNavigation = [...examData.navigation];
-            newNavigation[currentQuestionIndex].isAnswered = !!answerId;
+            newNavigation[currentQuestionIndex].isAnswered = !!answerId || !!essayAnswer;
             newNavigation[currentQuestionIndex].isMarked = isMarked;
 
             setExamData({ ...examData, questions: newQuestions, navigation: newNavigation });

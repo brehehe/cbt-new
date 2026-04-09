@@ -20,7 +20,7 @@
 
         <!-- Body -->
         <div class="px-6 py-4 text-gray-600 overflow-auto" style="max-height: 80vh">
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-1">
                 <div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
@@ -97,6 +97,19 @@
                                 @endforeach
                             </select>
                             @error('question_type_id')
+                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div class="mb-4 md:col-span-2">
+                            <label for="type" class="block text-sm font-medium text-gray-700">Jenis Soal
+                                <span class="text-red-600">*</span></label>
+                            <select class="mt-1 form-control" wire:model.lazy='type'>
+                                <option value="">Pilih Jenis Soal</option>
+                                <option value="single">Single Choice (Pilihan Ganda)</option>
+                                <!-- <option value="multiple">Multiple Choice (Pilihan Ganda Kompleks)</option> -->
+                                <option value="essay">Essay (Uraian)</option>
+                            </select>
+                            @error('type')
                                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                             @enderror
                         </div>

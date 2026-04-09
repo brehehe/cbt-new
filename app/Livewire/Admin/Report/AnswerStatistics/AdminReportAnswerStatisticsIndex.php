@@ -53,12 +53,12 @@ class AdminReportAnswerStatisticsIndex extends Component
             ->get();
 
         // Fetch all user answers for this timetable
-        // Improve performance by selecting only necessary columns
+        // Fetch all user answers for this timetable
         $userAnswers = UserModuleQuestion::whereHas('userTimetable', function ($q) {
                 $q->where('timetable_id', $this->timetable_id)
-                  ->where('status', 'done'); // Only count finished exams? Or all? Let's say DONE for now to be safe.
+                  ->where('status', 'done'); 
             })
-            ->select('timetable_question_id', 'timetable_answer_id', 'status')
+            ->select('timetable_question_id', 'timetable_answer_id', 'status', 'essay_answer')
             ->get()
             ->groupBy('timetable_question_id');
 
@@ -66,28 +66,63 @@ class AdminReportAnswerStatisticsIndex extends Component
 
         foreach ($questions as $question) {
             $answersForQuestion = $userAnswers->get($question->id, collect());
+            $isEssay = $question->type === 'essay';
             
-            $totalAnswered = $answersForQuestion->whereNotNull('timetable_answer_id')->count();
-            $totalCorrect = $answersForQuestion->where('status', 'correct')->count();
-            $totalWrong = $answersForQuestion->where('status', 'wrong')->count();
-            
-            // Calculate distribution per option
-            $distribution = [];
-            foreach ($question->answers as $option) {
-                $count = $answersForQuestion->where('timetable_answer_id', $option->id)->count();
-                $distribution[] = [
-                    'option_text' => $option->context, // Or label A, B, C if stored
-                    'is_correct' => $option->is_correct,
-                    'count' => $count,
-                    'percentage' => $totalAnswered > 0 ? round(($count / $totalAnswered) * 100, 1) : 0,
+            if ($isEssay) {
+                $totalAnswered = $answersForQuestion->whereNotNull('essay_answer')->count();
+                $totalCorrect = $answersForQuestion->where('status', 'correct')->count();
+                $totalWrong = $answersForQuestion->where('status', 'wrong')->count();
+                $totalPending = $answersForQuestion->where('status', 'check')->count();
+                
+                $distribution = [
+                    [
+                        'option_text' => 'Benar (Koreksi)',
+                        'is_correct' => true,
+                        'count' => $totalCorrect,
+                        'percentage' => $totalAnswered > 0 ? round(($totalCorrect / $totalAnswered) * 100, 1) : 0,
+                        'label' => 'CORRECT'
+                    ],
+                    [
+                        'option_text' => 'Salah (Koreksi)',
+                        'is_correct' => false,
+                        'count' => $totalWrong,
+                        'percentage' => $totalAnswered > 0 ? round(($totalWrong / $totalAnswered) * 100, 1) : 0,
+                        'label' => 'WRONG'
+                    ],
+                    [
+                        'option_text' => 'Belum Dinilai',
+                        'is_correct' => false,
+                        'count' => $totalPending,
+                        'percentage' => $totalAnswered > 0 ? round(($totalPending / $totalAnswered) * 100, 1) : 0,
+                        'label' => 'PENDING',
+                        'is_pending' => true
+                    ]
                 ];
+            } else {
+                $totalAnswered = $answersForQuestion->whereNotNull('timetable_answer_id')->count();
+                $totalCorrect = $answersForQuestion->where('status', 'correct')->count();
+                $totalWrong = $answersForQuestion->where('status', 'wrong')->count();
+                $totalPending = 0;
+
+                $distribution = [];
+                foreach ($question->answers as $option) {
+                    $count = $answersForQuestion->where('timetable_answer_id', $option->id)->count();
+                    $distribution[] = [
+                        'option_text' => $option->context,
+                        'is_correct' => $option->is_correct,
+                        'count' => $count,
+                        'percentage' => $totalAnswered > 0 ? round(($count / $totalAnswered) * 100, 1) : 0,
+                    ];
+                }
             }
 
             $stats[] = [
-                'question_text' => strip_tags($question->question),
+                'question_text' => $question->question, // Keep tags for limit later
+                'question_type' => $question->type,
                 'total_answered' => $totalAnswered,
                 'total_correct' => $totalCorrect,
                 'total_wrong' => $totalWrong,
+                'total_pending' => $totalPending,
                 'distribution' => $distribution,
             ];
         }

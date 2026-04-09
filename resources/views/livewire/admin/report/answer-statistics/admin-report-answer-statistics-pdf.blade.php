@@ -78,7 +78,10 @@
     @foreach($answerStats as $index => $stat)
         <div class="question-block">
             <div class="question-text">
-                {{ $index + 1 }}. {!! \Str::limit($stat['question_text'], 300) !!}
+                <span style="background: #e5e7eb; padding: 2px 5px; border-radius: 3px; font-size: 8pt; margin-right: 5px;">
+                    {{ $stat['question_type'] === 'essay' ? 'ESSAY' : 'PG' }}
+                </span>
+                {{ $index + 1 }}. {!! strip_tags($stat['question_text']) !!}
             </div>
             
             <table class="stats-table">
@@ -88,23 +91,39 @@
                         Total Dijawab: {{ $stat['total_answered'] }}<br>
                         Benar: <span style="color: green;">{{ $stat['total_correct'] }}</span><br>
                         Salah: <span style="color: red;">{{ $stat['total_wrong'] }}</span>
+                        @if($stat['question_type'] === 'essay')
+                            <br>Pending: <span style="color: #d97706;">{{ $stat['total_pending'] }}</span>
+                        @endif
                     </td>
                     <td width="70%">
-                        <strong>Sebaran Jawaban:</strong>
-                        <table width="100%">
+                        <strong>{{ $stat['question_type'] === 'essay' ? 'Status Penilaian:' : 'Sebaran Jawaban:' }}</strong>
+                        <table width="100%" style="font-size: 8pt; margin-top: 5px;">
                             @foreach($stat['distribution'] as $optIndex => $opt)
                                 <tr>
-                                    <td width="20" style="vertical-align: top;">
-                                        {{ chr(65 + $optIndex) }}
-                                        @if($opt['is_correct']) <strong>(Kunci)</strong> @endif
+                                    <td width="20" style="vertical-align: top; font-weight: bold;">
+                                        @if($stat['question_type'] === 'essay')
+                                            -
+                                        @else
+                                            {{ chr(65 + $optIndex) }}
+                                        @endif
                                     </td>
                                     <td>
-                                        <div style="margin-bottom: 2px;">{!! strip_tags($opt['option_text']) !!}</div>
-                                        <div style="display: flex; align-items: center;">
-                                            <div class="bar-container" style="margin-right: 5px;">
-                                                <div class="bar {{ $opt['is_correct'] ? 'correct' : '' }}" style="width: {{ $opt['percentage'] }}%;"></div>
+                                        <div style="margin-bottom: 2px;">
+                                            {!! strip_tags($opt['option_text']) !!}
+                                            @if(!($opt['is_pending'] ?? false) && $opt['is_correct'] && $stat['question_type'] !== 'essay') 
+                                                <strong>(Kunci)</strong> 
+                                            @endif
+                                        </div>
+                                        <div style="margin-top: 2px;">
+                                            @php
+                                                $barColor = $opt['is_correct'] ? '#28a745' : '#007bff';
+                                                if ($opt['is_pending'] ?? false) $barColor = '#f59e0b';
+                                                elseif ($stat['question_type'] === 'essay' && !$opt['is_correct']) $barColor = '#dc3545';
+                                            @endphp
+                                            <div class="bar-container" style="margin-right: 5px; width: 120px; height: 8px;">
+                                                <div class="bar" style="width: {{ $opt['percentage'] }}%; background-color: {{ $barColor }};"></div>
                                             </div>
-                                            <span>{{ $opt['count'] }} ({{ $opt['percentage'] }}%)</span>
+                                            <span style="font-size: 7pt;">{{ $opt['count'] }} ({{ $opt['percentage'] }}%)</span>
                                         </div>
                                     </td>
                                 </tr>

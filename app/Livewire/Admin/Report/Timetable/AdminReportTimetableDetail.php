@@ -32,9 +32,12 @@ class AdminReportTimetableDetail extends Component
 
         $user_timetables = UserTimetable::where('timetable_id', $this->timetable_module?->timetable_id)
             ->search($this->search)
-            ->with(['user', 'userModuleQuestions' => function($q) {
-                $q->select('id', 'user_timetable_id', 'timetable_question_id', 'status');
-            }])
+            ->with([
+                'user',
+                'userModuleQuestions' => function ($q) {
+                    $q->select('id', 'user_timetable_id', 'timetable_question_id', 'status', 'essay_answer');
+                }
+            ])
             ->paginate($this->perPage);
 
         return view('livewire.admin.report.timetable.admin-report-timetable-detail', [
@@ -50,13 +53,13 @@ class AdminReportTimetableDetail extends Component
             ->where('is_check', true)
             ->orderBy('order')
             ->get();
-            
+
         $questionIds = $questions->pluck('id')->filter()->values();
 
         $user_timetables = UserTimetable::where('timetable_id', $this->timetable_module?->timetable_id)
             ->with(['user'])
             ->get();
-            
+
         $userTimetableIds = $user_timetables->pluck('id')->filter()->values();
 
         $answerMap = TimetableAnswer::whereIn('timetable_question_id', $questionIds)
@@ -71,17 +74,13 @@ class AdminReportTimetableDetail extends Component
 
         $userQuestionStatuses = UserModuleQuestion::whereIn('user_timetable_id', $userTimetableIds)
             ->whereIn('timetable_question_id', $questionIds)
-            ->get(['user_timetable_id', 'timetable_question_id', 'status'])
-            ->groupBy('user_timetable_id')
-            ->map(function ($items) {
-                return $items->keyBy('timetable_question_id')->map->status;
-            })
-            ->toArray();
+            ->get(['user_timetable_id', 'timetable_question_id', 'status', 'essay_answer'])
+            ->groupBy('user_timetable_id');
 
         $correctCounts = [];
         foreach ($user_timetables as $userTimetable) {
-            $statuses = $userQuestionStatuses[$userTimetable->id] ?? [];
-            $count = collect($statuses)->filter(fn($status) => $status === 'correct')->count();
+            $userAnswers = $userQuestionStatuses->get($userTimetable->id) ?? collect();
+            $count = $userAnswers->where('status', 'correct')->count();
             $correctCounts[$userTimetable->id] = $count;
         }
 

@@ -67,7 +67,7 @@ Route::prefix('seb')->name('seb.')->group(function () {
         ->middleware('auth');
 });
 
-Route::group(['middleware'=> [BlockBots::class]], function () {
+Route::group(['middleware' => [BlockBots::class]], function () {
     Route::group(['namespace' => 'App\Livewire\Auth'], function () {
         // Add your routes here
         Route::get('login', 'Login\AuthLoginIndex')->name('login');
@@ -151,6 +151,8 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
             Route::get('/timetable/{timetable_id}/streaming', 'Timetable\Streaming\AdminMasterTimetableStreamingIndex')->name('admin.master.timetable.streaming');
             Route::get('/timetable/{timetable_id}/session', 'Timetable\Session\AdminMasterTimetableSessionIndex')->name('admin.master.timetable.session');
             Route::get('/timetable/{timetable_id}/{user_timetable_id}/answer', 'Timetable\Answer\AdminMasterTimetableAnswerIndex')->name('admin.master.timetable.answer');
+            Route::get('/timetable/{timetable_id}/correct', 'Timetable\Correct\AdminMasterTimetableCorrectIndex')->name('admin.master.timetable.correct');
+            Route::get('/timetable/user-timetable/{user_timetable_id}/correct', \App\Livewire\Admin\Master\Timetable\UserTimetable\Correct\AdminMasterTimetableUserTimetableCorrectIndex::class)->name('admin.master.timetable.user-timetable.correct');
             Route::get('/material', AdminMasterMaterialIndex::class)->name('admin.master.material');
             Route::get('/question-type', AdminMasterQuestionTypeIndex::class)->name('admin.master.question-type');
             Route::get('/category-question', AdminMasterCategoryQuestionIndex::class)->name('admin.master.category-question');
@@ -174,7 +176,7 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
             Route::get('/item-analysis-all', AdminReportItemAnalysisAllIndex::class)->name('admin.report.item-analysis-all');
             Route::get('/item-analysis/{id}/detail', AdminReportItemAnalysisDetailIndex::class)->name('admin.report.item-analysis.detail');
             Route::get('/exam-result', AdminReportExamResultIndex::class)->name('admin.report.exam-result');
-            
+
             // New Reports
             Route::get('/official', \App\Livewire\Admin\Report\Official\AdminReportOfficialIndex::class)->name('admin.report.official');
             Route::get('/attendance', \App\Livewire\Admin\Report\Attendance\AdminReportAttendanceIndex::class)->name('admin.report.attendance');
@@ -274,7 +276,7 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
             return '
                 <h2>Masukkan Password Admin</h2>
                 <form method="POST" action="/clearallsession/check">
-                    '.csrf_field().'
+                    ' . csrf_field() . '
                     <input type="password" name="password" placeholder="Password"
                         style="padding:10px; width:200px;">
                     <br><br>
@@ -294,7 +296,7 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
 
         <!-- FORM HAPUS SESSION TERPILIH -->
         <form method='POST' action='/clearallsession/confirm'>
-            ".csrf_field()."
+            " . csrf_field() . "
             <table border='1' cellpadding='10' cellspacing='0'>
                 <tr>
                     <th>Pilih</th>
@@ -320,7 +322,7 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
                     <td>{$userName}</td>
                     <td>{$s->ip_address}</td>
                     <td>{$s->user_agent}</td>
-                    <td>".date('Y-m-d H:i:s', $s->last_activity)."</td>
+                    <td>" . date('Y-m-d H:i:s', $s->last_activity) . "</td>
                 </tr>
             ";
         }
@@ -340,7 +342,7 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
 
         <!-- FORM HAPUS SEMUA -->
         <form method='POST' action='/clearallsession/clearall'>
-            ".csrf_field()."
+            " . csrf_field() . "
             <button type='submit' style='padding:10px 20px; background:darkred; color:white;'>
                 Hapus Semua Session (Force Logout Semua User)
             </button>
@@ -438,7 +440,7 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
     });
 
     // React-based Exam Detail Migration
-    Route::get('/exam/detail/{userTimetableId}/react', function($userTimetableId) {
+    Route::get('/exam/detail/{userTimetableId}/react', function ($userTimetableId) {
         return view('exam-react', ['userTimetableId' => $userTimetableId]);
     })->name('admin.exam.detail.react')->middleware(['auth']);
 
@@ -454,11 +456,11 @@ Route::group(['middleware'=> [BlockBots::class]], function () {
 
         Route::get('/live-session/{user_timetable_id}/update', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'updateLiveSession']);
         Route::get('/live-session/{user_timetable_id}/token', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'getLiveKitToken']);
-        
+
         // Admin Monitoring API
         Route::get('/admin/monitoring/{timetable_id}/sessions', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'getMonitoringSessions']);
         Route::get('/admin/monitoring/{timetable_id}/token', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'getMonitoringToken']);
-        
+
         Route::post('/{user_timetable_id}/finish', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'finishExam']);
     });
 

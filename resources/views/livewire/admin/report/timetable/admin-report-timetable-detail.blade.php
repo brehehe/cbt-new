@@ -94,48 +94,126 @@
 
                 <!-- Card Body: Answer Pattern Grid -->
                 <div class="p-6">
-                    <div class="flex items-center gap-2 mb-4">
-                        <i class="fa-solid fa-braille text-gray-400"></i>
-                        <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wide">Pola Jawaban</h4>
-                        <span class="px-2 py-0.5 rounded-full bg-gray-100 text-[10px] font-bold text-gray-500">
-                            {{ $timetable_questions->count() }} Soal
-                        </span>
-                    </div>
-
                     @php
-                        // Optimize lookup by keying the collection
+                        // Group questions by type and keep track of original indices
+                        $indexedQuestions = $timetable_questions->map(function($q, $i) {
+                            return (object)['question' => $q, 'originalIndex' => $i + 1];
+                        });
+
+                        $mcqGroup = $indexedQuestions->filter(fn($item) => $item->question->type !== 'essay');
+                        $essayGroup = $indexedQuestions->filter(fn($item) => $item->question->type === 'essay');
+                        
                         $userAnswers = $user_timetable->userModuleQuestions->keyBy('timetable_question_id');
                     @endphp
 
-                    <div class="flex flex-wrap gap-1.5 overflow-hidden">
-                        @foreach ($timetable_questions as $qIndex => $question)
-                            @php
-                                $userAnswer = $userAnswers[$question->id] ?? null;
-                                $status = $userAnswer?->status;
-                                $isCorrect = $status === 'correct';
-                                $hasAnswered = !is_null($status);
-
-                                $bgClass = 'bg-gray-100 text-gray-400';
-                                if ($hasAnswered) {
-                                    $bgClass = $isCorrect ? 'bg-green-500 text-white shadow-sm shadow-green-100' : 'bg-red-500 text-white shadow-sm shadow-red-100';
-                                }
-                            @endphp
-                            <div class="w-8 h-8 md:w-9 md:h-9 rounded-lg {{ $bgClass }} flex flex-col items-center justify-center transition-all hover:scale-110 cursor-default group relative"
-                                title="Soal {{ $qIndex + 1 }}: {{ $hasAnswered ? ($isCorrect ? 'Benar' : 'Salah') : 'Belum Dijawab' }}">
-                                <span class="text-[8px] opacity-70 font-bold leading-none mb-0.5">{{ $qIndex + 1 }}</span>
-                                <span class="text-[11px] font-black leading-none">
-                                    @if(!$hasAnswered) - @elseif($isCorrect) 1 @else 0 @endif
-                                </span>
-
-                                <!-- Tooltip -->
-                                <div
-                                    class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 transition-opacity">
-                                    Soal {{ $qIndex + 1 }}:
-                                    {{ \Illuminate\Support\Str::limit(strip_tags($question->question?->question ?? $question->question ?? ''), 20) }}
-                                </div>
+                    
+                    @if($mcqGroup->isNotEmpty())
+                        <div class="mb-4">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pola Jawaban Pilihan Ganda</span>
+                                <div class="flex-grow border-t border-gray-100 italic"></div>
                             </div>
-                        @endforeach
-                    </div>
+                            <div class="flex flex-wrap gap-1.5 overflow-hidden">
+                                @foreach ($mcqGroup as $item)
+                                    @php
+                                        $userAnswer = $userAnswers[$item->question->id] ?? null;
+                                        $status = $userAnswer?->status;
+                                        $isCorrect = $status === 'correct';
+                                        $hasAnswered = !is_null($status);
+
+                                        $bgClass = 'bg-gray-100 text-gray-400';
+                                        if ($hasAnswered) {
+                                            $bgClass = $isCorrect ? 'bg-green-500 text-white shadow-sm shadow-green-100' : 'bg-red-500 text-white shadow-sm shadow-red-100';
+                                        }
+                                    @endphp
+                                    <div class="w-8 h-8 md:w-9 md:h-9 rounded-lg {{ $bgClass }} flex flex-col items-center justify-center transition-all hover:scale-110 cursor-default group relative"
+                                        title="Soal {{ $item->originalIndex }}">
+                                        <span class="text-[8px] opacity-70 font-bold leading-none mb-0.5">{{ $item->originalIndex }}</span>
+                                        <span class="text-[11px] font-black leading-none">
+                                            @if(!$hasAnswered) - @elseif($isCorrect) 1 @else 0 @endif
+                                        </span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    @if($essayGroup->isNotEmpty())
+                        <div>
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="text-[10px] font-bold text-orange-400 uppercase tracking-widest">Pola Jawaban Essay</span>
+                                <div class="flex-grow border-t border-orange-50 mt-1"></div>
+                            </div>
+                            <div class="flex flex-wrap gap-1.5 overflow-hidden">
+                                @foreach ($essayGroup as $item)
+                                    @php
+                                        $userAnswer = $userAnswers[$item->question->id] ?? null;
+                                        $status = $userAnswer?->status;
+                                        $isGraded = in_array($status, ['correct', 'wrong']);
+                                        $isCorrect = $status === 'correct';
+                                        $isPending = $status === 'check';
+
+                                        $bgClass = 'bg-gray-100 text-gray-400';
+                                        if ($isGraded) {
+                                            $bgClass = $isCorrect ? 'bg-green-500 text-white shadow-sm shadow-green-100' : 'bg-red-500 text-white shadow-sm shadow-red-100';
+                                        } elseif ($isPending) {
+                                            $bgClass = 'bg-orange-100 text-orange-500 border border-orange-200';
+                                        }
+                                    @endphp
+                                    <div class="w-8 h-8 md:w-9 md:h-9 rounded-lg {{ $bgClass }} flex flex-col items-center justify-center transition-all hover:scale-110 cursor-default group relative"
+                                        title="Soal {{ $item->originalIndex }}: Essay">
+                                        <span class="text-[8px] opacity-70 font-bold leading-none mb-0.5">{{ $item->originalIndex }}</span>
+                                        <span class="text-[11px] font-black leading-none">
+                                            @if($isGraded) {{ $isCorrect ? '1' : '0' }} @elseif($isPending) ? @else - @endif
+                                        </span>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <!-- Essay Answers Toggle -->
+                            <div class="mt-8 pt-6 border-t border-gray-100 px-4">
+                                <details class="group/essay">
+                                    <summary class="flex items-center justify-between cursor-pointer list-none text-blue-600 hover:text-blue-700 transition-colors">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fa-solid fa-rectangle-list"></i>
+                                            <span class="text-sm font-bold uppercase tracking-wide">Lihat Jawaban Essay</span>
+                                        </div>
+                                        <span class="transition group-open/essay:rotate-180">
+                                            <i class="fa-solid fa-chevron-down text-sm"></i>
+                                        </span>
+                                    </summary>
+                                    <div class="mt-4 grid grid-cols-1 gap-4 animate-fadeIn pb-4">
+                                        @foreach ($essayGroup as $item)
+                                            @php
+                                                $userAnswer = $userAnswers[$item->question->id] ?? null;
+                                                $status = $userAnswer?->status;
+                                            @endphp
+                                            <div class="p-4 rounded-xl bg-gray-50 border border-gray-100">
+                                                <div class="flex items-center justify-between mb-3">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="w-6 h-6 flex items-center justify-center bg-gray-200 text-gray-700 rounded-full text-[10px] font-black">
+                                                            {{ $item->originalIndex }}
+                                                        </span>
+                                                        <span class="text-xs font-bold text-gray-600">Jawaban Peserta:</span>
+                                                    </div>
+                                                    @if($status === 'correct')
+                                                        <span class="text-[10px] font-black text-green-600 uppercase tracking-widest"><i class="fa-solid fa-check mr-1"></i> Benar</span>
+                                                    @elseif($status === 'wrong')
+                                                        <span class="text-[10px] font-black text-red-600 uppercase tracking-widest"><i class="fa-solid fa-xmark mr-1"></i> Salah</span>
+                                                    @else
+                                                        <span class="text-[10px] font-black text-orange-500 uppercase tracking-widest"><i class="fa-solid fa-clock mr-1"></i> Pending</span>
+                                                    @endif
+                                                </div>
+                                                <div class="text-sm text-gray-700 font-medium italic leading-relaxed whitespace-pre-wrap text-wrap break-words">
+                                                    {{ $userAnswer?->essay_answer ?: '(Tidak ada jawaban)' }}
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </details>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         @empty
@@ -156,7 +234,7 @@
 
 
     <!-- Question Reference Section -->
-    <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6 p-4">
+    <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6 p-4 mt-4">
         <details class="group">
             <summary
                 class="flex justify-between items-center font-medium cursor-pointer list-none text-gray-700 hover:text-blue-600 transition-colors">
@@ -170,23 +248,61 @@
                 </span>
             </summary>
             <div class="text-gray-600 mt-4 text-sm group-open:animate-fadeIn">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    @foreach ($timetable_questions as $index => $question)
-                        <div
-                            class="flex gap-3 p-3 rounded-lg border border-gray-100 bg-gray-50/50 hover:bg-white hover:shadow-sm transition-all">
-                            <div
-                                class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-blue-100 text-blue-700 rounded-full font-bold text-xs">
-                                {{ $index + 1 }}
-                            </div>
-                            <div class="flex-grow">
-                                <div class="mb-1 font-semibold text-xs text-gray-500">Soal {{ $index + 1 }}</div>
-                                <div class="prose prose-sm max-w-none text-gray-800">
-                                    {!! $question->question?->question ?? $question->question ?? '-' !!}
-                                </div>
-                            </div>
+                @php
+                    $mcqRefs = $timetable_questions->filter(fn($q) => $q->type !== 'essay');
+                    $essayRefs = $timetable_questions->filter(fn($q) => $q->type === 'essay');
+                    $allQuestionsKeyed = $timetable_questions->values();
+                @endphp
+
+                @if($mcqRefs->isNotEmpty())
+                    <div class="mb-8">
+                        <div class="flex items-center gap-3 mb-4">
+                            <h5 class="text-sm font-bold text-gray-700">Pilihan Ganda</h5>
+                            <div class="flex-grow border-t border-gray-100"></div>
                         </div>
-                    @endforeach
-                </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            @foreach ($mcqRefs as $question)
+                                @php $originalIdx = $allQuestionsKeyed->search($question) + 1; @endphp
+                                <div class="flex gap-3 p-3 rounded-lg border border-gray-100 bg-gray-50/50 hover:bg-white hover:shadow-sm transition-all">
+                                    <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-blue-100 text-blue-700 rounded-full font-bold text-xs">
+                                        {{ $originalIdx }}
+                                    </div>
+                                    <div class="flex-grow">
+                                        <div class="mb-1 font-semibold text-[10px] text-gray-400 uppercase">Soal {{ $originalIdx }}</div>
+                                        <div class="prose prose-sm max-w-none text-gray-800">
+                                            {!! $question->question?->question ?? $question->question ?? '-' !!}
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                @if($essayRefs->isNotEmpty())
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <h5 class="text-sm font-bold text-orange-600">Essay</h5>
+                            <div class="flex-grow border-t border-orange-100"></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            @foreach ($essayRefs as $question)
+                                @php $originalIdx = $allQuestionsKeyed->search($question) + 1; @endphp
+                                <div class="flex gap-3 p-3 rounded-lg border border-orange-50 bg-orange-50/20 hover:bg-white hover:shadow-sm transition-all">
+                                    <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-orange-100 text-orange-700 rounded-full font-bold text-xs">
+                                        {{ $originalIdx }}
+                                    </div>
+                                    <div class="flex-grow">
+                                        <div class="mb-1 font-semibold text-[10px] text-orange-400 uppercase">Soal {{ $originalIdx }} (ESSAY)</div>
+                                        <div class="prose prose-sm max-w-none text-gray-800">
+                                            {!! $question->question?->question ?? $question->question ?? '-' !!}
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
             </div>
         </details>
     </div>

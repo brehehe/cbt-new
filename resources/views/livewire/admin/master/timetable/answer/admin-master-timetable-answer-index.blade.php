@@ -73,13 +73,13 @@
         <div>
             <label for="terjawab" class="block text-sm font-medium text-gray-700">Terjawab</label>
             <input disabled type="number" id="terjawab"
-                value="{{ $user_timetable->userModuleQuestions->whereNotNull('timetable_answer_id')->count() }}"
+                value="{{ $user_timetable->userModuleQuestions->filter(fn($q) => $q->timetable_answer_id || $q->essay_answer)->count() }}"
                 placeholder="Masukkan" class="mt-1 form-control">
         </div>
         <div>
             <label for="tidak_terjawab" class="block text-sm font-medium text-gray-700">Tidak Terjawab</label>
             <input disabled type="number" id="tidak_terjawab"
-                value="{{ $user_timetable->userModuleQuestions->whereNull('timetable_answer_id')->count() }}"
+                value="{{ $user_timetable->userModuleQuestions->filter(fn($q) => !$q->timetable_answer_id && !$q->essay_answer)->count() }}"
                 placeholder="Masukkan" class="mt-1 form-control">
         </div>
         <div>
@@ -165,24 +165,42 @@
                             <td class="center">{{ $userModuleQuestions->firstItem() + $index }}</td>
 
                             {{-- Pertanyaan --}}
-                            <td>{!! optional($userModuleQuestion->timetableQuestion)->question ?? '-' !!}</td>
+                            <td>
+                                {!! optional($userModuleQuestion->timetableQuestion)->question ?? '-' !!}
+                                @if($userModuleQuestion->timetableQuestion?->type === 'essay')
+                                    <span class="block text-[10px] text-blue-500 font-bold uppercase mt-1">ESSAY</span>
+                                @endif
+                            </td>
 
                             {{-- Jawaban benar --}}
                             <td class="whitespace-nowrap">
-                                {{ $letter($labelCorrect) }}.
-                                {!! optional($correctAnswer)->context ?? '-' !!}
+                                @if($userModuleQuestion->timetableQuestion?->type === 'essay')
+                                    -
+                                @else
+                                    {{ $letter($labelCorrect) }}.
+                                    {!! optional($correctAnswer)->context ?? '-' !!}
+                                @endif
                             </td>
 
                             {{-- Jawaban yang dipilih user --}}
-                            <td class="whitespace-nowrap">
-                                {{ $letter($labelChosen) }}.
-                                {!! optional($chosenAnswer)->context ?? '-' !!}
+                            <td class="whitespace-normal min-w-[150px]">
+                                @if($userModuleQuestion->timetableQuestion?->type === 'essay')
+                                    <div class="italic text-gray-700">
+                                        {!! $userModuleQuestion->essay_answer ?: '<span class="text-gray-400">Tidak ada jawaban</span>' !!}
+                                    </div>
+                                @else
+                                    {{ $letter($labelChosen) }}.
+                                    {!! optional($chosenAnswer)->context ?? '-' !!}
+                                @endif
                             </td>
                             <td class="whitespace-nowrap">
                                 @if ($userModuleQuestion->status === 'correct')
                                     <span class="px-2 py-1 rounded bg-green-100 text-green-700 font-semibold">Benar</span>
                                 @elseif ($userModuleQuestion->status === 'wrong')
                                     <span class="px-2 py-1 rounded bg-red-100 text-red-700 font-semibold">Salah</span>
+                                @elseif ($userModuleQuestion->status === 'check')
+                                    <span class="px-2 py-1 rounded bg-blue-100 text-blue-700 font-semibold">Menunggu
+                                        Koreksi</span>
                                 @else
                                     <span class="px-2 py-1 rounded bg-gray-100 text-gray-700 font-semibold">Tidak
                                         Terjawab</span>

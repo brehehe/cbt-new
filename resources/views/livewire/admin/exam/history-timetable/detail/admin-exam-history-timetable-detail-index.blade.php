@@ -141,6 +141,9 @@
                                 {{ $userModuleQuestions->firstItem() + $index }}</td>
                             <td class="px-6 py-4 text-sm text-gray-900 font-medium whitespace-normal min-w-[200px]">
                                 {!! optional($userModuleQuestion->timetableQuestion)->question ?? '-' !!}
+                                @if($userModuleQuestion->timetableQuestion?->type === 'essay')
+                                    <span class="block text-[10px] text-blue-500 font-bold uppercase mt-1">ESSAY</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-500 whitespace-normal min-w-[150px]">
                                 @if($correctAnswer)
@@ -152,7 +155,11 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-500 whitespace-normal min-w-[150px]">
-                                @if($chosenAnswer)
+                                @if($userModuleQuestion->timetableQuestion?->type === 'essay')
+                                    <div class="prose prose-sm max-w-none text-gray-700 italic">
+                                        {!! $userModuleQuestion->essay_answer ?: '<span class="text-gray-400">Tidak ada jawaban</span>' !!}
+                                    </div>
+                                @elseif($chosenAnswer)
                                     <span
                                         class="font-semibold text-gray-700 inline-block mr-1">{{ $letter($labelChosen) }}.</span>
                                     {!! $chosenAnswer->context ?? '-' !!}
@@ -167,6 +174,10 @@
                                 @elseif ($userModuleQuestion->status === 'wrong')
                                     <span
                                         class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Salah</span>
+                                @elseif ($userModuleQuestion->status === 'check')
+                                    <span
+                                        class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Menunggu
+                                        Koreksi</span>
                                 @else
                                     <span
                                         class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Tidak
@@ -220,6 +231,10 @@
                     $statusColor = 'bg-red-50 border-red-200';
                     $statusText = 'Salah';
                     $statusTextColor = 'text-red-700';
+                } elseif ($userModuleQuestion->status === 'check') {
+                    $statusColor = 'bg-blue-50 border-blue-200';
+                    $statusText = 'Menunggu Koreksi';
+                    $statusTextColor = 'text-blue-700';
                 }
             @endphp
 
@@ -241,8 +256,10 @@
                         <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
                             <span class="block text-xs text-gray-500 uppercase tracking-wider mb-1">Jawaban Anda</span>
                             <div
-                                class="font-medium {{ $userModuleQuestion->status === 'correct' ? 'text-green-600' : ($userModuleQuestion->status === 'wrong' ? 'text-red-600' : 'text-gray-600') }}">
-                                @if($chosenAnswer)
+                                class="font-medium {{ $userModuleQuestion->status === 'correct' ? 'text-green-600' : ($userModuleQuestion->status === 'wrong' ? 'text-red-600' : ($userModuleQuestion->status === 'check' ? 'text-blue-600' : 'text-gray-600')) }}">
+                                @if($userModuleQuestion->timetableQuestion?->type === 'essay')
+                                    {!! $userModuleQuestion->essay_answer ?: '<span class="text-gray-400">Tidak ada jawaban</span>' !!}
+                                @elseif($chosenAnswer)
                                     {{ $letter($labelChosen) }}. {{ $chosenAnswer->context ?? '-' }}
                                 @else
                                     -

@@ -34,7 +34,7 @@ class AdminMasterQuestionIndex extends Component
     public $selectAll = false;
     public $bulkCategoryQuestionId;
 
-    public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id, $question, $description, $latex, $weight_correct, $weight_incorrect, $category_question_id;
+    public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id, $type, $question, $description, $latex, $weight_correct, $weight_incorrect, $category_question_id;
     public $topics = [], $material_categories = [], $materials = [], $question_types = [], $category_questions = [];
     public $images = [], $old_images = [], $new_images = [], $studys = [], $study_id;
     public $filterStudyId, $filterQuestionTypeId, $filterTopicId, $filterDifficulty, $filterCategoryQuestionId;
@@ -52,7 +52,7 @@ class AdminMasterQuestionIndex extends Component
 
     protected function buildQuestionsQuery()
     {
-        $questions = Question::select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect', 'study_id', 'difficulty', 'category_question_id')
+        $questions = Question::select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect', 'study_id', 'difficulty', 'category_question_id', 'type')
             ->search($this->search)
             ->orderBy('created_at', 'desc')
             ->orderBy('order', 'desc')
@@ -169,8 +169,8 @@ class AdminMasterQuestionIndex extends Component
             DB::rollBack();
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterQuestionIndex => applyBulkCategory', $error);
             return AlertHelper::error('Gagal', 'Ada kesalahan saat memperbarui kategori soal.');
@@ -184,7 +184,7 @@ class AdminMasterQuestionIndex extends Component
 
     public function mount()
     {
-        $this->topics         = Topic::select('id', 'name')->get();
+        $this->topics = Topic::select('id', 'name')->get();
         $this->question_types = QuestionType::select('id', 'name')->get();
         $this->category_questions = CategoryQuestion::select('id', 'name')->get();
         // if (Auth::user()?->hasRole('Dosen')) {   
@@ -213,12 +213,12 @@ class AdminMasterQuestionIndex extends Component
     {
         // Append chosen temporary files by storing them permanently 
         $folder = "/public/question/" . \Carbon\Carbon::now()->isoFormat('Y') . '/' . \Carbon\Carbon::now()->isoFormat('MM');
-        
+
         foreach ($this->new_images as $new_image) {
             $upload = $this->uploadFile($new_image, $folder);
             $this->images[] = 'question/' . \Carbon\Carbon::now()->isoFormat('Y') . '/' . \Carbon\Carbon::now()->isoFormat('MM') . '/' . $upload[1];
         }
-        
+
         // Reset the input model so it fires updated hook on the next upload
         $this->new_images = [];
         $this->old_images = $this->images;
@@ -241,6 +241,7 @@ class AdminMasterQuestionIndex extends Component
 
     public function updatedTopicId($value)
     {
+        $value = !$value ? null : $value;
         $this->material_category_id = null;
         $this->material_id = null;
         $this->material_categories = MaterialCategory::select('id', 'topic_id', 'name')
@@ -250,6 +251,7 @@ class AdminMasterQuestionIndex extends Component
 
     public function updatedMaterialCategoryId($value)
     {
+        $value = !$value ? null : $value;
         $this->material_id = null;
         $this->materials = Material::select('id', 'material_category_id', 'name')
             ->where('material_category_id', $value)
@@ -269,7 +271,7 @@ class AdminMasterQuestionIndex extends Component
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['data_id', 'study_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'latex', 'images', 'weight_correct', 'weight_incorrect', 'study_id_import', 'file_import', 'category_question_id']);
+        $this->reset(['data_id', 'study_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'type', 'question', 'description', 'latex', 'images', 'weight_correct', 'weight_incorrect', 'study_id_import', 'file_import', 'category_question_id']);
         $this->dispatch('close-modal', ['id' => 'modal-import-question']);
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
@@ -278,50 +280,54 @@ class AdminMasterQuestionIndex extends Component
     {
         $this->validate(
             [
-                'study_id'             => 'required|exists:studies,id',
-                'topic_id'             => 'required|exists:topics,id',
-                'category_question_id'  => 'required|exists:category_questions,id',
+                'study_id' => 'required|exists:studies,id',
+                'topic_id' => 'required|exists:topics,id',
+                'category_question_id' => 'required|exists:category_questions,id',
                 'material_category_id' => 'nullable|exists:material_categories,id',
-                'material_id'          => 'nullable|exists:materials,id',
-                'question_type_id'     => 'required|exists:question_types,id',
-                'question'             => 'required',
-                'latex'                => 'nullable',
-                'images.*'             => 'nullable|file|mimetypes:image/jpg,image/jpeg,image/png',
-                'description'          => 'nullable',
+                'material_id' => 'nullable|exists:materials,id',
+                'question_type_id' => 'required|exists:question_types,id',
+                'type' => 'required|in:single,multiple,essay',
+                'question' => 'required',
+                'latex' => 'nullable',
+                'images.*' => 'nullable|file|mimetypes:image/jpg,image/jpeg,image/png',
+                'description' => 'nullable',
             ],
             [
-                'topic_id.required'           => 'Topik soal wajib diisi.',
-                'study_id.required'           => 'Prodi wajib diisi.',
+                'topic_id.required' => 'Topik soal wajib diisi.',
+                'study_id.required' => 'Prodi wajib diisi.',
                 'material_category_id.exists' => 'Kategori materi soal tidak valid.',
-                'material_id.exists'          => 'Materi soal tidak valid.',
-                'question_type_id.required'   => 'Tipe Ujian wajib diisi.',
-                'question_type_id.exists'     => 'Tipe Ujian tidak valid.',
-                'question.required'           => 'Pertanyaan wajib diisi.',
-                'images.*.file'               => 'Gambar wajib berupa file.',
-                'images.*.mimes'              => 'Gambar hanya berformat : .jpg, .jpeg, .png.',
-                'category_question_id.exists'  => 'Kategori soal tidak valid.',
+                'material_id.exists' => 'Materi soal tidak valid.',
+                'question_type_id.required' => 'Tipe Ujian wajib diisi.',
+                'question_type_id.exists' => 'Tipe Ujian tidak valid.',
+                'type.required' => 'Jenis soal wajib diisi.',
+                'type.in' => 'Jenis soal tidak valid.',
+                'question.required' => 'Pertanyaan wajib diisi.',
+                'images.*.file' => 'Gambar wajib berupa file.',
+                'images.*.mimes' => 'Gambar hanya berformat : .jpg, .jpeg, .png.',
+                'category_question_id.exists' => 'Kategori soal tidak valid.',
             ]
         );
 
         try {
             DB::beginTransaction();
             $request = [
-                'id'                   => $this->data_id,
-                'user_id'              => Auth::user()?->id,
-                'company_id'           => Auth::user()?->company?->id,
-                'topic_id'             => $this->topic_id,
-                'study_id'             => $this->study_id,
+                'id' => $this->data_id,
+                'user_id' => Auth::user()?->id,
+                'company_id' => Auth::user()?->company?->id,
+                'topic_id' => $this->topic_id,
+                'study_id' => $this->study_id,
                 'material_category_id' => $this->material_category_id,
-                'material_id'          => $this->material_id,
-                'question_type_id'     => $this->question_type_id,
-                'question'             => $this->question,
-                'latex'                => $this->latex,
-                'images'               => $this->images,
-                'old_images'           => $this->old_images,
-                'description'          => $this->description,
-                'weight_correct'       => $this->weight_correct,
-                'weight_incorrect'     => $this->weight_incorrect,
-                'category_question_id'  => $this->category_question_id,
+                'material_id' => $this->material_id,
+                'question_type_id' => $this->question_type_id,
+                'type' => $this->type ?? \App\Models\Master\Question\Question::TYPE_SINGLE,
+                'question' => $this->question,
+                'latex' => $this->latex,
+                'images' => $this->images,
+                'old_images' => $this->old_images,
+                'description' => $this->description,
+                'weight_correct' => $this->weight_correct,
+                'weight_incorrect' => $this->weight_incorrect,
+                'category_question_id' => $this->category_question_id,
             ];
 
             $question = app(QuestionService::class)->updateOrCreate($request);
@@ -334,8 +340,8 @@ class AdminMasterQuestionIndex extends Component
             DB::rollBack();
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterModuleIndex => submit', $error);
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
@@ -360,8 +366,8 @@ class AdminMasterQuestionIndex extends Component
             DB::rollBack();
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterModuleIndex => delete', $error);
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menghapus data');
@@ -381,14 +387,14 @@ class AdminMasterQuestionIndex extends Component
         $this->validate(
             [
                 'study_id_import' => 'nullable|exists:studies,id',
-                'file_import'     => 'required|file|mimes:xls,xlsx|max:10240',   // 10 MB
+                'file_import' => 'required|file|mimes:xls,xlsx|max:10240',   // 10 MB
             ],
             [
                 'study_id_import.required' => 'Prodi wajib diisi.',
-                'study_id_import.exists'   => 'Prodi tidak valid.',
-                'file_import.file'         => 'File import soal wajib berupa file.',
-                'file_import.mimes'        => 'File import soal hanya berformat Excel: .xls atau .xlsx.',
-                'file_import.max'          => 'Ukuran file maksimal 10 MB.',
+                'study_id_import.exists' => 'Prodi tidak valid.',
+                'file_import.file' => 'File import soal wajib berupa file.',
+                'file_import.mimes' => 'File import soal hanya berformat Excel: .xls atau .xlsx.',
+                'file_import.max' => 'Ukuran file maksimal 10 MB.',
             ]
         );
 
@@ -402,8 +408,8 @@ class AdminMasterQuestionIndex extends Component
         } catch (Exception | Throwable $th) {
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterModuleIndex => importQuestion', $error);
             return AlertHelper::error('Gagal', 'Ada kesalahan saat import data soal');

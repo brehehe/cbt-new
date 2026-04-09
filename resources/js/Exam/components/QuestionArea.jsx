@@ -8,23 +8,70 @@ import LatexHTML from './LatexHTML';
 
 const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish }) => {
     const [selectedAnswerId, setSelectedAnswerId] = useState(question.timetable_answer_id);
+    const [essayAnswer, setEssayAnswer] = useState(question.essay_answer || '');
     const [isMarked, setIsMarked] = useState(question.is_mark);
     const [viewedImage, setViewedImage] = useState(null);
 
+    // Refs to track latest state for unmount saving
+    const essayValueRef = React.useRef(essayAnswer);
+    const isMarkedRef = React.useRef(isMarked);
+    const originalEssayValue = question.essay_answer || '';
+
     React.useEffect(() => {
         setSelectedAnswerId(question.timetable_answer_id);
+        setEssayAnswer(question.essay_answer || '');
         setIsMarked(question.is_mark);
     }, [question.id]);
 
     const handleAnswerSelect = (id) => {
         setSelectedAnswerId(id);
-        onSave(id, isMarked);
+        onSave(id, isMarked, essayAnswer);
     };
+
+    const handleEssayChange = (e) => {
+        const val = e.target.value;
+        setEssayAnswer(val);
+        essayValueRef.current = val;
+    };
+
+    // Debounced save for essay + Save on Unmount
+    React.useEffect(() => {
+        if (question.timetable_question.type !== 'essay') return;
+        
+        const timeoutId = setTimeout(() => {
+            if (essayAnswer !== originalEssayValue) {
+                onSave(selectedAnswerId, isMarked, essayAnswer);
+            }
+        }, 1000); // Save after 1 second of no typing
+
+        return () => {
+            clearTimeout(timeoutId);
+            // If the value changed and wasn't saved yet, save it now
+            if (essayValueRef.current !== originalEssayValue) {
+                onSave(selectedAnswerId, isMarkedRef.current, essayValueRef.current);
+            }
+        };
+    }, [question.id, essayAnswer]);
 
     const handleToggleMark = () => {
         const newMark = !isMarked;
         setIsMarked(newMark);
-        onSave(selectedAnswerId, newMark);
+        isMarkedRef.current = newMark;
+        onSave(selectedAnswerId, newMark, essayAnswer);
+    };
+
+    const handleNext = () => {
+        if (question.timetable_question.type === 'essay' && essayAnswer !== originalEssayValue) {
+            onSave(selectedAnswerId, isMarked, essayAnswer);
+        }
+        onNext();
+    };
+
+    const handlePrev = () => {
+        if (question.timetable_question.type === 'essay' && essayAnswer !== originalEssayValue) {
+            onSave(selectedAnswerId, isMarked, essayAnswer);
+        }
+        onPrev();
     };
 
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -124,83 +171,100 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
                             </div>
                         )}
 
-                        {/* Answers List */}
-                        <div className="grid grid-cols-1 gap-4 pb-20">
-                            {question.timetable_question.answers.map((answer, i) => (
-                                <label
-                                    key={answer.id}
-                                    className={`group relative flex items-start gap-5 p-6 rounded-3xl border-2 cursor-pointer transition-all duration-300 ${selectedAnswerId === answer.id
-                                        ? 'border-orange-600 bg-orange-50/30'
-                                        : 'border-gray-100 bg-white hover:border-orange-300 hover:shadow-xl hover:-translate-y-1'
-                                        }`}
-                                >
-                                    <input
-                                        type="radio"
-                                        name="answer"
-                                        className="hidden"
-                                        checked={selectedAnswerId === answer.id}
-                                        onChange={() => handleAnswerSelect(answer.id)}
+                        {/* Answers / Essay Input */}
+                        <div className="pb-20">
+                            {question.timetable_question.type === 'essay' ? (
+                                <div className="space-y-4">
+                                    <label className="block text-lg font-bold text-gray-700">Jawaban Anda:</label>
+                                    <textarea
+                                        value={essayAnswer}
+                                        onChange={handleEssayChange}
+                                        placeholder="Ketik jawaban Anda di sini..."
+                                        className="w-full h-64 p-6 rounded-3xl border-2 border-gray-100 focus:border-orange-600 focus:ring-4 focus:ring-orange-100 transition-all text-lg font-medium resize-none shadow-sm"
                                     />
+                                    <p className="text-sm text-gray-400 italic">
+                                        Jawaban Anda akan disimpan secara otomatis saat Anda mengetik.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 gap-4">
+                                    {question.timetable_question.answers.map((answer, i) => (
+                                        <label
+                                            key={answer.id}
+                                            className={`group relative flex items-start gap-5 p-6 rounded-3xl border-2 cursor-pointer transition-all duration-300 ${selectedAnswerId === answer.id
+                                                ? 'border-orange-600 bg-orange-50/30'
+                                                : 'border-gray-100 bg-white hover:border-orange-300 hover:shadow-xl hover:-translate-y-1'
+                                                }`}
+                                        >
+                                            <input
+                                                type="radio"
+                                                name="answer"
+                                                className="hidden"
+                                                checked={selectedAnswerId === answer.id}
+                                                onChange={() => handleAnswerSelect(answer.id)}
+                                            />
 
-                                    {/* Alphabet Circle */}
-                                    <div className={`flex-none w-10 h-10 rounded-2xl flex items-center justify-center font-black text-lg transition-all duration-300 shadow-sm border-2 ${selectedAnswerId === answer.id
-                                        ? 'bg-orange-600 border-orange-600 text-white rotate-12 scale-110 shadow-orange-200'
-                                        : 'bg-white border-gray-200 text-gray-400 group-hover:border-orange-400 group-hover:text-orange-500'
-                                        }`}>
-                                        {alphabet[i]}
-                                    </div>
+                                            {/* Alphabet Circle */}
+                                            <div className={`flex-none w-10 h-10 rounded-2xl flex items-center justify-center font-black text-lg transition-all duration-300 shadow-sm border-2 ${selectedAnswerId === answer.id
+                                                ? 'bg-orange-600 border-orange-600 text-white rotate-12 scale-110 shadow-orange-200'
+                                                : 'bg-white border-gray-200 text-gray-400 group-hover:border-orange-400 group-hover:text-orange-500'
+                                                }`}>
+                                                {alphabet[i]}
+                                            </div>
 
-                                    {/* Answer Content */}
-                                    <div className="flex-1 space-y-4 pt-1.5">
-                                        <LatexHTML
-                                            className="text-gray-800 text-lg font-bold leading-relaxed"
-                                            html={answer.context}
-                                        />
+                                            {/* Answer Content */}
+                                            <div className="flex-1 space-y-4 pt-1.5">
+                                                <LatexHTML
+                                                    className="text-gray-800 text-lg font-bold leading-relaxed"
+                                                    html={answer.context}
+                                                />
 
-                                        {/* Answer Images */}
-                                        {answer.images && JSON.parse(answer.images || '[]').length > 0 && (
-                                            <div className="flex flex-col gap-6 w-full">
-                                                {JSON.parse(answer.images).map((img, j) => (
+                                                {/* Answer Images */}
+                                                {answer.images && JSON.parse(answer.images || '[]').length > 0 && (
+                                                    <div className="flex flex-col gap-6 w-full">
+                                                        {JSON.parse(answer.images).map((img, j) => (
+                                                            <div
+                                                                key={j}
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    e.stopPropagation();
+                                                                    setViewedImage(`/storage/${img}`);
+                                                                }}
+                                                                className="p-1.5 rounded-2xl border border-gray-100 bg-gray-50 hover:bg-white transition-all cursor-zoom-in hover:shadow-xl w-full xl:w-3/4"
+                                                            >
+                                                                <img src={`/storage/${img}`} className="rounded-lg max-h-48 w-auto object-contain" alt="Option visual" />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+
+                                                {/* Answer Latex */}
+                                                {answer.latex_preview_png && (
                                                     <div
-                                                        key={j}
                                                         onClick={(e) => {
                                                             e.preventDefault();
                                                             e.stopPropagation();
-                                                            setViewedImage(`/storage/${img}`);
+                                                            setViewedImage(`/storage/${answer.latex_preview_png}`);
                                                         }}
-                                                        className="p-1.5 rounded-2xl border border-gray-100 bg-gray-50 hover:bg-white transition-all cursor-zoom-in hover:shadow-xl w-full xl:w-3/4"
+                                                        className="group inline-block p-4 bg-gray-50 rounded-xl border border-gray-100 hover:border-orange-300 hover:bg-white transition-all cursor-zoom-in relative"
                                                     >
-                                                        <img src={`/storage/${img}`} className="rounded-lg max-h-48 w-auto object-contain" alt="Option visual" />
+                                                        <img src={`/storage/${answer.latex_preview_png}`} className="max-h-24 object-contain mix-blend-multiply" alt="Option equation" />
+                                                        <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <ZoomIn className="w-4 h-4 text-orange-500" />
+                                                        </div>
                                                     </div>
-                                                ))}
+                                                )}
                                             </div>
-                                        )}
 
-                                        {/* Answer Latex */}
-                                        {answer.latex_preview_png && (
-                                            <div
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    setViewedImage(`/storage/${answer.latex_preview_png}`);
-                                                }}
-                                                className="group inline-block p-4 bg-gray-50 rounded-xl border border-gray-100 hover:border-orange-300 hover:bg-white transition-all cursor-zoom-in relative"
-                                            >
-                                                <img src={`/storage/${answer.latex_preview_png}`} className="max-h-24 object-contain mix-blend-multiply" alt="Option equation" />
-                                                <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <ZoomIn className="w-4 h-4 text-orange-500" />
-                                                </div>
+                                            {/* Checkmark Indicator */}
+                                            <div className={`flex-none w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${selectedAnswerId === answer.id ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
+                                                }`}>
+                                                <CheckCircle className="w-8 h-8 fill-orange-600 text-white" />
                                             </div>
-                                        )}
-                                    </div>
-
-                                    {/* Checkmark Indicator */}
-                                    <div className={`flex-none w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${selectedAnswerId === answer.id ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
-                                        }`}>
-                                        <CheckCircle className="w-8 h-8 fill-orange-600 text-white" />
-                                    </div>
-                                </label>
-                            ))}
+                                        </label>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -238,7 +302,7 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
 
                     <div className="max-w-full mx-auto flex items-center justify-between">
                         <button
-                            onClick={onPrev}
+                            onClick={handlePrev}
                             disabled={index === 0}
                             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${index === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 bg-gray-100 hover:bg-gray-200'
                                 }`}
@@ -259,7 +323,7 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
                             </button>
                         ) : (
                             <button
-                                onClick={onNext}
+                                onClick={handleNext}
                                 className="flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-white transition-all bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-200"
                             >
                                 Selanjutnya <ChevronRight className="w-5 h-5" />

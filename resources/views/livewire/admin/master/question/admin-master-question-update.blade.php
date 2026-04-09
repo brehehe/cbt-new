@@ -30,7 +30,7 @@
     <div class="space-y-6">
         <div class="p-4 bg-white shadow rounded-lg">
             <h2 class="text-lg font-semibold text-gray-800 mb-3">Detail Soal</h2>
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-2 mb-4">
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-1 mb-4">
                 <div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -146,6 +146,19 @@
                                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                             @enderror
                         </div>
+                        <div class="md:col-span-2">
+                            <label for="type" class="block text-sm font-medium text-gray-700">Jenis Soal
+                                <span class="text-red-600">*</span></label>
+                            <select class="mt-1 form-control" wire:model.live='type'>
+                                <option value="">Pilih Jenis Soal</option>
+                                <option value="single">Single Choice (Pilihan Ganda)</option>
+                                <!-- <option value="multiple">Multiple Choice (Pilihan Ganda Kompleks)</option> -->
+                                <option value="essay">Essay (Uraian)</option>
+                            </select>
+                            @error('type')
+                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
                         <div class="md:col-span-2" wire:ignore>
                             <label for="question" class="block text-sm font-medium text-gray-700">Pertanyaan<span
                                     class="text-red-600">*</span></label>
@@ -220,86 +233,88 @@
             </div>
         </div>
         {{-- card --}}
-        <div class="p-4 bg-white shadow rounded-lg">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
-                <div class="flex items-center">
-                </div>
-                <div class="flex items-center w-full sm:w-auto gap-2">
-                    <div class="relative w-full sm:w-64">
-                        <input type="text" class="mt-1 form-control-search" placeholder="Cari Sesuatu..."
-                            wire:model.live='search'>
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <i class="fas fa-search h-3 w-3 text-gray-400"></i>
-                        </div>
+        @if ($type != 'essay')
+            <div class="p-4 bg-white shadow rounded-lg">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+                    <div class="flex items-center">
                     </div>
-                    <button wire:click="openModal()" class="mt-1 px-3 py-2 btn btn-warning">
-                        Tambah
-                    </button>
+                    <div class="flex items-center w-full sm:w-auto gap-2">
+                        <div class="relative w-full sm:w-64">
+                            <input type="text" class="mt-1 form-control-search" placeholder="Cari Sesuatu..."
+                                wire:model.live='search'>
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <i class="fas fa-search h-3 w-3 text-gray-400"></i>
+                            </div>
+                        </div>
+                        <button wire:click="openModal()" class="mt-1 px-3 py-2 btn btn-warning">
+                            Tambah
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="w-2 center">Alpabet</th>
+                                <th class="w-2">Gambar</th>
+                                <th>Konteks Jawaban</th>
+                                <th class="w-2">Jawaban</th>
+                                <th class="w-2 center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($answers as $index => $result)
+                                <tr>
+                                    <td class="center">{{ $result?->alphabet ?? chr(64 + $loop->iteration) }} </td>
+                                    <td>
+                                        <button class="bg-primary text-white px-2 py-1 rounded"
+                                            wire:click="modalAnswerImage('{{ $result?->id }}', '{{ $result?->alphabet ?? chr(64 + $loop->iteration) }}')">Gambar</button>
+                                    </td>
+                                    <td>{{ $result?->context }}</td>
+                                    <td>
+                                        <div class="flex items-center mt-2" wire:key="{{ rand() }}">
+                                            <label class="relative inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" wire:click="toggleAnswerCorrect('{{ $result->id }}')"
+                                                    class="sr-only peer" {{ $result->is_correct ? 'checked' : '' }}>
+                                                <div
+                                                    class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td class="center">
+                                        <div class="flex items-center">
+                                            <button
+                                                class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn"
+                                                wire:click="edit('{{ $result->id }}')">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                            </button>
+                                            <button
+                                                class="btn btn-icon text-red-600 hover:text-red-800 transition-colors delete-btn"
+                                                wire:click="confirmDelete('{{ $result->id }}')">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="10" class="no-data">Tidak ada data</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <div class="table-container">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th class="w-2 center">Alpabet</th>
-                            <th class="w-2">Gambar</th>
-                            <th>Konteks Jawaban</th>
-                            <th class="w-2">Jawaban</th>
-                            <th class="w-2 center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($answers as $index => $result)
-                            <tr>
-                                <td class="center">{{ $result?->alphabet ?? chr(64 + $loop->iteration) }} </td>
-                                <td>
-                                    <button class="bg-primary text-white px-2 py-1 rounded"
-                                        wire:click="modalAnswerImage('{{ $result?->id }}', '{{ $result?->alphabet ?? chr(64 + $loop->iteration) }}')">Gambar</button>
-                                </td>
-                                <td>{{ $result?->context }}</td>
-                                <td>
-                                    <div class="flex items-center mt-2" wire:key="{{ rand() }}">
-                                        <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" wire:click="toggleAnswerCorrect('{{ $result->id }}')"
-                                                class="sr-only peer" {{ $result->is_correct ? 'checked' : '' }}>
-                                            <div
-                                                class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
-                                            </div>
-                                        </label>
-                                    </div>
-                                </td>
-                                <td class="center">
-                                    <div class="flex items-center">
-                                        <button
-                                            class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn"
-                                            wire:click="edit('{{ $result->id }}')">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                            </svg>
-                                        </button>
-                                        <button
-                                            class="btn btn-icon text-red-600 hover:text-red-800 transition-colors delete-btn"
-                                            wire:click="confirmDelete('{{ $result->id }}')">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="10" class="no-data">Tidak ada data</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        @endif
     </div>
 </div>
 @push('scripts')

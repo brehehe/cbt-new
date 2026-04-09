@@ -32,7 +32,7 @@ class AdminMasterQuestionUpdate extends Component
     public $isEditingAnswer = false;
 
     public $get_question;
-    public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id, $question, $description, $latex, $weight_correct, $weight_incorrect,$category_question_id;
+    public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id, $type, $question, $description, $latex, $weight_correct, $weight_incorrect,$category_question_id;
     public $topics = [], $material_categories = [], $materials = [], $question_types = [], $category_questions = [];
     public $images = [], $old_images = [], $new_images = [];
 
@@ -57,6 +57,7 @@ class AdminMasterQuestionUpdate extends Component
         $this->material_category_id = $this->get_question?->material_category_id;
         $this->material_id          = $this->get_question?->material_id;
         $this->question_type_id     = $this->get_question?->question_type_id;
+        $this->type                 = $this->get_question?->type ?? \App\Models\Master\Question\Question::TYPE_SINGLE;
         $this->question             = $this->get_question?->question;
         $this->description          = $this->get_question?->description;
         $this->latex                = $this->get_question?->latex;
@@ -207,6 +208,7 @@ class AdminMasterQuestionUpdate extends Component
                 'material_category_id' => 'nullable|exists:material_categories,id',
                 'material_id'          => 'nullable|exists:materials,id',
                 'question_type_id'     => 'required|exists:question_types,id',
+                'type'                 => 'required|in:single,multiple,essay',
                 'question'             => 'required',
                 'study_id'             => 'required|exists:studies,id',
                 // 'images.*'             => 'nullable|image|mimes:jpg,jpeg,png',
@@ -221,6 +223,8 @@ class AdminMasterQuestionUpdate extends Component
                 'material_id.exists'          => 'Materi soal tidak valid.',
                 'question_type_id.required'   => 'Tipe Ujian wajib diisi.',
                 'question_type_id.exists'     => 'Tipe Ujian tidak valid.',
+                'type.required'               => 'Jenis soal wajib diisi.',
+                'type.in'                     => 'Jenis soal tidak valid.',
                 'question.required'           => 'Pertanyaan wajib diisi.',
                 'images.*.image'              => 'Gambar wajib berupa gambar.',
                 'images.*.mimes'              => 'Gambar hanya berformat : .jpg, .jpeg, .png.',
@@ -246,6 +250,7 @@ class AdminMasterQuestionUpdate extends Component
                 'material_category_id' => $this->material_category_id,
                 'material_id'          => $this->material_id,
                 'question_type_id'     => $this->question_type_id,
+                'type'                 => $this->type ?? \App\Models\Master\Question\Question::TYPE_SINGLE,
                 'question'             => $this->question,
                 'images'               => $this->images,
                 'study_id'             => $this->study_id,
@@ -402,7 +407,20 @@ class AdminMasterQuestionUpdate extends Component
     public function toggleAnswerCorrect($id)
     {
         $answer = Answer::withoutGlobalScope('user_scope')->findOrFail($id);
-        $answer->is_correct = true;
+        
+        if ($this->type == \App\Models\Master\Question\Question::TYPE_SINGLE) {
+            // Unset all other answers for this question
+            Answer::withoutGlobalScope('user_scope')
+                ->where('question_id', $this->data_id)
+                ->where('id', '!=', $id)
+                ->update(['is_correct' => false]);
+            
+            $answer->is_correct = true;
+        } else {
+            // Toggle for multiple choice
+            $answer->is_correct = !$answer->is_correct;
+        }
+
         $answer->save();
     }
 

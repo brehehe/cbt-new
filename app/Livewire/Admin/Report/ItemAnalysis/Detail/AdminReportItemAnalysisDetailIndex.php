@@ -61,6 +61,7 @@ class AdminReportItemAnalysisDetailIndex extends Component
                 $query->where('timetable_id', $this->timetableId)
                     ->where('status', 'done');
             })
+            ->whereIn('status', ['correct', 'wrong'])
             ->with(['userTimetable.user', 'timetableAnswer'])
             ->get();
 
@@ -158,20 +159,38 @@ class AdminReportItemAnalysisDetailIndex extends Component
             ->count();
 
         // Discrimination Index = (Upper Correct / Upper Total) - (Lower Correct / Lower Total)
-        $discriminationIndex = ($upperCorrect / $groupSize) - ($lowerCorrect / $groupSize);
+        // Note: For this to be accurate, we need to compare against graded attempts in those groups
+        
+        $upperGradedCount = UserModuleQuestion::where('timetable_question_id', $question->id)
+            ->whereIn('user_timetable_id', $upperGroupIds)
+            ->whereIn('status', ['correct', 'wrong'])
+            ->count();
+            
+        $lowerGradedCount = UserModuleQuestion::where('timetable_question_id', $question->id)
+            ->whereIn('user_timetable_id', $lowerGroupIds)
+            ->whereIn('status', ['correct', 'wrong'])
+            ->count();
+
+        $discriminationIndex = 0;
+        if ($upperGradedCount > 0 && $lowerGradedCount > 0) {
+            $discriminationIndex = ($upperCorrect / $upperGradedCount) - ($lowerCorrect / $lowerGradedCount);
+        }
 
         return [
             'discrimination_index' => round($discriminationIndex, 3),
             'discrimination_level' => $this->getDiscriminationLevel($discriminationIndex),
             'upper_group_correct' => $upperCorrect,
             'lower_group_correct' => $lowerCorrect,
-            'upper_group_total' => $groupSize,
-            'lower_group_total' => $groupSize
+            'upper_group_total' => $upperGradedCount,
+            'lower_group_total' => $lowerGradedCount
         ];
     }
 
     public function analyzeAnswerOptions($question, $userResponses)
     {
+        if ($question->type === 'essay') {
+            return [];
+        }
         $options = $question->answers;
         $optionAnalysis = [];
 

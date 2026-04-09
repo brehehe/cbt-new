@@ -199,8 +199,13 @@
                                 {{ $items->firstItem() + $index }}
                             </td>
                             <td class="px-6 py-4">
-                                <div class="text-sm text-gray-900 line-clamp-2" title="{{ strip_tags($item->question_text ?? '') }}">
-                                    {!! \Str::limit(strip_tags($item->question_text ?? ''), 140) !!}
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase {{ $item->question_type === 'essay' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700' }}">
+                                        {{ $item->question_type === 'essay' ? 'Essay' : 'PG' }}
+                                    </span>
+                                    <div class="text-sm text-gray-900 line-clamp-1" title="{{ strip_tags($item->question_text ?? '') }}">
+                                        {!! \Str::limit(strip_tags($item->question_text ?? ''), 100) !!}
+                                    </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900 font-medium">

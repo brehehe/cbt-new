@@ -47,7 +47,10 @@
                 @endphp
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td class="left">{!! \Str::limit(strip_tags($analysis['question']->question ?? ''), 80) !!}</td>
+                    <td class="left">
+                        [{{ $analysis['question']->type === 'essay' ? 'Essay' : 'PG' }}] 
+                        {!! \Str::limit(strip_tags($analysis['question']->question ?? ''), 80) !!}
+                    </td>
                     <td>{{ $analysis['total_participants'] }}</td>
                     <td>{{ $analysis['correct_answers'] }}</td>
                     <td>{{ $analysis['difficulty_index'] }}</td>

@@ -16,7 +16,8 @@
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="icon icon-tabler icons-tabler-outline icon-tabler-file-import h-4 w-4"">
-                                        <path stroke=" none" d="M0 0h24v24H0z" fill="none" />
+                                                                        <path stroke=" none" d="M0 0h24v24H0z"
+                            fill="none" />
                         <path d="M14 3v4a1 1 0 0 0 1 1h4" />
                         <path d="M5 13v-8a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-5.5m-9.5 -2h7m-3 -3l3 3l-3 3" />
                         </svg>
@@ -156,7 +157,7 @@
                             Kategori Soal
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Pertanyaan</th>
+                            Jenis</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Difficulty</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi
@@ -192,29 +193,25 @@
                                     {{ $result?->categoryQuestion?->name ?? '-' }}
                                 </div>
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-900 max-w-xs relative">
-                                @if ($isRestricted)
-                                    <div class="absolute inset-0 flex items-center justify-center z-10 px-2 text-center">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <div class="{{ $isRestricted ? 'blur-[3px] select-none' : '' }}">
+                                    @if (($result->type ?? 'single') == 'single')
                                         <span
-                                            class="text-[10px] font-bold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded shadow-sm">
-                                            HUBUNGI ADMIN JIKA INGIN MELIHAT SOAL
+                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            Single
                                         </span>
-                                    </div>
-                                    <div class="blur-[5px] select-none">
-                                        {!! Str::limit($result?->question, 50) !!}
-                                    </div>
-                                @else
-                                    <div x-data="{ expanded: false }">
-                                        <span x-show="!expanded"
-                                            class="block truncate">{{ Str::limit($result?->question, 50) }}</span>
-                                        <span x-show="expanded" class="block">{{ $result?->question }}</span>
-                                        <button type="button" class="mt-1 text-xs text-blue-600 hover:text-blue-800"
-                                            @click="expanded = !expanded">
-                                            <span x-show="!expanded">Show</span>
-                                            <span x-show="expanded">Hide</span>
-                                        </button>
-                                    </div>
-                                @endif
+                                    @elseif($result->type == 'multiple')
+                                        <span
+                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+                                            Multiple
+                                        </span>
+                                    @else
+                                        <span
+                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            Essay
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 <div class="{{ $isRestricted ? 'blur-[3px] select-none' : '' }}">

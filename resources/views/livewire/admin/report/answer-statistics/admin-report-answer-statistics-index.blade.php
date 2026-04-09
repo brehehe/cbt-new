@@ -59,8 +59,11 @@
                                     </span>
                                 </div>
                                 <div class="flex-grow">
-                                    <div class="text-sm font-medium text-gray-900 mb-2">
-                                        {!! \Str::limit($stat['question_text'], 200) !!}
+                                    <div class="text-sm font-medium text-gray-900 mb-2 flex items-start gap-2">
+                                        <span class="mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider {{ $stat['question_type'] === 'essay' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700' }}">
+                                            {{ $stat['question_type'] === 'essay' ? 'Essay' : 'PG' }}
+                                        </span>
+                                        <div>{!! \Str::limit(strip_tags($stat['question_text']), 200) !!}</div>
                                     </div>
 
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
@@ -80,27 +83,43 @@
                                                     <span class="text-gray-500 text-xs text-red-600">Salah</span>
                                                     <span class="font-bold text-red-700">{{ $stat['total_wrong'] }}</span>
                                                 </div>
+                                                @if($stat['question_type'] === 'essay')
+                                                <div class="flex flex-col border-l pl-4 border-gray-100 italic">
+                                                    <span class="text-gray-500 text-xs text-orange-500">Pending</span>
+                                                    <span class="font-bold text-orange-600">{{ $stat['total_pending'] }}</span>
+                                                </div>
+                                                @endif
                                             </div>
                                         </div>
 
                                         <div>
-                                            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Sebaran
-                                                Jawaban</h4>
+                                            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                                                {{ $stat['question_type'] === 'essay' ? 'Status Penilaian' : 'Sebaran Jawaban' }}
+                                            </h4>
                                             <div class="space-y-1">
-                                                @foreach($stat['distribution'] as $optIndex => $opt)
+                                                @forelse($stat['distribution'] as $optIndex => $opt)
                                                     <div class="flex items-center text-xs mb-1">
                                                         <span
-                                                            class="w-6 font-medium {{ $opt['is_correct'] ? 'text-green-600' : 'text-gray-500' }}">
-                                                            {{ chr(65 + $optIndex) }}
-                                                            @if($opt['is_correct']) <i class="fas fa-check ml-1"></i> @endif
+                                                            class="w-8 font-black {{ $opt['is_correct'] ? 'text-green-600' : (($opt['is_pending'] ?? false) ? 'text-orange-500' : 'text-gray-500') }}">
+                                                            @if($stat['question_type'] === 'essay')
+                                                                <i class="fa-solid {{ $opt['is_correct'] ? 'fa-circle-check' : (($opt['is_pending'] ?? false) ? 'fa-circle-question' : 'fa-circle-xmark') }}"></i>
+                                                            @else
+                                                                {{ chr(65 + $optIndex) }}
+                                                                @if($opt['is_correct']) <i class="fas fa-check ml-1 text-[8px]"></i> @endif
+                                                            @endif
                                                         </span>
                                                         <div class="flex-grow mx-2">
-                                                            <div class="mb-1 text-gray-700">
+                                                            <div class="mb-1 text-gray-700 {{ $stat['question_type'] === 'essay' ? 'font-bold' : '' }}">
                                                                 {!! $opt['option_text'] !!}
                                                             </div>
                                                             <div class="flex items-center">
                                                                 <div class="flex-grow h-2 bg-gray-100 rounded-full overflow-hidden">
-                                                                    <div class="h-full {{ $opt['is_correct'] ? 'bg-green-500' : 'bg-blue-400' }}"
+                                                                    @php
+                                                                        $barColor = $opt['is_correct'] ? 'bg-green-500' : 'bg-blue-400';
+                                                                        if ($opt['is_pending'] ?? false) $barColor = 'bg-orange-400';
+                                                                        elseif ($stat['question_type'] === 'essay' && !$opt['is_correct']) $barColor = 'bg-red-400';
+                                                                    @endphp
+                                                                    <div class="h-full {{ $barColor }}"
                                                                         style="width: {{ $opt['percentage'] }}%"></div>
                                                                 </div>
                                                                 <span class="ml-2 w-12 text-right text-gray-600">
@@ -112,7 +131,11 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                @endforeach
+                                                @empty
+                                                    <div class="flex items-center text-xs mb-1">
+                                                        Tidak ada
+                                                    </div>
+                                                @endforelse
                                             </div>
                                         </div>
                                     </div>

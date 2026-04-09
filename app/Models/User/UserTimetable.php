@@ -62,6 +62,19 @@ class UserTimetable extends Model
         });
     }
 
+    public function recalculateMark()
+    {
+        $questions = $this->userModuleQuestions()->get();
+        $total = $questions->count();
+        $correct = $questions->where('status', 'correct')->count();
+
+        $mark = $total > 0 ? round(($correct / $total) * 100, 2) : 0;
+
+        $this->update(['mark' => $mark]);
+        
+        return $mark;
+    }
+
     public function scopeSearch($query, $search)
     {
         return $query->where(function ($q) use ($search) {

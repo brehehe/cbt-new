@@ -213,6 +213,13 @@
                                                         </li>
                                                     @endif
                                                     <li>
+                                                        <button wire:click="correctIndex('{{ $timetable->id }}')"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                            <i class="fa-solid fa-check mr-2 text-green-600"></i>
+                                                            Koreksi
+                                                        </button>
+                                                    </li>
+                                                    <li>
                                                         <button wire:click="confirmAlert('{{ $timetable->id }}')"
                                                             class="w-full text-left px-4 py-2 hover:bg-gray-100">
                                                             <i

@@ -98,6 +98,7 @@ class QuestionService
                     'weight_incorrect'     => $request['weight_incorrect'] ?? null,
                     'description'          => $request['description'] ?? null,
                     'category_question_id'  => $request['category_question_id'] ?? null,
+                    'type'                 => $request['type'] ?? \App\Models\Master\Question\Question::TYPE_SINGLE,
                 ]
             );
 

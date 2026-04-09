@@ -360,11 +360,16 @@
                             data-discrimination="{{ $analysis['discrimination_level'] }}"
                             data-question="{{ strtolower(strip_tags($analysis['question']->question ?? '')) }}">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $loop->iteration }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-600 max-w-xs">
-                                <div class="truncate" title="{{ strip_tags($analysis['question']->question ?? '') }}">
-                                    {!! \Str::limit(strip_tags($analysis['question']->question ?? ''), 60) !!}
-                                </div>
-                            </td>
+                             <td class="px-4 py-3 text-sm text-gray-600 max-w-xs">
+                                 <div class="flex items-center gap-2 mb-1">
+                                     <span class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase {{ $analysis['question']->type === 'essay' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700' }}">
+                                         {{ $analysis['question']->type === 'essay' ? 'Essay' : 'PG' }}
+                                     </span>
+                                     <div class="truncate" title="{{ strip_tags($analysis['question']->question ?? '') }}">
+                                         {!! \Str::limit(strip_tags($analysis['question']->question ?? ''), 60) !!}
+                                     </div>
+                                 </div>
+                             </td>
                             <td class="px-4 py-3 text-sm text-center text-gray-900">
                                 {{ $analysis['total_participants'] }}
                             </td>
@@ -409,7 +414,10 @@
                             <h3 class="text-lg font-semibold text-gray-800">
                                 Soal {{ $loop->iteration }}
                             </h3>
-                            <p class="text-sm text-gray-600 mt-1">
+                             <p class="text-sm text-gray-600 mt-1 flex items-center gap-2">
+                                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase {{ $analysis['question']->type === 'essay' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700' }}">
+                                    {{ $analysis['question']->type === 'essay' ? 'Essay' : 'PG' }}
+                                </span>
                                 {!! \Str::limit(strip_tags($analysis['question']->question ?? ''), 100) !!}
                             </p>
                         </div>
@@ -542,8 +550,8 @@
                         </div>
                     @endif
 
-                    {{-- Analisis Opsi Jawaban --}}
-                    @if (!empty($analysis['option_analysis']))
+                     {{-- Analisis Opsi Jawaban (Hanya untuk PG) --}}
+                    @if ($analysis['question']->type !== 'essay' && !empty($analysis['option_analysis']))
                         <div class="mt-6 pt-6 border-t border-gray-200">
                             <h4 class="font-semibold text-gray-800 mb-3">Analisis Opsi Jawaban</h4>
                             <div class="overflow-x-auto">

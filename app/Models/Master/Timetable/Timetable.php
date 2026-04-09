@@ -49,8 +49,8 @@ class Timetable extends Model
 
     protected $casts = [
         'supervisors' => 'array',
-        'start_time'  => 'datetime',
-        'end_time'    => 'datetime',
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
         'require_seb' => 'boolean',
         'is_recording' => 'boolean',
         'is_streaming' => 'boolean',
@@ -122,7 +122,7 @@ class Timetable extends Model
                         })
                         ->with([
                             'question' => function ($q) {
-                                $q->withoutGlobalScope('user_scope')->select('id', 'study_id', 'user_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'category_question_id', 'difficulty', 'order', 'question', 'images', 'description', 'latex', 'latex_preview_pdf', 'latex_preview_png', 'weight_correct', 'weight_incorrect');
+                                $q->withoutGlobalScope('user_scope')->select('id', 'study_id', 'user_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'category_question_id', 'difficulty', 'order', 'question', 'images', 'description', 'latex', 'latex_preview_pdf', 'latex_preview_png', 'weight_correct', 'weight_incorrect', 'type');
                             },
                             'question.answers' => function ($q) {
                                 $q->withoutGlobalScope('user_scope')->select('id', 'question_id', 'alphabet', 'context', 'images', 'latex', 'latex_preview_pdf', 'latex_preview_png', 'is_correct', 'order');
@@ -177,6 +177,7 @@ class Timetable extends Model
                                     'weight_incorrect' => $question->weight_incorrect,
                                     'created_at' => $now,
                                     'updated_at' => $now,
+                                    'type' => $question->type,
                                 ];
 
                                 // Process answers
@@ -222,7 +223,26 @@ class Timetable extends Model
                                     $questionUpserts,
                                     ['timetable_module_id', 'question_id'],
                                     [
-                                        'company_id', 'study_id', 'user_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'category_question_id', 'difficulty', 'order', 'question', 'images', 'description', 'latex', 'latex_preview_pdf', 'latex_preview_png', 'weight_correct', 'weight_incorrect', 'updated_at',
+                                        'company_id',
+                                        'study_id',
+                                        'user_id',
+                                        'topic_id',
+                                        'material_category_id',
+                                        'material_id',
+                                        'question_type_id',
+                                        'category_question_id',
+                                        'difficulty',
+                                        'order',
+                                        'question',
+                                        'images',
+                                        'description',
+                                        'latex',
+                                        'latex_preview_pdf',
+                                        'latex_preview_png',
+                                        'weight_correct',
+                                        'weight_incorrect',
+                                        'updated_at',
+                                        'type',
                                     ]
                                 );
 

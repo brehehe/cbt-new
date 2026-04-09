@@ -47,9 +47,9 @@ class ExamApiController extends Controller
         $remainingTime = max(0, $endTime->timestamp - now()->timestamp);
 
         // 2. Fetch Questions & Navigation
-        $questions = UserModuleQuestion::select('id', 'is_mark', 'timetable_answer_id', 'timetable_question_id', 'order')
+        $questions = UserModuleQuestion::select('id', 'is_mark', 'timetable_answer_id', 'essay_answer', 'timetable_question_id', 'order')
             ->with([
-                'timetableQuestion:id,question,description,latex,latex_preview_png,images',
+                'timetableQuestion:id,type,question,description,latex,latex_preview_png,images',
                 'timetableQuestion.answers:id,timetable_question_id,context,images,latex,latex_preview_png,order'
             ])
             ->where('user_timetable_id', $userTimetableId)
@@ -60,7 +60,7 @@ class ExamApiController extends Controller
             return [
                 'id' => $q->id,
                 'isMarked' => (bool)$q->is_mark,
-                'isAnswered' => !is_null($q->timetable_answer_id),
+                'isAnswered' => !is_null($q->timetable_answer_id) || !empty($q->essay_answer),
                 'order' => $q->order
             ];
         });
@@ -98,6 +98,7 @@ class ExamApiController extends Controller
         $validated = $request->validate([
             'question_navigation_id' => 'required|exists:user_module_questions,id',
             'timetable_answer_id' => 'nullable',
+            'essay_answer' => 'nullable|string',
             'is_mark' => 'boolean',
         ]);
 
@@ -111,6 +112,7 @@ class ExamApiController extends Controller
 
         $userModuleQuestion->update([
             'timetable_answer_id' => $validated['timetable_answer_id'],
+            'essay_answer' => $validated['essay_answer'],
             'is_mark' => $validated['is_mark'] ?? $userModuleQuestion->is_mark,
         ]);
 
@@ -407,13 +409,24 @@ class ExamApiController extends Controller
 
         // Calculate score
         $questions = UserModuleQuestion::where('user_timetable_id', $userTimetableId)
-            ->with(['timetableAnswer'])
+            ->with(['timetableAnswer', 'timetableQuestion'])
             ->get();
         
         $total = $questions->count();
         $correct = 0;
 
         foreach ($questions as $q) {
+            $type = $q->timetableQuestion->type ?? 'single';
+
+            if ($type === 'essay') {
+                if ($q->essay_answer) {
+                    $q->update(['status' => 'check']);
+                } else {
+                    $q->update(['status' => 'unanswered']);
+                }
+                continue;
+            }
+
             if ($q->timetable_answer_id) {
                 if ($q->timetableAnswer && $q->timetableAnswer->is_correct) {
                     $q->update(['status' => 'correct']);

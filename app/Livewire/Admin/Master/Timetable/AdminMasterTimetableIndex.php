@@ -59,9 +59,9 @@ class AdminMasterTimetableIndex extends Component
             ->pluck('name', 'id')
             ->toArray();
         $this->getSupervisors = User::companyRole('Pengawas', Auth::user()->company_id)->select('name', 'id')->get()->pluck('name', 'id')->toArray();
-        $this->classmates     = Classmate::where('company_id', Auth::user()->company_id)->pluck('name', 'id')->toArray();
-        $this->examRooms      = ExamRoom::where('company_id', Auth::user()->company_id)->get();
-        $this->examSessions   = ExamSession::where('company_id', Auth::user()->company_id)->get();
+        $this->classmates = Classmate::where('company_id', Auth::user()->company_id)->pluck('name', 'id')->toArray();
+        $this->examRooms = ExamRoom::where('company_id', Auth::user()->company_id)->get();
+        $this->examSessions = ExamSession::where('company_id', Auth::user()->company_id)->get();
     }
 
     public function openModal()
@@ -107,19 +107,19 @@ class AdminMasterTimetableIndex extends Component
     {
         $data = Timetable::find($id);
 
-        $this->data_id         = $data->id;
-        $this->name            = $data->name;
-        $this->module_id       = $data->module_id;
-        $this->exam_room_id    = $data->exam_room_id;
+        $this->data_id = $data->id;
+        $this->name = $data->name;
+        $this->module_id = $data->module_id;
+        $this->exam_room_id = $data->exam_room_id;
         $this->exam_session_id = $data->exam_session_id;
-        $this->classmate_id    = $data->classmate_id;
-        $this->supervisors     = json_decode($data->supervisors, true) ?? [];
-        $this->start_time      = Carbon::parse($data->start_time)->format('Y-m-d\TH:i');
-        $this->end_time        = Carbon::parse($data->end_time)->format('Y-m-d\TH:i');
-        $this->description     = $data->description;
-        $this->require_seb     = $data->require_seb ?? false;
-        $this->is_recording    = $data->is_recording ?? false;
-        $this->is_streaming    = $data->is_streaming ?? false;
+        $this->classmate_id = $data->classmate_id;
+        $this->supervisors = json_decode($data->supervisors, true) ?? [];
+        $this->start_time = Carbon::parse($data->start_time)->format('Y-m-d\TH:i');
+        $this->end_time = Carbon::parse($data->end_time)->format('Y-m-d\TH:i');
+        $this->description = $data->description;
+        $this->require_seb = $data->require_seb ?? false;
+        $this->is_recording = $data->is_recording ?? false;
+        $this->is_streaming = $data->is_streaming ?? false;
 
         // Pastikan hasil decode adalah array
         $rawStudys = $data->studys;
@@ -177,6 +177,11 @@ class AdminMasterTimetableIndex extends Component
         return AlertHelper::confirmDelete('delete', 'Anda yakin ingin menghapus data ini?', $id);
     }
 
+    public function correctIndex($id)
+    {
+        return redirect()->route('admin.master.timetable.correct', $id);
+    }
+
     public function delete($id)
     {
         try {
@@ -223,13 +228,13 @@ class AdminMasterTimetableIndex extends Component
     public function submit()
     {
         $this->validate([
-            'name'            => 'required',
-            'module_id'       => 'required',
-            'supervisors'     => 'required',
-            'start_time'      => 'required|date',
-            'end_time'        => 'required|date|after:start_time',
-            'classmate_id'    => 'required',
-            'exam_room_id'    => 'required',
+            'name' => 'required',
+            'module_id' => 'required',
+            'supervisors' => 'required',
+            'start_time' => 'required|date',
+            'end_time' => 'required|date|after:start_time',
+            'classmate_id' => 'required',
+            'exam_room_id' => 'required',
             'exam_session_id' => 'required',
         ], [
             'classmate_id.required' => 'Peserta wajib diisi',
@@ -251,20 +256,20 @@ class AdminMasterTimetableIndex extends Component
             Timetable::updateOrCreate([
                 'id' => $this->data_id,
             ], [
-                'company_id'      => Auth::user()->company_id,
-                'classmate_id'    => $this->classmate_id,
-                'name'            => $this->name,
-                'module_id'       => $this->module_id,
-                'exam_room_id'    => $this->exam_room_id,
+                'company_id' => Auth::user()->company_id,
+                'classmate_id' => $this->classmate_id,
+                'name' => $this->name,
+                'module_id' => $this->module_id,
+                'exam_room_id' => $this->exam_room_id,
                 'exam_session_id' => $this->exam_session_id,
-                'supervisors'     => json_encode($this->supervisors),
-                'start_time'      => $this->start_time,
-                'end_time'        => $this->end_time,
-                'description'     => $this->description,
-                'studys'          => $this->studys ? json_encode(array_keys($this->studys)) : null,
-                'require_seb'     => $this->require_seb ?? false,
-                'is_recording'    => $this->is_recording ?? false,
-                'is_streaming'    => $this->is_streaming ?? false,
+                'supervisors' => json_encode($this->supervisors),
+                'start_time' => $this->start_time,
+                'end_time' => $this->end_time,
+                'description' => $this->description,
+                'studys' => $this->studys ? json_encode(array_keys($this->studys)) : null,
+                'require_seb' => $this->require_seb ?? false,
+                'is_recording' => $this->is_recording ?? false,
+                'is_streaming' => $this->is_streaming ?? false,
             ]);
 
             DB::commit();
@@ -421,14 +426,16 @@ class AdminMasterTimetableIndex extends Component
             ]);
         }
     }
-    
+
     public function printCard($id)
     {
         try {
-            $timetable = Timetable::with(['classmate' => function ($q) {
-                $q->with(['classmateStudents.user.userDetail']);
-            }])->findOrFail($id);
-            
+            $timetable = Timetable::with([
+                'classmate' => function ($q) {
+                    $q->with(['classmateStudents.user.userDetail']);
+                }
+            ])->findOrFail($id);
+
             $company = Auth::user()->company()->with('companyDetail')->first();
 
             $pdf = Pdf::loadView('livewire.admin.master.timetable.admin-master-timetable-card-pdf', [
@@ -437,7 +444,7 @@ class AdminMasterTimetableIndex extends Component
             ])->setPaper('a4', 'portrait');
 
             return response()->streamDownload(
-                fn () => print($pdf->output()),
+                fn() => print ($pdf->output()),
                 'kartu-peserta-' . \Str::slug($timetable->name) . '.pdf'
             );
 

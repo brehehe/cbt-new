@@ -30,74 +30,156 @@
 
     @php
         $count_question = $timetable_questions->count();
-        $chunkSize = 35; // Number of questions per table section
-        $chunks = $timetable_questions->chunk($chunkSize);
+        $mcqQuestions = $timetable_questions->filter(fn($q) => $q->type !== 'essay');
+        $essayQuestions = $timetable_questions->filter(fn($q) => $q->type === 'essay');
+        
+        $chunkSize = 25; 
     @endphp
 
-    @php
-        $count_question = $timetable_questions->count();
-        $chunkSize = 25; // Smaller chunks for PDF readability
-        $chunks = $timetable_questions->chunk($chunkSize);
-    @endphp
-
-    @foreach ($chunks as $chunkIndex => $questionChunk)
-        <div style="margin-bottom: 25px; page-break-inside: avoid;">
-            <div style="background-color: #f9fafb; padding: 10px; border-radius: 8px; border-left: 4px solid #3b82f6; margin-bottom: 15px;">
-                <h3 style="font-size: 14px; margin: 0; color: #1e40af;">
-                    BAGIAN {{ $chunkIndex + 1 }}: Soal {{ ($chunkIndex * $chunkSize) + 1 }} - {{ min(($chunkIndex + 1) * $chunkSize, $count_question) }}
-                </h3>
-            </div>
-            
-            <table style="width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 10px;">
-                <thead>
-                    <tr>
-                        <th style="width: 30px;">No</th>
-                        <th class="text-left" style="width: 150px;">Nama Mahasiswa</th>
-                        @foreach ($questionChunk as $index => $q)
-                            <th style="font-size: 8px;">{{ ($chunkIndex * $chunkSize) + $loop->iteration }}</th>
-                        @endforeach
-                    </tr>
-                    <tr>
-                        <th colspan="2" style="background-color: #f3f4f6; font-size: 8px; text-align: right;">Kunci:</th>
-                        @foreach ($questionChunk as $q)
-                            <th style="font-size: 8px; background-color: #f3f4f6; font-weight: bold;">{{ $answerMap[$q->id] ?? '-' }}</th>
-                        @endforeach
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($user_timetables as $uIndex => $user_timetable)
-                        <tr>
-                            <td style="font-size: 8px;">{{ $uIndex + 1 }}</td>
-                            <td class="text-left" style="font-size: 8px; font-weight: bold; overflow: hidden;">
-                                {{ \Illuminate\Support\Str::limit($user_timetable->user?->name ?? '-', 25) }}
-                            </td>
-                            @foreach ($questionChunk as $question)
-                                @php
-                                    $status = $userQuestionStatuses[$user_timetable->id][$question->id] ?? null;
-                                    $isCorrect = $status === 'correct';
-                                    $hasAnswered = !is_null($status);
-                                    
-                                    $class = '';
-                                    $content = '-';
-                                    
-                                    if ($hasAnswered) {
-                                        if ($isCorrect) {
-                                            $class = 'badge-ok';
-                                            $content = '1';
-                                        } else {
-                                            $class = 'badge-no';
-                                            $content = '0';
-                                        }
-                                    }
-                                @endphp
-                                <td class="{{ $class }}" style="font-size: 8px;">{{ $content }}</td>
+    @if($mcqQuestions->isNotEmpty())
+        <div style="margin-bottom: 20px;">
+            <h2 style="font-size: 16px; color: #374151; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">A. Pilihan Ganda</h2>
+            @foreach ($mcqQuestions->chunk($chunkSize) as $chunkIndex => $questionChunk)
+                <div style="margin-bottom: 15px; page-break-inside: avoid;">
+                    <table style="width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 5px;">
+                        <thead>
+                            <tr>
+                                <th style="width: 30px;">No</th>
+                                <th class="text-left" style="width: 150px;">Nama Mahasiswa</th>
+                                @foreach ($questionChunk as $q)
+                                    <th style="font-size: 8px;">{{ $timetable_questions->search($q) + 1 }}</th>
+                                @endforeach
+                            </tr>
+                            <tr>
+                                <th colspan="2" style="background-color: #f3f4f6; font-size: 8px; text-align: right;">Kunci:</th>
+                                @foreach ($questionChunk as $q)
+                                    <th style="font-size: 8px; background-color: #f3f4f6; font-weight: bold;">{{ $answerMap[$q->id] ?? '-' }}</th>
+                                @endforeach
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($user_timetables as $uIndex => $user_timetable)
+                                <tr>
+                                    <td style="font-size: 8px;">{{ $uIndex + 1 }}</td>
+                                    <td class="text-left" style="font-size: 8px; font-weight: bold; overflow: hidden;">
+                                        {{ \Illuminate\Support\Str::limit($user_timetable->user?->name ?? '-', 25) }}
+                                    </td>
+                                    @foreach ($questionChunk as $question)
+                                        @php
+                                            $status = $userQuestionStatuses[$user_timetable->id][$question->id] ?? null;
+                                            $content = '-';
+                                            $style = '';
+                                            
+                                            if ($status === 'correct') {
+                                                $style = 'background-color: #d1fae5; color: #065f46;';
+                                                $content = '1';
+                                            } elseif ($status === 'wrong') {
+                                                $style = 'background-color: #fee2e2; color: #991b1b;';
+                                                $content = '0';
+                                            }
+                                        @endphp
+                                        <td style="font-size: 8px; {{ $style }}">{{ $content }}</td>
+                                    @endforeach
+                                </tr>
                             @endforeach
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                        </tbody>
+                    </table>
+                </div>
+            @endforeach
         </div>
-    @endforeach
+    @endif
+
+    @if($essayQuestions->isNotEmpty())
+        <div style="margin-bottom: 20px; page-break-before: auto;">
+            <h2 style="font-size: 16px; color: #374151; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">B. Essay</h2>
+            @foreach ($essayQuestions->chunk($chunkSize) as $chunkIndex => $questionChunk)
+                <div style="margin-bottom: 15px; page-break-inside: avoid;">
+                    <table style="width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 5px;">
+                        <thead>
+                            <tr>
+                                <th style="width: 30px;">No</th>
+                                <th class="text-left" style="width: 150px;">Nama Mahasiswa</th>
+                                @foreach ($questionChunk as $q)
+                                    <th style="font-size: 8px;">{{ $timetable_questions->search($q) + 1 }}</th>
+                                @endforeach
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($user_timetables as $uIndex => $user_timetable)
+                                <tr>
+                                    <td style="font-size: 8px;">{{ $uIndex + 1 }}</td>
+                                    <td class="text-left" style="font-size: 8px; font-weight: bold; overflow: hidden;">
+                                        {{ \Illuminate\Support\Str::limit($user_timetable->user?->name ?? '-', 25) }}
+                                    </td>
+                                    @foreach ($questionChunk as $question)
+                                        @php
+                                            $status = $userQuestionStatuses[$user_timetable->id][$question->id] ?? null;
+                                            $content = '-';
+                                            $style = '';
+                                            
+                                            if ($status === 'correct') {
+                                                $style = 'background-color: #d1fae5; color: #065f46; font-weight: bold;';
+                                                $content = '1';
+                                            } elseif ($status === 'wrong') {
+                                                $style = 'background-color: #fee2e2; color: #991b1b; font-weight: bold;';
+                                                $content = '0';
+                                            } elseif ($status === 'check') {
+                                                $style = 'background-color: #ffedd5; color: #9a3412; font-weight: bold;';
+                                                $content = '?';
+                                            }
+                                        @endphp
+                                        <td style="font-size: 8px; {{ $style }}">{{ $content }}</td>
+                                    @endforeach
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endforeach
+        </div>
+    @endif
+
+    <div class="page-break"></div>
+
+    <div style="margin-top: 20px;">
+        <h2 style="font-size: 16px; color: #374151; border-bottom: 2px solid #e5e7eb; padding-bottom: 5px; margin-bottom: 15px;">Detail Jawaban Essay</h2>
+        @foreach ($user_timetables as $uIndex => $user_timetable)
+            @php
+                $userEssayAnswers = $user_timetable->userModuleQuestions->whereIn('timetable_question_id', $essayQuestions->pluck('id'));
+            @endphp
+            @if($userEssayAnswers->isNotEmpty())
+                <div style="margin-bottom: 20px; page-break-inside: avoid; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+                    <div style="background-color: #f3f4f6; padding: 8px 12px; font-weight: bold; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: justify-between;">
+                        <span>{{ $uIndex + 1 }}. {{ $user_timetable->user?->name ?? '-' }}</span>
+                        <span style="color: #6b7280; font-size: 8px; float: right;">Nilai: {{ $user_timetable->mark ?? '0' }}</span>
+                    </div>
+                    <div style="padding: 10px;">
+                        @foreach ($essayQuestions as $question)
+                            @php
+                                $ans = $userEssayAnswers->where('timetable_question_id', $question->id)->first();
+                                $status = $ans?->status;
+                            @endphp
+                            <div style="margin-bottom: 10px; border-bottom: 1px dashed #f3f4f6; padding-bottom: 5px;">
+                                <div style="font-size: 9px; margin-bottom: 4px;">
+                                    <span style="font-weight: bold; background: #e5e7eb; padding: 1px 4px; border-radius: 4px;">Soal {{ $timetable_questions->search($question) + 1 }}</span>
+                                    @if($status === 'correct')
+                                        <span style="color: #059669; font-weight: bold; margin-left: 10px;">[BENAR]</span>
+                                    @elseif($status === 'wrong')
+                                        <span style="color: #dc2626; font-weight: bold; margin-left: 10px;">[SALAH]</span>
+                                    @else
+                                        <span style="color: #d97706; font-weight: bold; margin-left: 10px;">[PENDING]</span>
+                                    @endif
+                                </div>
+                                <div style="font-size: 9px; color: #4b5563; font-style: italic; padding-left: 10px;">
+                                    "{{ $ans?->essay_answer ?: '(Belum dijawab)' }}"
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+        @endforeach
+    </div>
 
     <div style="margin-top: 20px; page-break-inside: avoid;">
         <h3 style="font-size: 14px; border-bottom: 2px solid #e5e7eb; padding-bottom: 5px;">Ringkasan Nilai Akhir</h3>
@@ -106,7 +188,7 @@
                 <tr>
                     <th style="width: 30px;">No</th>
                     <th class="text-left">Nama Mahasiswa</th>
-                    <th style="width: 50px;">JB</th>
+                    <th style="width: 50px;">Benar (PG)</th>
                     <th style="width: 50px;">Nilai</th>
                 </tr>
             </thead>
@@ -134,13 +216,15 @@
         <thead>
             <tr>
                 <th style="width: 40px;">No</th>
-                <th>Isi Soal</th>
+                <th>Jenis</th>
+                <th class="text-left">Isi Soal</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($timetable_questions as $index => $question)
                 <tr>
                     <td style="font-weight: bold;">{{ $index + 1 }}</td>
+                    <td><span style="font-size: 8px; text-transform: uppercase; font-weight: bold; color: #6b7280;">{{ $question->type }}</span></td>
                     <td class="text-left" style="padding: 8px;">
                         <div>{!! $question->question?->question ?? $question->question ?? '-' !!}</div>
                     </td>

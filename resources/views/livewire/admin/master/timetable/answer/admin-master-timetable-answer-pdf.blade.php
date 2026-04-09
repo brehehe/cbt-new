@@ -57,6 +57,10 @@
         .badge-neutral {
             background: #f3f4f6;
         }
+
+        .badge-check {
+            background: #dbeafe;
+        }
     </style>
 </head>
 
@@ -88,12 +92,29 @@
                 @endphp
                 <tr>
                     <td class="center">{{ $index + 1 }}</td>
-                    <td>{!! optional($userModuleQuestion->timetableQuestion)->question ?? '-' !!}</td>
-                    <td>{!! $letter($labelCorrect) !!}. {!! optional($correctAnswer)->context ?? '-' !!}</td>
-                    <td>{!! $letter($labelChosen) !!}. {!! optional($chosenAnswer)->context ?? '-' !!}</td>
+                    <td>
+                        {!! optional($userModuleQuestion->timetableQuestion)->question ?? '-' !!}
+                        @if($userModuleQuestion->timetableQuestion?->type === 'essay')
+                            <div style="font-size: 8px; color: #2563eb; font-weight: bold; margin-top: 2px;">ESSAY</div>
+                        @endif
+                    </td>
+                    <td>
+                        @if($userModuleQuestion->timetableQuestion?->type === 'essay')
+                            -
+                        @else
+                            {!! $letter($labelCorrect) !!}. {!! optional($correctAnswer)->context ?? '-' !!}
+                        @endif
+                    </td>
+                    <td>
+                        @if($userModuleQuestion->timetableQuestion?->type === 'essay')
+                            <div style="font-style: italic;">{!! $userModuleQuestion->essay_answer ?: 'Tidak ada jawaban' !!}</div>
+                        @else
+                            {!! $letter($labelChosen) !!}. {!! optional($chosenAnswer)->context ?? '-' !!}
+                        @endif
+                    </td>
                     <td
-                        class="center {{ $userModuleQuestion->status === 'correct' ? 'badge-ok' : ($userModuleQuestion->status === 'wrong' ? 'badge-no' : 'badge-neutral') }}">
-                        {{ $userModuleQuestion->status === 'correct' ? 'Benar' : ($userModuleQuestion->status === 'wrong' ? 'Salah' : 'Tidak Terjawab') }}
+                        class="center {{ $userModuleQuestion->status === 'correct' ? 'badge-ok' : ($userModuleQuestion->status === 'wrong' ? 'badge-no' : ($userModuleQuestion->status === 'check' ? 'badge-check' : 'badge-neutral')) }}">
+                        {{ $userModuleQuestion->status === 'correct' ? 'Benar' : ($userModuleQuestion->status === 'wrong' ? 'Salah' : ($userModuleQuestion->status === 'check' ? 'Menunggu Koreksi' : 'Tidak Terjawab')) }}
                     </td>
                 </tr>
             @empty

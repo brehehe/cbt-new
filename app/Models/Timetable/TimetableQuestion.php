@@ -18,6 +18,10 @@ class TimetableQuestion extends Model
     use SoftDeletes, HasUuids;
     protected $guarded = ['id'];
 
+    const TYPE_SINGLE = 'single';
+    const TYPE_MULTIPLE = 'multiple';
+    const TYPE_ESSAY = 'essay';
+
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id', 'id');
