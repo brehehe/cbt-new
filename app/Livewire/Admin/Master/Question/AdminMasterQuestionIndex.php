@@ -23,10 +23,12 @@ use Livewire\WithFileUploads;
 use Maatwebsite\Excel\Facades\Excel;
 use Throwable;
 use App\Traits\UploadFile;
+use Spatie\LivewireFilepond\WithFilePond;
+
 
 class AdminMasterQuestionIndex extends Component
 {
-    use WithPagination, WithFileUploads, UploadFile;
+    use WithPagination, WithFilePond, UploadFile;
     protected $paginationTheme = 'bootstrap';
     public $perPage = 5, $search;
 
