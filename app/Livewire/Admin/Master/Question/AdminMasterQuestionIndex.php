@@ -40,7 +40,7 @@ class AdminMasterQuestionIndex extends Component
     public $topics = [], $material_categories = [], $materials = [], $question_types = [], $category_questions = [];
     public $images = [], $old_images = [], $new_images = [], $studys = [], $study_id;
     public $filterStudyId, $filterQuestionTypeId, $filterTopicId, $filterDifficulty, $filterCategoryQuestionId;
-    public $study_id_import, $file_import;
+    public $study_id_import, $file_import, $import_type = 'pg';
     public $isLimited = false;
 
     public function render()
@@ -273,7 +273,7 @@ class AdminMasterQuestionIndex extends Component
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['data_id', 'study_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'type', 'question', 'description', 'latex', 'images', 'weight_correct', 'weight_incorrect', 'study_id_import', 'file_import', 'category_question_id']);
+        $this->reset(['data_id', 'study_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'type', 'question', 'description', 'latex', 'images', 'weight_correct', 'weight_incorrect', 'study_id_import', 'file_import', 'category_question_id', 'import_type']);
         $this->dispatch('close-modal', ['id' => 'modal-import-question']);
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
@@ -403,7 +403,7 @@ class AdminMasterQuestionIndex extends Component
         try {
             // dd($this->study_id_import, $this->file_import);
             Excel::import(
-                new QuestionImport((string) $this->study_id_import),
+                new QuestionImport((string) $this->study_id_import, $this->import_type),
                 $this->file_import // <- TemporaryUploadedFile OK
             );
 

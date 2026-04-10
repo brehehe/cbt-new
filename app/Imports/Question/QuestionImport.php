@@ -15,40 +15,55 @@ class QuestionImport implements ToCollection
     * @param Collection $collection
     */
     public function __construct(
-        protected string $study_id,        // contoh param
+        protected string $study_id,
+        protected string $import_type = 'pg', 
     ) {}
 
     public function collection(Collection $collections)
     {
-        //
         try {
-            //head column
-            $header = [
-                'Prodi',
-                'Topik Soal',
-                'Kategori Materi',
-                'Materi Soal',
-                'Tipe Soal',
-                'Kategori Soal',
-                'Soal',
-                'Deskripsi Soal',
-                'A',
-                'B',
-                'C',
-                'D',
-                'E',
-                'Jawaban',
-            ];
+            // head column
+            if ($this->import_type == 'pg') {
+                $header = [
+                    'Prodi',
+                    'Topik Soal',
+                    'Kategori Materi',
+                    'Materi Soal',
+                    'Tipe Soal',
+                    'Kategori Soal',
+                    'Soal',
+                    'Deskripsi Soal',
+                    'A',
+                    'B',
+                    'C',
+                    'D',
+                    'E',
+                    'Jawaban',
+                ];
+            } else {
+                // Format Essay
+                $header = [
+                    'Prodi',
+                    'Topik Soal',
+                    'Kategori Materi',
+                    'Materi Soal',
+                    'Tipe Soal',
+                    'Kategori Soal',
+                    'Soal',
+                    'Deskripsi Soal',
+                    'Jawaban Referensi',
+                ];
+            }
 
             for ($i = 0; $i < count($header); $i++) {
-                if ($collections[0][$i] != $header[$i]) {
-                    throw new Exception("Header " . $header[$i] . " Tidak di temukan");
+                if (trim($collections[0][$i]) != $header[$i]) {
+                    throw new Exception("Header " . $header[$i] . " Tidak di temukan. Harap periksa kembali template anda.");
                 }
             }
 
             $user = Auth::user();
 
-            QuestionImportJob::dispatch($this->study_id, $user, $collections);
+            QuestionImportJob::dispatch($this->study_id, $user, $collections, $this->import_type);
         } catch (Exception | \Throwable $th) {
             $error = [
                 'message' => $th->getMessage(),

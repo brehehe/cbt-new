@@ -1,0 +1,2 @@
+Prodi,Topik Soal,Kategori Materi,Materi Soal,Tipe Soal,Kategori Soal,Soal,Deskripsi Soal,Jawaban Referensi
+Teknik Informatika,Pemrograman Laravel,Controller,Routing & Controller,Essay,Ujian Tengah Semester,"Jelaskan perbedaan antara model dan controller dalam arsitektur MVC Laravel!","Pastikan jawaban menyertakan contoh implementasi.","Model menangani logika data dan interaksi database, sedangkan Controller menangani logika aplikasi dan menjembatani antara Model dan View."

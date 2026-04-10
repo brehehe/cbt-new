@@ -24,14 +24,15 @@ class QuestionImportJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public $study_id, $user, $collections;
+    public $study_id, $user, $collections, $import_type;
 
-    public function __construct($study_id, $user, $collections)
+    public function __construct($study_id, $user, $collections, $import_type = 'pg')
     {
         //
         $this->study_id    = $study_id;
         $this->user        = $user;
         $this->collections = $collections;
+        $this->import_type = $import_type;
     }
 
     /**
@@ -42,6 +43,8 @@ class QuestionImportJob implements ShouldQueue
         //
         try {
             foreach ($this->collections as $key => $row) {
+                if ($key == 0) continue; // Skip header row
+
                 $value = $this->normalizeRow($row);
                 if ($value === null) {
                     Log::warning('Data soal tidak bisa diproses, format baris tidak valid', [
@@ -49,16 +52,24 @@ class QuestionImportJob implements ShouldQueue
                     ]);
                     continue;
                 }
-                if ($key == 0) {
-                    continue;
-                }
 
-                $studyName = $this->valueAt($value, 0);
-                $topicName = $this->valueAt($value, 1);
-                $typeName = $this->valueAt($value, 4);
-                $questionText = $this->valueAt($value, 5);
-                $description = $this->valueAt($value, 6);
-                $categoryName = $this->valueAt($value, 13);
+                if ($this->import_type == 'pg') {
+                    $studyName = $this->valueAt($value, 0);
+                    $topicName = $this->valueAt($value, 1);
+                    $typeName = $this->valueAt($value, 4);
+                    $questionText = $this->valueAt($value, 5);
+                    $description = $this->valueAt($value, 6);
+                    $categoryName = $this->valueAt($value, 13);
+                } else {
+                    // Format Essay
+                    $studyName = $this->valueAt($value, 0);
+                    $topicName = $this->valueAt($value, 1);
+                    $typeName = $this->valueAt($value, 4);
+                    $categoryName = $this->valueAt($value, 5);
+                    $questionText = $this->valueAt($value, 6);
+                    $description = $this->valueAt($value, 7);
+                    $referenceAnswer = $this->valueAt($value, 8);
+                }
 
                 if (!$studyName || !$topicName || !$typeName || !$questionText) {
                     Log::warning("Data soal tidak bisa masuk, ada field yang kosong", [
@@ -76,12 +87,14 @@ class QuestionImportJob implements ShouldQueue
                     continue;
                 }
 
-                for ($j = 7; $j < 11; $j++) {
-                    if (!$this->valueAt($value, $j)) {
-                        Log::warning("Data soal tidak bisa masuk, karena jawaban kosong ", [
-                            'collection' => $value,
-                        ]);
-                        continue 2;
+                if ($this->import_type == 'pg') {
+                    for ($j = 7; $j < 11; $j++) {
+                        if (!$this->valueAt($value, $j)) {
+                            Log::warning("Data soal tidak bisa masuk, karena jawaban kosong ", [
+                                'collection' => $value,
+                            ]);
+                            continue 2;
+                        }
                     }
                 }
 
@@ -154,6 +167,7 @@ class QuestionImportJob implements ShouldQueue
                     'description'          => $description,
                     'weight_correct'       => null,
                     'weight_incorrect'     => null,
+                    'type'                 => ($this->import_type == 'essay') ? \App\Models\Master\Question\Question::TYPE_ESSAY : \App\Models\Master\Question\Question::TYPE_SINGLE,
                 ];
 
                 $question = app(QuestionService::class)->updateOrCreate($request_question);
@@ -161,22 +175,38 @@ class QuestionImportJob implements ShouldQueue
                     throw new Exception("Ada kesalahaan saat QuestionImportJob => QuestionService => updateOrCreate", 500);
                 }
 
-                $correctKey = $this->valueAt($value, 12);
-                for ($i = 7; $i <= 11; $i++) {
-                    $answerText = $this->valueAt($value, $i);
-                    if (!$answerText) continue;
-                    $request_answer = [
-                        'company_id' => $this->user?->company?->id,
-                        'alphabet'   => null,
-                        'context'    => $answerText,
-                        'images'     => null,
-                        'old_images' => null,
-                        'is_correct' => $i == $this->letterToValue($correctKey) ? true : false,
-                    ];
+                if ($this->import_type == 'pg') {
+                    $correctKey = $this->valueAt($value, 12);
+                    for ($i = 7; $i <= 11; $i++) {
+                        $answerText = $this->valueAt($value, $i);
+                        if (!$answerText) continue;
+                        $request_answer = [
+                            'company_id' => $this->user?->company?->id,
+                            'alphabet'   => null,
+                            'context'    => $answerText,
+                            'images'     => null,
+                            'old_images' => null,
+                            'is_correct' => $i == $this->letterToValue($correctKey) ? true : false,
+                        ];
 
-                    $answer = app(AnswerService::class)->updateOrCreate($question, $request_answer);
-                    if (!$answer) {
-                        throw new Exception("Ada kesalahaan saat QuestionImportJob => AnswerService => updateOrCreate", 500);
+                        $answer = app(AnswerService::class)->updateOrCreate($question, $request_answer);
+                        if (!$answer) {
+                            throw new Exception("Ada kesalahaan saat QuestionImportJob => AnswerService => updateOrCreate", 500);
+                        }
+                    }
+                } else {
+                    // Create one reference answer for essay if provided
+                    if (!empty($referenceAnswer)) {
+                        $request_answer = [
+                            'company_id' => $this->user?->company?->id,
+                            'alphabet'   => null,
+                            'context'    => $referenceAnswer,
+                            'images'     => null,
+                            'old_images' => null,
+                            'is_correct' => true,
+                        ];
+
+                        app(AnswerService::class)->updateOrCreate($question, $request_answer);
                     }
                 }
 

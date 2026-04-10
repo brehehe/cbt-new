@@ -34,11 +34,40 @@
                 @enderror
             </div> --}}
             <div class="mb-4">
-                <div class="flex justify-between">
-                    <label for="file_import" class="block text-sm font-medium text-gray-700">File</label>
-                    <a href="{{ asset('import/Template soal CBT.xlsx') }}" download="Template Import Soal.xlsx"
-                        class="block text-sm font-medium text-gray-500">Download Template</a>
-                    {{-- <label for="file_import" class="block text-sm font-medium text-gray-700">File</label> --}}
+                <label class="block text-sm font-medium text-gray-700 mb-2">Tipe Import Soal</label>
+                <div class="flex gap-4">
+                    <label class="inline-flex items-center">
+                        <input type="radio" wire:model.live="import_type" value="pg" class="form-radio text-primary">
+                        <span class="ml-2 text-sm text-gray-700">Pilihan Ganda</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="radio" wire:model.live="import_type" value="essay" class="form-radio text-primary">
+                        <span class="ml-2 text-sm text-gray-700">Essay</span>
+                    </label>
+                </div>
+            </div>
+            <div class="mb-4">
+                <div class="flex justify-between items-center mb-2">
+                    <label for="file_import" class="block text-sm font-medium text-gray-700">File Excel</label>
+                    @if ($import_type == 'pg')
+                        <a href="{{ asset('import/Template soal CBT.xlsx') }}" download="Template Import Soal PG.xlsx"
+                            class="text-xs font-medium text-primary hover:underline flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Download Template PG
+                        </a>
+                    @else
+                        <a href="{{ asset('import/Template soal CBT Essay.xlsx') }}" download="Template Import Soal Essay.xlsx"
+                            class="text-xs font-medium text-primary hover:underline flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Download Template Essay
+                        </a>
+                    @endif
                 </div>
                 {{-- <input type="file" id="file_import" wire:model.defer="file_import" placeholder=""
                     class="mt-1 form-control"> --}}
