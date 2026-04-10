@@ -16,7 +16,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="icon icon-tabler icons-tabler-outline icon-tabler-file-import h-4 w-4"">
-                                                                        <path stroke=" none" d="M0 0h24v24H0z"
+                                                                            <path stroke=" none" d="M0 0h24v24H0z"
                             fill="none" />
                         <path d="M14 3v4a1 1 0 0 0 1 1h4" />
                         <path d="M5 13v-8a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-5.5m-9.5 -2h7m-3 -3l3 3l-3 3" />
@@ -220,12 +220,16 @@
                             </td>
                             <td class="center">
                                 @if ($isRestricted)
-                                    <div class="flex items-center justify-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-300" fill="none"
+                                    <div class="flex flex-col items-center justify-center gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                         </svg>
+                                        <span
+                                            class="text-[8px] text-gray-400 font-semibold uppercase leading-tight text-center">
+                                            Hubungi admin jika<br>ingin melihat detail soal
+                                        </span>
                                     </div>
                                 @else
                                     <div class="flex items-center">
