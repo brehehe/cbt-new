@@ -36,6 +36,7 @@ class AdminMasterTimetableIndex extends Component
     public $supervisors = [];
     public $start_time;
     public $end_time;
+    public $extra_time;
     public $description;
     public $getSupervisors = [];
     public $modules = [];
@@ -281,6 +282,45 @@ class AdminMasterTimetableIndex extends Component
             DB::rollback();
             AlertHelper::error('Gagal', 'Data gagal disimpan!' . $th->getMessage());
             return Log::error('Gagal Menyimpan Data Jadwal : ' . $th);
+        }
+    }
+
+    public function extraTimeModal($id)
+    {
+        $this->data_id = $id;
+        $data = Timetable::find($id);
+        $this->extra_time = $data->end_time;
+        return $this->dispatch('open-modal', ['id' => 'modal-timetable-extra-time']);
+    }
+
+    public function closeModalExtraTime()
+    {
+        return $this->dispatch('close-modal', ['id' => 'modal-timetable-extra-time']);
+    }
+
+    public function submitExtraTime()
+    {
+        $this->validate([
+            'extra_time' => 'required',
+        ], [
+            'extra_time.required' => 'Waktu Tambahan wajib diisi',
+        ]);
+
+        try {
+            DB::beginTransaction();
+            $data = Timetable::find($this->data_id);
+            $data->update([
+                'end_time' => $this->extra_time,
+                'extra_time' => $this->extra_time,
+            ]);
+            DB::commit();
+            $this->reset(['extra_time', 'data_id']);
+            AlertHelper::success('Berhasil', 'Data berhasil ditambahkan!');
+            $this->closeModalExtraTime();
+        } catch (\Throwable $th) {
+            DB::rollback();
+            AlertHelper::error('Gagal', 'Data gagal ditambahkan!');
+            return Log::info('Gagal Menambahkan Data Jadwal : ' . $th);
         }
     }
 

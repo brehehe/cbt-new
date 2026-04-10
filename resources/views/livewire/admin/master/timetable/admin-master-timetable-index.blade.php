@@ -129,11 +129,12 @@
                             <td class="text-center px-3 py-2 relative">
                                 <div x-data="{ open: false, x: 0, y: 0 }" class="inline-block text-left">
                                     <button @click="
-                                        open = !open;
-                                        const rect = $el.getBoundingClientRect();
-                                        x = rect.right - 200;
-                                        y = rect.bottom + window.scrollY;
-                                    " class="px-3 py-2 bg-gray-100 rounded-md hover:bg-gray-200 transition text-gray-700">
+                                            open = !open;
+                                            const rect = $el.getBoundingClientRect();
+                                            x = rect.right - 200;
+                                            y = rect.bottom + window.scrollY;
+                                        "
+                                        class="px-3 py-2 bg-gray-100 rounded-md hover:bg-gray-200 transition text-gray-700">
                                         <i class="fa-solid fa-ellipsis-vertical"></i>
                                     </button>
 
@@ -253,6 +254,13 @@
                                                             class="w-full text-left px-4 py-2 hover:bg-gray-100">
                                                             <i class="fa-solid fa-eye mr-2 text-blue-600"></i>
                                                             Detail
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button wire:click="extraTimeModal('{{ $timetable->id }}')"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                            <i class="fa-solid fa-clock mr-2 text-blue-600"></i>
+                                                            Tambah Waktu
                                                         </button>
                                                     </li>
                                                     <li>
