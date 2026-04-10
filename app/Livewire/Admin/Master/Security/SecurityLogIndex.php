@@ -12,7 +12,7 @@ class SecurityLogIndex extends Component
     use WithPagination;
 
     public $search = '';
-    public $perPage = 25;
+    public $perPage = 5;
     public $filterEvent = '';
     public $logSource = 'security'; // 'security' or 'audit'
 

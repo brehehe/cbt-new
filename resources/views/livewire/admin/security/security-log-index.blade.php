@@ -1,17 +1,12 @@
-<div class="p-6">
+<div>
     @include('livewire.admin.master.security.security-log-modal')
     
     <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">Security Audit Logs</h1>
+            <h1 class="text-2xl font-bold text-[color:var(--primary)]">Security Audit Logs</h1>
             <p class="text-sm text-gray-500 mt-1">Pantau percobaan pelanggaran keamanan sistem secara real-time.</p>
         </div>
         <div class="flex items-center gap-3">
-            <button wire:click="openModal('modal-security')" 
-                    class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 text-sm font-bold flex items-center gap-2 shadow-lg shadow-blue-500/20 text-nowrap">
-                <i class="fas fa-plus"></i>
-                Tambah Log Manual
-            </button>
             <button wire:click="clearLogs" 
                     wire:confirm="Apakah Anda yakin ingin menghapus semua log ini?"
                     class="px-4 py-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all duration-200 text-sm font-medium flex items-center gap-2 text-nowrap">
@@ -24,11 +19,11 @@
     <!-- Tabs Section -->
     <div class="mb-6 flex items-center gap-1 bg-gray-100 p-1 rounded-2xl w-fit">
         <button wire:click="$set('logSource', 'security')"
-                class="px-6 py-2 rounded-xl text-sm font-bold transition-all duration-200 {{ $logSource === 'security' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700' }}">
+                class="px-6 py-2 rounded-xl text-sm font-bold transition-all duration-200 {{ $logSource === 'security' ? 'bg-white shadow-sm text-[color:var(--primary)]' : 'text-gray-500 hover:text-gray-700' }}">
             <i class="fas fa-user-shield mr-2"></i>Security Violations
         </button>
         <button wire:click="$set('logSource', 'audit')"
-                class="px-6 py-2 rounded-xl text-sm font-bold transition-all duration-200 {{ $logSource === 'audit' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700' }}">
+                class="px-6 py-2 rounded-xl text-sm font-bold transition-all duration-200 {{ $logSource === 'audit' ? 'bg-white shadow-sm text-[color:var(--primary)]' : 'text-gray-500 hover:text-gray-700' }}">
             <i class="fas fa-database mr-2"></i>System Audit Logs
         </button>
     </div>
@@ -39,6 +34,7 @@
             <div class="flex items-center gap-2">
                 <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Per Page</span>
                 <select wire:model.live="perPage" class="bg-gray-50 border-none rounded-lg text-sm font-bold text-gray-700 focus:ring-0">
+                    <option value="5">5</option>
                     <option value="10">10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
@@ -91,7 +87,7 @@
                             <td class="px-6 py-4">
                                 @if($log->causer)
                                     <div class="flex items-center gap-3">
-                                        <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold">
+                                        <div class="h-8 w-8 rounded-full bg-[color:var(--primary)] flex items-center justify-center text-white text-xs font-bold">
                                             {{ strtoupper(substr($log->causer->name, 0, 1)) }}
                                         </div>
                                         <div>
@@ -109,7 +105,7 @@
                                         'created' => 'bg-green-100 text-green-700',
                                         'updated' => 'bg-amber-100 text-amber-700',
                                         'deleted' => 'bg-red-100 text-red-700',
-                                        default => 'bg-blue-100 text-blue-700'
+                                        default => 'bg-[color:var(--primary)] text-white'
                                     };
                                 @endphp
                                 <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider {{ $eventColor }}">
@@ -157,7 +153,7 @@
                                             {{ $log->properties['ip_address'] ?? 'N/A' }}
                                         </div>
                                         @if(isset($log->properties['location']))
-                                            <div class="flex items-center gap-1 text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                                            <div class="flex items-center gap-1 text-[10px] font-bold text-[color:var(--primary)] bg-blue-50 px-2 py-0.5 rounded border border-[color:var(--primary)]">
                                                 <i class="fas fa-map-marker-alt text-[8px]"></i>
                                                 {{ $log->properties['location']['city'] ?? '' }}{{ isset($log->properties['location']['city']) ? ',' : '' }} {{ $log->properties['location']['country'] ?? 'Unknown' }}
                                             </div>
@@ -186,7 +182,7 @@
                                     </div>
                                     <div class="text-gray-400 font-bold">Tidak ada log yang ditemukan</div>
                                     @if($search || $filterEvent)
-                                        <button wire:click="$set('search', ''); $set('filterEvent', '')" class="text-sm font-bold text-blue-500 hover:text-blue-600">Reset Filter</button>
+                                        <button wire:click="$set('search', ''); $set('filterEvent', '')" class="text-sm font-bold text-blue-500 hover:text-[color:var(--primary)]">Reset Filter</button>
                                     @endif
                                 </div>
                             </td>
@@ -197,9 +193,20 @@
         </div>
         
         @if($logs->hasPages())
-            <div class="px-6 py-5 bg-gray-50/50 border-t border-gray-100">
-                {{ $logs->links() }}
+            <div class="px-5 py-4 bg-gray-50/80 border-t border-gray-200">
+            <div class="flex items-center justify-between">
+                <div class="text-sm text-gray-700">
+                    Menampilkan <span class="font-medium">{{ $logs->firstItem() }}</span> sampai <span
+                        class="font-medium">{{ $logs->lastItem() }}</span> dari <span
+                        class="font-medium">{{ $logs->total() }}</span> hasil
+                </div>
+                <div>
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                        {{ $logs->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
+                    </nav>
+                </div>
             </div>
+        </div>
         @endif
     </div>
 
