@@ -81,10 +81,12 @@
                                 {{ \Carbon\Carbon::createFromTimestamp($session->last_activity)->diffForHumans() }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <button class="btn btn-warning" wire:click="confirmForceLogout('{{ $session->user_id }}')"
-                                    title="Force Logout Sesi Ini">
-                                    <i class="fa-solid fa-right-from-bracket"></i>
-                                </button>
+                                <div class="flex items-center">
+                                    <a wire:click="confirmForceLogout('{{ $session->user_id }}')"
+                                        class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn">
+                                        <i class="fa-solid fa-right-from-bracket"></i>
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     @empty
