@@ -19,7 +19,7 @@ use Throwable;
 
 class UserDetail extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids;
+    use HasFactory, SoftDeletes, HasUuids, \App\Traits\LogsSystemActivity;
 
     protected $guarded = ['id'];
 

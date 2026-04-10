@@ -14,7 +14,7 @@ use App\Models\Master\Question\Question;
 class CategoryQuestion extends Model
 {
     //
-    use SoftDeletes, HasUuids;
+    use SoftDeletes, HasUuids, \App\Traits\LogsSystemActivity;
     protected $guarded = ['id'];
 
     public function company()

@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Auth;
 class Topic extends Model
 {
     //
-    use SoftDeletes, HasUuids;
+    use SoftDeletes, HasUuids, \App\Traits\LogsSystemActivity;
     protected $guarded = ['id'];
 
     public function company()

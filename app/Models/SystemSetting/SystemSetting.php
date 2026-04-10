@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class SystemSetting extends Model
 {
     //
-    use SoftDeletes, HasUuids;
+    use SoftDeletes, HasUuids, \App\Traits\LogsSystemActivity;
     protected $guarded = ['id'];
 
     protected static function boot()

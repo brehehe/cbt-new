@@ -223,19 +223,68 @@
     </script>
 
     <script>
-        document.addEventListener('contextmenu', event => event.preventDefault());
-        document.addEventListener('copy', event => event.preventDefault());
-        document.addEventListener('cut', event => event.preventDefault());
+        // Security Logging System
+        async function logSecurityEvent(eventType, description, metadata = {}) {
+            try {
+                const response = await fetch('{{ route("admin.security.log") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        event_type: eventType,
+                        description: description,
+                        metadata: metadata
+                    })
+                });
+                const data = await response.json();
+                console.log('Security log status:', data.status);
+            } catch (error) {
+                console.error('Failed to send security log:', error);
+            }
+        }
+
+        // Rate limiting for logs
+        const logThrottle = {};
+        function throttledLog(type, desc, meta = {}) {
+            const now = Date.now();
+            if (!logThrottle[type] || now - logThrottle[type] > 5000) { // Limit to 1 log per 5s per type
+                logThrottle[type] = now;
+                logSecurityEvent(type, desc, meta);
+            }
+        }
+
+        document.addEventListener('contextmenu', event => {
+            event.preventDefault();
+            throttledLog('security.right_click', 'Percobaan klik kanan diblokir');
+        });
+        
+        document.addEventListener('copy', event => {
+            event.preventDefault();
+            throttledLog('security.copy', 'Percobaan menyalin konten (copy) diblokir');
+        });
+        
+        document.addEventListener('cut', event => {
+            event.preventDefault();
+            throttledLog('security.cut', 'Percobaan memotong konten (cut) diblokir');
+        });
 
         // Blackout on blur
+        let blurStartTime = null;
         window.addEventListener('blur', () => {
             const overlay = document.getElementById('blackout-overlay');
             if (overlay) overlay.style.display = 'flex';
+            blurStartTime = Date.now();
+            throttledLog('security.blur', 'Browser kehilangan fokus (Window Blur)');
         });
+        
         window.addEventListener('visibilitychange', () => {
             const overlay = document.getElementById('blackout-overlay');
-            if (document.visibilityState === 'hidden' && overlay) {
-                overlay.style.display = 'flex';
+            if (document.visibilityState === 'hidden') {
+                if (overlay) overlay.style.display = 'flex';
+                throttledLog('security.visibility_hidden', 'Tab disembunyikan (Visibility Hidden)');
             }
         });
 
@@ -251,9 +300,11 @@
             }
 
             // Immediate blackout on Cmd+Shift or Ctrl+Shift (screenshot combination)
-            if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.keyCode !== 82) { // 82 is R for refresh
+            // Ignore if the key being pressed is a modifier (Shift, Ctrl, Meta, Alt) or R (Refresh)
+            if ((e.metaKey || e.ctrlKey) && e.shiftKey && ![16, 17, 18, 91, 93, 82].includes(e.keyCode)) {
                 const overlay = document.getElementById('blackout-overlay');
                 if (overlay) overlay.style.display = 'flex';
+                throttledLog('security.screenshot', 'Percobaan screenshot terdeteksi (Shortcut Shift+Cmd/Ctrl)');
                 e.preventDefault();
                 return false;
             }
@@ -264,6 +315,12 @@
                 (e.metaKey && (e.keyCode === 67 || e.keyCode === 86)) ||
                 e.keyCode === 123 || e.keyCode === 44 || e.key === 'PrintScreen'
             ) {
+                let shortcut = e.key;
+                if (e.ctrlKey) shortcut = 'Ctrl+' + shortcut;
+                if (e.metaKey) shortcut = 'Cmd+' + shortcut;
+                
+                throttledLog('security.inspect', 'Percobaan inspect/shortcut diblokir: ' + shortcut);
+                
                 e.preventDefault();
                 if (e.key === 'PrintScreen' || e.keyCode === 44) {
                     navigator.clipboard.writeText('');
@@ -273,9 +330,9 @@
         }, true);
 
         // Anti-debugger
-        setInterval(function () {
-            (function (a) { return (function (a) { return (Function('debugger'))(); }(a)); }(function () { }));
-        }, 1000);
+        // setInterval(function () {
+        //     (function (a) { return (function (a) { return (Function('debugger'))(); }(a)); }(function () { }));
+        // }, 1000);
 
         // Disable autocomplete on all inputs
         document.querySelectorAll('input, form').forEach(el => {

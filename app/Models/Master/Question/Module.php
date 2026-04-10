@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 class Module extends Model
 {
     //
-    use SoftDeletes, HasUuids;
+    use SoftDeletes, HasUuids, \App\Traits\LogsSystemActivity;
     protected $guarded = ['id'];
     protected $casts = [
         'category_question_settings' => 'array',

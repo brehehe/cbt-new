@@ -6,8 +6,10 @@ use App\Models\Company\Company;
 use App\Models\Study\Study;
 use App\Models\Timetable\TimetableQuestion;
 use App\Models\Category\CategoryQuestion;
+use App\Traits\LogsSystemActivity;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -18,7 +20,7 @@ use Illuminate\Support\Facades\Auth;
 class Question extends Model
 {
     //
-    use SoftDeletes, HasUuids;
+    use HasFactory, LogsSystemActivity, SoftDeletes, HasUuids;
     protected $guarded = ['id'];
 
     const TYPE_SINGLE = 'single';

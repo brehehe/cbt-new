@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class CompanyService extends Model
 {
     //
-    use SoftDeletes, HasUuids;
+    use SoftDeletes, HasUuids, \App\Traits\LogsSystemActivity;
     protected $guarded = ['id'];
 
     protected static function boot()

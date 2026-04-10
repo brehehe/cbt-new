@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 class ExamSession extends Model
 {
     //
-    use SoftDeletes, HasUuids;
+    use SoftDeletes, HasUuids, \App\Traits\LogsSystemActivity;
     protected $guarded = ['id'];
 
     public function company()

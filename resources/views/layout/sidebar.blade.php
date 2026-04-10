@@ -242,6 +242,12 @@
                                     'pattern' => ['admin/master/setting', 'admin/master/setting/*'],
                                     'icon' => 'fa-cog',
                                 ],
+                                [
+                                    'label' => 'Log Keamanan',
+                                    'url' => route('admin.security.log.index'),
+                                    'pattern' => ['admin/master/security-log*'],
+                                    'icon' => 'fa-shield-halved',
+                                ],
                             ];
 
                             if (auth()->user()->username === 'procbt') {

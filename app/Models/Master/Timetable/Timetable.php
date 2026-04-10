@@ -24,7 +24,7 @@ use Illuminate\Support\Str;
 class Timetable extends Model
 {
     //
-    use SoftDeletes, HasUuids;
+    use SoftDeletes, HasUuids, \App\Traits\LogsSystemActivity;
     protected $guarded = ['id'];
 
     public function company()

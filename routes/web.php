@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Print\PrintController;
 use App\Http\Controllers\Admin\LatexPreviewController;
+use App\Http\Controllers\Admin\Security\SecurityLogController;
 use App\Http\Middleware\CheckUserTimetable;
 use App\Http\Middleware\BlockBots;
 use App\Livewire\Admin\Master\Classmate\AdminMasterClassmateIndex;
@@ -138,6 +139,7 @@ Route::group(['middleware' => [BlockBots::class]], function () {
             Route::get('/topic-question', AdminMasterTopicIndex::class)->name('admin.master.topic');
             Route::get('/material-category', AdminMasterMaterialCategoryIndex::class)->name('admin.master.material-category');
             Route::get('/rating-scale', 'RatingScale\AdminMasterRatingScaleIndex')->name('admin.master.rating-scale');
+            Route::get('/security-log', Security\SecurityLogIndex::class)->name('admin.security.log.index');
             Route::get('/regulation', 'Regulation\AdminMasterRegulationIndex')->name('admin.master.regulation');
             Route::get('/admin', 'Admin\AdminMasterAdminIndex')->name('admin.master.admin');
             Route::get('/lecturer', 'Lecturer\AdminMasterLecturerIndex')->name('admin.master.lecturer');
@@ -197,6 +199,9 @@ Route::group(['middleware' => [BlockBots::class]], function () {
 
         Route::post('/latex/preview', [LatexPreviewController::class, 'preview'])
             ->name('admin.latex.preview');
+
+        Route::post('/security/log', [SecurityLogController::class, 'store'])
+            ->name('admin.security.log');
     });
 
     // Dosen Dashboard Routes

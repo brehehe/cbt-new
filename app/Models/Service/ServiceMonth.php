@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class ServiceMonth extends Model
 {
     //
-    use HasUuids, SoftDeletes;
+    use HasUuids, SoftDeletes, \App\Traits\LogsSystemActivity;
 
     protected $guarded = ['id'];
 

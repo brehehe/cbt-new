@@ -20,7 +20,7 @@ use Throwable;
 class CompanyDetail extends Model
 {
     //
-    use SoftDeletes, HasUuids, RegionTrait;
+    use SoftDeletes, HasUuids, RegionTrait, \App\Traits\LogsSystemActivity;
 
     protected $guarded = ['id'];
 

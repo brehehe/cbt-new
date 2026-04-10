@@ -17,7 +17,7 @@ use Throwable;
 class Company extends Model
 {
     //
-    use HasFactory, HasUuids, SoftDeletes;
+    use HasFactory, HasUuids, SoftDeletes, \App\Traits\LogsSystemActivity;
 
     protected $guarded = ['id'];
 
