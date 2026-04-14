@@ -256,16 +256,16 @@
             }
         }
 
-        document.addEventListener('contextmenu', event => {
-            event.preventDefault();
-            throttledLog('security.right_click', 'Percobaan klik kanan diblokir');
-        });
-        
+        // document.addEventListener('contextmenu', event => {
+        //     event.preventDefault();
+        //     throttledLog('security.right_click', 'Percobaan klik kanan diblokir');
+        // });
+
         document.addEventListener('copy', event => {
             event.preventDefault();
             throttledLog('security.copy', 'Percobaan menyalin konten (copy) diblokir');
         });
-        
+
         document.addEventListener('cut', event => {
             event.preventDefault();
             throttledLog('security.cut', 'Percobaan memotong konten (cut) diblokir');
@@ -279,7 +279,7 @@
             blurStartTime = Date.now();
             throttledLog('security.blur', 'Browser kehilangan fokus (Window Blur)');
         });
-        
+
         window.addEventListener('visibilitychange', () => {
             const overlay = document.getElementById('blackout-overlay');
             if (document.visibilityState === 'hidden') {
@@ -318,9 +318,9 @@
                 let shortcut = e.key;
                 if (e.ctrlKey) shortcut = 'Ctrl+' + shortcut;
                 if (e.metaKey) shortcut = 'Cmd+' + shortcut;
-                
+
                 throttledLog('security.inspect', 'Percobaan inspect/shortcut diblokir: ' + shortcut);
-                
+
                 e.preventDefault();
                 if (e.key === 'PrintScreen' || e.keyCode === 44) {
                     navigator.clipboard.writeText('');
