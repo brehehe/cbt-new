@@ -43,7 +43,8 @@ class AuthLoginIndex extends Component
 
     public function mount()
     {
-        $this->is_credentials = in_array(config('app.env'), ['local', 'development']) ? true : false;
+        // $this->is_credentials = in_array(config('app.env'), ['local', 'development']) ? true : false;
+        $this->is_credentials = false;
 
         $this->credentials = [
             'admin'=>[
