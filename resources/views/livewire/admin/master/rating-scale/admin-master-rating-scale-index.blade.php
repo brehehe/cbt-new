@@ -6,21 +6,12 @@
             <div>
                 <h1 class="text-2xl font-bold text-[color:var(--primary)]">
                     Data Skala Penilaian</h1>
-                {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div class="flex gap-3">
                 <button wire:click="openInfoModal()"
                     class="btn btn-info !bg-blue-50 !text-blue-600 !border-blue-100 hover:!bg-blue-100 rounded-xl transition-all shadow-sm">
                     <i class="fa-solid fa-circle-info mr-2"></i>
                     Petunjuk
-                </button>
-                <button wire:click="openModal()"
-                    class="{{ in_array(config('app.name_slug'), ['pro-cbt']) ? 'btn btn-warning' : 'btn btn-primary' }} shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Tambah Skala Penilaian
                 </button>
             </div>
         </div>
@@ -66,9 +57,10 @@
                             </td>
                             <td>
                                 <div class="flex items-center gap-2">
-                                    <span class="font-medium text-gray-700">{{ number_format($data->min_score, 0) }}</span>
-                                    <span class="text-gray-400">—</span>
-                                    <span class="font-medium text-gray-700">{{ number_format($data->max_score, 0) }}</span>
+                                    <span class="font-bold text-gray-800">{{ number_format($data->min_score, 0) }}</span>
+                                    <span class="text-xs text-gray-400 font-medium">:</span>
+                                    <span class="text-gray-500 text-sm">{{ number_format($data->min_score, 0) }} —
+                                        {{ number_format($data->max_score, 0) }}</span>
                                 </div>
                             </td>
                             <td class="text-gray-600 italic text-sm">{{ $data->description }}</td>
@@ -78,7 +70,6 @@
                                         title="Edit" wire:click="edit('{{ $data->id }}')">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </button>
-
                                     <button class="p-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
                                         title="Hapus" wire:click="confirmDelete('{{ $data->id }}')">
                                         <i class="fa-solid fa-trash"></i>
@@ -91,12 +82,81 @@
                             <td colspan="5" class="py-12 text-center">
                                 <div class="flex flex-col items-center gap-2 text-gray-400">
                                     <i class="fa-solid fa-layer-group text-4xl"></i>
-                                    <p>Tidak ada data skala penilaian</p>
+                                    <p>Belum ada data. Tambahkan baris pertama di bawah.</p>
                                 </div>
                             </td>
                         </tr>
                     @endforelse
                 </tbody>
+                <tfoot>
+                    <tr class="bg-amber-50/60 border-t-2 border-dashed border-amber-200">
+                        <!-- No -->
+                        <td class="center">
+                            <span class="text-amber-400">
+                                <i class="fa-solid fa-plus"></i>
+                            </span>
+                        </td>
+                        <!-- Grade Letter -->
+                        <td class="py-2 pr-2">
+                            <div>
+                                <input id="new_grade_letter" type="text" wire:model="new_grade_letter" placeholder="A"
+                                    maxlength="10"
+                                    class="w-full px-3 py-1.5 text-sm font-semibold rounded-lg border border-amber-200 bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-amber-400 transition-all placeholder-gray-300 uppercase"
+                                    style="text-transform: uppercase;" />
+                                @error('new_grade_letter')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </td>
+                        <!-- Rentang Nilai -->
+                        <td class="py-2 pr-2">
+                            <div class="flex items-center gap-2">
+                                <div class="relative">
+                                    <input id="new_min_score" type="number" wire:model.live="new_min_score"
+                                        placeholder="0" min="0" max="100"
+                                        class="w-20 px-3 py-1.5 text-sm font-bold rounded-lg border border-amber-200 bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-amber-400 transition-all placeholder-gray-300 text-center" />
+                                </div>
+                                <span class="text-gray-400 text-xs font-medium">:</span>
+                                @if ($calculated_max_score !== null && $new_min_score !== '')
+                                    <span class="text-sm text-gray-500 whitespace-nowrap">
+                                        {{ (int) $new_min_score }}
+                                        <span class="text-gray-300 mx-1">—</span>
+                                        {{ (int) $calculated_max_score }}
+                                    </span>
+                                @else
+                                    <span class="text-xs text-gray-300 italic">masukkan nilai</span>
+                                @endif
+                            </div>
+                            @error('new_min_score')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </td>
+                        <!-- Deskripsi -->
+                        <td class="py-2 pr-2">
+                            <div>
+                                <input id="new_description" type="text" wire:model="new_description"
+                                    placeholder="Sangat Baik, Baik, ..."
+                                    class="w-full px-3 py-1.5 text-sm rounded-lg border border-amber-200 bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-amber-400 transition-all placeholder-gray-300" />
+                                @error('new_description')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </td>
+                        <!-- Aksi -->
+                        <td class="center py-2">
+                            <button wire:click="storeInline()" wire:loading.attr="disabled"
+                                class="{{ in_array(config('app.name_slug'), ['pro-cbt']) ? 'btn btn-warning btn-sm' : 'btn btn-primary btn-sm' }} !rounded-lg !px-3 !py-1.5 !text-xs shadow-sm"
+                                title="Tambahkan">
+                                <span wire:loading.remove wire:target="storeInline">
+                                    <i class="fa-solid fa-check mr-1"></i> Tambah
+                                </span>
+                                <span wire:loading wire:target="storeInline">
+                                    <i class="fa-solid fa-spinner fa-spin mr-1"></i> Menyimpan...
+                                </span>
+                            </button>
+                        </td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>
@@ -114,7 +174,7 @@
                         <div>
                             <p class="text-xs text-gray-400 uppercase tracking-wider font-bold">Rentang Nilai</p>
                             <p class="text-lg font-bold text-gray-800">
-                                {{ number_format($data->min_score, 0) }} - {{ number_format($data->max_score, 0) }}
+                                {{ number_format($data->min_score, 0) }} — {{ number_format($data->max_score, 0) }}
                             </p>
                         </div>
                     </div>
@@ -138,6 +198,51 @@
                 <p>Tidak ada data skala penilaian</p>
             </div>
         @endforelse
+
+        <!-- Mobile Inline Add -->
+        <div class="bg-amber-50 rounded-xl border-2 border-dashed border-amber-200 p-4 space-y-3">
+            <p class="text-xs font-bold text-amber-500 uppercase tracking-widest flex items-center gap-2">
+                <i class="fa-solid fa-plus-circle"></i> Tambah Grade Baru
+            </p>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="text-xs text-gray-500 font-medium mb-1 block">Grade</label>
+                    <input type="text" wire:model="new_grade_letter" placeholder="A, B+, ..." maxlength="10"
+                        style="text-transform: uppercase;"
+                        class="w-full px-3 py-2 text-sm font-semibold rounded-lg border border-amber-200 bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 transition-all placeholder-gray-300" />
+                    @error('new_grade_letter') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="text-xs text-gray-500 font-medium mb-1 block">Nilai Min</label>
+                    <input type="number" wire:model.live="new_min_score" placeholder="85" min="0" max="100"
+                        class="w-full px-3 py-2 text-sm font-bold rounded-lg border border-amber-200 bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 transition-all placeholder-gray-300 text-center" />
+                    @error('new_min_score') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
+            @if ($calculated_max_score !== null && $new_min_score !== '')
+                <div class="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-amber-100">
+                    <i class="fa-solid fa-arrow-right-arrow-left text-amber-400 text-xs"></i>
+                    <span class="text-sm font-semibold text-gray-700">
+                        Rentang: {{ (int) $new_min_score }} — {{ (int) $calculated_max_score }}
+                    </span>
+                </div>
+            @endif
+            <div>
+                <label class="text-xs text-gray-500 font-medium mb-1 block">Deskripsi</label>
+                <input type="text" wire:model="new_description" placeholder="Sangat Baik, Baik, ..."
+                    class="w-full px-3 py-2 text-sm rounded-lg border border-amber-200 bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 transition-all placeholder-gray-300" />
+                @error('new_description') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
+            <button wire:click="storeInline()" wire:loading.attr="disabled"
+                class="{{ in_array(config('app.name_slug'), ['pro-cbt']) ? 'btn btn-warning' : 'btn btn-primary' }} w-full shadow-sm">
+                <span wire:loading.remove wire:target="storeInline">
+                    <i class="fa-solid fa-check mr-2"></i> Tambahkan
+                </span>
+                <span wire:loading wire:target="storeInline">
+                    <i class="fa-solid fa-spinner fa-spin mr-2"></i> Menyimpan...
+                </span>
+            </button>
+        </div>
     </div>
 
     <!-- Footer Info -->

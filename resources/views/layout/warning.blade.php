@@ -131,21 +131,39 @@
 
         // Fungsi inisialisasi kamera
         async function initCamera() {
+            // navigator.mediaDevices hanya tersedia di HTTPS atau localhost
+            if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                cameraActive = false;
+                if (cameraStatus) {
+                    cameraStatus.textContent = "⚠️ Kamera tidak tersedia: Akses kamera memerlukan koneksi HTTPS. Silakan hubungi pengawas.";
+                    cameraStatus.classList.remove("text-gray-500");
+                    cameraStatus.classList.add("text-yellow-600");
+                }
+                // Tetap izinkan mulai ujian walau kamera tidak tersedia
+                cameraActive = true; // ubah ke false jika kamera WAJIB
+                updateButtonState();
+                return;
+            }
+
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 const video = document.getElementById('cameraPreview');
-                video.srcObject = stream;
+                if (video) video.srcObject = stream;
                 cameraActive = true;
-                cameraStatus.textContent = "✅ Kamera aktif dan berfungsi.";
-                cameraStatus.classList.remove("text-gray-500");
-                cameraStatus.classList.add("text-green-600");
+                if (cameraStatus) {
+                    cameraStatus.textContent = "✅ Kamera aktif dan berfungsi.";
+                    cameraStatus.classList.remove("text-gray-500");
+                    cameraStatus.classList.add("text-green-600");
+                }
                 updateButtonState();
             } catch (err) {
                 console.error('Error accessing camera:', err);
                 cameraActive = false;
-                cameraStatus.textContent = "❌ Kamera tidak dapat diakses. Harap izinkan akses kamera sebelum melanjutkan.";
-                cameraStatus.classList.remove("text-gray-500");
-                cameraStatus.classList.add("text-red-600");
+                if (cameraStatus) {
+                    cameraStatus.textContent = "❌ Kamera tidak dapat diakses. Harap izinkan akses kamera sebelum melanjutkan.";
+                    cameraStatus.classList.remove("text-gray-500");
+                    cameraStatus.classList.add("text-red-600");
+                }
                 updateButtonState();
             }
         }
@@ -164,17 +182,18 @@
 
         // Disable copy/selection
         @if(!Auth::user()->hasRole(['Admin', 'Super Admin', 'Pengawas', 'admin']))
-            document.addEventListener('contextmenu', event => event.preventDefault());
+            // document.addEventListener('contextmenu', event => event.preventDefault());
             document.addEventListener('copy', event => event.preventDefault());
             document.addEventListener('cut', event => event.preventDefault());
 
             // Blackout on blur
+            const blackoutOverlay = document.getElementById('blackout-overlay');
             window.addEventListener('blur', () => {
-                document.getElementById('blackout-overlay').style.display = 'flex';
+                if (blackoutOverlay) blackoutOverlay.style.display = 'flex';
             });
             window.addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'hidden') {
-                    document.getElementById('blackout-overlay').style.display = 'flex';
+                    if (blackoutOverlay) blackoutOverlay.style.display = 'flex';
                 }
             });
         @endif
@@ -219,9 +238,9 @@
 
         // Anti-debugger
         @if(!Auth::user()->hasRole(['Admin', 'Super Admin', 'Pengawas', 'admin']))
-            setInterval(function () {
-                (function (a) { return (function (a) { return (Function('debugger'))(); }(a)); }(function () { }));
-            }, 1000);
+            // setInterval(function () {
+            //     (function (a) { return (function (a) { return (Function('debugger'))(); }(a)); }(function () { }));
+            // }, 1000);
         @endif
 
         // Disable autocomplete on all inputs

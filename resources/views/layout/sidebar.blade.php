@@ -89,12 +89,13 @@
                         @endphp
                         @if (!empty($url))
                             <a href="{{ $url }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
-                                        {{ $active
+                                                    {{ $active
                             ? "bg-[#C3D4EC]/50 $brandColor active-menu"
                             : "text-gray-600 hover:bg-[#C3D4EC]/20 hover:$brandColor" }}">
                                 <div class="flex items-center gap-3">
-                                    <i class="fa-solid {{ $exam['icon'] }} text-lg mr-2
-                                                {{ $active ? $brandColor : 'text-gray-400 group-hover:' . $brandColor }}"></i>
+                                    <i
+                                        class="fa-solid {{ $exam['icon'] }} text-lg mr-2
+                                                            {{ $active ? $brandColor : 'text-gray-400 group-hover:' . $brandColor }}"></i>
                                     <span class="sidebar-text">{{ $exam['label'] }}</span>
                                 </div>
                             </a>
@@ -237,7 +238,7 @@
                                     'icon' => 'fa-users-gear',
                                 ],
                                 [
-                                    'label' => 'Seting',
+                                    'label' => 'Pengaturan',
                                     'url' => route('admin.master.setting'),
                                     'pattern' => ['admin/master/setting', 'admin/master/setting/*'],
                                     'icon' => 'fa-cog',
@@ -363,12 +364,13 @@
                                 $active = Request::is($master['pattern']);
                             @endphp
                             <a href="{{ $master['url'] }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
-                                        {{ $active
+                                                    {{ $active
                     ? "bg-[#C3D4EC]/50 $brandColor active-menu"
                     : "text-gray-600 hover:bg-[#C3D4EC]/20 hover:$brandColor" }}">
                                 <div class="flex items-center gap-3">
-                                    <i class="fa-solid {{ $master['icon'] }} text-lg mr-2
-                                            {{ $active ? $brandColor : 'text-gray-400 group-hover:' . $brandColor }}"></i>
+                                    <i
+                                        class="fa-solid {{ $master['icon'] }} text-lg mr-2
+                                                        {{ $active ? $brandColor : 'text-gray-400 group-hover:' . $brandColor }}"></i>
                                     <span class="sidebar-text">{{ $master['label'] }}</span>
                                 </div>
                             </a>
@@ -435,12 +437,13 @@
                                 $active = Request::is($report['match']);
                             @endphp
                             <a href="{{ $report['route'] }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
-                                            {{ $active
+                                                        {{ $active
                         ? "bg-[#C3D4EC]/50 $brandColor active-menu"
                         : "text-gray-600 hover:bg-[#C3D4EC]/20 hover:$brandColor" }}">
                                 <div class="flex items-center gap-3">
-                                    <i class="fa-solid {{ $report['icon'] }} mr-2 text-lg
-                                                {{ $active ? $brandColor : 'text-gray-400 group-hover:' . $brandColor }}"></i>
+                                    <i
+                                        class="fa-solid {{ $report['icon'] }} mr-2 text-lg
+                                                            {{ $active ? $brandColor : 'text-gray-400 group-hover:' . $brandColor }}"></i>
                                     <span class="sidebar-text">{{ $report['label'] }}</span>
                                 </div>
                             </a>

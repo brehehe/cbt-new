@@ -85,6 +85,18 @@
                         const statusElement = document.getElementById('cameraStatus');
                         let currentStream = null;
 
+                        // Cek apakah browser mengizinkan akses kamera (hanya HTTPS atau localhost)
+                        if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                            if (videoSelect) {
+                                videoSelect.innerHTML = '<option>Tidak tersedia (perlu HTTPS)</option>';
+                            }
+                            if (statusElement) {
+                                statusElement.textContent = '⚠️ Kamera tidak dapat diakses melalui koneksi HTTP. Ujian tetap dapat dilanjutkan.';
+                                statusElement.className = 'text-sm text-yellow-600';
+                            }
+                            return; // hentikan eksekusi, tidak perlu lanjut
+                        }
+
                         async function getCameras() {
                             try {
                                 await navigator.mediaDevices.getUserMedia({ video: true }); // Request permission first
@@ -116,8 +128,10 @@
                                 }
                             } catch (err) {
                                 console.error('Error getting cameras:', err);
-                                statusElement.textContent = 'Gagal mendeteksi kamera: ' + err.message;
-                                statusElement.className = 'text-sm text-red-500';
+                                if (statusElement) {
+                                    statusElement.textContent = 'Gagal mendeteksi kamera: ' + err.message;
+                                    statusElement.className = 'text-sm text-red-500';
+                                }
                             }
                         }
 
@@ -133,13 +147,17 @@
                             try {
                                 const stream = await navigator.mediaDevices.getUserMedia(constraints);
                                 currentStream = stream;
-                                videoElement.srcObject = stream;
-                                statusElement.textContent = 'Kamera aktif. Silakan lanjutkan.';
-                                statusElement.className = 'text-sm text-green-500';
+                                if (videoElement) videoElement.srcObject = stream;
+                                if (statusElement) {
+                                    statusElement.textContent = 'Kamera aktif. Silakan lanjutkan.';
+                                    statusElement.className = 'text-sm text-green-500';
+                                }
                             } catch (err) {
                                 console.error('Error starting stream:', err);
-                                statusElement.textContent = 'Gagal memulai kamera: ' + err.message;
-                                statusElement.className = 'text-sm text-red-500';
+                                if (statusElement) {
+                                    statusElement.textContent = 'Gagal memulai kamera: ' + err.message;
+                                    statusElement.className = 'text-sm text-red-500';
+                                }
                             }
                         }
 

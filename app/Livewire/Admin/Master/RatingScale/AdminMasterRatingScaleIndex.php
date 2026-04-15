@@ -18,6 +18,12 @@ class AdminMasterRatingScaleIndex extends Component
     public $max_score;
     public $description;
 
+    // Inline add row properties
+    public $new_grade_letter = '';
+    public $new_min_score = '';
+    public $new_description = '';
+    public $calculated_max_score = null;
+
     public function openModal()
     {
         return $this->dispatch('open-modal', ['id' => 'modal-rating-scale']);
@@ -131,6 +137,76 @@ class AdminMasterRatingScaleIndex extends Component
     public function closeInfoModal()
     {
         $this->dispatch('closeModalRatingScaleInfo');
+    }
+
+    public function updatedNewMinScore($value)
+    {
+        if ($value === '' || !is_numeric($value)) {
+            $this->calculated_max_score = null;
+            return;
+        }
+
+        $minScore = (float) $value;
+
+        // Find the next higher min_score from existing data
+        $nextEntry = RatingScale::where('company_id', auth()->user()->company_id)
+            ->where('min_score', '>', $minScore)
+            ->orderBy('min_score', 'asc')
+            ->first();
+
+        $this->calculated_max_score = $nextEntry ? $nextEntry->min_score : 100;
+    }
+
+    public function storeInline()
+    {
+        $this->validate([
+            'new_grade_letter' => 'required|string|max:10',
+            'new_min_score'    => 'required|numeric|min:0|max:100',
+            'new_description'  => 'required|string|max:255',
+        ], [
+            'new_grade_letter.required' => 'Grade wajib diisi.',
+            'new_min_score.required'    => 'Nilai wajib diisi.',
+            'new_min_score.numeric'     => 'Nilai harus berupa angka.',
+            'new_description.required'  => 'Deskripsi wajib diisi.',
+        ]);
+
+        $minScore = (float) $this->new_min_score;
+
+        // Recalculate max_score fresh from DB
+        $nextEntry = RatingScale::where('company_id', auth()->user()->company_id)
+            ->where('min_score', '>', $minScore)
+            ->orderBy('min_score', 'asc')
+            ->first();
+
+        $maxScore = $nextEntry ? $nextEntry->min_score : 100;
+
+        // Check overlap
+        $overlap = RatingScale::where('company_id', auth()->user()->company_id)
+            ->where('grade_letter', $this->new_grade_letter)
+            ->first();
+
+        if ($overlap) {
+            $this->addError('new_grade_letter', 'Grade ' . $this->new_grade_letter . ' sudah ada.');
+            return;
+        }
+
+        try {
+            DB::beginTransaction();
+            RatingScale::create([
+                'grade_letter' => strtoupper(trim($this->new_grade_letter)),
+                'min_score'    => $minScore,
+                'max_score'    => $maxScore,
+                'description'  => $this->new_description,
+                'company_id'   => auth()->user()->company_id,
+            ]);
+            DB::commit();
+            AlertHelper::success('Berhasil', 'Data berhasil ditambahkan!');
+            $this->reset(['new_grade_letter', 'new_min_score', 'new_description', 'calculated_max_score']);
+        } catch (\Throwable $th) {
+            DB::rollback();
+            AlertHelper::error('Gagal', 'Data gagal disimpan!');
+            Log::info('Gagal Menyimpan Data Rating Scale : ' . $th);
+        }
     }
 
     public function render()

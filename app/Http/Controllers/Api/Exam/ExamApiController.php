@@ -14,6 +14,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Agence104\LiveKit\AccessToken;
@@ -27,6 +28,8 @@ class ExamApiController extends Controller
      */
     public function getInitialState($userTimetableId)
     {
+        $hasEssayAnswerColumn = $this->hasEssayAnswerColumn();
+
         $userTimetable = UserTimetable::select('id', 'user_id', 'status', 'start_exam', 'pause_total_seconds', 'is_recording', 'is_streaming', 'company_id', 'timetable_id')
             ->with([
                 'user:id,name,nim,username',
@@ -47,7 +50,12 @@ class ExamApiController extends Controller
         $remainingTime = max(0, $endTime->timestamp - now()->timestamp);
 
         // 2. Fetch Questions & Navigation
-        $questions = UserModuleQuestion::select('id', 'is_mark', 'timetable_answer_id', 'essay_answer', 'timetable_question_id', 'order')
+        $questionSelects = ['id', 'is_mark', 'timetable_answer_id', 'timetable_question_id', 'order'];
+        if ($hasEssayAnswerColumn) {
+            $questionSelects[] = 'essay_answer';
+        }
+
+        $questions = UserModuleQuestion::select($questionSelects)
             ->with([
                 'timetableQuestion:id,type,question,description,latex,latex_preview_png,images',
                 'timetableQuestion.answers:id,timetable_question_id,context,images,latex,latex_preview_png,order'
@@ -56,11 +64,13 @@ class ExamApiController extends Controller
             ->orderBy('order')
             ->get();
 
-        $navigation = $questions->map(function($q) {
+        $navigation = $questions->map(function($q) use ($hasEssayAnswerColumn) {
+            $essayAnswer = $hasEssayAnswerColumn ? ($q->essay_answer ?? null) : null;
+
             return [
                 'id' => $q->id,
                 'isMarked' => (bool)$q->is_mark,
-                'isAnswered' => !is_null($q->timetable_answer_id) || !empty($q->essay_answer),
+                'isAnswered' => !is_null($q->timetable_answer_id) || !empty($essayAnswer),
                 'order' => $q->order
             ];
         });
@@ -95,6 +105,8 @@ class ExamApiController extends Controller
      */
     public function saveAnswer(Request $request)
     {
+        $hasEssayAnswerColumn = $this->hasEssayAnswerColumn();
+
         $validated = $request->validate([
             'question_navigation_id' => 'required|exists:user_module_questions,id',
             'timetable_answer_id' => 'nullable',
@@ -110,11 +122,16 @@ class ExamApiController extends Controller
              return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $userModuleQuestion->update([
+        $payload = [
             'timetable_answer_id' => $validated['timetable_answer_id'],
-            'essay_answer' => $validated['essay_answer'],
             'is_mark' => $validated['is_mark'] ?? $userModuleQuestion->is_mark,
-        ]);
+        ];
+
+        if ($hasEssayAnswerColumn) {
+            $payload['essay_answer'] = $validated['essay_answer'] ?? null;
+        }
+
+        $userModuleQuestion->update($payload);
 
         return response()->json(['success' => true]);
     }
@@ -600,5 +617,19 @@ class ExamApiController extends Controller
             Log::error('Admin LiveKit Token Generation Failed', ['error' => $e->getMessage()]);
             return response()->json(['error' => 'Failed to generate admin token'], 500);
         }
+    }
+
+    /**
+     * essay_answer is optional in some deployments.
+     */
+    private function hasEssayAnswerColumn(): bool
+    {
+        static $hasColumn;
+
+        if ($hasColumn === null) {
+            $hasColumn = Schema::hasColumn('user_module_questions', 'essay_answer');
+        }
+
+        return $hasColumn;
     }
 }

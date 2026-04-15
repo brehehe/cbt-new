@@ -35,11 +35,10 @@ class RatingScale extends Model
             return null;
         }
 
+        // Boundary values (e.g. exactly 85) may match two adjacent grades.
+        // orderBy('order') ensures the higher grade (smaller order) wins.
         return self::where('min_score', '<=', $mark)
             ->where('max_score', '>=', $mark)
-            ->when($companyId, function ($query) use ($companyId) {
-                $query->where('company_id', $companyId);
-            })
             ->orderBy('order')
             ->first();
     }

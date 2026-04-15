@@ -137,7 +137,7 @@
                             <a href="/admin/change-password/change-password" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#C3D4EC]/20 hover:text-[color:var(--primary)]
  rounded-lg transition-all duration-200">
                                 <i class="fas fa-lock w-4"></i>
-                                <span>Rubah Password</span>
+                                <span>Ubah Password</span>
                             </a>
                             <hr class="my-1 border-gray-100">
                             <a href="/logout"
