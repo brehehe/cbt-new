@@ -10,6 +10,7 @@ use App\Models\User\UserModuleQuestion;
 use App\Models\User\UserTimetable;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -24,18 +25,25 @@ class AdminReportTimetableDetail extends Component
 
     public function render()
     {
+        $hasEssayAnswerColumn = $this->hasEssayAnswerColumn();
+
         $timetable_questions = $this->timetable_module->questions()
             ->with(['question'])
             ->where('is_check', true)
             ->orderBy('order')
             ->get();
 
+        $questionSelects = ['id', 'user_timetable_id', 'timetable_question_id', 'status'];
+        if ($hasEssayAnswerColumn) {
+            $questionSelects[] = 'essay_answer';
+        }
+
         $user_timetables = UserTimetable::where('timetable_id', $this->timetable_module?->timetable_id)
             ->search($this->search)
             ->with([
                 'user',
-                'userModuleQuestions' => function ($q) {
-                    $q->select('id', 'user_timetable_id', 'timetable_question_id', 'status', 'essay_answer');
+                'userModuleQuestions' => function ($q) use ($questionSelects) {
+                    $q->select($questionSelects);
                 }
             ])
             ->paginate($this->perPage);
@@ -48,6 +56,8 @@ class AdminReportTimetableDetail extends Component
 
     public function exportPdf()
     {
+        $hasEssayAnswerColumn = $this->hasEssayAnswerColumn();
+
         $questions = $this->timetable_module->questions()
             ->with(['question'])
             ->where('is_check', true)
@@ -72,9 +82,14 @@ class AdminReportTimetableDetail extends Component
             })
             ->toArray();
 
+        $statusSelects = ['user_timetable_id', 'timetable_question_id', 'status'];
+        if ($hasEssayAnswerColumn) {
+            $statusSelects[] = 'essay_answer';
+        }
+
         $userQuestionStatuses = UserModuleQuestion::whereIn('user_timetable_id', $userTimetableIds)
             ->whereIn('timetable_question_id', $questionIds)
-            ->get(['user_timetable_id', 'timetable_question_id', 'status', 'essay_answer'])
+            ->get($statusSelects)
             ->groupBy('user_timetable_id');
 
         $correctCounts = [];
@@ -113,6 +128,17 @@ class AdminReportTimetableDetail extends Component
             }
         }
         return '-';
+    }
+
+    private function hasEssayAnswerColumn(): bool
+    {
+        static $hasColumn;
+
+        if ($hasColumn === null) {
+            $hasColumn = Schema::hasColumn('user_module_questions', 'essay_answer');
+        }
+
+        return $hasColumn;
     }
 
 

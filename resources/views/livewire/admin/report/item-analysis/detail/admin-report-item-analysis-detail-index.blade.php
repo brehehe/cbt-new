@@ -345,31 +345,38 @@
                         @php
                             $difficultyColor =
                                 $analysis['difficulty_index'] >= 0.7
-                                ? 'bg-green-100 text-green-800'
-                                : ($analysis['difficulty_index'] >= 0.3
-                                    ? 'bg-yellow-100 text-yellow-800'
-                                    : 'bg-red-100 text-red-800');
+                                    ? 'bg-green-100 text-green-800'
+                                    : ($analysis['difficulty_index'] >= 0.3
+                                        ? 'bg-yellow-100 text-yellow-800'
+                                        : 'bg-red-100 text-red-800');
                             $discriminationColor =
                                 $analysis['discrimination_index'] >= 0.4
-                                ? 'bg-green-100 text-green-800'
-                                : ($analysis['discrimination_index'] >= 0.2
-                                    ? 'bg-yellow-100 text-yellow-800'
-                                    : 'bg-red-100 text-red-800');
+                                    ? 'bg-green-100 text-green-800'
+                                    : ($analysis['discrimination_index'] >= 0.2
+                                        ? 'bg-yellow-100 text-yellow-800'
+                                        : 'bg-red-100 text-red-800');
                         @endphp
-                        <tr class="hover:bg-gray-50 question-row" data-difficulty="{{ $analysis['difficulty_level'] }}"
+                        @php
+                            $question = $analysis['question'] ?? null;
+                            $questionType = $question?->type ?? 'single';
+                            $questionText = strip_tags($question?->question ?? '');
+                        @endphp
+                        <tr class="hover:bg-gray-50 question-row"
+                            data-difficulty="{{ $analysis['difficulty_level'] }}"
                             data-discrimination="{{ $analysis['discrimination_level'] }}"
-                            data-question="{{ strtolower(strip_tags($analysis['question']->question ?? '')) }}">
+                            data-question="{{ strtolower($questionText) }}">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $loop->iteration }}</td>
-                             <td class="px-4 py-3 text-sm text-gray-600 max-w-xs">
-                                 <div class="flex items-center gap-2 mb-1">
-                                     <span class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase {{ $analysis['question']->type === 'essay' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700' }}">
-                                         {{ $analysis['question']->type === 'essay' ? 'Essay' : 'PG' }}
-                                     </span>
-                                     <div class="truncate" title="{{ strip_tags($analysis['question']->question ?? '') }}">
-                                         {!! \Str::limit(strip_tags($analysis['question']->question ?? ''), 60) !!}
-                                     </div>
-                                 </div>
-                             </td>
+                            <td class="px-4 py-3 text-sm text-gray-600 max-w-xs">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span
+                                        class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase {{ $questionType === 'essay' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700' }}">
+                                        {{ $questionType === 'essay' ? 'Essay' : 'PG' }}
+                                    </span>
+                                    <div class="truncate" title="{{ $questionText }}">
+                                        {!! \Str::limit($questionText, 60) !!}
+                                    </div>
+                                </div>
+                            </td>
                             <td class="px-4 py-3 text-sm text-center text-gray-900">
                                 {{ $analysis['total_participants'] }}
                             </td>
@@ -407,6 +414,12 @@
     <!-- Detail View (Hidden by default) -->
     <div id="detailView" class="hidden">
         @foreach ($itemAnalysisData as $questionId => $analysis)
+            @php
+                $question = $analysis['question'] ?? null;
+                $questionType = $question?->type ?? 'single';
+                $questionText = strip_tags($question?->question ?? '');
+                $questionUserName = $question?->user->name ?? '-';
+            @endphp
             <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
                 <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
                     <div class="flex items-center justify-between">
@@ -414,11 +427,12 @@
                             <h3 class="text-lg font-semibold text-gray-800">
                                 Soal {{ $loop->iteration }}
                             </h3>
-                             <p class="text-sm text-gray-600 mt-1 flex items-center gap-2">
-                                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase {{ $analysis['question']->type === 'essay' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700' }}">
-                                    {{ $analysis['question']->type === 'essay' ? 'Essay' : 'PG' }}
+                            <p class="text-sm text-gray-600 mt-1 flex items-center gap-2">
+                                <span
+                                    class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase {{ $questionType === 'essay' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700' }}">
+                                    {{ $questionType === 'essay' ? 'Essay' : 'PG' }}
                                 </span>
-                                {!! \Str::limit(strip_tags($analysis['question']->question ?? ''), 100) !!}
+                                {!! \Str::limit($questionText, 100) !!}
                             </p>
                         </div>
                         <div class="text-right">
@@ -426,16 +440,16 @@
                                 @php
                                     $difficultyColor =
                                         $analysis['difficulty_index'] >= 0.7
-                                        ? 'bg-green-100 text-green-800'
-                                        : ($analysis['difficulty_index'] >= 0.3
-                                            ? 'bg-yellow-100 text-yellow-800'
-                                            : 'bg-red-100 text-red-800');
+                                            ? 'bg-green-100 text-green-800'
+                                            : ($analysis['difficulty_index'] >= 0.3
+                                                ? 'bg-yellow-100 text-yellow-800'
+                                                : 'bg-red-100 text-red-800');
                                     $discriminationColor =
                                         $analysis['discrimination_index'] >= 0.4
-                                        ? 'bg-green-100 text-green-800'
-                                        : ($analysis['discrimination_index'] >= 0.2
-                                            ? 'bg-yellow-100 text-yellow-800'
-                                            : 'bg-red-100 text-red-800');
+                                            ? 'bg-green-100 text-green-800'
+                                            : ($analysis['discrimination_index'] >= 0.2
+                                                ? 'bg-yellow-100 text-yellow-800'
+                                                : 'bg-red-100 text-red-800');
                                 @endphp
                                 <span class="px-2 py-1 text-xs font-medium rounded {{ $difficultyColor }}">
                                     {{ $analysis['difficulty_level'] }}
@@ -469,10 +483,10 @@
                                 <div class="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
                                     <span class="text-sm font-medium text-purple-600">Dosen</span>
                                     <span class="font-bold text-purple-800">
-                                        {{ $analysis['question']->user->name ?? '-' }}
-                                        @if(Auth::user()->hasRole('Admin') && ($analysis['question']->user?->usrSecKey?->sec_val ?? false))
+                                        {{ $questionUserName }}
+                                        @if (Auth::user()->hasRole('Admin') && ($question?->user?->usrSecKey?->sec_val ?? false))
                                             <br><span
-                                                class="text-xs text-gray-500">({{ decrypt($analysis['question']->user->usrSecKey->sec_val) }})</span>
+                                                class="text-xs text-gray-500">({{ decrypt($question->user->usrSecKey->sec_val) }})</span>
                                         @endif
                                     </span>
                                 </div>
@@ -486,7 +500,8 @@
                                 <div class="p-3 bg-blue-50 rounded-lg">
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm font-medium text-blue-600">Tingkat Kesukaran (P)</span>
-                                        <span class="font-bold text-blue-800">{{ $analysis['difficulty_index'] }}</span>
+                                        <span
+                                            class="font-bold text-blue-800">{{ $analysis['difficulty_index'] }}</span>
                                     </div>
                                     <div class="mt-1">
                                         <div class="w-full bg-blue-200 rounded-full h-2">
@@ -550,23 +565,28 @@
                         </div>
                     @endif
 
-                     {{-- Analisis Opsi Jawaban (Hanya untuk PG) --}}
-                    @if ($analysis['question']->type !== 'essay' && !empty($analysis['option_analysis']))
+                    {{-- Analisis Opsi Jawaban (Hanya untuk PG) --}}
+                    @if ($questionType !== 'essay' && !empty($analysis['option_analysis']))
                         <div class="mt-6 pt-6 border-t border-gray-200">
                             <h4 class="font-semibold text-gray-800 mb-3">Analisis Opsi Jawaban</h4>
                             <div class="overflow-x-auto">
                                 <table class="min-w-full">
                                     <thead>
                                         <tr class="bg-gray-50">
-                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                            <th
+                                                class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                                                 Opsi</th>
-                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                            <th
+                                                class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                                                 Jawaban</th>
-                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                            <th
+                                                class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                                                 Dipilih</th>
-                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                            <th
+                                                class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                                                 Persentase</th>
-                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                            <th
+                                                class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                                                 Status</th>
                                         </tr>
                                     </thead>
@@ -788,7 +808,7 @@
         }
 
         // Search functionality
-        document.getElementById('searchQuestion').addEventListener('input', function () {
+        document.getElementById('searchQuestion').addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();
             filterTable();
         });
@@ -942,44 +962,44 @@
 
                         <!-- Group Analysis -->
                         ${analysis.upper_group_total > 0 ? `
-                                                                                                    <div class="pt-6 border-t border-gray-200">
-                                                                                                        <h4 class="font-semibold text-gray-800 mb-3">Analisis Kelompok (27% Atas vs 27% Bawah)</h4>
-                                                                                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                                                                            <div class="bg-green-50 p-4 rounded-lg">
-                                                                                                                <h5 class="font-medium text-green-800 mb-2">Kelompok Atas</h5>
-                                                                                                                <p class="text-sm text-green-600">
-                                                                                                                    ${analysis.upper_group_correct} dari ${analysis.upper_group_total} peserta menjawab benar
-                                                                                                                    (${((analysis.upper_group_correct / analysis.upper_group_total) * 100).toFixed(1)}%)
-                                                                                                                </p>
+                                                                                                            <div class="pt-6 border-t border-gray-200">
+                                                                                                                <h4 class="font-semibold text-gray-800 mb-3">Analisis Kelompok (27% Atas vs 27% Bawah)</h4>
+                                                                                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                                                                    <div class="bg-green-50 p-4 rounded-lg">
+                                                                                                                        <h5 class="font-medium text-green-800 mb-2">Kelompok Atas</h5>
+                                                                                                                        <p class="text-sm text-green-600">
+                                                                                                                            ${analysis.upper_group_correct} dari ${analysis.upper_group_total} peserta menjawab benar
+                                                                                                                            (${((analysis.upper_group_correct / analysis.upper_group_total) * 100).toFixed(1)}%)
+                                                                                                                        </p>
+                                                                                                                    </div>
+                                                                                                                    <div class="bg-red-50 p-4 rounded-lg">
+                                                                                                                        <h5 class="font-medium text-red-800 mb-2">Kelompok Bawah</h5>
+                                                                                                                        <p class="text-sm text-red-600">
+                                                                                                                            ${analysis.lower_group_correct} dari ${analysis.lower_group_total} peserta menjawab benar
+                                                                                                                            (${((analysis.lower_group_correct / analysis.lower_group_total) * 100).toFixed(1)}%)
+                                                                                                                        </p>
+                                                                                                                    </div>
+                                                                                                                </div>
                                                                                                             </div>
-                                                                                                            <div class="bg-red-50 p-4 rounded-lg">
-                                                                                                                <h5 class="font-medium text-red-800 mb-2">Kelompok Bawah</h5>
-                                                                                                                <p class="text-sm text-red-600">
-                                                                                                                    ${analysis.lower_group_correct} dari ${analysis.lower_group_total} peserta menjawab benar
-                                                                                                                    (${((analysis.lower_group_correct / analysis.lower_group_total) * 100).toFixed(1)}%)
-                                                                                                                </p>
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                    ` : ''}
+                                                                                                            ` : ''}
 
                         <!-- Option Analysis -->
                         ${analysis.option_analysis && analysis.option_analysis.length > 0 ? `
-                                                                                                    <div class="pt-6 border-t border-gray-200">
-                                                                                                        <h4 class="font-semibold text-gray-800 mb-3">Analisis Opsi Jawaban</h4>
-                                                                                                        <div class="overflow-x-auto">
-                                                                                                            <table class="min-w-full">
-                                                                                                                <thead>
-                                                                                                                    <tr class="bg-gray-50">
-                                                                                                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Opsi</th>
-                                                                                                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Jawaban</th>
-                                                                                                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Dipilih</th>
-                                                                                                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Persentase</th>
-                                                                                                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                                                                                                    </tr>
-                                                                                                                </thead>
-                                                                                                                <tbody class="divide-y divide-gray-200">
-                                                                                                                    ${analysis.option_analysis.map((option, index) => `
+                                                                                                            <div class="pt-6 border-t border-gray-200">
+                                                                                                                <h4 class="font-semibold text-gray-800 mb-3">Analisis Opsi Jawaban</h4>
+                                                                                                                <div class="overflow-x-auto">
+                                                                                                                    <table class="min-w-full">
+                                                                                                                        <thead>
+                                                                                                                            <tr class="bg-gray-50">
+                                                                                                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Opsi</th>
+                                                                                                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Jawaban</th>
+                                                                                                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Dipilih</th>
+                                                                                                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Persentase</th>
+                                                                                                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                                                                                                            </tr>
+                                                                                                                        </thead>
+                                                                                                                        <tbody class="divide-y divide-gray-200">
+                                                                                                                            ${analysis.option_analysis.map((option, index) => `
                                             <tr class="${option.is_correct ? 'bg-green-50' : ''}">
                                                 <td class="px-3 py-2 text-sm font-medium text-gray-900">
                                                     ${option.option?.alphabet || String.fromCharCode(65 + index)}
@@ -1004,11 +1024,11 @@
                                                 </td>
                                             </tr>
                                         `).join('')}
-                                                                                                                </tbody>
-                                                                                                            </table>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                    ` : ''}
+                                                                                                                        </tbody>
+                                                                                                                    </table>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                            ` : ''}
 
                         <!-- Recommendations -->
                         <div class="pt-6 border-t border-gray-200">
@@ -1046,14 +1066,14 @@
         }
 
         // Close modal when clicking outside
-        document.getElementById('questionModal').addEventListener('click', function (e) {
+        document.getElementById('questionModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeModal();
             }
         });
 
         // Keyboard shortcuts
-        document.addEventListener('keydown', function (e) {
+        document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeModal();
             }
@@ -1083,7 +1103,7 @@
 
         // Debounce search untuk performance
         let searchTimeout;
-        document.getElementById('searchQuestion').addEventListener('input', function () {
+        document.getElementById('searchQuestion').addEventListener('input', function() {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 filterTable();
@@ -1094,7 +1114,7 @@
         function initializeTooltips() {
             const tooltipElements = document.querySelectorAll('[title]');
             tooltipElements.forEach(element => {
-                element.addEventListener('mouseenter', function () {
+                element.addEventListener('mouseenter', function() {
                     // Simple tooltip implementation
                     const tooltip = document.createElement('div');
                     tooltip.className =
@@ -1104,7 +1124,7 @@
                     tooltip.style.left = this.offsetLeft + 'px';
                     this.appendChild(tooltip);
 
-                    this.addEventListener('mouseleave', function () {
+                    this.addEventListener('mouseleave', function() {
                         if (tooltip.parentNode) {
                             tooltip.parentNode.removeChild(tooltip);
                         }
@@ -1116,7 +1136,7 @@
         }
 
         // Initialize tooltips when page loads
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             initializeTooltips();
         });
 

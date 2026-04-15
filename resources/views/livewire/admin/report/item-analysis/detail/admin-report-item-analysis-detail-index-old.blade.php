@@ -110,6 +110,11 @@
     </div>
 
     @foreach ($itemAnalysisData as $questionId => $analysis)
+        @php
+            $question = $analysis['question'] ?? null;
+            $questionText = strip_tags($question?->question ?? '');
+            $questionType = $question?->type ?? 'single';
+        @endphp
         <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
             <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
                 <div class="flex items-center justify-between">
@@ -118,7 +123,7 @@
                             Soal {{ $loop->iteration }}
                         </h3>
                         <p class="text-sm text-gray-600 mt-1">
-                            {!! \Str::limit(strip_tags($analysis['question']->question ?? ''), 100) !!}
+                            {!! \Str::limit($questionText, 100) !!}
                         </p>
                     </div>
                     <div class="text-right">
@@ -126,16 +131,16 @@
                             @php
                                 $difficultyColor =
                                     $analysis['difficulty_index'] >= 0.7
-                                    ? 'bg-green-100 text-green-800'
-                                    : ($analysis['difficulty_index'] >= 0.3
-                                        ? 'bg-yellow-100 text-yellow-800'
-                                        : 'bg-red-100 text-red-800');
+                                        ? 'bg-green-100 text-green-800'
+                                        : ($analysis['difficulty_index'] >= 0.3
+                                            ? 'bg-yellow-100 text-yellow-800'
+                                            : 'bg-red-100 text-red-800');
                                 $discriminationColor =
                                     $analysis['discrimination_index'] >= 0.4
-                                    ? 'bg-green-100 text-green-800'
-                                    : ($analysis['discrimination_index'] >= 0.2
-                                        ? 'bg-yellow-100 text-yellow-800'
-                                        : 'bg-red-100 text-red-800');
+                                        ? 'bg-green-100 text-green-800'
+                                        : ($analysis['discrimination_index'] >= 0.2
+                                            ? 'bg-yellow-100 text-yellow-800'
+                                            : 'bg-red-100 text-red-800');
                             @endphp
                             <span class="px-2 py-1 text-xs font-medium rounded {{ $difficultyColor }}">
                                 {{ $analysis['difficulty_level'] }}
@@ -189,7 +194,8 @@
                             <div class="p-3 bg-purple-50 rounded-lg">
                                 <div class="flex justify-between items-center">
                                     <span class="text-sm font-medium text-purple-600">Daya Pembeda (D)</span>
-                                    <span class="font-bold text-purple-800">{{ $analysis['discrimination_index'] }}</span>
+                                    <span
+                                        class="font-bold text-purple-800">{{ $analysis['discrimination_index'] }}</span>
                                 </div>
                                 <div class="mt-1">
                                     <div class="w-full bg-purple-200 rounded-full h-2">

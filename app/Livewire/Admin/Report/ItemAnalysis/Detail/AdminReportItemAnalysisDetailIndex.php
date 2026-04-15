@@ -248,6 +248,7 @@ class AdminReportItemAnalysisDetailIndex extends Component
     public function getEmptyAnalysis()
     {
         return [
+            'question' => null,
             'total_participants' => 0,
             'correct_answers' => 0,
             'incorrect_answers' => 0,

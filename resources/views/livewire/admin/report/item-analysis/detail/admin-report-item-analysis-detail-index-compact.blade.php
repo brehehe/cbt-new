@@ -82,10 +82,15 @@
                 </thead>
                 <tbody>
                     @foreach ($itemAnalysisData as $questionId => $analysis)
+                        @php
+                            $question = $analysis['question'] ?? null;
+                            $questionText = strip_tags($question?->question ?? '');
+                            $questionType = $question?->type ?? 'single';
+                        @endphp
                         <tr class="border-b">
                             <td class="text-center font-medium">{{ $loop->iteration }}</td>
                             <td class="text-xs">
-                                {!! \Str::limit(strip_tags($analysis['question']->question ?? ''), 30) !!}
+                                {!! \Str::limit($questionText, 30) !!}
                             </td>
                             <td class="text-center">{{ $analysis['total_participants'] }}</td>
                             <td class="text-center">{{ $analysis['correct_answers'] }}</td>
@@ -94,10 +99,10 @@
                                 @php
                                     $diffColor =
                                         $analysis['difficulty_index'] >= 0.7
-                                        ? 'text-green-600'
-                                        : ($analysis['difficulty_index'] >= 0.3
-                                            ? 'text-yellow-600'
-                                            : 'text-red-600');
+                                            ? 'text-green-600'
+                                            : ($analysis['difficulty_index'] >= 0.3
+                                                ? 'text-yellow-600'
+                                                : 'text-red-600');
                                 @endphp
                                 <span class="text-xs {{ $diffColor }} font-medium">
                                     {{ $analysis['difficulty_level'] }}
@@ -108,10 +113,10 @@
                                 @php
                                     $discColor =
                                         $analysis['discrimination_index'] >= 0.4
-                                        ? 'text-green-600'
-                                        : ($analysis['discrimination_index'] >= 0.2
-                                            ? 'text-yellow-600'
-                                            : 'text-red-600');
+                                            ? 'text-green-600'
+                                            : ($analysis['discrimination_index'] >= 0.2
+                                                ? 'text-yellow-600'
+                                                : 'text-red-600');
                                 @endphp
                                 <span class="text-xs {{ $discColor }} font-medium">
                                     {{ $analysis['discrimination_level'] }}

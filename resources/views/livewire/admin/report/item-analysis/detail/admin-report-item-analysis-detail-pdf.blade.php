@@ -1,25 +1,78 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <title>Analisis Butir Soal</title>
     <style>
-        * { font-family: DejaVu Sans, Arial, sans-serif; }
-        body { font-size: 11px; color: #111827; }
-        h1 { font-size: 16px; margin: 0 0 4px; }
-        .subtitle { color: #6b7280; margin-bottom: 12px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #e5e7eb; padding: 6px 8px; text-align: center; vertical-align: top; }
-        th { background: #f3f4f6; font-weight: 600; }
-        td.left, th.left { text-align: left; }
-        .badge-easy { background: #d1fae5; }
-        .badge-mid { background: #fef3c7; }
-        .badge-hard { background: #fecaca; }
-        .badge-good { background: #d1fae5; }
-        .badge-ok { background: #fef3c7; }
-        .badge-bad { background: #fecaca; }
+        * {
+            font-family: DejaVu Sans, Arial, sans-serif;
+        }
+
+        body {
+            font-size: 11px;
+            color: #111827;
+        }
+
+        h1 {
+            font-size: 16px;
+            margin: 0 0 4px;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #e5e7eb;
+            padding: 6px 8px;
+            text-align: center;
+            vertical-align: top;
+        }
+
+        th {
+            background: #f3f4f6;
+            font-weight: 600;
+        }
+
+        td.left,
+        th.left {
+            text-align: left;
+        }
+
+        .badge-easy {
+            background: #d1fae5;
+        }
+
+        .badge-mid {
+            background: #fef3c7;
+        }
+
+        .badge-hard {
+            background: #fecaca;
+        }
+
+        .badge-good {
+            background: #d1fae5;
+        }
+
+        .badge-ok {
+            background: #fef3c7;
+        }
+
+        .badge-bad {
+            background: #fecaca;
+        }
     </style>
 </head>
+
 <body>
     <h1>Analisis Butir Soal</h1>
     <div class="subtitle">
@@ -42,14 +95,26 @@
         <tbody>
             @foreach ($itemAnalysisData as $analysis)
                 @php
-                    $difficultyClass = $analysis['difficulty_level'] === 'Mudah' ? 'badge-easy' : ($analysis['difficulty_level'] === 'Sedang' ? 'badge-mid' : 'badge-hard');
-                    $discClass = in_array($analysis['discrimination_level'], ['Sangat Baik', 'Baik']) ? 'badge-good' : (in_array($analysis['discrimination_level'], ['Cukup']) ? 'badge-ok' : 'badge-bad');
+                    $question = $analysis['question'] ?? null;
+                    $questionType = $question?->type ?? 'single';
+                    $questionText = strip_tags($question?->question ?? '');
+                    $difficultyClass =
+                        $analysis['difficulty_level'] === 'Mudah'
+                            ? 'badge-easy'
+                            : ($analysis['difficulty_level'] === 'Sedang'
+                                ? 'badge-mid'
+                                : 'badge-hard');
+                    $discClass = in_array($analysis['discrimination_level'], ['Sangat Baik', 'Baik'])
+                        ? 'badge-good'
+                        : (in_array($analysis['discrimination_level'], ['Cukup'])
+                            ? 'badge-ok'
+                            : 'badge-bad');
                 @endphp
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td class="left">
-                        [{{ $analysis['question']->type === 'essay' ? 'Essay' : 'PG' }}] 
-                        {!! \Str::limit(strip_tags($analysis['question']->question ?? ''), 80) !!}
+                        [{{ $questionType === 'essay' ? 'Essay' : 'PG' }}]
+                        {!! \Str::limit($questionText, 80) !!}
                     </td>
                     <td>{{ $analysis['total_participants'] }}</td>
                     <td>{{ $analysis['correct_answers'] }}</td>
@@ -62,4 +127,5 @@
         </tbody>
     </table>
 </body>
+
 </html>

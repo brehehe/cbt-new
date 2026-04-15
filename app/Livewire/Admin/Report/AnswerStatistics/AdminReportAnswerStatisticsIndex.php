@@ -8,6 +8,7 @@ use App\Models\User\UserModuleQuestion;
 use App\Models\User\UserTimetable;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Livewire\Component;
 
 class AdminReportAnswerStatisticsIndex extends Component
@@ -42,6 +43,7 @@ class AdminReportAnswerStatisticsIndex extends Component
         }
 
         $this->timetable = Timetable::with('module')->find($this->timetable_id);
+        $hasEssayAnswerColumn = $this->hasEssayAnswerColumn();
 
         // Fetch all questions for this timetable via TimetableModule
         $questions = TimetableQuestion::with('answers')
@@ -54,11 +56,16 @@ class AdminReportAnswerStatisticsIndex extends Component
 
         // Fetch all user answers for this timetable
         // Fetch all user answers for this timetable
+        $answerSelects = ['timetable_question_id', 'timetable_answer_id', 'status'];
+        if ($hasEssayAnswerColumn) {
+            $answerSelects[] = 'essay_answer';
+        }
+
         $userAnswers = UserModuleQuestion::whereHas('userTimetable', function ($q) {
                 $q->where('timetable_id', $this->timetable_id)
                   ->where('status', 'done'); 
             })
-            ->select('timetable_question_id', 'timetable_answer_id', 'status', 'essay_answer')
+            ->select($answerSelects)
             ->get()
             ->groupBy('timetable_question_id');
 
@@ -69,7 +76,9 @@ class AdminReportAnswerStatisticsIndex extends Component
             $isEssay = $question->type === 'essay';
             
             if ($isEssay) {
-                $totalAnswered = $answersForQuestion->whereNotNull('essay_answer')->count();
+                $totalAnswered = $hasEssayAnswerColumn
+                    ? $answersForQuestion->whereNotNull('essay_answer')->count()
+                    : $answersForQuestion->whereIn('status', ['correct', 'wrong', 'check'])->count();
                 $totalCorrect = $answersForQuestion->where('status', 'correct')->count();
                 $totalWrong = $answersForQuestion->where('status', 'wrong')->count();
                 $totalPending = $answersForQuestion->where('status', 'check')->count();
@@ -128,6 +137,17 @@ class AdminReportAnswerStatisticsIndex extends Component
         }
 
         $this->answerStats = $stats;
+    }
+
+    private function hasEssayAnswerColumn(): bool
+    {
+        static $hasColumn;
+
+        if ($hasColumn === null) {
+            $hasColumn = Schema::hasColumn('user_module_questions', 'essay_answer');
+        }
+
+        return $hasColumn;
     }
 
     public function render()
