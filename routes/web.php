@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\LatexPreviewController;
 use App\Http\Controllers\Admin\Security\SecurityLogController;
 use App\Http\Middleware\CheckUserTimetable;
 use App\Http\Middleware\BlockBots;
+use App\Http\Middleware\RoleBasedDashboardRedirect;
 use App\Livewire\Admin\Master\Classmate\AdminMasterClassmateIndex;
 use App\Livewire\Admin\Master\Classmate\Detail\AdminMasterClassmateDetailIndex;
 use App\Livewire\Admin\Master\ExamRoom\AdminMasterExamRoomIndex;
@@ -46,6 +47,10 @@ Route::middleware(['auth', CheckUserTimetable::class])->group(function () {
     Route::get('/profile', \App\Livewire\Admin\Profile\AdminProfileIndex::class)->name('user.profile');
 });
 
+Route::get('/student/onboarding', \App\Livewire\Mahasiswa\Onboarding\StudentOnboarding::class)
+    ->name('student.onboarding')
+    ->middleware(['auth']);
+
 require __DIR__ . '/auth.php';
 
 // Public Stress Test Route (Only for testing purposes)
@@ -68,7 +73,7 @@ Route::prefix('seb')->name('seb.')->group(function () {
         ->middleware('auth');
 });
 
-Route::group(['middleware' => [BlockBots::class]], function () {
+Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::class]], function () {
     Route::group(['namespace' => 'App\Livewire\Auth'], function () {
         // Add your routes here
         Route::get('login', 'Login\AuthLoginIndex')->name('login');
