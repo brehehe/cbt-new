@@ -35,6 +35,12 @@ class CheckUserTimetable
             ->first();
 
         if ($userTimetable) {
+            // Check if timetable still exists, if deleted then delete userTimetable as well
+            if (!$userTimetable->timetable) {
+                $userTimetable->delete();
+                return redirect()->route('admin.exam.timetable');
+            }
+
             // Check for timeout
             if ($userTimetable->start_exam) {
                 // Eager load necessary relationships if not already loaded
