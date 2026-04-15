@@ -222,6 +222,22 @@
                 @if ($analysis['upper_group_total'] > 0)
                     <div class="mt-6 pt-6 border-t border-gray-200">
                         <h4 class="font-semibold text-gray-800 mb-3">Analisis Kelompok (27% Atas vs 27% Bawah)</h4>
+                        @php
+                            $upperPercent =
+                                $analysis['upper_group_total'] > 0
+                                    ? number_format(
+                                        ($analysis['upper_group_correct'] / $analysis['upper_group_total']) * 100,
+                                        1,
+                                    )
+                                    : '0.0';
+                            $lowerPercent =
+                                $analysis['lower_group_total'] > 0
+                                    ? number_format(
+                                        ($analysis['lower_group_correct'] / $analysis['lower_group_total']) * 100,
+                                        1,
+                                    )
+                                    : '0.0';
+                        @endphp
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="bg-green-50 p-4 rounded-lg">
                                 <h5 class="font-medium text-green-800 mb-2">Kelompok Atas</h5>
