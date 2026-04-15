@@ -228,7 +228,7 @@
                                 <p class="text-sm text-green-600">
                                     {{ $analysis['upper_group_correct'] }} dari {{ $analysis['upper_group_total'] }}
                                     peserta menjawab benar
-                                    ({{ number_format(($analysis['upper_group_correct'] / $analysis['upper_group_total']) * 100, 1) }}%)
+                                    ({{ $upperPercent }}%)
                                 </p>
                             </div>
                             <div class="bg-red-50 p-4 rounded-lg">
@@ -236,7 +236,7 @@
                                 <p class="text-sm text-red-600">
                                     {{ $analysis['lower_group_correct'] }} dari {{ $analysis['lower_group_total'] }}
                                     peserta menjawab benar
-                                    ({{ number_format(($analysis['lower_group_correct'] / $analysis['lower_group_total']) * 100, 1) }}%)
+                                    ({{ $lowerPercent }}%)
                                 </p>
                             </div>
                         </div>
