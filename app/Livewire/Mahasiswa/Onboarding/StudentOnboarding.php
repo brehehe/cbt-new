@@ -138,17 +138,6 @@ class StudentOnboarding extends Component
 
                 Log::info('Step 1 complete');
                 AlertHelper::success('Berhasil', 'Data profil berhasil diperbarui!');
-            } elseif ($this->currentStep === 2) {
-                $this->validate([
-                    'password' => 'required|min:8|confirmed',
-                ]);
-
-                Auth::user()->update([
-                    'password' => Hash::make($this->password),
-                ]);
-
-                Log::info('Step 2 complete');
-                AlertHelper::success('Berhasil', 'Kata sandi berhasil diperbarui!');
             }
 
             $this->currentStep++;
@@ -195,7 +184,7 @@ class StudentOnboarding extends Component
                 $transactionModule = $simulationTimetable->timetableModule()->withoutGlobalScope('user_scope')->first();
 
                 if (!$transactionModule) {
-                   throw new \Exception('Modul simulasi tidak ditemukan.');
+                    throw new \Exception('Modul simulasi tidak ditemukan.');
                 }
 
                 $userTimetable = \App\Models\User\UserTimetable::create([

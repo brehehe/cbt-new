@@ -5,7 +5,7 @@
             <div class="flex items-center justify-between">
                 <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
                     <div class="bg-orange-600 h-2.5 rounded-full transition-all duration-500"
-                        style="width: {{ ($currentStep / 3) * 100 }}%"></div>
+                        style="width: {{ ($currentStep / 2) * 100 }}%"></div>
                 </div>
             </div>
             <div class="flex justify-between mt-4">
@@ -20,17 +20,9 @@
                 <div class="text-center">
                     <div
                         class="w-10 h-10 mx-auto rounded-full flex items-center justify-center {{ $currentStep >= 2 ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-500' }} shadow-lg transition-all duration-300">
-                        <i class="fas fa-key"></i>
-                    </div>
-                    <p class="mt-2 text-xs font-semibold {{ $currentStep >= 2 ? 'text-orange-600' : 'text-gray-500' }}">
-                        Keamanan</p>
-                </div>
-                <div class="text-center">
-                    <div
-                        class="w-10 h-10 mx-auto rounded-full flex items-center justify-center {{ $currentStep >= 3 ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-500' }} shadow-lg transition-all duration-300">
                         <i class="fas fa-book-open"></i>
                     </div>
-                    <p class="mt-2 text-xs font-semibold {{ $currentStep >= 3 ? 'text-orange-600' : 'text-gray-500' }}">
+                    <p class="mt-2 text-xs font-semibold {{ $currentStep >= 2 ? 'text-orange-600' : 'text-gray-500' }}">
                         Panduan</p>
                 </div>
             </div>
@@ -44,8 +36,6 @@
                 @if($currentStep === 1)
                     @include('livewire.mahasiswa.onboarding.steps.profile')
                 @elseif($currentStep === 2)
-                    @include('livewire.mahasiswa.onboarding.steps.password')
-                @elseif($currentStep === 3)
                     @include('livewire.mahasiswa.onboarding.steps.simulation')
                 @endif
 
@@ -60,7 +50,7 @@
                         <div></div>
                     @endif
 
-                    @if($currentStep < 3)
+                    @if($currentStep < 2)
                         <button wire:click="nextStep" wire:loading.attr="disabled"
                             class="px-10 py-3 bg-orange-600 text-white rounded-xl font-bold shadow-lg shadow-orange-200 hover:bg-orange-700 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed group">
                             <span wire:loading.remove>Lanjutkan <i class="fas fa-arrow-right ml-2"></i></span>
