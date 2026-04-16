@@ -30,11 +30,16 @@ class ExamApiController extends Controller
     {
         $hasEssayAnswerColumn = $this->hasEssayAnswerColumn();
 
-        $userTimetable = UserTimetable::select('id', 'user_id', 'status', 'start_exam', 'pause_total_seconds', 'is_recording', 'is_streaming', 'company_id', 'timetable_id')
+        $userTimetable = UserTimetable::withoutGlobalScopes()
+            ->select('id', 'user_id', 'status', 'start_exam', 'pause_total_seconds', 'is_recording', 'is_streaming', 'company_id', 'timetable_id')
             ->with([
                 'user:id,name,nim,username',
-                'timetable:id,module_id,company_id',
-                'timetable.module:id,name,duration',
+                'timetable' => function($q) {
+                    $q->withoutGlobalScopes()->select('id', 'module_id', 'company_id', 'is_simulation');
+                },
+                'timetable.module' => function($q) {
+                    $q->withoutGlobalScopes()->select('id', 'name', 'duration');
+                },
             ])
             ->where('id', $userTimetableId)
             ->firstOrFail();
@@ -55,14 +60,20 @@ class ExamApiController extends Controller
             $questionSelects[] = 'essay_answer';
         }
 
-        $questions = UserModuleQuestion::select($questionSelects)
+        $questions = UserModuleQuestion::withoutGlobalScopes()
+            ->select($questionSelects)
             ->with([
-                'timetableQuestion:id,type,question,description,latex,latex_preview_png,images',
-                'timetableQuestion.answers:id,timetable_question_id,context,images,latex,latex_preview_png,order'
+                'timetableQuestion' => function($q) {
+                    $q->withoutGlobalScopes()->select('id', 'type', 'question', 'description', 'latex', 'latex_preview_png', 'images');
+                },
+                'timetableQuestion.answers' => function($q) {
+                    $q->withoutGlobalScopes()->select('id', 'timetable_question_id', 'context', 'images', 'latex', 'latex_preview_png', 'order');
+                }
             ])
             ->where('user_timetable_id', $userTimetableId)
             ->orderBy('order')
-            ->get();
+            ->get()
+            ->values();
 
         $navigation = $questions->map(function($q) use ($hasEssayAnswerColumn) {
             $essayAnswer = $hasEssayAnswerColumn ? ($q->essay_answer ?? null) : null;
@@ -73,7 +84,7 @@ class ExamApiController extends Controller
                 'isAnswered' => !is_null($q->timetable_answer_id) || !empty($essayAnswer),
                 'order' => $q->order
             ];
-        });
+        })->values();
 
         $alertCount = ExamAlert::where('user_timetable_id', $userTimetableId)->count();
 

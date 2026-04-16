@@ -72,7 +72,11 @@ class Timetable extends Model
             $user = Auth::user();
 
             if (!$user || !$user->hasRole('Anonymous')) {
-                $builder->where('company_id', optional($user?->company)?->id)->orderBy('order', 'asc');
+                $builder->where(function ($query) use ($user) {
+                    $query->where('company_id', optional($user?->company)?->id)
+                        ->orWhere('is_simulation', 'true')
+                        ->orWhereNull('company_id');
+                });
             }
 
             $builder->orderBy('order', 'asc');

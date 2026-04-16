@@ -56,6 +56,7 @@ class AdminMasterQuestionIndex extends Component
     {
         $questions = Question::select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect', 'study_id', 'difficulty', 'category_question_id', 'type')
             ->search($this->search)
+            ->where('is_simulation', 'false')
             ->orderBy('created_at', 'desc')
             ->orderBy('order', 'desc')
             ->orderBy('question', 'asc');

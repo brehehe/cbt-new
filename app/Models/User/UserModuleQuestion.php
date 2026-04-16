@@ -33,7 +33,13 @@ class UserModuleQuestion extends Model
             $user = Auth::user();
 
             if (!$user || !$user->hasRole('Anonymous')) {
-                $builder->where('company_id', optional($user?->company)?->id)->orderBy('order', 'asc');
+                $builder->where(function ($query) use ($user) {
+                    $query->where('company_id', optional($user?->company)?->id)
+                        ->orWhereHas('userTimetable.timetable', function ($q) {
+                            $q->where('is_simulation', 'true');
+                        })
+                        ->orWhereNull('company_id');
+                });
             }
 
             $builder->orderBy('order', 'asc');

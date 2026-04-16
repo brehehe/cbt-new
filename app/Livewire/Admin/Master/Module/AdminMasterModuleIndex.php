@@ -44,6 +44,7 @@ class AdminMasterModuleIndex extends Component
                 'questionType:id,name'
             ])
             ->where('company_id', Auth::user()?->company?->id)
+            ->where('is_simulation', 'false')
             ->orderBy('order', 'desc');
         return view('livewire.admin.master.module.admin-master-module-index', [
             'modules' => $modules->paginate($this->perPage)

@@ -145,6 +145,24 @@ const ExamContainer = ({ userTimetableId }) => {
         );
     }
 
+    if (!examData || !examData.questions || examData.questions.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center">
+                <AlertTriangle className="w-16 h-16 text-red-500 mb-4" />
+                <h1 className="text-2xl font-bold text-gray-800">Soal Tidak Ditemukan</h1>
+                <p className="text-gray-600 mt-2 max-w-md">
+                    Gagal memuat daftar soal untuk ujian ini. Silakan hubungi admin atau pengawas.
+                </p>
+                <button 
+                    onClick={() => window.location.reload()}
+                    className="mt-6 px-6 py-2 bg-orange-600 text-white rounded-lg font-bold"
+                >
+                    Refresh Halaman
+                </button>
+            </div>
+        );
+    }
+
     const currentQuestion = examData.questions[currentQuestionIndex];
     const companyColor = examData.userTimetable.company?.color_primary || '#f58634';
 
@@ -155,7 +173,7 @@ const ExamContainer = ({ userTimetableId }) => {
                 <div className="max-w-full mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="flex items-center justify-between gap-4">
                         <div className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-lg">
-                            <span className="text-sm font-medium">Modul: {examData.userTimetable.timetable.module.name}</span>
+                            <span className="text-sm font-medium">Modul: {examData.userTimetable?.timetable?.module?.name || 'Simulasi'}</span>
                         </div>
                         {alertCount > 0 && (
                             <div className="px-3 py-1 bg-red-500/90 text-white rounded-lg animate-pulse flex items-center gap-1">
@@ -211,15 +229,21 @@ const ExamContainer = ({ userTimetableId }) => {
 
                 {/* Center Content: Question Area */}
                 <main className="flex-1 flex flex-col overflow-hidden bg-white">
-                    <QuestionArea
-                        question={currentQuestion}
-                        index={currentQuestionIndex}
-                        total={examData.questions.length}
-                        onSave={handleSaveAnswer}
-                        onNext={() => setCurrentQuestionIndex(prev => Math.min(examData.questions.length - 1, prev + 1))}
-                        onPrev={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
-                        onFinish={handleFinishExam}
-                    />
+                    {currentQuestion ? (
+                        <QuestionArea
+                            question={currentQuestion}
+                            index={currentQuestionIndex}
+                            total={examData.questions.length}
+                            onSave={handleSaveAnswer}
+                            onNext={() => setCurrentQuestionIndex(prev => Math.min(examData.questions.length - 1, prev + 1))}
+                            onPrev={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
+                            onFinish={handleFinishExam}
+                        />
+                    ) : (
+                        <div className="flex items-center justify-center h-full">
+                            <p className="text-gray-400">Pilih soal untuk melanjutkan</p>
+                        </div>
+                    )}
                 </main>
 
                 {/* Right Sidebar: Camera & Profile */}

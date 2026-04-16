@@ -7,9 +7,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import LatexHTML from './LatexHTML';
 
 const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish }) => {
-    const [selectedAnswerId, setSelectedAnswerId] = useState(question.timetable_answer_id);
-    const [essayAnswer, setEssayAnswer] = useState(question.essay_answer || '');
-    const [isMarked, setIsMarked] = useState(question.is_mark);
+    const [selectedAnswerId, setSelectedAnswerId] = useState(question?.timetable_answer_id);
+    const [essayAnswer, setEssayAnswer] = useState(question?.essay_answer || '');
+    const [isMarked, setIsMarked] = useState(question?.is_mark);
     const [viewedImage, setViewedImage] = useState(null);
 
     // Refs to track latest state for unmount saving
@@ -18,10 +18,10 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
     const originalEssayValue = question.essay_answer || '';
 
     React.useEffect(() => {
-        setSelectedAnswerId(question.timetable_answer_id);
-        setEssayAnswer(question.essay_answer || '');
-        setIsMarked(question.is_mark);
-    }, [question.id]);
+        setSelectedAnswerId(question?.timetable_answer_id);
+        setEssayAnswer(question?.essay_answer || '');
+        setIsMarked(question?.is_mark);
+    }, [question?.id]);
 
     const handleAnswerSelect = (id) => {
         setSelectedAnswerId(id);
@@ -36,7 +36,7 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
 
     // Debounced save for essay + Save on Unmount
     React.useEffect(() => {
-        if (question.timetable_question.type !== 'essay') return;
+        if (question?.timetable_question?.type !== 'essay') return;
         
         const timeoutId = setTimeout(() => {
             if (essayAnswer !== originalEssayValue) {
@@ -51,7 +51,7 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
                 onSave(selectedAnswerId, isMarkedRef.current, essayValueRef.current);
             }
         };
-    }, [question.id, essayAnswer]);
+    }, [question?.id, essayAnswer]);
 
     const handleToggleMark = () => {
         const newMark = !isMarked;
@@ -61,14 +61,14 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
     };
 
     const handleNext = () => {
-        if (question.timetable_question.type === 'essay' && essayAnswer !== originalEssayValue) {
+        if (question?.timetable_question?.type === 'essay' && essayAnswer !== originalEssayValue) {
             onSave(selectedAnswerId, isMarked, essayAnswer);
         }
         onNext();
     };
 
     const handlePrev = () => {
-        if (question.timetable_question.type === 'essay' && essayAnswer !== originalEssayValue) {
+        if (question?.timetable_question?.type === 'essay' && essayAnswer !== originalEssayValue) {
             onSave(selectedAnswerId, isMarked, essayAnswer);
         }
         onPrev();
@@ -107,22 +107,22 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
                         {/* Question Text */}
                         <div className="space-y-6">
                             <div className="prose prose-xl max-w-none text-gray-900 leading-relaxed font-medium text-justify">
-                                <LatexHTML html={question.timetable_question.question} />
+                                <LatexHTML html={question?.timetable_question?.question || 'Soal tidak dapat dimuat.'} />
                             </div>
-                            {question.timetable_question.description && (
+                            {question?.timetable_question?.description && (
                                 <div className="prose prose-xl max-w-none text-gray-900 leading-relaxed font-medium text-justify">
                                     <LatexHTML
                                         className="text-orange-600/80 text-sm italic leading-snug font-medium prose-sm prose-orange"
-                                        html={question.timetable_question.description}
+                                        html={question?.timetable_question?.description}
                                     />
                                 </div>
                             )}
                         </div>
 
                         {/* Question Images */}
-                        {question.timetable_question.images && (
+                        {question?.timetable_question?.images && (
                             (() => {
-                                const parseImages = JSON.parse(question.timetable_question.images || '[]');
+                                const parseImages = JSON.parse(question?.timetable_question?.images || '[]');
                                 if (parseImages.length === 0) return null;
 
                                 return (
@@ -151,14 +151,14 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
                         )}
 
                         {/* Latex Preview */}
-                        {question.timetable_question.latex_preview_png && (
+                        {question?.timetable_question?.latex_preview_png && (
                             <div className="flex justify-start -mt-4">
                                 <div
-                                    onClick={() => setViewedImage(`/storage/${question.timetable_question.latex_preview_png}`)}
+                                    onClick={() => setViewedImage(`/storage/${question?.timetable_question?.latex_preview_png}`)}
                                     className="group relative p-6 bg-white rounded-2xl border-2 border-dashed border-gray-200 shadow-sm transition-all hover:border-orange-400 hover:shadow-xl cursor-zoom-in"
                                 >
                                     <img
-                                        src={`/storage/${question.timetable_question.latex_preview_png}`}
+                                        src={`/storage/${question?.timetable_question?.latex_preview_png}`}
                                         alt="Equation"
                                         className="w-full h-auto object-contain mx-auto mix-blend-multiply"
                                     />
@@ -173,7 +173,7 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
 
                         {/* Answers / Essay Input */}
                         <div className="pb-20">
-                            {question.timetable_question.type === 'essay' ? (
+                            {question?.timetable_question?.type === 'essay' ? (
                                 <div className="space-y-4">
                                     <label className="block text-lg font-bold text-gray-700">Jawaban Anda:</label>
                                     <textarea
@@ -188,7 +188,7 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 gap-4">
-                                    {question.timetable_question.answers.map((answer, i) => (
+                                    {question?.timetable_question?.answers?.map((answer, i) => (
                                         <label
                                             key={answer.id}
                                             className={`group relative flex items-start gap-5 p-6 rounded-3xl border-2 cursor-pointer transition-all duration-300 ${selectedAnswerId === answer.id

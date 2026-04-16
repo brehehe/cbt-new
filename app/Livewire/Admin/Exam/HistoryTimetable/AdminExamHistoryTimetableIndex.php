@@ -50,10 +50,10 @@ class AdminExamHistoryTimetableIndex extends Component
                 $query->whereHas('timetable', function ($q) {
                     $q->where('name', 'like', '%' . $this->search . '%');
                 })
-                ->orWhereHas('user', function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%')
-                        ->orWhere('email', 'like', '%' . $this->search . '%');
-                });
+                    ->orWhereHas('user', function ($q) {
+                        $q->where('name', 'like', '%' . $this->search . '%')
+                            ->orWhere('email', 'like', '%' . $this->search . '%');
+                    });
             })
             ->where('user_id', Auth::id())
             ->where('status', 'done')

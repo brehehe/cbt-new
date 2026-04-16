@@ -68,8 +68,8 @@
                         </button>
                     @else
                         <button wire:click="finish" wire:loading.attr="disabled"
-                            class="px-10 py-3 bg-gradient-to-r from-orange-600 to-purple-600 text-white rounded-xl font-bold shadow-xl shadow-orange-200 hover:from-orange-700 hover:to-purple-700 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed group">
-                            <span wire:loading.remove>Mulai Gunakan PRO-CBT <i class="fas fa-rocket ml-2"></i></span>
+                            class="px-10 py-3 bg-orange-600 text-white rounded-xl font-bold shadow-xl shadow-orange-200 hover:bg-orange-700 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed group">
+                            <span wire:loading.remove>Mulai Simulasikan Ujian <i class="fas fa-rocket ml-2"></i></span>
                             <span wire:loading><i class="fas fa-spinner animate-spin mr-2"></i> Menyiapkan...</span>
                         </button>
                     @endif

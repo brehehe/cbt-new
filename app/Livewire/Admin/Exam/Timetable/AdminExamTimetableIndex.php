@@ -319,6 +319,7 @@ class AdminExamTimetableIndex extends Component
                         ->orWhere('description', 'ilike', '%' . $search . '%');
                 });
             })
+            ->where('is_simulation', 'false')
             ->where(function ($query) {
                 $now = Carbon::now();
                 $query->where('start_time', '<=', $now->copy()->addMinutes(5))

@@ -391,6 +391,7 @@ class AdminMasterTimetableIndex extends Component
                     ->orWhere('end_time', 'ilike', '%' . $search . '%')
                     ->orWhere('description', 'ilike', '%' . $search . '%');
             })
+            ->where('is_simulation', 'false')
             ->orderBy('order', 'desc')
             ->paginate($this->perPage);
 
