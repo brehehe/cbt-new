@@ -68,7 +68,7 @@ class AdminReportItemAnalysisDetailIndex extends Component
         $totalParticipants = $userResponses->count();
 
         if ($totalParticipants == 0) {
-            return $this->getEmptyAnalysis();
+            return $this->getEmptyAnalysis($question);
         }
 
         // Calculate basic statistics
@@ -245,10 +245,10 @@ class AdminReportItemAnalysisDetailIndex extends Component
         return round($difficulty * $q * $discrimination, 4);
     }
 
-    public function getEmptyAnalysis()
+    public function getEmptyAnalysis($question)
     {
         return [
-            'question' => null,
+            'question' => $question,
             'total_participants' => 0,
             'correct_answers' => 0,
             'incorrect_answers' => 0,
