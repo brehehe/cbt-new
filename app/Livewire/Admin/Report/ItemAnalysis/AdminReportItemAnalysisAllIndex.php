@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\Report\ItemAnalysis;
 
+use App\Helpers\AlertHelper;
 use App\Models\Master\Question\Question;
 use App\Models\Timetable\TimetableQuestion;
 use App\Models\User\UserModuleQuestion;
@@ -44,6 +45,31 @@ class AdminReportItemAnalysisAllIndex extends Component
         });
 
         session()->flash('message', 'Difficulty berhasil diperbarui.');
+    }
+
+    public function confirmDeleteAttempts(string $questionId): void
+    {
+        AlertHelper::confirmDelete(
+            'deleteAttempts',
+            'Apakah Anda yakin ingin menghapus SEMUA data jawaban peserta untuk soal ini? Tindakan ini tidak dapat dibatalkan.',
+            $questionId
+        );
+    }
+
+    public function deleteAttempts($params): void
+    {
+        $questionId = is_array($params) ? $params[0] : $params;
+
+        DB::transaction(function () use ($questionId) {
+            $timetableQuestionIds = TimetableQuestion::where('question_id', $questionId)->pluck('id');
+
+            UserModuleQuestion::withoutGlobalScope('user_scope')
+                ->whereIn('timetable_question_id', $timetableQuestionIds)
+                ->where('company_id', auth()->user()?->company_id)
+                ->delete();
+        });
+
+        AlertHelper::success('Berhasil', 'Data jawaban untuk soal ini telah dibersihkan.');
     }
 
     public function generateAll(): void
@@ -121,7 +147,7 @@ class AdminReportItemAnalysisAllIndex extends Component
                 DB::raw("sum(case when user_module_questions.status in ('correct', 'wrong') then 1 else 0 end) as total_attempts"),
                 DB::raw("sum(case when user_module_questions.status = 'correct' then 1 else 0 end) as total_correct"),
             ])
-            ->orderBy('questions.question');
+            ->orderBy('questions.question', 'asc');
 
         $items = $query->paginate($this->perPage);
 

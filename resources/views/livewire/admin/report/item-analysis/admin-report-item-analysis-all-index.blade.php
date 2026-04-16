@@ -161,6 +161,9 @@
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-40">
                             Daya Pembeda
                         </th>
+                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
+                            Aksi
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -232,6 +235,13 @@
                                 <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full border {{ $discriminationColor }}">
                                     {{ $discriminationLabel }}
                                 </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                <button wire:click="confirmDeleteAttempts('{{ $item->question_id }}')"
+                                        class="text-red-600 hover:text-red-900 transition-colors duration-150 p-2 rounded-lg hover:bg-red-50"
+                                        title="Hapus Data Jawaban">
+                                    <i class="fas fa-trash-can"></i>
+                                </button>
                             </td>
                         </tr>
                     @empty

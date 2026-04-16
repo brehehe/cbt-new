@@ -24,6 +24,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use Throwable;
 use App\Traits\UploadFile;
 use Spatie\LivewireFilepond\WithFilePond;
+use App\Exports\QuestionExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class AdminMasterQuestionIndex extends Component
@@ -420,5 +422,41 @@ class AdminMasterQuestionIndex extends Component
 
         $this->closeModal();
         return AlertHelper::success('Berhasil', 'Data berhasil diimport, silahkan tunggu beberapa saat.');
+    }
+
+    public function exportExcel()
+    {
+        if (!config('app.export_question')) {
+            return AlertHelper::error('Gagal', 'Fitur export dinonaktifkan.');
+        }
+
+        $questions = $this->buildQuestionsQuery()
+            ->with(['study', 'topic', 'categoryQuestion', 'answers'])
+            ->get();
+
+        return Excel::download(new QuestionExport($questions), 'bank-soal-' . date('Y-m-d-H-i-s') . '.xlsx');
+    }
+
+    public function exportPdf()
+    {
+        if (!config('app.export_question')) {
+            return AlertHelper::error('Gagal', 'Fitur export dinonaktifkan.');
+        }
+
+        $questions = $this->buildQuestionsQuery()
+            ->with(['study', 'topic', 'categoryQuestion', 'answers'])
+            ->get();
+
+        $company = Auth::user()->company;
+
+        $pdf = Pdf::loadView('livewire.admin.master.question.admin-master-question-pdf', [
+            'questions' => $questions,
+            'company' => $company,
+        ])->setPaper('a4', 'landscape');
+
+        return response()->streamDownload(
+            fn () => print($pdf->output()),
+            'bank-soal-' . date('Y-m-d-H-i-s') . '.pdf'
+        );
     }
 }

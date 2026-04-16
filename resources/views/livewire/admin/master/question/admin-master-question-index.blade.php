@@ -10,22 +10,31 @@
                     Data Bank Soal</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
-            <div>
+            <div class="flex items-center gap-2">
                 @if (config('app.import_question'))
-                    <button wire:click="openModalImport()" class="btn btn-primary">
+                    <button wire:click="openModalImport()" class="btn btn-primary flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="icon icon-tabler icons-tabler-outline icon-tabler-file-import h-4 w-4"">
-                                                                            <path stroke=" none" d="M0 0h24v24H0z"
-                            fill="none" />
-                        <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                        <path d="M5 13v-8a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-5.5m-9.5 -2h7m-3 -3l3 3l-3 3" />
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-file-import h-4 w-4">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                            <path d="M5 13v-8a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-5.5m-9.5 -2h7m-3 -3l3 3l-3 3" />
                         </svg>
                         Import
                     </button>
                 @endif
+                @if (config('app.export_question'))
+                    <button wire:click="exportExcel" class="btn btn-success flex items-center gap-2">
+                        <i class="fa-solid fa-file-excel text-sm"></i>
+                        Excel
+                    </button>
+                    <button wire:click="exportPdf" class="btn btn-danger flex items-center gap-2">
+                        <i class="fa-solid fa-file-pdf text-sm"></i>
+                        PDF
+                    </button>
+                @endif
                 <button wire:click="openModal()"
-                    class="{{ in_array(config('app.name_slug'), ['pro-cbt']) ? 'btn btn-warning' : 'btn btn-primary' }}">
+                    class="{{ in_array(config('app.name_slug'), ['pro-cbt']) ? 'btn btn-warning' : 'btn btn-primary' }} flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
