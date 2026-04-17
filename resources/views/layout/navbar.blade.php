@@ -103,7 +103,7 @@
                         class="flex items-center gap-2 sm:gap-3 p-2 rounded-xl hover:bg-[#C3D4EC]/20 transition-all duration-200">
                         <!-- Profile Image -->
                         <div class="h-8 w-8 rounded-lg overflow-hidden bg-white flex items-center justify-center">
-                            <img src="{{ auth()->user()->profile ?? asset('asset/img/profile.png') }}" alt="Profile"
+                            <img src="{{ auth()->user()->profile ? asset('storage/' . auth()->user()->profile) : asset('asset/img/profile.png') }}" alt="Profile"
                                 class="h-full w-full object-cover">
                         </div>
                         <!-- Profile Info (Hidden on small screens) -->

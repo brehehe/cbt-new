@@ -100,7 +100,7 @@
                         @php
                             $profile = $class->user->profile
                                 ? asset('storage/' . $class->user->profile)
-                                : auth()->user()->profile ?? asset('asset/img/profile.png');
+                                : (auth()->user()->profile ? asset('storage/' . auth()->user()->profile) : asset('asset/img/profile.png'));
                         @endphp
                         <tr class="h-6">
                             <td class="border border-gray-400">{{ $loop->iteration }}</td>
