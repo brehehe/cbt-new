@@ -37,12 +37,16 @@ class AdminMasterMaterialIndex extends Component
 
     public function mount()
     {
-        $this->topics              = Topic::select('id', 'name')->get();
+        $this->topics = Topic::select('id', 'name')->get();
     }
 
     public function updatedTopicId($value)
     {
         $this->material_category_id = null;
+        if (empty($value)) {
+            $this->material_categories = [];
+            return;
+        }
         $this->material_categories = MaterialCategory::select('id', 'topic_id', 'name')
             ->where('topic_id', $value)->whereDoesntHave('childs')->get();
     }
@@ -68,31 +72,31 @@ class AdminMasterMaterialIndex extends Component
     {
         $this->validate(
             [
-                'topic_id'             => 'required|exists:topics,id',
+                'topic_id' => 'required|exists:topics,id',
                 'material_category_id' => 'required|exists:material_categories,id',
-                'name'                 => 'required',
-                'level'                => 'required',
-                'description'          => 'nullable',
+                'name' => 'required',
+                'level' => 'required',
+                'description' => 'nullable',
             ],
             [
-                'topic_id.required'             => 'Topik wajib diisi.',
+                'topic_id.required' => 'Topik wajib diisi.',
                 'material_category_id.required' => 'kategori materi wajib diisi.',
-                'material_category_id.exists'   => 'Kategori materi tidak valid.',
-                'name.required'                 => 'Nama materi wajib diisi.',
-                'level.required'                => 'Level materi wajib diisi.',
+                'material_category_id.exists' => 'Kategori materi tidak valid.',
+                'name.required' => 'Nama materi wajib diisi.',
+                'level.required' => 'Level materi wajib diisi.',
             ]
         );
 
         try {
             DB::beginTransaction();
             $request = [
-                'id'                   => $this->data_id,
-                'company_id'           => Auth::user()?->company?->id,
-                'topic_id'             => $this->topic_id,
+                'id' => $this->data_id,
+                'company_id' => Auth::user()?->company?->id,
+                'topic_id' => $this->topic_id,
                 'material_category_id' => $this->material_category_id,
-                'name'                 => $this->name,
-                'level'                => $this->level,
-                'description'          => $this->description,
+                'name' => $this->name,
+                'level' => $this->level,
+                'description' => $this->description,
             ];
 
             $material = app(MaterialService::class)->updateOrCreate($request);
@@ -105,8 +109,8 @@ class AdminMasterMaterialIndex extends Component
             DB::rollBack();
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterMaterialIndex => submit', $error);
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
@@ -118,13 +122,13 @@ class AdminMasterMaterialIndex extends Component
 
     public function edit($id)
     {
-        $result                     = Material::findOrFail($id);
-        $this->data_id              = $result?->id;
-        $this->topic_id             = $result?->topic_id;
+        $result = Material::findOrFail($id);
+        $this->data_id = $result?->id;
+        $this->topic_id = $result?->topic_id;
         $this->material_category_id = $result?->material_category_id;
-        $this->name                 = $result?->name;
-        $this->level                = $result?->level;
-        $this->description          = $result?->description;
+        $this->name = $result?->name;
+        $this->level = $result?->level;
+        $this->description = $result?->description;
         $this->openModal();
     }
 
@@ -140,8 +144,8 @@ class AdminMasterMaterialIndex extends Component
         } catch (Exception | Throwable $th) {
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterMaterialIndex => delete', $error);
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menghapus data');

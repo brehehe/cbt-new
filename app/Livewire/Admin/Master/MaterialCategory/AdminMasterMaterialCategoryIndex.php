@@ -33,7 +33,7 @@ class AdminMasterMaterialCategoryIndex extends Component
             ->select('id', 'company_id', 'topic_id', 'material_category_id', 'name', 'description')
             ->with([
                 'topic:id,name'
-            ])->where('topic_id', $this->topic_id)->get();
+            ])->when(!empty($this->topic_id), fn($q) => $q->where('topic_id', $this->topic_id))->get();
 
         $topics = Topic::select('id', 'name')->get();
         return view('livewire.admin.master.material-category.admin-master-material-category-index',[
