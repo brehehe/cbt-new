@@ -26,26 +26,26 @@ class DatabaseSeeder extends Seeder
             ServiceSeeder::class,
             ServiceMonthSeeder::class,
 
-            // Region
+                // Region
             CountrySeeder::class,
 
-            // Company
+                // Company
             CompanySeeder::class,
 
-            //Master
-            // QuestionTypeSeeder::class,
+                //Master
+            QuestionTypeSeeder::class,
 
-            // Question
+                // Question
+            QuestionSeeder::class,
         ]);
         if (env('QUESTION_DUMMY') === true) {
             $this->call([
-                // QuestionSeeder::class,
             ]);
         }
         $this->call([
             StudySeeder::class,
             UserDetailSeeder::class,
-            // QuestionPaketSeeder::class,
+            QuestionPaketSeeder::class,
         ]);
     }
 }
