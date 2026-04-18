@@ -17,7 +17,7 @@ class AdminReportStudentExamResultIndex extends Component
     public $search = '';
     public $user_id = '';
     public $perPage = 10;
-    
+
     // Cache users list for dropdown
     public $users = [];
 
@@ -28,7 +28,7 @@ class AdminReportStudentExamResultIndex extends Component
         $this->users = User::query()
             ->where('company_id', $companyId)
             // ->role('Mahasiswa')
-            ->orderBy('name','asc')
+            ->orderBy('name', 'asc')
             ->get(['id', 'name', 'nim', 'username']);
     }
 
@@ -36,7 +36,7 @@ class AdminReportStudentExamResultIndex extends Component
     {
         $this->resetPage();
     }
-    
+
     public function updatingUserId()
     {
         $this->resetPage();
@@ -62,8 +62,8 @@ class AdminReportStudentExamResultIndex extends Component
             $examResults = UserTimetable::with(['timetable.module', 'timetable.examSession', 'timetable.examRoom'])
                 ->where('user_id', $this->user_id)
                 ->where('status', 'done')
-                ->where(function($query) {
-                    $query->whereHas('timetable', function($q) {
+                ->where(function ($query) {
+                    $query->whereHas('timetable', function ($q) {
                         $q->search($this->search);
                     });
                 })
@@ -93,8 +93,8 @@ class AdminReportStudentExamResultIndex extends Component
         $examResults = UserTimetable::with(['timetable.module', 'timetable.examSession', 'timetable.examRoom'])
             ->where('user_id', $this->user_id)
             ->where('status', 'done')
-            ->where(function($query) {
-                $query->whereHas('timetable', function($q) {
+            ->where(function ($query) {
+                $query->whereHas('timetable', function ($q) {
                     $q->search($this->search);
                 });
             })
@@ -125,8 +125,8 @@ class AdminReportStudentExamResultIndex extends Component
             ->setPaper('a4', 'portrait');
 
         return response()->streamDownload(
-            fn () => print($pdf->output()),
-            'hasil-ujian-siswa_' . \Str::slug($user->name) . '_' . date('Y-m-d') . '.pdf'
+            fn() => print ($pdf->output()),
+            'hasil-ujian-mahasiswa_' . \Str::slug($user->name) . '_' . date('Y-m-d') . '.pdf'
         );
     }
 }

@@ -3,7 +3,7 @@
     <div class="flex flex-col gap-4 mb-6 lg:flex-row lg:items-center lg:justify-between">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Live Exam Monitoring</h1>
-            <p class="text-sm text-gray-600">Monitor siswa yang sedang mengerjakan ujian secara real-time</p>
+            <p class="text-sm text-gray-600">Monitor Mahasiswa yang sedang mengerjakan ujian secara real-time</p>
         </div>
 
         <div class="flex flex-col gap-2 lg:flex-row lg:items-center">
@@ -108,14 +108,15 @@
                     <option value="">Semua Jadwal</option>
                     @foreach ($activeTimetables as $timetable)
                         <option value="{{ $timetable->id }}">{{ $timetable->name }} -
-                            {{ $timetable->module->name ?? '' }}</option>
+                            {{ $timetable->module->name ?? '' }}
+                        </option>
                     @endforeach
                 </select>
             </div>
 
             <!-- Search -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Cari Siswa</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Cari Mahasiswa</label>
                 <input type="text" wire:model.live.debounce.300ms="search" placeholder="Nama, NIM, Username..."
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
@@ -158,7 +159,7 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Siswa</th>
+                            Mahasiswa</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Ujian</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -177,149 +178,148 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($activeSessions as $session)
-                        <tr class="hover:bg-gray-50">
-                            <!-- Student Info -->
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-10 w-10">
-                                        <div
-                                            class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-medium">
-                                            {{ strtoupper(substr($session->user->name ?? 'U', 0, 2)) }}
-                                        </div>
-                                    </div>
-                                    <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900">
-                                            {{ $session->user->name ?? 'Unknown' }}</div>
-                                        <div class="text-sm text-gray-500">
-                                            {{ $session->user->nim ?? ($session->user->username ?? 'N/A') }}</div>
-                                    </div>
-                                </div>
-                            </td>
+                                    <tr class="hover:bg-gray-50">
+                                        <!-- Student Info -->
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10">
+                                                    <div
+                                                        class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-medium">
+                                                        {{ strtoupper(substr($session->user->name ?? 'U', 0, 2)) }}
+                                                    </div>
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900">
+                                                        {{ $session->user->name ?? 'Unknown' }}
+                                                    </div>
+                                                    <div class="text-sm text-gray-500">
+                                                        {{ $session->user->nim ?? ($session->user->username ?? 'N/A') }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
 
-                            <!-- Exam Info -->
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ $session->timetable->name ?? 'N/A' }}</div>
-                                <div class="text-sm text-gray-500">{{ $session->timetable->module->name ?? 'N/A' }}
-                                </div>
-                            </td>
+                                        <!-- Exam Info -->
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900">{{ $session->timetable->name ?? 'N/A' }}</div>
+                                            <div class="text-sm text-gray-500">{{ $session->timetable->module->name ?? 'N/A' }}
+                                            </div>
+                                        </td>
 
-                            <!-- Progress -->
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    {{ $session->current_question_number }}/{{ $session->total_questions }}</div>
-                                <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
-                                    <div class="bg-blue-600 h-2 rounded-full"
-                                        style="width: {{ $session->progress_percentage }}%"></div>
-                                </div>
-                                <div class="text-xs text-gray-500 mt-1">{{ $session->progress_percentage }}% completed
-                                </div>
-                            </td>
+                                        <!-- Progress -->
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900">
+                                                {{ $session->current_question_number }}/{{ $session->total_questions }}
+                                            </div>
+                                            <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                                                <div class="bg-blue-600 h-2 rounded-full"
+                                                    style="width: {{ $session->progress_percentage }}%"></div>
+                                            </div>
+                                            <div class="text-xs text-gray-500 mt-1">{{ $session->progress_percentage }}% completed
+                                            </div>
+                                        </td>
 
-                            <!-- Connection Status -->
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span @class([
-                                    'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
-                                    'bg-green-100 text-green-800' =>
-                                        $session->connection_status === 'connected',
-                                    'bg-red-100 text-red-800' => $session->connection_status === 'disconnected',
-                                    'bg-yellow-100 text-yellow-800' =>
-                                        $session->connection_status === 'unstable',
-                                    'bg-gray-100 text-gray-800' => !in_array($session->connection_status, [
-                                        'connected',
-                                        'disconnected',
-                                        'unstable',
-                                    ]),
-                                ])>
-                                    {{ ucfirst($session->connection_status) }}
-                                </span>
-                            </td>
+                                        <!-- Connection Status -->
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span @class([
+                                                'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
+                                                'bg-green-100 text-green-800' =>
+                                                    $session->connection_status === 'connected',
+                                                'bg-red-100 text-red-800' => $session->connection_status === 'disconnected',
+                                                'bg-yellow-100 text-yellow-800' =>
+                                                    $session->connection_status === 'unstable',
+                                                'bg-gray-100 text-gray-800' => !in_array($session->connection_status, [
+                                                    'connected',
+                                                    'disconnected',
+                                                    'unstable',
+                                                ]),
+                                            ])>
+                                                {{ ucfirst($session->connection_status) }}
+                                            </span>
+                                        </td>
 
-                            <!-- Camera Status -->
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span @class([
-                                    'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
-                                    'bg-green-100 text-green-800' => $session->camera_status === 'active',
-                                    'bg-red-100 text-red-800' => in_array($session->camera_status, [
-                                        'inactive',
-                                        'error',
-                                    ]),
-                                    'bg-yellow-100 text-yellow-800' => $session->camera_status === 'pending',
-                                    'bg-gray-100 text-gray-800' => !in_array($session->camera_status, [
-                                        'active',
-                                        'inactive',
-                                        'error',
-                                        'pending',
-                                    ]),
-                                ])>
-                                    {{ ucfirst($session->camera_status) }}
-                                </span>
-                            </td>
+                                        <!-- Camera Status -->
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span @class([
+                                                'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
+                                                'bg-green-100 text-green-800' => $session->camera_status === 'active',
+                                                'bg-red-100 text-red-800' => in_array($session->camera_status, [
+                                                    'inactive',
+                                                    'error',
+                                                ]),
+                                                'bg-yellow-100 text-yellow-800' => $session->camera_status === 'pending',
+                                                'bg-gray-100 text-gray-800' => !in_array($session->camera_status, [
+                                                    'active',
+                                                    'inactive',
+                                                    'error',
+                                                    'pending',
+                                                ]),
+                                            ])>
+                                                {{ ucfirst($session->camera_status) }}
+                                            </span>
+                                        </td>
 
-                            <!-- Alerts -->
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center space-x-2">
-                                    <span @class([
-                                        'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
-                                        'bg-red-100 text-red-800' => $session->risk_level === 'high',
-                                        'bg-yellow-100 text-yellow-800' => $session->risk_level === 'medium',
-                                        'text-white border' => $session->risk_level === 'low',
-                                        'bg-green-100 text-green-800' => $session->risk_level === 'none',
-                                        'bg-gray-100 text-gray-800' => !in_array($session->risk_level, ['high','medium','low','none']),
-                                    ])
-                                    style="{{ $session->risk_level === 'low'
-                                        ? 'background-color:' . ($companyData->color_primary ?? '#2b7fff') .
-                                        ';border-color:' . ($companyData->color_primary ?? '#2b7fff')
-                                        : '' }}"
-                                    >
-                                        {{ $session->alert_count }} alerts
-                                    </span>
+                                        <!-- Alerts -->
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center space-x-2">
+                                                <span @class([
+                                                    'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
+                                                    'bg-red-100 text-red-800' => $session->risk_level === 'high',
+                                                    'bg-yellow-100 text-yellow-800' => $session->risk_level === 'medium',
+                                                    'text-white border' => $session->risk_level === 'low',
+                                                    'bg-green-100 text-green-800' => $session->risk_level === 'none',
+                                                    'bg-gray-100 text-gray-800' => !in_array($session->risk_level, ['high', 'medium', 'low', 'none']),
+                                                ])
+                                                    style="{{ $session->risk_level === 'low'
+                        ? 'background-color:' . ($companyData->color_primary ?? '#2b7fff') .
+                        ';border-color:' . ($companyData->color_primary ?? '#2b7fff')
+                        : '' }}">
+                                                    {{ $session->alert_count }} alerts
+                                                </span>
 
-                                </div>
-                            </td>
+                                            </div>
+                                        </td>
 
-                            <!-- Last Activity -->
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $session->last_activity ? $session->last_activity->diffForHumans() : 'N/A' }}
-                            </td>
+                                        <!-- Last Activity -->
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ $session->last_activity ? $session->last_activity->diffForHumans() : 'N/A' }}
+                                        </td>
 
-                            <!-- Actions -->
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <div class="flex items-center space-x-2">
-                                    <button wire:click="viewSessionDetail('{{ $session->id }}')"
-                                        class="text-blue-600 hover:text-blue-900 p-1 rounded">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                    </button>
+                                        <!-- Actions -->
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div class="flex items-center space-x-2">
+                                                <button wire:click="viewSessionDetail('{{ $session->id }}')"
+                                                    class="text-blue-600 hover:text-blue-900 p-1 rounded">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                    </svg>
+                                                </button>
 
-                                    @if ($session->connection_status === 'connected')
-                                        <button wire:click="forceDisconnect('{{ $session->id }}')"
-                                            wire:confirm="Apakah Anda yakin ingin memutuskan koneksi siswa ini?"
-                                            class="text-yellow-600 hover:text-yellow-900 p-1 rounded">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636" />
-                                            </svg>
-                                        </button>
-                                    @endif
+                                                @if ($session->connection_status === 'connected')
+                                                    <button wire:click="forceDisconnect('{{ $session->id }}')"
+                                                        wire:confirm="Apakah Anda yakin ingin memutuskan koneksi Mahasiswa ini?"
+                                                        class="text-yellow-600 hover:text-yellow-900 p-1 rounded">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636" />
+                                                        </svg>
+                                                    </button>
+                                                @endif
 
-                                    <button wire:click="terminateSession('{{ $session->id }}')"
-                                        wire:confirm="Apakah Anda yakin ingin menghentikan sesi ujian ini?"
-                                        class="text-red-600 hover:text-red-900 p-1 rounded">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                                                <button wire:click="terminateSession('{{ $session->id }}')"
+                                                    wire:confirm="Apakah Anda yakin ingin menghentikan sesi ujian ini?"
+                                                    class="text-red-600 hover:text-red-900 p-1 rounded">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
                     @empty
                         <tr>
                             <td colspan="8" class="px-6 py-4 text-center text-gray-500">
@@ -342,14 +342,14 @@
     <script>
         let autoRefreshInterval;
 
-        document.addEventListener('livewire:initialized', function() {
+        document.addEventListener('livewire:initialized', function () {
             // Initialize auto refresh
             if (@json($autoRefresh)) {
                 startAutoRefresh();
             }
 
             // Listen for auto refresh toggle
-            Livewire.on('autoRefreshToggled', function(enabled) {
+            Livewire.on('autoRefreshToggled', function (enabled) {
                 if (enabled) {
                     startAutoRefresh();
                 } else {
@@ -358,7 +358,7 @@
             });
 
             // Listen for data refresh events
-            Livewire.on('dataRefreshed', function() {
+            Livewire.on('dataRefreshed', function () {
                 console.log('Data refreshed at', new Date().toLocaleTimeString());
             });
         });
@@ -378,7 +378,7 @@
         }
 
         // Clean up when page is unloaded
-        window.addEventListener('beforeunload', function() {
+        window.addEventListener('beforeunload', function () {
             stopAutoRefresh();
         });
     </script>

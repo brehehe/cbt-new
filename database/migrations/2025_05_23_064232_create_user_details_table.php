@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -44,7 +43,7 @@ return new class extends Migration
             $table->enum('marital_status', ['single', 'married', 'divorced', 'widowed'])->nullable()->comment('Status pernikahan');
 
             // Data Akademik untuk Mahasiswa
-            $table->string('nim')->nullable()->comment('Nomor Induk Siswa');
+            $table->string('nim')->nullable()->comment('Nomor Induk Mahasiswa');
             $table->string('student_program')->nullable()->comment('Program studi untuk mahasiswa');
             $table->string('student_faculty')->nullable()->comment('Fakultas untuk mahasiswa');
             $table->string('student_department')->nullable()->comment('Jurusan untuk mahasiswa');

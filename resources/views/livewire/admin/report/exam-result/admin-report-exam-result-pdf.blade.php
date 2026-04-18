@@ -227,7 +227,7 @@
         <thead>
             <tr>
                 <th class="col-no">No</th>
-                <th class="text-left">Nama Siswa</th>
+                <th class="text-left">Nama Mahasiswa</th>
                 <th>NIM/Username</th>
                 <th>Modul</th>
                 <th>Jadwal Ujian</th>

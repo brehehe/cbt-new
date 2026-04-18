@@ -84,14 +84,14 @@
                 <thead>
                     <tr>
                         <th class="w-1 center">No</th>
-                        <th>Nama Siswa</th>
+                        <th>Nama Mahasiswa</th>
                         <th>NIM/Username</th>
                         <th>Modul</th>
                         <th>Jadwal</th>
                         <th>Mulai</th>
                         <th>Selesai</th>
-                            <th>Nilai</th>
-                            <th>Skala Penilaian</th>
+                        <th>Nilai</th>
+                        <th>Skala Penilaian</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -107,13 +107,13 @@
                             <td>{{ $result->timetable?->name ?? '-' }}</td>
                             <td>{{ $result->timetable?->start_time?->format('d F Y H:i') ?? '-' }}</td>
                             <td>{{ $result->timetable?->end_time?->format('d F Y H:i') ?? '-' }}</td>
-                                <td>{{ $result->mark ?? '-' }}</td>
-                                <td>
-                                    <div class="flex flex-col">
-                                        <span class="font-semibold">{{ $gradeDetail?->grade_letter ?? '-' }}</span>
-                                        <span class="text-xs text-gray-500">{{ $gradeDetail?->description ?? '-' }}</span>
-                                    </div>
-                                </td>
+                            <td>{{ $result->mark ?? '-' }}</td>
+                            <td>
+                                <div class="flex flex-col">
+                                    <span class="font-semibold">{{ $gradeDetail?->grade_letter ?? '-' }}</span>
+                                    <span class="text-xs text-gray-500">{{ $gradeDetail?->description ?? '-' }}</span>
+                                </div>
+                            </td>
                         </tr>
                     @empty
                         <tr>

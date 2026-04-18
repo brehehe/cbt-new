@@ -61,7 +61,7 @@
         <div class="grid grid-cols-1 gap-6 mb-6 lg:grid-cols-3">
             <!-- Student Info Card -->
             <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Informasi Siswa</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Informasi Mahasiswa</h3>
                 <div class="space-y-3">
                     <div class="flex items-center">
                         <div

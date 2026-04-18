@@ -1,31 +1,96 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Laporan Hasil Ujian Siswa</title>
+    <title>Laporan Hasil Ujian Mahasiswa</title>
     <style>
-        body { font-family: sans-serif; }
-        .header { text-align: center; margin-bottom: 20px; }
-        .company-logo { height: 60px; margin-bottom: 10px; }
-        .company-name { font-size: 18px; font-weight: bold; }
-        .company-address { font-size: 12px; color: #555; }
-        .report-title { font-size: 16px; font-weight: bold; margin-top: 20px; text-decoration: underline; }
-        
-        .student-info { margin-bottom: 20px; width: 100%; }
-        .student-info td { padding: 5px; }
-        .info-label { font-weight: bold; width: 120px; }
-        
-        table.results { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
-        table.results th, table.results td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        table.results th { background-color: #f2f2f2; }
-        
-        .footer { margin-top: 30px; text-align: right; font-size: 12px; }
-        .signature { margin-top: 50px; }
-        
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .font-bold { font-weight: bold; }
+        body {
+            font-family: sans-serif;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .company-logo {
+            height: 60px;
+            margin-bottom: 10px;
+        }
+
+        .company-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .company-address {
+            font-size: 12px;
+            color: #555;
+        }
+
+        .report-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-decoration: underline;
+        }
+
+        .student-info {
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .student-info td {
+            padding: 5px;
+        }
+
+        .info-label {
+            font-weight: bold;
+            width: 120px;
+        }
+
+        table.results {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        table.results th,
+        table.results td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        table.results th {
+            background-color: #f2f2f2;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: right;
+            font-size: 12px;
+        }
+
+        .signature {
+            margin-top: 50px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .font-bold {
+            font-weight: bold;
+        }
     </style>
 </head>
+
 <body>
     <div class="header">
         @if($company->logo)
@@ -33,13 +98,13 @@
         @endif
         <div class="company-name">{{ $company->name }}</div>
         <div class="company-address">{{ $company->companyDetail->address ?? '' }}</div>
-        
-        <div class="report-title">LAPORAN HASIL UJIAN SISWA</div>
+
+        <div class="report-title">LAPORAN HASIL UJIAN MAHASISWA</div>
     </div>
 
     <table class="student-info">
         <tr>
-            <td class="info-label">Nama Siswa</td>
+            <td class="info-label">Nama Mahasiswa</td>
             <td>: {{ $user->name }}</td>
             <td class="info-label">Dicetak Tanggal</td>
             <td>: {{ date('d M Y') }}</td>
@@ -101,4 +166,5 @@
         </div>
     </div>
 </body>
+
 </html>

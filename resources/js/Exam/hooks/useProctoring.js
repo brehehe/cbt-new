@@ -19,7 +19,7 @@ export const useProctoring = (userTimetableId, onAlert) => {
 
     const handleVisibilityChange = useCallback(() => {
         if (document.hidden) {
-            logAlert('tab_switch', 'Siswa berpindah tab / meninggalkan halaman');
+            logAlert('tab_switch', 'Mahasiswa berpindah tab / meninggalkan halaman');
             setIsBlackout(true);
         } else {
             setIsBlackout(false);
@@ -27,7 +27,7 @@ export const useProctoring = (userTimetableId, onAlert) => {
     }, [logAlert]);
 
     const handleBlur = useCallback(() => {
-        logAlert('window_blur', 'Siswa kehilangan fokus pada jendela browser');
+        logAlert('window_blur', 'Mahasiswa kehilangan fokus pada jendela browser');
         setIsBlackout(true);
     }, [logAlert]);
 

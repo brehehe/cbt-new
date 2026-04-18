@@ -1,18 +1,18 @@
 <div>
     <div class="mb-4">
-        <h1 class="text-2xl font-bold text-[color:var(--primary)]">Laporan Hasil Ujian Siswa</h1>
-        <p class="text-gray-600">Lihat semua hasil ujian untuk siswa tertentu.</p>
+        <h1 class="text-2xl font-bold text-[color:var(--primary)]">Laporan Hasil Ujian Mahasiswa</h1>
+        <p class="text-gray-600">Lihat semua hasil ujian untuk mahasiswa tertentu.</p>
     </div>
 
     <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <div>
-                <label for="user_id" class="block text-sm font-medium text-gray-700">Pilih Siswa</label>
+                <label for="user_id" class="block text-sm font-medium text-gray-700">Pilih Mahasiswa</label>
                 <div wire:key="select-user-{{ rand() }}">
                     <select
                         class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                         wire:model.live="user_id" id="user_id">
-                        <option value="">-- Pilih Siswa --</option>
+                        <option value="">-- Pilih Mahasiswa --</option>
                         @foreach($users as $user)
                             <option value="{{ $user->id }}">
                                 {{ $user->name }} ({{ $user->nim ?? $user->username }})
@@ -58,7 +58,7 @@
 
             @if($examResults->isEmpty())
                 <div class="text-center py-10">
-                    <p class="text-gray-500">Tidak ada data hasil ujian ditemukan untuk siswa ini.</p>
+                    <p class="text-gray-500">Tidak ada data hasil ujian ditemukan untuk Mahasiswa ini.</p>
                 </div>
             @else
                 <div class="overflow-x-auto">

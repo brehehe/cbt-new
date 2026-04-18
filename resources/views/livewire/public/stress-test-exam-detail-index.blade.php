@@ -268,10 +268,10 @@
                     <div class="space-y-3" wire:key="question-{{ $questionNavigationId }}">
                         @foreach ($question_answers as $question_answer)
                                             <label class="relative flex items-start p-3 transition-all border rounded-xl cursor-pointer hover:shadow-md group
-                                                    {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma', 'unidayan'])
+                                                                        {{ in_array(config('app.name_slug'), ['ups_tegal', 'unimma', 'unidayan'])
                             ? 'hover:bg-blue-50 hover:border-blue-300'
                             : 'hover:bg-orange-50 hover:border-orange-300' }}
-                                                    {{ $timetable_answer_id == $question_answer['id']
+                                                                        {{ $timetable_answer_id == $question_answer['id']
                             ? (in_array(config('app.name_slug'), ['ups_tegal', 'unimma', 'unidayan']) ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500' : 'bg-orange-50 border-orange-500 ring-1 ring-orange-500')
                             : 'border-gray-200 bg-white' }}">
 
@@ -344,7 +344,7 @@
                     <div class="flex">
                         @if ($last)
                             <button type="button" wire:click="nextQuestion" class="flex items-center px-5 py-2.5 text-sm font-medium text-white transition-all rounded-lg shadow-sm
-                                bg-primary hover:bg-primary ring-primary hover:shadow-md focus:ring-4">
+                                    bg-primary hover:bg-primary ring-primary hover:shadow-md focus:ring-4">
                                 Selanjutnya
                                 <svg class="w-5 h-5 ml-2 -mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -393,7 +393,7 @@
                         <span
                             class="text-lg font-bold text-white lg:text-xl">{{ strtoupper(substr($userTimetable->user->name ?? '?', 0, 2)) }}</span>
                     </div>
-                    <h3 class="font-semibold text-gray-800">{{ $userTimetable->user->name ?? 'Siswa' }}</h3>
+                    <h3 class="font-semibold text-gray-800">{{ $userTimetable->user->name ?? 'Mahasiswa' }}</h3>
                     <p class="text-sm text-gray-600">NIM:
                         {{ $userTimetable->user->nim ?? ($userTimetable->user->username ?? 'Tidak Diketahui') }}
                     </p>
@@ -1063,12 +1063,12 @@
                 if (!['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
                     // Navigation: Left/Right Arrows
                     if (e.key === 'ArrowRight') {
-                            @if ($last) Livewire.dispatch('nextQuestion'); @endif
-                            return;
+                                @if ($last) Livewire.dispatch('nextQuestion'); @endif
+                                return;
                     }
                     if (e.key === 'ArrowLeft') {
-                            @if ($first) Livewire.dispatch('previousQuestion'); @endif
-                            return;
+                                @if ($first) Livewire.dispatch('previousQuestion'); @endif
+                                return;
                     }
 
                     // Answering: A, B, C, D, E
