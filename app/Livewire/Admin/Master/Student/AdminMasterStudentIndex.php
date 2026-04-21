@@ -307,6 +307,7 @@ class AdminMasterStudentIndex extends Component
                     Rule::unique('users', 'nim')
                         ->where('type_user', 'employee')
                         ->where('company_id', $currentCompanyId)
+                        ->whereNull('deleted_at')
                         ->ignore($this->data_id),
                 ],
                 'email' => [
@@ -316,6 +317,7 @@ class AdminMasterStudentIndex extends Component
                     Rule::unique('users', 'email')
                         ->where('type_user', 'employee')
                         ->where('company_id', $currentCompanyId)
+                        ->whereNull('deleted_at')
                         ->ignore($this->data_id),
                 ],
                 'password' => $this->data_id ? 'nullable|string|min:8' : 'required|string|min:8',
@@ -327,6 +329,7 @@ class AdminMasterStudentIndex extends Component
                     Rule::unique('users', 'phone')
                         ->where('type_user', 'employee')
                         ->where('company_id', $currentCompanyId)
+                        ->whereNull('deleted_at')
                         ->ignore($this->data_id),
                 ],
                 'username' => [
@@ -337,6 +340,7 @@ class AdminMasterStudentIndex extends Component
                     Rule::unique('users', 'username')
                         ->where('type_user', 'employee')
                         ->where('company_id', $currentCompanyId)
+                        ->whereNull('deleted_at')
                         ->ignore($this->data_id),
                 ],
                 'address' => 'nullable|string|max:500',
@@ -398,6 +402,7 @@ class AdminMasterStudentIndex extends Component
                     Rule::unique('users', 'phone')
                         ->where('type_user', 'employee')
                         ->where('company_id', $currentCompanyId)
+                        ->whereNull('deleted_at')
                         ->ignore($this->data_id),
                 ],
                 'nim' => [
@@ -408,6 +413,7 @@ class AdminMasterStudentIndex extends Component
                     Rule::unique('users', 'nim')
                         ->where('type_user', 'employee')
                         ->where('company_id', $currentCompanyId)
+                        ->whereNull('deleted_at')
                         ->ignore($this->data_id),
                 ],
                 'username' => [
@@ -418,6 +424,7 @@ class AdminMasterStudentIndex extends Component
                     Rule::unique('users', 'username')
                         ->where('type_user', 'employee')
                         ->where('company_id', $currentCompanyId)
+                        ->whereNull('deleted_at')
                         ->ignore($this->data_id),
                 ],
                 'email' => [
@@ -427,6 +434,7 @@ class AdminMasterStudentIndex extends Component
                     Rule::unique('users', 'email')
                         ->where('type_user', 'employee')
                         ->where('company_id', $currentCompanyId)
+                        ->whereNull('deleted_at')
                         ->ignore($this->data_id),
                 ],
                 'study_id' => 'nullable|exists:studies,id',
@@ -453,6 +461,36 @@ class AdminMasterStudentIndex extends Component
                 // Update user detail
                 $this->updateUserDetail($user, $validatedData);
             } else {
+                if (!$this->data_id) {
+                    $trashedUser = User::onlyTrashed()
+                        ->where('company_id', $currentCompanyId)
+                        ->where('type_user', 'employee')
+                        ->where(function ($query) {
+                            $query->where('nim', $this->nim)
+                                ->orWhere('email', $this->email);
+                            if ($this->username) {
+                                $query->orWhere('username', $this->username);
+                            }
+                        })
+                        ->first();
+
+                    if ($trashedUser) {
+                        $trashedUser->restore();
+                        $this->data_id = $trashedUser->id;
+
+                        // Restore relations if they exist and are trashed
+                        $detail = UserDetail::onlyTrashed()->where('user_id', $trashedUser->id)->first();
+                        if ($detail) {
+                            $detail->restore();
+                        }
+
+                        $secKey = UsrSecKey::onlyTrashed()->where('user_id', $trashedUser->id)->first();
+                        if ($secKey) {
+                            $secKey->restore();
+                        }
+                    }
+                }
+
                 $profilePath = $this->data_id ? User::find($this->data_id)->profile : null;
                 if ($this->profile && $this->profile instanceof \Illuminate\Http\UploadedFile) {
                     $profilePath = $this->profile->store('profiles', 'public');
@@ -563,6 +601,38 @@ class AdminMasterStudentIndex extends Component
             if ($this->data_id) {
                 return $this->updateExistingUser($companyId, $validatedData);
             }
+
+            // Check for trashed user first to allow re-addition
+            $trashedUser = User::onlyTrashed()
+                ->where('company_id', $companyId)
+                ->where('type_user', 'employee')
+                ->where(function ($query) use ($validatedData) {
+                    $query->where('nim', $validatedData['nim'])
+                        ->orWhere('email', $validatedData['email']);
+                    if (!empty($validatedData['username'])) {
+                        $query->orWhere('username', $validatedData['username']);
+                    }
+                })
+                ->first();
+
+            if ($trashedUser) {
+                $trashedUser->restore();
+                
+                // Restore relations if they exists and are trashed
+                $detail = UserDetail::onlyTrashed()->where('user_id', $trashedUser->id)->first();
+                if ($detail) {
+                    $detail->restore();
+                }
+                
+                $secKey = UsrSecKey::onlyTrashed()->where('user_id', $trashedUser->id)->first();
+                if ($secKey) {
+                    $secKey->restore();
+                }
+
+                $this->data_id = $trashedUser->id;
+                return $this->updateExistingUser($companyId, $validatedData);
+            }
+
             // Untuk user baru, buat user baru
             $user = $this->createNewUser($companyId, $validatedData);
 
