@@ -115,20 +115,21 @@
         <div class="p-5 bg-white shadow rounded-lg">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
                 <div class="flex items-center">
-                    {{-- <span class="text-sm text-gray-700 mr-2">Tampil</span>
-                    <select class="mt-1 form-control" wire:model.live='perPage'>
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                    <span class="text-sm text-gray-700 ml-2">data</span> --}}
-                    <div>
-                        <h1 class="text-2xl font-bold text-[color:var(--primary)]">
-                            Data Mahasiswa</h1>
-                        {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
+                <div class="flex flex-col mb-2 sm:mb-0">
+                    <h1 class="text-2xl font-bold text-[color:var(--primary)]">
+                        Data Mahasiswa
+                    </h1>
+                    <div class="flex items-center mt-2 text-sm text-gray-500">
+                        <span class="mr-2">Tampilkan</span>
+                        <select class="form-control-sm w-20 py-1 px-2 border-gray-300 rounded text-sm" wire:model.live='perPage'>
+                            <option value="8">8</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <span class="ml-2">data per halaman</span>
                     </div>
+                </div>
                 </div>
                 <div class="flex items-center w-full sm:w-auto gap-2">
                     <div class="relative w-full sm:w-64">
@@ -157,7 +158,7 @@
                     <tbody>
                         @forelse ($classmateStudents as $index => $result)
                             <tr>
-                                <td class="center">{{ $loop->iteration }}</td>
+                                <td class="center">{{ ($classmateStudents->currentPage() - 1) * $classmateStudents->perPage() + $loop->iteration }}</td>
                                 <td>{{ $result?->user?->userDetail?->nim }}</td>
                                 <td>{{ $result?->user?->name }}</td>
                                 <td>{{ $result?->user?->email }}</td>
@@ -182,6 +183,10 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+            
+            <div class="mt-4">
+                {{ $classmateStudents->links() }}
             </div>
         </div>
     </div>

@@ -41,6 +41,9 @@ class AdminMasterStudentIndex extends Component
 
     public $perPage = 5;
 
+    public $selectedRows = [];
+    public $selectAll = false;
+
     // User
     public $data_id;
     public $name;
@@ -180,6 +183,8 @@ class AdminMasterStudentIndex extends Component
             'notes',
             'photo',
             'photo_old',
+            'selectedRows',
+            'selectAll',
         ]);
         $this->resetErrorBag();
         $this->resetValidation();
@@ -765,6 +770,30 @@ class AdminMasterStudentIndex extends Component
         AlertHelper::success('Pengguna Berhasil Dihapus');
     }
 
+    public function confirmDeleteSelected()
+    {
+        if (count($this->selectedRows) > 0) {
+            return AlertHelper::confirmDelete('deleteSelected', 'Apakah Anda yakin ingin menghapus data yang dipilih?', null);
+        }
+        return AlertHelper::error('Gagal', 'Pilih minimal satu data untuk dihapus.');
+    }
+
+    public function deleteSelected()
+    {
+        $authId = (string) Auth::id();
+        if (in_array($authId, $this->selectedRows)) {
+            $this->selectedRows = array_diff($this->selectedRows, [$authId]);
+            AlertHelper::error('Gagal', 'Anda tidak dapat menghapus akun Anda sendiri.');
+        }
+
+        if (count($this->selectedRows) > 0) {
+            User::whereIn('id', $this->selectedRows)->delete();
+            $this->selectedRows = [];
+            $this->selectAll = false;
+            AlertHelper::success('Pengguna Berhasil Dihapus');
+        }
+    }
+
     public function export()
     {
         try {
@@ -853,7 +882,7 @@ class AdminMasterStudentIndex extends Component
         }
     }
 
-    public function render()
+    protected function getUsersQuery()
     {
         $user = User::companyRole('Mahasiswa', Auth::user()->company_id)
             ->search($this->search)
@@ -876,8 +905,24 @@ class AdminMasterStudentIndex extends Component
             $user->where('type_study', $this->isStudentFilter);
         }
 
+        return $user;
+    }
+
+    public function updatedSelectAll($value)
+    {
+        if ($value) {
+            $this->selectedRows = $this->getUsersQuery()->pluck('users.id')->map(function($id) {
+                return (string) $id;
+            })->toArray();
+        } else {
+            $this->selectedRows = [];
+        }
+    }
+
+    public function render()
+    {
         return view('livewire.admin.master.student.admin-master-student-index', [
-            'admins' => $user->paginate($this->perPage),
+            'admins' => $this->getUsersQuery()->paginate($this->perPage),
         ])
             ->extends('layout.app')
             ->section('content');

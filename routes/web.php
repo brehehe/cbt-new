@@ -454,6 +454,12 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
         return view('exam-react', ['userTimetableId' => $userTimetableId]);
     })->name('admin.exam.detail.react')->middleware(['auth']);
 
+    // Admin Dashboard API Routes
+    Route::prefix('api/admin/dashboard')->middleware('auth')->group(function () {
+        Route::get('/stats', [App\Http\Controllers\Api\Admin\DashboardApiController::class, 'getStats'])->name('admin.api.dashboard.stats');
+        Route::get('/realtime', [App\Http\Controllers\Api\Admin\DashboardApiController::class, 'getRealtime'])->name('admin.api.dashboard.realtime');
+    });
+
     // Exam API Routes (using web middleware for session persistence)
     Route::prefix('api/exam')->middleware('auth')->group(function () {
         Route::get('/{user_timetable_id}/data', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'getInitialState']);

@@ -13,7 +13,7 @@ use Auth;
 class AdminMasterClassmateDetailIndex extends Component
 {
     use WithPagination;
-    protected $paginationTheme = 'bootstrap';
+    protected $paginationTheme = 'tailwind';
     public $perPage = 8, $search;
     public $classmate_id;
     public $name;
@@ -71,6 +71,18 @@ class AdminMasterClassmateDetailIndex extends Component
         $this->openStudentModal = false;
         $this->reset('search', 'selectedStudents');
         $this->dispatch('close-modal', ['id' => 'modalStudent']);
+    }
+
+    public function updatedSearch()
+    {
+        $this->resetPage();
+        $this->resetPage('modalPage');
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+        $this->resetPage('modalPage');
     }
 
     public function choiceQuestion($user_id)
@@ -152,12 +164,16 @@ class AdminMasterClassmateDetailIndex extends Component
 
     public function render()
     {
-        $classmateStudents = ClassmateStudent::search($this->search)->where('classmate_id', $this->classmate_id)->select('id', 'user_id', 'classmate_id')->with(['user:id,name,email', 'user.userDetail'])->get();
+        $classmateStudents = ClassmateStudent::search($this->search)
+            ->where('classmate_id', $this->classmate_id)
+            ->select('id', 'user_id', 'classmate_id')
+            ->with(['user:id,name,email', 'user.userDetail'])
+            ->paginate($this->perPage);
 
         return view('livewire.admin.master.classmate.detail.admin-master-classmate-detail-index', [
             'mahasiswas' => $this->openStudentModal ? User::role(['Mahasiswa'])
                 ->search($this->search)
-                ->paginate($this->perPage) : [],
+                ->paginate($this->perPage, ['*'], 'modalPage') : [],
             'classmateStudents' => $classmateStudents,
         ])
             ->extends('layout.app')

@@ -54,6 +54,13 @@
                     </div>
                 </div>
 
+                <!-- Delete Selected Button -->
+                @if(count($selectedRows) > 0)
+                    <button wire:click="confirmDeleteSelected" class="btn btn-error mr-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                        <i class="fa-solid fa-trash mr-1"></i> Hapus Terpilih ({{ count($selectedRows) }})
+                    </button>
+                @endif
+
                 <!-- Add Button -->
                 <button wire:click="openModal()"
                     class="{{ in_array(config('app.name_slug'), ['pro-cbt']) ? 'btn btn-warning' : 'btn btn-primary' }}">
@@ -116,6 +123,9 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-10">
+                            <input type="checkbox" wire:model.live="selectAll" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                        </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Mahasiswa
                         </th>
@@ -139,6 +149,9 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse ($admins as $admin)
                         <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" wire:model.live="selectedRows" value="{{ $admin->id }}" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-10 w-10">
