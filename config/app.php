@@ -128,4 +128,5 @@ return [
     'export_question' => env('EXPORT_QUESTION', false),
     'limit_question_view' => env('LIMIT_QUESTION_VIEW', false),
     'limit_question_count' => env('LIMIT_QUESTION_COUNT', 5),
+    'login_is_credentials' => env('LOGIN_IS_CREDENTIALS', false),
 ];

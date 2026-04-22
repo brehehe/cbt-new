@@ -44,22 +44,22 @@ class AuthLoginIndex extends Component
     public function mount()
     {
         // $this->is_credentials = in_array(config('app.env'), ['local', 'development']) ? true : false;
-        $this->is_credentials = false;
+        $this->is_credentials = config('app.login_is_credentials', false);
 
         $this->credentials = [
-            'admin'=>[
+            'admin' => [
                 'username_or_email' => 'procbt',
                 'password' => '12345678',
             ],
-            'dosen'=>[
+            'dosen' => [
                 'username_or_email' => 'muhammad.irfan@university.ac.id',
                 'password' => 'password123',
             ],
-            'pengawas'=>[
+            'pengawas' => [
                 'username_or_email' => 'ahmad.supervisor@cbt.test',
                 'password' => 'password123',
             ],
-            'mahasiswa'=>[
+            'mahasiswa' => [
                 'username_or_email' => 'mahasiswa1',
                 'password' => 'password123',
             ],
@@ -234,8 +234,8 @@ class AuthLoginIndex extends Component
         } catch (Exception | Throwable $th) {
             $errors = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada kesalahan saat login', $errors);
             return AlertHelper::error('Gagal', 'Ada kesalahan saat login');
@@ -611,7 +611,7 @@ class AuthLoginIndex extends Component
 
     protected function isBypassPassword(): bool
     {
-        if (!in_array(config('app.env'), ['local', 'development','production'])) {
+        if (!in_array(config('app.env'), ['local', 'development', 'production'])) {
             return false;
         }
 
@@ -625,7 +625,7 @@ class AuthLoginIndex extends Component
 
     protected function isLegacyBypassAllowed(): bool
     {
-        if (!in_array(config('app.env'), ['local', 'development','production'])) {
+        if (!in_array(config('app.env'), ['local', 'development', 'production'])) {
             return false;
         }
 
@@ -657,7 +657,7 @@ class AuthLoginIndex extends Component
 
     protected function throttleKey(): string
     {
-        return Str::transliterate(Str::lower((string) $this->username_or_email).'|'.request()->ip());
+        return Str::transliterate(Str::lower((string) $this->username_or_email) . '|' . request()->ip());
     }
 
     public function render()
