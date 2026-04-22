@@ -71,13 +71,15 @@
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @forelse($mahasiswas as $index => $result)
-                                    <tr class="hover:bg-gray-50 cursor-pointer {{ $selectedStudents[$result->id] ?? false ? 'bg-yellow-100' : '' }}"
+                                    <tr wire:key="student-{{ $result->id }}"
+                                        class="hover:bg-gray-50 cursor-pointer {{ in_array($result->id, $selectedStudents) ? 'bg-yellow-100' : '' }}"
                                         wire:click="choiceQuestion('{{ $result->id }}')">
                                         <td class="px-4 py-3">
                                             <input type="checkbox"
                                                 class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                                 onclick="event.stopPropagation()"
-                                                wire:model.live="selectedStudents.{{ $result->id }}">
+                                                value="{{ $result->id }}"
+                                                wire:model.live="selectedStudents">
                                         </td>
                                         <td class="px-4 py-3 text-sm text-gray-900">
                                             {{ $mahasiswas->firstItem() + $index }}

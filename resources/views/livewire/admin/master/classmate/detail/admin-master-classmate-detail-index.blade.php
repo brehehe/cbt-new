@@ -132,6 +132,11 @@
                 </div>
                 </div>
                 <div class="flex items-center w-full sm:w-auto gap-2">
+                    @if(count($selectedDeleteStudents) > 0)
+                        <button wire:click="confirmDeleteSelected()" class="mt-1 px-3 py-2 btn btn-danger">
+                            Hapus Terpilih ({{ count($selectedDeleteStudents) }})
+                        </button>
+                    @endif
                     <div class="relative w-full sm:w-64">
                         <input type="text" class="mt-1 form-control-search" placeholder="Cari Sesuatu..."
                             wire:model.live='search'>
@@ -148,6 +153,9 @@
                 <table class="table">
                     <thead>
                         <tr>
+                            <th class="w-1 center">
+                                <input type="checkbox" wire:model.live="selectAllDelete" class="form-checkbox rounded border-gray-300 text-[color:var(--primary)] focus:ring-[color:var(--primary)]">
+                            </th>
                             <th class="w-1 center">No</th>
                             <th>NIM</th>
                             <th>Nama</th>
@@ -158,6 +166,9 @@
                     <tbody>
                         @forelse ($classmateStudents as $index => $result)
                             <tr>
+                                <td class="center">
+                                    <input type="checkbox" value="{{ $result->id }}" wire:model.live="selectedDeleteStudents" class="form-checkbox rounded border-gray-300 text-[color:var(--primary)] focus:ring-[color:var(--primary)]">
+                                </td>
                                 <td class="center">{{ ($classmateStudents->currentPage() - 1) * $classmateStudents->perPage() + $loop->iteration }}</td>
                                 <td>{{ $result?->user?->userDetail?->nim }}</td>
                                 <td>{{ $result?->user?->name }}</td>
@@ -178,7 +189,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="10" class="no-data">Tidak ada data</td>
+                                <td colspan="11" class="no-data">Tidak ada data</td>
                             </tr>
                         @endforelse
                     </tbody>

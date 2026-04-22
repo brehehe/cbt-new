@@ -87,13 +87,11 @@ class AdminMasterClassmateDetailIndex extends Component
 
     public function choiceQuestion($user_id)
     {
-        // Kalau id sudah ada → hapus (uncheck)
-        if (isset($this->selectedStudents[$user_id]) && $this->selectedStudents[$user_id]) {
-            unset($this->selectedStudents[$user_id]);
-        }
-        // Kalau id belum ada → tambahkan (check)
-        else {
-            $this->selectedStudents[$user_id] = true;
+        $user_id = (string) $user_id;
+        if (in_array($user_id, $this->selectedStudents)) {
+            $this->selectedStudents = array_values(array_diff($this->selectedStudents, [$user_id]));
+        } else {
+            $this->selectedStudents[] = $user_id;
         }
     }
 
@@ -103,29 +101,23 @@ class AdminMasterClassmateDetailIndex extends Component
             ->search($this->search);
 
         $pageResults = $query->paginate($this->perPage);
+        $pageIds = $pageResults->pluck('id')->map(fn($id) => (string)$id)->toArray();
 
-        foreach ($pageResults as $user) {
-            if ($selectAll) {
-                $this->selectedStudents[$user->id] = true;
-            } else {
-                unset($this->selectedStudents[$user->id]);
-            }
+        if ($selectAll) {
+            $this->selectedStudents = array_values(array_unique(array_merge($this->selectedStudents, $pageIds)));
+        } else {
+            $this->selectedStudents = array_values(array_diff($this->selectedStudents, $pageIds));
         }
     }
 
     public function toggleSelectAllAllPages($selectAll = true)
     {
-        // Ambil semua ID sesuai filter aktif tanpa memuat data berat
-        $ids = User::role(['Mahasiswa'])
-            ->search($this->search)
-            ->pluck('id');
-
-        foreach ($ids as $id) {
-            if ($selectAll) {
-                $this->selectedStudents[$id] = true;
-            } else {
-                unset($this->selectedStudents[$id]);
-            }
+        if ($selectAll) {
+            $this->selectedStudents = User::role(['Mahasiswa'])
+                ->search($this->search)
+                ->pluck('id')->map(fn($id) => (string)$id)->toArray();
+        } else {
+            $this->selectedStudents = [];
         }
     }
 
@@ -133,9 +125,9 @@ class AdminMasterClassmateDetailIndex extends Component
     {
         if (count($this->selectedStudents) > 0) {
             // Simpan data mahasiswa yang dipilih
-            foreach ($this->selectedStudents as $user_id => $selected) {
-                if ($selected) {
-                    ClassmateStudent::create([
+            foreach ($this->selectedStudents as $user_id) {
+                if ($user_id) {
+                    ClassmateStudent::firstOrCreate([
                         'classmate_id' => $this->classmate_id,
                         'user_id' => $user_id,
                     ]);
@@ -160,6 +152,39 @@ class AdminMasterClassmateDetailIndex extends Component
             return AlertHelper::success('Berhasil', 'Data mahasiswa berhasil dihapus.');
         }
         return AlertHelper::error('Gagal', 'Data mahasiswa tidak ditemukan.');
+    }
+
+    public $selectedDeleteStudents = [];
+    public $selectAllDelete = false;
+
+    public function updatedSelectAllDelete($value)
+    {
+        if ($value) {
+            $this->selectedDeleteStudents = ClassmateStudent::search($this->search)
+                ->where('classmate_id', $this->classmate_id)
+                ->pluck('id')->map(fn($id) => (string)$id)->toArray();
+        } else {
+            $this->selectedDeleteStudents = [];
+        }
+    }
+
+    public function confirmDeleteSelected()
+    {
+        if (empty($this->selectedDeleteStudents)) {
+            return AlertHelper::error('Gagal', 'Tidak ada data mahasiswa yang dipilih.');
+        }
+        return AlertHelper::confirmDelete('deleteSelected', 'Apakah Anda yakin ingin menghapus data mahasiswa yang dipilih?', 'selected');
+    }
+
+    public function deleteSelected()
+    {
+        if (empty($this->selectedDeleteStudents)) {
+            return AlertHelper::error('Gagal', 'Tidak ada data mahasiswa yang dipilih.');
+        }
+        ClassmateStudent::whereIn('id', $this->selectedDeleteStudents)->delete();
+        $this->selectedDeleteStudents = [];
+        $this->selectAllDelete = false;
+        return AlertHelper::success('Berhasil', 'Data mahasiswa terpilih berhasil dihapus.');
     }
 
     public function render()
