@@ -98,9 +98,10 @@ class AdminMasterClassmateDetailIndex extends Component
     public function toggleSelectAllOnPage($selectAll = true)
     {
         $query = User::role(['Mahasiswa'])
-            ->search($this->search);
+            ->search($this->search)
+            ->orderBy('name', 'asc');
 
-        $pageResults = $query->paginate($this->perPage);
+        $pageResults = $query->paginate($this->perPage, ['*'], 'modalPage');
         $pageIds = $pageResults->pluck('id')->map(fn($id) => (string)$id)->toArray();
 
         if ($selectAll) {
