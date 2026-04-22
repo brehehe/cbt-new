@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Master\Supervisor;
 use App\Helpers\AlertHelper;
 use App\Helpers\RoleHelper;
 use App\Models\User;
+use App\Models\UsrSecKey;
 use App\Models\User\UserDetail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
