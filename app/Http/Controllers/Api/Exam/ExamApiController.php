@@ -328,9 +328,14 @@ class ExamApiController extends Controller
             ->first();
         
         if ($liveSession) {
+            $connStatus = strtolower($request->connection_status ?? 'connected');
+            if ($connStatus === 'connection error') {
+                $connStatus = 'error';
+            }
+
             $liveSession->update([
                 'last_activity' => now(),
-                'connection_status' => strtolower($request->connection_status ?? 'connected'),
+                'connection_status' => $connStatus,
                 'camera_status' => $request->camera_status ?? $liveSession->camera_status,
                 'peer_id' => $request->peer_id ?? $liveSession->peer_id,
                 'answered_questions' => $request->answered_count ?? $liveSession->answered_questions,

@@ -16,10 +16,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
+use App\Traits\Region\RegionTrait;
 
 class UserDetail extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids, \App\Traits\LogsSystemActivity;
+    use HasFactory, SoftDeletes, HasUuids, RegionTrait, \App\Traits\LogsSystemActivity;
 
     protected $guarded = ['id'];
 
@@ -333,7 +334,7 @@ class UserDetail extends Model
                     'line' => $th->getLine(),
                 ];
 
-                Log::error('Ada kesalahan saat boot CompanyDetail sync', $error);
+                Log::error('Ada kesalahan saat boot UserDetail sync', $error);
             }
         });
     }

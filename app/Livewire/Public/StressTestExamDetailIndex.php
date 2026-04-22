@@ -723,7 +723,11 @@ class StressTestExamDetailIndex extends Component
 
             // Update connection status
             if (isset($data['connection_status'])) {
-                $updateData['connection_status'] = $data['connection_status'];
+                $connStatus = strtolower($data['connection_status']);
+                if ($connStatus === 'connection error') {
+                    $connStatus = 'error';
+                }
+                $updateData['connection_status'] = $connStatus;
             }
 
             // Update camera status
