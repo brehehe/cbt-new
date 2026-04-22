@@ -18,7 +18,7 @@
                                 {{ $userTimetable->timetable->module->duration }} Menit</p>
                         </div>
                         <div>
-                            <p><span class="font-medium">Jumlah Soal:</span> 40 Soal</p>
+                            <p><span class="font-medium">Jumlah Soal:</span> {{$userTimetable->userModuleQuestions->count()}} Soal</p>
                             <p><span class="font-medium">Jenis Ujian:</span>
                                 {{ $userTimetable->timetable->module->questionType->name ?? '-' }}
                             </p>
