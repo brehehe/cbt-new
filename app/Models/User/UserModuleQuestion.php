@@ -20,6 +20,10 @@ class UserModuleQuestion extends Model
     use SoftDeletes, HasUuids;
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'is_show' => 'boolean',
+    ];
+
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id', 'id');

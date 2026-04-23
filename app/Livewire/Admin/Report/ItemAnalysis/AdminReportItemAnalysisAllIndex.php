@@ -47,15 +47,23 @@ class AdminReportItemAnalysisAllIndex extends Component
         session()->flash('message', 'Difficulty berhasil diperbarui.');
     }
 
+    /**
+     * Konfirmasi sebelum menyembunyikan riwayat pengerjaan dari item analisis.
+     * Riwayat ujian siswa TETAP tersimpan, hanya disembunyikan dari perhitungan analisis.
+     */
     public function confirmDeleteAttempts(string $questionId): void
     {
         AlertHelper::confirmDelete(
             'deleteAttempts',
-            'Apakah Anda yakin ingin menghapus SEMUA data jawaban peserta untuk soal ini? Tindakan ini tidak dapat dibatalkan.',
+            'Hapus riwayat pengerjaan soal ini? ',
             $questionId
         );
     }
 
+    /**
+     * Sembunyikan riwayat pengerjaan dari item analisis dengan is_show = false.
+     * History ujian siswa TIDAK dihapus — tetap tampil di halaman detail ujian siswa.
+     */
     public function deleteAttempts($params): void
     {
         $questionId = is_array($params) ? $params[0] : $params;
@@ -63,13 +71,32 @@ class AdminReportItemAnalysisAllIndex extends Component
         DB::transaction(function () use ($questionId) {
             $timetableQuestionIds = TimetableQuestion::where('question_id', $questionId)->pluck('id');
 
+            // Set is_show = false: data tetap ada, tidak ikut dihitung di item analisis.
+            // History ujian siswa masih terlihat di halaman riwayat detail.
             UserModuleQuestion::withoutGlobalScope('user_scope')
                 ->whereIn('timetable_question_id', $timetableQuestionIds)
                 ->where('company_id', auth()->user()?->company_id)
-                ->delete();
+                ->update(['is_show' => false]);
         });
 
-        AlertHelper::success('Berhasil', 'Data jawaban untuk soal ini telah dibersihkan.');
+        AlertHelper::success('Berhasil', 'Riwayat pengerjaan soal ini disembunyikan dari Item Analisis. History ujian siswa tetap utuh.');
+    }
+
+    /**
+     * Tampilkan kembali riwayat pengerjaan ke item analisis (is_show = true).
+     */
+    public function restoreAttempts(string $questionId): void
+    {
+        DB::transaction(function () use ($questionId) {
+            $timetableQuestionIds = TimetableQuestion::where('question_id', $questionId)->pluck('id');
+
+            UserModuleQuestion::withoutGlobalScope('user_scope')
+                ->whereIn('timetable_question_id', $timetableQuestionIds)
+                ->where('company_id', auth()->user()?->company_id)
+                ->update(['is_show' => true]);
+        });
+
+        AlertHelper::success('Berhasil', 'Riwayat pengerjaan soal ini ditampilkan kembali di Item Analisis.');
     }
 
     public function generateAll(): void
@@ -79,6 +106,7 @@ class AdminReportItemAnalysisAllIndex extends Component
             ->join('questions', 'timetable_questions.question_id', '=', 'questions.id')
             ->where('timetable_questions.is_check', true)
             ->where('user_module_questions.company_id', auth()->user()?->company_id)
+            ->where('user_module_questions.is_show', true) // hanya yang tidak disembunyikan
             ->whereExists(function ($subQuery) {
                 $subQuery->select(DB::raw(1))
                     ->from('module_questions')
@@ -129,6 +157,7 @@ class AdminReportItemAnalysisAllIndex extends Component
             ->join('questions', 'timetable_questions.question_id', '=', 'questions.id')
             ->where('timetable_questions.is_check', true)
             ->where('user_module_questions.company_id', auth()->user()?->company_id)
+            ->where('user_module_questions.is_show', true) // hanya yang tidak disembunyikan admin
             ->whereExists(function ($subQuery) {
                 $subQuery->select(DB::raw(1))
                     ->from('module_questions')

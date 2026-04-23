@@ -1,9 +1,9 @@
 <div>
-    <div class="mb-4">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-bold text-[color:var(--primary)]">
-                    Nilai Ujian Detail</h1>
+    <div class="mb-6">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="text-center md:text-left">
+                <h1 class="text-2xl font-bold text-[color:var(--primary)]">Nilai Ujian Detail</h1>
+                <p class="text-gray-600 text-sm mt-1">Lihat detail hasil ujian dan statistik pengerjaan.</p>
             </div>
             <div>
                 <button wire:click="exportPdf" class="btn btn-primary">
@@ -13,7 +13,9 @@
             </div>
         </div>
     </div>
-    <div class="grid grid-cols-4 gap-4 mb-4">
+
+    {{-- Info Jadwal --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <div>
             <label for="name" class="block text-sm font-medium text-gray-700">Nama</label>
             <input type="text" id="name" value="{{ $timetable['name'] }}" disabled placeholder="Masukkan Nama"
@@ -46,7 +48,7 @@
             <input disabled type="text" id="end_time" value="{{ $end_time }}" placeholder="Masukkan"
                 class="mt-1 form-control">
         </div>
-        <div class="md:col-span-4">
+        <div class="col-span-1 md:col-span-2 lg:col-span-4">
             <label for="supervisors" class="block text-sm font-medium text-gray-700">Pengawas</label>
             <div wire:key="select-{{ rand() }}">
                 <select disabled class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
@@ -64,10 +66,13 @@
             </div>
         </div>
     </div>
-    <div class="grid grid-cols-5 gap-4 mb-4">
+
+    {{-- Statistik --}}
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
         <div>
             <label for="total_soal" class="block text-sm font-medium text-gray-700">Total Soal</label>
-            <input disabled type="number" id="total_soal" value="{{ $user_timetable->userModuleQuestions->count() }}"
+            <input disabled type="number" id="total_soal"
+                value="{{ $user_timetable->userModuleQuestions->count() }}"
                 placeholder="Masukkan" class="mt-1 form-control">
         </div>
         <div>
@@ -94,17 +99,18 @@
                 value="{{ $user_timetable->userModuleQuestions->where('status', 'wrong')->count() }}"
                 placeholder="Masukkan" class="mt-1 form-control">
         </div>
-        <div class="md:col-span-5">
+        <div>
             <label for="nilai" class="block text-sm font-medium text-gray-700">Nilai</label>
-            <input disabled type="number" id="nilai" value="{{ $user_timetable->mark }}" placeholder="Masukkan"
-                class="mt-1 form-control">
+            <input disabled type="number" id="nilai" value="{{ $user_timetable->mark }}"
+                placeholder="Masukkan" class="mt-1 form-control">
         </div>
     </div>
+
+    {{-- Table Controls --}}
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <div class="flex items-center bg-white rounded-lg shadow-sm border border-gray-200 px-3 py-2 w-full md:w-auto">
             <span class="text-sm text-gray-600 mr-2">Tampil</span>
-            <select
-                class="form-select text-sm border-none focus:ring-0 p-0 text-gray-700 font-semibold bg-transparent w-12"
+            <select class="form-select text-sm border-none focus:ring-0 p-0 text-gray-700 font-semibold bg-transparent w-12"
                 wire:model.live='perPage'>
                 <option value="5">5</option>
                 <option value="10">10</option>
@@ -126,107 +132,136 @@
             </div>
         </div>
     </div>
-    <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
+
+    {{-- Table --}}
+    <div class="hidden md:block bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
         <div class="table-container">
-            <table class="table">
-                <thead>
+            <table class="table w-full">
+                <thead class="bg-gray-50">
                     <tr>
-                        <th class="w-1 center">No</th>
-                        <th>Soal</th>
-                        <th>Jawaban</th>
-                        <th>Jawaban Terpilih</th>
-                        <th>Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16 text-center">No</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Soal</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jawaban Benar</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jawaban Terpilih</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Status</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="bg-white divide-y divide-gray-200">
                     @forelse ($userModuleQuestions as $index => $userModuleQuestion)
                         @php
-                            // 1) Koleksi semua pilihan jawaban untuk soal ini
-                            $answers = $userModuleQuestion->timetableQuestion?->answers ?? collect();
-
-                            // 2) Jawaban BENAR
+                            $answers      = $userModuleQuestion->timetableQuestion?->answers ?? collect();
                             $correctAnswer = $answers->firstWhere('is_correct', true);
-
-                            // 3) Jawaban yang dipilih user (relasi answer: belongsTo/hasOne)
-                            $chosenAnswer = $userModuleQuestion->timetableAnswer; // <- bisa null
-
-                            // 4) Posisi jawaban benar di koleksi (0‑based)
-                            $posCorrect = $answers->search(fn($a) => $a->is_correct);
+                            $chosenAnswer  = $userModuleQuestion->timetableAnswer;
+                            $posCorrect   = $answers->search(fn($a) => $a->is_correct);
                             $labelCorrect = $posCorrect !== false ? $posCorrect + 1 : null;
-
-                            // 5) Posisi jawaban yang dipilih user di koleksi (0‑based)
-                            $posChosen = $answers->search(fn($a) => $a->id === optional($chosenAnswer)->id);
-                            $labelChosen = $posChosen !== false ? $posChosen + 1 : null;
-
-                            // 6) Fungsi util untuk A/B/C/… (opsional)
-                            $letter = fn($n) => $n ? chr(64 + $n) : '-'; // 1→A, 2→B, …
+                            $posChosen    = $answers->search(fn($a) => $a->id === optional($chosenAnswer)->id);
+                            $labelChosen  = $posChosen !== false ? $posChosen + 1 : null;
+                            $letter       = fn($n) => $n ? chr(64 + $n) : '-';
                         @endphp
-                        <tr>
-                            <td class="center">{{ $userModuleQuestions->firstItem() + $index }}</td>
+                        <tr class="hover:bg-gray-50 transition-colors duration-200">
+                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                                {{ $userModuleQuestions->firstItem() + $index }}
+                            </td>
 
-                            {{-- Pertanyaan --}}
-                            <td>
-                                {!! optional($userModuleQuestion->timetableQuestion)->question ?? '-' !!}
+                            {{-- Soal --}}
+                            <td class="px-6 py-4 text-sm text-gray-900 font-medium min-w-[200px] max-w-xs"
+                                x-data="{ expanded: false, truncated: false }"
+                                x-init="$nextTick(() => { truncated = $refs.sq.scrollWidth > $refs.sq.clientWidth })">
+                                <div x-ref="sq" :style="expanded ? '' : 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'">
+                                    {!! optional($userModuleQuestion->timetableQuestion)->question ?? '-' !!}
+                                </div>
                                 @if($userModuleQuestion->timetableQuestion?->type === 'essay')
                                     <span class="block text-[10px] text-blue-500 font-bold uppercase mt-1">ESSAY</span>
                                 @endif
+                                <button x-show="truncated || expanded" @click="expanded = !expanded"
+                                    class="mt-1 text-xs text-primary hover:underline focus:outline-none"
+                                    x-text="expanded ? 'Sembunyikan' : 'Lihat Selengkapnya'"></button>
                             </td>
 
-                            {{-- Jawaban benar --}}
-                            <td class="whitespace-nowrap">
+                            {{-- Jawaban Benar --}}
+                            <td class="px-6 py-4 text-sm text-gray-500 min-w-[150px] max-w-[180px]"
+                                x-data="{ expanded: false, truncated: false }"
+                                x-init="$nextTick(() => { truncated = $refs.ca.scrollWidth > $refs.ca.clientWidth })">
                                 @if($userModuleQuestion->timetableQuestion?->type === 'essay')
-                                    -
+                                    <span class="text-gray-400">-</span>
                                 @else
-                                    {{ $letter($labelCorrect) }}.
-                                    {!! optional($correctAnswer)->context ?? '-' !!}
+                                    <div x-ref="ca" :style="expanded ? '' : 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'">
+                                        <span class="font-semibold text-gray-700 mr-1">{{ $letter($labelCorrect) }}.</span>
+                                        {!! optional($correctAnswer)->context ?? '-' !!}
+                                    </div>
+                                    <button x-show="truncated || expanded" @click="expanded = !expanded"
+                                        class="mt-1 text-xs text-primary hover:underline focus:outline-none"
+                                        x-text="expanded ? 'Sembunyikan' : 'Selengkapnya'"></button>
                                 @endif
                             </td>
 
-                            {{-- Jawaban yang dipilih user --}}
-                            <td class="whitespace-normal min-w-[150px]">
+                            {{-- Jawaban Terpilih --}}
+                            <td class="px-6 py-4 text-sm text-gray-500 min-w-[150px] max-w-[180px]"
+                                x-data="{ expanded: false, truncated: false }"
+                                x-init="$nextTick(() => { truncated = $refs.ua.scrollWidth > $refs.ua.clientWidth })">
                                 @if($userModuleQuestion->timetableQuestion?->type === 'essay')
-                                    <div class="italic text-gray-700">
+                                    <div x-ref="ua" class="italic text-gray-700"
+                                        :style="expanded ? '' : 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'">
                                         {!! $userModuleQuestion->essay_answer ?: '<span class="text-gray-400">Tidak ada jawaban</span>' !!}
                                     </div>
+                                    <button x-show="truncated || expanded" @click="expanded = !expanded"
+                                        class="mt-1 text-xs text-primary hover:underline focus:outline-none"
+                                        x-text="expanded ? 'Sembunyikan' : 'Selengkapnya'"></button>
+                                @elseif($chosenAnswer)
+                                    <div x-ref="ua" :style="expanded ? '' : 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'">
+                                        <span class="font-semibold text-gray-700 mr-1">{{ $letter($labelChosen) }}.</span>
+                                        {!! $chosenAnswer->context ?? '-' !!}
+                                    </div>
+                                    <button x-show="truncated || expanded" @click="expanded = !expanded"
+                                        class="mt-1 text-xs text-primary hover:underline focus:outline-none"
+                                        x-text="expanded ? 'Sembunyikan' : 'Selengkapnya'"></button>
                                 @else
-                                    {{ $letter($labelChosen) }}.
-                                    {!! optional($chosenAnswer)->context ?? '-' !!}
+                                    -
                                 @endif
                             </td>
-                            <td class="whitespace-nowrap">
+
+                            {{-- Status --}}
+                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
                                 @if ($userModuleQuestion->status === 'correct')
-                                    <span class="px-2 py-1 rounded bg-green-100 text-green-700 font-semibold">Benar</span>
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Benar</span>
                                 @elseif ($userModuleQuestion->status === 'wrong')
-                                    <span class="px-2 py-1 rounded bg-red-100 text-red-700 font-semibold">Salah</span>
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Salah</span>
                                 @elseif ($userModuleQuestion->status === 'check')
-                                    <span class="px-2 py-1 rounded bg-blue-100 text-blue-700 font-semibold">Menunggu
-                                        Koreksi</span>
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Menunggu Koreksi</span>
                                 @else
-                                    <span class="px-2 py-1 rounded bg-gray-100 text-gray-700 font-semibold">Tidak
-                                        Terjawab</span>
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Tidak Terjawab</span>
                                 @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="no-data">Tidak ada data</td>
+                            <td colspan="5" class="px-6 py-10 text-center text-gray-500">
+                                <div class="flex flex-col items-center justify-center">
+                                    <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                    </svg>
+                                    <span class="text-base font-medium">Tidak ada data</span>
+                                    <p class="text-sm text-gray-400 mt-1">Coba sesuaikan filter pencarian anda</p>
+                                </div>
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
 
-        <!-- Pagination -->
-        <div class="px-5 py-4 bg-gray-50/80 border-t border-gray-200">
-            <div class="flex items-center justify-between">
-                <div class="text-sm text-gray-700">
-                    Menampilkan <span class="font-medium">{{ $userModuleQuestions->firstItem() }}</span> sampai <span
-                        class="font-medium">{{ $userModuleQuestions->lastItem() }}</span> dari <span
-                        class="font-medium">{{ $userModuleQuestions->total() }}</span> hasil
+        {{-- Pagination --}}
+        <div class="px-5 py-4 bg-gray-50/80 border-t border-gray-200 rounded-b-xl">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="text-sm text-gray-700 text-center md:text-left">
+                    Menampilkan <span class="font-medium">{{ $userModuleQuestions->firstItem() }}</span>
+                    sampai <span class="font-medium">{{ $userModuleQuestions->lastItem() }}</span>
+                    dari <span class="font-medium">{{ $userModuleQuestions->total() }}</span> hasil
                 </div>
-                <div>
+                <div class="flex justify-center">
                     <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        {{ $userModuleQuestions->links('vendor.livewire.custom') }} <!-- Menampilkan pagination -->
+                        {{ $userModuleQuestions->links('vendor.livewire.custom') }}
                     </nav>
                 </div>
             </div>

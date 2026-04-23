@@ -115,6 +115,8 @@
                             No</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Soal
                         </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pertanyaan
+                        </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Jawaban Benar</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -139,30 +141,44 @@
                         <tr class="hover:bg-gray-50 transition-colors duration-200">
                             <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
                                 {{ $userModuleQuestions->firstItem() + $index }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-900 font-medium whitespace-normal min-w-[200px]">
-                                {!! optional($userModuleQuestion->timetableQuestion)->question ?? '-' !!}
+                            <td class="px-6 py-4 text-sm text-gray-900 font-medium min-w-[200px] max-w-xs" x-data="{ expanded: false, truncated: false }" x-init="$nextTick(() => { truncated = $refs.t1.scrollWidth > $refs.t1.clientWidth })">
+                                <div x-ref="t1" :style="expanded ? '' : 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'">
+                                    {!! optional($userModuleQuestion->timetableQuestion)->question ?? '-' !!}
+                                </div>
                                 @if($userModuleQuestion->timetableQuestion?->type === 'essay')
                                     <span class="block text-[10px] text-blue-500 font-bold uppercase mt-1">ESSAY</span>
                                 @endif
+                                <button x-show="truncated || expanded" @click="expanded = !expanded" class="mt-1 text-xs text-primary hover:underline focus:outline-none" x-text="expanded ? 'Sembunyikan' : 'Lihat Selengkapnya'"></button>
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-500 whitespace-normal min-w-[150px]">
+                            <td class="px-6 py-4 text-sm text-gray-900 font-medium min-w-[200px] max-w-xs" x-data="{ expanded: false, truncated: false }" x-init="$nextTick(() => { truncated = $refs.t2.scrollWidth > $refs.t2.clientWidth })">
+                                <div x-ref="t2" :style="expanded ? '' : 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'">
+                                    {!! optional($userModuleQuestion->timetableQuestion)->description ?? '-' !!}
+                                </div>
+                                <button x-show="truncated || expanded" @click="expanded = !expanded" class="mt-1 text-xs text-primary hover:underline focus:outline-none" x-text="expanded ? 'Sembunyikan' : 'Lihat Selengkapnya'"></button>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-500 min-w-[150px] max-w-[180px]" x-data="{ expanded: false, truncated: false }" x-init="$nextTick(() => { truncated = $refs.t3.scrollWidth > $refs.t3.clientWidth })">
                                 @if($correctAnswer)
-                                    <span
-                                        class="font-semibold text-gray-700 inline-block mr-1">{{ $letter($labelCorrect) }}.</span>
-                                    {!! $correctAnswer->context ?? '-' !!}
+                                    <div x-ref="t3" :style="expanded ? '' : 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'">
+                                        <span class="font-semibold text-gray-700 inline-block mr-1">{{ $letter($labelCorrect) }}.</span>
+                                        {!! $correctAnswer->context ?? '-' !!}
+                                    </div>
+                                    <button x-show="truncated || expanded" @click="expanded = !expanded" class="mt-1 text-xs text-primary hover:underline focus:outline-none" x-text="expanded ? 'Sembunyikan' : 'Selengkapnya'"></button>
                                 @else
                                     -
                                 @endif
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-500 whitespace-normal min-w-[150px]">
+                            <td class="px-6 py-4 text-sm text-gray-500 min-w-[150px] max-w-[180px]" x-data="{ expanded: false, truncated: false }" x-init="$nextTick(() => { truncated = $refs.t4.scrollWidth > $refs.t4.clientWidth })">
                                 @if($userModuleQuestion->timetableQuestion?->type === 'essay')
-                                    <div class="prose prose-sm max-w-none text-gray-700 italic">
+                                    <div x-ref="t4" class="prose prose-sm max-w-none text-gray-700 italic" :style="expanded ? '' : 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'">
                                         {!! $userModuleQuestion->essay_answer ?: '<span class="text-gray-400">Tidak ada jawaban</span>' !!}
                                     </div>
+                                    <button x-show="truncated || expanded" @click="expanded = !expanded" class="mt-1 text-xs text-primary hover:underline focus:outline-none" x-text="expanded ? 'Sembunyikan' : 'Selengkapnya'"></button>
                                 @elseif($chosenAnswer)
-                                    <span
-                                        class="font-semibold text-gray-700 inline-block mr-1">{{ $letter($labelChosen) }}.</span>
-                                    {!! $chosenAnswer->context ?? '-' !!}
+                                    <div x-ref="t4" :style="expanded ? '' : 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'">
+                                        <span class="font-semibold text-gray-700 inline-block mr-1">{{ $letter($labelChosen) }}.</span>
+                                        {!! $chosenAnswer->context ?? '-' !!}
+                                    </div>
+                                    <button x-show="truncated || expanded" @click="expanded = !expanded" class="mt-1 text-xs text-primary hover:underline focus:outline-none" x-text="expanded ? 'Sembunyikan' : 'Selengkapnya'"></button>
                                 @else
                                     -
                                 @endif
