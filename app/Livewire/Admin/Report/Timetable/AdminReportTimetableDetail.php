@@ -90,7 +90,8 @@ class AdminReportTimetableDetail extends Component
         $userQuestionStatuses = UserModuleQuestion::whereIn('user_timetable_id', $userTimetableIds)
             ->whereIn('timetable_question_id', $questionIds)
             ->get($statusSelects)
-            ->groupBy('user_timetable_id');
+            ->groupBy('user_timetable_id')
+            ->map(fn($items) => $items->keyBy('timetable_question_id'));
 
         $correctCounts = [];
         foreach ($user_timetables as $userTimetable) {

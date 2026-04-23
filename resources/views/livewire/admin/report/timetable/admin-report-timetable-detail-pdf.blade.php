@@ -66,7 +66,8 @@
                                     </td>
                                     @foreach ($questionChunk as $question)
                                         @php
-                                            $status = $userQuestionStatuses[$user_timetable->id][$question->id] ?? null;
+                                            $userAnswer = $userQuestionStatuses[$user_timetable->id][$question->id] ?? null;
+                                            $status = $userAnswer?->status;
                                             $content = '-';
                                             $style = '';
                                             
@@ -113,7 +114,8 @@
                                     </td>
                                     @foreach ($questionChunk as $question)
                                         @php
-                                            $status = $userQuestionStatuses[$user_timetable->id][$question->id] ?? null;
+                                            $userAnswer = $userQuestionStatuses[$user_timetable->id][$question->id] ?? null;
+                                            $status = $userAnswer?->status;
                                             $content = '-';
                                             $style = '';
                                             
@@ -145,9 +147,11 @@
         <h2 style="font-size: 16px; color: #374151; border-bottom: 2px solid #e5e7eb; padding-bottom: 5px; margin-bottom: 15px;">Detail Jawaban Essay</h2>
         @foreach ($user_timetables as $uIndex => $user_timetable)
             @php
-                $userEssayAnswers = $user_timetable->userModuleQuestions->whereIn('timetable_question_id', $essayQuestions->pluck('id'));
+                $userAnswersForUser = $userQuestionStatuses[$user_timetable->id] ?? collect();
+                $essayQuestionIds = $essayQuestions->pluck('id');
+                $hasEssayAnswers = $essayQuestionIds->contains(fn($id) => isset($userAnswersForUser[$id]));
             @endphp
-            @if($userEssayAnswers->isNotEmpty())
+            @if($hasEssayAnswers)
                 <div style="margin-bottom: 20px; page-break-inside: avoid; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
                     <div style="background-color: #f3f4f6; padding: 8px 12px; font-weight: bold; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: justify-between;">
                         <span>{{ $uIndex + 1 }}. {{ $user_timetable->user?->name ?? '-' }}</span>
@@ -156,7 +160,7 @@
                     <div style="padding: 10px;">
                         @foreach ($essayQuestions as $question)
                             @php
-                                $ans = $userEssayAnswers->where('timetable_question_id', $question->id)->first();
+                                $ans = $userAnswersForUser[$question->id] ?? null;
                                 $status = $ans?->status;
                             @endphp
                             <div style="margin-bottom: 10px; border-bottom: 1px dashed #f3f4f6; padding-bottom: 5px;">
