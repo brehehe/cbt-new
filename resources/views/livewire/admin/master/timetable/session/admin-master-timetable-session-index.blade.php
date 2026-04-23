@@ -57,7 +57,9 @@
                             Aktivitas Terakhir</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Kamera</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi
+                        <th
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[1%]">
+                            Aksi
                         </th>
                     </tr>
                 </thead>
@@ -87,18 +89,24 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center gap-2">
-                                    @if(optional($session->userTimetable)->status === 'suspend')
-                                        <button class="btn btn-success" wire:click="unsuspendSession('{{ $session->id }}')"
+                                    @if (optional($session->userTimetable)->status === 'suspend')
+                                        <button
+                                            class="btn btn-icon text-green-600 hover:text-green-800 transition-colors edit-btn"
+                                            wire:click="unsuspendSession('{{ $session->id }}')"
                                             wire:confirm="Apakah Anda yakin ingin mencabut suspend peserta ini?">
                                             <i class="fa-solid fa-user-check"></i>
                                         </button>
                                     @else
-                                        <button class="btn btn-danger" wire:click="suspendSession('{{ $session->id }}')"
+                                        <button
+                                            class="btn btn-icon text-red-600 hover:text-red-800 transition-colors edit-btn"
+                                            wire:click="suspendSession('{{ $session->id }}')"
                                             wire:confirm="Apakah Anda yakin ingin mensuspend peserta ini?">
                                             <i class="fa-solid fa-user-slash"></i>
                                         </button>
                                     @endif
-                                    <button class="btn btn-warning" wire:click="forceLogoutUser('{{ $session->user->id }}')"
+                                    <button
+                                        class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn"
+                                        wire:click="forceLogoutUser('{{ $session->user->id }}')"
                                         wire:confirm="Apakah Anda yakin ingin force logout peserta ini?">
                                         <i class="fa-solid fa-right-from-bracket"></i>
                                     </button>
