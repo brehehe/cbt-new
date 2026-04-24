@@ -23,20 +23,13 @@ class CheckUserTimetable
         $currentRoute = $request->route()->getName();
         if (in_array($currentRoute, [
             'admin.exam.detail',
-<<<<<<< Updated upstream
             'admin.exam.detail.react',  // React exam page — sudah di route yang benar
-=======
->>>>>>> Stashed changes
             'admin.exam.warning',
             'login',
             'logout',
             'register',
             'password.request',
-<<<<<<< Updated upstream
             'password.reset'
-=======
-            'password.reset',
->>>>>>> Stashed changes
         ])) {
             return $next($request);
         }

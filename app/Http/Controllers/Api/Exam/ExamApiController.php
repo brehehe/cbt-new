@@ -45,7 +45,6 @@ class ExamApiController extends Controller
             ->where('id', $userTimetableId)
             ->firstOrFail();
 
-<<<<<<< Updated upstream
         $this->userTimetableId = $userTimetableId;
         $this->userTimetable = $userTimetable;
 
@@ -54,17 +53,6 @@ class ExamApiController extends Controller
         // dan menambahkannya ke 'pause_total_seconds'
         $this->remainingTime = $this->resumeTimerIfPaused();
 
-=======
-        // 1. Calculate Remaining Time
-        if (! $userTimetable->start_exam) {
-            $userTimetable->update(['start_exam' => now()]);
-        }
-        $startTime = Carbon::parse($userTimetable->start_exam);
-        $duration = $userTimetable->timetable->module->duration ?? 60;
-        $pauseSeconds = (int) ($userTimetable->pause_total_seconds ?? 0);
-        $endTime = $startTime->addMinutes($duration)->addSeconds($pauseSeconds);
-        $remainingTime = max(0, $endTime->timestamp - now()->timestamp);
->>>>>>> Stashed changes
 
         // 2. Fetch Questions & Navigation
         $questionSelects = ['id', 'is_mark', 'timetable_answer_id', 'timetable_question_id', 'order'];

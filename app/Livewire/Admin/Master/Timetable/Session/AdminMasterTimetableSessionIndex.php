@@ -173,12 +173,8 @@ class AdminMasterTimetableSessionIndex extends Component
 
             AlertHelper::success('Berhasil', "Akun di-logout ({$deletedCount} sesi dihapus) dan ujian diputus.");
         } catch (\Throwable $e) {
-<<<<<<< Updated upstream
             \Log::error("ForceLogout error: " . $e->getMessage());
             AlertHelper::warning('Perhatian', 'Gagal logout akun: ' . $e->getMessage());
-=======
-            AlertHelper::warning('Perhatian', 'Gagal logout akun: '.$e->getMessage());
->>>>>>> Stashed changes
         }
     }
 

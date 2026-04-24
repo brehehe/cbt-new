@@ -485,7 +485,6 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
 
     // Exam API Routes (using web middleware for session persistence)
     Route::prefix('api/exam')->middleware('auth')->group(function () {
-<<<<<<< Updated upstream
         // Auth Check Routes — ditangani AuthCheckController
         // GET /api/exam/ping        → cek apakah session masih valid (401 jika expired)
         // GET /api/exam/{id}/status → cek is_active ExamLiveSession (deteksi force-logout)
@@ -498,15 +497,6 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
         Route::post('/recording/upload-full', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'uploadFullRecording']);
         Route::post('/recording/upload-chunk', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'uploadChunk']);
         Route::post('/recording/merge', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'mergeRecordingChunks']);
-=======
-        Route::get('/{user_timetable_id}/data', [ExamApiController::class, 'getInitialState']);
-        Route::post('/save-answer', [ExamApiController::class, 'saveAnswer']);
-        Route::post('/toggle-mark', [ExamApiController::class, 'toggleMark']);
-        Route::post('/log-alert', [ExamApiController::class, 'logAlert']);
-        Route::post('/recording/upload-full', [ExamApiController::class, 'uploadFullRecording']);
-        Route::post('/recording/upload-chunk', [ExamApiController::class, 'uploadChunk']);
-        Route::post('/recording/merge', [ExamApiController::class, 'mergeRecordingChunks']);
->>>>>>> Stashed changes
 
         Route::get('/live-session/{user_timetable_id}/update', [ExamApiController::class, 'updateLiveSession']);
         Route::get('/live-session/{user_timetable_id}/token', [ExamApiController::class, 'getLiveKitToken']);
@@ -515,14 +505,10 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
         Route::get('/admin/monitoring/{timetable_id}/sessions', [ExamApiController::class, 'getMonitoringSessions']);
         Route::get('/admin/monitoring/{timetable_id}/token', [ExamApiController::class, 'getMonitoringToken']);
 
-<<<<<<< Updated upstream
         // Auth Check Routes — status ujian (cek ExamLiveSession.is_active)
         Route::get('/{user_timetable_id}/status', [App\Http\Controllers\Api\Auth\AuthCheckController::class, 'examStatus']);
 
         Route::post('/{user_timetable_id}/finish', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'finishExam']);
-=======
-        Route::post('/{user_timetable_id}/finish', [ExamApiController::class, 'finishExam']);
->>>>>>> Stashed changes
     });
 
     Route::get('/stress-test/exam/{userTimetableId}', StressTestExamDetailIndex::class)->name('public.stress-test.exam');
