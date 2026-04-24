@@ -4,9 +4,9 @@ namespace Database\Seeders;
 
 use App\Helpers\RoleHelper;
 use App\Models\Company\Company;
+use App\Models\Spatie\Role;
 use App\Models\User;
 use App\Models\User\UserDetail;
-use App\Models\Spatie\Role;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -19,12 +19,12 @@ class SimpleUserSeeder extends Seeder
         // Create roles if they don't exist
         $studentRole = Role::firstOrCreate([
             'name' => 'Mahasiswa',
-            'guard_name' => 'web'
+            'guard_name' => 'web',
         ]);
 
         $lecturerRole = Role::firstOrCreate([
             'name' => 'Dosen',
-            'guard_name' => 'web'
+            'guard_name' => 'web',
         ]);
 
         // Create a sample student
@@ -32,7 +32,7 @@ class SimpleUserSeeder extends Seeder
             'name' => 'Ahmad Fauzi',
             'email' => 'ahmad.fauzi@student.test.com',
             'password' => Hash::make('12345678'),
-            'email_verified_at' => now()
+            'email_verified_at' => now(),
         ]);
 
         $student->assignRole('Mahasiswa');
@@ -49,7 +49,7 @@ class SimpleUserSeeder extends Seeder
             'gender' => 'male',
             'verification_status' => 'verified',
             'verified_at' => now(),
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         RoleHelper::assignRoleToUserInCompany($student, 'Mahasiswa', $companyId);
@@ -59,7 +59,7 @@ class SimpleUserSeeder extends Seeder
             'name' => 'Dr. Muhammad Irfan, S.Kom., M.T.',
             'email' => 'muhammad.irfan@test.com',
             'password' => Hash::make('12345678'),
-            'email_verified_at' => now()
+            'email_verified_at' => now(),
         ]);
 
         $lecturer->assignRole('Dosen');
@@ -78,7 +78,7 @@ class SimpleUserSeeder extends Seeder
             'gender' => 'male',
             'verification_status' => 'verified',
             'verified_at' => now(),
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         RoleHelper::assignRoleToUserInCompany($lecturer, 'Dosen', $companyId);

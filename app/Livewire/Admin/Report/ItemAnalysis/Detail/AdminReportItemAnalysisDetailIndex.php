@@ -2,27 +2,30 @@
 
 namespace App\Livewire\Admin\Report\ItemAnalysis\Detail;
 
-use Livewire\Component;
 use App\Models\Master\Timetable\Timetable;
-use App\Models\Timetable\TimetableModule;
-use App\Models\Timetable\TimetableQuestion;
-use App\Models\Timetable\TimetableAnswer;
-use App\Models\User\UserTimetable;
 use App\Models\User\UserModuleQuestion;
+use App\Models\User\UserTimetable;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\DB;
+use Livewire\Component;
 
 class AdminReportItemAnalysisDetailIndex extends Component
 {
     protected $paginationTheme = 'bootstrap';
 
     public $timetableId;
+
     public $timetable;
+
     public $timetableModule;
+
     public $timetableQuestions;
+
     public $userTimetables;
+
     public $itemAnalysisData = [];
+
     public $perPage = 10;
+
     public $search = '';
 
     public function mount($id)
@@ -85,7 +88,7 @@ class AdminReportItemAnalysisDetailIndex extends Component
             $userScores[$userTimetable->id] = [
                 'score' => $totalCorrect,
                 'user_id' => $userTimetable->user_id,
-                'user_name' => $userTimetable->user->name
+                'user_name' => $userTimetable->user->name,
             ];
         }
 
@@ -114,7 +117,7 @@ class AdminReportItemAnalysisDetailIndex extends Component
             'upper_group_total' => $discriminationData['upper_group_total'],
             'lower_group_total' => $discriminationData['lower_group_total'],
             'option_analysis' => $optionAnalysis,
-            'reliability_contribution' => $this->calculateReliabilityContribution($difficultyIndex, $discriminationData['discrimination_index'])
+            'reliability_contribution' => $this->calculateReliabilityContribution($difficultyIndex, $discriminationData['discrimination_index']),
         ];
     }
 
@@ -137,7 +140,7 @@ class AdminReportItemAnalysisDetailIndex extends Component
                 'upper_group_correct' => 0,
                 'lower_group_correct' => 0,
                 'upper_group_total' => 0,
-                'lower_group_total' => 0
+                'lower_group_total' => 0,
             ];
         }
 
@@ -160,12 +163,12 @@ class AdminReportItemAnalysisDetailIndex extends Component
 
         // Discrimination Index = (Upper Correct / Upper Total) - (Lower Correct / Lower Total)
         // Note: For this to be accurate, we need to compare against graded attempts in those groups
-        
+
         $upperGradedCount = UserModuleQuestion::where('timetable_question_id', $question->id)
             ->whereIn('user_timetable_id', $upperGroupIds)
             ->whereIn('status', ['correct', 'wrong'])
             ->count();
-            
+
         $lowerGradedCount = UserModuleQuestion::where('timetable_question_id', $question->id)
             ->whereIn('user_timetable_id', $lowerGroupIds)
             ->whereIn('status', ['correct', 'wrong'])
@@ -182,7 +185,7 @@ class AdminReportItemAnalysisDetailIndex extends Component
             'upper_group_correct' => $upperCorrect,
             'lower_group_correct' => $lowerCorrect,
             'upper_group_total' => $upperGradedCount,
-            'lower_group_total' => $lowerGradedCount
+            'lower_group_total' => $lowerGradedCount,
         ];
     }
 
@@ -202,7 +205,7 @@ class AdminReportItemAnalysisDetailIndex extends Component
                 'option' => $option,
                 'selected_count' => $selectedCount,
                 'percentage' => round($percentage, 1),
-                'is_correct' => $option->is_correct
+                'is_correct' => $option->is_correct,
             ];
         }
 
@@ -211,10 +214,10 @@ class AdminReportItemAnalysisDetailIndex extends Component
         if ($unanswered > 0) {
             $percentage = ($unanswered / $userResponses->count()) * 100;
             $optionAnalysis[] = [
-                'option' => (object)['alphabet' => 'X', 'context' => 'Tidak dijawab'],
+                'option' => (object) ['alphabet' => 'X', 'context' => 'Tidak dijawab'],
                 'selected_count' => $unanswered,
                 'percentage' => round($percentage, 1),
-                'is_correct' => false
+                'is_correct' => false,
             ];
         }
 
@@ -223,17 +226,31 @@ class AdminReportItemAnalysisDetailIndex extends Component
 
     public function getDifficultyLevel($index)
     {
-        if ($index >= 0.7) return 'Mudah';
-        if ($index >= 0.3) return 'Sedang';
+        if ($index >= 0.7) {
+            return 'Mudah';
+        }
+        if ($index >= 0.3) {
+            return 'Sedang';
+        }
+
         return 'Sukar';
     }
 
     public function getDiscriminationLevel($index)
     {
-        if ($index >= 0.4) return 'Sangat Baik';
-        if ($index >= 0.3) return 'Baik';
-        if ($index >= 0.2) return 'Cukup';
-        if ($index >= 0.1) return 'Buruk';
+        if ($index >= 0.4) {
+            return 'Sangat Baik';
+        }
+        if ($index >= 0.3) {
+            return 'Baik';
+        }
+        if ($index >= 0.2) {
+            return 'Cukup';
+        }
+        if ($index >= 0.1) {
+            return 'Buruk';
+        }
+
         return 'Sangat Buruk';
     }
 
@@ -242,6 +259,7 @@ class AdminReportItemAnalysisDetailIndex extends Component
         // Kontribusi terhadap reliabilitas = P × Q × D
         // P = difficulty index, Q = 1-P, D = discrimination index
         $q = 1 - $difficulty;
+
         return round($difficulty * $q * $discrimination, 4);
     }
 
@@ -261,14 +279,14 @@ class AdminReportItemAnalysisDetailIndex extends Component
             'upper_group_total' => 0,
             'lower_group_total' => 0,
             'option_analysis' => [],
-            'reliability_contribution' => 0
+            'reliability_contribution' => 0,
         ];
     }
 
     public function render()
     {
         return \view('livewire.admin.report.item-analysis.detail.admin-report-item-analysis-detail-index', [
-            'itemAnalysisData' => $this->itemAnalysisData
+            'itemAnalysisData' => $this->itemAnalysisData,
         ])->extends('layout.app')->section('content');
     }
 
@@ -286,7 +304,8 @@ class AdminReportItemAnalysisDetailIndex extends Component
             'itemAnalysisData' => $this->itemAnalysisData,
         ])->setPaper('a4', 'landscape');
 
-        $fileName = 'analisis-butir-soal-' . ($this->timetableId ?? 'timetable') . '.pdf';
+        $fileName = 'analisis-butir-soal-'.($this->timetableId ?? 'timetable').'.pdf';
+
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
         }, $fileName);

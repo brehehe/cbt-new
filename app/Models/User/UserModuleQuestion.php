@@ -4,20 +4,21 @@ namespace App\Models\User;
 
 use App\Models\Company\Company;
 use App\Models\Master\Question\Answer;
+use App\Models\Master\Question\ModuleQuestion;
+use App\Models\Timetable\TimetableAnswer;
+use App\Models\Timetable\TimetableModule;
+use App\Models\Timetable\TimetableQuestion;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Master\Question\ModuleQuestion;
-use App\Models\Timetable\TimetableAnswer;
-use App\Models\Timetable\TimetableModule;
-use App\Models\Timetable\TimetableQuestion;
 
 class UserModuleQuestion extends Model
 {
     //
-    use SoftDeletes, HasUuids;
+    use HasUuids, SoftDeletes;
+
     protected $guarded = ['id'];
 
     protected $casts = [
@@ -36,7 +37,7 @@ class UserModuleQuestion extends Model
         static::addGlobalScope('user_scope', function (Builder $builder) {
             $user = Auth::user();
 
-            if (!$user || !$user->hasRole('Anonymous')) {
+            if (! $user || ! $user->hasRole('Anonymous')) {
                 $builder->where(function ($query) use ($user) {
                     $query->where('company_id', optional($user?->company)?->id)
                         ->orWhereHas('userTimetable.timetable', function ($q) {
@@ -58,7 +59,7 @@ class UserModuleQuestion extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
-        $term = '%' . $term . '%';
+        $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id'], 'ILIKE', $term);

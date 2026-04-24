@@ -12,7 +12,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class UserCompanyRole extends Model
 {
     //
-    use SoftDeletes, HasUuids, \App\Traits\LogsSystemActivity;
+    use \App\Traits\LogsSystemActivity, HasUuids, SoftDeletes;
+
     protected $guarded = ['id'];
 
     public function company()

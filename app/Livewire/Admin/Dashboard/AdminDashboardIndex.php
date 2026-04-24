@@ -3,20 +3,18 @@
 namespace App\Livewire\Admin\Dashboard;
 
 use App\Helpers\AlertHelper;
-use App\Models\User;
-use App\Models\User\UserTimetable;
-use App\Models\Master\Timetable\Timetable;
-use App\Models\Master\Exam\ExamType;
 use App\Models\Exam\ExamAlert;
 use App\Models\Exam\ExamLiveSession;
-use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
-use Livewire\Component;
+use App\Models\Master\Exam\ExamType;
+use App\Models\Master\Timetable\Timetable;
+use App\Models\User;
+use App\Models\User\UserTimetable;
+use DateTime;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Schema;
-use DateTime;
-use Carbon\Carbon;
+use Livewire\Component;
 
 class AdminDashboardIndex extends Component
 {
@@ -24,20 +22,35 @@ class AdminDashboardIndex extends Component
 
     // Dashboard properties
     public $totalUsers;
+
     public $activeExams;
+
     public $totalExamTypes;
+
     public $todayExams;
+
     public $completedExams;
+
     public $examAlerts;
+
     public $weeklyExamStats;
+
     public $monthlyStats;
+
     public $examStatistics;
+
     public $liveSessionStats;
+
     public $upcomingExams;
+
     public $recentExamResults;
+
     public $criticalAlerts;
+
     public $systemPerformance;
+
     public $uptimeDetails;
+
     public $userProfile; // User profile data for authenticated user
 
     public function mount()
@@ -45,11 +58,12 @@ class AdminDashboardIndex extends Component
         $this->loadDashboardData();
         // $this->pingGoogleDns();
     }
+
     public function pingGoogleDns()
     {
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             // Windows
-            $ping = shell_exec("ping -n 1 8.8.8.8");
+            $ping = shell_exec('ping -n 1 8.8.8.8');
             preg_match('/time[=<]\s?(\d+)\s?ms/i', $ping, $matches);
         } else {
             // Linux / macOS
@@ -91,15 +105,15 @@ class AdminDashboardIndex extends Component
             // Test 4: Real network latency to external server
             $networkLatency = $this->pingGoogleDns();
             if ($networkLatency) {
-                $measurements[] = (float)$networkLatency;
+                $measurements[] = (float) $networkLatency;
             }
 
             // Calculate weighted average
             $avgResponse = array_sum($measurements) / count($measurements);
 
-            return round($avgResponse, 1) . 'ms';
+            return round($avgResponse, 1).'ms';
         } catch (\Exception $e) {
-            return 'Error: ' . $e->getMessage();
+            return 'Error: '.$e->getMessage();
         }
     }
 
@@ -115,11 +129,11 @@ class AdminDashboardIndex extends Component
                     preg_match('/LastBootUpTime=(\d{14})/', $output, $matches);
                     if (isset($matches[1])) {
                         $bootTime = DateTime::createFromFormat('YmdHis', $matches[1]);
-                        $now = new DateTime();
+                        $now = new DateTime;
                         $diff = $now->diff($bootTime);
                         $totalHours = ($diff->days * 24) + $diff->h;
                         $uptimePercentage = min(($totalHours / (24 * 30)) * 100, 99.9);
-                        $uptime = number_format($uptimePercentage, 1) . '%';
+                        $uptime = number_format($uptimePercentage, 1).'%';
                     }
                 }
             } else {
@@ -129,7 +143,7 @@ class AdminDashboardIndex extends Component
                     $upSeconds = floatval(explode(' ', trim($uptimeData))[0]);
                     $upDays = $upSeconds / 86400;
                     $uptimePercentage = min(($upDays / 30) * 100, 99.9);
-                    $uptime = number_format($uptimePercentage, 1) . '%';
+                    $uptime = number_format($uptimePercentage, 1).'%';
                 }
             }
 
@@ -188,7 +202,7 @@ class AdminDashboardIndex extends Component
                 if ($cpuUsage) {
                     preg_match('/LoadPercentage=(\d+)/', $cpuUsage, $matches);
                     if (isset($matches[1])) {
-                        $loadMetrics['cpu'] = (int)$matches[1];
+                        $loadMetrics['cpu'] = (int) $matches[1];
                     }
                 }
 
@@ -201,8 +215,8 @@ class AdminDashboardIndex extends Component
                     preg_match('/AvailableMemorySize=(\d+)/', $memAvail, $availMatches);
 
                     if (isset($totalMatches[1]) && isset($availMatches[1])) {
-                        $total = (int)$totalMatches[1];
-                        $available = (int)$availMatches[1];
+                        $total = (int) $totalMatches[1];
+                        $available = (int) $availMatches[1];
                         $used = $total - $available;
                         $memUsage = ($used / $total) * 100;
                         $loadMetrics['memory'] = round($memUsage);
@@ -222,8 +236,8 @@ class AdminDashboardIndex extends Component
                     preg_match('/MemAvailable:\s+(\d+)/', $memInfo, $availMatches);
 
                     if (isset($totalMatches[1]) && isset($availMatches[1])) {
-                        $total = (int)$totalMatches[1];
-                        $available = (int)$availMatches[1];
+                        $total = (int) $totalMatches[1];
+                        $available = (int) $availMatches[1];
                         $used = $total - $available;
                         $memUsage = ($used / $total) * 100;
                         $loadMetrics['memory'] = round($memUsage);
@@ -241,7 +255,7 @@ class AdminDashboardIndex extends Component
             // Calculate average load
             $avgLoad = count($loadMetrics) > 0 ? array_sum($loadMetrics) / count($loadMetrics) : 25;
 
-            return round($avgLoad) . '%';
+            return round($avgLoad).'%';
         } catch (\Exception $e) {
             return '25%'; // Fallback
         }
@@ -252,14 +266,14 @@ class AdminDashboardIndex extends Component
         try {
             return [
                 'timestamp' => date('Y-m-d H:i:s'),
-                'response_time_ms' => (float)str_replace('ms', '', $this->getRealServerResponseTime()),
+                'response_time_ms' => (float) str_replace('ms', '', $this->getRealServerResponseTime()),
                 'concurrent_users' => $this->getRealConcurrentUsers(),
-                'server_load_percent' => (int)str_replace('%', '', $this->getRealServerLoad()),
+                'server_load_percent' => (int) str_replace('%', '', $this->getRealServerLoad()),
                 'network_latency' => $this->getRealNetworkLatency(),
                 'database_connections' => $this->getRealDatabaseConnections(),
                 'active_processes' => $this->getActiveProcesses(),
                 'system_temperature' => $this->getSystemTemperature(),
-                'bandwidth_usage' => $this->getBandwidthUsage()
+                'bandwidth_usage' => $this->getBandwidthUsage(),
             ];
         } catch (\Exception $e) {
             return ['error' => $e->getMessage()];
@@ -273,7 +287,7 @@ class AdminDashboardIndex extends Component
                 'google_dns' => $this->testNetworkLatency('8.8.8.8'),
                 'cloudflare_dns' => $this->testNetworkLatency('1.1.1.1'),
                 'local_gateway' => $this->testLocalGateway(),
-                'internet_speed' => $this->estimateInternetSpeed()
+                'internet_speed' => $this->estimateInternetSpeed(),
             ];
 
             $avgLatency = array_filter([$networkTests['google_dns'], $networkTests['cloudflare_dns']]);
@@ -281,8 +295,8 @@ class AdminDashboardIndex extends Component
 
             return [
                 'status' => $avgLatency < 100 ? 'excellent' : ($avgLatency < 200 ? 'good' : 'poor'),
-                'avg_latency' => $avgLatency ? round($avgLatency) . 'ms' : 'unavailable',
-                'tests' => $networkTests
+                'avg_latency' => $avgLatency ? round($avgLatency).'ms' : 'unavailable',
+                'tests' => $networkTests,
             ];
         } catch (\Exception $e) {
             return ['status' => 'error', 'message' => $e->getMessage()];
@@ -308,8 +322,8 @@ class AdminDashboardIndex extends Component
                 'php_current' => $this->formatBytes($phpMemory),
                 'php_peak' => $this->formatBytes($phpMemoryPeak),
                 'php_limit' => $phpMemoryLimit,
-                'php_usage_percent' => round($phpMemoryPercent, 1) . '%',
-                'system_usage' => $systemMemory
+                'php_usage_percent' => round($phpMemoryPercent, 1).'%',
+                'system_usage' => $systemMemory,
             ];
         } catch (\Exception $e) {
             return ['error' => $e->getMessage()];
@@ -322,11 +336,13 @@ class AdminDashboardIndex extends Component
             if (PHP_OS_FAMILY === 'Windows') {
                 $output = shell_exec('wmic cpu get loadpercentage /value');
                 preg_match('/LoadPercentage=(\d+)/', $output, $matches);
-                return isset($matches[1]) ? $matches[1] . '%' : 'unavailable';
+
+                return isset($matches[1]) ? $matches[1].'%' : 'unavailable';
             } else {
                 // Linux CPU usage
                 $load = sys_getloadavg();
-                return round($load[0] * 100) . '%';
+
+                return round($load[0] * 100).'%';
             }
         } catch (\Exception $e) {
             return 'unavailable';
@@ -347,7 +363,7 @@ class AdminDashboardIndex extends Component
                     'used' => $this->formatBytes($diskUsed),
                     'free' => $this->formatBytes($diskFree),
                     'total' => $this->formatBytes($diskTotal),
-                    'usage_percent' => round($diskUsagePercent, 1) . '%'
+                    'usage_percent' => round($diskUsagePercent, 1).'%',
                 ];
             }
 
@@ -368,7 +384,8 @@ class AdminDashboardIndex extends Component
                 $output = shell_exec("ping -c 1 $host | grep 'time='");
                 preg_match('/time=([\d.]+)\s?ms/', $output, $matches);
             }
-            return isset($matches[1]) ? (float)$matches[1] : null;
+
+            return isset($matches[1]) ? (float) $matches[1] : null;
         } catch (\Exception $e) {
             return null;
         }
@@ -388,6 +405,7 @@ class AdminDashboardIndex extends Component
             if (isset($matches[0])) {
                 return $this->testNetworkLatency($matches[0]);
             }
+
             return null;
         } catch (\Exception $e) {
             return null;
@@ -398,12 +416,12 @@ class AdminDashboardIndex extends Component
     {
         $latencies = [
             $this->testNetworkLatency('8.8.8.8'),
-            $this->testNetworkLatency('1.1.1.1')
+            $this->testNetworkLatency('1.1.1.1'),
         ];
 
         $validLatencies = array_filter($latencies);
         if (count($validLatencies) > 0) {
-            return round(array_sum($validLatencies) / count($validLatencies)) . 'ms';
+            return round(array_sum($validLatencies) / count($validLatencies)).'ms';
         }
 
         return 'unavailable';
@@ -413,7 +431,8 @@ class AdminDashboardIndex extends Component
     {
         try {
             $connections = DB::select('SHOW STATUS LIKE "Threads_connected"');
-            return isset($connections[0]->Value) ? (int)$connections[0]->Value : 0;
+
+            return isset($connections[0]->Value) ? (int) $connections[0]->Value : 0;
         } catch (\Exception $e) {
             return 0;
         }
@@ -424,10 +443,12 @@ class AdminDashboardIndex extends Component
         try {
             if (PHP_OS_FAMILY === 'Windows') {
                 $output = shell_exec('tasklist | find /c ""');
-                return (int)trim($output);
+
+                return (int) trim($output);
             } else {
                 $output = shell_exec('ps aux | wc -l');
-                return (int)trim($output);
+
+                return (int) trim($output);
             }
         } catch (\Exception $e) {
             return 0;
@@ -440,9 +461,10 @@ class AdminDashboardIndex extends Component
             if (PHP_OS_FAMILY !== 'Windows') {
                 $temp = shell_exec('cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null');
                 if ($temp) {
-                    return round((int)$temp / 1000) . '°C';
+                    return round((int) $temp / 1000).'°C';
                 }
             }
+
             return 'unavailable';
         } catch (\Exception $e) {
             return 'unavailable';
@@ -456,7 +478,7 @@ class AdminDashboardIndex extends Component
             $concurrent = $this->getRealConcurrentUsers();
             $estimatedBandwidth = $concurrent * 0.5; // 0.5 Mbps per user estimate
 
-            return round($estimatedBandwidth, 1) . ' Mbps';
+            return round($estimatedBandwidth, 1).' Mbps';
         } catch (\Exception $e) {
             return 'unavailable';
         }
@@ -473,7 +495,8 @@ class AdminDashboardIndex extends Component
             if ($data && $time > 0) {
                 $bytes = strlen($data);
                 $kbps = ($bytes / 1024) / $time;
-                return round($kbps) . ' KB/s';
+
+                return round($kbps).' KB/s';
             }
 
             return 'unavailable';
@@ -493,8 +516,8 @@ class AdminDashboardIndex extends Component
                 preg_match('/AvailableMemorySize=(\d+)/', $availMem, $availMatches);
 
                 if (isset($totalMatches[1]) && isset($availMatches[1])) {
-                    $total = (int)$totalMatches[1] * 1024; // Convert KB to bytes
-                    $available = (int)$availMatches[1] * 1024;
+                    $total = (int) $totalMatches[1] * 1024; // Convert KB to bytes
+                    $available = (int) $availMatches[1] * 1024;
                     $used = $total - $available;
                     $usagePercent = ($used / $total) * 100;
 
@@ -502,7 +525,7 @@ class AdminDashboardIndex extends Component
                         'total' => $this->formatBytes($total),
                         'used' => $this->formatBytes($used),
                         'available' => $this->formatBytes($available),
-                        'usage_percent' => round($usagePercent, 1) . '%'
+                        'usage_percent' => round($usagePercent, 1).'%',
                     ];
                 }
             } else {
@@ -512,8 +535,8 @@ class AdminDashboardIndex extends Component
                     preg_match('/MemAvailable:\s+(\d+)/', $memInfo, $availMatches);
 
                     if (isset($totalMatches[1]) && isset($availMatches[1])) {
-                        $total = (int)$totalMatches[1] * 1024;
-                        $available = (int)$availMatches[1] * 1024;
+                        $total = (int) $totalMatches[1] * 1024;
+                        $available = (int) $availMatches[1] * 1024;
                         $used = $total - $available;
                         $usagePercent = ($used / $total) * 100;
 
@@ -521,7 +544,7 @@ class AdminDashboardIndex extends Component
                             'total' => $this->formatBytes($total),
                             'used' => $this->formatBytes($used),
                             'available' => $this->formatBytes($available),
-                            'usage_percent' => round($usagePercent, 1) . '%'
+                            'usage_percent' => round($usagePercent, 1).'%',
                         ];
                     }
                 }
@@ -536,7 +559,7 @@ class AdminDashboardIndex extends Component
     private function convertToBytes($size)
     {
         $unit = strtolower(substr($size, -1));
-        $value = (int)$size;
+        $value = (int) $size;
 
         switch ($unit) {
             case 'g':
@@ -553,13 +576,13 @@ class AdminDashboardIndex extends Component
     private function formatBytes($bytes)
     {
         if ($bytes >= 1024 * 1024 * 1024) {
-            return round($bytes / (1024 * 1024 * 1024), 2) . ' GB';
+            return round($bytes / (1024 * 1024 * 1024), 2).' GB';
         } elseif ($bytes >= 1024 * 1024) {
-            return round($bytes / (1024 * 1024), 2) . ' MB';
+            return round($bytes / (1024 * 1024), 2).' MB';
         } elseif ($bytes >= 1024) {
-            return round($bytes / 1024, 2) . ' KB';
+            return round($bytes / 1024, 2).' KB';
         } else {
-            return $bytes . ' B';
+            return $bytes.' B';
         }
     }
 
@@ -582,7 +605,7 @@ class AdminDashboardIndex extends Component
                 'total_exams_this_month' => UserTimetable::whereMonth('created_at', date('m'))->count(),
                 'completed_this_month' => UserTimetable::where('status', 'done')->whereMonth('updated_at', date('m'))->count(),
                 'avg_completion_rate' => $this->calculateCompletionRate(),
-                'new_users_this_month' => User::whereMonth('created_at', date('m'))->count()
+                'new_users_this_month' => User::whereMonth('created_at', date('m'))->count(),
             ];
 
             // Exam status statistics
@@ -630,7 +653,7 @@ class AdminDashboardIndex extends Component
             // Load user profile with role-based access control
             $this->userProfile = $this->getUserProfileData();
         } catch (\Exception $e) {
-            Session::flash('error', 'Error loading dashboard data: ' . $e->getMessage());
+            Session::flash('error', 'Error loading dashboard data: '.$e->getMessage());
         }
     }
 
@@ -653,7 +676,7 @@ class AdminDashboardIndex extends Component
         } elseif ($currentUser->hasRole('Admin')) {
             // Admin can view their profile with admin information
             return [
-                'user' => $currentUser->load('userDetail','study'),
+                'user' => $currentUser->load('userDetail', 'study'),
                 'role' => 'Admin',
                 'can_view_others' => true,
                 'show_academic_info' => false,
@@ -693,9 +716,10 @@ class AdminDashboardIndex extends Component
             $count = UserTimetable::whereDate('created_at', $date)->count();
             $stats[] = [
                 'date' => date('M d', strtotime($date)),
-                'count' => $count
+                'count' => $count,
             ];
         }
+
         return $stats;
     }
 
@@ -705,7 +729,7 @@ class AdminDashboardIndex extends Component
             'done' => UserTimetable::where('status', 'done')->count(),
             'exam' => UserTimetable::where('status', 'exam')->count(),
             'warning' => UserTimetable::where('status', 'warning')->count(),
-            'blocked' => UserTimetable::where('status', 'blocked')->count()
+            'blocked' => UserTimetable::where('status', 'blocked')->count(),
         ];
     }
 
@@ -718,7 +742,7 @@ class AdminDashboardIndex extends Component
             'active_sessions' => $activeSessions,
             'high_risk' => $highRisk,
             'camera_issues' => rand(0, 5), // This would be calculated from actual monitoring
-            'connection_issues' => rand(0, 3)
+            'connection_issues' => rand(0, 3),
         ];
     }
 
@@ -814,7 +838,8 @@ class AdminDashboardIndex extends Component
                 }
 
                 $avgResponseTime = $totalResponseTime / $recentExams->count();
-                return round($avgResponseTime) . 'ms';
+
+                return round($avgResponseTime).'ms';
             }
 
             // Method 2: Calculate based on database query performance
@@ -828,7 +853,7 @@ class AdminDashboardIndex extends Component
 
             $calculatedResponseTime = ($dbResponseTime * $loadMultiplier) + rand(50, 150);
 
-            return round(min($calculatedResponseTime, 2000)) . 'ms'; // Cap at 2 seconds
+            return round(min($calculatedResponseTime, 2000)).'ms'; // Cap at 2 seconds
 
         } catch (\Exception $e) {
             // Fallback calculation based on current time
@@ -842,7 +867,7 @@ class AdminDashboardIndex extends Component
                 $baseResponse += rand(10, 40);
             }
 
-            return $baseResponse . 'ms';
+            return $baseResponse.'ms';
         }
     }
 
@@ -853,13 +878,13 @@ class AdminDashboardIndex extends Component
             $load = sys_getloadavg(); // [1min, 5min, 15min]
 
             // Hitung jumlah core
-            $cpuCores = (int) shell_exec("nproc") ?: 1;
+            $cpuCores = (int) shell_exec('nproc') ?: 1;
 
             // Estimasi CPU usage (load 1 min dibanding jumlah core)
             $cpuPercent = ($load[0] / $cpuCores) * 100;
 
             // Ambil info memory
-            $meminfo = file_get_contents("/proc/meminfo");
+            $meminfo = file_get_contents('/proc/meminfo');
             preg_match('/MemTotal:\s+(\d+)/', $meminfo, $matchesTotal);
             preg_match('/MemAvailable:\s+(\d+)/', $meminfo, $matchesAvailable);
 
@@ -871,12 +896,11 @@ class AdminDashboardIndex extends Component
             // Gabungkan rata-rata CPU + Memory
             $serverLoad = ($cpuPercent + $memPercent) / 2;
 
-            return round($serverLoad) . '%';
+            return round($serverLoad).'%';
         } catch (\Exception $e) {
             return 'N/A';
         }
     }
-
 
     private function calculateSystemUptime()
     {
@@ -912,7 +936,7 @@ class AdminDashboardIndex extends Component
                 // Ensure minimum realistic uptime
                 $uptime = max($calculatedUptime, 85.0);
 
-                return number_format($uptime, 1) . '%';
+                return number_format($uptime, 1).'%';
             }
 
             // Fallback: Calculate based on system start time (if available)
@@ -938,7 +962,7 @@ class AdminDashboardIndex extends Component
                     $totalHours = (isset($days[1]) ? $days[1] * 24 : 0) + (isset($hours[1]) ? $hours[1] : 0);
                     $uptimePercentage = min(($totalHours / (24 * 30)) * 100, 99.9); // Based on 30-day period
 
-                    return number_format($uptimePercentage, 1) . '%';
+                    return number_format($uptimePercentage, 1).'%';
                 }
             }
 
@@ -972,7 +996,7 @@ class AdminDashboardIndex extends Component
         $variation = (rand(-10, 10) / 100); // -0.1% to +0.1%
         $uptime = $baseUptime + $variation;
 
-        return number_format(max($uptime, 95.0), 1) . '%';
+        return number_format(max($uptime, 95.0), 1).'%';
     }
 
     private function getUptimeDetails()
@@ -1016,19 +1040,19 @@ class AdminDashboardIndex extends Component
 
             return [
                 'current' => $this->systemPerformance['system_uptime'],
-                'daily' => number_format(max($dailyUptime, 95), 1) . '%',
-                'weekly' => number_format(max($weeklyUptime, 96), 1) . '%',
-                'monthly' => number_format(max($monthlyUptime, 97), 1) . '%',
+                'daily' => number_format(max($dailyUptime, 95), 1).'%',
+                'weekly' => number_format(max($weeklyUptime, 96), 1).'%',
+                'monthly' => number_format(max($monthlyUptime, 97), 1).'%',
                 'incidents' => [
                     'today' => $todayIncidents,
                     'week' => $weeklyIncidents,
-                    'month' => $monthlyIncidents
+                    'month' => $monthlyIncidents,
                 ],
                 'last_downtime' => $lastDowntime,
                 'business_hours' => $businessHoursUptime,
                 'after_hours' => $afterHoursUptime,
                 'status' => $this->getSystemStatus(),
-                'next_maintenance' => $this->getNextMaintenanceWindow()
+                'next_maintenance' => $this->getNextMaintenanceWindow(),
             ];
         } catch (\Exception $e) {
             return [
@@ -1041,7 +1065,7 @@ class AdminDashboardIndex extends Component
                 'business_hours' => '99.9%',
                 'after_hours' => '99.1%',
                 'status' => 'Operational',
-                'next_maintenance' => 'Scheduled for next Sunday 2:00 AM'
+                'next_maintenance' => 'Scheduled for next Sunday 2:00 AM',
             ];
         }
     }
@@ -1049,11 +1073,11 @@ class AdminDashboardIndex extends Component
     private function calculateBusinessHoursUptime()
     {
         // Business hours: 8 AM - 6 PM, Monday to Friday
-        $businessHoursExams = UserTimetable::whereRaw("
+        $businessHoursExams = UserTimetable::whereRaw('
             HOUR(created_at) BETWEEN 8 AND 18
             AND DAYOFWEEK(created_at) BETWEEN 2 AND 6
             AND DATE(created_at) >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-        ")->count();
+        ')->count();
 
         $businessHoursSuccess = UserTimetable::whereRaw("
             HOUR(created_at) BETWEEN 8 AND 18
@@ -1063,16 +1087,17 @@ class AdminDashboardIndex extends Component
         ")->count();
 
         $uptime = $businessHoursExams > 0 ? ($businessHoursSuccess / $businessHoursExams) * 100 : 99.9;
-        return number_format(max($uptime, 98), 1) . '%';
+
+        return number_format(max($uptime, 98), 1).'%';
     }
 
     private function calculateAfterHoursUptime()
     {
         // After hours: 6 PM - 8 AM, and weekends
-        $afterHoursExams = UserTimetable::whereRaw("
+        $afterHoursExams = UserTimetable::whereRaw('
             (HOUR(created_at) < 8 OR HOUR(created_at) > 18 OR DAYOFWEEK(created_at) IN (1, 7))
             AND DATE(created_at) >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-        ")->count();
+        ')->count();
 
         $afterHoursSuccess = UserTimetable::whereRaw("
             (HOUR(created_at) < 8 OR HOUR(created_at) > 18 OR DAYOFWEEK(created_at) IN (1, 7))
@@ -1081,7 +1106,8 @@ class AdminDashboardIndex extends Component
         ")->count();
 
         $uptime = $afterHoursExams > 0 ? ($afterHoursSuccess / $afterHoursExams) * 100 : 99.1;
-        return number_format(max($uptime, 96), 1) . '%';
+
+        return number_format(max($uptime, 96), 1).'%';
     }
 
     private function getSystemStatus()
@@ -1115,7 +1141,7 @@ class AdminDashboardIndex extends Component
         if ($daysUntil <= 1) {
             return 'Scheduled for tomorrow 2:00 AM';
         } else {
-            return 'Scheduled for ' . date('l, M j', $nextSunday) . ' at 2:00 AM';
+            return 'Scheduled for '.date('l, M j', $nextSunday).' at 2:00 AM';
         }
     }
 
@@ -1135,7 +1161,7 @@ class AdminDashboardIndex extends Component
                 'last_minute' => UserTimetable::where('updated_at', '>=', $oneMinuteAgo)->count(),
                 'last_5_minutes' => UserTimetable::where('updated_at', '>=', $fiveMinutesAgo)->count(),
                 'last_15_minutes' => UserTimetable::where('updated_at', '>=', $fifteenMinutesAgo)->count(),
-                'active_now' => UserTimetable::where('status', 'exam')->count()
+                'active_now' => UserTimetable::where('status', 'exam')->count(),
             ];
 
             // Real-time exam statistics
@@ -1144,7 +1170,7 @@ class AdminDashboardIndex extends Component
                 'completed_last_minute' => UserTimetable::where('status', 'done')
                     ->where('updated_at', '>=', $oneMinuteAgo)->count(),
                 'alerts_last_minute' => ExamAlert::where('created_at', '>=', $oneMinuteAgo)->count(),
-                'average_completion_time' => $this->getAverageCompletionTime()
+                'average_completion_time' => $this->getAverageCompletionTime(),
             ];
 
             // System health indicators
@@ -1153,7 +1179,7 @@ class AdminDashboardIndex extends Component
                 'query_success_rate' => $dbMetrics['success_rate'],
                 'memory_usage_estimate' => $this->estimateMemoryUsage(),
                 'error_rate' => $this->calculateErrorRate(),
-                'throughput' => $this->calculateThroughput()
+                'throughput' => $this->calculateThroughput(),
             ];
 
             // Peak performance tracking
@@ -1161,7 +1187,7 @@ class AdminDashboardIndex extends Component
                 'peak_concurrent_today' => $this->getPeakConcurrentToday(),
                 'peak_response_time_today' => $this->getPeakResponseTimeToday(),
                 'total_requests_today' => $this->getTotalRequestsToday(),
-                'success_rate_today' => $this->getSuccessRateToday()
+                'success_rate_today' => $this->getSuccessRateToday(),
             ];
 
             return [
@@ -1171,13 +1197,13 @@ class AdminDashboardIndex extends Component
                 'exam_activity' => $examActivity,
                 'system_health' => $systemHealth,
                 'peak_metrics' => $peakMetrics,
-                'status_indicators' => $this->getStatusIndicators()
+                'status_indicators' => $this->getStatusIndicators(),
             ];
         } catch (\Exception $e) {
             return [
                 'timestamp' => date('Y-m-d H:i:s'),
                 'error' => 'Unable to fetch real-time metrics',
-                'fallback_data' => true
+                'fallback_data' => true,
             ];
         }
     }
@@ -1209,10 +1235,10 @@ class AdminDashboardIndex extends Component
         $successRate = $queryCount > 0 ? ($successfulQueries / $queryCount) * 100 : 0;
 
         return [
-            'response_time' => round($responseTime, 2) . 'ms',
-            'success_rate' => round($successRate, 1) . '%',
+            'response_time' => round($responseTime, 2).'ms',
+            'success_rate' => round($successRate, 1).'%',
             'queries_tested' => $queryCount,
-            'successful_queries' => $successfulQueries
+            'successful_queries' => $successfulQueries,
         ];
     }
 
@@ -1234,6 +1260,7 @@ class AdminDashboardIndex extends Component
         }
 
         $averageSeconds = $totalTime / $recentCompletions->count();
+
         return gmdate('H:i:s', $averageSeconds);
     }
 
@@ -1248,7 +1275,8 @@ class AdminDashboardIndex extends Component
         $examMemory = $activeExams * 0.2; // 0.2% per active exam
 
         $totalMemory = $baseMemory + $userMemory + $examMemory;
-        return min($totalMemory, 85) . '%';
+
+        return min($totalMemory, 85).'%';
     }
 
     private function calculateErrorRate()
@@ -1265,13 +1293,15 @@ class AdminDashboardIndex extends Component
         }
 
         $errorRate = ($totalErrors / $totalOperations) * 100;
-        return number_format($errorRate, 1) . '%';
+
+        return number_format($errorRate, 1).'%';
     }
 
     private function calculateThroughput()
     {
         $operationsLastMinute = UserTimetable::where('updated_at', '>=', date('Y-m-d H:i:s', strtotime('-1 minute')))->count();
-        return $operationsLastMinute . ' ops/min';
+
+        return $operationsLastMinute.' ops/min';
     }
 
     private function getPeakConcurrentToday()
@@ -1292,7 +1322,8 @@ class AdminDashboardIndex extends Component
     private function getPeakResponseTimeToday()
     {
         $currentResponse = (int) str_replace('ms', '', $this->calculateAvgResponseTime());
-        return round($currentResponse * 1.3) . 'ms';
+
+        return round($currentResponse * 1.3).'ms';
     }
 
     private function getTotalRequestsToday()
@@ -1311,7 +1342,7 @@ class AdminDashboardIndex extends Component
             return '100%';
         }
 
-        return number_format(($successToday / $totalToday) * 100, 1) . '%';
+        return number_format(($successToday / $totalToday) * 100, 1).'%';
     }
 
     private function getStatusIndicators()
@@ -1324,7 +1355,7 @@ class AdminDashboardIndex extends Component
             'response_time_status' => $responseTime < 200 ? 'good' : ($responseTime < 500 ? 'fair' : 'poor'),
             'server_load_status' => $serverLoad < 60 ? 'good' : ($serverLoad < 80 ? 'fair' : 'poor'),
             'error_rate_status' => $errorRate < 1 ? 'good' : ($errorRate < 5 ? 'fair' : 'poor'),
-            'overall_status' => $this->calculateOverallStatus($responseTime, $serverLoad, $errorRate)
+            'overall_status' => $this->calculateOverallStatus($responseTime, $serverLoad, $errorRate),
         ];
     }
 
@@ -1332,22 +1363,39 @@ class AdminDashboardIndex extends Component
     {
         $score = 0;
 
-        if ($responseTime < 200) $score += 3;
-        elseif ($responseTime < 500) $score += 2;
-        else $score += 1;
+        if ($responseTime < 200) {
+            $score += 3;
+        } elseif ($responseTime < 500) {
+            $score += 2;
+        } else {
+            $score += 1;
+        }
 
-        if ($serverLoad < 60) $score += 3;
-        elseif ($serverLoad < 80) $score += 2;
-        else $score += 1;
+        if ($serverLoad < 60) {
+            $score += 3;
+        } elseif ($serverLoad < 80) {
+            $score += 2;
+        } else {
+            $score += 1;
+        }
 
-        if ($errorRate < 1) $score += 3;
-        elseif ($errorRate < 5) $score += 2;
-        else $score += 1;
+        if ($errorRate < 1) {
+            $score += 3;
+        } elseif ($errorRate < 5) {
+            $score += 2;
+        } else {
+            $score += 1;
+        }
 
-        if ($score >= 8) return 'excellent';
-        elseif ($score >= 6) return 'good';
-        elseif ($score >= 4) return 'fair';
-        else return 'poor';
+        if ($score >= 8) {
+            return 'excellent';
+        } elseif ($score >= 6) {
+            return 'good';
+        } elseif ($score >= 4) {
+            return 'fair';
+        } else {
+            return 'poor';
+        }
     }
 
     public function refreshData()

@@ -18,20 +18,38 @@ use Throwable;
 class AdminMasterMaterialIndex extends Component
 {
     use WithPagination;
-    protected $paginationTheme = 'bootstrap';
-    public $perPage = 10, $search;
 
-    public $topics = [], $material_categories = [];
-    public $data_id, $topic_id, $material_category_id, $name, $level, $description;
+    protected $paginationTheme = 'bootstrap';
+
+    public $perPage = 10;
+
+    public $search;
+
+    public $topics = [];
+
+    public $material_categories = [];
+
+    public $data_id;
+
+    public $topic_id;
+
+    public $material_category_id;
+
+    public $name;
+
+    public $level;
+
+    public $description;
 
     public function render()
     {
         $materials = Material::search($this->search)->select('id', 'material_category_id', 'name', 'level', 'description')
             ->with([
-                'materialCategory:id,name'
+                'materialCategory:id,name',
             ]);
+
         return view('livewire.admin.master.material.admin-master-material-index', [
-            'materials' => $materials->paginate($this->perPage)
+            'materials' => $materials->paginate($this->perPage),
         ])->extends('layout.app')->section('content');
     }
 
@@ -45,6 +63,7 @@ class AdminMasterMaterialIndex extends Component
         $this->material_category_id = null;
         if (empty($value)) {
             $this->material_categories = [];
+
             return;
         }
         $this->material_categories = MaterialCategory::select('id', 'topic_id', 'name')
@@ -65,6 +84,7 @@ class AdminMasterMaterialIndex extends Component
     {
         $this->resetValidation();
         $this->reset(['data_id', 'topic_id', 'material_category_id', 'name', 'level', 'description']);
+
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
 
@@ -100,12 +120,12 @@ class AdminMasterMaterialIndex extends Component
             ];
 
             $material = app(MaterialService::class)->updateOrCreate($request);
-            if (!$material) {
-                throw new Exception("Ada kesalahaan saat MaterialService => updateOrCreate", 500);
+            if (! $material) {
+                throw new Exception('Ada kesalahaan saat MaterialService => updateOrCreate', 500);
             }
 
             DB::commit();
-        } catch (Exception | Throwable $th) {
+        } catch (Exception|Throwable $th) {
             DB::rollBack();
             $error = [
                 'message' => $th->getMessage(),
@@ -113,10 +133,12 @@ class AdminMasterMaterialIndex extends Component
                 'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterMaterialIndex => submit', $error);
+
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
         }
 
         $this->closeModal();
+
         return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
     }
 
@@ -141,13 +163,14 @@ class AdminMasterMaterialIndex extends Component
     {
         try {
             app(MaterialService::class)->delete($id[0]);
-        } catch (Exception | Throwable $th) {
+        } catch (Exception|Throwable $th) {
             $error = [
                 'message' => $th->getMessage(),
                 'file' => $th->getFile(),
                 'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterMaterialIndex => delete', $error);
+
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menghapus data');
         }
 

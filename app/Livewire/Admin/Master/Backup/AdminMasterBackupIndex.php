@@ -29,13 +29,15 @@ class AdminMasterBackupIndex extends Component
                 '--disable-notifications' => true,
             ]);
 
-            Log::info('Database backup berhasil dilakukan oleh user: ' . auth()->user()->username);
-            
+            Log::info('Database backup berhasil dilakukan oleh user: '.auth()->user()->username);
+
             $backupName = config('backup.backup.name');
+
             return AlertHelper::success('Berhasil', "Backup database berhasil dibuat. File tersimpan di storage/app/public/{$backupName}/");
         } catch (\Exception $e) {
-            Log::error('Error saat backup database: ' . $e->getMessage());
-            return AlertHelper::error('Gagal', 'Terjadi kesalahan saat membuat backup database: ' . $e->getMessage());
+            Log::error('Error saat backup database: '.$e->getMessage());
+
+            return AlertHelper::error('Gagal', 'Terjadi kesalahan saat membuat backup database: '.$e->getMessage());
         }
     }
 
@@ -53,13 +55,15 @@ class AdminMasterBackupIndex extends Component
                 '--disable-notifications' => true,
             ]);
 
-            Log::info('Storage backup berhasil dilakukan oleh user: ' . auth()->user()->username);
-            
+            Log::info('Storage backup berhasil dilakukan oleh user: '.auth()->user()->username);
+
             $backupName = config('backup.backup.name');
+
             return AlertHelper::success('Berhasil', "Backup storage berhasil dibuat. File tersimpan di storage/app/public/{$backupName}/");
         } catch (\Exception $e) {
-            Log::error('Error saat backup storage: ' . $e->getMessage());
-            return AlertHelper::error('Gagal', 'Terjadi kesalahan saat membuat backup storage: ' . $e->getMessage());
+            Log::error('Error saat backup storage: '.$e->getMessage());
+
+            return AlertHelper::error('Gagal', 'Terjadi kesalahan saat membuat backup storage: '.$e->getMessage());
         }
     }
 
@@ -76,13 +80,15 @@ class AdminMasterBackupIndex extends Component
                 '--disable-notifications' => true,
             ]);
 
-            Log::info('Full backup berhasil dilakukan oleh user: ' . auth()->user()->username);
-            
+            Log::info('Full backup berhasil dilakukan oleh user: '.auth()->user()->username);
+
             $backupName = config('backup.backup.name');
+
             return AlertHelper::success('Berhasil', "Backup lengkap berhasil dibuat. File tersimpan di storage/app/public/{$backupName}/");
         } catch (\Exception $e) {
-            Log::error('Error saat full backup: ' . $e->getMessage());
-            return AlertHelper::error('Gagal', 'Terjadi kesalahan saat membuat backup lengkap: ' . $e->getMessage());
+            Log::error('Error saat full backup: '.$e->getMessage());
+
+            return AlertHelper::error('Gagal', 'Terjadi kesalahan saat membuat backup lengkap: '.$e->getMessage());
         }
     }
 
@@ -91,38 +97,38 @@ class AdminMasterBackupIndex extends Component
         try {
             // Lokasi backup sesuai config backup.php (disk public)
             $backupPath = storage_path('app/public');
-            
-            if (!file_exists($backupPath)) {
+
+            if (! file_exists($backupPath)) {
                 return [];
             }
 
             $files = [];
-            
+
             // Cari semua folder di dalam public storage
-            $directories = glob($backupPath . '/*', GLOB_ONLYDIR);
-            
+            $directories = glob($backupPath.'/*', GLOB_ONLYDIR);
+
             foreach ($directories as $dir) {
                 // Cari semua file .zip di folder tersebut
-                $zipFiles = glob($dir . '/*.zip');
-                
+                $zipFiles = glob($dir.'/*.zip');
+
                 foreach ($zipFiles as $file) {
                     $filename = basename($file);
                     $folderName = basename($dir);
-                    
+
                     // Tentukan tipe backup berdasarkan nama file atau folder
                     $type = 'Full Backup';
-                    
+
                     // Cek dari nama file
-                    if (strpos($filename, 'db-only') !== false || 
+                    if (strpos($filename, 'db-only') !== false ||
                         strpos($filename, 'database-only') !== false ||
                         strpos($filename, '-db.zip') !== false) {
                         $type = 'Database';
-                    } elseif (strpos($filename, 'files-only') !== false || 
+                    } elseif (strpos($filename, 'files-only') !== false ||
                               strpos($filename, 'storage-only') !== false ||
                               strpos($filename, '-files.zip') !== false) {
                         $type = 'Storage';
                     }
-                    
+
                     $files[] = [
                         'name' => $filename,
                         'path' => $file,
@@ -142,7 +148,8 @@ class AdminMasterBackupIndex extends Component
 
             return $files;
         } catch (\Exception $e) {
-            Log::error('Error getting backup files: ' . $e->getMessage());
+            Log::error('Error getting backup files: '.$e->getMessage());
+
             return [];
         }
     }
@@ -155,16 +162,17 @@ class AdminMasterBackupIndex extends Component
         }
 
         try {
-            if (!file_exists($filePath)) {
+            if (! file_exists($filePath)) {
                 return AlertHelper::error('Gagal', 'File backup tidak ditemukan.');
             }
 
             unlink($filePath);
-            Log::info('Backup file deleted: ' . $filePath . ' by user: ' . auth()->user()->username);
-            
+            Log::info('Backup file deleted: '.$filePath.' by user: '.auth()->user()->username);
+
             return AlertHelper::success('Berhasil', 'File backup berhasil dihapus.');
         } catch (\Exception $e) {
-            Log::error('Error deleting backup: ' . $e->getMessage());
+            Log::error('Error deleting backup: '.$e->getMessage());
+
             return AlertHelper::error('Gagal', 'Terjadi kesalahan saat menghapus backup.');
         }
     }
@@ -178,28 +186,30 @@ class AdminMasterBackupIndex extends Component
 
         try {
             $backupPath = storage_path('app/public');
-            
-            if (!file_exists($backupPath)) {
+
+            if (! file_exists($backupPath)) {
                 return AlertHelper::error('Gagal', 'Direktori backup tidak ditemukan.');
             }
 
             // Dapatkan folder backup name (contoh: pro-cbt)
             $backupName = config('backup.backup.name');
-            $specificBackupDir = $backupPath . '/' . $backupName;
+            $specificBackupDir = $backupPath.'/'.$backupName;
 
             if (file_exists($specificBackupDir)) {
                 // Delete the specific backup directory entirely, and recreate it
                 File::deleteDirectory($specificBackupDir);
                 File::makeDirectory($specificBackupDir, 0755, true);
-                
-                Log::info('All backup files deleted by user: ' . auth()->user()->username);
+
+                Log::info('All backup files deleted by user: '.auth()->user()->username);
+
                 return AlertHelper::success('Berhasil', 'Semua file backup berhasil dihapus.');
             } else {
                 return AlertHelper::success('Berhasil', 'Tidak ada file backup yang perlu dihapus.');
             }
-            
+
         } catch (\Exception $e) {
-            Log::error('Error deleting all backups: ' . $e->getMessage());
+            Log::error('Error deleting all backups: '.$e->getMessage());
+
             return AlertHelper::error('Gagal', 'Terjadi kesalahan saat menghapus semua backup.');
         }
     }
@@ -207,12 +217,12 @@ class AdminMasterBackupIndex extends Component
     private function formatBytes($bytes, $precision = 2)
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        
+
         for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
             $bytes /= 1024;
         }
-        
-        return round($bytes, $precision) . ' ' . $units[$i];
+
+        return round($bytes, $precision).' '.$units[$i];
     }
 
     public function render()

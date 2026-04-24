@@ -2,31 +2,30 @@
 
 namespace App\Livewire\Admin\Master\Admin;
 
+use App\Exports\AdminExport;
 use App\Helpers\AlertHelper;
 use App\Helpers\RoleHelper;
-use App\Models\Role\RoleCompany;
+use App\Imports\User\AdminImport;
 use App\Models\User;
 use App\Models\User\UserDetail;
+use App\Models\UsrSecKey;
+use Auth;
+use Crypt;
 use DB;
-use Log;
-use Illuminate\Support\Str;
+use Hash;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
-use Auth;
-use Hash;
-use Crypt;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
-use App\Traits\RegionTrait;
-use App\Exports\AdminExport;
-use App\Imports\User\AdminImport;
+use Log;
+use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\UsrSecKey;
 
 class AdminMasterAdminIndex extends Component
 {
-    use WithPagination, WithFileUploads;
+    use WithFileUploads, WithPagination;
 
     protected $queryString = [
         // 'page' => ['except' => 1], // Ini akan menghapus ?page=1 dari URL
@@ -39,18 +38,27 @@ class AdminMasterAdminIndex extends Component
 
     // User
     public $data_id;
+
     public $name;
+
     public $username;
+
     public $email;
+
     public $password;
+
     public $profile;
+
     public $profile_old;
+
     public $phone;
 
     // User Detail
     public $address;
+
     // public $identity_card;
     public $is_head = true;
+
     public $is_active = true;
 
     // Import file
@@ -79,9 +87,9 @@ class AdminMasterAdminIndex extends Component
         ]);
         $this->resetErrorBag();
         $this->resetValidation();
+
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
-
 
     public function edit($id)
     {
@@ -96,14 +104,14 @@ class AdminMasterAdminIndex extends Component
         if ($user->userDetail) {
             $this->is_head =
                 $user
-                ->companyRoles()
-                ->where('company_id', Auth::user()->company_id)
-                ->first()->is_head ?? true;
+                    ->companyRoles()
+                    ->where('company_id', Auth::user()->company_id)
+                    ->first()->is_head ?? true;
             $this->is_active =
                 $user
-                ->companyRoles()
-                ->where('company_id', Auth::user()->company_id)
-                ->first()->is_active ?? true;
+                    ->companyRoles()
+                    ->where('company_id', Auth::user()->company_id)
+                    ->first()->is_active ?? true;
         }
 
         $this->openModal();
@@ -156,9 +164,10 @@ class AdminMasterAdminIndex extends Component
             // Handle user creation/update
             $userResult = $this->handleUserIdentityResolution($currentCompanyId, $validatedData);
 
-            if (!$userResult['success']) {
+            if (! $userResult['success']) {
                 DB::rollBack();
                 $this->addError('general', $userResult['message']);
+
                 return;
             }
 
@@ -182,6 +191,7 @@ class AdminMasterAdminIndex extends Component
             // Handle validation errors
             DB::rollBack();
             $this->setErrorBag($e->validator->getMessageBag());
+
             return;
         } catch (\Exception $e) {
             // Handle general errors
@@ -190,7 +200,7 @@ class AdminMasterAdminIndex extends Component
             $errorMessage = 'Pengguna gagal disimpan.';
 
             // Log detailed error for debugging
-            Log::error('Error saving user: ' . $e->getMessage(), [
+            Log::error('Error saving user: '.$e->getMessage(), [
                 'user_id' => Auth::id(),
                 'company_id' => $currentCompanyId,
                 'data' => [
@@ -204,7 +214,7 @@ class AdminMasterAdminIndex extends Component
 
             // Show user-friendly error message
             if (app()->environment('local')) {
-                $errorMessage .= ' Error: ' . $e->getMessage();
+                $errorMessage .= ' Error: '.$e->getMessage();
             }
 
             AlertHelper::error('Gagal', $errorMessage);
@@ -213,7 +223,7 @@ class AdminMasterAdminIndex extends Component
             // Handle any other throwable errors
             DB::rollBack();
 
-            Log::error('Critical error saving user: ' . $th->getMessage(), [
+            Log::error('Critical error saving user: '.$th->getMessage(), [
                 'user_id' => Auth::id(),
                 'company_id' => $currentCompanyId,
                 'trace' => $th->getTraceAsString(),
@@ -236,7 +246,6 @@ class AdminMasterAdminIndex extends Component
 
             // Untuk user baru, buat user baru
             $user = $this->createNewUser($companyId, $validatedData);
-
 
             UsrSecKey::create([
                 'user_id' => $user->id,
@@ -264,7 +273,7 @@ class AdminMasterAdminIndex extends Component
     protected function updateExistingUser($companyId, $validatedData)
     {
         $user = User::find($this->data_id);
-        if (!$user) {
+        if (! $user) {
             throw new \Exception('User tidak ditemukan');
         }
 
@@ -284,7 +293,7 @@ class AdminMasterAdminIndex extends Component
         ];
 
         // Handle password update
-        if (!empty($validatedData['password'])) {
+        if (! empty($validatedData['password'])) {
             $updateData['password'] = Hash::make($validatedData['password']);
         }
 
@@ -293,7 +302,7 @@ class AdminMasterAdminIndex extends Component
         ]);
 
         // Handle profile image
-        if ($this->profile && $this->profile instanceof \Illuminate\Http\UploadedFile) {
+        if ($this->profile && $this->profile instanceof UploadedFile) {
             // Delete old profile if exists
             if ($user->profile && Storage::disk('public')->exists($user->profile)) {
                 Storage::disk('public')->delete($user->profile);
@@ -327,7 +336,7 @@ class AdminMasterAdminIndex extends Component
         ];
 
         // Handle profile image
-        if ($this->profile && $this->profile instanceof \Illuminate\Http\UploadedFile) {
+        if ($this->profile && $this->profile instanceof UploadedFile) {
             $createData['profile'] = $this->profile->store('profiles', 'public');
         }
 
@@ -392,10 +401,11 @@ class AdminMasterAdminIndex extends Component
     public function export()
     {
         try {
-            $fileName = 'admin_export_' . date('YmdHis') . '.xlsx';
-            return Excel::download(new AdminExport(), $fileName);
+            $fileName = 'admin_export_'.date('YmdHis').'.xlsx';
+
+            return Excel::download(new AdminExport, $fileName);
         } catch (\Exception $e) {
-            Log::error('Admin Export Error: ' . $e->getMessage());
+            Log::error('Admin Export Error: '.$e->getMessage());
             AlertHelper::error('Gagal', 'Gagal mengekspor data admin.');
         }
     }
@@ -407,15 +417,15 @@ class AdminMasterAdminIndex extends Component
                 'importFile' => 'required|mimes:xlsx,xls|max:5120', // max 5MB
             ]);
 
-            Excel::import(new AdminImport(), $this->importFile);
+            Excel::import(new AdminImport, $this->importFile);
 
             $this->reset('importFile');
             AlertHelper::success('Berhasil', 'Data admin berhasil diimpor.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             AlertHelper::error('Gagal', 'File tidak valid. Pastikan format file adalah Excel (.xlsx atau .xls).');
         } catch (\Exception $e) {
-            Log::error('Admin Import Error: ' . $e->getMessage());
-            AlertHelper::error('Gagal', 'Gagal mengimpor data admin: ' . $e->getMessage());
+            Log::error('Admin Import Error: '.$e->getMessage());
+            AlertHelper::error('Gagal', 'Gagal mengimpor data admin: '.$e->getMessage());
         }
     }
 
@@ -424,17 +434,27 @@ class AdminMasterAdminIndex extends Component
         try {
             // Create a simple template with headers
             $headers = [
-                ['Name', 'Username', 'Email', 'Phone', 'Password', 'Address']
+                ['Name', 'Username', 'Email', 'Phone', 'Password', 'Address'],
             ];
 
             $fileName = 'admin_template.xlsx';
-            return Excel::download(new class($headers) implements \Maatwebsite\Excel\Concerns\FromArray {
+
+            return Excel::download(new class($headers) implements FromArray
+            {
                 private $data;
-                public function __construct($data) { $this->data = $data; }
-                public function array(): array { return $this->data; }
+
+                public function __construct($data)
+                {
+                    $this->data = $data;
+                }
+
+                public function array(): array
+                {
+                    return $this->data;
+                }
             }, $fileName);
         } catch (\Exception $e) {
-            Log::error('Admin Template Download Error: ' . $e->getMessage());
+            Log::error('Admin Template Download Error: '.$e->getMessage());
             AlertHelper::error('Gagal', 'Gagal mengunduh template.');
         }
     }

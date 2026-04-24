@@ -11,16 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (DB::getDriverName() !== 'pgsql') {
+            return;
+        }
         if (Schema::hasTable('category_questions')) {
             DB::statement('ALTER TABLE category_questions ALTER COLUMN name TYPE text');
         }
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
+        if (DB::getDriverName() !== 'pgsql') {
+            return;
+        }
         if (Schema::hasTable('category_questions')) {
             DB::statement('ALTER TABLE category_questions ALTER COLUMN name TYPE varchar(255)');
         }

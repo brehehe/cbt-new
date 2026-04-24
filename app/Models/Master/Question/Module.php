@@ -14,8 +14,10 @@ use Illuminate\Support\Facades\Auth;
 class Module extends Model
 {
     //
-    use SoftDeletes, HasUuids, \App\Traits\LogsSystemActivity;
+    use \App\Traits\LogsSystemActivity, HasUuids, SoftDeletes;
+
     protected $guarded = ['id'];
+
     protected $casts = [
         'category_question_settings' => 'array',
         'topic_question_settings' => 'array',
@@ -33,7 +35,7 @@ class Module extends Model
         static::addGlobalScope('user_scope', function (Builder $builder) {
             $user = Auth::user();
 
-            if (!$user || !$user->hasRole('Anonymous')) {
+            if (! $user || ! $user->hasRole('Anonymous')) {
                 $builder->where(function ($query) use ($user) {
                     $query->where('company_id', optional($user?->company)?->id)
                         ->orWhere('is_simulation', 'true')
@@ -53,7 +55,7 @@ class Module extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
-        $term = '%' . $term . '%';
+        $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id', 'name', 'duration', 'description', 'random_question'], 'ILIKE', $term);
@@ -62,8 +64,6 @@ class Module extends Model
 
     /**
      * Get the questionType that owns the Module
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function questionType(): BelongsTo
     {
@@ -72,8 +72,6 @@ class Module extends Model
 
     /**
      * Get all of the moduleQuestions for the Module
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function moduleQuestions(): HasMany
     {

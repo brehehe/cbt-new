@@ -10,12 +10,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Auth;
 
 class ExamRecording extends Model
 {
     //
-    use SoftDeletes, HasUuids;
+    use HasUuids, SoftDeletes;
+
     protected $guarded = ['id'];
 
     public function company()
@@ -38,7 +38,7 @@ class ExamRecording extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
-        $term = '%' . $term . '%';
+        $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id'], 'ILIKE', $term);
@@ -52,7 +52,7 @@ class ExamRecording extends Model
 
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function userTimetable()

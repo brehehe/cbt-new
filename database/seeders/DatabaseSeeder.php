@@ -26,16 +26,16 @@ class DatabaseSeeder extends Seeder
             ServiceSeeder::class,
             ServiceMonthSeeder::class,
 
-                // Region
+            // Region
             CountrySeeder::class,
 
-                // Company
+            // Company
             CompanySeeder::class,
 
-                //Master
+            // Master
             QuestionTypeSeeder::class,
 
-                // Question
+            // Question
             QuestionSeeder::class,
         ]);
         if (env('QUESTION_DUMMY') === true) {

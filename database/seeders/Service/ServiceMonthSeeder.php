@@ -24,7 +24,7 @@ class ServiceMonthSeeder extends Seeder
                 'price' => 0,
                 'is_trial' => true,
                 'is_active' => true,
-                'serviceMonthDetails'=> [
+                'serviceMonthDetails' => [
                     [
                         'service_id' => Service::where('name', 'Rawat Inap')->first()->id,
                     ],
@@ -46,7 +46,7 @@ class ServiceMonthSeeder extends Seeder
                 'price' => 100000,
                 'is_trial' => false,
                 'is_active' => true,
-                'serviceMonthDetails'=> [
+                'serviceMonthDetails' => [
                     [
                         'service_id' => Service::where('name', 'Rawat Inap')->first()->id,
                     ],
@@ -68,7 +68,7 @@ class ServiceMonthSeeder extends Seeder
                 'price' => 200000,
                 'is_trial' => false,
                 'is_active' => true,
-                'serviceMonthDetails'=> [
+                'serviceMonthDetails' => [
                     [
                         'service_id' => Service::where('name', 'Rawat Inap')->first()->id,
                     ],
@@ -90,7 +90,7 @@ class ServiceMonthSeeder extends Seeder
                 'price' => 300000,
                 'is_trial' => false,
                 'is_active' => true,
-                'serviceMonthDetails'=> [
+                'serviceMonthDetails' => [
                     [
                         'service_id' => Service::where('name', 'Rawat Inap')->first()->id,
                     ],
@@ -112,7 +112,7 @@ class ServiceMonthSeeder extends Seeder
                 'price' => 500000,
                 'is_trial' => false,
                 'is_active' => true,
-                'serviceMonthDetails'=> [
+                'serviceMonthDetails' => [
                     [
                         'service_id' => Service::where('name', 'Rawat Inap')->first()->id,
                     ],
@@ -135,7 +135,7 @@ class ServiceMonthSeeder extends Seeder
                 'is_trial' => false,
                 'is_lifetime' => true,
                 'is_active' => true,
-                'serviceMonthDetails'=> [
+                'serviceMonthDetails' => [
                     [
                         'service_id' => Service::where('name', 'Rawat Inap')->first()->id,
                     ],

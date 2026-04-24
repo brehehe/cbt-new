@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('one_health_code')->nullable()->comment('Kode satusehat');
             $table->string('facility_code')->nullable()->comment('Kode sarana by one health');
             $table->string('organization_id')->nullable()->comment('Nomor organisasi by one health');
-            //Region
+            // Region
             $table->string('province_code')->nullable()->comment('Kode provinsi by one health');
             $table->string('province')->nullable();  // Provinsi
             $table->string('city_code')->nullable()->comment('Kode kabupaten by one health');

@@ -15,17 +15,30 @@ use Throwable;
 
 class AdminMasterExamSessionIndex extends Component
 {
-     use WithPagination;
-    protected $paginationTheme = 'bootstrap';
-    public $perPage = 10, $search;
+    use WithPagination;
 
-    public $data_id, $name, $code, $is_active, $description;
+    protected $paginationTheme = 'bootstrap';
+
+    public $perPage = 10;
+
+    public $search;
+
+    public $data_id;
+
+    public $name;
+
+    public $code;
+
+    public $is_active;
+
+    public $description;
 
     public function render()
     {
         $exam_sessions = ExamSession::search($this->search)->select('id', 'name', 'code', 'description', 'is_active');
+
         return view('livewire.admin.master.exam-session.admin-master-exam-session-index', [
-            'exam_sessions' => $exam_sessions->paginate($this->perPage)
+            'exam_sessions' => $exam_sessions->paginate($this->perPage),
         ])->extends('layout.app')->section('content');
     }
 
@@ -48,6 +61,7 @@ class AdminMasterExamSessionIndex extends Component
     {
         $this->resetValidation();
         $this->reset(['data_id', 'name', 'code', 'is_active', 'description']);
+
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
 
@@ -55,8 +69,8 @@ class AdminMasterExamSessionIndex extends Component
     {
         $this->validate(
             [
-                'name'        => 'required',
-                'code'        => 'required',
+                'name' => 'required',
+                'code' => 'required',
                 'description' => 'nullable',
             ],
             [
@@ -67,41 +81,43 @@ class AdminMasterExamSessionIndex extends Component
 
         try {
             DB::beginTransaction();
-                $request = [
-                    'id'          => $this->data_id,
-                    'company_id'  => Auth::user()?->company?->id,
-                    'name'        => $this->name,
-                    'code'        => $this->code,
-                    'description' => $this->description,
-                ];
+            $request = [
+                'id' => $this->data_id,
+                'company_id' => Auth::user()?->company?->id,
+                'name' => $this->name,
+                'code' => $this->code,
+                'description' => $this->description,
+            ];
 
-                $exam_session = app(ExamSessionService::class)->updateOrCreate($request);
-                if (!$exam_session) {
-                    throw new Exception("Ada kesalahaan saat ExamSessionService => updateOrCreate", 500);
-                }
+            $exam_session = app(ExamSessionService::class)->updateOrCreate($request);
+            if (! $exam_session) {
+                throw new Exception('Ada kesalahaan saat ExamSessionService => updateOrCreate', 500);
+            }
 
             DB::commit();
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             DB::rollBack();
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterExamSessionIndex => submit', $error);
+
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
         }
 
         $this->closeModal();
+
         return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
     }
 
     public function edit($id)
     {
-        $result            = ExamSession::findOrFail($id);
-        $this->data_id     = $result?->id;
-        $this->name        = $result?->name;
-        $this->code        = $result?->code;
+        $result = ExamSession::findOrFail($id);
+        $this->data_id = $result?->id;
+        $this->name = $result?->name;
+        $this->code = $result?->code;
         $this->description = $result?->description;
         $this->openModal();
     }
@@ -109,43 +125,44 @@ class AdminMasterExamSessionIndex extends Component
     public function toggleExamSessionIsActive($id)
     {
         try {
-            $result            = ExamSession::findOrFail($id);
-            $this->data_id     = $result?->id;
-            $this->name        = $result?->name;
-            $this->code        = $result?->code;
-            $this->is_active   = $result?->is_active ? false : true;
+            $result = ExamSession::findOrFail($id);
+            $this->data_id = $result?->id;
+            $this->name = $result?->name;
+            $this->code = $result?->code;
+            $this->is_active = $result?->is_active ? false : true;
             $this->description = $result?->description;
 
             DB::beginTransaction();
-                $request = [
-                    'id'          => $this->data_id,
-                    'company_id'  => Auth::user()?->company?->id,
-                    'name'        => $this->name,
-                    'code'        => $this->code,
-                    'is_active'   => $this->is_active,
-                    'description' => $this->description,
-                ];
+            $request = [
+                'id' => $this->data_id,
+                'company_id' => Auth::user()?->company?->id,
+                'name' => $this->name,
+                'code' => $this->code,
+                'is_active' => $this->is_active,
+                'description' => $this->description,
+            ];
 
-
-                $exam_session = app(ExamSessionService::class)->updateOrCreate($request);
-                if (!$exam_session) {
-                    throw new Exception("Ada kesalahaan saat ExamSessionService => updateOrCreate", 500);
-                }
-                // dd($result, $request, $exam_session);
+            $exam_session = app(ExamSessionService::class)->updateOrCreate($request);
+            if (! $exam_session) {
+                throw new Exception('Ada kesalahaan saat ExamSessionService => updateOrCreate', 500);
+            }
+            // dd($result, $request, $exam_session);
 
             DB::commit();
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             DB::rollBack();
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterExamSessionIndex => toggleExamSessionIsActive', $error);
+
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
         }
 
         $this->closeModal();
+
         return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
     }
 
@@ -158,13 +175,14 @@ class AdminMasterExamSessionIndex extends Component
     {
         try {
             app(ExamSessionService::class)->delete($id[0]);
-        } catch (Exception | Throwable $th) {
+        } catch (Exception|Throwable $th) {
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterExamSessionIndex => delete', $error);
+
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menghapus data');
         }
 

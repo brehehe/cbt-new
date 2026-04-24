@@ -17,9 +17,13 @@ class AdminMasterTimetableSessionIndex extends Component
     use WithPagination;
 
     public $timetable_id;
+
     public $timetable;
+
     public $perPage = 12;
+
     public $search = '';
+
     public $filterStatus = 'all'; // all, active, disconnected
 
     protected $listeners = [
@@ -33,12 +37,12 @@ class AdminMasterTimetableSessionIndex extends Component
     {
         $this->timetable_id = $timetable_id;
 
-        if (!$this->timetable_id) {
+        if (! $this->timetable_id) {
             return redirect()->route('admin.master.timetable');
         }
 
         $timetable = Timetable::with(['module', 'company'])->find($this->timetable_id);
-        if (!$timetable) {
+        if (! $timetable) {
             return redirect()->route('admin.master.timetable');
         }
 
@@ -48,8 +52,9 @@ class AdminMasterTimetableSessionIndex extends Component
     public function suspendSession($sessionId)
     {
         $session = ExamLiveSession::with(['user', 'timetable'])->find($sessionId);
-        if (!$session) {
+        if (! $session) {
             AlertHelper::warning('Perhatian', 'Sesi tidak ditemukan.');
+
             return;
         }
 
@@ -84,7 +89,7 @@ class AdminMasterTimetableSessionIndex extends Component
                     ]);
                 }
             } catch (\Throwable $e) {
-                AlertHelper::warning('Perhatian', 'Gagal finalisasi rekaman: ' . $e->getMessage());
+                AlertHelper::warning('Perhatian', 'Gagal finalisasi rekaman: '.$e->getMessage());
             }
         }
 
@@ -94,8 +99,9 @@ class AdminMasterTimetableSessionIndex extends Component
     public function unsuspendSession($sessionId)
     {
         $session = ExamLiveSession::with(['user', 'timetable'])->find($sessionId);
-        if (!$session) {
+        if (! $session) {
             AlertHelper::warning('Perhatian', 'Sesi tidak ditemukan.');
+
             return;
         }
 
@@ -113,8 +119,9 @@ class AdminMasterTimetableSessionIndex extends Component
     public function terminateSession($sessionId)
     {
         $session = ExamLiveSession::with(['user', 'timetable'])->find($sessionId);
-        if (!$session) {
+        if (! $session) {
             AlertHelper::warning('Perhatian', 'Sesi tidak ditemukan.');
+
             return;
         }
 
@@ -166,8 +173,12 @@ class AdminMasterTimetableSessionIndex extends Component
 
             AlertHelper::success('Berhasil', "Akun di-logout ({$deletedCount} sesi dihapus) dan ujian diputus.");
         } catch (\Throwable $e) {
+<<<<<<< Updated upstream
             \Log::error("ForceLogout error: " . $e->getMessage());
             AlertHelper::warning('Perhatian', 'Gagal logout akun: ' . $e->getMessage());
+=======
+            AlertHelper::warning('Perhatian', 'Gagal logout akun: '.$e->getMessage());
+>>>>>>> Stashed changes
         }
     }
 
@@ -178,7 +189,7 @@ class AdminMasterTimetableSessionIndex extends Component
             ->where('timetable_id', $this->timetable_id)
             ->when($this->search, function ($q) {
                 $q->whereHas('user', function ($uq) {
-                    $uq->where('name', 'ilike', '%' . $this->search . '%');
+                    $uq->where('name', 'ilike', '%'.$this->search.'%');
                 });
             })
             ->when($this->filterStatus !== 'all', function ($q) {

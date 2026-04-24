@@ -26,12 +26,12 @@ class ExamMonitoringService
                 'metadata' => [
                     'browser' => request()->header('User-Agent'),
                     'ip_address' => request()->ip(),
-                ]
+                ],
             ]);
 
             return $recording;
         } catch (Exception $e) {
-            Log::error('Failed to start recording: ' . $e->getMessage());
+            Log::error('Failed to start recording: '.$e->getMessage());
             throw $e;
         }
     }
@@ -64,7 +64,7 @@ class ExamMonitoringService
 
             return $recording;
         } catch (Exception $e) {
-            Log::error('Failed to save video chunk: ' . $e->getMessage());
+            Log::error('Failed to save video chunk: '.$e->getMessage());
             throw $e;
         }
     }
@@ -87,7 +87,7 @@ class ExamMonitoringService
 
             return $alert;
         } catch (Exception $e) {
-            Log::error('Failed to log alert: ' . $e->getMessage());
+            Log::error('Failed to log alert: '.$e->getMessage());
             throw $e;
         }
     }
@@ -100,7 +100,7 @@ class ExamMonitoringService
             return "{$basePath}/chunk_{$chunkNumber}.webm";
         }
 
-        return "{$basePath}/recording_" . now()->format('Y-m-d_H-i-s') . ".webm";
+        return "{$basePath}/recording_".now()->format('Y-m-d_H-i-s').'.webm';
     }
 
     public function getRecordingsByTimetable($userTimetableId)

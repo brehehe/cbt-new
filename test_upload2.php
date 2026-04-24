@@ -1,8 +1,10 @@
 <?php
+
 require 'vendor/autoload.php';
 $app = require_once 'bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+$kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -16,5 +18,5 @@ $file = new UploadedFile($tmpPath, 'test_image.png', 'image/png', null, true);
 
 $stored = $file->store($folder, $disk);
 echo "Stored path: $stored\n";
-echo "Exists on public disk? " . (Storage::disk($disk)->exists($stored) ? 'yes' : 'no') . "\n";
-echo "File content: " . Storage::disk($disk)->get($stored) . "\n";
+echo 'Exists on public disk? '.(Storage::disk($disk)->exists($stored) ? 'yes' : 'no')."\n";
+echo 'File content: '.Storage::disk($disk)->get($stored)."\n";

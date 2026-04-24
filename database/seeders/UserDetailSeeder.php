@@ -4,10 +4,10 @@ namespace Database\Seeders;
 
 use App\Helpers\RoleHelper;
 use App\Models\Company\Company;
-use App\Models\User;
-use App\Models\User\UserDetail;
 use App\Models\Spatie\Role;
 use App\Models\Study\Study;
+use App\Models\User;
+use App\Models\User\UserDetail;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -17,22 +17,22 @@ class UserDetailSeeder extends Seeder
     public function run(): void
     {
         // Create roles if they don't exist
-        if (!Role::where('name', 'Mahasiswa')->exists()) {
+        if (! Role::where('name', 'Mahasiswa')->exists()) {
             Role::create([
                 'name' => 'Mahasiswa',
-                'guard_name' => 'web'
+                'guard_name' => 'web',
             ]);
         }
-        if (!Role::where('name', 'Dosen')->exists()) {
+        if (! Role::where('name', 'Dosen')->exists()) {
             Role::create([
                 'name' => 'Dosen',
-                'guard_name' => 'web'
+                'guard_name' => 'web',
             ]);
         }
-        if (!Role::where('name', 'Pengawas')->exists()) {
+        if (! Role::where('name', 'Pengawas')->exists()) {
             Role::create([
                 'name' => 'Pengawas',
-                'guard_name' => 'web'
+                'guard_name' => 'web',
             ]);
         }
 
@@ -61,7 +61,7 @@ class UserDetailSeeder extends Seeder
                 'student_semester' => '6',
                 'birth_place' => 'Jakarta',
                 'birth_date' => '2002-03-15',
-                'gender' => 'male'
+                'gender' => 'male',
             ],
             [
                 'name' => 'Siti Nurhaliza',
@@ -73,7 +73,7 @@ class UserDetailSeeder extends Seeder
                 'student_semester' => '4',
                 'birth_place' => 'Bandung',
                 'birth_date' => '2003-07-22',
-                'gender' => 'female'
+                'gender' => 'female',
             ],
             [
                 'name' => 'Budi Santoso',
@@ -85,7 +85,7 @@ class UserDetailSeeder extends Seeder
                 'student_semester' => '2',
                 'birth_place' => 'Surabaya',
                 'birth_date' => '2004-01-10',
-                'gender' => 'male'
+                'gender' => 'male',
             ],
             [
                 'name' => 'Dewi Lestari',
@@ -97,7 +97,7 @@ class UserDetailSeeder extends Seeder
                 'student_semester' => '8',
                 'birth_place' => 'Yogyakarta',
                 'birth_date' => '2001-11-05',
-                'gender' => 'female'
+                'gender' => 'female',
             ],
             [
                 'name' => 'Reza Pratama',
@@ -109,7 +109,7 @@ class UserDetailSeeder extends Seeder
                 'student_semester' => '3',
                 'birth_place' => 'Medan',
                 'birth_date' => '2003-09-18',
-                'gender' => 'male'
+                'gender' => 'male',
             ],
             // [
             //     'name' => 'Mahasiswa 1',
@@ -255,7 +255,7 @@ class UserDetailSeeder extends Seeder
                     ->where('company_id', $companyId)
                     ->inRandomOrder()
                     ->first()->id,
-                'type_study'=> rand(0,1) ? 'mahasiswa' : 'general',
+                'type_study' => rand(0, 1) ? 'mahasiswa' : 'general',
             ]);
 
             $user->assignRole('Mahasiswa');
@@ -279,23 +279,23 @@ class UserDetailSeeder extends Seeder
                 'religion' => 'Islam',
                 'nationality' => 'Indonesian',
                 'marital_status' => 'single',
-                'address' => 'Jl. Contoh No. ' . rand(1, 100),
+                'address' => 'Jl. Contoh No. '.rand(1, 100),
                 'city' => $data['birth_place'],
                 'province' => 'DKI Jakarta',
                 'country' => 'ID',
-                'phone' => '021' . rand(10000000, 99999999),
-                'mobile_phone' => '08' . rand(1000000000, 9999999999),
+                'phone' => '021'.rand(10000000, 99999999),
+                'mobile_phone' => '08'.rand(1000000000, 9999999999),
                 'identity_type' => 'KTP',
                 'identity_number' => rand(1000000000000000, 9999999999999999),
                 'blood_group' => ['A', 'B', 'AB', 'O'][rand(0, 3)],
                 'emergency_contact_name' => 'Orang Tua',
-                'emergency_contact_phone' => '08' . rand(1000000000, 9999999999),
+                'emergency_contact_phone' => '08'.rand(1000000000, 9999999999),
                 'emergency_contact_relation' => 'Parent',
                 'verification_status' => 'verified',
                 'verified_at' => now(),
                 'status' => 'active',
                 'total_exams_taken' => rand(5, 25),
-                'average_score' => rand(6500, 9500) / 100
+                'average_score' => rand(6500, 9500) / 100,
             ]);
 
             RoleHelper::assignRoleToUserInCompany($user, 'Mahasiswa', $companyId);
@@ -303,9 +303,9 @@ class UserDetailSeeder extends Seeder
 
         for ($i = 1; $i <= 10; $i++) {
             $mahasiswa = User::create([
-                'name' => 'Mahasiswa ' . ($i),
-                'email' => 'mahasiswa' . ($i) . '@gmail.com',
-                'username' => Str::replace(' ', '', strtolower('Mahasiswa ' . ($i))),
+                'name' => 'Mahasiswa '.($i),
+                'email' => 'mahasiswa'.($i).'@gmail.com',
+                'username' => Str::replace(' ', '', strtolower('Mahasiswa '.($i))),
                 'password' => Hash::make('password123'),
                 'email_verified_at' => now(),
                 'company_id' => $companyId,
@@ -313,18 +313,18 @@ class UserDetailSeeder extends Seeder
                     ->where('company_id', $companyId)
                     ->where('name', 'Kedokteran')
                     ->first()?->id ?? Study::withoutGlobalScope('user_scope')
-                        ->where('company_id', $companyId)
-                        ->inRandomOrder()
-                        ->first()->id,
-                'type_study'=> 'general',
+                    ->where('company_id', $companyId)
+                    ->inRandomOrder()
+                    ->first()->id,
+                'type_study' => 'general',
             ]);
 
             $mahasiswa->assignRole('Mahasiswa');
 
             UserDetail::create([
-                'nim' => '2024' . str_pad($i, 4, '0', STR_PAD_LEFT),
+                'nim' => '2024'.str_pad($i, 4, '0', STR_PAD_LEFT),
                 'user_id' => $mahasiswa->id,
-                'student_id' => '2024' . str_pad($i, 4, '0', STR_PAD_LEFT),
+                'student_id' => '2024'.str_pad($i, 4, '0', STR_PAD_LEFT),
                 'student_program' => 'Kedokteran',
                 'student_faculty' => 'Fakultas Kedokteran',
                 'student_department' => 'Ilmu Kedokteran',
@@ -340,23 +340,23 @@ class UserDetailSeeder extends Seeder
                 'religion' => 'Islam',
                 'nationality' => 'Indonesian',
                 'marital_status' => 'single',
-                'address' => 'Jl. Contoh No. ' . rand(1, 100),
+                'address' => 'Jl. Contoh No. '.rand(1, 100),
                 'city' => 'Jakarta',
                 'province' => 'DKI Jakarta',
                 'country' => 'ID',
-                'phone' => '021' . rand(10000000, 99999999),
-                'mobile_phone' => '08' . rand(1000000000, 9999999999),
+                'phone' => '021'.rand(10000000, 99999999),
+                'mobile_phone' => '08'.rand(1000000000, 9999999999),
                 'identity_type' => 'KTP',
                 'identity_number' => rand(1000000000000000, 9999999999999999),
                 'blood_group' => ['A', 'B', 'AB', 'O'][rand(0, 3)],
                 'emergency_contact_name' => 'Orang Tua',
-                'emergency_contact_phone' => '08' . rand(1000000000, 9999999999),
+                'emergency_contact_phone' => '08'.rand(1000000000, 9999999999),
                 'emergency_contact_relation' => 'Parent',
                 'verification_status' => 'verified',
                 'verified_at' => now(),
                 'status' => 'active',
                 'total_exams_taken' => rand(5, 25),
-                'average_score' => rand(6500, 9500) / 100
+                'average_score' => rand(6500, 9500) / 100,
             ]);
 
             RoleHelper::assignRoleToUserInCompany($mahasiswa, 'Mahasiswa', $companyId);
@@ -364,9 +364,9 @@ class UserDetailSeeder extends Seeder
 
         for ($i = 11; $i <= 50; $i++) {
             $mahasiswa = User::create([
-                'name' => 'Mahasiswa ' . ($i),
-                'email' => 'mahasiswa' . ($i) . '@gmail.com',
-                'username' => Str::replace(' ', '', strtolower('Mahasiswa ' . ($i))),
+                'name' => 'Mahasiswa '.($i),
+                'email' => 'mahasiswa'.($i).'@gmail.com',
+                'username' => Str::replace(' ', '', strtolower('Mahasiswa '.($i))),
                 'password' => Hash::make('password123'),
                 'email_verified_at' => now(),
                 'company_id' => $companyId,
@@ -374,15 +374,15 @@ class UserDetailSeeder extends Seeder
                     ->where('company_id', $companyId)
                     ->inRandomOrder()
                     ->first()->id,
-                'type_study'=> rand(0,1) ? 'mahasiswa' : 'general',
+                'type_study' => rand(0, 1) ? 'mahasiswa' : 'general',
             ]);
 
             $mahasiswa->assignRole('Mahasiswa');
 
             UserDetail::create([
-                'nim' => '2024' . str_pad($i, 4, '0', STR_PAD_LEFT),
+                'nim' => '2024'.str_pad($i, 4, '0', STR_PAD_LEFT),
                 'user_id' => $mahasiswa->id,
-                'student_id' => '2024' . str_pad($i, 4, '0', STR_PAD_LEFT),
+                'student_id' => '2024'.str_pad($i, 4, '0', STR_PAD_LEFT),
                 'student_program' => 'Kedokteran',
                 'student_faculty' => 'Fakultas Kedokteran',
                 'student_department' => 'Ilmu Kedokteran',
@@ -398,23 +398,23 @@ class UserDetailSeeder extends Seeder
                 'religion' => 'Islam',
                 'nationality' => 'Indonesian',
                 'marital_status' => 'single',
-                'address' => 'Jl. Contoh No. ' . rand(1, 100),
+                'address' => 'Jl. Contoh No. '.rand(1, 100),
                 'city' => 'Jakarta',
                 'province' => 'DKI Jakarta',
                 'country' => 'ID',
-                'phone' => '021' . rand(10000000, 99999999),
-                'mobile_phone' => '08' . rand(1000000000, 9999999999),
+                'phone' => '021'.rand(10000000, 99999999),
+                'mobile_phone' => '08'.rand(1000000000, 9999999999),
                 'identity_type' => 'KTP',
                 'identity_number' => rand(1000000000000000, 9999999999999999),
                 'blood_group' => ['A', 'B', 'AB', 'O'][rand(0, 3)],
                 'emergency_contact_name' => 'Orang Tua',
-                'emergency_contact_phone' => '08' . rand(1000000000, 9999999999),
+                'emergency_contact_phone' => '08'.rand(1000000000, 9999999999),
                 'emergency_contact_relation' => 'Parent',
                 'verification_status' => 'verified',
                 'verified_at' => now(),
                 'status' => 'active',
                 'total_exams_taken' => rand(5, 25),
-                'average_score' => rand(6500, 9500) / 100
+                'average_score' => rand(6500, 9500) / 100,
             ]);
 
             RoleHelper::assignRoleToUserInCompany($mahasiswa, 'Mahasiswa', $companyId);
@@ -437,7 +437,7 @@ class UserDetailSeeder extends Seeder
                 'lecturer_specialization' => 'Artificial Intelligence',
                 'birth_place' => 'Jakarta',
                 'birth_date' => '1979-08-15',
-                'gender' => 'male'
+                'gender' => 'male',
             ],
             [
                 'name' => 'Prof. Dr. Sari Wijayanti, S.Si., M.Kom.',
@@ -452,7 +452,7 @@ class UserDetailSeeder extends Seeder
                 'lecturer_specialization' => 'Data Science',
                 'birth_place' => 'Bandung',
                 'birth_date' => '1975-07-10',
-                'gender' => 'female'
+                'gender' => 'female',
             ],
             [
                 'name' => 'Bambang Kurniawan, S.T., M.T.',
@@ -467,7 +467,7 @@ class UserDetailSeeder extends Seeder
                 'lecturer_specialization' => 'Network Security',
                 'birth_place' => 'Surabaya',
                 'birth_date' => '1983-11-20',
-                'gender' => 'male'
+                'gender' => 'male',
             ],
             [
                 'name' => 'Dr. Rina Kartika, S.E., M.M.',
@@ -482,7 +482,7 @@ class UserDetailSeeder extends Seeder
                 'lecturer_specialization' => 'Strategic Management',
                 'birth_place' => 'Yogyakarta',
                 'birth_date' => '1980-06-05',
-                'gender' => 'female'
+                'gender' => 'female',
             ],
             [
                 'name' => 'Agus Setiawan, S.E., M.Ak.',
@@ -497,8 +497,8 @@ class UserDetailSeeder extends Seeder
                 'lecturer_specialization' => 'Financial Accounting',
                 'birth_place' => 'Medan',
                 'birth_date' => '1985-09-12',
-                'gender' => 'male'
-            ]
+                'gender' => 'male',
+            ],
         ];
 
         foreach ($lecturerData as $data) {
@@ -539,17 +539,17 @@ class UserDetailSeeder extends Seeder
                 'religion' => 'Islam',
                 'nationality' => 'Indonesian',
                 'marital_status' => 'married',
-                'address' => 'Jl. Dosen No. ' . rand(1, 50),
+                'address' => 'Jl. Dosen No. '.rand(1, 50),
                 'city' => $data['birth_place'],
                 'province' => 'DKI Jakarta',
                 'country' => 'ID',
-                'phone' => '021' . rand(10000000, 99999999),
-                'mobile_phone' => '08' . rand(1000000000, 9999999999),
+                'phone' => '021'.rand(10000000, 99999999),
+                'mobile_phone' => '08'.rand(1000000000, 9999999999),
                 'identity_type' => 'KTP',
                 'identity_number' => rand(1000000000000000, 9999999999999999),
                 'blood_group' => ['A', 'B', 'AB', 'O'][rand(0, 3)],
                 'emergency_contact_name' => 'Keluarga',
-                'emergency_contact_phone' => '08' . rand(1000000000, 9999999999),
+                'emergency_contact_phone' => '08'.rand(1000000000, 9999999999),
                 'emergency_contact_relation' => 'Spouse',
                 'verification_status' => 'verified',
                 'verified_at' => now(),
@@ -559,10 +559,10 @@ class UserDetailSeeder extends Seeder
                         'name' => 'Sertifikat Pendidik',
                         'issuer' => 'Kementerian Pendidikan',
                         'issue_date' => '2015-01-01',
-                        'credential_id' => 'CERT' . rand(100000, 999999),
-                        'added_at' => now()->toISOString()
-                    ]
-                ]
+                        'credential_id' => 'CERT'.rand(100000, 999999),
+                        'added_at' => now()->toISOString(),
+                    ],
+                ],
             ]);
 
             RoleHelper::assignRoleToUserInCompany($user, 'Dosen', $companyId);
@@ -626,7 +626,7 @@ class UserDetailSeeder extends Seeder
                 'specialization' => 'Student Development',
                 'experience_years' => 10,
                 'hire_date' => '2014-11-30',
-            ]
+            ],
         ];
 
         foreach ($supervisorsData as $data) {
@@ -647,22 +647,22 @@ class UserDetailSeeder extends Seeder
                 'supervisor_id' => $data['employee_id'], // Same as employee_id for supervisor
                 'supervisor_nip' => $data['employee_id'],
                 'phone' => $data['phone'],
-                'birth_date' => '1980-' . rand(1, 12) . '-' . rand(1, 28),
+                'birth_date' => '1980-'.rand(1, 12).'-'.rand(1, 28),
                 'birth_place' => ['Jakarta', 'Bandung', 'Surabaya', 'Medan', 'Semarang'][rand(0, 4)],
                 'gender' => rand(0, 1) ? 'male' : 'female',
-                'address' => 'Jl. Supervisor ' . rand(1, 100) . ', Jakarta',
-                'postal_code' => '1' . rand(1000, 9999),
+                'address' => 'Jl. Supervisor '.rand(1, 100).', Jakarta',
+                'postal_code' => '1'.rand(1000, 9999),
                 'city' => 'Jakarta',
                 'province' => 'DKI Jakarta',
                 'country' => 'Indonesia',
-                'emergency_contact_name' => 'Emergency Contact ' . $data['name'],
-                'emergency_contact_phone' => '081' . rand(100000000, 999999999),
+                'emergency_contact_name' => 'Emergency Contact '.$data['name'],
+                'emergency_contact_phone' => '081'.rand(100000000, 999999999),
                 'emergency_contact_relation' => 'Spouse',
                 'verification_status' => 'verified',
                 'verified_at' => now(),
                 'status' => 'active',
                 'supervisor_department' => $data['department'],
-                'supervisor_unit' => $data['department'] . ' Unit',
+                'supervisor_unit' => $data['department'].' Unit',
                 'supervisor_position' => $data['position'],
                 'supervisor_level' => ['Junior', 'Senior', 'Lead', 'Principal'][rand(0, 3)],
                 'supervisor_area' => ['Academic', 'Administrative', 'Technical', 'General'][rand(0, 3)],
@@ -671,25 +671,25 @@ class UserDetailSeeder extends Seeder
                 'supervisor_type' => ['internal', 'external'][rand(0, 1)],
                 'supervisor_start_date' => $data['hire_date'],
                 'supervisor_experience_years' => $data['experience_years'],
-                'notes' => 'Supervisor Role - ' . $data['department'],
+                'notes' => 'Supervisor Role - '.$data['department'],
                 'certifications' => json_encode([
                     [
                         'name' => 'Educational Supervision Certificate',
                         'issuer' => 'Ministry of Education',
                         'issue_date' => '2018-01-01',
-                        'credential_id' => 'SUP' . rand(100000, 999999),
-                        'added_at' => now()->toISOString()
-                    ]
+                        'credential_id' => 'SUP'.rand(100000, 999999),
+                        'added_at' => now()->toISOString(),
+                    ],
                 ]),
                 'supervisor_certifications' => json_encode([
                     [
                         'name' => 'Supervisor Management Certification',
                         'issuer' => 'Professional Supervisors Association',
                         'issue_date' => '2020-01-01',
-                        'credential_id' => 'SMC' . rand(100000, 999999),
-                        'added_at' => now()->toISOString()
-                    ]
-                ])
+                        'credential_id' => 'SMC'.rand(100000, 999999),
+                        'added_at' => now()->toISOString(),
+                    ],
+                ]),
             ]);
 
             RoleHelper::assignRoleToUserInCompany($user, 'Pengawas', $companyId);

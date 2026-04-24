@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class RoleBasedDashboardRedirect
 {
@@ -34,7 +33,7 @@ class RoleBasedDashboardRedirect
             // Check if user is a student (either by role or type_study)
             $isStudent = ($user->type_study === 'mahasiswa' || $user->hasRole('Mahasiswa'));
 
-            if ($isStudent && !$user->user_check) {
+            if ($isStudent && ! $user->user_check) {
                 // Allow specific routes to avoid infinite loop
                 if (
                     $request->routeIs('student.onboarding') ||

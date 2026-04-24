@@ -2,47 +2,106 @@
 
 namespace App\Livewire\Admin\Master\Question;
 
-use Exception;
-use Livewire\Component;
+use App\Exports\QuestionExport;
 use App\Helpers\AlertHelper;
 use App\Imports\Question\QuestionImport;
-use Livewire\WithPagination;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use App\Models\Master\Question\Topic;
-use App\Services\Module\ModuleService;
-use App\Models\Master\Question\Material;
-use App\Models\Master\Question\Question;
-use App\Models\Master\Question\MaterialCategory;
 use App\Models\Category\CategoryQuestion;
+use App\Models\Master\Question\Material;
+use App\Models\Master\Question\MaterialCategory;
+use App\Models\Master\Question\Question;
 use App\Models\Master\Question\QuestionType;
+use App\Models\Master\Question\Topic;
 use App\Models\Study\Study;
 use App\Services\Question\QuestionService;
-use Illuminate\Support\Facades\Auth;
-use Livewire\WithFileUploads;
-use Maatwebsite\Excel\Facades\Excel;
-use Throwable;
 use App\Traits\UploadFile;
-use Spatie\LivewireFilepond\WithFilePond;
-use App\Exports\QuestionExport;
 use Barryvdh\DomPDF\Facade\Pdf;
-
+use Carbon\Carbon;
+use Exception;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Livewire\Component;
+use Livewire\WithPagination;
+use Maatwebsite\Excel\Facades\Excel;
+use Spatie\LivewireFilepond\WithFilePond;
+use Throwable;
 
 class AdminMasterQuestionIndex extends Component
 {
-    use WithPagination, WithFilePond, UploadFile;
+    use UploadFile, WithFilePond, WithPagination;
+
     protected $paginationTheme = 'bootstrap';
-    public $perPage = 5, $search;
+
+    public $perPage = 5;
+
+    public $search;
 
     public $selectedQuestions = [];
+
     public $selectAll = false;
+
     public $bulkCategoryQuestionId;
 
-    public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id, $type, $question, $description, $latex, $weight_correct, $weight_incorrect, $category_question_id;
-    public $topics = [], $material_categories = [], $materials = [], $question_types = [], $category_questions = [];
-    public $images = [], $old_images = [], $new_images = [], $studys = [], $study_id;
-    public $filterStudyId, $filterQuestionTypeId, $filterTopicId, $filterDifficulty, $filterCategoryQuestionId;
-    public $study_id_import, $file_import, $import_type = 'pg';
+    public $data_id;
+
+    public $topic_id;
+
+    public $material_category_id;
+
+    public $material_id;
+
+    public $question_type_id;
+
+    public $type;
+
+    public $question;
+
+    public $description;
+
+    public $latex;
+
+    public $weight_correct;
+
+    public $weight_incorrect;
+
+    public $category_question_id;
+
+    public $topics = [];
+
+    public $material_categories = [];
+
+    public $materials = [];
+
+    public $question_types = [];
+
+    public $category_questions = [];
+
+    public $images = [];
+
+    public $old_images = [];
+
+    public $new_images = [];
+
+    public $studys = [];
+
+    public $study_id;
+
+    public $filterStudyId;
+
+    public $filterQuestionTypeId;
+
+    public $filterTopicId;
+
+    public $filterDifficulty;
+
+    public $filterCategoryQuestionId;
+
+    public $study_id_import;
+
+    public $file_import;
+
+    public $import_type = 'pg';
+
     public $isLimited = false;
 
     public function render()
@@ -50,7 +109,7 @@ class AdminMasterQuestionIndex extends Component
         $questions = $this->buildQuestionsQuery();
 
         return view('livewire.admin.master.question.admin-master-question-index', [
-            'questions' => $questions->paginate($this->perPage)
+            'questions' => $questions->paginate($this->perPage),
         ])->extends('layout.app')->section('content');
     }
 
@@ -170,7 +229,7 @@ class AdminMasterQuestionIndex extends Component
                 ->update(['category_question_id' => $this->bulkCategoryQuestionId]);
 
             DB::commit();
-        } catch (Exception | Throwable $th) {
+        } catch (Exception|Throwable $th) {
             DB::rollBack();
             $error = [
                 'message' => $th->getMessage(),
@@ -178,6 +237,7 @@ class AdminMasterQuestionIndex extends Component
                 'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterQuestionIndex => applyBulkCategory', $error);
+
             return AlertHelper::error('Gagal', 'Ada kesalahan saat memperbarui kategori soal.');
         }
 
@@ -192,7 +252,7 @@ class AdminMasterQuestionIndex extends Component
         $this->topics = Topic::select('id', 'name')->get();
         $this->question_types = QuestionType::select('id', 'name')->get();
         $this->category_questions = CategoryQuestion::select('id', 'name')->get();
-        // if (Auth::user()?->hasRole('Dosen')) {   
+        // if (Auth::user()?->hasRole('Dosen')) {
         //     $studyIds = Auth::user()?->studys ?? [];
 
         //     // Ensure $studyIds is always an array
@@ -216,12 +276,12 @@ class AdminMasterQuestionIndex extends Component
 
     public function updatedNewImages($value)
     {
-        // Append chosen temporary files by storing them permanently 
-        $folder = "/public/question/" . \Carbon\Carbon::now()->isoFormat('Y') . '/' . \Carbon\Carbon::now()->isoFormat('MM');
+        // Append chosen temporary files by storing them permanently
+        $folder = '/public/question/'.Carbon::now()->isoFormat('Y').'/'.Carbon::now()->isoFormat('MM');
 
         foreach ($this->new_images as $new_image) {
             $upload = $this->uploadFile($new_image, $folder);
-            $this->images[] = 'question/' . \Carbon\Carbon::now()->isoFormat('Y') . '/' . \Carbon\Carbon::now()->isoFormat('MM') . '/' . $upload[1];
+            $this->images[] = 'question/'.Carbon::now()->isoFormat('Y').'/'.Carbon::now()->isoFormat('MM').'/'.$upload[1];
         }
 
         // Reset the input model so it fires updated hook on the next upload
@@ -246,7 +306,7 @@ class AdminMasterQuestionIndex extends Component
 
     public function updatedTopicId($value)
     {
-        $value = !$value ? null : $value;
+        $value = ! $value ? null : $value;
         $this->material_category_id = null;
         $this->material_id = null;
         $this->material_categories = MaterialCategory::select('id', 'topic_id', 'name')
@@ -256,7 +316,7 @@ class AdminMasterQuestionIndex extends Component
 
     public function updatedMaterialCategoryId($value)
     {
-        $value = !$value ? null : $value;
+        $value = ! $value ? null : $value;
         $this->material_id = null;
         $this->materials = Material::select('id', 'material_category_id', 'name')
             ->where('material_category_id', $value)
@@ -278,6 +338,7 @@ class AdminMasterQuestionIndex extends Component
         $this->resetValidation();
         $this->reset(['data_id', 'study_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'type', 'question', 'description', 'latex', 'images', 'weight_correct', 'weight_incorrect', 'study_id_import', 'file_import', 'category_question_id', 'import_type']);
         $this->dispatch('close-modal', ['id' => 'modal-import-question']);
+
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
 
@@ -324,7 +385,7 @@ class AdminMasterQuestionIndex extends Component
                 'material_category_id' => $this->material_category_id,
                 'material_id' => $this->material_id,
                 'question_type_id' => $this->question_type_id,
-                'type' => $this->type ?? \App\Models\Master\Question\Question::TYPE_SINGLE,
+                'type' => $this->type ?? Question::TYPE_SINGLE,
                 'question' => $this->question,
                 'latex' => $this->latex,
                 'images' => $this->images,
@@ -336,12 +397,12 @@ class AdminMasterQuestionIndex extends Component
             ];
 
             $question = app(QuestionService::class)->updateOrCreate($request);
-            if (!$question) {
-                throw new Exception("Ada kesalahaan saat QuestionService => updateOrCreate", 500);
+            if (! $question) {
+                throw new Exception('Ada kesalahaan saat QuestionService => updateOrCreate', 500);
             }
 
             DB::commit();
-        } catch (Exception | Throwable $th) {
+        } catch (Exception|Throwable $th) {
             DB::rollBack();
             $error = [
                 'message' => $th->getMessage(),
@@ -349,10 +410,12 @@ class AdminMasterQuestionIndex extends Component
                 'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterModuleIndex => submit', $error);
+
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
         }
 
         $this->closeModal();
+
         return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
     }
 
@@ -367,7 +430,7 @@ class AdminMasterQuestionIndex extends Component
             DB::beginTransaction();
             app(QuestionService::class)->delete($id[0]);
             DB::commit();
-        } catch (Exception | Throwable $th) {
+        } catch (Exception|Throwable $th) {
             DB::rollBack();
             $error = [
                 'message' => $th->getMessage(),
@@ -375,6 +438,7 @@ class AdminMasterQuestionIndex extends Component
                 'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterModuleIndex => delete', $error);
+
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menghapus data');
         }
 
@@ -410,23 +474,25 @@ class AdminMasterQuestionIndex extends Component
                 $this->file_import // <- TemporaryUploadedFile OK
             );
 
-        } catch (Exception | Throwable $th) {
+        } catch (Exception|Throwable $th) {
             $error = [
                 'message' => $th->getMessage(),
                 'file' => $th->getFile(),
                 'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterModuleIndex => importQuestion', $error);
+
             return AlertHelper::error('Gagal', 'Ada kesalahan saat import data soal');
         }
 
         $this->closeModal();
+
         return AlertHelper::success('Berhasil', 'Data berhasil diimport, silahkan tunggu beberapa saat.');
     }
 
     public function exportExcel()
     {
-        if (!config('app.export_question')) {
+        if (! config('app.export_question')) {
             return AlertHelper::error('Gagal', 'Fitur export dinonaktifkan.');
         }
 
@@ -434,12 +500,12 @@ class AdminMasterQuestionIndex extends Component
             ->with(['study', 'topic', 'categoryQuestion', 'answers'])
             ->get();
 
-        return Excel::download(new QuestionExport($questions), 'bank-soal-' . date('Y-m-d-H-i-s') . '.xlsx');
+        return Excel::download(new QuestionExport($questions), 'bank-soal-'.date('Y-m-d-H-i-s').'.xlsx');
     }
 
     public function exportPdf()
     {
-        if (!config('app.export_question')) {
+        if (! config('app.export_question')) {
             return AlertHelper::error('Gagal', 'Fitur export dinonaktifkan.');
         }
 
@@ -455,8 +521,8 @@ class AdminMasterQuestionIndex extends Component
         ])->setPaper('a4', 'landscape');
 
         return response()->streamDownload(
-            fn () => print($pdf->output()),
-            'bank-soal-' . date('Y-m-d-H-i-s') . '.pdf'
+            fn () => print ($pdf->output()),
+            'bank-soal-'.date('Y-m-d-H-i-s').'.pdf'
         );
     }
 }

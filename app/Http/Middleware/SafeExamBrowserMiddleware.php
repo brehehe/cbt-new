@@ -24,9 +24,9 @@ class SafeExamBrowserMiddleware
         if (config('seb.require_browser_exam_key')) {
             $browserExamKey = $request->header('X-SafeExamBrowser-RequestHash');
 
-            if ($isSEB && !$this->validateBrowserExamKey($browserExamKey, $request)) {
+            if ($isSEB && ! $this->validateBrowserExamKey($browserExamKey, $request)) {
                 return response()->view('errors.seb-invalid', [
-                    'message' => 'Invalid Safe Exam Browser configuration. Please download the correct configuration file.'
+                    'message' => 'Invalid Safe Exam Browser configuration. Please download the correct configuration file.',
                 ], 403);
             }
         }
@@ -48,20 +48,20 @@ class SafeExamBrowserMiddleware
      */
     private function validateBrowserExamKey(?string $key, Request $request): bool
     {
-        if (!$key) {
+        if (! $key) {
             return false;
         }
 
         // Get configured browser exam key from config
         $configuredKey = config('seb.browser_exam_key');
 
-        if (!$configuredKey) {
+        if (! $configuredKey) {
             return true; // No key configured, allow
         }
 
         // Generate expected hash
         $url = $request->fullUrl();
-        $expectedHash = hash('sha256', $url . $configuredKey);
+        $expectedHash = hash('sha256', $url.$configuredKey);
 
         return hash_equals($expectedHash, $key);
     }

@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Master\Question\Answer;
+use App\Models\Master\Question\Question;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
-use App\Models\Master\Question\Question;
-use App\Models\Master\Question\Answer;
 use Symfony\Component\Process\Process;
 
 class LatexPreviewController
@@ -24,7 +24,7 @@ class LatexPreviewController
         if ($latexInput === '') {
             return response()->json([
                 'ok' => false,
-                'message' => 'LaTeX kosong.'
+                'message' => 'LaTeX kosong.',
             ], 422);
         }
 
@@ -35,6 +35,7 @@ class LatexPreviewController
 
         if (Storage::disk('public')->exists($publicPdf)) {
             $this->maybePersistPreview($data['target_type'] ?? null, $data['target_id'] ?? null, $publicPdf, $publicPng);
+
             return response()->json([
                 'ok' => true,
                 'pdf_url' => Storage::disk('public')->url($publicPdf),
@@ -43,11 +44,11 @@ class LatexPreviewController
         }
 
         $tmpDir = storage_path("app/latex-previews/{$hash}");
-        if (!File::exists($tmpDir)) {
+        if (! File::exists($tmpDir)) {
             File::makeDirectory($tmpDir, 0755, true);
         }
 
-        $texFile = $tmpDir . '/main.tex';
+        $texFile = $tmpDir.'/main.tex';
         $content = $this->normalizeLatex($latexInput);
         File::put($texFile, $content);
 
@@ -62,11 +63,12 @@ class LatexPreviewController
         $xelatex->setTimeout(20);
         $xelatex->run();
 
-        if (!$xelatex->isSuccessful()) {
+        if (! $xelatex->isSuccessful()) {
             \Log::error('LaTeX render failed', [
                 'error' => $xelatex->getErrorOutput(),
                 'output' => $xelatex->getOutput(),
             ]);
+
             return response()->json([
                 'ok' => false,
                 'message' => 'Gagal render LaTeX. Pastikan input valid.',
@@ -74,11 +76,11 @@ class LatexPreviewController
             ], 500);
         }
 
-        $pdfPath = $tmpDir . '/main.pdf';
-        if (!File::exists($pdfPath)) {
+        $pdfPath = $tmpDir.'/main.pdf';
+        if (! File::exists($pdfPath)) {
             return response()->json([
                 'ok' => false,
-                'message' => 'File PDF tidak ditemukan setelah render.'
+                'message' => 'File PDF tidak ditemukan setelah render.',
             ], 500);
         }
 
@@ -87,16 +89,17 @@ class LatexPreviewController
             '-png',
             '-singlefile',
             $pdfPath,
-            $tmpDir . '/preview'
+            $tmpDir.'/preview',
         ]);
         $pngProcess->setTimeout(20);
         $pngProcess->run();
 
-        if (!$pngProcess->isSuccessful()) {
+        if (! $pngProcess->isSuccessful()) {
             \Log::error('LaTeX PDF->PNG failed', [
                 'error' => $pngProcess->getErrorOutput(),
                 'output' => $pngProcess->getOutput(),
             ]);
+
             return response()->json([
                 'ok' => false,
                 'message' => 'Gagal konversi PDF ke PNG. Pastikan pdftoppm terpasang.',
@@ -105,7 +108,7 @@ class LatexPreviewController
         }
 
         Storage::disk('public')->put($publicPdf, File::get($pdfPath));
-        $pngPath = $tmpDir . '/preview.png';
+        $pngPath = $tmpDir.'/preview.png';
         if (File::exists($pngPath)) {
             Storage::disk('public')->put($publicPng, File::get($pngPath));
         }
@@ -121,7 +124,7 @@ class LatexPreviewController
 
     private function maybePersistPreview(?string $targetType, $targetId, string $pdfPath, string $pngPath): void
     {
-        if (!$targetType || !$targetId) {
+        if (! $targetType || ! $targetId) {
             return;
         }
 
@@ -130,6 +133,7 @@ class LatexPreviewController
                 'latex_preview_pdf' => $pdfPath,
                 'latex_preview_png' => $pngPath,
             ]);
+
             return;
         }
 

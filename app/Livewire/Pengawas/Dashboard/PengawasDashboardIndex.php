@@ -2,22 +2,31 @@
 
 namespace App\Livewire\Pengawas\Dashboard;
 
-use Livewire\Component;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
+use Livewire\Component;
 
 class PengawasDashboardIndex extends Component
 {
     public $activeStudents = 45;
+
     public $totalStudents = 47;
+
     public $flaggedStudents = 2;
+
     public $averageProgress = 78;
+
     public $activeExams = 3;
+
     public $violationCount = 1;
+
     public $suspiciousActivities = [];
+
     public $studentsActivity = [];
+
     public $examRooms = [];
+
     public $systemAlerts = [];
+
     public $monitoringData = [];
 
     public function mount()
@@ -35,7 +44,7 @@ class PengawasDashboardIndex extends Component
                 'activity' => 'Multiple tab switching',
                 'severity' => 'medium',
                 'time' => '14:25',
-                'exam' => 'UAS Database'
+                'exam' => 'UAS Database',
             ],
             [
                 'id' => 2,
@@ -43,8 +52,8 @@ class PengawasDashboardIndex extends Component
                 'activity' => 'Face not detected',
                 'severity' => 'high',
                 'time' => '14:20',
-                'exam' => 'UTS Algoritma'
-            ]
+                'exam' => 'UTS Algoritma',
+            ],
         ];
 
         $this->studentsActivity = [
@@ -55,7 +64,7 @@ class PengawasDashboardIndex extends Component
                 'progress' => 85,
                 'time_remaining' => '00:45:30',
                 'status' => 'active',
-                'camera_status' => 'active'
+                'camera_status' => 'active',
             ],
             [
                 'id' => 2,
@@ -64,7 +73,7 @@ class PengawasDashboardIndex extends Component
                 'progress' => 92,
                 'time_remaining' => '00:32:15',
                 'status' => 'active',
-                'camera_status' => 'active'
+                'camera_status' => 'active',
             ],
             [
                 'id' => 3,
@@ -73,8 +82,8 @@ class PengawasDashboardIndex extends Component
                 'progress' => 65,
                 'time_remaining' => '01:15:45',
                 'status' => 'active',
-                'camera_status' => 'warning'
-            ]
+                'camera_status' => 'warning',
+            ],
         ];
 
         $this->examRooms = [
@@ -83,37 +92,37 @@ class PengawasDashboardIndex extends Component
                 'exam' => 'UAS Database Systems',
                 'students' => 25,
                 'active' => 23,
-                'flagged' => 1
+                'flagged' => 1,
             ],
             [
                 'room' => 'Lab Komputer 2',
                 'exam' => 'UTS Algoritma',
                 'students' => 22,
                 'active' => 22,
-                'flagged' => 1
-            ]
+                'flagged' => 1,
+            ],
         ];
 
         $this->systemAlerts = [
             [
                 'type' => 'warning',
                 'message' => 'High CPU usage detected on server 2',
-                'time' => '14:30'
+                'time' => '14:30',
             ],
             [
                 'type' => 'info',
                 'message' => 'Automatic backup completed successfully',
-                'time' => '14:15'
-            ]
+                'time' => '14:15',
+            ],
         ];
 
         // Generate sample monitoring data
         $this->monitoringData = [];
         for ($i = 59; $i >= 0; $i--) {
             $this->monitoringData[] = [
-                'time' => $i . 'm ago',
+                'time' => $i.'m ago',
                 'active_students' => rand(40, 47),
-                'violations' => rand(0, 3)
+                'violations' => rand(0, 3),
             ];
         }
     }

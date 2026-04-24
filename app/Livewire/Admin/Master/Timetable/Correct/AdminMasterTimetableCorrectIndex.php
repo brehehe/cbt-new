@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Livewire\Admin\Master\Timetable\Correct;
- 
+
 use App\Models\Master\Timetable\Timetable;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -9,8 +9,14 @@ use Livewire\WithPagination;
 class AdminMasterTimetableCorrectIndex extends Component
 {
     use WithPagination;
-    public $timetable_id, $timetable;
-    public $search = '', $perPage = 10;
+
+    public $timetable_id;
+
+    public $timetable;
+
+    public $search = '';
+
+    public $perPage = 10;
 
     public function mount($timetable_id)
     {
@@ -23,21 +29,21 @@ class AdminMasterTimetableCorrectIndex extends Component
         $userTimetables = $this->timetable->userTimetables()
             ->search($this->search)
             ->withCount([
-                'userModuleQuestions as total_essay' => function($q) {
-                    $q->whereHas('timetableQuestion', function($sq) {
+                'userModuleQuestions as total_essay' => function ($q) {
+                    $q->whereHas('timetableQuestion', function ($sq) {
                         $sq->where('type', 'essay');
                     });
                 },
-                'userModuleQuestions as pending_essay' => function($q) {
+                'userModuleQuestions as pending_essay' => function ($q) {
                     $q->where('status', 'check');
-                }
+                },
             ])
             ->paginate($this->perPage);
 
         return view('livewire.admin.master.timetable.correct.admin-master-timetable-correct-index', [
-            'userTimetables' => $userTimetables
+            'userTimetables' => $userTimetables,
         ])
-        ->extends('layout.app')
-        ->section('content');
+            ->extends('layout.app')
+            ->section('content');
     }
 }

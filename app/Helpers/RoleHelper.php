@@ -6,14 +6,12 @@ use App\Models\Role\RoleCompany;
 use App\Models\Spatie\Role;
 use App\Models\User\UserCompanyRole;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class RoleHelper
 {
-
     public static function assignRoleToUserInCompany($user, $roleName, $companyId, $medicalRecordNumber = null, $is_head = null, $is_active = null)
     {
-        $is_head   = $is_head ?? false;
+        $is_head = $is_head ?? false;
         $is_active = $is_active ?? true;
         $user->is_head = $is_head;
         $user->is_active = $is_active;
@@ -46,7 +44,7 @@ class RoleHelper
                 : ($medicalRecordNumber
                     ? $medicalRecordNumber
                     : ($role->name == 'Pasien'
-                        ? 'PMR' . date('ymd') . str_pad(UserCompanyRole::where('company_id', $companyId)
+                        ? 'PMR'.date('ymd').str_pad(UserCompanyRole::where('company_id', $companyId)
                             ->whereDate('created_at', Carbon::now())->count() + 1, 5, '0', STR_PAD_LEFT)
                         : null)),
             'is_head' => $is_head,
@@ -59,7 +57,7 @@ class RoleHelper
         // Cari role global
         $role = Role::where('name', $roleName)->first();
 
-        if (!$role) {
+        if (! $role) {
             return false;
         }
 
@@ -68,7 +66,7 @@ class RoleHelper
             ->where('company_id', $companyId)
             ->first();
 
-        if (!$roleCompany) {
+        if (! $roleCompany) {
             return false;
         }
 

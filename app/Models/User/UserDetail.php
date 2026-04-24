@@ -2,25 +2,25 @@
 
 namespace App\Models\User;
 
-use App\Models\User;
 use App\Models\Company\Company;
 use App\Models\Master\Region\City;
 use App\Models\Master\Region\District;
 use App\Models\Master\Region\Province;
 use App\Models\Master\Region\SubDistrict;
+use App\Models\User;
+use App\Traits\Region\RegionTrait;
 use Exception;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
-use App\Traits\Region\RegionTrait;
 
 class UserDetail extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids, RegionTrait, \App\Traits\LogsSystemActivity;
+    use \App\Traits\LogsSystemActivity, HasFactory, HasUuids, RegionTrait, SoftDeletes;
 
     protected $guarded = ['id'];
 
@@ -100,7 +100,7 @@ class UserDetail extends Model
         'district_code',
         'sub_district_code',
         'district',
-        'sub_district'
+        'sub_district',
     ];
 
     protected $casts = [
@@ -122,7 +122,7 @@ class UserDetail extends Model
         'awards' => 'array',
         'exam_history' => 'array',
         'system_preferences' => 'array',
-        'metadata' => 'array'
+        'metadata' => 'array',
     ];
 
     // Relationships
@@ -175,12 +175,12 @@ class UserDetail extends Model
 
     public function getIsStudentAttribute()
     {
-        return !empty($this->student_id);
+        return ! empty($this->student_id);
     }
 
     public function getIsLecturerAttribute()
     {
-        return !empty($this->lecturer_id);
+        return ! empty($this->lecturer_id);
     }
 
     public function getAgeAttribute()
@@ -191,12 +191,15 @@ class UserDetail extends Model
     public function getFormattedPhoneAttribute()
     {
         $phone = $this->mobile_phone ?: $this->phone;
-        if (!$phone) return null;
+        if (! $phone) {
+            return null;
+        }
 
         // Format Indonesian phone number
         if (substr($phone, 0, 1) === '0') {
-            return '+62' . substr($phone, 1);
+            return '+62'.substr($phone, 1);
         }
+
         return $phone;
     }
 
@@ -234,7 +237,7 @@ class UserDetail extends Model
     {
         $certifications = $this->certifications ?? [];
         $certifications[] = array_merge($certification, [
-            'added_at' => now()->toISOString()
+            'added_at' => now()->toISOString(),
         ]);
         $this->update(['certifications' => $certifications]);
     }
@@ -243,7 +246,7 @@ class UserDetail extends Model
     {
         $trainings = $this->training_history ?? [];
         $trainings[] = array_merge($training, [
-            'added_at' => now()->toISOString()
+            'added_at' => now()->toISOString(),
         ]);
         $this->update(['training_history' => $trainings]);
     }
@@ -252,7 +255,7 @@ class UserDetail extends Model
     {
         $awards = $this->awards ?? [];
         $awards[] = array_merge($award, [
-            'added_at' => now()->toISOString()
+            'added_at' => now()->toISOString(),
         ]);
         $this->update(['awards' => $awards]);
     }
@@ -261,7 +264,7 @@ class UserDetail extends Model
     {
         $this->update([
             'last_login_at' => now(),
-            'last_login_ip' => $ip ?: request()->ip()
+            'last_login_ip' => $ip ?: request()->ip(),
         ]);
     }
 
@@ -270,7 +273,7 @@ class UserDetail extends Model
         $this->update([
             'verification_status' => 'verified',
             'verified_at' => now(),
-            'verified_by' => $verifiedBy ?: auth()->id()
+            'verified_by' => $verifiedBy ?: auth()->id(),
         ]);
     }
 
@@ -279,7 +282,7 @@ class UserDetail extends Model
         $this->update([
             'verification_status' => 'rejected',
             'verified_at' => now(),
-            'verified_by' => auth()->id()
+            'verified_by' => auth()->id(),
         ]);
     }
 
@@ -289,7 +292,7 @@ class UserDetail extends Model
         return static::create(array_merge([
             'user_id' => $userId,
             'student_id' => $data['student_id'] ?? null,
-            'student_status' => 'active'
+            'student_status' => 'active',
         ], $data));
     }
 
@@ -298,7 +301,7 @@ class UserDetail extends Model
         return static::create(array_merge([
             'user_id' => $userId,
             'lecturer_id' => $data['lecturer_id'] ?? null,
-            'lecturer_status' => 'active'
+            'lecturer_status' => 'active',
         ], $data));
     }
 
@@ -326,7 +329,7 @@ class UserDetail extends Model
                 $model->setCity();
                 $model->setDistrict();
                 $model->setSubDistrict();
-            } catch (Exception | Throwable $th) {
+            } catch (Exception|Throwable $th) {
                 DB::rollBack();
                 $error = [
                     'message' => $th->getMessage(),
@@ -339,11 +342,11 @@ class UserDetail extends Model
         });
     }
 
-    function setProvince()
+    public function setProvince()
     {
         $province = Province::where('code', $this->province_code)->first();
 
-        if (!$province) {
+        if (! $province) {
             $this->getProvinceTrait();
         }
 
@@ -355,11 +358,11 @@ class UserDetail extends Model
         }
     }
 
-    function setCity()
+    public function setCity()
     {
         $city = City::where('code', $this->city_code)->where('parent_code', $this->province_code)->first();
 
-        if (!$city) {
+        if (! $city) {
             $this->getCityTrait($this->province_code);
         }
 
@@ -371,11 +374,11 @@ class UserDetail extends Model
         }
     }
 
-    function setDistrict()
+    public function setDistrict()
     {
         $district = District::where('code', $this->district_code)->where('parent_code', $this->city_code)->first();
 
-        if (!$district) {
+        if (! $district) {
             $this->getDistrictTrait($this->city_code);
         }
 
@@ -387,11 +390,11 @@ class UserDetail extends Model
         }
     }
 
-    function setSubDistrict()
+    public function setSubDistrict()
     {
         $subDistrict = SubDistrict::where('code', $this->sub_district_code)->where('parent_code', $this->district_code)->first();
 
-        if (!$subDistrict) {
+        if (! $subDistrict) {
             $this->getSubDistrictTrait($this->district_code);
         }
 

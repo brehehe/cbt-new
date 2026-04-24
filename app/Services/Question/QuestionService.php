@@ -2,17 +2,18 @@
 
 namespace App\Services\Question;
 
-use Carbon\Carbon;
-use App\Traits\UploadFile;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\File;
 use App\Models\Master\Question\Question;
+use App\Traits\UploadFile;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class QuestionService
 {
     use UploadFile;
+
     /**
      * Create a new class instance.
      */
@@ -21,7 +22,7 @@ class QuestionService
     public function __construct()
     {
         //
-        $this->main_folder = Carbon::now()->isoFormat('Y') . '/' . Carbon::now()->isoFormat('MM');
+        $this->main_folder = Carbon::now()->isoFormat('Y').'/'.Carbon::now()->isoFormat('MM');
     }
 
     public function updateOrCreate($request)
@@ -29,9 +30,9 @@ class QuestionService
         try {
             $imagePaths = [];
             $folder = "question/{$this->main_folder}";
-            $disk   = 'public';
+            $disk = 'public';
 
-            if (!Storage::disk($disk)->exists($folder)) {
+            if (! Storage::disk($disk)->exists($folder)) {
                 Storage::disk($disk)->makeDirectory($folder);
             }
 
@@ -39,6 +40,7 @@ class QuestionService
             $normalize = function ($val) use ($folder, $disk) {
                 if ($val instanceof TemporaryUploadedFile) {
                     $stored = $val->store($folder, $disk);           // "question/2025/11/xxx.jpg"
+
                     return '/'.ltrim($stored, '/');                  // "/question/2025/11/xxx.jpg"
                 }
                 // String bisa berupa URL lengkap atau path
@@ -49,9 +51,10 @@ class QuestionService
                 } else {
                     $path = (string) $val;
                 }
-                
+
                 // Hilangkan /storage dan buat path relatif
                 $path = Str::of($path)->replaceFirst('/storage', '')->trim('/')->prepend('/')->toString();
+
                 return $path;  // "/question/2026/02/xxx.jpg"
             };
 
@@ -73,7 +76,7 @@ class QuestionService
                 $filePath = ltrim($rm, '/');  // hapus leading slash
                 if (Storage::disk($disk)->exists($filePath)) {
                     Storage::disk($disk)->delete($filePath);
-                    \Log::info('✅ Hapus gambar soal: ' . $filePath);
+                    \Log::info('✅ Hapus gambar soal: '.$filePath);
                 }
             }
 
@@ -81,24 +84,24 @@ class QuestionService
             $imagePaths = array_keys($final);
 
             // 🔹 Simpan data
-            $question = \App\Models\Master\Question\Question::updateOrCreate(
+            $question = Question::updateOrCreate(
                 ['id' => $request['id'] ?? null],
                 [
-                    'user_id'              => $request['user_id'] ?? null,
-                    'study_id'             => $request['study_id'] ?? null,
-                    'company_id'           => $request['company_id'] ?? null,
-                    'topic_id'             => $request['topic_id'] ?? null,
+                    'user_id' => $request['user_id'] ?? null,
+                    'study_id' => $request['study_id'] ?? null,
+                    'company_id' => $request['company_id'] ?? null,
+                    'topic_id' => $request['topic_id'] ?? null,
                     'material_category_id' => $request['material_category_id'] ?? null,
-                    'material_id'          => $request['material_id'] ?? null,
-                    'question_type_id'     => $request['question_type_id'] ?? null,
-                    'question'             => $request['question'] ?? null,
-                    'latex'                => $request['latex'] ?? null,
-                    'images'               => json_encode($imagePaths),
-                    'weight_correct'       => $request['weight_correct'] ?? null,
-                    'weight_incorrect'     => $request['weight_incorrect'] ?? null,
-                    'description'          => $request['description'] ?? null,
-                    'category_question_id'  => $request['category_question_id'] ?? null,
-                    'type'                 => $request['type'] ?? \App\Models\Master\Question\Question::TYPE_SINGLE,
+                    'material_id' => $request['material_id'] ?? null,
+                    'question_type_id' => $request['question_type_id'] ?? null,
+                    'question' => $request['question'] ?? null,
+                    'latex' => $request['latex'] ?? null,
+                    'images' => json_encode($imagePaths),
+                    'weight_correct' => $request['weight_correct'] ?? null,
+                    'weight_incorrect' => $request['weight_incorrect'] ?? null,
+                    'description' => $request['description'] ?? null,
+                    'category_question_id' => $request['category_question_id'] ?? null,
+                    'type' => $request['type'] ?? Question::TYPE_SINGLE,
                 ]
             );
 
@@ -106,7 +109,7 @@ class QuestionService
 
         } catch (\Throwable $th) {
             \Log::error('❌ Error di QuestionService::updateOrCreate', [
-                'msg'  => $th->getMessage(),
+                'msg' => $th->getMessage(),
                 'file' => $th->getFile(),
                 'line' => $th->getLine(),
             ]);
@@ -114,20 +117,19 @@ class QuestionService
         }
     }
 
-
     private function uploadImages(array $old_images, array $new_images)
     {
-        $images = $currentUrls = $newPaths = $uploadFiles =[];
+        $images = $currentUrls = $newPaths = $uploadFiles = [];
 
         foreach ($new_images as $item) {
             if (is_string($item)) {
                 $relative = ltrim(Str::after(parse_url($item, PHP_URL_PATH), '/storage/'), '/');
-                $currentUrls[] = asset('storage/'. $relative);
+                $currentUrls[] = asset('storage/'.$relative);
             }
 
             if ($item instanceof TemporaryUploadedFile) {
                 $url_image = $this->uploadFile($item, "/public/question/{$this->main_folder}");
-                $newPaths[] = "/question/{$this->main_folder}/". $url_image[1];
+                $newPaths[] = "/question/{$this->main_folder}/".$url_image[1];
             }
         }
 

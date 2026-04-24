@@ -2,38 +2,56 @@
 
 namespace App\Livewire\Admin\Master\Timetable\Video;
 
+use App\Helpers\AlertHelper;
 use App\Models\Exam\ExamRecording;
-use Livewire\Component;
-use Livewire\WithPagination;
-use App\Models\Master\Timetable\Timetable;
 use App\Models\Master\Question\Module;
+use App\Models\Master\Timetable\Timetable;
 use App\Models\User;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
-use App\Helpers\AlertHelper;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class AdminMasterTimetableVideoIndex extends Component
 {
     use WithPagination;
-    public $timetable_id, $timetable, $modules = [], $supervisors = [], $module_id, $getSupervisors = [];
-    public $search = '', $perPage = 5, $start_time, $end_time;
+
+    public $timetable_id;
+
+    public $timetable;
+
+    public $modules = [];
+
+    public $supervisors = [];
+
+    public $module_id;
+
+    public $getSupervisors = [];
+
+    public $search = '';
+
+    public $perPage = 5;
+
+    public $start_time;
+
+    public $end_time;
 
     protected $listeners = [
         'deleteAllRecordings',
-        'deleteRecording'
+        'deleteRecording',
     ];
 
     public function mount($timetable_id = null)
     {
         $this->timetable_id = $timetable_id;
 
-        if (!$this->timetable_id) {
+        if (! $this->timetable_id) {
             return redirect()->route('admin.master.timetable');
         }
 
         $timetable = Timetable::with('userTimetables')->find($this->timetable_id);
-        if (!$timetable) {
+        if (! $timetable) {
             return redirect()->route('admin.master.timetable');
         }
 
@@ -60,20 +78,20 @@ class AdminMasterTimetableVideoIndex extends Component
             ]);
         }
 
-        $zipName = 'Exam_Recordings_' . str_replace(' ', '_', $this->timetable['name']) . '_' . date('Ymd_His') . '.zip';
-        $zipPath = storage_path('app/public/temp/' . $zipName);
+        $zipName = 'Exam_Recordings_'.str_replace(' ', '_', $this->timetable['name']).'_'.date('Ymd_His').'.zip';
+        $zipPath = storage_path('app/public/temp/'.$zipName);
 
         // Ensure temp directory exists
-        if (!file_exists(storage_path('app/public/temp'))) {
+        if (! file_exists(storage_path('app/public/temp'))) {
             mkdir(storage_path('app/public/temp'), 0755, true);
         }
 
-        $zip = new \ZipArchive();
-        if ($zip->open($zipPath, \ZipArchive::CREATE) === TRUE) {
+        $zip = new \ZipArchive;
+        if ($zip->open($zipPath, \ZipArchive::CREATE) === true) {
             foreach ($recordings as $recording) {
-                $filePath = storage_path('app/public/' . $recording->video_path);
+                $filePath = storage_path('app/public/'.$recording->video_path);
                 if (file_exists($filePath)) {
-                    $zip->addFile($filePath, 'exam-recording/' . basename($recording->video_path));
+                    $zip->addFile($filePath, 'exam-recording/'.basename($recording->video_path));
                 }
             }
             $zip->close();
@@ -98,22 +116,22 @@ class AdminMasterTimetableVideoIndex extends Component
         try {
             \DB::beginTransaction();
             $recordings = ExamRecording::where('timetable_id', $this->timetable_id)->get();
-            
+
             foreach ($recordings as $recording) {
                 if ($recording->video_path) {
-                    $filePath = storage_path('app/public/' . $recording->video_path);
+                    $filePath = storage_path('app/public/'.$recording->video_path);
                     if (file_exists($filePath)) {
                         unlink($filePath);
                     }
                 }
-                $recording->delete(); 
+                $recording->delete();
             }
 
             \DB::commit();
             AlertHelper::success('Berhasil', 'Semua video dan rekaman berhasil dihapus.');
         } catch (\Throwable $th) {
             \DB::rollback();
-            Log::error('Gagal menghapus semua rekaman: ' . $th->getMessage());
+            Log::error('Gagal menghapus semua rekaman: '.$th->getMessage());
             AlertHelper::error('Gagal', 'Terjadi kesalahan saat menghapus data.');
         }
     }
@@ -128,21 +146,21 @@ class AdminMasterTimetableVideoIndex extends Component
         try {
             \DB::beginTransaction();
             $recording = ExamRecording::find($id[0]);
-            
+
             if ($recording->video_path) {
-                $filePath = storage_path('app/public/' . $recording->video_path);
+                $filePath = storage_path('app/public/'.$recording->video_path);
                 if (file_exists($filePath)) {
                     unlink($filePath);
                 }
             }
-            
+
             $recording->delete();
             \DB::commit();
-            
+
             AlertHelper::success('Berhasil', 'Rekaman video berhasil dihapus.');
         } catch (\Throwable $th) {
             \DB::rollback();
-            Log::error('Gagal menghapus rekaman: ' . $th->getMessage());
+            Log::error('Gagal menghapus rekaman: '.$th->getMessage());
             AlertHelper::error('Gagal', 'Gagal menghapus rekaman.');
         }
     }

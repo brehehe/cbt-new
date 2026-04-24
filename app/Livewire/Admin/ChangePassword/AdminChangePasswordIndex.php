@@ -3,37 +3,38 @@
 namespace App\Livewire\Admin\ChangePassword;
 
 use App\Helpers\AlertHelper;
-use Livewire\Component;
+use App\Models\UsrSecKey;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Http;
-use App\Models\UsrSecKey;
+use Livewire\Component;
 
 class AdminChangePasswordIndex extends Component
 {
     public $currentPassword;
+
     public $newPassword;
+
     public $confirmPassword;
 
     protected $rules = [
         'currentPassword' => 'required|string',
-        'newPassword'     => 'required|string|min:8',
+        'newPassword' => 'required|string|min:8',
         'confirmPassword' => 'required|string|min:8|same:newPassword',
     ];
 
     protected $messages = [
         'currentPassword.required' => 'Kata sandi saat ini wajib diisi.',
-        'currentPassword.string'   => 'Kata sandi saat ini harus berupa teks.',
+        'currentPassword.string' => 'Kata sandi saat ini harus berupa teks.',
 
-        'newPassword.required'     => 'Kata sandi baru wajib diisi.',
-        'newPassword.string'       => 'Kata sandi baru harus berupa teks.',
-        'newPassword.min'          => 'Kata sandi baru minimal terdiri dari 8 karakter.',
-        'newPassword.confirmed'    => 'Kata sandi baru dan konfirmasi tidak sama.',
+        'newPassword.required' => 'Kata sandi baru wajib diisi.',
+        'newPassword.string' => 'Kata sandi baru harus berupa teks.',
+        'newPassword.min' => 'Kata sandi baru minimal terdiri dari 8 karakter.',
+        'newPassword.confirmed' => 'Kata sandi baru dan konfirmasi tidak sama.',
 
         'confirmPassword.required' => 'Konfirmasi kata sandi wajib diisi.',
-        'confirmPassword.string'   => 'Konfirmasi kata sandi harus berupa teks.',
-        'confirmPassword.min'      => 'Konfirmasi kata sandi minimal terdiri dari 8 karakter.',
+        'confirmPassword.string' => 'Konfirmasi kata sandi harus berupa teks.',
+        'confirmPassword.min' => 'Konfirmasi kata sandi minimal terdiri dari 8 karakter.',
     ];
 
     public function changePassword()
@@ -45,7 +46,7 @@ class AdminChangePasswordIndex extends Component
 
             $user = auth()->user();
 
-            if (!Hash::check($this->currentPassword, $user->password)) {
+            if (! Hash::check($this->currentPassword, $user->password)) {
                 return AlertHelper::error('Error', 'Password Yang Anda Masukan Salah.');
             }
 
@@ -60,29 +61,32 @@ class AdminChangePasswordIndex extends Component
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Gagal mengubah kata sandi. Silakan coba lagi nanti: ' . $e->getMessage());
+            Log::error('Gagal mengubah kata sandi. Silakan coba lagi nanti: '.$e->getMessage());
+
             return AlertHelper::error('Error', 'Gagal mengubah kata sandi. Silakan coba lagi nanti.');
         }
+
         return AlertHelper::success('Berhasil', 'Kata sandi berhasil diubah.');
     }
 
     public function testPrint()
     {
-        $printerPath = "COM5"; // Windows (cek di Device Manager)
+        $printerPath = 'COM5'; // Windows (cek di Device Manager)
         // $printerPath = "/dev/rfcomm0"; // Linux
 
         $content = "Halo ini struk dari Laravel!\nTotal: Rp 50.000\n\n";
 
         // ESC/POS commands
         $esc = "\x1B";
-        $cut = $esc . "d" . "\x03"; // feed 3 line + cut
+        $cut = $esc.'d'."\x03"; // feed 3 line + cut
 
-        $fp = fopen($printerPath, "w");
+        $fp = fopen($printerPath, 'w');
         if ($fp) {
             fwrite($fp, $content);
             fwrite($fp, $cut);
             fclose($fp);
-            return "✅ Struk berhasil dicetak";
+
+            return '✅ Struk berhasil dicetak';
         } else {
             return "❌ Gagal membuka printer $printerPath";
         }

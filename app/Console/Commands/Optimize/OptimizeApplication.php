@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 
 class OptimizeApplication extends Command
 {
-   /**
+    /**
      * The name and signature of the console command.
      *
      * @var string
@@ -71,7 +71,7 @@ class OptimizeApplication extends Command
         }
 
         // Clear compiled services and packages
-        $this->line("  - Clearing compiled classes...");
+        $this->line('  - Clearing compiled classes...');
         $this->callSilent('clear-compiled');
 
         $this->info('✅ All caches cleared!');
@@ -99,14 +99,14 @@ class OptimizeApplication extends Command
         }
 
         // Additional production optimizations - with error handling
-        $this->line("  - Generating autoload files...");
+        $this->line('  - Generating autoload files...');
         try {
             exec('composer dump-autoload --optimize --no-dev --classmap-authoritative 2>&1', $output, $returnCode);
             if ($returnCode !== 0) {
-                $this->warn("Warning: Composer autoload optimization failed");
+                $this->warn('Warning: Composer autoload optimization failed');
             }
         } catch (\Exception $e) {
-            $this->warn("Warning: Could not optimize composer autoload");
+            $this->warn('Warning: Could not optimize composer autoload');
         }
 
         $this->info('✅ Production optimizations completed!');
@@ -162,9 +162,9 @@ class OptimizeApplication extends Command
             }
         }
 
-        if (!$hasIdeHelper) {
-            $this->line("  - IDE Helper not installed, skipping...");
-            $this->line("    Install with: composer require --dev barryvdh/laravel-ide-helper");
+        if (! $hasIdeHelper) {
+            $this->line('  - IDE Helper not installed, skipping...');
+            $this->line('    Install with: composer require --dev barryvdh/laravel-ide-helper');
         }
     }
 
@@ -197,13 +197,13 @@ class OptimizeApplication extends Command
     {
         $composerLock = base_path('composer.lock');
 
-        if (!file_exists($composerLock)) {
+        if (! file_exists($composerLock)) {
             return false;
         }
 
         $lockData = json_decode(file_get_contents($composerLock), true);
 
-        if (!$lockData) {
+        if (! $lockData) {
             return false;
         }
 

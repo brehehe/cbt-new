@@ -1,27 +1,34 @@
 <?php
+
 namespace App\Livewire\Admin\Master\RatingScale;
 
 use App\Helpers\AlertHelper;
-use Livewire\Component;
-use Livewire\WithPagination;
 use App\Models\Master\RatingScale\RatingScale;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
+use Livewire\Component;
 
 class AdminMasterRatingScaleIndex extends Component
 {
     public $search = '';
+
     public $data_id;
+
     public $grade_letter;
+
     public $min_score;
+
     public $max_score;
+
     public $description;
 
     // Inline add row properties
     public $new_grade_letter = '';
+
     public $new_min_score = '';
+
     public $new_description = '';
+
     public $calculated_max_score = null;
 
     public function openModal()
@@ -38,6 +45,7 @@ class AdminMasterRatingScaleIndex extends Component
             'max_score',
             'description',
         ]);
+
         return $this->dispatch('close-modal', ['id' => 'modal-rating-scale']);
     }
 
@@ -69,7 +77,8 @@ class AdminMasterRatingScaleIndex extends Component
         } catch (\Throwable $th) {
             DB::rollback();
             AlertHelper::error('Gagal', 'Data gagal dihapus!');
-            return Log::info('Gagal Menghapus Data Role : ' . $th);
+
+            return Log::info('Gagal Menghapus Data Role : '.$th);
         }
     }
 
@@ -104,7 +113,8 @@ class AdminMasterRatingScaleIndex extends Component
             ->first();
 
         if ($overlap) {
-            $this->addError('min_score', 'Rentang nilai tumpang tindih dengan Grade ' . $overlap->grade_letter . ' (' . $overlap->min_score . '-' . $overlap->max_score . ')');
+            $this->addError('min_score', 'Rentang nilai tumpang tindih dengan Grade '.$overlap->grade_letter.' ('.$overlap->min_score.'-'.$overlap->max_score.')');
+
             return;
         }
 
@@ -125,7 +135,8 @@ class AdminMasterRatingScaleIndex extends Component
         } catch (\Throwable $th) {
             DB::rollback();
             AlertHelper::error('Gagal', 'Data gagal disimpan!');
-            return Log::info('Gagal Menyimpan Data Rating Scale : ' . $th);
+
+            return Log::info('Gagal Menyimpan Data Rating Scale : '.$th);
         }
     }
 
@@ -141,8 +152,9 @@ class AdminMasterRatingScaleIndex extends Component
 
     public function updatedNewMinScore($value)
     {
-        if ($value === '' || !is_numeric($value)) {
+        if ($value === '' || ! is_numeric($value)) {
             $this->calculated_max_score = null;
+
             return;
         }
 
@@ -161,13 +173,13 @@ class AdminMasterRatingScaleIndex extends Component
     {
         $this->validate([
             'new_grade_letter' => 'required|string|max:10',
-            'new_min_score'    => 'required|numeric|min:0|max:100',
-            'new_description'  => 'required|string|max:255',
+            'new_min_score' => 'required|numeric|min:0|max:100',
+            'new_description' => 'required|string|max:255',
         ], [
             'new_grade_letter.required' => 'Grade wajib diisi.',
-            'new_min_score.required'    => 'Nilai wajib diisi.',
-            'new_min_score.numeric'     => 'Nilai harus berupa angka.',
-            'new_description.required'  => 'Deskripsi wajib diisi.',
+            'new_min_score.required' => 'Nilai wajib diisi.',
+            'new_min_score.numeric' => 'Nilai harus berupa angka.',
+            'new_description.required' => 'Deskripsi wajib diisi.',
         ]);
 
         $minScore = (float) $this->new_min_score;
@@ -186,7 +198,8 @@ class AdminMasterRatingScaleIndex extends Component
             ->first();
 
         if ($overlap) {
-            $this->addError('new_grade_letter', 'Grade ' . $this->new_grade_letter . ' sudah ada.');
+            $this->addError('new_grade_letter', 'Grade '.$this->new_grade_letter.' sudah ada.');
+
             return;
         }
 
@@ -194,10 +207,10 @@ class AdminMasterRatingScaleIndex extends Component
             DB::beginTransaction();
             RatingScale::create([
                 'grade_letter' => strtoupper(trim($this->new_grade_letter)),
-                'min_score'    => $minScore,
-                'max_score'    => $maxScore,
-                'description'  => $this->new_description,
-                'company_id'   => auth()->user()->company_id,
+                'min_score' => $minScore,
+                'max_score' => $maxScore,
+                'description' => $this->new_description,
+                'company_id' => auth()->user()->company_id,
             ]);
             DB::commit();
             AlertHelper::success('Berhasil', 'Data berhasil ditambahkan!');
@@ -205,7 +218,7 @@ class AdminMasterRatingScaleIndex extends Component
         } catch (\Throwable $th) {
             DB::rollback();
             AlertHelper::error('Gagal', 'Data gagal disimpan!');
-            Log::info('Gagal Menyimpan Data Rating Scale : ' . $th);
+            Log::info('Gagal Menyimpan Data Rating Scale : '.$th);
         }
     }
 
@@ -213,10 +226,10 @@ class AdminMasterRatingScaleIndex extends Component
     {
         $data = RatingScale::query()
             ->when($this->search, function ($query, $search) {
-                $query->where('grade_letter', 'ilike', '%' . $search . '%')
-                    ->orWhere('min_score', 'ilike', '%' . $search . '%')
-                    ->orWhere('max_score', 'ilike', '%' . $search . '%')
-                    ->orWhere('description', 'ilike', '%' . $search . '%');
+                $query->where('grade_letter', 'ilike', '%'.$search.'%')
+                    ->orWhere('min_score', 'ilike', '%'.$search.'%')
+                    ->orWhere('max_score', 'ilike', '%'.$search.'%')
+                    ->orWhere('description', 'ilike', '%'.$search.'%');
             })
             ->orderBy('order', 'asc')
             ->get();
@@ -225,7 +238,6 @@ class AdminMasterRatingScaleIndex extends Component
             'datas' => $data,
         ])
             ->extends('layout.app')
-            ->section('content')
-        ;
+            ->section('content');
     }
 }

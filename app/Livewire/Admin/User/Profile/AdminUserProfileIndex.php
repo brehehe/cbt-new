@@ -2,29 +2,41 @@
 
 namespace App\Livewire\Admin\User\Profile;
 
-use Livewire\Component;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Company\Company;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
 
 class AdminUserProfileIndex extends Component
 {
     public $user;
+
     public $canEdit = false;
+
     public $isEditing = false;
 
     // Form Properties
     public $name;
+
     public $email;
+
     public $username;
+
     public $phone;
+
     public $address;
+
     public $gender;
+
     public $birth_place;
+
     public $birth_date;
 
     // Role Specific
     public $nim;
+
     public $nidn;
+
     public $nip;
 
     protected function rules()
@@ -90,15 +102,15 @@ class AdminUserProfileIndex extends Component
 
     public function toggleEdit()
     {
-        $this->isEditing = !$this->isEditing;
-        if (!$this->isEditing) {
+        $this->isEditing = ! $this->isEditing;
+        if (! $this->isEditing) {
             $this->initForm(); // Reset if cancelling
         }
     }
 
     public function updateProfile()
     {
-        if (!$this->canEdit) {
+        if (! $this->canEdit) {
             return;
         }
 
@@ -141,14 +153,14 @@ class AdminUserProfileIndex extends Component
             $this->dispatch('swal:modal', [
                 'type' => 'error',
                 'title' => 'Gagal!',
-                'text' => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage(),
+                'text' => 'Terjadi kesalahan saat menyimpan data: '.$e->getMessage(),
             ]);
         }
     }
 
     public function render()
     {
-        $companyData = \App\Models\Company\Company::first();
+        $companyData = Company::first();
 
         return view('livewire.admin.user.profile.admin-user-profile-index');
     }

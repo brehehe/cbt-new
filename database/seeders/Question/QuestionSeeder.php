@@ -10,7 +10,6 @@ use App\Models\Master\Question\Question;
 use App\Models\Master\Question\QuestionType;
 use App\Models\Master\Question\Topic;
 use App\Models\Study\Study;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class QuestionSeeder extends Seeder

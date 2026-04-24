@@ -9,14 +9,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class ServiceMonth extends Model
 {
     //
-    use HasUuids, SoftDeletes, \App\Traits\LogsSystemActivity;
+    use \App\Traits\LogsSystemActivity, HasUuids, SoftDeletes;
 
     protected $guarded = ['id'];
 
     public function scopeSearch($query, $search)
     {
-        return $query->where('name', 'ilike', '%' . $search . '%')
-            ->orWhere('description', 'ilike', '%' . $search . '%');
+        return $query->where('name', 'ilike', '%'.$search.'%')
+            ->orWhere('description', 'ilike', '%'.$search.'%');
     }
 
     protected static function boot()

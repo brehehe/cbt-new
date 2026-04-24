@@ -2,29 +2,31 @@
 
 namespace App\Livewire\Admin\Master\Supervisor;
 
+use App\Exports\SupervisorExport;
 use App\Helpers\AlertHelper;
 use App\Helpers\RoleHelper;
+use App\Imports\User\SupervisorImport;
 use App\Models\User;
-use App\Models\UsrSecKey;
 use App\Models\User\UserDetail;
+use App\Models\UsrSecKey;
+use Hash;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Log;
-use Hash;
-use App\Exports\SupervisorExport;
-use App\Imports\User\SupervisorImport;
+use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Facades\Excel;
 
 class AdminMasterSupervisorIndex extends Component
 {
-    use WithPagination, WithFileUploads;
+    use WithFileUploads, WithPagination;
 
     protected $queryString = [
         // 'page' => ['except' => 1], // Ini akan menghapus ?page=1 dari URL
@@ -34,7 +36,9 @@ class AdminMasterSupervisorIndex extends Component
     ];
 
     public $search = '';
+
     public $statusFilter = '';
+
     public $departmentFilter = '';
 
     public $perPage = 5;
@@ -44,30 +48,51 @@ class AdminMasterSupervisorIndex extends Component
 
     // User
     public $data_id;
+
     public $name;
+
     public $username;
+
     public $email;
+
     public $password;
+
     public $profile;
+
     public $profile_old;
+
     public $phone;
 
     // User Detail
     public $address;
+
     public $supervisor_id;
+
     public $supervisor_nip;
+
     public $supervisor_department;
+
     public $supervisor_unit;
+
     public $supervisor_position;
+
     public $supervisor_level;
+
     public $supervisor_area;
+
     public $supervisor_specialization;
+
     public $supervisor_status;
+
     public $supervisor_type;
+
     public $supervisor_start_date;
+
     public $supervisor_experience_years;
+
     // public $identity_card;
     public $is_head = true;
+
     public $is_active = true;
 
     public function openModal()
@@ -106,9 +131,9 @@ class AdminMasterSupervisorIndex extends Component
         ]);
         $this->resetErrorBag();
         $this->resetValidation();
+
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
-
 
     public function edit($id)
     {
@@ -183,7 +208,7 @@ class AdminMasterSupervisorIndex extends Component
                     ->ignore($this->data_id),
             ],
             'address' => 'nullable|string|max:500',
-            'supervisor_id' => 'required|string|max:50|unique:user_details,supervisor_id,' . ($this->data_id ? $this->data_id : 'NULL') . ',user_id',
+            'supervisor_id' => 'required|string|max:50|unique:user_details,supervisor_id,'.($this->data_id ? $this->data_id : 'NULL').',user_id',
         ]);
 
         try {
@@ -193,9 +218,10 @@ class AdminMasterSupervisorIndex extends Component
             // Handle user creation/update
             $userResult = $this->handleUserIdentityResolution($currentCompanyId, $validatedData);
 
-            if (!$userResult['success']) {
+            if (! $userResult['success']) {
                 DB::rollBack();
                 $this->addError('general', $userResult['message']);
+
                 return;
             }
 
@@ -219,6 +245,7 @@ class AdminMasterSupervisorIndex extends Component
             // Handle validation errors
             DB::rollBack();
             $this->setErrorBag($e->validator->getMessageBag());
+
             return;
         } catch (\Exception $e) {
             // Handle general errors
@@ -227,7 +254,7 @@ class AdminMasterSupervisorIndex extends Component
             $errorMessage = 'Pengguna gagal disimpan.';
 
             // Log detailed error for debugging
-            Log::error('Error saving user: ' . $e->getMessage(), [
+            Log::error('Error saving user: '.$e->getMessage(), [
                 'user_id' => Auth::id(),
                 'company_id' => $currentCompanyId,
                 'data' => [
@@ -241,7 +268,7 @@ class AdminMasterSupervisorIndex extends Component
 
             // Show user-friendly error message
             if (app()->environment('local')) {
-                $errorMessage .= ' Error: ' . $e->getMessage();
+                $errorMessage .= ' Error: '.$e->getMessage();
             }
 
             AlertHelper::error('Gagal', $errorMessage);
@@ -250,7 +277,7 @@ class AdminMasterSupervisorIndex extends Component
             // Handle any other throwable errors
             DB::rollBack();
 
-            Log::error('Critical error saving user: ' . $th->getMessage(), [
+            Log::error('Critical error saving user: '.$th->getMessage(), [
                 'user_id' => Auth::id(),
                 'company_id' => $currentCompanyId,
                 'trace' => $th->getTraceAsString(),
@@ -300,7 +327,7 @@ class AdminMasterSupervisorIndex extends Component
     protected function updateExistingUser($companyId, $validatedData)
     {
         $user = User::find($this->data_id);
-        if (!$user) {
+        if (! $user) {
             throw new \Exception('User tidak ditemukan');
         }
 
@@ -320,12 +347,12 @@ class AdminMasterSupervisorIndex extends Component
         ];
 
         // Handle password update
-        if (!empty($validatedData['password'])) {
+        if (! empty($validatedData['password'])) {
             $updateData['password'] = Hash::make($validatedData['password']);
         }
 
         // Handle profile image
-        if ($this->profile && $this->profile instanceof \Illuminate\Http\UploadedFile) {
+        if ($this->profile && $this->profile instanceof UploadedFile) {
             // Delete old profile if exists
             if ($user->profile && Storage::disk('public')->exists($user->profile)) {
                 Storage::disk('public')->delete($user->profile);
@@ -333,7 +360,7 @@ class AdminMasterSupervisorIndex extends Component
             $updateData['profile'] = $this->profile->store('profiles', 'public');
         }
 
-        if (!empty($validatedData['password'])) {
+        if (! empty($validatedData['password'])) {
             UsrSecKey::where('user_id', $user->id)->where('company_id', $companyId)->update([
                 'sec_val' => encrypt($validatedData['password']),
             ]);
@@ -365,7 +392,7 @@ class AdminMasterSupervisorIndex extends Component
         ];
 
         // Handle profile image
-        if ($this->profile && $this->profile instanceof \Illuminate\Http\UploadedFile) {
+        if ($this->profile && $this->profile instanceof UploadedFile) {
             $createData['profile'] = $this->profile->store('profiles', 'public');
         }
 
@@ -443,10 +470,11 @@ class AdminMasterSupervisorIndex extends Component
     public function export()
     {
         try {
-            $fileName = 'supervisor_export_' . date('YmdHis') . '.xlsx';
-            return Excel::download(new SupervisorExport(), $fileName);
+            $fileName = 'supervisor_export_'.date('YmdHis').'.xlsx';
+
+            return Excel::download(new SupervisorExport, $fileName);
         } catch (\Exception $e) {
-            Log::error('Supervisor Export Error: ' . $e->getMessage());
+            Log::error('Supervisor Export Error: '.$e->getMessage());
             AlertHelper::error('Gagal', 'Gagal mengekspor data pengawas.');
         }
     }
@@ -458,15 +486,15 @@ class AdminMasterSupervisorIndex extends Component
                 'importFile' => 'required|mimes:xlsx,xls|max:5120', // max 5MB
             ]);
 
-            Excel::import(new SupervisorImport(), $this->importFile);
+            Excel::import(new SupervisorImport, $this->importFile);
 
             $this->reset('importFile');
             AlertHelper::success('Berhasil', 'Data pengawas berhasil diimpor.');
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             AlertHelper::error('Gagal', 'File tidak valid. Pastikan format file adalah Excel (.xlsx atau .xls).');
         } catch (\Exception $e) {
-            Log::error('Supervisor Import Error: ' . $e->getMessage());
-            AlertHelper::error('Gagal', 'Gagal mengimpor data pengawas: ' . $e->getMessage());
+            Log::error('Supervisor Import Error: '.$e->getMessage());
+            AlertHelper::error('Gagal', 'Gagal mengimpor data pengawas: '.$e->getMessage());
         }
     }
 
@@ -475,17 +503,27 @@ class AdminMasterSupervisorIndex extends Component
         try {
             // Create a simple template with headers
             $headers = [
-                ['Name', 'Username', 'Email', 'Phone', 'Password', 'Position', 'Address']
+                ['Name', 'Username', 'Email', 'Phone', 'Password', 'Position', 'Address'],
             ];
 
             $fileName = 'supervisor_template.xlsx';
-            return Excel::download(new class($headers) implements \Maatwebsite\Excel\Concerns\FromArray {
+
+            return Excel::download(new class($headers) implements FromArray
+            {
                 private $data;
-                public function __construct($data) { $this->data = $data; }
-                public function array(): array { return $this->data; }
+
+                public function __construct($data)
+                {
+                    $this->data = $data;
+                }
+
+                public function array(): array
+                {
+                    return $this->data;
+                }
             }, $fileName);
         } catch (\Exception $e) {
-            Log::error('Supervisor Template Download Error: ' . $e->getMessage());
+            Log::error('Supervisor Template Download Error: '.$e->getMessage());
             AlertHelper::error('Gagal', 'Gagal mengunduh template.');
         }
     }
@@ -505,7 +543,7 @@ class AdminMasterSupervisorIndex extends Component
         }
 
         // Filter by department if selected
-        if (!empty($this->departmentFilter)) {
+        if (! empty($this->departmentFilter)) {
             $query->whereHas('userDetail', function ($q) {
                 $q->where('supervisor_department', $this->departmentFilter);
             });

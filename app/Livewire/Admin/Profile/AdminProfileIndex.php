@@ -2,30 +2,41 @@
 
 namespace App\Livewire\Admin\Profile;
 
-use Livewire\Component;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Company\Company;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
 
 class AdminProfileIndex extends Component
 {
-
     public $user;
+
     public $canEdit = false;
+
     public $isEditing = false;
 
     // Form Properties
     public $name;
+
     public $email;
+
     public $username;
+
     public $phone;
+
     public $address;
+
     public $gender;
+
     public $birth_place;
+
     public $birth_date;
 
     // Role Specific
     public $nim;
+
     public $nidn;
+
     public $nip;
 
     protected function rules()
@@ -91,15 +102,15 @@ class AdminProfileIndex extends Component
 
     public function toggleEdit()
     {
-        $this->isEditing = !$this->isEditing;
-        if (!$this->isEditing) {
+        $this->isEditing = ! $this->isEditing;
+        if (! $this->isEditing) {
             $this->initForm(); // Reset if cancelling
         }
     }
 
     public function updateProfile()
     {
-        if (!$this->canEdit) {
+        if (! $this->canEdit) {
             return;
         }
 
@@ -142,7 +153,7 @@ class AdminProfileIndex extends Component
             $this->dispatch('swal:modal', [
                 'type' => 'error',
                 'title' => 'Gagal!',
-                'text' => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage(),
+                'text' => 'Terjadi kesalahan saat menyimpan data: '.$e->getMessage(),
             ]);
         }
     }
@@ -150,14 +161,14 @@ class AdminProfileIndex extends Component
     public function render()
     {
         // Explicitly fetch company data with correct namespace
-        $companyData = \App\Models\Company\Company::first();
+        $companyData = Company::first();
 
         return view('livewire.admin.profile.admin-profile-index', [
             'user' => $this->user,
             'canEdit' => $this->canEdit,
             'companyData' => $companyData,
         ])
-        ->extends('layout.app')
-        ->section('content');
+            ->extends('layout.app')
+            ->section('content');
     }
 }

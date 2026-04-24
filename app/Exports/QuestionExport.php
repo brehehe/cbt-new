@@ -2,14 +2,13 @@
 
 namespace App\Exports;
 
-use App\Models\Master\Question\Question;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Illuminate\Support\Collection;
 
-class QuestionExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize
+class QuestionExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping
 {
     protected $questions;
 
@@ -19,16 +18,13 @@ class QuestionExport implements FromCollection, WithHeadings, WithMapping, Shoul
     }
 
     /**
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function collection()
     {
         return $this->questions;
     }
 
-    /**
-     * @return array
-     */
     public function headings(): array
     {
         return [
@@ -49,15 +45,14 @@ class QuestionExport implements FromCollection, WithHeadings, WithMapping, Shoul
     }
 
     /**
-     * @param mixed $question
-     * @return array
+     * @param  mixed  $question
      */
     public function map($question): array
     {
         static $no = 0;
         $no++;
 
-        $typeLabel = match($question->type) {
+        $typeLabel = match ($question->type) {
             'single' => 'Single (PG)',
             'multiple' => 'Multiple',
             'essay' => 'Essay',
@@ -66,7 +61,7 @@ class QuestionExport implements FromCollection, WithHeadings, WithMapping, Shoul
 
         $options = [];
         $correctKey = '-';
-        
+
         $alphabets = ['A', 'B', 'C', 'D', 'E'];
         foreach ($alphabets as $alphabet) {
             $answer = $question->answers->firstWhere('alphabet', $alphabet);

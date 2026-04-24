@@ -11,7 +11,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class RoleCompany extends Model
 {
     //
-    use SoftDeletes, HasUuids, \App\Traits\LogsSystemActivity;
+    use \App\Traits\LogsSystemActivity, HasUuids, SoftDeletes;
+
     protected $guarded = ['id'];
 
     public function company()
@@ -39,11 +40,12 @@ class RoleCompany extends Model
     {
         if ($search) {
             $query->whereHas('role', function ($q) use ($search) {
-                $q->where('name', 'ilike', '%' . $search . '%');
+                $q->where('name', 'ilike', '%'.$search.'%');
             })->orWhereHas('company', function ($q) use ($search) {
-                $q->where('name', 'ilike', '%' . $search . '%');
+                $q->where('name', 'ilike', '%'.$search.'%');
             });
         }
+
         return $query;
 
     }

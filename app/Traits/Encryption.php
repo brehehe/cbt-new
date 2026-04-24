@@ -8,16 +8,16 @@ trait Encryption
 {
     //
 
-    public static function encrypted ($string)
+    public static function encrypted($string)
     {
         if ($string == null) {
             return null;
         }
-        
+
         return Crypt::encryptString($string);
     }
 
-    public static function decrypted ($string)
+    public static function decrypted($string)
     {
         if ($string == null) {
             return null;

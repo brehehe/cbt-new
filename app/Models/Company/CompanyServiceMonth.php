@@ -2,7 +2,6 @@
 
 namespace App\Models\Company;
 
-use App\Models\Company\Company;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,7 +9,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class CompanyServiceMonth extends Model
 {
     //
-    use SoftDeletes, HasUuids, \App\Traits\LogsSystemActivity;
+    use \App\Traits\LogsSystemActivity, HasUuids, SoftDeletes;
+
     protected $guarded = ['id'];
 
     public function company()

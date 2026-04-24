@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Jobs\Question\QuestionImportJob;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,7 @@ class QuestionPaketSeeder extends Seeder
         try {
             $folderPath = database_path('seeders/csvs');
             $files = File::files($folderPath);
-            $user = Auth::user() ?? \App\Models\User::first(); // fallback kalau seeder tanpa auth
+            $user = Auth::user() ?? User::first(); // fallback kalau seeder tanpa auth
             $study_id = 'seeded_study_auto'; // dummy id untuk Job
 
             // Paket dari .env
@@ -45,6 +46,7 @@ class QuestionPaketSeeder extends Seeder
 
                 if ($rows[0] !== $header) {
                     Log::warning("Header tidak sesuai di file {$filename}");
+
                     continue;
                 }
 
@@ -59,7 +61,7 @@ class QuestionPaketSeeder extends Seeder
                 $selected = array_slice($rows, 0, $count);
 
                 // Ubah ke Collection agar sama dengan struktur QuestionImport
-                $collection = new Collection();
+                $collection = new Collection;
                 $collection->push(collect($header)); // header baris pertama
 
                 foreach ($selected as $row) {
@@ -76,8 +78,8 @@ class QuestionPaketSeeder extends Seeder
         } catch (\Throwable $th) {
             Log::error('Gagal menjalankan QuestionPaketSeeder', [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ]);
         }
     }

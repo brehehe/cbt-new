@@ -12,19 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('modules', function (Blueprint $table) {
-            if (!Schema::hasColumn('modules', 'is_simulation')) {
+            if (! Schema::hasColumn('modules', 'is_simulation')) {
                 $table->enum('is_simulation', ['true', 'false'])->default('false')->index();
             }
         });
 
         Schema::table('questions', function (Blueprint $table) {
-            if (!Schema::hasColumn('questions', 'is_simulation')) {
+            if (! Schema::hasColumn('questions', 'is_simulation')) {
                 $table->enum('is_simulation', ['true', 'false'])->default('false')->index();
             }
         });
 
         Schema::table('timetables', function (Blueprint $table) {
-            if (!Schema::hasColumn('timetables', 'is_simulation')) {
+            if (! Schema::hasColumn('timetables', 'is_simulation')) {
                 $table->enum('is_simulation', ['true', 'false'])->default('false')->index();
             }
         });
@@ -38,7 +38,7 @@ return new class extends Migration
         Schema::table('modules', function (Blueprint $table) {
             $table->dropColumn('is_simulation');
         });
-        
+
         Schema::table('questions', function (Blueprint $table) {
             $table->dropColumn('is_simulation');
         });

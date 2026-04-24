@@ -6,6 +6,7 @@ use App\Helpers\RoleHelper;
 use App\Models\Study\Study;
 use App\Models\User;
 use App\Models\User\UserDetail;
+use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -14,7 +15,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Exception;
 
 class StudentImport implements ToCollection, WithHeadingRow
 {
@@ -25,9 +25,6 @@ class StudentImport implements ToCollection, WithHeadingRow
         $this->typeStudy = $typeStudy;
     }
 
-    /**
-     * @param Collection $rows
-     */
     public function collection(Collection $rows)
     {
         try {
@@ -40,19 +37,19 @@ class StudentImport implements ToCollection, WithHeadingRow
                 try {
                     DB::beginTransaction();
 
-                    $resolvedTypeStudy = $this->typeStudy ?? (!empty($row['type_study']) ? $row['type_study'] : 'general');
+                    $resolvedTypeStudy = $this->typeStudy ?? (! empty($row['type_study']) ? $row['type_study'] : 'general');
 
                     // Validate required fields
                     if (empty($row['name']) || empty($row['nim']) || empty($row['email'])) {
-                        throw new Exception("Row " . ($index + 2) . ": Name, NIM, and Email are required");
+                        throw new Exception('Row '.($index + 2).': Name, NIM, and Email are required');
                     }
 
                     if ($resolvedTypeStudy === 'general' && empty($row['username'])) {
-                        throw new Exception("Row " . ($index + 2) . ": Username is required for general");
+                        throw new Exception('Row '.($index + 2).': Username is required for general');
                     }
 
                     // Check if user already exists
-                    $existingUser = User::where(function ($query) use ($row, $currentCompanyId) {
+                    $existingUser = User::where(function ($query) use ($row) {
                         $query->where('email', $row['email'])
                             ->orWhere('nim', $row['nim']);
                     })
@@ -61,20 +58,20 @@ class StudentImport implements ToCollection, WithHeadingRow
                         ->first();
 
                     if ($existingUser) {
-                        throw new Exception("Row " . ($index + 2) . ": User with email/NIM already exists");
+                        throw new Exception('Row '.($index + 2).': User with email/NIM already exists');
                     }
 
                     // Get study_id if program_studi is provided
                     $studyId = null;
-                    if (!empty($row['program_studi'])) {
-                        $study = Study::where('name', 'LIKE', '%' . $row['program_studi'] . '%')->first();
+                    if (! empty($row['program_studi'])) {
+                        $study = Study::where('name', 'LIKE', '%'.$row['program_studi'].'%')->first();
                         if ($study) {
                             $studyId = $study->id;
                         }
                     }
 
                     // Default password if not provided
-                    $password = !empty($row['password']) ? $row['password'] : 'password123';
+                    $password = ! empty($row['password']) ? $row['password'] : 'password123';
                     $typeStudy = $resolvedTypeStudy;
 
                     // Create user
@@ -102,7 +99,7 @@ class StudentImport implements ToCollection, WithHeadingRow
                     ];
 
                     // Handle identity_number encryption if provided
-                    if (!empty($row['identity_number'])) {
+                    if (! empty($row['identity_number'])) {
                         try {
                             $detailData['identity_number'] = Crypt::encryptString($row['identity_number']);
                         } catch (Exception $e) {
@@ -131,23 +128,23 @@ class StudentImport implements ToCollection, WithHeadingRow
                     DB::rollBack();
                     $errorCount++;
                     $errors[] = $e->getMessage();
-                    Log::error("Student Import Error: " . $e->getMessage());
+                    Log::error('Student Import Error: '.$e->getMessage());
                 }
             }
 
             // Log summary
-            Log::info("Student Import Completed", [
+            Log::info('Student Import Completed', [
                 'success' => $successCount,
                 'errors' => $errorCount,
-                'details' => $errors
+                'details' => $errors,
             ]);
-        } catch (Exception | \Throwable $th) {
+        } catch (Exception|\Throwable $th) {
             $error = [
                 'message' => $th->getMessage(),
                 'file' => $th->getFile(),
                 'line' => $th->getLine(),
             ];
-            Log::error("Student Import Failed", $error);
+            Log::error('Student Import Failed', $error);
             throw $th;
         }
     }

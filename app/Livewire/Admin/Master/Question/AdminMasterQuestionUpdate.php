@@ -2,81 +2,139 @@
 
 namespace App\Livewire\Admin\Master\Question;
 
-use Storage;
-use Exception;
-use Throwable;
-use Livewire\Component;
-use Illuminate\Support\Str;
 use App\Helpers\AlertHelper;
-use Livewire\WithFileUploads;
+use App\Models\Category\CategoryQuestion;
+use App\Models\Master\Question\Answer;
+use App\Models\Master\Question\Material;
+use App\Models\Master\Question\MaterialCategory;
+use App\Models\Master\Question\Question;
+use App\Models\Master\Question\QuestionType;
+use App\Models\Master\Question\Topic;
+use App\Models\Study\Study;
+use App\Services\Answer\AnswerService;
+use App\Services\Question\QuestionService;
+use App\Traits\UploadFile;
+use Carbon\Carbon;
+use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Master\Question\Topic;
-use App\Models\Master\Question\Answer;
-use App\Services\Answer\AnswerService;
-use App\Models\Master\Question\Material;
-use App\Models\Category\CategoryQuestion;
-use App\Models\Master\Question\Question;
-use App\Services\Question\QuestionService;
-use App\Models\Master\Question\QuestionType;
-use App\Models\Master\Question\MaterialCategory;
-use App\Traits\UploadFile;
-use App\Models\Study\Study;
+use Illuminate\Support\Str;
+use Livewire\Component;
+use Livewire\WithFileUploads;
+use Storage;
+use Throwable;
 
 class AdminMasterQuestionUpdate extends Component
 {
-    use WithFileUploads, UploadFile;
+    use UploadFile, WithFileUploads;
+
     public $search;
 
     public $isEditingAnswer = false;
 
     public $get_question;
-    public $data_id, $topic_id, $material_category_id, $material_id, $question_type_id, $type, $question, $description, $latex, $weight_correct, $weight_incorrect,$category_question_id;
-    public $topics = [], $material_categories = [], $materials = [], $question_types = [], $category_questions = [];
-    public $images = [], $old_images = [], $new_images = [];
 
-    public $answer_id, $answer_context, $answer_description, $answer_latex, $answer_correct, $answer_alphabet;
-    public $answer_images = [], $old_answer_images = [], $answer_new_images = [];
-    public $studys = [], $study_id;
+    public $data_id;
+
+    public $topic_id;
+
+    public $material_category_id;
+
+    public $material_id;
+
+    public $question_type_id;
+
+    public $type;
+
+    public $question;
+
+    public $description;
+
+    public $latex;
+
+    public $weight_correct;
+
+    public $weight_incorrect;
+
+    public $category_question_id;
+
+    public $topics = [];
+
+    public $material_categories = [];
+
+    public $materials = [];
+
+    public $question_types = [];
+
+    public $category_questions = [];
+
+    public $images = [];
+
+    public $old_images = [];
+
+    public $new_images = [];
+
+    public $answer_id;
+
+    public $answer_context;
+
+    public $answer_description;
+
+    public $answer_latex;
+
+    public $answer_correct;
+
+    public $answer_alphabet;
+
+    public $answer_images = [];
+
+    public $old_answer_images = [];
+
+    public $answer_new_images = [];
+
+    public $studys = [];
+
+    public $study_id;
 
     public function render()
     {
         $answers = $this->get_question->answers()->orderBy('order', 'asc')->orderBy('alphabet', 'asc')->search($this->search)->get();
+
         return view('livewire.admin.master.question.admin-master-question-update', [
-            'answers' => $answers
+            'answers' => $answers,
         ])->extends('layout.app')->section('content');
     }
 
     public function mount($id)
     {
-        $this->get_question         = Question::findOrFail($id);
-        $this->data_id              = $this->get_question?->id;
+        $this->get_question = Question::findOrFail($id);
+        $this->data_id = $this->get_question?->id;
         $this->normalizeAnswerAlphabet($this->data_id);
-        $this->topic_id             = $this->get_question?->topic_id;
+        $this->topic_id = $this->get_question?->topic_id;
         $this->material_category_id = $this->get_question?->material_category_id;
-        $this->material_id          = $this->get_question?->material_id;
-        $this->question_type_id     = $this->get_question?->question_type_id;
-        $this->type                 = $this->get_question?->type ?? \App\Models\Master\Question\Question::TYPE_SINGLE;
-        $this->question             = $this->get_question?->question;
-        $this->description          = $this->get_question?->description;
-        $this->latex                = $this->get_question?->latex;
-        $this->weight_correct       = $this->get_question?->weight_correct;
-        $this->weight_incorrect     = $this->get_question?->weight_incorrect;
+        $this->material_id = $this->get_question?->material_id;
+        $this->question_type_id = $this->get_question?->question_type_id;
+        $this->type = $this->get_question?->type ?? Question::TYPE_SINGLE;
+        $this->question = $this->get_question?->question;
+        $this->description = $this->get_question?->description;
+        $this->latex = $this->get_question?->latex;
+        $this->weight_correct = $this->get_question?->weight_correct;
+        $this->weight_incorrect = $this->get_question?->weight_incorrect;
         $this->category_question_id = $this->get_question?->category_question_id;
-        $this->topics              = Topic::select('id', 'name')->get();
+        $this->topics = Topic::select('id', 'name')->get();
         $this->material_categories = MaterialCategory::select('id', 'topic_id', 'name')->where('topic_id', $this->get_question?->topic_id)->get();
-        $this->question_types      = QuestionType::select('id', 'name')->get();
-        $this->category_questions  = CategoryQuestion::select('id', 'name')->get();
-        $this->materials           = Material::select('id', 'material_category_id', 'name')->where('material_category_id', $this->get_question?->material_category_id)->get();
+        $this->question_types = QuestionType::select('id', 'name')->get();
+        $this->category_questions = CategoryQuestion::select('id', 'name')->get();
+        $this->materials = Material::select('id', 'material_category_id', 'name')->where('material_category_id', $this->get_question?->material_category_id)->get();
 
         foreach (json_decode($this->get_question?->images, true) ?? [] as $image) {
             // Normalize path to strip /storage/ prefix for internal array handling
             $cleanPath = Str::after($image, '/storage/');
             $cleanPath = ltrim($cleanPath, '/');
-            
+
             $this->old_images[] = $cleanPath;
-            $this->images[]     = $cleanPath;
+            $this->images[] = $cleanPath;
         }
 
         // if (Auth::user()?->hasRole('Dosen')) {
@@ -115,7 +173,7 @@ class AdminMasterQuestionUpdate extends Component
             return empty($answer->alphabet) || (int) $answer->order <= 0;
         });
 
-        if (!$needsUpdate) {
+        if (! $needsUpdate) {
             return;
         }
 
@@ -139,7 +197,7 @@ class AdminMasterQuestionUpdate extends Component
 
     public function updatedTopicId($value)
     {
-        $value = !$value ? null : $value;
+        $value = ! $value ? null : $value;
         $this->material_category_id = null;
         $this->material_id = null;
         $this->material_categories = MaterialCategory::select('id', 'topic_id', 'name')
@@ -155,7 +213,7 @@ class AdminMasterQuestionUpdate extends Component
     public function delete($id)
     {
         $answerId = is_array($id) ? ($id[0] ?? null) : $id;
-        if (!$answerId) {
+        if (! $answerId) {
             return AlertHelper::error('Gagal', 'ID jawaban tidak valid.');
         }
 
@@ -170,14 +228,15 @@ class AdminMasterQuestionUpdate extends Component
             $this->normalizeAnswerAlphabet($this->data_id);
 
             DB::commit();
-        } catch (Exception | Throwable $th) {
+        } catch (Exception|Throwable $th) {
             DB::rollBack();
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterQuestionUpdate => delete', $error);
+
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menghapus jawaban');
         }
 
@@ -186,7 +245,7 @@ class AdminMasterQuestionUpdate extends Component
 
     public function updatedMaterialCategoryId($value)
     {
-        $value = !$value ? null : $value;
+        $value = ! $value ? null : $value;
         $this->material_id = null;
         $this->materials = Material::select('id', 'material_category_id', 'name')
             ->where('material_category_id', $value)
@@ -195,7 +254,7 @@ class AdminMasterQuestionUpdate extends Component
 
     public function updatedCategoryQuestionId($value)
     {
-        $this->category_question_id = !$value ? null : $value;
+        $this->category_question_id = ! $value ? null : $value;
     }
 
     public function submitQuestion()
@@ -204,37 +263,37 @@ class AdminMasterQuestionUpdate extends Component
 
         $this->validate(
             [
-                'topic_id'             => 'required|exists:topics,id',
+                'topic_id' => 'required|exists:topics,id',
                 'material_category_id' => 'nullable|exists:material_categories,id',
-                'material_id'          => 'nullable|exists:materials,id',
-                'question_type_id'     => 'required|exists:question_types,id',
-                'type'                 => 'required|in:single,multiple,essay',
-                'question'             => 'required',
-                'study_id'             => 'required|exists:studies,id',
+                'material_id' => 'nullable|exists:materials,id',
+                'question_type_id' => 'required|exists:question_types,id',
+                'type' => 'required|in:single,multiple,essay',
+                'question' => 'required',
+                'study_id' => 'required|exists:studies,id',
                 // 'images.*'             => 'nullable|image|mimes:jpg,jpeg,png',
-                'description'          => 'nullable',
-                'category_question_id'  => 'nullable|exists:category_questions,id',
-                    'latex'                => 'nullable',
+                'description' => 'nullable',
+                'category_question_id' => 'nullable|exists:category_questions,id',
+                'latex' => 'nullable',
             ],
             [
-                'study_id.required'           => 'Prodi wajib diisi.',
-                'topic_id.required'           => 'Topik soal wajib diisi.',
+                'study_id.required' => 'Prodi wajib diisi.',
+                'topic_id.required' => 'Topik soal wajib diisi.',
                 'material_category_id.exists' => 'Kategori materi soal tidak valid.',
-                'material_id.exists'          => 'Materi soal tidak valid.',
-                'question_type_id.required'   => 'Tipe Ujian wajib diisi.',
-                'question_type_id.exists'     => 'Tipe Ujian tidak valid.',
-                'type.required'               => 'Jenis soal wajib diisi.',
-                'type.in'                     => 'Jenis soal tidak valid.',
-                'question.required'           => 'Pertanyaan wajib diisi.',
-                'images.*.image'              => 'Gambar wajib berupa gambar.',
-                'images.*.mimes'              => 'Gambar hanya berformat : .jpg, .jpeg, .png.',
+                'material_id.exists' => 'Materi soal tidak valid.',
+                'question_type_id.required' => 'Tipe Ujian wajib diisi.',
+                'question_type_id.exists' => 'Tipe Ujian tidak valid.',
+                'type.required' => 'Jenis soal wajib diisi.',
+                'type.in' => 'Jenis soal tidak valid.',
+                'question.required' => 'Pertanyaan wajib diisi.',
+                'images.*.image' => 'Gambar wajib berupa gambar.',
+                'images.*.mimes' => 'Gambar hanya berformat : .jpg, .jpeg, .png.',
                 'category_question_id.exists' => 'Kategori soal tidak valid.',
             ]
         );
 
         try {
             DB::beginTransaction();
-            
+
             // Debug: Log data yang akan dikirim ke service
             Log::info('📝 Livewire submit gambar soal', [
                 'total_images' => count($this->images),
@@ -242,46 +301,48 @@ class AdminMasterQuestionUpdate extends Component
                 'images' => $this->images,
                 'old_images' => $this->old_images,
             ]);
-            
+
             $request = [
-                'id'                   => $this->data_id,
-                'company_id'           => Auth::user()?->company?->id,
-                'topic_id'             => $this->topic_id,
+                'id' => $this->data_id,
+                'company_id' => Auth::user()?->company?->id,
+                'topic_id' => $this->topic_id,
                 'material_category_id' => $this->material_category_id,
-                'material_id'          => $this->material_id,
-                'question_type_id'     => $this->question_type_id,
-                'type'                 => $this->type ?? \App\Models\Master\Question\Question::TYPE_SINGLE,
-                'question'             => $this->question,
-                'images'               => $this->images,
-                'study_id'             => $this->study_id,
-                'old_images'           => $this->old_images,
-                'description'          => $this->description,
-                'weight_correct'       => $this->weight_correct,
-                'weight_incorrect'     => $this->weight_incorrect,
+                'material_id' => $this->material_id,
+                'question_type_id' => $this->question_type_id,
+                'type' => $this->type ?? Question::TYPE_SINGLE,
+                'question' => $this->question,
+                'images' => $this->images,
+                'study_id' => $this->study_id,
+                'old_images' => $this->old_images,
+                'description' => $this->description,
+                'weight_correct' => $this->weight_correct,
+                'weight_incorrect' => $this->weight_incorrect,
                 'category_question_id' => $this->category_question_id,
-                    'latex'                => $this->latex,
+                'latex' => $this->latex,
             ];
 
             $question = app(QuestionService::class)->updateOrCreate($request);
-            if (!$question) {
-                throw new Exception("Ada kesalahaan saat QuestionService => updateOrCreate", 500);
+            if (! $question) {
+                throw new Exception('Ada kesalahaan saat QuestionService => updateOrCreate', 500);
             }
-            
+
             $this->get_question = $question;
 
             DB::commit();
-        } catch (Exception | Throwable $th) {
+        } catch (Exception|Throwable $th) {
             DB::rollBack();
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterQuestionUpdate => submitQuestion', $error);
+
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
         }
 
         $this->closeModal();
+
         return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
     }
 
@@ -292,13 +353,14 @@ class AdminMasterQuestionUpdate extends Component
         $this->answer_correct = false;
         $this->dispatch('reset-answer-latex-preview');
         $this->dispatch('sync-answer-latex-preview');
+
         return $this->dispatch('open-modal', ['id' => 'modal']);
     }
 
     public function closeModal()
     {
         $this->resetValidation();
-        
+
         // Reset gambar ke state database agar perubahan filepond tidak disimpan jika dibatalkan
         $this->images = [];
         $this->old_images = [];
@@ -306,12 +368,13 @@ class AdminMasterQuestionUpdate extends Component
             $cleanPath = Str::after($image, '/storage/');
             $cleanPath = ltrim($cleanPath, '/');
             $this->old_images[] = $cleanPath;
-            $this->images[]     = $cleanPath;
+            $this->images[] = $cleanPath;
         }
-        
+
         $this->reset(['answer_id', 'answer_context', 'answer_description', 'answer_latex', 'answer_correct', 'answer_images', 'old_answer_images', 'answer_alphabet']);
         $this->dispatch('close-modal', ['id' => 'modal-images']);
         $this->dispatch('close-modal', ['id' => 'modal-answer-images']);
+
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
 
@@ -320,14 +383,14 @@ class AdminMasterQuestionUpdate extends Component
         // Reset dan reload gambar dari database agar filepond menampilkan state terbaru
         $this->images = [];
         $this->old_images = [];
-        
+
         foreach (json_decode($this->get_question?->images, true) ?? [] as $image) {
             $cleanPath = Str::after($image, '/storage/');
             $cleanPath = ltrim($cleanPath, '/');
             $this->old_images[] = $cleanPath;
-            $this->images[]     = $cleanPath;
+            $this->images[] = $cleanPath;
         }
-        
+
         return $this->dispatch('open-modal', ['id' => 'modal-images']);
     }
 
@@ -336,10 +399,10 @@ class AdminMasterQuestionUpdate extends Component
         $this->answer_correct = (bool) $this->answer_correct;
         $this->validate(
             [
-                'answer_context'     => 'required',
+                'answer_context' => 'required',
                 // 'answer_images.*'    => 'nullable|image|mimes:jpg,jpeg,png',
                 'answer_description' => 'nullable',
-                    'answer_latex'       => 'nullable',
+                'answer_latex' => 'nullable',
             ],
             [
                 'answer_context.required' => 'Konteks jawaban wajib diisi.',
@@ -350,7 +413,7 @@ class AdminMasterQuestionUpdate extends Component
 
         try {
             DB::beginTransaction();
-            
+
             // Debug: Log data yang akan dikirim ke service
             Log::info('📝 Livewire submit gambar jawaban', [
                 'total_images' => count($this->answer_images),
@@ -358,67 +421,70 @@ class AdminMasterQuestionUpdate extends Component
                 'answer_images' => $this->answer_images,
                 'old_answer_images' => $this->old_answer_images,
             ]);
-            
+
             $request = [
-                'id'         => $this->answer_id,
+                'id' => $this->answer_id,
                 'company_id' => Auth::user()?->company?->id,
-                'alphabet'   => $this->answer_alphabet,
-                'context'    => $this->answer_context,
-                'images'     => $this->answer_images,
+                'alphabet' => $this->answer_alphabet,
+                'context' => $this->answer_context,
+                'images' => $this->answer_images,
                 'old_images' => $this->old_answer_images,
                 'is_correct' => (bool) $this->answer_correct,
-                    'latex'      => $this->answer_latex,
+                'latex' => $this->answer_latex,
             ];
 
             $answer = app(AnswerService::class)->updateOrCreate($this->get_question, $request);
-            if (!$answer) {
-                throw new Exception("Ada kesalahaan saat AnswerService => updateOrCreate", 500);
+            if (! $answer) {
+                throw new Exception('Ada kesalahaan saat AnswerService => updateOrCreate', 500);
             }
 
             DB::commit();
-        } catch (Exception | Throwable $th) {
+        } catch (Exception|Throwable $th) {
             DB::rollBack();
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterQuestionUpdate => submitAnswer', $error);
+
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
         }
 
         $this->closeModal();
+
         return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
     }
 
     public function edit($id)
     {
-        $result               = Answer::findOrFail($id);
-        $this->answer_id      = $result?->id;
+        $result = Answer::findOrFail($id);
+        $this->answer_id = $result?->id;
         $this->answer_alphabet = $result?->alphabet;
         $this->answer_context = $result?->context;
-        $this->answer_latex   = $result?->latex;
+        $this->answer_latex = $result?->latex;
         $this->answer_correct = $result?->is_correct;
         $this->isEditingAnswer = true;
         $this->dispatch('open-modal', ['id' => 'modal']);
+
         return $this->dispatch('sync-answer-latex-preview');
     }
 
     public function toggleAnswerCorrect($id)
     {
         $answer = Answer::withoutGlobalScope('user_scope')->findOrFail($id);
-        
-        if ($this->type == \App\Models\Master\Question\Question::TYPE_SINGLE) {
+
+        if ($this->type == Question::TYPE_SINGLE) {
             // Unset all other answers for this question
             Answer::withoutGlobalScope('user_scope')
                 ->where('question_id', $this->data_id)
                 ->where('id', '!=', $id)
                 ->update(['is_correct' => false]);
-            
+
             $answer->is_correct = true;
         } else {
             // Toggle for multiple choice
-            $answer->is_correct = !$answer->is_correct;
+            $answer->is_correct = ! $answer->is_correct;
         }
 
         $answer->save();
@@ -426,23 +492,24 @@ class AdminMasterQuestionUpdate extends Component
 
     public function modalAnswerImage($id, $alphabet)
     {
-        $result                = Answer::findOrFail($id);
+        $result = Answer::findOrFail($id);
         $this->answer_alphabet = $alphabet;
-        $this->answer_id       = $result?->id;
-        $this->answer_context  = $result?->context;
-        $this->answer_latex    = $result?->latex;
-        $this->answer_correct  = $result?->is_correct;
-        
+        $this->answer_id = $result?->id;
+        $this->answer_context = $result?->context;
+        $this->answer_latex = $result?->latex;
+        $this->answer_correct = $result?->is_correct;
+
         // Reset dan reload gambar dari database agar filepond menampilkan state terbaru
         $this->answer_images = [];
         $this->old_answer_images = [];
-        
+
         foreach (json_decode($result?->images, true) ?? [] as $image) {
             $cleanPath = Str::after($image, '/storage/');
             $cleanPath = ltrim($cleanPath, '/');
-            $this->answer_images[]     = $cleanPath;
+            $this->answer_images[] = $cleanPath;
             $this->old_answer_images[] = $cleanPath;
         }
+
         // dd($this->answer_images, $this->old_answer_images);
         // $this->dispatch('initFilepondWithImages', $this->answer_images);
         return $this->dispatch('open-modal', ['id' => 'modal-answer-images']);
@@ -450,12 +517,12 @@ class AdminMasterQuestionUpdate extends Component
 
     public function updatedNewImages($value)
     {
-        $folder = "/public/question/" . \Carbon\Carbon::now()->isoFormat('Y') . '/' . \Carbon\Carbon::now()->isoFormat('MM');
-        
+        $folder = '/public/question/'.Carbon::now()->isoFormat('Y').'/'.Carbon::now()->isoFormat('MM');
+
         foreach ($this->new_images as $new_image) {
             $upload = $this->uploadFile($new_image, $folder);
             // $upload[1] is the saved filename (e.g., xxx.webp)
-            $this->images[] = 'question/' . \Carbon\Carbon::now()->isoFormat('Y') . '/' . \Carbon\Carbon::now()->isoFormat('MM') . '/' . $upload[1];
+            $this->images[] = 'question/'.Carbon::now()->isoFormat('Y').'/'.Carbon::now()->isoFormat('MM').'/'.$upload[1];
         }
         $this->new_images = [];
     }
@@ -470,11 +537,11 @@ class AdminMasterQuestionUpdate extends Component
 
     public function updatedAnswerNewImages($value)
     {
-        $folder = "/public/answer/" . \Carbon\Carbon::now()->isoFormat('Y') . '/' . \Carbon\Carbon::now()->isoFormat('MM');
-        
+        $folder = '/public/answer/'.Carbon::now()->isoFormat('Y').'/'.Carbon::now()->isoFormat('MM');
+
         foreach ($this->answer_new_images as $new_image) {
             $upload = $this->uploadFile($new_image, $folder);
-            $this->answer_images[] = 'answer/' . \Carbon\Carbon::now()->isoFormat('Y') . '/' . \Carbon\Carbon::now()->isoFormat('MM') . '/' . $upload[1];
+            $this->answer_images[] = 'answer/'.Carbon::now()->isoFormat('Y').'/'.Carbon::now()->isoFormat('MM').'/'.$upload[1];
         }
         $this->answer_new_images = [];
     }

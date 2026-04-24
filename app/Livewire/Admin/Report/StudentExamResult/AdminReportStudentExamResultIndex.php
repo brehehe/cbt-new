@@ -5,17 +5,19 @@ namespace App\Livewire\Admin\Report\StudentExamResult;
 use App\Models\Master\RatingScale\RatingScale;
 use App\Models\User;
 use App\Models\User\UserTimetable;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class AdminReportStudentExamResultIndex extends Component
 {
     use WithPagination;
 
     public $search = '';
+
     public $user_id = '';
+
     public $perPage = 10;
 
     // Cache users list for dropdown
@@ -81,12 +83,12 @@ class AdminReportStudentExamResultIndex extends Component
 
     public function exportPdf()
     {
-        if (!$this->user_id) {
+        if (! $this->user_id) {
             return;
         }
 
         $user = User::find($this->user_id);
-        if (!$user) {
+        if (! $user) {
             return;
         }
 
@@ -125,8 +127,8 @@ class AdminReportStudentExamResultIndex extends Component
             ->setPaper('a4', 'portrait');
 
         return response()->streamDownload(
-            fn() => print ($pdf->output()),
-            'hasil-ujian-mahasiswa_' . \Str::slug($user->name) . '_' . date('Y-m-d') . '.pdf'
+            fn () => print ($pdf->output()),
+            'hasil-ujian-mahasiswa_'.\Str::slug($user->name).'_'.date('Y-m-d').'.pdf'
         );
     }
 }

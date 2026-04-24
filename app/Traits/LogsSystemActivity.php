@@ -2,11 +2,8 @@
 
 namespace App\Traits;
 
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Models\Activity;
-use Illuminate\Support\Facades\Request;
-use Stevebauman\Location\Facades\Location;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 trait LogsSystemActivity
 {
@@ -20,10 +17,10 @@ trait LogsSystemActivity
             ->dontSubmitEmptyLogs()
             ->useLogName('audit')
             ->setDescriptionForEvent(
-                fn(string $eventName) => "{$eventName} " . class_basename($this)
+                fn (string $eventName) => "{$eventName} ".class_basename($this)
             );
     }
-    
+
     /**
      * Define sensitivity masking for logs
      */

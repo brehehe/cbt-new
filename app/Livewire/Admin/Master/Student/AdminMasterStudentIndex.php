@@ -2,31 +2,34 @@
 
 namespace App\Livewire\Admin\Master\Student;
 
+use App\Exports\StudentExport;
 use App\Helpers\AlertHelper;
 use App\Helpers\RoleHelper;
+use App\Imports\User\StudentImport;
 use App\Models\Study\Study;
 use App\Models\User;
 use App\Models\User\UserDetail;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Crypt;
+use App\Models\UsrSecKey;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\ValidationException;
-use App\Exports\StudentExport;
-use App\Imports\User\StudentImport;
+use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\UsrSecKey;
 
 class AdminMasterStudentIndex extends Component
 {
-    use WithPagination, WithFileUploads;
+    use WithFileUploads, WithPagination;
 
     protected $queryString = [
         // 'page' => ['except' => 1], // Ini akan menghapus ?page=1 dari URL
@@ -36,85 +39,142 @@ class AdminMasterStudentIndex extends Component
     ];
 
     public $search = '';
+
     public $programFilter = '';
+
     public $statusFilter = '';
 
     public $perPage = 5;
 
     public $selectedRows = [];
+
     public $selectAll = false;
 
     // User
     public $data_id;
+
     public $name;
+
     public $nim;
+
     public $email;
+
     public $password;
+
     public $profile;
+
     public $profile_old;
+
     public $phone;
 
     // User Detail - Basic Information
     public $address;
+
     public $is_head = false;
+
     public $is_active = false;
 
     // Student Specific Fields
     public $student_id;
+
     public $student_program;
+
     public $student_faculty;
+
     public $student_department;
+
     public $student_major;
+
     public $student_class;
+
     public $student_semester;
+
     public $student_batch;
+
     public $student_academic_year;
+
     public $student_status = 'active';
+
     public $student_gpa;
+
     public $student_advisor_id;
+
     public $student_entry_date;
+
     public $student_graduation_date;
+
     public $username;
 
     // Personal Information
     public $birth_date;
+
     public $birth_place;
+
     public $gender;
+
     public $religion;
+
     public $nationality = 'Indonesian';
+
     public $marital_status = 'single';
+
     public $postal_code;
+
     public $city;
+
     public $province;
+
     public $country = 'ID';
+
     public $mobile_phone;
+
     public $emergency_contact_name;
+
     public $emergency_contact_phone;
+
     public $emergency_contact_relation;
+
     public $identity_type = 'KTP';
+
     public $identity_number;
+
     public $blood_group;
 
     // Academic Performance
     public $total_exams_taken = 0;
+
     public $average_score;
+
     public $exam_preference;
+
     public $special_needs = false;
+
     public $special_needs_description;
 
     // System Settings
     public $preferred_language = 'id';
+
     public $verification_status = 'pending';
+
     public $notes;
+
     public $studys = [];
+
     public $study_id;
+
     public $isStudent;
+
     public $isStudentFilter;
+
     public $type_study;
-    public $photo, $photo_old;
+
+    public $photo;
+
+    public $photo_old;
 
     // Import file
     public $importFileMahasiswa;
+
     public $importFileGeneral;
 
     public function openModal()
@@ -191,7 +251,6 @@ class AdminMasterStudentIndex extends Component
         $this->dispatch('close-modal', ['id' => 'modal']);
     }
 
-
     public function edit($id)
     {
         try {
@@ -219,7 +278,7 @@ class AdminMasterStudentIndex extends Component
                     } catch (\Exception $e) {
                         // If decryption fails, assume it's already plain text
                         $this->identity_number = $detail->identity_number;
-                        Log::info('Identity number appears to be stored as plain text for user: ' . $user->id);
+                        Log::info('Identity number appears to be stored as plain text for user: '.$user->id);
                     }
                 } else {
                     $this->identity_number = null;
@@ -280,13 +339,13 @@ class AdminMasterStudentIndex extends Component
             }
 
             $this->openModal();
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('User not found for edit: ' . $id);
+        } catch (ModelNotFoundException $e) {
+            Log::error('User not found for edit: '.$id);
             AlertHelper::error('Error', 'Data mahasiswa tidak ditemukan.');
         } catch (\Exception $e) {
-            Log::error('Error in edit method: ' . $e->getMessage(), [
+            Log::error('Error in edit method: '.$e->getMessage(), [
                 'user_id' => $id,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
             AlertHelper::error('Error', 'Gagal membuka data mahasiswa. Silakan coba lagi.');
         }
@@ -450,9 +509,10 @@ class AdminMasterStudentIndex extends Component
             if ($this->type_study == 'mahasiswa') {
                 $userResult = $this->handleUserIdentityResolution($currentCompanyId, $validatedData);
 
-                if (!$userResult['success']) {
+                if (! $userResult['success']) {
                     DB::rollBack();
                     $this->addError('general', $userResult['message']);
+
                     return;
                 }
 
@@ -461,7 +521,7 @@ class AdminMasterStudentIndex extends Component
                 // Update user detail
                 $this->updateUserDetail($user, $validatedData);
             } else {
-                if (!$this->data_id) {
+                if (! $this->data_id) {
                     $trashedUser = User::onlyTrashed()
                         ->where('company_id', $currentCompanyId)
                         ->where('type_user', 'employee')
@@ -492,7 +552,7 @@ class AdminMasterStudentIndex extends Component
                 }
 
                 $profilePath = $this->data_id ? User::find($this->data_id)->profile : null;
-                if ($this->profile && $this->profile instanceof \Illuminate\Http\UploadedFile) {
+                if ($this->profile && $this->profile instanceof UploadedFile) {
                     $profilePath = $this->profile->store('profiles', 'public');
                 }
 
@@ -516,7 +576,7 @@ class AdminMasterStudentIndex extends Component
                 UsrSecKey::updateOrCreate(
                     [
                         'user_id' => $user->id,
-                        'company_id' => Auth::user()->company_id
+                        'company_id' => Auth::user()->company_id,
                     ],
                     [
                         'sec_val' => $this->password ? encrypt($this->password) : ($this->data_id ? optional(UsrSecKey::where('user_id', $this->data_id)->first())->sec_val : encrypt('password123')),
@@ -536,7 +596,6 @@ class AdminMasterStudentIndex extends Component
             // Assign role (hanya untuk karyawan)
             $this->assignUserRole($user, $currentCompanyId);
 
-
             // Commit transaction jika semua berhasil
             DB::commit();
 
@@ -549,6 +608,7 @@ class AdminMasterStudentIndex extends Component
             // Handle validation errors
             DB::rollBack();
             $this->setErrorBag($e->validator->getMessageBag());
+
             return;
         } catch (\Exception $e) {
             // Handle general errors
@@ -557,7 +617,7 @@ class AdminMasterStudentIndex extends Component
             $errorMessage = 'Pengguna gagal disimpan.';
 
             // Log detailed error for debugging
-            Log::error('Error saving user: ' . $e->getMessage(), [
+            Log::error('Error saving user: '.$e->getMessage(), [
                 'user_id' => Auth::id(),
                 'company_id' => $currentCompanyId,
                 'data' => [
@@ -572,7 +632,7 @@ class AdminMasterStudentIndex extends Component
 
             // Show user-friendly error message
             if (in_array(App::environment(), ['local', 'development'])) {
-                $errorMessage .= ' Error: ' . $e->getMessage();
+                $errorMessage .= ' Error: '.$e->getMessage();
             }
 
             AlertHelper::error('Gagal', $errorMessage);
@@ -581,7 +641,7 @@ class AdminMasterStudentIndex extends Component
             // Handle any other throwable errors
             DB::rollBack();
 
-            Log::error('Critical error saving user: ' . $th->getMessage(), [
+            Log::error('Critical error saving user: '.$th->getMessage(), [
                 'user_id' => Auth::id(),
                 'company_id' => $currentCompanyId,
                 'trace' => $th->getTraceAsString(),
@@ -609,7 +669,7 @@ class AdminMasterStudentIndex extends Component
                 ->where(function ($query) use ($validatedData) {
                     $query->where('nim', $validatedData['nim'])
                         ->orWhere('email', $validatedData['email']);
-                    if (!empty($validatedData['username'])) {
+                    if (! empty($validatedData['username'])) {
                         $query->orWhere('username', $validatedData['username']);
                     }
                 })
@@ -617,19 +677,20 @@ class AdminMasterStudentIndex extends Component
 
             if ($trashedUser) {
                 $trashedUser->restore();
-                
+
                 // Restore relations if they exists and are trashed
                 $detail = UserDetail::onlyTrashed()->where('user_id', $trashedUser->id)->first();
                 if ($detail) {
                     $detail->restore();
                 }
-                
+
                 $secKey = UsrSecKey::onlyTrashed()->where('user_id', $trashedUser->id)->first();
                 if ($secKey) {
                     $secKey->restore();
                 }
 
                 $this->data_id = $trashedUser->id;
+
                 return $this->updateExistingUser($companyId, $validatedData);
             }
 
@@ -657,7 +718,7 @@ class AdminMasterStudentIndex extends Component
     {
         $user = User::find($this->data_id);
 
-        if (!$user) {
+        if (! $user) {
             throw new \Exception('User tidak ditemukan');
         }
 
@@ -680,12 +741,12 @@ class AdminMasterStudentIndex extends Component
         ];
 
         // Handle password update
-        if (!empty($validatedData['password'])) {
+        if (! empty($validatedData['password'])) {
             $updateData['password'] = Hash::make($validatedData['password']);
         }
 
         // Handle profile image
-        if ($this->profile && $this->profile instanceof \Illuminate\Http\UploadedFile) {
+        if ($this->profile && $this->profile instanceof UploadedFile) {
             // Delete old profile if exists
             if ($user->profile && Storage::disk('public')->exists($user->profile)) {
                 Storage::disk('public')->delete($user->profile);
@@ -693,9 +754,9 @@ class AdminMasterStudentIndex extends Component
             $updateData['profile'] = $this->profile->store('profiles', 'public');
         }
 
-        if($this->password){
+        if ($this->password) {
             UsrSecKey::where('user_id', $user->id)->where('company_id', $companyId)->update([
-                'sec_val' => Crypt::encryptString($this->password)
+                'sec_val' => Crypt::encryptString($this->password),
             ]);
         }
 
@@ -728,7 +789,7 @@ class AdminMasterStudentIndex extends Component
         ];
 
         // Handle profile image
-        if ($this->profile && $this->profile instanceof \Illuminate\Http\UploadedFile) {
+        if ($this->profile && $this->profile instanceof UploadedFile) {
             $createData['profile'] = $this->profile->store('profiles', 'public');
         }
 
@@ -789,13 +850,13 @@ class AdminMasterStudentIndex extends Component
         ];
 
         // Handle identity card encryption safely
-        if (!empty($validatedData['identity_number'])) {
+        if (! empty($validatedData['identity_number'])) {
             try {
                 $detailData['identity_number'] = Crypt::encryptString($validatedData['identity_number']);
             } catch (\Exception $e) {
                 // If encryption fails, store as plain text for now
                 $detailData['identity_number'] = $validatedData['identity_number'];
-                Log::warning('Failed to encrypt identity_number, storing as plain text: ' . $e->getMessage());
+                Log::warning('Failed to encrypt identity_number, storing as plain text: '.$e->getMessage());
             }
         }
 
@@ -845,6 +906,7 @@ class AdminMasterStudentIndex extends Component
         if (count($this->selectedRows) > 0) {
             return AlertHelper::confirmDelete('deleteSelected', 'Apakah Anda yakin ingin menghapus data yang dipilih?', null);
         }
+
         return AlertHelper::error('Gagal', 'Pilih minimal satu data untuk dihapus.');
     }
 
@@ -867,10 +929,11 @@ class AdminMasterStudentIndex extends Component
     public function export()
     {
         try {
-            $fileName = 'student_export_' . date('YmdHis') . '.xlsx';
-            return Excel::download(new StudentExport(), $fileName);
+            $fileName = 'student_export_'.date('YmdHis').'.xlsx';
+
+            return Excel::download(new StudentExport, $fileName);
         } catch (\Exception $e) {
-            Log::error('Student Export Error: ' . $e->getMessage());
+            Log::error('Student Export Error: '.$e->getMessage());
             AlertHelper::error('Gagal', 'Gagal mengekspor data mahasiswa.');
         }
     }
@@ -886,11 +949,11 @@ class AdminMasterStudentIndex extends Component
 
             $this->reset('importFileMahasiswa');
             AlertHelper::success('Berhasil', 'Data mahasiswa berhasil diimpor.');
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             AlertHelper::error('Gagal', 'File tidak valid. Pastikan format file adalah Excel (.xlsx atau .xls).');
         } catch (\Exception $e) {
-            Log::error('Student Import Error: ' . $e->getMessage());
-            AlertHelper::error('Gagal', 'Gagal mengimpor data mahasiswa: ' . $e->getMessage());
+            Log::error('Student Import Error: '.$e->getMessage());
+            AlertHelper::error('Gagal', 'Gagal mengimpor data mahasiswa: '.$e->getMessage());
         }
     }
 
@@ -905,11 +968,11 @@ class AdminMasterStudentIndex extends Component
 
             $this->reset('importFileGeneral');
             AlertHelper::success('Berhasil', 'Data general berhasil diimpor.');
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             AlertHelper::error('Gagal', 'File tidak valid. Pastikan format file adalah Excel (.xlsx atau .xls).');
         } catch (\Exception $e) {
-            Log::error('General Import Error: ' . $e->getMessage());
-            AlertHelper::error('Gagal', 'Gagal mengimpor data general: ' . $e->getMessage());
+            Log::error('General Import Error: '.$e->getMessage());
+            AlertHelper::error('Gagal', 'Gagal mengimpor data general: '.$e->getMessage());
         }
     }
 
@@ -918,17 +981,27 @@ class AdminMasterStudentIndex extends Component
         try {
             // Create a simple template with headers
             $headers = [
-                ['Name', 'NIM', 'Username', 'Email', 'Phone', 'Password', 'Program Studi', 'Faculty', 'Department', 'Semester', 'Student Status', 'Address', 'Identity Number']
+                ['Name', 'NIM', 'Username', 'Email', 'Phone', 'Password', 'Program Studi', 'Faculty', 'Department', 'Semester', 'Student Status', 'Address', 'Identity Number'],
             ];
 
             $fileName = 'student_template_mahasiswa.xlsx';
-            return Excel::download(new class($headers) implements \Maatwebsite\Excel\Concerns\FromArray {
+
+            return Excel::download(new class($headers) implements FromArray
+            {
                 private $data;
-                public function __construct($data) { $this->data = $data; }
-                public function array(): array { return $this->data; }
+
+                public function __construct($data)
+                {
+                    $this->data = $data;
+                }
+
+                public function array(): array
+                {
+                    return $this->data;
+                }
             }, $fileName);
         } catch (\Exception $e) {
-            Log::error('Student Template Download Error: ' . $e->getMessage());
+            Log::error('Student Template Download Error: '.$e->getMessage());
             AlertHelper::error('Gagal', 'Gagal mengunduh template.');
         }
     }
@@ -937,17 +1010,27 @@ class AdminMasterStudentIndex extends Component
     {
         try {
             $headers = [
-                ['Name', 'NIM', 'Username', 'Email', 'Phone', 'Password', 'Address']
+                ['Name', 'NIM', 'Username', 'Email', 'Phone', 'Password', 'Address'],
             ];
 
             $fileName = 'student_template_general.xlsx';
-            return Excel::download(new class($headers) implements \Maatwebsite\Excel\Concerns\FromArray {
+
+            return Excel::download(new class($headers) implements FromArray
+            {
                 private $data;
-                public function __construct($data) { $this->data = $data; }
-                public function array(): array { return $this->data; }
+
+                public function __construct($data)
+                {
+                    $this->data = $data;
+                }
+
+                public function array(): array
+                {
+                    return $this->data;
+                }
             }, $fileName);
         } catch (\Exception $e) {
-            Log::error('General Template Download Error: ' . $e->getMessage());
+            Log::error('General Template Download Error: '.$e->getMessage());
             AlertHelper::error('Gagal', 'Gagal mengunduh template general.');
         }
     }
@@ -960,12 +1043,12 @@ class AdminMasterStudentIndex extends Component
             ->orderBy('name', 'asc');
 
         // Apply program filter
-        if (!empty($this->programFilter)) {
+        if (! empty($this->programFilter)) {
             $user->where('study_id', $this->programFilter);
         }
 
         // Apply status filter
-        if (!empty($this->statusFilter)) {
+        if (! empty($this->statusFilter)) {
             $user->whereHas('userDetail', function ($query) {
                 $query->where('student_status', $this->statusFilter);
             });
@@ -981,7 +1064,7 @@ class AdminMasterStudentIndex extends Component
     public function updatedSelectAll($value)
     {
         if ($value) {
-            $this->selectedRows = $this->getUsersQuery()->pluck('users.id')->map(function($id) {
+            $this->selectedRows = $this->getUsersQuery()->pluck('users.id')->map(function ($id) {
                 return (string) $id;
             })->toArray();
         } else {

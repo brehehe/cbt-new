@@ -5,6 +5,7 @@ namespace App\Imports\User;
 use App\Helpers\RoleHelper;
 use App\Models\User;
 use App\Models\User\UserDetail;
+use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -12,13 +13,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Exception;
 
 class AdminImport implements ToCollection, WithHeadingRow
 {
-    /**
-     * @param Collection $rows
-     */
     public function collection(Collection $rows)
     {
         try {
@@ -33,7 +30,7 @@ class AdminImport implements ToCollection, WithHeadingRow
 
                     // Validate required fields
                     if (empty($row['name']) || empty($row['username']) || empty($row['email'])) {
-                        throw new Exception("Row " . ($index + 2) . ": Name, Username, and Email are required");
+                        throw new Exception('Row '.($index + 2).': Name, Username, and Email are required');
                     }
 
                     // Check if user already exists
@@ -43,11 +40,11 @@ class AdminImport implements ToCollection, WithHeadingRow
                         ->first();
 
                     if ($existingUser) {
-                        throw new Exception("Row " . ($index + 2) . ": User with email {$row['email']} already exists");
+                        throw new Exception('Row '.($index + 2).": User with email {$row['email']} already exists");
                     }
 
                     // Default password if not provided
-                    $password = !empty($row['password']) ? $row['password'] : 'password123';
+                    $password = ! empty($row['password']) ? $row['password'] : 'password123';
 
                     // Create user
                     $user = User::create([
@@ -61,7 +58,7 @@ class AdminImport implements ToCollection, WithHeadingRow
                     ]);
 
                     // Create user detail if address provided
-                    if (!empty($row['address'])) {
+                    if (! empty($row['address'])) {
                         UserDetail::create([
                             'user_id' => $user->id,
                             'address' => $row['address'],
@@ -87,23 +84,23 @@ class AdminImport implements ToCollection, WithHeadingRow
                     DB::rollBack();
                     $errorCount++;
                     $errors[] = $e->getMessage();
-                    Log::error("Admin Import Error: " . $e->getMessage());
+                    Log::error('Admin Import Error: '.$e->getMessage());
                 }
             }
 
             // Log summary
-            Log::info("Admin Import Completed", [
+            Log::info('Admin Import Completed', [
                 'success' => $successCount,
                 'errors' => $errorCount,
-                'details' => $errors
+                'details' => $errors,
             ]);
-        } catch (Exception | \Throwable $th) {
+        } catch (Exception|\Throwable $th) {
             $error = [
                 'message' => $th->getMessage(),
                 'file' => $th->getFile(),
                 'line' => $th->getLine(),
             ];
-            Log::error("Admin Import Failed", $error);
+            Log::error('Admin Import Failed', $error);
             throw $th;
         }
     }

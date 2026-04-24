@@ -17,7 +17,9 @@ class AdminReportItemAnalysisAllIndex extends Component
     protected $paginationTheme = 'bootstrap';
 
     public $perPage = 10;
+
     public $search = '';
+
     public $difficultySelections = [];
 
     public function updatingSearch()
@@ -30,7 +32,7 @@ class AdminReportItemAnalysisAllIndex extends Component
         $difficulty = $this->difficultySelections[$questionId] ?? 'default';
         $allowed = ['default', 'easy', 'medium', 'hard'];
 
-        if (!in_array($difficulty, $allowed, true)) {
+        if (! in_array($difficulty, $allowed, true)) {
             $difficulty = 'default';
         }
 
@@ -123,6 +125,7 @@ class AdminReportItemAnalysisAllIndex extends Component
 
         if ($rows->isEmpty()) {
             session()->flash('message', 'Tidak ada data untuk digenerate.');
+
             return;
         }
 
@@ -165,7 +168,7 @@ class AdminReportItemAnalysisAllIndex extends Component
                     ->where('module_questions.is_check', true);
             })
             ->when($this->search, function ($q) {
-                $term = '%' . $this->search . '%';
+                $term = '%'.$this->search.'%';
                 $q->where('questions.question', 'ilike', $term);
             })
             ->groupBy('questions.id', 'questions.question', 'questions.difficulty')
@@ -181,7 +184,7 @@ class AdminReportItemAnalysisAllIndex extends Component
         $items = $query->paginate($this->perPage);
 
         foreach ($items as $item) {
-            if (!array_key_exists($item->question_id, $this->difficultySelections)) {
+            if (! array_key_exists($item->question_id, $this->difficultySelections)) {
                 $this->difficultySelections[$item->question_id] = $item->difficulty ?? 'default';
             }
         }

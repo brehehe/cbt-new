@@ -5,7 +5,6 @@ namespace App\Livewire\Admin\Master\Timetable\Streaming;
 use App\Models\Exam\ExamLiveSession;
 use App\Models\Exam\ExamRecording;
 use App\Models\Master\Timetable\Timetable;
-use App\Models\User\UserTimetable;
 use App\Services\Exam\RecordingFinalizer;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -15,12 +14,19 @@ class AdminMasterTimetableStreamingIndex extends Component
     use WithPagination;
 
     public $timetableId;
+
     public $timetable;
+
     public $selectedSessionId = null;
+
     public $selectedSession = null;
+
     public $viewMode = 'grid'; // grid, single, gallery
+
     public $filterStatus = 'all'; // all, active, warning, error
+
     public $sortBy = 'last_activity'; // last_activity, name, alerts
+
     public $sortDirection = 'desc';
 
     protected $listeners = [
@@ -29,7 +35,7 @@ class AdminMasterTimetableStreamingIndex extends Component
         'takeSnapshot',
         'sendMessage',
         'terminateSession',
-        'suspendSession'
+        'suspendSession',
     ];
 
     public function mount($timetable_id)
@@ -63,12 +69,14 @@ class AdminMasterTimetableStreamingIndex extends Component
     public function openSessionModal($sessionId)
     {
         $this->selectSession($sessionId);
+
         return $this->dispatch('open-modal', ['id' => 'modal-streaming-session']);
     }
 
     public function closeModal()
     {
         $this->reset(['selectedSessionId', 'selectedSession']);
+
         return $this->dispatch('close-modal', ['id' => 'modal-streaming-session']);
     }
 
@@ -101,7 +109,7 @@ class AdminMasterTimetableStreamingIndex extends Component
         $session = ExamLiveSession::find($sessionId);
         if ($session) {
             // Implement snapshot logic here
-            session()->flash('success', 'Snapshot berhasil diambil untuk ' . $session->user->name);
+            session()->flash('success', 'Snapshot berhasil diambil untuk '.$session->user->name);
         }
     }
 
@@ -110,7 +118,7 @@ class AdminMasterTimetableStreamingIndex extends Component
         $session = ExamLiveSession::find($sessionId);
         if ($session) {
             // Implement messaging logic here
-            session()->flash('success', 'Pesan berhasil dikirim ke ' . $session->user->name);
+            session()->flash('success', 'Pesan berhasil dikirim ke '.$session->user->name);
         }
     }
 
@@ -121,18 +129,19 @@ class AdminMasterTimetableStreamingIndex extends Component
             $session->update([
                 'is_active' => false,
                 'connection_status' => 'terminated',
-                'last_activity' => now()
+                'last_activity' => now(),
             ]);
 
-            session()->flash('success', 'Sesi ujian ' . $session->user->name . ' telah dihentikan');
+            session()->flash('success', 'Sesi ujian '.$session->user->name.' telah dihentikan');
         }
     }
 
     public function suspendSession($sessionId)
     {
         $session = ExamLiveSession::with(['user', 'userTimetable'])->find($sessionId);
-        if (!$session) {
+        if (! $session) {
             session()->flash('error', 'Sesi tidak ditemukan.');
+
             return;
         }
 
@@ -140,7 +149,7 @@ class AdminMasterTimetableStreamingIndex extends Component
         $session->update([
             'is_active' => false,
             'connection_status' => 'terminated',
-            'last_activity' => now()
+            'last_activity' => now(),
         ]);
 
         // Tandai user timetable sebagai suspend
@@ -172,14 +181,14 @@ class AdminMasterTimetableStreamingIndex extends Component
                 }
             } catch (\Throwable $e) {
                 // Jangan blokir suspend; hanya log error finalisasi
-                \Log::error('Gagal finalisasi rekaman saat suspend: ' . $e->getMessage(), [
+                \Log::error('Gagal finalisasi rekaman saat suspend: '.$e->getMessage(), [
                     'user_timetable_id' => $userTimetable->id ?? null,
                     'session_id' => $sessionId,
                 ]);
             }
         }
 
-        session()->flash('success', 'Sesi ' . ($session->user->name ?? 'peserta') . ' telah disuspend dan pengguna dilogout.');
+        session()->flash('success', 'Sesi '.($session->user->name ?? 'peserta').' telah disuspend dan pengguna dilogout.');
     }
 
     private function loadActiveSessions()
@@ -195,7 +204,7 @@ class AdminMasterTimetableStreamingIndex extends Component
             'userTimetable',
             'examRecordings' => function ($query) {
                 $query->orderBy('created_at', 'desc')->limit(5);
-            }
+            },
         ])->find($this->selectedSessionId);
     }
 
@@ -270,7 +279,7 @@ class AdminMasterTimetableStreamingIndex extends Component
             'total' => $total,
             'active' => $active,
             'warning' => $warning,
-            'error' => $error
+            'error' => $error,
         ];
     }
 
@@ -278,7 +287,7 @@ class AdminMasterTimetableStreamingIndex extends Component
     {
         return view('livewire.admin.master.timetable.streaming.admin-master-timetable-streaming-index', [
             'sessions' => $this->getActiveSessionsProperty(),
-            'stats' => $this->getSessionStatsProperty()
+            'stats' => $this->getSessionStatsProperty(),
         ])->extends('layout.app')->section('content');
     }
 }

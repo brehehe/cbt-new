@@ -5,7 +5,6 @@ namespace App\Livewire\Admin\Report\AnswerStatistics;
 use App\Models\Master\Timetable\Timetable;
 use App\Models\Timetable\TimetableQuestion;
 use App\Models\User\UserModuleQuestion;
-use App\Models\User\UserTimetable;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
@@ -14,8 +13,11 @@ use Livewire\Component;
 class AdminReportAnswerStatisticsIndex extends Component
 {
     public $timetable_id = '';
+
     public $answerStats = [];
+
     public $timetables = [];
+
     public $timetable = null;
 
     public function mount()
@@ -36,9 +38,10 @@ class AdminReportAnswerStatisticsIndex extends Component
 
     public function loadStatistics()
     {
-        if (!$this->timetable_id) {
+        if (! $this->timetable_id) {
             $this->answerStats = [];
             $this->timetable = null;
+
             return;
         }
 
@@ -62,9 +65,9 @@ class AdminReportAnswerStatisticsIndex extends Component
         }
 
         $userAnswers = UserModuleQuestion::whereHas('userTimetable', function ($q) {
-                $q->where('timetable_id', $this->timetable_id)
-                  ->where('status', 'done'); 
-            })
+            $q->where('timetable_id', $this->timetable_id)
+                ->where('status', 'done');
+        })
             ->select($answerSelects)
             ->get()
             ->groupBy('timetable_question_id');
@@ -74,7 +77,7 @@ class AdminReportAnswerStatisticsIndex extends Component
         foreach ($questions as $question) {
             $answersForQuestion = $userAnswers->get($question->id, collect());
             $isEssay = $question->type === 'essay';
-            
+
             if ($isEssay) {
                 $totalAnswered = $hasEssayAnswerColumn
                     ? $answersForQuestion->whereNotNull('essay_answer')->count()
@@ -82,21 +85,21 @@ class AdminReportAnswerStatisticsIndex extends Component
                 $totalCorrect = $answersForQuestion->where('status', 'correct')->count();
                 $totalWrong = $answersForQuestion->where('status', 'wrong')->count();
                 $totalPending = $answersForQuestion->where('status', 'check')->count();
-                
+
                 $distribution = [
                     [
                         'option_text' => 'Benar (Koreksi)',
                         'is_correct' => true,
                         'count' => $totalCorrect,
                         'percentage' => $totalAnswered > 0 ? round(($totalCorrect / $totalAnswered) * 100, 1) : 0,
-                        'label' => 'CORRECT'
+                        'label' => 'CORRECT',
                     ],
                     [
                         'option_text' => 'Salah (Koreksi)',
                         'is_correct' => false,
                         'count' => $totalWrong,
                         'percentage' => $totalAnswered > 0 ? round(($totalWrong / $totalAnswered) * 100, 1) : 0,
-                        'label' => 'WRONG'
+                        'label' => 'WRONG',
                     ],
                     [
                         'option_text' => 'Belum Dinilai',
@@ -104,8 +107,8 @@ class AdminReportAnswerStatisticsIndex extends Component
                         'count' => $totalPending,
                         'percentage' => $totalAnswered > 0 ? round(($totalPending / $totalAnswered) * 100, 1) : 0,
                         'label' => 'PENDING',
-                        'is_pending' => true
-                    ]
+                        'is_pending' => true,
+                    ],
                 ];
             } else {
                 $totalAnswered = $answersForQuestion->whereNotNull('timetable_answer_id')->count();
@@ -159,7 +162,7 @@ class AdminReportAnswerStatisticsIndex extends Component
 
     public function exportPdf()
     {
-        if (!$this->timetable_id || empty($this->answerStats)) {
+        if (! $this->timetable_id || empty($this->answerStats)) {
             return;
         }
 
@@ -173,8 +176,8 @@ class AdminReportAnswerStatisticsIndex extends Component
             ->setPaper('a4', 'portrait');
 
         return response()->streamDownload(
-            fn () => print($pdf->output()),
-            'laporan-statistik-jawaban-' . date('Y-m-d-H-i-s') . '.pdf'
+            fn () => print ($pdf->output()),
+            'laporan-statistik-jawaban-'.date('Y-m-d-H-i-s').'.pdf'
         );
     }
 }

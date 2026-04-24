@@ -3,21 +3,33 @@
 namespace App\Livewire\Mahasiswa\Onboarding;
 
 use App\Helpers\AlertHelper;
-use Livewire\Component;
+use App\Models\Master\Timetable\Timetable;
+use App\Models\Timetable\TimetableQuestion;
+use App\Models\User\UserModuleQuestion;
+use App\Models\User\UserTimetable;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
+use Livewire\Component;
 
 class StudentOnboarding extends Component
 {
     public $currentStep = 1;
+
     public $debugMsg = '';
 
     // Simulation State
     public $simCurrentIndex = 0;
+
     public $simAnswers = [];
+
     public $simMarks = [];
+
     public $simTimeSeconds = 3585; // 00:59:45
+
     public $simQuestions = [
         [
             'id' => 1,
@@ -28,7 +40,7 @@ class StudentOnboarding extends Component
                 ['id' => 'b', 'text' => 'Bandung'],
                 ['id' => 'c', 'text' => 'Surabaya'],
                 ['id' => 'd', 'text' => 'IKN (Nusantara)'],
-            ]
+            ],
         ],
         [
             'id' => 2,
@@ -44,18 +56,22 @@ class StudentOnboarding extends Component
                 ['id' => 'b', 'text' => 'Ctrl+Shift+I'],
                 ['id' => 'c', 'text' => 'Alt+F4'],
                 ['id' => 'd', 'text' => 'Ctrl+C'],
-            ]
-        ]
+            ],
+        ],
     ];
 
     // Step 1: Profile
     public $name;
+
     public $nim;
+
     public $phone;
+
     public $address;
 
     // Step 2: Password
     public $password;
+
     public $password_confirmation;
 
     public function mount()
@@ -89,6 +105,7 @@ class StudentOnboarding extends Component
         $h = floor($this->simTimeSeconds / 3600);
         $m = floor(($this->simTimeSeconds % 3600) / 60);
         $s = $this->simTimeSeconds % 60;
+
         return sprintf('%02d:%02d:%02d', $h, $m, $s);
     }
 
@@ -99,7 +116,7 @@ class StudentOnboarding extends Component
 
     public function toggleSimMark($qId)
     {
-        $this->simMarks[$qId] = !$this->simMarks[$qId];
+        $this->simMarks[$qId] = ! $this->simMarks[$qId];
     }
 
     public function setSimIndex($index)
@@ -141,13 +158,13 @@ class StudentOnboarding extends Component
             }
 
             $this->currentStep++;
-            $this->debugMsg = 'Moved to step ' . $this->currentStep;
-            Log::info('Step incremented to ' . $this->currentStep);
+            $this->debugMsg = 'Moved to step '.$this->currentStep;
+            Log::info('Step incremented to '.$this->currentStep);
 
         } catch (\Exception $e) {
-            Log::error('Onboarding Error: ' . $e->getMessage());
-            $this->debugMsg = 'Error: ' . $e->getMessage();
-            AlertHelper::error('Gagal', 'Terjadi kesalahan: ' . $e->getMessage());
+            Log::error('Onboarding Error: '.$e->getMessage());
+            $this->debugMsg = 'Error: '.$e->getMessage();
+            AlertHelper::error('Gagal', 'Terjadi kesalahan: '.$e->getMessage());
         }
     }
 
@@ -162,35 +179,35 @@ class StudentOnboarding extends Component
         $user->update(['user_check' => true]);
 
         // Cari jadwal simulasi (Gunakan withoutGlobalScope karena simulation data company_id-nya null)
-        $simulationTimetable = \App\Models\Master\Timetable\Timetable::withoutGlobalScope('user_scope')
+        $simulationTimetable = Timetable::withoutGlobalScope('user_scope')
             ->where('is_simulation', 'true')
             ->orderBy('created_at', 'desc')
             ->first();
 
         if ($simulationTimetable) {
             try {
-                \Illuminate\Support\Facades\DB::beginTransaction();
+                DB::beginTransaction();
 
                 // Hapus sesi simulasi lama jika mahasiswa ingin mengulang onboarding
-                $oldSimulations = \App\Models\User\UserTimetable::where('user_id', $user->id)
+                $oldSimulations = UserTimetable::where('user_id', $user->id)
                     ->withoutGlobalScope('user_scope')
                     ->where('timetable_id', $simulationTimetable->id)
                     ->get();
                 foreach ($oldSimulations as $oldSim) {
-                    \App\Models\User\UserModuleQuestion::where('user_timetable_id', $oldSim->id)->delete();
+                    UserModuleQuestion::where('user_timetable_id', $oldSim->id)->delete();
                     $oldSim->delete();
                 }
 
                 $transactionModule = $simulationTimetable->timetableModule()->withoutGlobalScope('user_scope')->first();
 
-                if (!$transactionModule) {
+                if (! $transactionModule) {
                     throw new \Exception('Modul simulasi tidak ditemukan.');
                 }
 
-                $userTimetable = \App\Models\User\UserTimetable::create([
+                $userTimetable = UserTimetable::create([
                     'user_id' => $user->id,
                     'timetable_id' => $simulationTimetable->id,
-                    'start_process' => \Carbon\Carbon::now(),
+                    'start_process' => Carbon::now(),
                     'studys' => $simulationTimetable->studys,
                     'is_recording' => false,
                     'is_streaming' => false,
@@ -198,19 +215,19 @@ class StudentOnboarding extends Component
                 ]);
 
                 // Ambil soal-soal simulasi
-                $modulesQuestions = \App\Models\Timetable\TimetableQuestion::withoutGlobalScope('user_scope')
+                $modulesQuestions = TimetableQuestion::withoutGlobalScope('user_scope')
                     ->where('timetable_module_id', $transactionModule->id)
                     ->orderBy('order')
                     ->get();
 
                 $userModuleQuestionsData = [];
-                $now = \Carbon\Carbon::now();
+                $now = Carbon::now();
                 // Gunakan company_id dari userTimetable yang baru dibuat (untuk sinkronisasi scope)
                 $companyId = $userTimetable->company_id;
 
                 foreach ($modulesQuestions as $index => $moduleQuestion) {
                     $userModuleQuestionsData[] = [
-                        'id' => (string) \Illuminate\Support\Str::uuid(),
+                        'id' => (string) Str::uuid(),
                         'user_timetable_id' => $userTimetable->id,
                         'timetable_module_id' => $transactionModule->id,
                         'timetable_question_id' => $moduleQuestion->id,
@@ -222,23 +239,25 @@ class StudentOnboarding extends Component
                     ];
                 }
 
-                if (!empty($userModuleQuestionsData)) {
-                    \App\Models\User\UserModuleQuestion::insert($userModuleQuestionsData);
+                if (! empty($userModuleQuestionsData)) {
+                    UserModuleQuestion::insert($userModuleQuestionsData);
                 }
 
-                \Illuminate\Support\Facades\DB::commit();
+                DB::commit();
 
                 // Set session
-                \Illuminate\Support\Facades\Session::put('user_timetable_id', $userTimetable->id);
+                Session::put('user_timetable_id', $userTimetable->id);
 
                 AlertHelper::success('Selesai', 'Anda telah menyelesaikan Onboarding! Silakan coba Ujian Simulasi.');
+
                 return redirect()->route('admin.exam.warning');
 
             } catch (\Exception $e) {
-                \Illuminate\Support\Facades\DB::rollBack();
-                Log::error('Onboarding Simulation Error: ' . $e->getMessage());
+                DB::rollBack();
+                Log::error('Onboarding Simulation Error: '.$e->getMessage());
                 // Fallback
                 AlertHelper::success('Selesai', 'Selamat! Onboarding selesai.');
+
                 return redirect()->route('admin.exam.timetable');
             }
         }

@@ -18,10 +18,10 @@ class ModuleQuestionService
     {
         foreach ($request['question_id'] ?? [] as $key => $question_id) {
             ModuleQuestion::create([
-                'company_id'  => $request['company_id'] ?? null,
-                'module_id'   => $request['module_id'] ?? null,
+                'company_id' => $request['company_id'] ?? null,
+                'module_id' => $request['module_id'] ?? null,
                 'question_id' => $question_id,
-                'study_id'    => $request['study_id'] ?? null,
+                'study_id' => $request['study_id'] ?? null,
             ]);
         }
     }

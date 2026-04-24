@@ -6,20 +6,38 @@ use App\Models\Master\Question\Module;
 use App\Models\Master\RatingScale\RatingScale;
 use App\Models\Master\Timetable\Timetable;
 use App\Models\User;
-use App\Models\User\UserModuleQuestion;
-use App\Models\User\UserTimetable;
-use Livewire\Component;
-use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
 use Livewire\WithPagination;
 
 class AdminExamHistoryTimetableDetailIndex extends Component
 {
     use WithPagination;
-    public $user_timetable_id, $timetable_id, $timetable, $user_timetable;
-    public $search = '', $perPage = 5;
-    public $modules = [], $supervisors = [], $getSupervisors = [], $module_id;
-    public $start_time, $end_time;
+
+    public $user_timetable_id;
+
+    public $timetable_id;
+
+    public $timetable;
+
+    public $user_timetable;
+
+    public $search = '';
+
+    public $perPage = 5;
+
+    public $modules = [];
+
+    public $supervisors = [];
+
+    public $getSupervisors = [];
+
+    public $module_id;
+
+    public $start_time;
+
+    public $end_time;
 
     // public function hydrate()
     // {
@@ -32,14 +50,14 @@ class AdminExamHistoryTimetableDetailIndex extends Component
         $this->user_timetable_id = $user_timetable_id;
 
         $timetable = Timetable::with('userTimetables')->find($this->timetable_id);
-        if (!$timetable) {
+        if (! $timetable) {
             return redirect()->route('admin.master.timetable');
         }
 
         $this->timetable = $timetable->toArray();
 
         $this->user_timetable = $timetable->userTimetables()->find($this->user_timetable_id);
-        if (!$this->user_timetable) {
+        if (! $this->user_timetable) {
             return redirect()->route('admin.master.timetable.detail', ['timetable_id' => $this->timetable_id]);
         }
 
@@ -60,7 +78,7 @@ class AdminExamHistoryTimetableDetailIndex extends Component
             ->paginate($this->perPage);
 
         return view('livewire.admin.exam.history-timetable.detail.admin-exam-history-timetable-detail-index', [
-            'userModuleQuestions' => $userModuleQuestions
+            'userModuleQuestions' => $userModuleQuestions,
         ])
             ->extends('layout.app')
             ->section('content');

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin\Exam;
 
 use App\Http\Controllers\Controller;
 use App\Models\Exam\ExamLiveSession;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -37,9 +36,9 @@ class LiveStreamController extends Controller
                         'user' => $s->user->name ?? 'No User',
                         'camera_status' => $s->camera_status,
                         'timetable_id' => $s->timetable_id,
-                        'is_active' => $s->is_active
+                        'is_active' => $s->is_active,
                     ];
-                })->toArray()
+                })->toArray(),
             ]);
 
             $streams = [];
@@ -57,17 +56,17 @@ class LiveStreamController extends Controller
                     'camera_status' => $session->camera_status,
                     'connection_status' => $session->connection_status,
                     'last_seen' => $session->updated_at,
-                    'webrtc_endpoint' => $request->getSchemeAndHttpHost() . '/api/stream/connect/' . $session->session_token,
-                    'peer_id' => $session->peer_id ?? null // PeerJS ID for direct connection
+                    'webrtc_endpoint' => $request->getSchemeAndHttpHost().'/api/stream/connect/'.$session->session_token,
+                    'peer_id' => $session->peer_id ?? null, // PeerJS ID for direct connection
                 ];
 
                 // 🔥 DETAILED DEBUG LOGGING
-                Log::info('📹 Stream data for ' . $session->user->name, [
+                Log::info('📹 Stream data for '.$session->user->name, [
                     'peer_id' => $session->peer_id ?? 'NULL',
                     'has_real_camera' => $hasRealStream ? 'YES' : 'NO',
                     'camera_status' => $session->camera_status,
                     'updated_at' => $session->updated_at->toDateTimeString(),
-                    'seconds_ago' => $session->updated_at->diffInSeconds(now())
+                    'seconds_ago' => $session->updated_at->diffInSeconds(now()),
                 ]);
 
                 $streams[] = $streamData;
@@ -84,15 +83,15 @@ class LiveStreamController extends Controller
                 'success' => true,
                 'streams' => $streams,
                 'total_active' => count($streams),
-                'real_cameras' => $realCameras
+                'real_cameras' => $realCameras,
             ]);
         } catch (\Exception $e) {
-            Log::error('Error getting real camera streams: ' . $e->getMessage());
+            Log::error('Error getting real camera streams: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
                 'error' => 'Failed to get camera streams',
-                'streams' => []
+                'streams' => [],
             ], 500);
         }
     }
@@ -107,19 +106,19 @@ class LiveStreamController extends Controller
                 ->where('is_active', true)
                 ->first();
 
-            if (!$session) {
+            if (! $session) {
                 return response()->json([
                     'success' => false,
-                    'error' => 'Session not found or not active'
+                    'error' => 'Session not found or not active',
                 ], 404);
             }
 
             // Check if student has camera active or pending
-            if (!in_array($session->camera_status, ['active', 'pending'])) {
+            if (! in_array($session->camera_status, ['active', 'pending'])) {
                 return response()->json([
                     'success' => false,
                     'error' => 'Student camera is not available',
-                    'camera_status' => $session->camera_status
+                    'camera_status' => $session->camera_status,
                 ], 400);
             }
 
@@ -130,17 +129,17 @@ class LiveStreamController extends Controller
                 'connection_type' => 'webrtc',
                 'ice_servers' => [
                     ['urls' => 'stun:stun.l.google.com:19302'],
-                    ['urls' => 'stun:stun1.l.google.com:19302']
+                    ['urls' => 'stun:stun1.l.google.com:19302'],
                 ],
-                'signaling_url' => config('app.url') . '/api/stream/signaling/' . $sessionToken,
-                'peer_id' => $session->peer_id // PeerJS ID
+                'signaling_url' => config('app.url').'/api/stream/signaling/'.$sessionToken,
+                'peer_id' => $session->peer_id, // PeerJS ID
             ]);
         } catch (\Exception $e) {
-            Log::error('Error connecting to student stream: ' . $e->getMessage());
+            Log::error('Error connecting to student stream: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'error' => 'Failed to connect to student camera'
+                'error' => 'Failed to connect to student camera',
             ], 500);
         }
     }
@@ -153,7 +152,7 @@ class LiveStreamController extends Controller
         try {
             $session = ExamLiveSession::where('session_token', $sessionToken)->first();
 
-            if (!$session) {
+            if (! $session) {
                 return response()->json(['error' => 'Session not found'], 404);
             }
 
@@ -187,13 +186,14 @@ class LiveStreamController extends Controller
                 case 'peer-id':
                     // Store PeerJS ID
                     $session->update(['peer_id' => $data['peer_id']]);
-                    Log::info("PeerJS ID stored for session {$sessionToken}: " . $data['peer_id']);
+                    Log::info("PeerJS ID stored for session {$sessionToken}: ".$data['peer_id']);
                     break;
             }
 
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
-            Log::error('Signaling error: ' . $e->getMessage());
+            Log::error('Signaling error: '.$e->getMessage());
+
             return response()->json(['error' => 'Signaling failed'], 500);
         }
     }
@@ -206,45 +206,44 @@ class LiveStreamController extends Controller
         try {
             $validated = $request->validate([
                 'session_token' => 'required|string',
-                'peer_id' => 'required|string'
+                'peer_id' => 'required|string',
             ]);
 
             $session = ExamLiveSession::where('session_token', $validated['session_token'])
                 ->where('is_active', true)
                 ->first();
 
-            if (!$session) {
+            if (! $session) {
                 return response()->json([
                     'success' => false,
-                    'error' => 'Session not found or inactive'
+                    'error' => 'Session not found or inactive',
                 ], 404);
             }
 
             $session->update([
                 'peer_id' => $validated['peer_id'],
-                'connection_status' => 'connected'
+                'connection_status' => 'connected',
             ]);
 
             Log::info('Peer ID updated', [
                 'session_id' => $session->id,
                 'user' => $session->user->name,
-                'peer_id' => $validated['peer_id']
+                'peer_id' => $validated['peer_id'],
             ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Peer ID updated successfully'
+                'message' => 'Peer ID updated successfully',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error updating peer ID: ' . $e->getMessage());
+            Log::error('Error updating peer ID: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'error' => 'Failed to update peer ID'
+                'error' => 'Failed to update peer ID',
             ], 500);
         }
     }
-
 
     /**
      * Check if student has active camera connection

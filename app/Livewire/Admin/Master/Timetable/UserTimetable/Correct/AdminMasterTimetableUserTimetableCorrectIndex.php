@@ -3,15 +3,15 @@
 namespace App\Livewire\Admin\Master\Timetable\UserTimetable\Correct;
 
 use App\Helpers\AlertHelper;
-use App\Helpers\RoleHelper;
-use App\Models\User\UserTimetable;
 use App\Models\User\UserModuleQuestion;
+use App\Models\User\UserTimetable;
 use Livewire\Component;
-use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 class AdminMasterTimetableUserTimetableCorrectIndex extends Component
 {
-    public $user_timetable_id, $user_timetable;
+    public $user_timetable_id;
+
+    public $user_timetable;
 
     public function mount($user_timetable_id)
     {
@@ -47,7 +47,7 @@ class AdminMasterTimetableUserTimetableCorrectIndex extends Component
             ->get();
 
         return view('livewire.admin.master.timetable.user-timetable.correct.admin-master-timetable-user-timetable-correct-index', [
-            'essayQuestions' => $essayQuestions
+            'essayQuestions' => $essayQuestions,
         ])
             ->extends('layout.app')
             ->section('content');

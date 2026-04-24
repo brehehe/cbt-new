@@ -2,17 +2,17 @@
 
 namespace App\Services\Answer;
 
-use Carbon\Carbon;
-use App\Traits\UploadFile;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
 use App\Models\Master\Question\Answer;
+use App\Traits\UploadFile;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class AnswerService
 {
     use UploadFile;
+
     /**
      * Create a new class instance.
      */
@@ -21,7 +21,7 @@ class AnswerService
     public function __construct()
     {
         //
-        $this->main_folder = Carbon::now()->isoFormat('Y') . '/' . Carbon::now()->isoFormat('MM');
+        $this->main_folder = Carbon::now()->isoFormat('Y').'/'.Carbon::now()->isoFormat('MM');
     }
 
     public function updateOrCreate($question, $request)
@@ -32,14 +32,14 @@ class AnswerService
             $disk = 'public';
 
             $existingAnswer = null;
-            if (!empty($request['id'])) {
+            if (! empty($request['id'])) {
                 $existingAnswer = Answer::withoutGlobalScope('user_scope')
                     ->withTrashed()
                     ->where('question_id', $question->id)
                     ->find($request['id']);
             }
 
-             if (!Storage::disk($disk)->exists($folder)) {
+            if (! Storage::disk($disk)->exists($folder)) {
                 Storage::disk($disk)->makeDirectory($folder);
             }
 
@@ -47,6 +47,7 @@ class AnswerService
             $normalize = function ($val) use ($folder, $disk) {
                 if ($val instanceof TemporaryUploadedFile) {
                     $stored = $val->store($folder, $disk);           // "answer/2025/11/xxx.jpg"
+
                     return '/'.ltrim($stored, '/');                  // "/answer/2025/11/xxx.jpg"
                 }
                 // String bisa berupa URL lengkap atau path
@@ -57,9 +58,10 @@ class AnswerService
                 } else {
                     $path = (string) $val;
                 }
-                
+
                 // Hilangkan /storage dan buat path relatif
                 $path = Str::of($path)->replaceFirst('/storage', '')->trim('/')->prepend('/')->toString();
+
                 return $path;  // "/answer/2026/02/xxx.jpg"
             };
 
@@ -100,7 +102,7 @@ class AnswerService
                 $filePath = ltrim($rm, '/');  // hapus leading slash
                 if (Storage::disk($disk)->exists($filePath)) {
                     Storage::disk($disk)->delete($filePath);
-                    \Log::info('✅ Hapus gambar jawaban: ' . $filePath);
+                    \Log::info('✅ Hapus gambar jawaban: '.$filePath);
                 }
             }
 
@@ -134,7 +136,7 @@ class AnswerService
                 $order = (int) $request['order'];
             }
 
-            if (!$order || $order <= 0) {
+            if (! $order || $order <= 0) {
                 $order = $this->resolveNextOrder($question);
             }
 
@@ -150,11 +152,11 @@ class AnswerService
                     [
                         'question_id' => $question->id,
                         'company_id' => $request['company_id'] ?? null,
-                        'alphabet'   => $alphabet,
-                        'order'      => $order,
-                        'context'    => $context,
-                        'latex'      => $request['latex'] ?? ($existingAnswer?->latex ?? null),
-                        'images'     => json_encode($imagePaths),
+                        'alphabet' => $alphabet,
+                        'order' => $order,
+                        'context' => $context,
+                        'latex' => $request['latex'] ?? ($existingAnswer?->latex ?? null),
+                        'images' => json_encode($imagePaths),
                         'is_correct' => $isCorrect,
                     ]
                 );
@@ -162,7 +164,7 @@ class AnswerService
             return $answer;
         } catch (\Throwable $th) {
             \Log::error('❌ Error di AnswerService::updateOrCreate', [
-                'msg'  => $th->getMessage(),
+                'msg' => $th->getMessage(),
                 'file' => $th->getFile(),
                 'line' => $th->getLine(),
             ]);
@@ -193,5 +195,4 @@ class AnswerService
 
         return $nextOrder > 0 ? $nextOrder + 1 : 1;
     }
-
 }

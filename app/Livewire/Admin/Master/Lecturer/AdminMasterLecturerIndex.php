@@ -2,28 +2,28 @@
 
 namespace App\Livewire\Admin\Master\Lecturer;
 
+use App\Exports\LecturerExport;
 use App\Helpers\AlertHelper;
 use App\Helpers\RoleHelper;
+use App\Imports\User\LecturerImport;
 use App\Models\Study\Study;
 use App\Models\User;
 use App\Models\User\UserDetail;
+use App\Models\UsrSecKey;
+use Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Log;
-use Hash;
-use App\Exports\LecturerExport;
-use App\Imports\User\LecturerImport;
+use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\UsrSecKey;
 
 class AdminMasterLecturerIndex extends Component
 {
-    use WithPagination, WithFileUploads;
+    use WithFileUploads, WithPagination;
 
     protected $queryString = [
         // 'page' => ['except' => 1], // Ini akan menghapus ?page=1 dari URL
@@ -31,54 +31,89 @@ class AdminMasterLecturerIndex extends Component
     ];
 
     public $search = '';
+
     public $facultyFilter = '';
+
     public $departmentFilter = '';
+
     public $positionFilter = '';
 
     public $perPage = 5;
 
     // Import file
     public $importFile;
+
     public $showModal = false;
+
     public $editMode = false;
 
     // User
     public $data_id;
+
     public $name;
+
     public $email;
+
     public $password;
 
     // Lecturer Detail
     public $lecturer_id;
+
     public $lecturer_nidn;
+
     public $lecturer_nip;
+
     public $lecturer_department;
+
     public $lecturer_faculty;
+
     public $lecturer_position;
+
     public $lecturer_functional_position;
+
     public $lecturer_education_level;
+
     public $lecturer_specialization;
+
     public $lecturer_expertise;
+
     public $lecturer_status = 'active';
+
     public $lecturer_type = 'full_time';
+
     public $lecturer_start_date;
 
     // Personal Info
     public $birth_place;
+
     public $birth_date;
+
     public $gender;
+
     public $religion;
+
     public $nationality = 'Indonesian';
+
     public $marital_status = 'single';
+
     public $address;
+
     public $city;
+
     public $province;
+
     public $phone;
+
     public $mobile_phone;
+
     public $identity_type = 'KTP';
+
     public $identity_number;
+
     public $studys = [];
+
     public $getStudys = [];
+
     public $filterStudy;
 
     protected $rules = [
@@ -166,7 +201,7 @@ class AdminMasterLecturerIndex extends Component
             'identity_number',
             'data_id',
             'editMode',
-            'password'
+            'password',
         ]);
         $this->resetErrorBag();
         $this->resetValidation();
@@ -247,9 +282,9 @@ class AdminMasterLecturerIndex extends Component
         ];
 
         if ($this->editMode) {
-            $rules['email'] = 'required|email|unique:users,email,' . $this->data_id . ',id';
-            $rules['lecturer_id'] = 'required|string|unique:user_details,lecturer_id,' . $this->data_id . ',user_id';
-            $rules['lecturer_nidn'] = 'required|string|unique:user_details,lecturer_nidn,' . $this->data_id . ',user_id';
+            $rules['email'] = 'required|email|unique:users,email,'.$this->data_id.',id';
+            $rules['lecturer_id'] = 'required|string|unique:user_details,lecturer_id,'.$this->data_id.',user_id';
+            $rules['lecturer_nidn'] = 'required|string|unique:user_details,lecturer_nidn,'.$this->data_id.',user_id';
         } else {
             // For create mode: strict unique validation + password required
             $rules['email'] = 'required|email|unique:users,email';
@@ -307,7 +342,7 @@ class AdminMasterLecturerIndex extends Component
                     UsrSecKey::updateOrCreate(
                         [
                             'user_id' => $user->id,
-                            'company_id' => Auth::user()->company_id
+                            'company_id' => Auth::user()->company_id,
                         ],
                         [
                             'sec_val' => encrypt($this->password),
@@ -355,7 +390,7 @@ class AdminMasterLecturerIndex extends Component
                     'identity_type' => $this->identity_type,
                     'identity_number' => $this->identity_number,
                     'verification_status' => 'pending',
-                    'status' => 'active'
+                    'status' => 'active',
                 ]);
 
                 RoleHelper::assignRoleToUserInCompany($user, 'Dosen', Auth::user()->company_id);
@@ -367,7 +402,7 @@ class AdminMasterLecturerIndex extends Component
             $this->closeModal();
         } catch (\Exception $e) {
             DB::rollBack();
-            AlertHelper::error('Gagal', 'Terjadi kesalahan: ' . $e->getMessage());
+            AlertHelper::error('Gagal', 'Terjadi kesalahan: '.$e->getMessage());
         }
     }
 
@@ -385,7 +420,7 @@ class AdminMasterLecturerIndex extends Component
 
             AlertHelper::success('Berhasil', 'Data dosen berhasil dihapus.');
         } catch (\Exception $e) {
-            AlertHelper::error('Gagal', 'Terjadi kesalahan: ' . $e->getMessage());
+            AlertHelper::error('Gagal', 'Terjadi kesalahan: '.$e->getMessage());
         }
     }
 
@@ -397,10 +432,11 @@ class AdminMasterLecturerIndex extends Component
     public function export()
     {
         try {
-            $fileName = 'lecturer_export_' . date('YmdHis') . '.xlsx';
-            return Excel::download(new LecturerExport(), $fileName);
+            $fileName = 'lecturer_export_'.date('YmdHis').'.xlsx';
+
+            return Excel::download(new LecturerExport, $fileName);
         } catch (\Exception $e) {
-            Log::error('Lecturer Export Error: ' . $e->getMessage());
+            Log::error('Lecturer Export Error: '.$e->getMessage());
             AlertHelper::error('Gagal', 'Gagal mengekspor data dosen.');
         }
     }
@@ -412,15 +448,15 @@ class AdminMasterLecturerIndex extends Component
                 'importFile' => 'required|mimes:xlsx,xls|max:5120', // max 5MB
             ]);
 
-            Excel::import(new LecturerImport(), $this->importFile);
+            Excel::import(new LecturerImport, $this->importFile);
 
             $this->reset('importFile');
             AlertHelper::success('Berhasil', 'Data dosen berhasil diimpor.');
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             AlertHelper::error('Gagal', 'File tidak valid. Pastikan format file adalah Excel (.xlsx atau .xls).');
         } catch (\Exception $e) {
-            Log::error('Lecturer Import Error: ' . $e->getMessage());
-            AlertHelper::error('Gagal', 'Gagal mengimpor data dosen: ' . $e->getMessage());
+            Log::error('Lecturer Import Error: '.$e->getMessage());
+            AlertHelper::error('Gagal', 'Gagal mengimpor data dosen: '.$e->getMessage());
         }
     }
 
@@ -429,17 +465,27 @@ class AdminMasterLecturerIndex extends Component
         try {
             // Create a simple template with headers
             $headers = [
-                ['Name', 'Username', 'Email', 'Phone', 'Password', 'NIDN/NIP', 'Faculty', 'Department', 'Position', 'Address']
+                ['Name', 'Username', 'Email', 'Phone', 'Password', 'NIDN/NIP', 'Faculty', 'Department', 'Position', 'Address'],
             ];
 
             $fileName = 'lecturer_template.xlsx';
-            return Excel::download(new class($headers) implements \Maatwebsite\Excel\Concerns\FromArray {
+
+            return Excel::download(new class($headers) implements FromArray
+            {
                 private $data;
-                public function __construct($data) { $this->data = $data; }
-                public function array(): array { return $this->data; }
+
+                public function __construct($data)
+                {
+                    $this->data = $data;
+                }
+
+                public function array(): array
+                {
+                    return $this->data;
+                }
             }, $fileName);
         } catch (\Exception $e) {
-            Log::error('Lecturer Template Download Error: ' . $e->getMessage());
+            Log::error('Lecturer Template Download Error: '.$e->getMessage());
             AlertHelper::error('Gagal', 'Gagal mengunduh template.');
         }
     }
@@ -451,11 +497,11 @@ class AdminMasterLecturerIndex extends Component
             ->with(['userDetail'])
             ->whereHas('userDetail', function ($q) {
                 if ($this->search) {
-                    $q->where('lecturer_id', 'ilike', '%' . $this->search . '%')
-                        ->orWhere('lecturer_nidn', 'ilike', '%' . $this->search . '%')
+                    $q->where('lecturer_id', 'ilike', '%'.$this->search.'%')
+                        ->orWhere('lecturer_nidn', 'ilike', '%'.$this->search.'%')
                         ->orWhereHas('user', function ($userQuery) {
-                            $userQuery->where('name', 'ilike', '%' . $this->search . '%')
-                                ->orWhere('email', 'ilike', '%' . $this->search . '%');
+                            $userQuery->where('name', 'ilike', '%'.$this->search.'%')
+                                ->orWhere('email', 'ilike', '%'.$this->search.'%');
                         });
                 }
 

@@ -2,10 +2,11 @@
 
 namespace App\Models\Master\Question;
 
+use App\Models\Category\CategoryQuestion;
 use App\Models\Company\Company;
 use App\Models\Study\Study;
 use App\Models\Timetable\TimetableQuestion;
-use App\Models\Category\CategoryQuestion;
+use App\Models\User;
 use App\Traits\LogsSystemActivity;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -20,15 +21,18 @@ use Illuminate\Support\Facades\Auth;
 class Question extends Model
 {
     //
-    use HasFactory, LogsSystemActivity, SoftDeletes, HasUuids;
+    use HasFactory, HasUuids, LogsSystemActivity, SoftDeletes;
+
     protected $guarded = ['id'];
 
     const TYPE_SINGLE = 'single';
+
     const TYPE_MULTIPLE = 'multiple';
+
     const TYPE_ESSAY = 'essay';
 
     protected $casts = [
-        'images' => 'array'
+        'images' => 'array',
     ];
 
     public function company()
@@ -43,7 +47,7 @@ class Question extends Model
         static::addGlobalScope('user_scope', function (Builder $builder) {
             $user = Auth::user();
 
-            if (!$user || !$user->hasRole('Anonymous')) {
+            if (! $user || ! $user->hasRole('Anonymous')) {
                 $builder->where(function ($query) use ($user) {
                     $query->where('company_id', optional($user?->company)?->id)
                         ->orWhere('is_simulation', 'true')
@@ -63,7 +67,7 @@ class Question extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
-        $term = '%' . $term . '%';
+        $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id', 'question', 'description'], 'ILIKE', $term);
@@ -72,8 +76,6 @@ class Question extends Model
 
     /**
      * Get the topic that owns the Question
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function topic(): BelongsTo
     {
@@ -82,8 +84,6 @@ class Question extends Model
 
     /**
      * Get the materialCategory that owns the Question
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function materialCategory(): BelongsTo
     {
@@ -92,8 +92,6 @@ class Question extends Model
 
     /**
      * Get the material that owns the Question
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function material(): BelongsTo
     {
@@ -102,8 +100,6 @@ class Question extends Model
 
     /**
      * Get the questionType that owns the Question
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function questionType(): BelongsTo
     {
@@ -112,8 +108,6 @@ class Question extends Model
 
     /**
      * Get all of the answers for the Question
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function answers(): HasMany
     {
@@ -122,8 +116,6 @@ class Question extends Model
 
     /**
      * Get all of the moduleQuestion for the Question
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function moduleQuestions(): HasMany
     {
@@ -132,8 +124,6 @@ class Question extends Model
 
     /**
      * Get the categoryQuestion that owns the Question
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function categoryQuestion(): BelongsTo
     {
@@ -142,8 +132,6 @@ class Question extends Model
 
     /**
      * Get the timetableQuestion associated with the Question
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function timetableQuestion(): HasOne
     {
@@ -157,6 +145,6 @@ class Question extends Model
 
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

@@ -84,8 +84,8 @@ class ReCacheCommand extends Command
         }
 
         // If no specific option is provided, re-cache all
-        if (!$this->option('config') && !$this->option('routes') &&
-            !$this->option('views') && !$this->option('events')) {
+        if (! $this->option('config') && ! $this->option('routes') &&
+            ! $this->option('views') && ! $this->option('events')) {
             $this->reCacheAll();
         }
     }

@@ -2,29 +2,35 @@
 
 namespace App\Livewire\Admin\Exam\Monitor;
 
-use App\Models\Exam\ExamLiveSession;
 use App\Models\Exam\ExamAlert;
+use App\Models\Exam\ExamLiveSession;
 use App\Models\Master\Timetable\Timetable;
-use App\Models\User\UserTimetable;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\Auth;
 
 class AdminExamMonitorIndex extends Component
 {
     use WithPagination;
 
     public $selectedTimetable = '';
+
     public $search = '';
+
     public $statusFilter = '';
+
     public $riskFilter = '';
+
     public $refreshInterval = 5; // seconds
+
     public $autoRefresh = true;
 
     // Statistics
     public $totalActiveSessions = 0;
+
     public $totalOnlineStudents = 0;
+
     public $highRiskStudents = 0;
+
     public $totalAlerts = 0;
 
     protected $listeners = [
@@ -32,7 +38,7 @@ class AdminExamMonitorIndex extends Component
         'toggleAutoRefresh',
         'updateSessionData',
         'studentDisconnected',
-        'alertReceived'
+        'alertReceived',
     ];
 
     public function mount()
@@ -69,7 +75,7 @@ class AdminExamMonitorIndex extends Component
 
     public function toggleAutoRefresh()
     {
-        $this->autoRefresh = !$this->autoRefresh;
+        $this->autoRefresh = ! $this->autoRefresh;
         $this->dispatch('autoRefreshToggled', $this->autoRefresh);
     }
 
@@ -104,7 +110,7 @@ class AdminExamMonitorIndex extends Component
                 'user_timetable_id' => $session->user_timetable_id,
                 'alert_type' => $alertData['type'] ?? 'general',
                 'description' => $alertData['description'] ?? 'Alert detected',
-                'metadata' => $alertData['metadata'] ?? []
+                'metadata' => $alertData['metadata'] ?? [],
             ]);
         }
     }
@@ -121,7 +127,7 @@ class AdminExamMonitorIndex extends Component
             // Mark session as inactive
             $session->update([
                 'is_active' => false,
-                'connection_status' => 'disconnected'
+                'connection_status' => 'disconnected',
             ]);
 
             // Update user timetable status if needed
@@ -183,9 +189,9 @@ class AdminExamMonitorIndex extends Component
 
         if ($this->search) {
             $query->whereHas('user', function ($q) {
-                $q->where('name', 'ilike', '%' . $this->search . '%')
-                    ->orWhere('nim', 'ilike', '%' . $this->search . '%')
-                    ->orWhere('username', 'ilike', '%' . $this->search . '%');
+                $q->where('name', 'ilike', '%'.$this->search.'%')
+                    ->orWhere('nim', 'ilike', '%'.$this->search.'%')
+                    ->orWhere('username', 'ilike', '%'.$this->search.'%');
             });
         }
 
@@ -225,7 +231,7 @@ class AdminExamMonitorIndex extends Component
     {
         return view('livewire.admin.exam.monitor.admin-exam-monitor-index', [
             'activeTimetables' => $this->activeTimtables,
-            'activeSessions' => $this->activeSessions
+            'activeSessions' => $this->activeSessions,
         ])->extends('layout.app')->section('content');
     }
 }

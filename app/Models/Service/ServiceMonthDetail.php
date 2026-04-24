@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class ServiceMonthDetail extends Model
 {
     //
-    use SoftDeletes, HasUuids;
+    use HasUuids, SoftDeletes;
+
     protected $guarded = ['id'];
 
     public function company()

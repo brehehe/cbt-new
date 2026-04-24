@@ -3,16 +3,13 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use App\Models\User;
-use App\Models\User\UserTimetable;
-use App\Models\Master\Exam\ExamType;
 use App\Models\Exam\ExamAlert;
 use App\Models\Exam\ExamLiveSession;
+use App\Models\Master\Exam\ExamType;
 use App\Models\Master\Timetable\Timetable;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Schema;
+use App\Models\User;
+use App\Models\User\UserTimetable;
+use Illuminate\Http\Request;
 
 class DashboardApiController extends Controller
 {
@@ -36,14 +33,14 @@ class DashboardApiController extends Controller
                 'total_exams_this_month' => $totalStarted,
                 'completed_this_month' => $totalCompleted,
                 'avg_completion_rate' => $avg_completion_rate,
-                'new_users_this_month' => User::whereMonth('created_at', date('m'))->count()
+                'new_users_this_month' => User::whereMonth('created_at', date('m'))->count(),
             ];
 
             $examStatistics = [
                 'done' => UserTimetable::where('status', 'done')->count(),
                 'exam' => UserTimetable::where('status', 'exam')->count(),
                 'warning' => UserTimetable::where('status', 'warning')->count(),
-                'blocked' => UserTimetable::where('status', 'blocked')->count()
+                'blocked' => UserTimetable::where('status', 'blocked')->count(),
             ];
 
             // Upcoming exams
@@ -73,13 +70,13 @@ class DashboardApiController extends Controller
                     'examStatistics' => $examStatistics,
                     'upcomingExams' => $upcomingExams,
                     'recentExamResults' => $recentExamResults,
-                    'userProfile' => $this->getUserProfileData()
-                ]
+                    'userProfile' => $this->getUserProfileData(),
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -94,7 +91,7 @@ class DashboardApiController extends Controller
                 'active_sessions' => $activeSessions,
                 'high_risk' => $highRisk,
                 'camera_issues' => rand(0, 5), // Simulated based on logic in Livewire
-                'connection_issues' => rand(0, 3)
+                'connection_issues' => rand(0, 3),
             ];
 
             $criticalAlerts = ExamAlert::where('created_at', '>=', date('Y-m-d H:i:s', strtotime('-1 day')))
@@ -109,13 +106,13 @@ class DashboardApiController extends Controller
                     'liveSessionStats' => $liveSessionStats,
                     'criticalAlerts' => $criticalAlerts,
                     'systemUptime' => $this->getBasicUptime(),
-                    'serverLoad' => rand(20, 50) . '%' // Abstracted simulation
-                ]
+                    'serverLoad' => rand(20, 50).'%', // Abstracted simulation
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -128,16 +125,17 @@ class DashboardApiController extends Controller
             $count = UserTimetable::whereDate('created_at', $date)->count();
             $stats[] = [
                 'date' => date('M d', strtotime($date)),
-                'count' => $count
+                'count' => $count,
             ];
         }
+
         return $stats;
     }
 
     private function getUserProfileData()
     {
         $currentUser = auth()->user();
-        if (!$currentUser) {
+        if (! $currentUser) {
             return null;
         }
 
@@ -150,7 +148,7 @@ class DashboardApiController extends Controller
             ];
         } elseif ($currentUser->hasRole('Admin')) {
             return [
-                'user' => $currentUser->load('userDetail','study'),
+                'user' => $currentUser->load('userDetail', 'study'),
                 'role' => 'Admin',
                 'can_view_others' => true,
                 'show_academic_info' => false,
@@ -192,6 +190,7 @@ class DashboardApiController extends Controller
         }
         $variation = (rand(-10, 10) / 100);
         $uptime = $baseUptime + $variation;
-        return number_format(max($uptime, 95.0), 1) . '%';
+
+        return number_format(max($uptime, 95.0), 1).'%';
     }
 }

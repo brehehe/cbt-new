@@ -38,7 +38,7 @@ return new class extends Migration
                 'connection_restored',
                 'supervisor_disconnect',
                 'streaming_unstable',
-                'streaming_disconnected'
+                'streaming_disconnected',
             ])->comment('Jenis peringatan yang diterima oleh pengguna');
             $table->text('description');
             $table->json('metadata')->nullable(); // untuk menyimpan data tambahan

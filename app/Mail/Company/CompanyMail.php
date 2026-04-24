@@ -3,8 +3,8 @@
 namespace App\Mail\Company;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -29,7 +29,7 @@ class CompanyMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Company Information - ' . $this->company['name'] ?? 'Company Mail',
+            subject: 'Company Information - '.$this->company['name'] ?? 'Company Mail',
         );
     }
 
@@ -40,13 +40,13 @@ class CompanyMail extends Mailable
     {
         return new Content(
             view: 'mail.company.company-mail',
-    );
+        );
     }
 
     /**
      * Get the attachments for the message.
      *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     * @return array<int, Attachment>
      */
     public function attachments(): array
     {

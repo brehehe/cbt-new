@@ -3,16 +3,17 @@
 namespace App\Exports;
 
 use App\Models\User;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Illuminate\Support\Facades\Auth;
 
-class AdminExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize
+class AdminExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping
 {
     /**
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function collection()
     {
@@ -25,9 +26,6 @@ class AdminExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
             ->get();
     }
 
-    /**
-     * @return array
-     */
     public function headings(): array
     {
         return [
@@ -39,8 +37,7 @@ class AdminExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
     }
 
     /**
-     * @param mixed $admin
-     * @return array
+     * @param  mixed  $admin
      */
     public function map($admin): array
     {

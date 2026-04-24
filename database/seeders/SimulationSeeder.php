@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
 
 class SimulationSeeder extends Seeder
 {
@@ -19,6 +19,7 @@ class SimulationSeeder extends Seeder
 
         if ($existingModule) {
             $this->command->info('Simulation data already exists.');
+
             return;
         }
 
@@ -37,7 +38,7 @@ class SimulationSeeder extends Seeder
             'is_simulation' => 'true',
             'created_at' => $now,
             'updated_at' => $now,
-            'order' => 9999
+            'order' => 9999,
         ]);
 
         // 2. Create Fake Questions
@@ -52,9 +53,9 @@ class SimulationSeeder extends Seeder
             'is_simulation' => 'true',
             'created_at' => $now,
             'updated_at' => $now,
-            'order' => 1
+            'order' => 1,
         ]);
-        
+
         $ans1Id = (string) Str::uuid();
         $ans2Id = (string) Str::uuid();
         $ans3Id = (string) Str::uuid();
@@ -67,7 +68,7 @@ class SimulationSeeder extends Seeder
             ['id' => $ans2Id, 'question_id' => $q1Id, 'alphabet' => 'B', 'context' => 'Soeharto', 'is_correct' => false, 'created_at' => $now, 'updated_at' => $now],
             ['id' => $ans3Id, 'question_id' => $q1Id, 'alphabet' => 'C', 'context' => 'B.J. Habibie', 'is_correct' => false, 'created_at' => $now, 'updated_at' => $now],
             ['id' => $ans4Id, 'question_id' => $q1Id, 'alphabet' => 'D', 'context' => 'Abdurrahman Wahid', 'is_correct' => false, 'created_at' => $now, 'updated_at' => $now],
-            ['id' => $ans5Id, 'question_id' => $q1Id, 'alphabet' => 'E', 'context' => 'Megawati', 'is_correct' => false, 'created_at' => $now, 'updated_at' => $now]
+            ['id' => $ans5Id, 'question_id' => $q1Id, 'alphabet' => 'E', 'context' => 'Megawati', 'is_correct' => false, 'created_at' => $now, 'updated_at' => $now],
         ]);
 
         // Essay Question
@@ -81,13 +82,13 @@ class SimulationSeeder extends Seeder
             'is_simulation' => 'true',
             'created_at' => $now,
             'updated_at' => $now,
-            'order' => 2
+            'order' => 2,
         ]);
 
         // Map Module to Questions
         DB::table('module_questions')->insert([
             ['id' => (string) Str::uuid(), 'module_id' => $moduleId, 'question_id' => $q1Id, 'order' => 1, 'created_at' => $now, 'updated_at' => $now],
-            ['id' => (string) Str::uuid(), 'module_id' => $moduleId, 'question_id' => $q2Id, 'order' => 2, 'created_at' => $now, 'updated_at' => $now]
+            ['id' => (string) Str::uuid(), 'module_id' => $moduleId, 'question_id' => $q2Id, 'order' => 2, 'created_at' => $now, 'updated_at' => $now],
         ]);
 
         // 3. Create Timetable
@@ -102,7 +103,7 @@ class SimulationSeeder extends Seeder
             'is_simulation' => 'true',
             'created_at' => $now,
             'updated_at' => $now,
-            'order' => 9999
+            'order' => 9999,
         ]);
 
         // We also need to add them to Timetable Question (as per system requirements)
@@ -117,7 +118,7 @@ class SimulationSeeder extends Seeder
             'random_question' => false,
             'is_all_study' => true,
             'created_at' => $now,
-            'updated_at' => $now
+            'updated_at' => $now,
         ]);
 
         $ttq1Id = (string) Str::uuid();
@@ -125,33 +126,33 @@ class SimulationSeeder extends Seeder
 
         DB::table('timetable_questions')->insert([
             [
-                'id' => $ttq1Id, 
-                'timetable_module_id' => $ttModuleId, 
-                'question_id' => $q1Id, 
-                'question' => '<p>Siapakah presiden pertama Republik Indonesia?</p>', 
-                'order' => 1, 
-                'is_check' => true, 
+                'id' => $ttq1Id,
+                'timetable_module_id' => $ttModuleId,
+                'question_id' => $q1Id,
+                'question' => '<p>Siapakah presiden pertama Republik Indonesia?</p>',
+                'order' => 1,
+                'is_check' => true,
                 'difficulty' => 'default',
                 'type' => 'single',
                 'weight_correct' => 1,
                 'weight_incorrect' => 0,
-                'created_at' => $now, 
-                'updated_at' => $now
+                'created_at' => $now,
+                'updated_at' => $now,
             ],
             [
-                'id' => $ttq2Id, 
-                'timetable_module_id' => $ttModuleId, 
-                'question_id' => $q2Id, 
-                'question' => '<p>Jelaskan secara singkat tujuan dari simulasi Onboarding yang saat ini Anda ikuti.</p>', 
-                'order' => 2, 
-                'is_check' => true, 
+                'id' => $ttq2Id,
+                'timetable_module_id' => $ttModuleId,
+                'question_id' => $q2Id,
+                'question' => '<p>Jelaskan secara singkat tujuan dari simulasi Onboarding yang saat ini Anda ikuti.</p>',
+                'order' => 2,
+                'is_check' => true,
                 'difficulty' => 'default',
                 'type' => 'essay',
                 'weight_correct' => 5,
                 'weight_incorrect' => 0,
-                'created_at' => $now, 
-                'updated_at' => $now
-            ]
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
         ]);
 
         DB::table('timetable_answers')->insert([
@@ -159,7 +160,7 @@ class SimulationSeeder extends Seeder
             ['id' => (string) Str::uuid(), 'timetable_question_id' => $ttq1Id, 'answer_id' => $ans2Id, 'alphabet' => 'B', 'context' => 'Soeharto', 'is_correct' => false, 'order' => 2, 'created_at' => $now, 'updated_at' => $now],
             ['id' => (string) Str::uuid(), 'timetable_question_id' => $ttq1Id, 'answer_id' => $ans3Id, 'alphabet' => 'C', 'context' => 'B.J. Habibie', 'is_correct' => false, 'order' => 3, 'created_at' => $now, 'updated_at' => $now],
             ['id' => (string) Str::uuid(), 'timetable_question_id' => $ttq1Id, 'answer_id' => $ans4Id, 'alphabet' => 'D', 'context' => 'Abdurrahman Wahid', 'is_correct' => false, 'order' => 4, 'created_at' => $now, 'updated_at' => $now],
-            ['id' => (string) Str::uuid(), 'timetable_question_id' => $ttq1Id, 'answer_id' => $ans5Id, 'alphabet' => 'E', 'context' => 'Megawati', 'is_correct' => false, 'order' => 5, 'created_at' => $now, 'updated_at' => $now]
+            ['id' => (string) Str::uuid(), 'timetable_question_id' => $ttq1Id, 'answer_id' => $ans5Id, 'alphabet' => 'E', 'context' => 'Megawati', 'is_correct' => false, 'order' => 5, 'created_at' => $now, 'updated_at' => $now],
         ]);
 
         $this->command->info('Simulation Seeder executed successfully!');

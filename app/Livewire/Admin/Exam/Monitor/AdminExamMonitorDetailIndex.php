@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Admin\Exam\Monitor;
 
-use App\Models\Exam\ExamLiveSession;
 use App\Models\Exam\ExamAlert;
+use App\Models\Exam\ExamLiveSession;
 use App\Models\Exam\ExamRecording;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -13,13 +13,16 @@ class AdminExamMonitorDetailIndex extends Component
     use WithPagination;
 
     public $sessionId;
+
     public $session;
+
     public $refreshInterval = 3; // seconds
+
     public $autoRefresh = true;
 
     protected $listeners = [
         'refreshSessionData',
-        'toggleAutoRefresh'
+        'toggleAutoRefresh',
     ];
 
     public function mount($session)
@@ -36,7 +39,7 @@ class AdminExamMonitorDetailIndex extends Component
 
     public function toggleAutoRefresh()
     {
-        $this->autoRefresh = !$this->autoRefresh;
+        $this->autoRefresh = ! $this->autoRefresh;
         $this->dispatch('autoRefreshToggled', $this->autoRefresh);
     }
 
@@ -45,10 +48,11 @@ class AdminExamMonitorDetailIndex extends Component
         if ($this->session) {
             $this->session->update([
                 'is_active' => false,
-                'connection_status' => 'disconnected'
+                'connection_status' => 'disconnected',
             ]);
 
             session()->flash('success', 'Sesi ujian telah dihentikan.');
+
             return redirect()->route('admin.exam.monitor');
         }
     }
@@ -57,7 +61,7 @@ class AdminExamMonitorDetailIndex extends Component
     {
         if ($this->session) {
             $this->session->update([
-                'connection_status' => 'connected'
+                'connection_status' => 'connected',
             ]);
 
             session()->flash('success', 'Koneksi student telah dipaksa untuk tersambung kembali.');
@@ -73,11 +77,12 @@ class AdminExamMonitorDetailIndex extends Component
             'userTimetable',
             'examRecordings' => function ($query) {
                 $query->orderBy('created_at', 'desc')->limit(10);
-            }
+            },
         ])->find($this->sessionId);
 
-        if (!$this->session) {
+        if (! $this->session) {
             session()->flash('error', 'Sesi tidak ditemukan.');
+
             return redirect()->route('admin.exam.monitor');
         }
     }
@@ -98,7 +103,7 @@ class AdminExamMonitorDetailIndex extends Component
 
     public function render()
     {
-        if (!$this->session) {
+        if (! $this->session) {
             return view('livewire.admin.exam.monitor.admin-exam-monitor-detail-index')
                 ->with('error', 'Session not found')
                 ->extends('layout.app')
@@ -107,7 +112,7 @@ class AdminExamMonitorDetailIndex extends Component
 
         return view('livewire.admin.exam.monitor.admin-exam-monitor-detail-index', [
             'recentAlerts' => $this->recentAlerts,
-            'recordings' => $this->recordings
+            'recordings' => $this->recordings,
         ])->extends('layout.app')->section('content');
     }
 }

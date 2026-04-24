@@ -31,11 +31,11 @@ class StudySeeder extends Seeder
             ];
 
             foreach ($studies as $studyName) {
-                if (!Study::where('company_id', $company->id)->where('name', $studyName)->exists()) {
+                if (! Study::where('company_id', $company->id)->where('name', $studyName)->exists()) {
                     Study::create([
                         'company_id' => $company->id,
                         'name' => $studyName,
-                        'description' => 'Program Studi ' . $studyName,
+                        'description' => 'Program Studi '.$studyName,
                     ]);
                 }
             }

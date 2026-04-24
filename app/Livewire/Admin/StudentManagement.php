@@ -6,43 +6,70 @@ use App\Models\User;
 use App\Models\User\UserDetail;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Spatie\Permission\Models\Role;
 
 class StudentManagement extends Component
 {
     use WithPagination;
 
     public $search = '';
+
     public $facultyFilter = '';
+
     public $programFilter = '';
+
     public $statusFilter = '';
+
     public $showModal = false;
+
     public $editMode = false;
+
     public $selectedStudentId = null;
 
     // Form properties
     public $name = '';
+
     public $email = '';
+
     public $student_id = '';
+
     public $student_program = '';
+
     public $student_faculty = '';
+
     public $student_department = '';
+
     public $student_class = '';
+
     public $student_semester = '';
+
     public $student_academic_year = '';
+
     public $student_status = 'active';
+
     public $birth_place = '';
+
     public $birth_date = '';
+
     public $gender = '';
+
     public $religion = '';
+
     public $nationality = 'Indonesian';
+
     public $marital_status = 'single';
+
     public $address = '';
+
     public $city = '';
+
     public $province = '';
+
     public $phone = '';
+
     public $mobile_phone = '';
+
     public $identity_type = 'KTP';
+
     public $identity_number = '';
 
     protected $rules = [
@@ -89,10 +116,10 @@ class StudentManagement extends Component
             ->with(['userDetail'])
             ->whereHas('userDetail', function ($q) {
                 if ($this->search) {
-                    $q->where('student_id', 'ilike', '%' . $this->search . '%')
+                    $q->where('student_id', 'ilike', '%'.$this->search.'%')
                         ->orWhereHas('user', function ($userQuery) {
-                            $userQuery->where('name', 'ilike', '%' . $this->search . '%')
-                                ->orWhere('email', 'ilike', '%' . $this->search . '%');
+                            $userQuery->where('name', 'ilike', '%'.$this->search.'%')
+                                ->orWhere('email', 'ilike', '%'.$this->search.'%');
                         });
                 }
 
@@ -126,7 +153,7 @@ class StudentManagement extends Component
         return view('livewire.admin.student-management', [
             'students' => $students,
             'faculties' => $faculties,
-            'programs' => $programs
+            'programs' => $programs,
         ]);
     }
 
@@ -174,8 +201,8 @@ class StudentManagement extends Component
     public function save()
     {
         if ($this->editMode) {
-            $this->rules['email'] = 'required|email|unique:users,email,' . $this->selectedStudentId;
-            $this->rules['student_id'] = 'required|string|unique:user_details,student_id,' . $this->selectedStudentId . ',user_id';
+            $this->rules['email'] = 'required|email|unique:users,email,'.$this->selectedStudentId;
+            $this->rules['student_id'] = 'required|string|unique:user_details,student_id,'.$this->selectedStudentId.',user_id';
         }
 
         $this->validate();
@@ -221,7 +248,7 @@ class StudentManagement extends Component
                     'name' => $this->name,
                     'email' => $this->email,
                     'password' => bcrypt('password123'),
-                    'email_verified_at' => now()
+                    'email_verified_at' => now(),
                 ]);
 
                 $user->assignRole('Student');
@@ -249,7 +276,7 @@ class StudentManagement extends Component
                     'identity_type' => $this->identity_type,
                     'identity_number' => $this->identity_number,
                     'verification_status' => 'pending',
-                    'status' => 'active'
+                    'status' => 'active',
                 ]);
 
                 session()->flash('message', 'Data mahasiswa berhasil ditambahkan.');
@@ -257,7 +284,7 @@ class StudentManagement extends Component
 
             $this->closeModal();
         } catch (\Exception $e) {
-            session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            session()->flash('error', 'Terjadi kesalahan: '.$e->getMessage());
         }
     }
 
@@ -270,7 +297,7 @@ class StudentManagement extends Component
 
             session()->flash('message', 'Data mahasiswa berhasil dihapus.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            session()->flash('error', 'Terjadi kesalahan: '.$e->getMessage());
         }
     }
 
@@ -307,7 +334,7 @@ class StudentManagement extends Component
             'identity_type',
             'identity_number',
             'selectedStudentId',
-            'editMode'
+            'editMode',
         ]);
     }
 }

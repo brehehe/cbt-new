@@ -17,8 +17,8 @@ class OneHealthy extends Model
 
     protected $casts = [
         'organization_id' => 'encrypted',
-        'client_id'       => 'encrypted',
-        'client_secret'   => 'encrypted',
+        'client_id' => 'encrypted',
+        'client_secret' => 'encrypted',
     ];
 
     /**

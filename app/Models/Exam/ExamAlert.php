@@ -4,7 +4,6 @@ namespace App\Models\Exam;
 
 use App\Models\Company\Company;
 use App\Models\Master\Timetable\Timetable;
-use App\Models\User;
 use App\Models\User\UserTimetable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -15,7 +14,8 @@ use Illuminate\Support\Facades\Auth;
 class ExamAlert extends Model
 {
     //
-    use SoftDeletes, HasUuids;
+    use HasUuids, SoftDeletes;
+
     protected $guarded = ['id'];
 
     public function company()
@@ -30,7 +30,7 @@ class ExamAlert extends Model
         static::addGlobalScope('user_scope', function (Builder $builder) {
             $user = Auth::user();
 
-            if (!$user || !$user->hasRole('Anonymous')) {
+            if (! $user || ! $user->hasRole('Anonymous')) {
                 $builder->where('company_id', optional($user?->company)?->id)->orderBy('order', 'asc');
             }
 
@@ -46,10 +46,10 @@ class ExamAlert extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
-        $term = '%' . $term . '%';
+        $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id', 'user_timetable_id', 'timetable_id','description'], 'ILIKE', $term);
+            $query->whereAny(['company_id', 'user_timetable_id', 'timetable_id', 'description'], 'ILIKE', $term);
         });
     }
 

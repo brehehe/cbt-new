@@ -1,11 +1,22 @@
 <?php
 
-use App\Http\Controllers\Print\PrintController;
 use App\Http\Controllers\Admin\LatexPreviewController;
 use App\Http\Controllers\Admin\Security\SecurityLogController;
-use App\Http\Middleware\CheckUserTimetable;
+use App\Http\Controllers\Api\Admin\DashboardApiController;
+use App\Http\Controllers\Api\Exam\ExamApiController;
+use App\Http\Controllers\BackupController;
+use App\Http\Controllers\Print\PrintController;
+use App\Http\Controllers\SEBController;
 use App\Http\Middleware\BlockBots;
+use App\Http\Middleware\CheckUserTimetable;
 use App\Http\Middleware\RoleBasedDashboardRedirect;
+use App\Livewire\Admin\Exam\Detail\AdminExamDetailIndex;
+use App\Livewire\Admin\Exam\LiveStream\AdminExamLiveStreamIndex;
+use App\Livewire\Admin\Exam\Monitor\AdminExamMonitorDetailIndex;
+use App\Livewire\Admin\Exam\Monitor\AdminExamMonitorIndex;
+use App\Livewire\Admin\LecturerManagement;
+use App\Livewire\Admin\Master\Backup\AdminMasterBackupIndex;
+use App\Livewire\Admin\Master\CategoryQuestion\AdminMasterCategoryQuestionIndex;
 use App\Livewire\Admin\Master\Classmate\AdminMasterClassmateIndex;
 use App\Livewire\Admin\Master\Classmate\Detail\AdminMasterClassmateDetailIndex;
 use App\Livewire\Admin\Master\ExamRoom\AdminMasterExamRoomIndex;
@@ -13,26 +24,38 @@ use App\Livewire\Admin\Master\ExamSession\AdminMasterExamSessionIndex;
 use App\Livewire\Admin\Master\ExamType\AdminMasterExamTypeIndex;
 use App\Livewire\Admin\Master\Material\AdminMasterMaterialIndex;
 use App\Livewire\Admin\Master\MaterialCategory\AdminMasterMaterialCategoryIndex;
-use App\Livewire\Admin\Master\CategoryQuestion\AdminMasterCategoryQuestionIndex;
 use App\Livewire\Admin\Master\Module\AdminMasterModuleIndex;
 use App\Livewire\Admin\Master\Module\AdminMasterModuleQuestionIndex;
 use App\Livewire\Admin\Master\Question\AdminMasterQuestionIndex;
 use App\Livewire\Admin\Master\Question\AdminMasterQuestionUpdate;
 use App\Livewire\Admin\Master\QuestionType\AdminMasterQuestionTypeIndex;
+use App\Livewire\Admin\Master\Timetable\UserTimetable\Correct\AdminMasterTimetableUserTimetableCorrectIndex;
 use App\Livewire\Admin\Master\Topic\AdminMasterTopicIndex;
-use App\Livewire\Admin\Master\Backup\AdminMasterBackupIndex;
-use App\Livewire\Admin\Report\ItemAnalysis\AdminReportItemAnalysisIndex;
-use App\Livewire\Admin\Report\ItemAnalysis\AdminReportItemAnalysisAllIndex;
-use App\Livewire\Admin\Report\ItemAnalysis\Detail\AdminReportItemAnalysisDetailIndex;
+use App\Livewire\Admin\Profile\AdminProfileIndex;
+use App\Livewire\Admin\Report\AnswerStatistics\AdminReportAnswerStatisticsIndex;
+use App\Livewire\Admin\Report\Attendance\AdminReportAttendanceIndex;
+use App\Livewire\Admin\Report\Card\AdminReportCardIndex;
 use App\Livewire\Admin\Report\ExamResult\AdminReportExamResultIndex;
+use App\Livewire\Admin\Report\FullExamResult\AdminReportFullExamResultIndex;
+use App\Livewire\Admin\Report\ItemAnalysis\AdminReportItemAnalysisAllIndex;
+use App\Livewire\Admin\Report\ItemAnalysis\AdminReportItemAnalysisIndex;
+use App\Livewire\Admin\Report\ItemAnalysis\Detail\AdminReportItemAnalysisDetailIndex;
+use App\Livewire\Admin\Report\Official\AdminReportOfficialIndex;
 use App\Livewire\Admin\Report\Question\AdminReportQuestionIndex;
-use App\Livewire\Admin\Report\Timetable\AdminReportTimetable;
+use App\Livewire\Admin\Report\StudentExamResult\AdminReportStudentExamResultIndex;
 use App\Livewire\Admin\Report\Timetable\AdminReportTimetableDetail;
 use App\Livewire\Admin\Report\Timetable\AdminReportTimetableIndex;
+use App\Livewire\Admin\Session\AdminSessionIndex;
+use App\Livewire\Admin\StudentManagement;
+use App\Livewire\Mahasiswa\Onboarding\StudentOnboarding;
+use App\Livewire\Public\StressTestExamDetailIndex;
+use App\Models\Exam\ExamLiveSession;
 use App\Models\User;
+use App\Models\User\UserTimetable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
+use Security\SecurityLogIndex;
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
@@ -44,31 +67,31 @@ Route::middleware(['auth'])->group(function () {
 
 // Profile route accessible by all authenticated users including Mahasiswa
 Route::middleware(['auth', CheckUserTimetable::class])->group(function () {
-    Route::get('/profile', \App\Livewire\Admin\Profile\AdminProfileIndex::class)->name('user.profile');
+    Route::get('/profile', AdminProfileIndex::class)->name('user.profile');
 });
 
-Route::get('/student/onboarding', \App\Livewire\Mahasiswa\Onboarding\StudentOnboarding::class)
+Route::get('/student/onboarding', StudentOnboarding::class)
     ->name('student.onboarding')
     ->middleware(['auth']);
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
 
 // Public Stress Test Route (Only for testing purposes)
 
 // Safe Exam Browser Routes
 Route::prefix('seb')->name('seb.')->group(function () {
     // Generic config - no timetable required, just login page
-    Route::get('/config', [App\Http\Controllers\SEBController::class, 'downloadGenericConfig'])
+    Route::get('/config', [SEBController::class, 'downloadGenericConfig'])
         ->name('config.generic');
 
     // Specific timetable config
-    Route::get('/config/{timetable}', [App\Http\Controllers\SEBController::class, 'downloadConfig'])
+    Route::get('/config/{timetable}', [SEBController::class, 'downloadConfig'])
         ->name('config.download');
 
-    Route::get('/validate', [App\Http\Controllers\SEBController::class, 'validateSEB'])
+    Route::get('/validate', [SEBController::class, 'validateSEB'])
         ->name('validate');
 
-    Route::get('/check/{timetable}', [App\Http\Controllers\SEBController::class, 'checkTimetableSEB'])
+    Route::get('/check/{timetable}', [SEBController::class, 'checkTimetableSEB'])
         ->name('check.timetable')
         ->middleware('auth');
 });
@@ -108,11 +131,11 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
         })->name('admin.debug.video');
 
         // User Management Routes
-        Route::get('/students', \App\Livewire\Admin\StudentManagement::class)->name('admin.students');
-        Route::get('/lecturers', \App\Livewire\Admin\LecturerManagement::class)->name('admin.lecturers');
+        Route::get('/students', StudentManagement::class)->name('admin.students');
+        Route::get('/lecturers', LecturerManagement::class)->name('admin.lecturers');
 
         // Session Management Route
-        Route::get('/session', \App\Livewire\Admin\Session\AdminSessionIndex::class)->name('admin.session');
+        Route::get('/session', AdminSessionIndex::class)->name('admin.session');
 
         Route::group(['namespace' => 'ChangePassword', 'prefix' => 'change-password'], function () {
             Route::get('/change-password', 'AdminChangePasswordIndex')->name('user.change-password.change-password');
@@ -127,14 +150,14 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
             Route::get('/history-timetable', 'HistoryTimetable\AdminExamHistoryTimetableIndex')->name('admin.exam.history-timetable');
             Route::get('/history-timetable/{timetable_id}/{user_timetable_id}', 'HistoryTimetable\Detail\AdminExamHistoryTimetableDetailIndex')->name('admin.exam.history-timetable.detail');
             Route::get('/warning', 'Warning\AdminExamWarningIndex')->name('admin.exam.warning');
-            Route::get('/detail', \App\Livewire\Admin\Exam\Detail\AdminExamDetailIndex::class)->name('admin.exam.detail');
-            Route::get('/monitor', \App\Livewire\Admin\Exam\Monitor\AdminExamMonitorIndex::class)->name('admin.exam.monitor');
-            Route::get('/monitor/{session}', \App\Livewire\Admin\Exam\Monitor\AdminExamMonitorDetailIndex::class)->name('admin.exam.monitor.detail');
-            Route::get('/live-stream', \App\Livewire\Admin\Exam\LiveStream\AdminExamLiveStreamIndex::class)->name('admin.exam.live-stream');
+            Route::get('/detail', AdminExamDetailIndex::class)->name('admin.exam.detail');
+            Route::get('/monitor', AdminExamMonitorIndex::class)->name('admin.exam.monitor');
+            Route::get('/monitor/{session}', AdminExamMonitorDetailIndex::class)->name('admin.exam.monitor.detail');
+            Route::get('/live-stream', AdminExamLiveStreamIndex::class)->name('admin.exam.live-stream');
         });
 
         // Backup Download Route (outside master group)
-        Route::get('/backup/download', [\App\Http\Controllers\BackupController::class, 'download'])->name('admin.backup.download');
+        Route::get('/backup/download', [BackupController::class, 'download'])->name('admin.backup.download');
 
         Route::group(['namespace' => 'Master', 'prefix' => 'master'], function () {
             Route::get('/role', 'Role\AdminMasterRoleIndex')->name('admin.master.role');
@@ -144,7 +167,7 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
             Route::get('/topic-question', AdminMasterTopicIndex::class)->name('admin.master.topic');
             Route::get('/material-category', AdminMasterMaterialCategoryIndex::class)->name('admin.master.material-category');
             Route::get('/rating-scale', 'RatingScale\AdminMasterRatingScaleIndex')->name('admin.master.rating-scale');
-            Route::get('/security-log', Security\SecurityLogIndex::class)->name('admin.security.log.index');
+            Route::get('/security-log', SecurityLogIndex::class)->name('admin.security.log.index');
             Route::get('/regulation', 'Regulation\AdminMasterRegulationIndex')->name('admin.master.regulation');
             Route::get('/admin', 'Admin\AdminMasterAdminIndex')->name('admin.master.admin');
             Route::get('/lecturer', 'Lecturer\AdminMasterLecturerIndex')->name('admin.master.lecturer');
@@ -159,7 +182,7 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
             Route::get('/timetable/{timetable_id}/session', 'Timetable\Session\AdminMasterTimetableSessionIndex')->name('admin.master.timetable.session');
             Route::get('/timetable/{timetable_id}/{user_timetable_id}/answer', 'Timetable\Answer\AdminMasterTimetableAnswerIndex')->name('admin.master.timetable.answer');
             Route::get('/timetable/{timetable_id}/correct', 'Timetable\Correct\AdminMasterTimetableCorrectIndex')->name('admin.master.timetable.correct');
-            Route::get('/timetable/user-timetable/{user_timetable_id}/correct', \App\Livewire\Admin\Master\Timetable\UserTimetable\Correct\AdminMasterTimetableUserTimetableCorrectIndex::class)->name('admin.master.timetable.user-timetable.correct');
+            Route::get('/timetable/user-timetable/{user_timetable_id}/correct', AdminMasterTimetableUserTimetableCorrectIndex::class)->name('admin.master.timetable.user-timetable.correct');
             Route::get('/material', AdminMasterMaterialIndex::class)->name('admin.master.material');
             Route::get('/question-type', AdminMasterQuestionTypeIndex::class)->name('admin.master.question-type');
             Route::get('/category-question', AdminMasterCategoryQuestionIndex::class)->name('admin.master.category-question');
@@ -185,12 +208,12 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
             Route::get('/exam-result', AdminReportExamResultIndex::class)->name('admin.report.exam-result');
 
             // New Reports
-            Route::get('/official', \App\Livewire\Admin\Report\Official\AdminReportOfficialIndex::class)->name('admin.report.official');
-            Route::get('/attendance', \App\Livewire\Admin\Report\Attendance\AdminReportAttendanceIndex::class)->name('admin.report.attendance');
-            Route::get('/card', \App\Livewire\Admin\Report\Card\AdminReportCardIndex::class)->name('admin.report.card');
-            Route::get('/full-exam-result', \App\Livewire\Admin\Report\FullExamResult\AdminReportFullExamResultIndex::class)->name('admin.report.full-exam-result');
-            Route::get('/answer-statistics', \App\Livewire\Admin\Report\AnswerStatistics\AdminReportAnswerStatisticsIndex::class)->name('admin.report.answer-statistics');
-            Route::get('/student-exam-result', \App\Livewire\Admin\Report\StudentExamResult\AdminReportStudentExamResultIndex::class)->name('admin.report.student-exam-result');
+            Route::get('/official', AdminReportOfficialIndex::class)->name('admin.report.official');
+            Route::get('/attendance', AdminReportAttendanceIndex::class)->name('admin.report.attendance');
+            Route::get('/card', AdminReportCardIndex::class)->name('admin.report.card');
+            Route::get('/full-exam-result', AdminReportFullExamResultIndex::class)->name('admin.report.full-exam-result');
+            Route::get('/answer-statistics', AdminReportAnswerStatisticsIndex::class)->name('admin.report.answer-statistics');
+            Route::get('/student-exam-result', AdminReportStudentExamResultIndex::class)->name('admin.report.student-exam-result');
         });
 
         // Print previews (temporary demo routes)
@@ -281,12 +304,12 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
     Route::get('/clearallsession', function () {
 
         // ========== JIKA BELUM VERIFIKASI PASSWORD ==========
-        if (!session('clearsession_verified')) {
+        if (! session('clearsession_verified')) {
 
             return '
                 <h2>Masukkan Password Admin</h2>
                 <form method="POST" action="/clearallsession/check">
-                    ' . csrf_field() . '
+                    '.csrf_field().'
                     <input type="password" name="password" placeholder="Password"
                         style="padding:10px; width:200px;">
                     <br><br>
@@ -306,7 +329,7 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
 
         <!-- FORM HAPUS SESSION TERPILIH -->
         <form method='POST' action='/clearallsession/confirm'>
-            " . csrf_field() . "
+            ".csrf_field()."
             <table border='1' cellpadding='10' cellspacing='0'>
                 <tr>
                     <th>Pilih</th>
@@ -332,9 +355,9 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
                     <td>{$userName}</td>
                     <td>{$s->ip_address}</td>
                     <td>{$s->user_agent}</td>
-                    <td>" . date('Y-m-d H:i:s', $s->last_activity) . "</td>
+                    <td>".date('Y-m-d H:i:s', $s->last_activity).'</td>
                 </tr>
-            ";
+            ';
         }
 
         $html .= "
@@ -352,7 +375,7 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
 
         <!-- FORM HAPUS SEMUA -->
         <form method='POST' action='/clearallsession/clearall'>
-            " . csrf_field() . "
+            ".csrf_field()."
             <button type='submit' style='padding:10px 20px; background:darkred; color:white;'>
                 Hapus Semua Session (Force Logout Semua User)
             </button>
@@ -372,6 +395,7 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
 
         if ($input === $password) {
             session(['clearsession_verified' => true]);
+
             return redirect('/clearallsession');
         }
 
@@ -380,12 +404,12 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
     });
 
     Route::post('/clearallsession/confirm', function () {
-        if (!session('clearsession_verified')) {
+        if (! session('clearsession_verified')) {
             return redirect('/clearallsession')->with('error', 'Tidak diizinkan.');
         }
 
-        if (!request()->has('sessions')) {
-            return "Tidak ada session yang dipilih.";
+        if (! request()->has('sessions')) {
+            return 'Tidak ada session yang dipilih.';
         }
 
         // Ambil user_id dari session yang akan dihapus
@@ -395,7 +419,7 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
         if ($userIds->isNotEmpty()) {
             try {
                 // 1. Putuskan live session untuk user-user tersebut
-                \App\Models\Exam\ExamLiveSession::whereIn('user_id', $userIds)
+                ExamLiveSession::whereIn('user_id', $userIds)
                     ->update([
                         'is_active' => false,
                         'connection_status' => 'disconnected',
@@ -404,12 +428,12 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
                     ]);
 
                 // 2. Pause timer ujian untuk user-user tersebut
-                \App\Models\User\UserTimetable::whereIn('user_id', $userIds)
+                UserTimetable::whereIn('user_id', $userIds)
                     ->whereIn('status', ['exam', 'warning'])
                     ->whereNull('paused_at')
                     ->update(['paused_at' => now()]);
-            } catch (\Throwable $e) {
-                \Log::error("ClearSession Confirm Error: " . $e->getMessage());
+            } catch (Throwable $e) {
+                Log::error('ClearSession Confirm Error: '.$e->getMessage());
             }
         }
 
@@ -420,15 +444,14 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
         return redirect('/clearallsession')->with('message', 'Session terpilih telah dihapus. Status ujian & live session telah disesuaikan.');
     });
 
-
     Route::post('/clearallsession/clearall', function () {
-        if (!session('clearsession_verified')) {
+        if (! session('clearsession_verified')) {
             return redirect('/clearallsession')->with('error', 'Tidak diizinkan.');
         }
 
         try {
             // 1. Putuskan semua live session yang aktif
-            \App\Models\Exam\ExamLiveSession::where('is_active', true)
+            ExamLiveSession::where('is_active', true)
                 ->update([
                     'is_active' => false,
                     'connection_status' => 'disconnected',
@@ -437,11 +460,11 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
                 ]);
 
             // 2. Pause semua ujian yang sedang berjalan
-            \App\Models\User\UserTimetable::whereIn('status', ['exam', 'warning'])
+            UserTimetable::whereIn('status', ['exam', 'warning'])
                 ->whereNull('paused_at')
                 ->update(['paused_at' => now()]);
-        } catch (\Throwable $e) {
-            \Log::error("ClearSession ClearAll Error: " . $e->getMessage());
+        } catch (Throwable $e) {
+            Log::error('ClearSession ClearAll Error: '.$e->getMessage());
         }
 
         DB::table('sessions')->truncate();
@@ -456,12 +479,13 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
 
     // Admin Dashboard API Routes
     Route::prefix('api/admin/dashboard')->middleware('auth')->group(function () {
-        Route::get('/stats', [App\Http\Controllers\Api\Admin\DashboardApiController::class, 'getStats'])->name('admin.api.dashboard.stats');
-        Route::get('/realtime', [App\Http\Controllers\Api\Admin\DashboardApiController::class, 'getRealtime'])->name('admin.api.dashboard.realtime');
+        Route::get('/stats', [DashboardApiController::class, 'getStats'])->name('admin.api.dashboard.stats');
+        Route::get('/realtime', [DashboardApiController::class, 'getRealtime'])->name('admin.api.dashboard.realtime');
     });
 
     // Exam API Routes (using web middleware for session persistence)
     Route::prefix('api/exam')->middleware('auth')->group(function () {
+<<<<<<< Updated upstream
         // Auth Check Routes — ditangani AuthCheckController
         // GET /api/exam/ping        → cek apakah session masih valid (401 jika expired)
         // GET /api/exam/{id}/status → cek is_active ExamLiveSession (deteksi force-logout)
@@ -474,19 +498,32 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
         Route::post('/recording/upload-full', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'uploadFullRecording']);
         Route::post('/recording/upload-chunk', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'uploadChunk']);
         Route::post('/recording/merge', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'mergeRecordingChunks']);
+=======
+        Route::get('/{user_timetable_id}/data', [ExamApiController::class, 'getInitialState']);
+        Route::post('/save-answer', [ExamApiController::class, 'saveAnswer']);
+        Route::post('/toggle-mark', [ExamApiController::class, 'toggleMark']);
+        Route::post('/log-alert', [ExamApiController::class, 'logAlert']);
+        Route::post('/recording/upload-full', [ExamApiController::class, 'uploadFullRecording']);
+        Route::post('/recording/upload-chunk', [ExamApiController::class, 'uploadChunk']);
+        Route::post('/recording/merge', [ExamApiController::class, 'mergeRecordingChunks']);
+>>>>>>> Stashed changes
 
-        Route::get('/live-session/{user_timetable_id}/update', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'updateLiveSession']);
-        Route::get('/live-session/{user_timetable_id}/token', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'getLiveKitToken']);
+        Route::get('/live-session/{user_timetable_id}/update', [ExamApiController::class, 'updateLiveSession']);
+        Route::get('/live-session/{user_timetable_id}/token', [ExamApiController::class, 'getLiveKitToken']);
 
         // Admin Monitoring API
-        Route::get('/admin/monitoring/{timetable_id}/sessions', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'getMonitoringSessions']);
-        Route::get('/admin/monitoring/{timetable_id}/token', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'getMonitoringToken']);
+        Route::get('/admin/monitoring/{timetable_id}/sessions', [ExamApiController::class, 'getMonitoringSessions']);
+        Route::get('/admin/monitoring/{timetable_id}/token', [ExamApiController::class, 'getMonitoringToken']);
 
+<<<<<<< Updated upstream
         // Auth Check Routes — status ujian (cek ExamLiveSession.is_active)
         Route::get('/{user_timetable_id}/status', [App\Http\Controllers\Api\Auth\AuthCheckController::class, 'examStatus']);
 
         Route::post('/{user_timetable_id}/finish', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'finishExam']);
+=======
+        Route::post('/{user_timetable_id}/finish', [ExamApiController::class, 'finishExam']);
+>>>>>>> Stashed changes
     });
 
-    Route::get('/stress-test/exam/{userTimetableId}', \App\Livewire\Public\StressTestExamDetailIndex::class)->name('public.stress-test.exam');
+    Route::get('/stress-test/exam/{userTimetableId}', StressTestExamDetailIndex::class)->name('public.stress-test.exam');
 });

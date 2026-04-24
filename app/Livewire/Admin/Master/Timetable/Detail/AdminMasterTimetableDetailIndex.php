@@ -2,34 +2,54 @@
 
 namespace App\Livewire\Admin\Master\Timetable\Detail;
 
+use App\Exports\TimetableDetailExport;
 use App\Models\Master\Question\Module;
+use App\Models\Master\RatingScale\RatingScale;
 use App\Models\Master\Timetable\Timetable;
 use App\Models\User;
 use App\Models\User\UserTimetable;
 use Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Livewire\Component;
-use Session;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Master\RatingScale\RatingScale;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminMasterTimetableDetailIndex extends Component
 {
     use WithPagination;
-    public $timetable_id, $timetable, $modules = [], $supervisors = [], $module_id, $getSupervisors = [];
-    public $search = '', $perPage = 5, $start_time, $end_time;
+
+    public $timetable_id;
+
+    public $timetable;
+
+    public $modules = [];
+
+    public $supervisors = [];
+
+    public $module_id;
+
+    public $getSupervisors = [];
+
+    public $search = '';
+
+    public $perPage = 5;
+
+    public $start_time;
+
+    public $end_time;
 
     public function mount($timetable_id = null)
     {
         $this->timetable_id = $timetable_id;
 
-        if (!$this->timetable_id) {
+        if (! $this->timetable_id) {
             return redirect()->route('admin.master.timetable');
         }
 
         $timetable = Timetable::with('userTimetables')->find($this->timetable_id);
-        if (!$timetable) {
+        if (! $timetable) {
             return redirect()->route('admin.master.timetable');
         }
 
@@ -113,7 +133,8 @@ class AdminMasterTimetableDetailIndex extends Component
             'gradeMap' => $gradeMap,
         ])->setPaper('a4', 'landscape');
 
-        $fileName = 'nilai-ujian-' . ($this->timetable_id ?? 'timetable') . '.pdf';
+        $fileName = 'nilai-ujian-'.($this->timetable_id ?? 'timetable').'.pdf';
+
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
         }, $fileName);
@@ -122,13 +143,14 @@ class AdminMasterTimetableDetailIndex extends Component
     public function exportExcel()
     {
         try {
-            $fileName = 'nilai-ujian-' . ($this->timetable['name'] ?? 'detail') . '-' . date('YmdHis') . '.xlsx';
-            return \Maatwebsite\Excel\Facades\Excel::download(
-                new \App\Exports\TimetableDetailExport($this->timetable_id, $this->search),
+            $fileName = 'nilai-ujian-'.($this->timetable['name'] ?? 'detail').'-'.date('YmdHis').'.xlsx';
+
+            return Excel::download(
+                new TimetableDetailExport($this->timetable_id, $this->search),
                 $fileName
             );
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Timetable Detail Export Error: ' . $e->getMessage());
+            Log::error('Timetable Detail Export Error: '.$e->getMessage());
             $this->dispatch('swal:alert', [
                 'type' => 'error',
                 'title' => 'Gagal',

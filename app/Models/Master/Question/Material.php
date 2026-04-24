@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Auth;
 class Material extends Model
 {
     //
-    use SoftDeletes, HasUuids, \App\Traits\LogsSystemActivity;
+    use \App\Traits\LogsSystemActivity, HasUuids, SoftDeletes;
+
     protected $guarded = ['id'];
 
     public function company()
@@ -29,7 +30,7 @@ class Material extends Model
         static::addGlobalScope('user_scope', function (Builder $builder) {
             $user = Auth::user();
 
-            if (!$user || !$user->hasRole('Anonymous')) {
+            if (! $user || ! $user->hasRole('Anonymous')) {
                 $builder->where('company_id', optional($user?->company)?->id)->orderBy('order', 'asc');
             }
 
@@ -45,7 +46,7 @@ class Material extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
-        $term = '%' . $term . '%';
+        $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id', 'material_category_id', 'name', 'level', 'description'], 'ILIKE', $term)
@@ -57,8 +58,6 @@ class Material extends Model
 
     /**
      * Get the materialCategory that owns the Material
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function materialCategory(): BelongsTo
     {
@@ -67,8 +66,6 @@ class Material extends Model
 
     /**
      * Get all of the questions for the Topic
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function questions(): HasMany
     {

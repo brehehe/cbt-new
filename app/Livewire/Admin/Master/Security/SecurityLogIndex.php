@@ -12,8 +12,11 @@ class SecurityLogIndex extends Component
     use WithPagination;
 
     public $search = '';
+
     public $perPage = 5;
+
     public $filterEvent = '';
+
     public $logSource = 'security'; // 'security' or 'audit'
 
     // Modal Form State
@@ -45,12 +48,12 @@ class SecurityLogIndex extends Component
         $logs = Activity::where('log_name', $this->logSource)
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
-                    $q->where('description', 'like', '%' . $this->search . '%')
-                      ->orWhereHas('causer', function ($uq) {
-                          $uq->where('name', 'like', '%' . $this->search . '%');
-                      })
-                      ->orWhere('properties->ip_address', 'like', '%' . $this->search . '%')
-                      ->orWhere('subject_type', 'like', '%' . $this->search . '%');
+                    $q->where('description', 'like', '%'.$this->search.'%')
+                        ->orWhereHas('causer', function ($uq) {
+                            $uq->where('name', 'like', '%'.$this->search.'%');
+                        })
+                        ->orWhere('properties->ip_address', 'like', '%'.$this->search.'%')
+                        ->orWhere('subject_type', 'like', '%'.$this->search.'%');
                 });
             })
             ->when($this->filterEvent, function ($query) {
@@ -111,7 +114,7 @@ class SecurityLogIndex extends Component
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->userAgent(),
                 'manual_entry' => true,
-                'recorded_by' => auth()->user()->name
+                'recorded_by' => auth()->user()->name,
             ])
             ->log($this->form['description']);
 

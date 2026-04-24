@@ -20,7 +20,7 @@ use Throwable;
 class CompanyDetail extends Model
 {
     //
-    use SoftDeletes, HasUuids, RegionTrait, \App\Traits\LogsSystemActivity;
+    use \App\Traits\LogsSystemActivity, HasUuids, RegionTrait, SoftDeletes;
 
     protected $guarded = ['id'];
 
@@ -50,7 +50,7 @@ class CompanyDetail extends Model
                 $model->setCity();
                 $model->setDistrict();
                 $model->setSubDistrict();
-            } catch (Exception |Throwable $th) {
+            } catch (Exception|Throwable $th) {
                 DB::rollBack();
                 $error = [
                     'message' => $th->getMessage(),
@@ -61,25 +61,22 @@ class CompanyDetail extends Model
                 Log::error('Ada kesalahan saat boot CompanyDetail sync', $error);
             }
 
-
         });
     }
 
     /**
      * Get the company that owns the CompanyDetail
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class, 'company_id', 'id');
     }
 
-    function setProvince()
+    public function setProvince()
     {
         $province = Province::where('code', $this->province_code)->first();
 
-        if (!$province) {
+        if (! $province) {
             $this->getProvinceTrait();
         }
 
@@ -91,11 +88,11 @@ class CompanyDetail extends Model
         }
     }
 
-    function setCity()
+    public function setCity()
     {
         $city = City::where('code', $this->city_code)->where('parent_code', $this->province_code)->first();
 
-        if (!$city) {
+        if (! $city) {
             $this->getCityTrait($this->province_code);
         }
 
@@ -107,11 +104,11 @@ class CompanyDetail extends Model
         }
     }
 
-    function setDistrict()
+    public function setDistrict()
     {
         $district = District::where('code', $this->district_code)->where('parent_code', $this->city_code)->first();
 
-        if (!$district) {
+        if (! $district) {
             $this->getDistrictTrait($this->city_code);
         }
 
@@ -123,11 +120,11 @@ class CompanyDetail extends Model
         }
     }
 
-    function setSubDistrict()
+    public function setSubDistrict()
     {
         $subDistrict = SubDistrict::where('code', $this->sub_district_code)->where('parent_code', $this->district_code)->first();
 
-        if (!$subDistrict) {
+        if (! $subDistrict) {
             $this->getSubDistrictTrait($this->district_code);
         }
 

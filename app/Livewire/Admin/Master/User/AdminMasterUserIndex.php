@@ -7,23 +7,20 @@ use App\Helpers\RoleHelper;
 use App\Models\Doctor\Doctor;
 use App\Models\Role\RoleCompany;
 use App\Models\User;
-use App\Models\User\UserCompanyRole;
 use App\Models\User\UserDetail;
-use App\Models\User\UserPrice;
 use App\Traits\Region\RegionTrait;
-use Illuminate\Console\View\Components\Alert;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
-use Illuminate\Support\Str;
 
 class AdminMasterUserIndex extends Component
 {
-    use WithPagination, WithFileUploads, RegionTrait;
+    use RegionTrait, WithFileUploads, WithPagination;
 
     protected $queryString = [
         // 'page' => ['except' => 1], // Ini akan menghapus ?page=1 dari URL
@@ -36,58 +33,97 @@ class AdminMasterUserIndex extends Component
 
     // User
     public $data_id;
+
     public $name;
+
     public $username;
+
     public $email;
+
     public $password;
+
     public $profile;
+
     public $profile_old;
+
     public $phone;
 
     // User Detail
     public $address;
+
     public $identity_card;
+
     public $blood_group;
+
     public $administrative_gender;
+
     public $birth_date;
+
     public $deceased_date;
+
     public $marital_status;
+
     public $role_id;
+
     public $is_head = false;
+
     public $is_active = false;
+
     public $province_code;
+
     public $city_code;
+
     public $district_code;
+
     public $sub_district_code;
+
     public $rt_code;
+
     public $rw_code;
 
     public $maritalStatusDetails = [];
+
     public $administrativeGenderDetails = [];
+
     public $roles = [];
+
     public $provinces = [];
+
     public $cities = [];
+
     public $districts = [];
+
     public $subDistricts = [];
 
     // Doctor
     public $sip_number;
+
     public $specialization;
+
     public $doctor_type = 'general';
+
     public $type = 'in';
+
     public $role_name;
 
     // Price
     public $incentive_doctor = 0;
+
     public $incentive_pharmacy = 0;
+
     public $incentive_nurse = 0;
+
     public $incentive_cashier = 0;
+
     public $price_doctor = 0;
 
     // Type Incentive
     public $type_incentive_doctor = 'rupiah';
+
     public $type_incentive_nurse = 'rupiah';
+
     public $type_incentive_pharmacy = 'rupiah';
+
     public $type_incentive_cashier = 'rupiah';
 
     public function mount()
@@ -123,6 +159,7 @@ class AdminMasterUserIndex extends Component
         $this->type_incentive_pharmacy = 'rupiah';
         $this->type_incentive_cashier = 'rupiah';
         $this->provinces = $this->getProvinceTrait();
+
         return $this->dispatch('open-modal', ['id' => 'modal']);
     }
 
@@ -131,6 +168,7 @@ class AdminMasterUserIndex extends Component
         $this->reset(['data_id', 'name', 'username', 'email', 'password', 'profile', 'profile_old', 'phone', 'address', 'identity_number', 'blood_group', 'administrative_gender', 'birth_date', 'deceased_date', 'marital_status', 'role_id', 'is_head', 'is_active', 'sip_number', 'specialization', 'doctor_type', 'type', 'incentive_doctor', 'incentive_pharmacy', 'incentive_nurse', 'incentive_cashier', 'type_incentive_doctor', 'type_incentive_nurse', 'type_incentive_pharmacy', 'type_incentive_cashier', 'price_doctor', 'role_name', 'province_code', 'city_code', 'district_code', 'sub_district_code', 'provinces', 'cities', 'districts', 'subDistricts', 'rt_code', 'rw_code']);
         $this->resetErrorBag();
         $this->resetValidation();
+
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
 
@@ -195,14 +233,14 @@ class AdminMasterUserIndex extends Component
 
         $this->role_id =
             $user
-            ->companyRoles()
-            ->where('company_id', Auth::user()->company_id)
-            ->first()->role_company_id ?? null;
+                ->companyRoles()
+                ->where('company_id', Auth::user()->company_id)
+                ->first()->role_company_id ?? null;
         $this->role_name =
             $user
-            ->companyRoles()
-            ->where('company_id', Auth::user()->company_id)
-            ->first()->role->name ?? null;
+                ->companyRoles()
+                ->where('company_id', Auth::user()->company_id)
+                ->first()->role->name ?? null;
 
         if ($user->userDetail) {
             $this->address = $user->userDetail->address;
@@ -223,14 +261,14 @@ class AdminMasterUserIndex extends Component
             $this->rw_code = $user->userDetail->rw;
             $this->is_head =
                 $user
-                ->companyRoles()
-                ->where('company_id', Auth::user()->company_id)
-                ->first()->is_head ?? false;
+                    ->companyRoles()
+                    ->where('company_id', Auth::user()->company_id)
+                    ->first()->is_head ?? false;
             $this->is_active =
                 $user
-                ->companyRoles()
-                ->where('company_id', Auth::user()->company_id)
-                ->first()->is_active ?? false;
+                    ->companyRoles()
+                    ->where('company_id', Auth::user()->company_id)
+                    ->first()->is_active ?? false;
             if ($this->role_name == 'Dokter') {
                 $this->sip_number = $user->userDetail->sip_number;
                 $this->specialization = $user->userDetail->specialization;
@@ -239,7 +277,6 @@ class AdminMasterUserIndex extends Component
                 $this->type = $user->userDetail->type ?? 'in';
             }
         }
-
 
         $this->openModal();
     }
@@ -358,16 +395,15 @@ class AdminMasterUserIndex extends Component
             'type' => $this->role_name == 'Dokter' ? 'required|in:in,out' : 'nullable',
         ]);
 
-
-
         try {
             DB::beginTransaction();
 
             // Handle user creation/update with smart identity resolution
             $userResult = $this->handleUserIdentityResolution($currentCompanyId);
 
-            if (!$userResult['success']) {
+            if (! $userResult['success']) {
                 DB::rollBack();
+
                 return AlertHelper::error('Gagal', $userResult['message']);
             }
 
@@ -391,8 +427,8 @@ class AdminMasterUserIndex extends Component
             return;
         } catch (\Throwable $th) {
             DB::rollBack();
-            AlertHelper::error('Gagal', 'Pengguna gagal disimpan. ' . $th->getMessage());
-            Log::error('Error saving user: ' . $th->getMessage(), [
+            AlertHelper::error('Gagal', 'Pengguna gagal disimpan. '.$th->getMessage());
+            Log::error('Error saving user: '.$th->getMessage(), [
                 'user_id' => Auth::id(),
                 'data' => [
                     'name' => $this->name,
@@ -492,7 +528,7 @@ class AdminMasterUserIndex extends Component
     protected function updateExistingUser($companyId)
     {
         $user = User::find($this->data_id);
-        if (!$user) {
+        if (! $user) {
             throw new \Exception('User tidak ditemukan');
         }
 
@@ -561,13 +597,14 @@ class AdminMasterUserIndex extends Component
             ],
         );
     }
+
     /**
      * Assign user role
      */
     protected function assignUserRole($user, $companyId)
     {
         $getRole = RoleCompany::find($this->role_id);
-        if (!$getRole) {
+        if (! $getRole) {
             throw new \Exception('Role tidak ditemukan.');
         }
 
@@ -596,6 +633,7 @@ class AdminMasterUserIndex extends Component
         $this->reset(['data_id', 'incentive_doctor', 'incentive_pharmacy', 'incentive_nurse', 'incentive_cashier', 'type_incentive_doctor', 'type_incentive_nurse', 'type_incentive_pharmacy', 'type_incentive_cashier']);
         $this->resetErrorBag();
         $this->resetValidation();
+
         return $this->dispatch('close-modal', ['id' => 'modal-price']);
     }
 

@@ -19,13 +19,13 @@ class ExamSessionService
         // dd($data);
         $exam_room = ExamSession::updateOrCreate(
             [
-                'id' => $data['id'] ?? null
+                'id' => $data['id'] ?? null,
             ],
             [
-                'name'        => $data['name'] ?? '',
-                'code'        => $data['code'] ?? null,
+                'name' => $data['name'] ?? '',
+                'code' => $data['code'] ?? null,
                 'description' => $data['description'] ?? null,
-                'is_active'   => $data['is_active'] ?? true,
+                'is_active' => $data['is_active'] ?? true,
             ]
         );
 

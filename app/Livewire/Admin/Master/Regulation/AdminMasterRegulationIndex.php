@@ -7,13 +7,15 @@ use App\Models\Master\Regulation\Regulation;
 use DB;
 use Livewire\Component;
 use Log;
-use Livewire\WithPagination;
 
 class AdminMasterRegulationIndex extends Component
 {
     public $search = '';
+
     public $data_id;
+
     public $description;
+
     public $type;
 
     public function openModal()
@@ -28,6 +30,7 @@ class AdminMasterRegulationIndex extends Component
             'type',
             'description',
         ]);
+
         return $this->dispatch('close-modal', ['id' => 'modal-regulation']);
     }
 
@@ -57,7 +60,8 @@ class AdminMasterRegulationIndex extends Component
         } catch (\Throwable $th) {
             DB::rollback();
             AlertHelper::error('Gagal', 'Data gagal dihapus!');
-            return Log::info('Gagal Menghapus Data Regulasi : ' . $th);
+
+            return Log::info('Gagal Menghapus Data Regulasi : '.$th);
         }
     }
 
@@ -82,7 +86,8 @@ class AdminMasterRegulationIndex extends Component
         } catch (\Throwable $th) {
             DB::rollback();
             AlertHelper::error('Gagal', 'Data gagal disimpan!');
-            return Log::info('Gagal Menyimpan Data Regulasi : ' . $th);
+
+            return Log::info('Gagal Menyimpan Data Regulasi : '.$th);
         }
     }
 
@@ -100,7 +105,7 @@ class AdminMasterRegulationIndex extends Component
     {
         $regulation = Regulation::query()
             ->when($this->search, function ($query, $search) {
-                $query->where('description', 'ilike', '%' . $search . '%');
+                $query->where('description', 'ilike', '%'.$search.'%');
             })
             ->orderBy('order', 'asc')
             ->get();
@@ -109,7 +114,6 @@ class AdminMasterRegulationIndex extends Component
             'regulations' => $regulation,
         ])
             ->extends('layout.app')
-            ->section('content')
-        ;
+            ->section('content');
     }
 }

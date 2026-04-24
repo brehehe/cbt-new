@@ -2,22 +2,31 @@
 
 namespace App\Livewire\Dosen\Dashboard;
 
-use Livewire\Component;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
+use Livewire\Component;
 
 class DosenDashboardIndex extends Component
 {
     public $totalMyExams = 15;
+
     public $totalStudents = 120;
+
     public $totalQuestions = 85;
+
     public $averageScore = 78.5;
+
     public $activeExams = 2;
+
     public $activeStudents = 35;
+
     public $questionTypes = 8;
+
     public $currentExams = [];
+
     public $upcomingExams = [];
+
     public $recentActivities = [];
+
     public $weeklyPerformance = [];
 
     public function mount()
@@ -33,14 +42,14 @@ class DosenDashboardIndex extends Component
                 'id' => 1,
                 'name' => 'Ujian Tengah Semester - Algoritma',
                 'participants' => 25,
-                'remaining_time' => '01:45:30'
+                'remaining_time' => '01:45:30',
             ],
             [
                 'id' => 2,
                 'name' => 'Quiz Mingguan - Database',
                 'participants' => 18,
-                'remaining_time' => '00:30:15'
-            ]
+                'remaining_time' => '00:30:15',
+            ],
         ];
 
         $this->upcomingExams = [
@@ -48,14 +57,14 @@ class DosenDashboardIndex extends Component
                 'id' => 3,
                 'name' => 'Ujian Akhir Semester - Pemrograman Web',
                 'participants' => 45,
-                'start_time' => '15 Sep, 09:00'
+                'start_time' => '15 Sep, 09:00',
             ],
             [
                 'id' => 4,
                 'name' => 'Quiz - Struktur Data',
                 'participants' => 32,
-                'start_time' => '16 Sep, 14:00'
-            ]
+                'start_time' => '16 Sep, 14:00',
+            ],
         ];
 
         $this->recentActivities = [
@@ -63,20 +72,20 @@ class DosenDashboardIndex extends Component
                 'student_name' => 'Ahmad Ridwan',
                 'activity' => 'Menyelesaikan ujian',
                 'status' => 'completed',
-                'time' => '5 menit yang lalu'
+                'time' => '5 menit yang lalu',
             ],
             [
                 'student_name' => 'Siti Nurhayati',
                 'activity' => 'Sedang mengerjakan ujian',
                 'status' => 'ongoing',
-                'time' => '10 menit yang lalu'
+                'time' => '10 menit yang lalu',
             ],
             [
                 'student_name' => 'Budi Santoso',
                 'activity' => 'Menyelesaikan ujian',
                 'status' => 'completed',
-                'time' => '15 menit yang lalu'
-            ]
+                'time' => '15 menit yang lalu',
+            ],
         ];
 
         $this->weeklyPerformance = [
@@ -86,7 +95,7 @@ class DosenDashboardIndex extends Component
             ['date' => 'Sep 12', 'average' => 79],
             ['date' => 'Sep 13', 'average' => 85],
             ['date' => 'Sep 14', 'average' => 88],
-            ['date' => 'Sep 15', 'average' => 90]
+            ['date' => 'Sep 15', 'average' => 90],
         ];
     }
 

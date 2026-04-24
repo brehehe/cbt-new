@@ -7,10 +7,10 @@ use App\Models\Master\RatingScale\RatingScale;
 use App\Models\Master\Timetable\Timetable;
 use App\Models\User;
 use App\Models\User\UserTimetable;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class AdminReportExamResultIndex extends Component
 {
@@ -19,13 +19,19 @@ class AdminReportExamResultIndex extends Component
     protected $paginationTheme = 'bootstrap';
 
     public $perPage = 10;
+
     public $search = '';
+
     public $user_id = '';
+
     public $module_id = '';
+
     public $timetable_id = '';
 
     public $users = [];
+
     public $modules = [];
+
     public $timetables = [];
 
     public function mount()
@@ -124,7 +130,7 @@ class AdminReportExamResultIndex extends Component
         foreach ($examResults as $result) {
             $grade = $this->getGradeDetail($result->mark);
             $letter = $grade ? $grade->grade_letter : '-';
-            if (!isset($gradeDistribution[$letter])) {
+            if (! isset($gradeDistribution[$letter])) {
                 $gradeDistribution[$letter] = 0;
             }
             $gradeDistribution[$letter]++;
@@ -146,8 +152,8 @@ class AdminReportExamResultIndex extends Component
             ->setOption('margin-left', 10);
 
         return response()->streamDownload(
-            fn () => print($pdf->output()),
-            'exam-result-report-' . date('Y-m-d-H-i-s') . '.pdf'
+            fn () => print ($pdf->output()),
+            'exam-result-report-'.date('Y-m-d-H-i-s').'.pdf'
         );
     }
 
@@ -162,7 +168,7 @@ class AdminReportExamResultIndex extends Component
         if ($this->user_id) {
             $user = $this->users->find($this->user_id);
             if ($user) {
-                $summary['user'] = $user->name . ' (' . $user->nim . ')';
+                $summary['user'] = $user->name.' ('.$user->nim.')';
             }
         }
 

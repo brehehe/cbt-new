@@ -2,44 +2,86 @@
 
 namespace App\Livewire\Admin\Master\Module;
 
-use Exception;
-use Livewire\Component;
 use App\Helpers\AlertHelper;
-use Livewire\WithPagination;
-use Livewire\WithFileUploads;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Category\CategoryQuestion;
 use App\Models\Master\Question\Module;
 use App\Models\Master\Question\ModuleQuestion;
 use App\Models\Master\Question\Question;
-use App\Models\Category\CategoryQuestion;
-use App\Services\Module\ModuleService;
-use Spatie\LivewireFilepond\WithFilePond;
 use App\Models\Master\Question\QuestionType;
 use App\Models\Master\Question\Topic;
 use App\Models\Study\Study;
 use App\Services\Module\ModuleQuestionService;
+use App\Services\Module\ModuleService;
+use Exception;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Livewire\Component;
+use Livewire\WithFileUploads;
+use Livewire\WithPagination;
+use Spatie\LivewireFilepond\WithFilePond;
 use Throwable;
 
 class AdminMasterModuleQuestionIndex extends Component
 {
-    use WithPagination, WithFileUploads, WithFilePond;
+    use WithFilePond, WithFileUploads, WithPagination;
+
     protected $paginationTheme = 'bootstrap';
-    public $perPage = 8, $search;
+
+    public $perPage = 8;
+
+    public $search;
+
     public $perPageModule = 5;
 
-    public $get_module, $question_types;
-    public $data_id, $question_type_id, $name, $duration, $description, $random_question;
+    public $get_module;
+
+    public $question_types;
+
+    public $data_id;
+
+    public $question_type_id;
+
+    public $name;
+
+    public $duration;
+
+    public $description;
+
+    public $random_question;
+
     public $question_pick_type = 'manual';
-    public $module_question_id, $question_id = [];
-    public $get_studys = [], $studys = [], $is_all_study = false, $topics = [];
-    public $filterStudyId, $filterQuestionTypeId, $filterTopicId;
-    public $selected_all = [], $openQuestion = false;
+
+    public $module_question_id;
+
+    public $question_id = [];
+
+    public $get_studys = [];
+
+    public $studys = [];
+
+    public $is_all_study = false;
+
+    public $topics = [];
+
+    public $filterStudyId;
+
+    public $filterQuestionTypeId;
+
+    public $filterTopicId;
+
+    public $selected_all = [];
+
+    public $openQuestion = false;
+
     public $category_questions = [];
+
     public $category_question_settings = [];
+
     public $category_question_limits = [];
+
     public $topic_question_settings = [];
+
     public $topic_question_limits = [];
 
     public function render()
@@ -86,25 +128,25 @@ class AdminMasterModuleQuestionIndex extends Component
 
         return view('livewire.admin.master.module.admin-master-module-question-index', [
             'module_questions' => $module_questions,
-            'questions'        => $this->openQuestion ? $questions->orderBy('id', 'desc')->paginate($this->perPage) : [],
+            'questions' => $this->openQuestion ? $questions->orderBy('id', 'desc')->paginate($this->perPage) : [],
         ])->extends('layout.app')->section('content');
     }
 
     public function mount($id)
     {
-        $this->get_module       = Module::findOrFail($id);
-        $this->data_id          = $this->get_module?->id;
+        $this->get_module = Module::findOrFail($id);
+        $this->data_id = $this->get_module?->id;
         $this->question_type_id = $this->get_module?->question_type_id;
-        $this->name             = $this->get_module?->name;
-        $this->duration         = $this->get_module?->duration;
-        $this->description      = $this->get_module?->description;
-        $this->random_question  = $this->get_module?->random_question;
+        $this->name = $this->get_module?->name;
+        $this->duration = $this->get_module?->duration;
+        $this->description = $this->get_module?->description;
+        $this->random_question = $this->get_module?->random_question;
         $this->question_pick_type = $this->get_module?->question_pick_type ?? 'manual';
-        $this->is_all_study     = $this->get_module?->is_all_study;
+        $this->is_all_study = $this->get_module?->is_all_study;
 
-        $this->studys           = json_decode($this->get_module?->studys) ?? [];
+        $this->studys = json_decode($this->get_module?->studys) ?? [];
         $this->category_questions = CategoryQuestion::select('id', 'name')->get();
-        $this->topics           = Topic::select('id', 'name')->get();
+        $this->topics = Topic::select('id', 'name')->get();
         $this->initializeCategoryQuestionSettings();
         $this->loadCategoryQuestionLimits();
         $this->applyCategoryQuestionSettings($this->get_module?->category_question_settings ?? []);
@@ -131,7 +173,7 @@ class AdminMasterModuleQuestionIndex extends Component
             $this->get_studys = Study::whereIn('id', $this->studys)->orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
         }
 
-        $this->question_types   = QuestionType::select('id', 'name')->get();
+        $this->question_types = QuestionType::select('id', 'name')->get();
     }
 
     public function updatedQuestionTypeId()
@@ -142,7 +184,7 @@ class AdminMasterModuleQuestionIndex extends Component
 
     public function updatedTopicQuestionSettings($value, $key)
     {
-        if (!is_string($key)) {
+        if (! is_string($key)) {
             return;
         }
 
@@ -152,7 +194,7 @@ class AdminMasterModuleQuestionIndex extends Component
         }
 
         [$topicId, $field] = $parts;
-        if (!in_array($field, ['default', 'easy', 'medium', 'hard'], true)) {
+        if (! in_array($field, ['default', 'easy', 'medium', 'hard'], true)) {
             return;
         }
 
@@ -168,7 +210,7 @@ class AdminMasterModuleQuestionIndex extends Component
 
     public function updatedCategoryQuestionSettings($value, $key)
     {
-        if (!is_string($key)) {
+        if (! is_string($key)) {
             return;
         }
 
@@ -178,7 +220,7 @@ class AdminMasterModuleQuestionIndex extends Component
         }
 
         [$categoryId, $field] = $parts;
-        if (!in_array($field, ['default', 'easy', 'medium', 'hard'], true)) {
+        if (! in_array($field, ['default', 'easy', 'medium', 'hard'], true)) {
             return;
         }
 
@@ -204,6 +246,7 @@ class AdminMasterModuleQuestionIndex extends Component
         $this->perPage = 8;
         $this->openQuestion = false;
         $this->dispatch('close-modal', ['id' => 'modal-module-question']);
+
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
 
@@ -224,10 +267,10 @@ class AdminMasterModuleQuestionIndex extends Component
         $this->validate(
             [
                 'question_type_id' => 'required|exists:question_types,id',
-                'name'             => 'required',
-                'description'      => 'nullable',
-                'duration'         => 'required|numeric|min:1',
-                'studys'           => 'required|array',
+                'name' => 'required',
+                'description' => 'nullable',
+                'duration' => 'required|numeric|min:1',
+                'studys' => 'required|array',
                 'question_pick_type' => 'required|in:manual,category,topic',
                 'category_question_settings.*.enabled' => 'nullable|boolean',
                 'category_question_settings.*.default' => 'nullable|integer|min:0',
@@ -242,13 +285,13 @@ class AdminMasterModuleQuestionIndex extends Component
             ],
             [
                 'question_type_id.required' => 'Tipe Ujian wajib diisi.',
-                'question_type_id.exists'   => 'Tipe Ujian tidak valid.',
-                'name.required'             => 'Nama modul wajib diisi.',
-                'duration.required'         => 'Durasi pengerjaan modul wajib diisi.',
-                'duration.numeric'          => 'Durasi pengerjaan modul hanya bernilai angka.',
-                'duration.min'              => 'Durasi pengerjaan modul minimal 1 menit.',
-                'studys.required'           => 'Prodi wajib dipilih.',
-                'studys.array'              => 'Prodi tidak valid.',
+                'question_type_id.exists' => 'Tipe Ujian tidak valid.',
+                'name.required' => 'Nama modul wajib diisi.',
+                'duration.required' => 'Durasi pengerjaan modul wajib diisi.',
+                'duration.numeric' => 'Durasi pengerjaan modul hanya bernilai angka.',
+                'duration.min' => 'Durasi pengerjaan modul minimal 1 menit.',
+                'studys.required' => 'Prodi wajib dipilih.',
+                'studys.array' => 'Prodi tidak valid.',
                 'question_pick_type.required' => 'Tipe pengambilan soal wajib dipilih.',
                 'question_pick_type.in' => 'Tipe pengambilan soal tidak valid.',
             ]
@@ -257,7 +300,7 @@ class AdminMasterModuleQuestionIndex extends Component
         $this->resetErrorBag('category_question_settings');
         $this->resetErrorBag('topic_question_settings');
         foreach ($this->category_question_settings as $categoryId => $settings) {
-            if (!($settings['enabled'] ?? false)) {
+            if (! ($settings['enabled'] ?? false)) {
                 continue;
             }
             $limits = $this->category_question_limits[$categoryId] ?? ['default' => 0, 'easy' => 0, 'medium' => 0, 'hard' => 0];
@@ -275,7 +318,7 @@ class AdminMasterModuleQuestionIndex extends Component
         }
 
         foreach ($this->topic_question_settings as $topicId => $settings) {
-            if (!($settings['enabled'] ?? false)) {
+            if (! ($settings['enabled'] ?? false)) {
                 continue;
             }
             $limits = $this->topic_question_limits[$topicId] ?? ['default' => 0, 'easy' => 0, 'medium' => 0, 'hard' => 0];
@@ -299,34 +342,34 @@ class AdminMasterModuleQuestionIndex extends Component
         try {
             DB::beginTransaction();
             $request = [
-                'id'               => $this->data_id,
-                'user_id'          => Auth::user()?->id,
-                'company_id'       => Auth::user()?->company?->id,
+                'id' => $this->data_id,
+                'user_id' => Auth::user()?->id,
+                'company_id' => Auth::user()?->company?->id,
                 'question_type_id' => $this->question_type_id,
-                'name'             => $this->name,
-                'duration'         => $this->duration,
-                'random_question'  => $this->random_question,
-                'description'      => $this->description,
-                'studys'           => $this->studys,
-                'is_all_study'     => $this->is_all_study,
+                'name' => $this->name,
+                'duration' => $this->duration,
+                'random_question' => $this->random_question,
+                'description' => $this->description,
+                'studys' => $this->studys,
+                'is_all_study' => $this->is_all_study,
                 'question_pick_type' => $this->question_pick_type,
                 'category_question_settings' => $this->getFilteredCategoryQuestionSettings(),
                 'topic_question_settings' => $this->getFilteredTopicQuestionSettings(),
             ];
 
             $module = app(ModuleService::class)->updateOrCreate($request);
-            if (!$module) {
-                throw new Exception("Ada kesalahaan saat ModuleService => updateOrCreate", 500);
+            if (! $module) {
+                throw new Exception('Ada kesalahaan saat ModuleService => updateOrCreate', 500);
             }
 
-            if ($this->question_pick_type === 'category' && !empty($request['category_question_settings'])) {
+            if ($this->question_pick_type === 'category' && ! empty($request['category_question_settings'])) {
                 $categoryIds = array_keys($request['category_question_settings']);
                 $questionIds = Question::withoutGlobalScope('user_scope')
                     ->whereIn('category_question_id', $categoryIds)
                     ->pluck('id')
                     ->toArray();
 
-                if (!empty($questionIds)) {
+                if (! empty($questionIds)) {
                     ModuleQuestion::withoutGlobalScope('user_scope')
                         ->where('module_id', $module->id)
                         ->whereIn('question_id', $questionIds)
@@ -335,14 +378,14 @@ class AdminMasterModuleQuestionIndex extends Component
                             'question_pick_type' => 'category',
                         ]);
                 }
-            } elseif ($this->question_pick_type === 'topic' && !empty($request['topic_question_settings'])) {
+            } elseif ($this->question_pick_type === 'topic' && ! empty($request['topic_question_settings'])) {
                 $topicIds = array_keys($request['topic_question_settings']);
                 $questionIds = Question::withoutGlobalScope('user_scope')
                     ->whereIn('topic_id', $topicIds)
                     ->pluck('id')
                     ->toArray();
 
-                if (!empty($questionIds)) {
+                if (! empty($questionIds)) {
                     ModuleQuestion::withoutGlobalScope('user_scope')
                         ->where('module_id', $module->id)
                         ->whereIn('question_id', $questionIds)
@@ -357,14 +400,15 @@ class AdminMasterModuleQuestionIndex extends Component
             $this->applyCategoryQuestionSettings($module->category_question_settings ?? []);
 
             DB::commit();
-        } catch (Exception | Throwable $th) {
+        } catch (Exception|Throwable $th) {
             DB::rollBack();
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterModuleQuestionIndex => submitModule', $error);
+
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
         }
 
@@ -374,6 +418,7 @@ class AdminMasterModuleQuestionIndex extends Component
     public function modalModuleQuestion()
     {
         $this->openQuestion = true;
+
         return $this->dispatch('open-modal', ['id' => 'modal-module-question']);
     }
 
@@ -386,26 +431,28 @@ class AdminMasterModuleQuestionIndex extends Component
         try {
             DB::beginTransaction();
             $request = [
-                'id'          => $this->data_id,
-                'company_id'  => Auth::user()?->company?->id,
-                'module_id'   => $this->get_module?->id,
+                'id' => $this->data_id,
+                'company_id' => Auth::user()?->company?->id,
+                'module_id' => $this->get_module?->id,
                 'question_id' => $this->selected_all ? array_keys($this->selected_all) : [],
-                'study_id'    => Question::whereIn('id', $this->question_id)->pluck('study_id')->first()->id ?? null,
+                'study_id' => Question::whereIn('id', $this->question_id)->pluck('study_id')->first()->id ?? null,
             ];
 
             app(ModuleQuestionService::class)->updateOrCreate($request);
 
             DB::commit();
             $this->closeModal();
+
             return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
-        } catch (Exception | Throwable $th) {
+        } catch (Exception|Throwable $th) {
             DB::rollBack();
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterModuleQuestionIndex => submitModuleQuestion', $error);
+
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
         }
     }
@@ -419,13 +466,14 @@ class AdminMasterModuleQuestionIndex extends Component
     {
         try {
             app(ModuleQuestionService::class)->delete($id[0]);
-        } catch (Exception | Throwable $th) {
+        } catch (Exception|Throwable $th) {
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterModuleQuestionIndex => delete', $error);
+
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menghapus data');
         }
 
@@ -439,9 +487,9 @@ class AdminMasterModuleQuestionIndex extends Component
             $this->category_question_settings[$category->id] = [
                 'enabled' => false,
                 'default' => 0,
-                'easy'    => 0,
-                'medium'  => 0,
-                'hard'    => 0,
+                'easy' => 0,
+                'medium' => 0,
+                'hard' => 0,
             ];
         }
     }
@@ -455,15 +503,15 @@ class AdminMasterModuleQuestionIndex extends Component
         }
 
         foreach ($existingSettings ?? [] as $categoryId => $settings) {
-            if (!isset($this->category_question_settings[$categoryId])) {
+            if (! isset($this->category_question_settings[$categoryId])) {
                 continue;
             }
             $this->category_question_settings[$categoryId] = [
                 'enabled' => true,
                 'default' => (int) ($settings['default'] ?? 0),
-                'easy'    => (int) ($settings['easy'] ?? 0),
-                'medium'  => (int) ($settings['medium'] ?? 0),
-                'hard'    => (int) ($settings['hard'] ?? 0),
+                'easy' => (int) ($settings['easy'] ?? 0),
+                'medium' => (int) ($settings['medium'] ?? 0),
+                'hard' => (int) ($settings['hard'] ?? 0),
             ];
         }
     }
@@ -472,15 +520,15 @@ class AdminMasterModuleQuestionIndex extends Component
     {
         $filtered = [];
         foreach ($this->category_question_settings as $categoryId => $settings) {
-            if (!($settings['enabled'] ?? false)) {
+            if (! ($settings['enabled'] ?? false)) {
                 continue;
             }
 
             $filtered[$categoryId] = [
                 'default' => (int) ($settings['default'] ?? 0),
-                'easy'   => (int) ($settings['easy'] ?? 0),
+                'easy' => (int) ($settings['easy'] ?? 0),
                 'medium' => (int) ($settings['medium'] ?? 0),
-                'hard'   => (int) ($settings['hard'] ?? 0),
+                'hard' => (int) ($settings['hard'] ?? 0),
             ];
         }
 
@@ -494,9 +542,9 @@ class AdminMasterModuleQuestionIndex extends Component
             $this->topic_question_settings[$topic->id] = [
                 'enabled' => false,
                 'default' => 0,
-                'easy'    => 0,
-                'medium'  => 0,
-                'hard'    => 0,
+                'easy' => 0,
+                'medium' => 0,
+                'hard' => 0,
             ];
         }
     }
@@ -510,15 +558,15 @@ class AdminMasterModuleQuestionIndex extends Component
         }
 
         foreach ($existingSettings ?? [] as $topicId => $settings) {
-            if (!isset($this->topic_question_settings[$topicId])) {
+            if (! isset($this->topic_question_settings[$topicId])) {
                 continue;
             }
             $this->topic_question_settings[$topicId] = [
                 'enabled' => true,
                 'default' => (int) ($settings['default'] ?? 0),
-                'easy'    => (int) ($settings['easy'] ?? 0),
-                'medium'  => (int) ($settings['medium'] ?? 0),
-                'hard'    => (int) ($settings['hard'] ?? 0),
+                'easy' => (int) ($settings['easy'] ?? 0),
+                'medium' => (int) ($settings['medium'] ?? 0),
+                'hard' => (int) ($settings['hard'] ?? 0),
             ];
         }
     }
@@ -527,15 +575,15 @@ class AdminMasterModuleQuestionIndex extends Component
     {
         $filtered = [];
         foreach ($this->topic_question_settings as $topicId => $settings) {
-            if (!($settings['enabled'] ?? false)) {
+            if (! ($settings['enabled'] ?? false)) {
                 continue;
             }
 
             $filtered[$topicId] = [
                 'default' => (int) ($settings['default'] ?? 0),
-                'easy'   => (int) ($settings['easy'] ?? 0),
+                'easy' => (int) ($settings['easy'] ?? 0),
                 'medium' => (int) ($settings['medium'] ?? 0),
-                'hard'   => (int) ($settings['hard'] ?? 0),
+                'hard' => (int) ($settings['hard'] ?? 0),
             ];
         }
 
@@ -565,11 +613,11 @@ class AdminMasterModuleQuestionIndex extends Component
         $rows = $query->groupBy('category_question_id', DB::raw("COALESCE(difficulty, 'default')"))->get();
 
         foreach ($rows as $row) {
-            if (!isset($limits[$row->category_question_id])) {
+            if (! isset($limits[$row->category_question_id])) {
                 continue;
             }
             $difficulty = $row->difficulty ?? 'default';
-            if (!isset($limits[$row->category_question_id][$difficulty])) {
+            if (! isset($limits[$row->category_question_id][$difficulty])) {
                 $limits[$row->category_question_id][$difficulty] = 0;
             }
             $limits[$row->category_question_id][$difficulty] = (int) $row->total;
@@ -601,11 +649,11 @@ class AdminMasterModuleQuestionIndex extends Component
         $rows = $query->groupBy('topic_id', DB::raw("COALESCE(difficulty, 'default')"))->get();
 
         foreach ($rows as $row) {
-            if (!isset($limits[$row->topic_id])) {
+            if (! isset($limits[$row->topic_id])) {
                 continue;
             }
             $difficulty = $row->difficulty ?? 'default';
-            if (!isset($limits[$row->topic_id][$difficulty])) {
+            if (! isset($limits[$row->topic_id][$difficulty])) {
                 $limits[$row->topic_id][$difficulty] = 0;
             }
             $limits[$row->topic_id][$difficulty] = (int) $row->total;

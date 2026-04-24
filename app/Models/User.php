@@ -10,6 +10,7 @@ use App\Models\Company\Company;
 use App\Models\Study\Study;
 use App\Models\User\UserCompanyRole;
 use App\Models\User\UserDetail;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -21,8 +22,8 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasRoles, HasUuids, Notifiable, SoftDeletes, \App\Traits\LogsSystemActivity;
+    /** @use HasFactory<UserFactory> */
+    use \App\Traits\LogsSystemActivity, HasFactory, HasRoles, HasUuids, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -63,7 +64,7 @@ class User extends Authenticatable
     {
         return Str::of($this->name)
             ->explode(' ')
-            ->map(fn(string $name) => Str::of($name)->substr(0, 1))
+            ->map(fn (string $name) => Str::of($name)->substr(0, 1))
             ->implode('');
     }
 
@@ -101,6 +102,7 @@ class User extends Authenticatable
                 return true;
             }
         }
+
         return false;
     }
 
@@ -132,7 +134,6 @@ class User extends Authenticatable
         });
     }
 
-
     public function companyRoles()
     {
         return $this->hasMany(UserCompanyRole::class);
@@ -145,7 +146,7 @@ class User extends Authenticatable
 
     public function usrSecKey()
     {
-        return $this->hasOne(\App\Models\UsrSecKey::class, 'user_id', 'id');
+        return $this->hasOne(UsrSecKey::class, 'user_id', 'id');
     }
 
     // booted method has been removed because UsrSecKey is handled by controllers
@@ -172,10 +173,11 @@ class User extends Authenticatable
             'value' => $value,
             'context' => $context, // company_id
             'reason' => $reason, // conflict_resolution, user_preference, etc
-            'added_at' => now()->toISOString()
+            'added_at' => now()->toISOString(),
         ];
 
         $this->update(['alternative_contacts' => $contacts]);
+
         return $this;
     }
 
@@ -264,6 +266,7 @@ class User extends Authenticatable
                 });
         });
     }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');

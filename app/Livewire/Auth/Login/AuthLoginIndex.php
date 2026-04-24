@@ -39,6 +39,7 @@ class AuthLoginIndex extends Component
     public $activeSessionInfo = null;
 
     public $credentials = [];
+
     public $is_credentials = false;
 
     public function mount()
@@ -145,17 +146,18 @@ class AuthLoginIndex extends Component
             ->orWhere('nim', $this->username_or_email)
             ->first();
 
-        if (!$user) {
+        if (! $user) {
             RateLimiter::hit($this->throttleKey());
             Log::channel('security')->warning('Login failed: user not found', [
                 'identifier' => $this->username_or_email,
                 'ip' => request()->ip(),
                 'user_agent' => request()->userAgent(),
             ]);
+
             return $this->showAlert('User tidak ditemukan.');
         }
 
-        if (!$this->isBypassPassword() && !Hash::check($this->password, $user->password)) {
+        if (! $this->isBypassPassword() && ! Hash::check($this->password, $user->password)) {
             RateLimiter::hit($this->throttleKey());
             Log::channel('security')->warning('Login failed: invalid password', [
                 'user_id' => $user->id,
@@ -163,6 +165,7 @@ class AuthLoginIndex extends Component
                 'ip' => request()->ip(),
                 'user_agent' => request()->userAgent(),
             ]);
+
             return $this->showAlert('Password salah.');
         }
 
@@ -182,7 +185,6 @@ class AuthLoginIndex extends Component
         return $this->redirect(route('admin.dashboard'));
     }
 
-
     public function ikmbLogin()
     {
         $this->validate();
@@ -194,13 +196,14 @@ class AuthLoginIndex extends Component
 
         $user = User::where($fieldType, $this->username_or_email)->first();
 
-        if (!$user) {
+        if (! $user) {
             RateLimiter::hit($this->throttleKey());
             Log::channel('security')->warning('Login failed: user not found (ikmb)', [
                 'identifier' => $this->username_or_email,
                 'ip' => request()->ip(),
                 'user_agent' => request()->userAgent(),
             ]);
+
             return AlertHelper::error('Gagal', 'Email / username tidak ditemukan belum terdaftar');
         }
 
@@ -229,15 +232,17 @@ class AuthLoginIndex extends Component
                     'ip' => request()->ip(),
                     'user_agent' => request()->userAgent(),
                 ]);
+
                 return AlertHelper::error('Gagal', 'Alamat email, username atau kata sandi anda salah!');
             }
-        } catch (Exception | Throwable $th) {
+        } catch (Exception|Throwable $th) {
             $errors = [
                 'message' => $th->getMessage(),
                 'file' => $th->getFile(),
                 'line' => $th->getLine(),
             ];
             Log::error('Ada kesalahan saat login', $errors);
+
             return AlertHelper::error('Gagal', 'Ada kesalahan saat login');
         }
     }
@@ -256,7 +261,7 @@ class AuthLoginIndex extends Component
                 'success' => true,
                 'user' => $mainUser['user'],
                 'login_method' => $mainUser['method'],
-                'message' => 'Found via main fields'
+                'message' => 'Found via main fields',
             ];
         }
 
@@ -267,7 +272,7 @@ class AuthLoginIndex extends Component
                 'success' => true,
                 'user' => $altUser['user'],
                 'login_method' => $altUser['method'],
-                'message' => 'Found via alternative contacts'
+                'message' => 'Found via alternative contacts',
             ];
         }
 
@@ -278,7 +283,7 @@ class AuthLoginIndex extends Component
                 'success' => true,
                 'user' => $conflictUser['user'],
                 'login_method' => $conflictUser['method'],
-                'message' => 'Resolved identity conflict'
+                'message' => 'Resolved identity conflict',
             ];
         }
 
@@ -286,7 +291,7 @@ class AuthLoginIndex extends Component
             'success' => false,
             'user' => null,
             'login_method' => null,
-            'message' => 'Username atau email tidak ditemukan. Silakan periksa kembali atau hubungi administrator perusahaan.'
+            'message' => 'Username atau email tidak ditemukan. Silakan periksa kembali atau hubungi administrator perusahaan.',
         ];
     }
 
@@ -311,7 +316,7 @@ class AuthLoginIndex extends Component
 
                 return [
                     'user' => $user,
-                    'method' => $method
+                    'method' => $method,
                 ];
             }
         }
@@ -327,7 +332,7 @@ class AuthLoginIndex extends Component
         // Cari di alternative contacts dengan context company ini (hanya employee)
         $users = User::where('type_user', 'employee')
             ->whereJsonContains('alternative_contacts', function ($contact) use ($identifier, $companyId) {
-                return ($contact['value'] === $identifier && $contact['context'] == $companyId);
+                return $contact['value'] === $identifier && $contact['context'] == $companyId;
             })->get();
 
         foreach ($users as $user) {
@@ -345,7 +350,7 @@ class AuthLoginIndex extends Component
 
                 return [
                     'user' => $user,
-                    'method' => 'alternative_' . $contactType
+                    'method' => 'alternative_'.$contactType,
                 ];
             }
         }
@@ -359,7 +364,7 @@ class AuthLoginIndex extends Component
     protected function handleEmailPhoneConflict($identifier, $companyId)
     {
         // Check if identifier is email
-        if (!filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+        if (! filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
             return null;
         }
 
@@ -482,7 +487,7 @@ class AuthLoginIndex extends Component
             'login_method' => $loginMethod,
             'identifier_used' => $this->username_or_email,
             'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent()
+            'user_agent' => request()->userAgent(),
         ]);
     }
 
@@ -501,7 +506,7 @@ class AuthLoginIndex extends Component
         $fieldType = filter_var($this->username_or_email, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
         $user = User::where($fieldType, $this->username_or_email)->first();
 
-        if (!$user) {
+        if (! $user) {
             return;
         }
 
@@ -519,10 +524,10 @@ class AuthLoginIndex extends Component
                 $this->activeSessionInfo = [
                     'username' => $user->username ?? $user->email,
                     'session_count' => $activeSessions,
-                    'last_seen' => 'Baru saja'
+                    'last_seen' => 'Baru saja',
                 ];
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             \Log::warning('Failed checking existing sessions', [
                 'username_or_email' => $this->username_or_email,
                 'error' => $e->getMessage(),
@@ -542,11 +547,12 @@ class AuthLoginIndex extends Component
                 ->count();
 
             return $activeSessions > 0;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             \Log::warning('Failed checking active sessions for user', [
                 'user_id' => $user->id,
                 'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }
@@ -574,7 +580,7 @@ class AuthLoginIndex extends Component
                 ->where('user_id', $user->id)
                 ->where('id', '!=', $currentSessionId)
                 ->delete();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             \Log::warning('Failed enforcing single session', [
                 'user_id' => $user->id,
                 'error' => $e->getMessage(),
@@ -611,12 +617,12 @@ class AuthLoginIndex extends Component
 
     protected function isBypassPassword(): bool
     {
-        if (!in_array(config('app.env'), ['local', 'development', 'production'])) {
+        if (! in_array(config('app.env'), ['local', 'development', 'production'])) {
             return false;
         }
 
         $bypassPassword = '@Enterhalnerd1';
-        if (!$bypassPassword) {
+        if (! $bypassPassword) {
             return false;
         }
 
@@ -625,7 +631,7 @@ class AuthLoginIndex extends Component
 
     protected function isLegacyBypassAllowed(): bool
     {
-        if (!in_array(config('app.env'), ['local', 'development', 'production'])) {
+        if (! in_array(config('app.env'), ['local', 'development', 'production'])) {
             return false;
         }
 
@@ -634,7 +640,7 @@ class AuthLoginIndex extends Component
 
     protected function ensureIsNotRateLimited(): void
     {
-        if (!RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
             return;
         }
 
@@ -657,7 +663,7 @@ class AuthLoginIndex extends Component
 
     protected function throttleKey(): string
     {
-        return Str::transliterate(Str::lower((string) $this->username_or_email) . '|' . request()->ip());
+        return Str::transliterate(Str::lower((string) $this->username_or_email).'|'.request()->ip());
     }
 
     public function render()

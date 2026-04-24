@@ -14,9 +14,11 @@ use Livewire\WithPagination;
 class AdminSessionIndex extends Component
 {
     use WithPagination;
+
     protected $paginationTheme = 'bootstrap';
 
     public $search = '';
+
     public $perPage = 10;
 
     public function updatingSearch()
@@ -30,9 +32,9 @@ class AdminSessionIndex extends Component
             ->whereNotNull('user_id');
 
         if ($this->search) {
-            $query->where(function($q) {
-                $q->where('ip_address', 'like', '%' . $this->search . '%')
-                  ->orWhere('user_agent', 'like', '%' . $this->search . '%');
+            $query->where(function ($q) {
+                $q->where('ip_address', 'like', '%'.$this->search.'%')
+                    ->orWhere('user_agent', 'like', '%'.$this->search.'%');
             });
         }
 
@@ -84,7 +86,7 @@ class AdminSessionIndex extends Component
 
             AlertHelper::success('Berhasil', "Akun di-logout ({$deletedCount} sesi dihapus) dan sesi ujian diputus.");
         } catch (\Throwable $e) {
-            AlertHelper::warning('Perhatian', 'Gagal logout akun: ' . $e->getMessage());
+            AlertHelper::warning('Perhatian', 'Gagal logout akun: '.$e->getMessage());
         }
     }
 
@@ -125,7 +127,7 @@ class AdminSessionIndex extends Component
 
             AlertHelper::success('Berhasil', 'Semua akun berhasil di force logout.');
         } catch (\Throwable $e) {
-            AlertHelper::warning('Perhatian', 'Gagal memproses force logout: ' . $e->getMessage());
+            AlertHelper::warning('Perhatian', 'Gagal memproses force logout: '.$e->getMessage());
         }
     }
 }

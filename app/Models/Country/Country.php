@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Country extends Model
 {
     //
-    use HasUuids, SoftDeletes, \App\Traits\LogsSystemActivity;
+    use \App\Traits\LogsSystemActivity, HasUuids, SoftDeletes;
 
     protected $guarded = ['id'];
 

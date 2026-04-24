@@ -52,9 +52,9 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->post('/logout');
+        $response = $this->actingAs($user)->get('/logout');
 
-        $response->assertRedirect('/');
+        $response->assertRedirect('/login');
 
         $this->assertGuest();
     }

@@ -3,16 +3,17 @@
 namespace App\Exports;
 
 use App\Models\User;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Illuminate\Support\Facades\Auth;
 
-class LecturerExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize
+class LecturerExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping
 {
     /**
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function collection()
     {
@@ -25,9 +26,6 @@ class LecturerExport implements FromCollection, WithHeadings, WithMapping, Shoul
             ->get();
     }
 
-    /**
-     * @return array
-     */
     public function headings(): array
     {
         return [
@@ -43,8 +41,7 @@ class LecturerExport implements FromCollection, WithHeadings, WithMapping, Shoul
     }
 
     /**
-     * @param mixed $lecturer
-     * @return array
+     * @param  mixed  $lecturer
      */
     public function map($lecturer): array
     {

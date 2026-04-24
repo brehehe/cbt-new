@@ -33,7 +33,7 @@ class FixRecordingStatus extends Command
                 ->first();
 
             if ($record) {
-                $this->info("Found record with status: " . $record->status);
+                $this->info('Found record with status: '.$record->status);
 
                 // Update to valid status
                 DB::table('exam_recordings')
@@ -42,14 +42,14 @@ class FixRecordingStatus extends Command
 
                 $this->info("Updated status to 'completed'");
             } else {
-                $this->info("Specific record not found");
+                $this->info('Specific record not found');
             }
 
             // Check for any other records with invalid status
             $invalidRecords = DB::select("SELECT id, status FROM exam_recordings WHERE status NOT IN ('recording', 'completed', 'failed')");
 
             if (count($invalidRecords) > 0) {
-                $this->warn("Found " . count($invalidRecords) . " records with invalid status:");
+                $this->warn('Found '.count($invalidRecords).' records with invalid status:');
                 foreach ($invalidRecords as $invalid) {
                     $this->line("ID: {$invalid->id}, Status: {$invalid->status}");
 
@@ -60,14 +60,15 @@ class FixRecordingStatus extends Command
                     $this->info("Fixed record {$invalid->id}");
                 }
             } else {
-                $this->info("No records with invalid status found.");
+                $this->info('No records with invalid status found.');
             }
 
-            $this->info("All done!");
+            $this->info('All done!');
 
             return 0;
         } catch (\Exception $e) {
-            $this->error("Error: " . $e->getMessage());
+            $this->error('Error: '.$e->getMessage());
+
             return 1;
         }
     }

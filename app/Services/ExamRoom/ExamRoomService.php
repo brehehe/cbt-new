@@ -18,14 +18,14 @@ class ExamRoomService
     {
         $exam_room = ExamRoom::updateOrCreate(
             [
-                'id' => $data['id'] ?? null
+                'id' => $data['id'] ?? null,
             ],
             [
-                'company_id'  => $data['company_id'] ?? null,
-                'name'        => $data['name'] ?? '',
-                'code'        => $data['code'] ?? null,
+                'company_id' => $data['company_id'] ?? null,
+                'name' => $data['name'] ?? '',
+                'code' => $data['code'] ?? null,
                 'description' => $data['description'] ?? null,
-                'is_active'   => $data['is_active'] ?? true,
+                'is_active' => $data['is_active'] ?? true,
             ]
         );
 

@@ -16,16 +16,29 @@ use Throwable;
 class AdminMasterExamRoomIndex extends Component
 {
     use WithPagination;
-    protected $paginationTheme = 'bootstrap';
-    public $perPage = 10, $search;
 
-    public $data_id, $name, $code, $is_active, $description;
+    protected $paginationTheme = 'bootstrap';
+
+    public $perPage = 10;
+
+    public $search;
+
+    public $data_id;
+
+    public $name;
+
+    public $code;
+
+    public $is_active;
+
+    public $description;
 
     public function render()
     {
         $exam_rooms = ExamRoom::search($this->search)->select('id', 'name', 'code', 'description', 'is_active');
+
         return view('livewire.admin.master.exam-room.admin-master-exam-room-index', [
-            'exam_rooms' => $exam_rooms->paginate($this->perPage)
+            'exam_rooms' => $exam_rooms->paginate($this->perPage),
         ])->extends('layout.app')->section('content');
     }
 
@@ -48,6 +61,7 @@ class AdminMasterExamRoomIndex extends Component
     {
         $this->resetValidation();
         $this->reset(['data_id', 'name', 'code', 'is_active', 'description']);
+
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
 
@@ -55,8 +69,8 @@ class AdminMasterExamRoomIndex extends Component
     {
         $this->validate(
             [
-                'name'        => 'required',
-                'code'        => 'required',
+                'name' => 'required',
+                'code' => 'required',
                 'description' => 'nullable',
             ],
             [
@@ -67,41 +81,43 @@ class AdminMasterExamRoomIndex extends Component
 
         try {
             DB::beginTransaction();
-                $request = [
-                    'id'          => $this->data_id,
-                    'company_id'  => Auth::user()?->company?->id,
-                    'name'        => $this->name,
-                    'code'        => $this->code,
-                    'description' => $this->description,
-                ];
+            $request = [
+                'id' => $this->data_id,
+                'company_id' => Auth::user()?->company?->id,
+                'name' => $this->name,
+                'code' => $this->code,
+                'description' => $this->description,
+            ];
 
-                $exam_room = app(ExamRoomService::class)->updateOrCreate($request);
-                if (!$exam_room) {
-                    throw new Exception("Ada kesalahaan saat ExamRoomService => updateOrCreate", 500);
-                }
+            $exam_room = app(ExamRoomService::class)->updateOrCreate($request);
+            if (! $exam_room) {
+                throw new Exception('Ada kesalahaan saat ExamRoomService => updateOrCreate', 500);
+            }
 
             DB::commit();
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             DB::rollBack();
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterExamRoomIndex => submit', $error);
+
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
         }
 
         $this->closeModal();
+
         return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
     }
 
     public function edit($id)
     {
-        $result            = ExamRoom::findOrFail($id);
-        $this->data_id     = $result?->id;
-        $this->name        = $result?->name;
-        $this->code        = $result?->code;
+        $result = ExamRoom::findOrFail($id);
+        $this->data_id = $result?->id;
+        $this->name = $result?->name;
+        $this->code = $result?->code;
         $this->description = $result?->description;
         $this->openModal();
     }
@@ -109,41 +125,43 @@ class AdminMasterExamRoomIndex extends Component
     public function toggleExamRoomIsActive($id)
     {
         try {
-            $result            = ExamRoom::findOrFail($id);
-            $this->data_id     = $result?->id;
-            $this->name        = $result?->name;
-            $this->code        = $result?->code;
-            $this->is_active   = $result?->is_active ? false : true;
+            $result = ExamRoom::findOrFail($id);
+            $this->data_id = $result?->id;
+            $this->name = $result?->name;
+            $this->code = $result?->code;
+            $this->is_active = $result?->is_active ? false : true;
             $this->description = $result?->description;
 
             DB::beginTransaction();
-                $request = [
-                    'id'          => $this->data_id,
-                    'company_id'  => Auth::user()?->company?->id,
-                    'name'        => $this->name,
-                    'code'        => $this->code,
-                    'is_active'   => $this->is_active,
-                    'description' => $this->description,
-                ];
+            $request = [
+                'id' => $this->data_id,
+                'company_id' => Auth::user()?->company?->id,
+                'name' => $this->name,
+                'code' => $this->code,
+                'is_active' => $this->is_active,
+                'description' => $this->description,
+            ];
 
-                $exam_room = app(ExamRoomService::class)->updateOrCreate($request);
-                if (!$exam_room) {
-                    throw new Exception("Ada kesalahaan saat ExamRoomService => updateOrCreate", 500);
-                }
+            $exam_room = app(ExamRoomService::class)->updateOrCreate($request);
+            if (! $exam_room) {
+                throw new Exception('Ada kesalahaan saat ExamRoomService => updateOrCreate', 500);
+            }
 
             DB::commit();
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             DB::rollBack();
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterExamRoomIndex => toggleExamRoomIsActive', $error);
+
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
         }
 
         $this->closeModal();
+
         return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
     }
 
@@ -156,13 +174,14 @@ class AdminMasterExamRoomIndex extends Component
     {
         try {
             app(ExamRoomService::class)->delete($id[0]);
-        } catch (Exception | Throwable $th) {
+        } catch (Exception|Throwable $th) {
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat AdminMasterExamRoomIndex => delete', $error);
+
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menghapus data');
         }
 

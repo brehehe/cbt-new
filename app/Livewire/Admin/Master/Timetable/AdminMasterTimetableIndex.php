@@ -3,53 +3,76 @@
 namespace App\Livewire\Admin\Master\Timetable;
 
 use App\Helpers\AlertHelper;
+use App\Models\Classmate\Classmate;
 use App\Models\Exam\ExamLiveSession;
 use App\Models\Exam\ExamRecording;
-use App\Models\Classmate\Classmate;
 use App\Models\Master\Exam\ExamRoom;
 use App\Models\Master\Exam\ExamSession;
 use App\Models\Master\Question\Module;
-use Livewire\Component;
-use Livewire\WithPagination;
 use App\Models\Master\Timetable\Timetable;
-use Barryvdh\DomPDF\Facade\Pdf;
-use App\Models\User\UserTimetable;
 use App\Models\Study\Study;
 use App\Models\User;
+use App\Models\User\UserTimetable;
+use App\Services\Exam\RecordingFinalizer;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
+use Livewire\Component;
+use Livewire\WithPagination;
 use Session;
-use Carbon\Carbon;
-use App\Services\Exam\RecordingFinalizer;
 
 class AdminMasterTimetableIndex extends Component
 {
     use WithPagination;
+
     protected $paginationTheme = 'bootstrap';
+
     public $search = '';
+
     public $perPage = 5;
+
     public $data_id;
+
     public $name;
+
     public $module_id;
+
     public $supervisors = [];
+
     public $start_time;
+
     public $end_time;
+
     public $extra_time;
+
     public $description;
+
     public $getSupervisors = [];
+
     public $modules = [];
+
     public $studys = [];
+
     public $study_id;
+
     public $classmates = [];
+
     public $classmate_id;
+
     public $examRooms = [];
+
     public $exam_room_id;
+
     public $examSessions = [];
+
     public $exam_session_id;
+
     public $require_seb = false;
+
     public $is_recording = false;
+
     public $is_streaming = false;
 
     public function mount()
@@ -69,6 +92,7 @@ class AdminMasterTimetableIndex extends Component
     {
         $this->is_recording = true;
         $this->is_streaming = true;
+
         return $this->dispatch('open-modal', ['id' => 'modal-timetable']);
     }
 
@@ -99,8 +123,9 @@ class AdminMasterTimetableIndex extends Component
             'exam_session_id',
             'require_seb',
             'is_recording',
-            'is_streaming'
+            'is_streaming',
         ]);
+
         return $this->dispatch('close-modal', ['id' => 'modal-timetable']);
     }
 
@@ -168,7 +193,8 @@ class AdminMasterTimetableIndex extends Component
         } catch (\Throwable $th) {
             DB::rollback();
             AlertHelper::error('Gagal', 'Token gagal dibuat!');
-            return Log::info('Gagal Menghapus Token : ' . $th);
+
+            return Log::info('Gagal Menghapus Token : '.$th);
         }
         AlertHelper::success('Berhasil', 'Token berhasil dibuat!');
     }
@@ -195,7 +221,8 @@ class AdminMasterTimetableIndex extends Component
         } catch (\Throwable $th) {
             DB::rollback();
             AlertHelper::error('Gagal', 'Data gagal dihapus!');
-            return Log::info('Gagal Menghapus Data Jadwal : ' . $th);
+
+            return Log::info('Gagal Menghapus Data Jadwal : '.$th);
         }
     }
 
@@ -209,7 +236,6 @@ class AdminMasterTimetableIndex extends Component
         'end_time.required' => 'Waktu Selesai wajib diisi',
         'end_time.after' => 'Waktu Selesai harus lebih besar dari Waktu Mulai',
     ];
-
 
     public function updatedStartTime($value)
     {
@@ -280,8 +306,9 @@ class AdminMasterTimetableIndex extends Component
         } catch (\Throwable $th) {
 
             DB::rollback();
-            AlertHelper::error('Gagal', 'Data gagal disimpan!' . $th->getMessage());
-            return Log::error('Gagal Menyimpan Data Jadwal : ' . $th);
+            AlertHelper::error('Gagal', 'Data gagal disimpan!'.$th->getMessage());
+
+            return Log::error('Gagal Menyimpan Data Jadwal : '.$th);
         }
     }
 
@@ -290,6 +317,7 @@ class AdminMasterTimetableIndex extends Component
         $this->data_id = $id;
         $data = Timetable::find($id);
         $this->extra_time = $data->end_time;
+
         return $this->dispatch('open-modal', ['id' => 'modal-timetable-extra-time']);
     }
 
@@ -320,7 +348,8 @@ class AdminMasterTimetableIndex extends Component
         } catch (\Throwable $th) {
             DB::rollback();
             AlertHelper::error('Gagal', 'Data gagal ditambahkan!');
-            return Log::info('Gagal Menambahkan Data Jadwal : ' . $th);
+
+            return Log::info('Gagal Menambahkan Data Jadwal : '.$th);
         }
     }
 
@@ -329,7 +358,7 @@ class AdminMasterTimetableIndex extends Component
         try {
             $timetable = Timetable::findOrFail($id);
             $timetable->update([
-                'is_recording' => !$timetable->is_recording,
+                'is_recording' => ! $timetable->is_recording,
             ]);
         } catch (\Throwable $th) {
             AlertHelper::error('Gagal', 'Gagal mengubah status recording.');
@@ -345,7 +374,7 @@ class AdminMasterTimetableIndex extends Component
         try {
             $timetable = Timetable::findOrFail($id);
             $timetable->update([
-                'is_streaming' => !$timetable->is_streaming,
+                'is_streaming' => ! $timetable->is_streaming,
             ]);
         } catch (\Throwable $th) {
             AlertHelper::error('Gagal', 'Gagal mengubah status streaming.');
@@ -355,7 +384,6 @@ class AdminMasterTimetableIndex extends Component
             ]);
         }
     }
-
 
     public function confirmDetail($id)
     {
@@ -386,10 +414,10 @@ class AdminMasterTimetableIndex extends Component
     {
         $timetable = Timetable::query()
             ->when($this->search, function ($query, $search) {
-                $query->where('name', 'ilike', '%' . $search . '%')
-                    ->orWhere('start_time', 'ilike', '%' . $search . '%')
-                    ->orWhere('end_time', 'ilike', '%' . $search . '%')
-                    ->orWhere('description', 'ilike', '%' . $search . '%');
+                $query->where('name', 'ilike', '%'.$search.'%')
+                    ->orWhere('start_time', 'ilike', '%'.$search.'%')
+                    ->orWhere('end_time', 'ilike', '%'.$search.'%')
+                    ->orWhere('description', 'ilike', '%'.$search.'%');
             })
             ->where('is_simulation', 'false')
             ->orderBy('order', 'desc')
@@ -399,8 +427,7 @@ class AdminMasterTimetableIndex extends Component
             'timetables' => $timetable,
         ])
             ->extends('layout.app')
-            ->section('content')
-        ;
+            ->section('content');
     }
 
     public function confirmSuspend($id)
@@ -413,7 +440,7 @@ class AdminMasterTimetableIndex extends Component
         try {
             DB::beginTransaction();
             $timetableId = is_array($id) ? ($id[0] ?? null) : $id;
-            if (!$timetableId) {
+            if (! $timetableId) {
                 throw new \InvalidArgumentException('ID Jadwal tidak valid.');
             }
 
@@ -474,7 +501,7 @@ class AdminMasterTimetableIndex extends Component
             $timetable = Timetable::with([
                 'classmate' => function ($q) {
                     $q->with(['classmateStudents.user.userDetail']);
-                }
+                },
             ])->findOrFail($id);
 
             $company = Auth::user()->company()->with('companyDetail')->first();
@@ -485,8 +512,8 @@ class AdminMasterTimetableIndex extends Component
             ])->setPaper('a4', 'portrait');
 
             return response()->streamDownload(
-                fn() => print ($pdf->output()),
-                'kartu-peserta-' . \Str::slug($timetable->name) . '.pdf'
+                fn () => print ($pdf->output()),
+                'kartu-peserta-'.\Str::slug($timetable->name).'.pdf'
             );
 
         } catch (\Throwable $th) {

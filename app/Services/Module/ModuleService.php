@@ -5,11 +5,9 @@ namespace App\Services\Module;
 use App\Models\Master\Question\Module;
 use App\Models\Master\Question\ModuleQuestion;
 use App\Models\Master\Question\Question;
-use App\Models\Category\CategoryQuestion;
-use App\Models\Master\Question\Topic;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
 
 class ModuleService
 {
@@ -24,7 +22,7 @@ class ModuleService
     public function updateOrCreate($request)
     {
         $existing = null;
-        if (!empty($request['id'])) {
+        if (! empty($request['id'])) {
             $existing = Module::find($request['id']);
         }
 
@@ -44,18 +42,18 @@ class ModuleService
 
         $material = Module::updateOrCreate(
             [
-                'id' => $request['id'] ?? null
+                'id' => $request['id'] ?? null,
             ],
             [
-                'user_id'          => $request['user_id'] ?? null,
-                'company_id'       => $request['company_id'] ?? null,
+                'user_id' => $request['user_id'] ?? null,
+                'company_id' => $request['company_id'] ?? null,
                 'question_type_id' => $request['question_type_id'] ?? null,
-                'name'             => $request['name'] ?? null,
-                'duration'         => $request['duration'] ?? null,
-                'random_question'  => $request['random_question'] ?? false,
-                'description'      => $request['description'] ?? null,
-                'studys'           => json_encode($request['studys']) ?? json_encode([]),
-                'is_all_study'     => $request['is_all_study'] ?? false,
+                'name' => $request['name'] ?? null,
+                'duration' => $request['duration'] ?? null,
+                'random_question' => $request['random_question'] ?? false,
+                'description' => $request['description'] ?? null,
+                'studys' => json_encode($request['studys']) ?? json_encode([]),
+                'is_all_study' => $request['is_all_study'] ?? false,
                 'question_pick_type' => $questionPickType,
                 'category_question_settings' => $categoryQuestionSettings,
                 'topic_question_settings' => $topicQuestionSettings,
@@ -93,7 +91,7 @@ class ModuleService
 
             // 1. Identify questions to remove (exist in DB but not in target)
             $toRemoveIds = array_diff($existingQuestionIds, $targetQuestionIds);
-            if (!empty($toRemoveIds)) {
+            if (! empty($toRemoveIds)) {
                 ModuleQuestion::withoutGlobalScope('user_scope')
                     ->where('module_id', $module->id)
                     ->whereIn('question_id', $toRemoveIds)
@@ -103,7 +101,7 @@ class ModuleService
 
             // 2. Identify questions to add (exist in target but not in DB)
             $toAddQuestionIds = array_diff($targetQuestionIds, $existingQuestionIds);
-            if (!empty($toAddQuestionIds)) {
+            if (! empty($toAddQuestionIds)) {
                 $lastOrder = ModuleQuestion::withoutGlobalScope('user_scope')->max('order') ?? 0;
                 $newRecords = [];
                 $targetQuestionsMap = $targetQuestions->keyBy('id');
@@ -152,7 +150,7 @@ class ModuleService
 
             // 1. Identify questions to remove
             $toRemoveIds = array_diff($existingQuestionIds, $targetQuestionIds);
-            if (!empty($toRemoveIds)) {
+            if (! empty($toRemoveIds)) {
                 ModuleQuestion::withoutGlobalScope('user_scope')
                     ->where('module_id', $module->id)
                     ->whereIn('question_id', $toRemoveIds)
@@ -162,7 +160,7 @@ class ModuleService
 
             // 2. Identify questions to add
             $toAddQuestionIds = array_diff($targetQuestionIds, $existingQuestionIds);
-            if (!empty($toAddQuestionIds)) {
+            if (! empty($toAddQuestionIds)) {
                 $lastOrder = ModuleQuestion::withoutGlobalScope('user_scope')->max('order') ?? 0;
                 $newRecords = [];
                 $targetQuestionsMap = $targetQuestions->keyBy('id');
@@ -200,6 +198,7 @@ class ModuleService
             if (is_string($existingSettings)) {
                 $existingSettings = json_decode($existingSettings, true) ?? [];
             }
+
             return $existingSettings ?? [];
         }
 

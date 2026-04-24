@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Auth;
 class Answer extends Model
 {
     //
-    use SoftDeletes, HasUuids, \App\Traits\LogsSystemActivity;
+    use \App\Traits\LogsSystemActivity, HasUuids, SoftDeletes;
+
     protected $guarded = ['id'];
 
     public function company()
@@ -28,7 +29,7 @@ class Answer extends Model
         static::addGlobalScope('user_scope', function (Builder $builder) {
             $user = Auth::user();
 
-            if (!$user || !$user->hasRole('Anonymous')) {
+            if (! $user || ! $user->hasRole('Anonymous')) {
                 $builder->where('company_id', optional($user?->company)?->id)->orderBy('order', 'asc');
             }
 
@@ -36,7 +37,7 @@ class Answer extends Model
         });
 
         static::creating(function ($modelCreate) {
-            if (!empty($modelCreate->order)) {
+            if (! empty($modelCreate->order)) {
                 return;
             }
 
@@ -59,7 +60,7 @@ class Answer extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
-        $term = '%'. $term .'%';
+        $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id', 'alphabet', 'context', 'is_correct'], 'ILIKE', $term);
@@ -68,8 +69,6 @@ class Answer extends Model
 
     /**
      * Get the question that owns the Answer
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function question(): BelongsTo
     {

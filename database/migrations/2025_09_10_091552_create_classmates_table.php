@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('classmates', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->enum('type_study',['default','mahasiswa','general'])->default('default')->comment('Type of study: default, mahasiswa, or general');
+            $table->enum('type_study', ['default', 'mahasiswa', 'general'])->default('default')->comment('Type of study: default, mahasiswa, or general');
             $table->string('name');
             $table->foreignUuid('user_id')->nullable();
             $table->text('description')->nullable();

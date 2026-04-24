@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Exam\LiveStreamController;
 use App\Http\Controllers\Api\RealTimeMetricsController;
 use App\Models\Exam\ExamLiveSession;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ Route::post('/end-live-session', function (Request $request) {
         ExamLiveSession::where('session_token', $sessionToken)
             ->update([
                 'is_active' => false,
-                'connection_status' => 'disconnected'
+                'connection_status' => 'disconnected',
             ]);
     }
 
@@ -26,7 +27,8 @@ Route::post('/end-live-session', function (Request $request) {
 
 Route::post('/log-alert', function (Request $request) {
     // Handle alert logging from client side
-    \Log::info('Client alert received', $request->all());
+    Log::info('Client alert received', $request->all());
+
     return response()->json(['success' => true]);
 });
 
@@ -37,9 +39,9 @@ Route::post('/stream/offer', function (Request $request) {
 
     // In real implementation, this would relay the offer to supervisors
     // For now, we'll just log it
-    \Log::info('WebRTC offer received', [
+    Log::info('WebRTC offer received', [
         'session_token' => $sessionToken,
-        'offer_type' => $offer['type'] ?? null
+        'offer_type' => $offer['type'] ?? null,
     ]);
 
     return response()->json(['success' => true]);
@@ -50,9 +52,9 @@ Route::post('/stream/answer', function (Request $request) {
     $answer = $request->input('answer');
 
     // Relay answer back to student
-    \Log::info('WebRTC answer received', [
+    Log::info('WebRTC answer received', [
         'session_token' => $sessionToken,
-        'answer_type' => $answer['type'] ?? null
+        'answer_type' => $answer['type'] ?? null,
     ]);
 
     return response()->json(['success' => true]);
@@ -63,9 +65,9 @@ Route::post('/stream/ice-candidate', function (Request $request) {
     $candidate = $request->input('candidate');
 
     // Relay ICE candidate
-    \Log::info('ICE candidate received', [
+    Log::info('ICE candidate received', [
         'session_token' => $sessionToken,
-        'candidate_type' => $candidate['type'] ?? null
+        'candidate_type' => $candidate['type'] ?? null,
     ]);
 
     return response()->json(['success' => true]);
@@ -86,7 +88,7 @@ Route::get('/stream/sessions', function () {
             'connection_status' => $session->connection_status,
             'camera_status' => $session->camera_status,
             'progress' => $session->progress_percentage,
-            'alerts' => $session->alert_count
+            'alerts' => $session->alert_count,
         ];
     });
 
@@ -101,7 +103,7 @@ Route::get('/stream/sessions', function () {
                 'connection_status' => 'connected',
                 'camera_status' => 'active',
                 'progress' => 45,
-                'alerts' => 2
+                'alerts' => 2,
             ],
             [
                 'id' => 2,
@@ -111,7 +113,7 @@ Route::get('/stream/sessions', function () {
                 'connection_status' => 'connected',
                 'camera_status' => 'active',
                 'progress' => 67,
-                'alerts' => 0
+                'alerts' => 0,
             ],
             [
                 'id' => 3,
@@ -121,7 +123,7 @@ Route::get('/stream/sessions', function () {
                 'connection_status' => 'unstable',
                 'camera_status' => 'active',
                 'progress' => 23,
-                'alerts' => 5
+                'alerts' => 5,
             ],
             [
                 'id' => 4,
@@ -131,8 +133,8 @@ Route::get('/stream/sessions', function () {
                 'connection_status' => 'connected',
                 'camera_status' => 'active',
                 'progress' => 89,
-                'alerts' => 1
-            ]
+                'alerts' => 1,
+            ],
         ]);
     }
 
@@ -140,21 +142,20 @@ Route::get('/stream/sessions', function () {
 });
 
 // Get real camera streams
-Route::get('/stream/real-streams', [App\Http\Controllers\Admin\Exam\LiveStreamController::class, 'getRealStreams'])
+Route::get('/stream/real-streams', [LiveStreamController::class, 'getRealStreams'])
     ->name('api.stream.real-streams');
 
 // Connect to specific student stream
-Route::get('/stream/connect/{sessionToken}', [App\Http\Controllers\Admin\Exam\LiveStreamController::class, 'connectToStudentStream'])
+Route::get('/stream/connect/{sessionToken}', [LiveStreamController::class, 'connectToStudentStream'])
     ->name('api.stream.connect');
 
 // WebRTC signaling endpoint
-Route::post('/stream/signaling/{sessionToken}', [App\Http\Controllers\Admin\Exam\LiveStreamController::class, 'handleSignaling'])
+Route::post('/stream/signaling/{sessionToken}', [LiveStreamController::class, 'handleSignaling'])
     ->name('api.stream.signaling');
 
 // Update peer_id for live session
-Route::post('/stream/update-peer-id', [App\Http\Controllers\Admin\Exam\LiveStreamController::class, 'updatePeerId'])
+Route::post('/stream/update-peer-id', [LiveStreamController::class, 'updatePeerId'])
     ->name('api.stream.update-peer-id');
-
 
 // Real-time monitoring endpoints
 Route::get('/metrics/system', [RealTimeMetricsController::class, 'getSystemMetrics'])
@@ -162,4 +163,3 @@ Route::get('/metrics/system', [RealTimeMetricsController::class, 'getSystemMetri
 
 Route::get('/metrics/livestream', [RealTimeMetricsController::class, 'getLiveStreamMetrics'])
     ->name('api.metrics.livestream');
-

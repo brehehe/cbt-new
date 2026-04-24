@@ -3,47 +3,66 @@
 namespace App\Livewire\Admin\Exam\Detail;
 
 use App\Helpers\AlertHelper;
-use App\Helpers\AuthHelper;
 use App\Models\Exam\ExamAlert;
 use App\Models\Exam\ExamLiveSession;
 use App\Models\Exam\ExamRecording;
-use App\Models\Master\Question\Answer;
-use App\Models\Timetable\TimetableAnswer;
 use App\Models\User\UserModuleQuestion;
 use App\Models\User\UserTimetable;
-use DB;
-use Livewire\Component;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\Request;
 use App\Services\Exam\RecordingFinalizer;
+use DB;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Component;
 
 class AdminExamDetailIndex extends Component
 {
     public $userTimetableId;
+
     public $remainingTime;
+
     public $userTimetable;
+
     public $questionNavigations = [];
+
     public $questionNavigationId;
+
     public $isMark = false;
+
     public $percentage = 0;
+
     public $timetable_answer_id;
+
     public $question;
+
     public $images = [];
+
     public $description;
+
     public $number;
+
     public $question_answers = [];
+
     public $question_latex = null;
+
     public $question_latex_preview_png = null;
+
     public $currentRecording = null;
+
     public $alertCount = 0;
+
     public $liveSession = null;
+
     public $peerJSId = null;
+
     public $is_recording = false;
+
     public $is_streaming = false;
+
     public $hasPrevious = false;
+
     public $hasNext = false;
+
     public $questionNavigationOrder;
 
     protected $listeners = [
@@ -59,7 +78,7 @@ class AdminExamDetailIndex extends Component
         'updatePeerJSId',
         'completeExamFinalization',
         'finalizeRecording' => 'finalizeRecording',
-        'completeSuspendFinalization'
+        'completeSuspendFinalization',
     ];
 
     public function mount()
@@ -70,22 +89,23 @@ class AdminExamDetailIndex extends Component
         $this->initializeRecording();
         $this->initializeLiveSession();
         $this->updateNavigationStatus();
-        
+
         // Ensure frontend initializes properly
         $this->js('if(typeof initializeExamFrontend === "function") { initializeExamFrontend(); } else { console.warn("initializeExamFrontend not found"); }');
     }
 
     private function initializeLiveSession()
     {
-        if (!$this->userTimetable || !$this->userTimetable->timetable_id) {
+        if (! $this->userTimetable || ! $this->userTimetable->timetable_id) {
             return redirect()->route('admin.exam.timetable');
         }
 
-        if (!$this->userTimetable->is_streaming) {
-             \Log::info('Live session/Streaming skipped (is_streaming=false)', [
+        if (! $this->userTimetable->is_streaming) {
+            \Log::info('Live session/Streaming skipped (is_streaming=false)', [
                 'user_id' => Auth::id(),
-                'user_timetable_id' => $this->userTimetableId
+                'user_timetable_id' => $this->userTimetableId,
             ]);
+
             return;
         }
 
@@ -109,7 +129,7 @@ class AdminExamDetailIndex extends Component
             }
         }
 
-        if ($existingActive && !$isStale && data_get($existingActive->session_metadata, 'session_id') && data_get($existingActive->session_metadata, 'session_id') !== $currentSessionId) {
+        if ($existingActive && ! $isStale && data_get($existingActive->session_metadata, 'session_id') && data_get($existingActive->session_metadata, 'session_id') !== $currentSessionId) {
             ExamAlert::create([
                 'timetable_id' => $this->userTimetable->timetable_id,
                 'user_timetable_id' => $this->userTimetableId,
@@ -129,6 +149,7 @@ class AdminExamDetailIndex extends Component
             // }
 
             AlertHelper::warning('Perhatian', 'Akun Anda tercatat masih aktif di perangkat lain/tab lain. Jika Anda baru saja refresh/reconnect, tunggu 2 menit atau hubungi pengawas.');
+
             return redirect()->route('admin.exam.monitor');
         }
 
@@ -136,7 +157,7 @@ class AdminExamDetailIndex extends Component
         $this->liveSession = ExamLiveSession::updateOrCreate(
             [
                 'user_timetable_id' => $this->userTimetableId,
-                'user_id' => Auth::id()
+                'user_id' => Auth::id(),
             ],
             [
                 'timetable_id' => $this->userTimetable->timetable_id,
@@ -154,9 +175,9 @@ class AdminExamDetailIndex extends Component
                 ],
                 'browser_info' => [
                     'user_agent' => request()->header('User-Agent'),
-                    'platform' => $this->detectPlatform(request()->header('User-Agent'))
+                    'platform' => $this->detectPlatform(request()->header('User-Agent')),
                 ],
-                'peer_id' => $this->is_streaming ? $this->peerJSId : null // Kosongkan jika streaming tidak aktif
+                'peer_id' => $this->is_streaming ? $this->peerJSId : null, // Kosongkan jika streaming tidak aktif
             ]
         );
 
@@ -165,17 +186,30 @@ class AdminExamDetailIndex extends Component
 
     private function detectPlatform($userAgent)
     {
-        if (str_contains($userAgent, 'Windows')) return 'Windows';
-        if (str_contains($userAgent, 'Mac')) return 'Mac';
-        if (str_contains($userAgent, 'Linux')) return 'Linux';
-        if (str_contains($userAgent, 'Android')) return 'Android';
-        if (str_contains($userAgent, 'iOS')) return 'iOS';
+        if (str_contains($userAgent, 'Windows')) {
+            return 'Windows';
+        }
+        if (str_contains($userAgent, 'Mac')) {
+            return 'Mac';
+        }
+        if (str_contains($userAgent, 'Linux')) {
+            return 'Linux';
+        }
+        if (str_contains($userAgent, 'Android')) {
+            return 'Android';
+        }
+        if (str_contains($userAgent, 'iOS')) {
+            return 'iOS';
+        }
+
         return 'Unknown';
     }
 
     private function updateLiveSessionProgress()
     {
-        if (!$this->liveSession) return;
+        if (! $this->liveSession) {
+            return;
+        }
 
         $questions = $this->getUserQuestions();
 
@@ -186,7 +220,7 @@ class AdminExamDetailIndex extends Component
             'marked_questions' => $questions->where('is_mark', true)->count(),
             'warning_count' => $this->alertCount,
             'alert_count' => ExamAlert::where('user_timetable_id', $this->userTimetableId)->count(),
-            'last_activity' => Carbon::now()
+            'last_activity' => Carbon::now(),
         ]);
     }
 
@@ -200,15 +234,17 @@ class AdminExamDetailIndex extends Component
     public function getUserTimetableStatus(): ?string
     {
         // Jika belum set id, cari yang aktif untuk user
-        if (!$this->userTimetableId) {
+        if (! $this->userTimetableId) {
             $active = UserTimetable::where('user_id', Auth::id())
                 ->whereIn('status', ['exam', 'warning', 'suspend', 'done'])
                 ->orderByDesc('updated_at')
                 ->first();
+
             return $active?->status;
         }
 
         $current = UserTimetable::select('id', 'status')->find($this->userTimetableId);
+
         return $current?->status;
     }
 
@@ -217,27 +253,28 @@ class AdminExamDetailIndex extends Component
         // Method ini akan dipanggil dari JavaScript setelah PeerJS berhasil diinisialisasi
         \Log::info('PeerJS initialization requested for user', [
             'user_id' => Auth::id(),
-            'user_timetable_id' => $this->userTimetableId
+            'user_timetable_id' => $this->userTimetableId,
         ]);
     }
 
     public function updatePeerJSId($peerId)
     {
-        if (!$this->is_streaming) {
+        if (! $this->is_streaming) {
             if ($this->liveSession) {
                 $this->liveSession->update([
                     'peer_id' => null,
                     'camera_status' => 'pending',
-                    'last_activity' => Carbon::now()
+                    'last_activity' => Carbon::now(),
                 ]);
             }
+
             return;
         }
 
         \Log::info('🔥 updatePeerJSId CALLED via Livewire', [
             'peer_id' => $peerId,
             'user_id' => Auth::id(),
-            'live_session_exists' => $this->liveSession ? 'yes' : 'no'
+            'live_session_exists' => $this->liveSession ? 'yes' : 'no',
         ]);
 
         $this->peerJSId = $peerId;
@@ -247,15 +284,15 @@ class AdminExamDetailIndex extends Component
             $this->liveSession->update([
                 'peer_id' => $peerId,
                 'camera_status' => 'active', // Anggap kamera aktif jika PeerJS berhasil
-                'last_activity' => Carbon::now()
+                'last_activity' => Carbon::now(),
             ]);
 
             \Log::info('✅ PeerJS ID updated for live session in DB', [
                 'peer_id' => $peerId,
-                'live_session_id' => $this->liveSession->id
+                'live_session_id' => $this->liveSession->id,
             ]);
         } else {
-             \Log::warning('⚠️ liveSession is NULL in updatePeerJSId');
+            \Log::warning('⚠️ liveSession is NULL in updatePeerJSId');
         }
 
         // Emit event ke JavaScript untuk memberitahu bahwa PeerJS ID sudah disimpan
@@ -264,17 +301,18 @@ class AdminExamDetailIndex extends Component
 
     private function initializeRecording()
     {
-        if (!$this->userTimetable || !$this->userTimetable->timetable_id) {
+        if (! $this->userTimetable || ! $this->userTimetable->timetable_id) {
             return redirect()->route('admin.exam.timetable');
         }
 
         // Cek apakah fitur recording diaktifkan untuk peserta ini (atau global jika logic diubah nanti)
         // Asumsi field 'is_recording' ada di tabel user_timetables
-        if (!$this->userTimetable->is_recording) {
-             \Log::info('Recording skipped (is_recording=false)', [
+        if (! $this->userTimetable->is_recording) {
+            \Log::info('Recording skipped (is_recording=false)', [
                 'user_id' => Auth::id(),
-                'user_timetable_id' => $this->userTimetableId
+                'user_timetable_id' => $this->userTimetableId,
             ]);
+
             return;
         }
 
@@ -283,12 +321,12 @@ class AdminExamDetailIndex extends Component
             'timetable_id' => $this->userTimetable->timetable_id,
             'user_timetable_id' => $this->userTimetableId,
             'start_time' => now(),
-            'status' => 'recording'
+            'status' => 'recording',
         ]);
 
         \Log::info('Recording initialized', [
             'user_id' => Auth::id(),
-            'recording_id' => $this->currentRecording->id
+            'recording_id' => $this->currentRecording->id,
         ]);
     }
 
@@ -299,11 +337,12 @@ class AdminExamDetailIndex extends Component
     public function saveRecordingChunk($chunkBlob = '', $data = [])
     {
         try {
-            if (!$this->currentRecording) {
+            if (! $this->currentRecording) {
                 \Log::warning('❌ saveRecordingChunk called without currentRecording', [
                     'user_id' => Auth::id(),
                     'user_timetable_id' => $this->userTimetableId,
                 ]);
+
                 return false;
             }
 
@@ -323,11 +362,12 @@ class AdminExamDetailIndex extends Component
             }
 
             // Validate format
-            if (empty($actualChunkBlob) || !preg_match('/^data:video\/[^;]+;.*base64,/', $actualChunkBlob)) {
+            if (empty($actualChunkBlob) || ! preg_match('/^data:video\/[^;]+;.*base64,/', $actualChunkBlob)) {
                 \Log::error('❌ Invalid chunk blob format', [
                     'user_id' => Auth::id(),
                     'blob_preview' => is_string($actualChunkBlob) ? substr($actualChunkBlob, 0, 80) : 'not_string',
                 ]);
+
                 return false;
             }
 
@@ -337,28 +377,30 @@ class AdminExamDetailIndex extends Component
                 \Log::error('❌ Failed to decode chunk video data', [
                     'user_id' => Auth::id(),
                 ]);
+
                 return false;
             }
 
             // Determine chunk number
-            if (!$chunkNumber || $chunkNumber <= 0) {
+            if (! $chunkNumber || $chunkNumber <= 0) {
                 $chunkNumber = ($this->currentRecording->chunk_number ?? 0) + 1;
             }
 
             // Build path: store under chunks directory per userTimetable
-            $baseDir = 'exam_recordings/chunks/' . $this->userTimetableId;
-            $filename = $baseDir . '/' . $this->currentRecording->id . '_chunk_' . $chunkNumber . '.webm';
+            $baseDir = 'exam_recordings/chunks/'.$this->userTimetableId;
+            $filename = $baseDir.'/'.$this->currentRecording->id.'_chunk_'.$chunkNumber.'.webm';
 
             $disk = Storage::disk('public');
-            if (!$disk->exists($baseDir)) {
+            if (! $disk->exists($baseDir)) {
                 $disk->makeDirectory($baseDir);
             }
 
             $saveResult = $disk->put($filename, $videoData);
-            if (!$saveResult) {
+            if (! $saveResult) {
                 \Log::error('❌ Failed to save chunk file', [
                     'filename' => $filename,
                 ]);
+
                 return false;
             }
 
@@ -392,6 +434,7 @@ class AdminExamDetailIndex extends Component
                 'user_id' => Auth::id(),
                 'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }
@@ -402,7 +445,7 @@ class AdminExamDetailIndex extends Component
     public function finalizeRecording($data = [])
     {
         try {
-            if (!$this->currentRecording) {
+            if (! $this->currentRecording) {
                 return false;
             }
 
@@ -443,6 +486,7 @@ class AdminExamDetailIndex extends Component
                 'user_id' => Auth::id(),
                 'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }
@@ -478,41 +522,41 @@ class AdminExamDetailIndex extends Component
             'original_size_mb' => $compressionInfo['originalSize'] ?? 'unknown',
             'raw_parameters' => func_get_args(),
             'video_blob_type' => gettype($videoBlob),
-            'video_blob_received' => !empty($actualVideoBlob),
+            'video_blob_received' => ! empty($actualVideoBlob),
             'video_blob_length' => is_string($actualVideoBlob) ? strlen($actualVideoBlob) : 'not_string',
-            'data_parameter' => $data
+            'data_parameter' => $data,
         ]);
 
         // Use the actual video blob for processing
         $videoBlob = $actualVideoBlob;
 
         // Debug output to browser console
-        $this->js('console.log("🚀 PHP METHOD saveRecordingVideo CALLED! Video length: ' . strlen($videoBlob) . '");');
+        $this->js('console.log("🚀 PHP METHOD saveRecordingVideo CALLED! Video length: '.strlen($videoBlob).'");');
 
         try {
             \Log::info('🎬 saveRecordingVideo processing', [
                 'user_id' => Auth::id(),
                 'user_timetable_id' => $this->userTimetableId,
-                'has_current_recording' => !is_null($this->currentRecording),
+                'has_current_recording' => ! is_null($this->currentRecording),
                 'video_blob_length' => strlen($videoBlob),
-                'video_blob_preview' => substr($videoBlob, 0, 100)
+                'video_blob_preview' => substr($videoBlob, 0, 100),
             ]);
 
-            if (empty($videoBlob) || !$this->currentRecording) {
+            if (empty($videoBlob) || ! $this->currentRecording) {
                 \Log::warning('❌ No video data or recording session', [
                     'user_id' => Auth::id(),
-                    'has_video_blob' => !empty($videoBlob),
-                    'has_current_recording' => !is_null($this->currentRecording)
+                    'has_video_blob' => ! empty($videoBlob),
+                    'has_current_recording' => ! is_null($this->currentRecording),
                 ]);
 
                 return false;
             }
 
             // Check video blob format - improved regex to handle codecs parameter
-            if (!preg_match('/^data:video\/[^;]+;.*base64,/', $videoBlob)) {
+            if (! preg_match('/^data:video\/[^;]+;.*base64,/', $videoBlob)) {
                 \Log::error('❌ Invalid video blob format', [
                     'user_id' => Auth::id(),
-                    'blob_start' => substr($videoBlob, 0, 100)
+                    'blob_start' => substr($videoBlob, 0, 100),
                 ]);
 
                 return false;
@@ -525,7 +569,7 @@ class AdminExamDetailIndex extends Component
             if ($videoData === false || strlen($videoData) === 0) {
                 \Log::error('❌ Failed to decode video data', [
                     'user_id' => Auth::id(),
-                    'decode_result' => $videoData === false ? 'false' : 'empty'
+                    'decode_result' => $videoData === false ? 'false' : 'empty',
                 ]);
 
                 return false;
@@ -533,28 +577,28 @@ class AdminExamDetailIndex extends Component
 
             \Log::info('✅ Video data decoded successfully', [
                 'original_size' => strlen($videoBlob),
-                'decoded_size' => strlen($videoData)
+                'decoded_size' => strlen($videoData),
             ]);
 
             // Create final filename
             $recoveryPrefix = $isEmergencyRecovery ? 'RECOVERY_' : '';
-            $filename = 'exam_recordings/' . $recoveryPrefix . $this->userTimetableId . '_exam_' .
-                now()->format('Y-m-d_H-i-s') . '.webm';
+            $filename = 'exam_recordings/'.$recoveryPrefix.$this->userTimetableId.'_exam_'.
+                now()->format('Y-m-d_H-i-s').'.webm';
 
-            \Log::info('💾 Saving to file: ' . $filename);
+            \Log::info('💾 Saving to file: '.$filename);
 
             // Save to storage
             $disk = Storage::disk('public');
             $directory = dirname($filename);
 
-            if (!$disk->exists($directory)) {
+            if (! $disk->exists($directory)) {
                 $disk->makeDirectory($directory);
-                \Log::info('📁 Created directory: ' . $directory);
+                \Log::info('📁 Created directory: '.$directory);
             }
 
             $saveResult = $disk->put($filename, $videoData);
 
-            \Log::info('💾 Save result: ' . ($saveResult ? 'SUCCESS' : 'FAILED'));
+            \Log::info('💾 Save result: '.($saveResult ? 'SUCCESS' : 'FAILED'));
 
             if ($saveResult) {
                 $fileSize = $disk->size($filename);
@@ -564,7 +608,7 @@ class AdminExamDetailIndex extends Component
                     'filename' => $filename,
                     'file_size' => $fileSize,
                     'full_path' => $fullPath,
-                    'file_exists' => file_exists($fullPath)
+                    'file_exists' => file_exists($fullPath),
                 ]);
 
                 // Prepare metadata for recording
@@ -572,8 +616,8 @@ class AdminExamDetailIndex extends Component
                     'compression_applied' => $compressionInfo['optimized'] ?? false,
                     'compression_savings' => $compressionInfo['compressionSavings'] ?? '0%',
                     'original_size_mb' => $compressionInfo['originalSize'] ?? 'unknown',
-                    'final_size_mb' => number_format($fileSize / (1024 * 1024), 2) . 'MB',
-                    'optimization_timestamp' => now()->toISOString()
+                    'final_size_mb' => number_format($fileSize / (1024 * 1024), 2).'MB',
+                    'optimization_timestamp' => now()->toISOString(),
                 ];
 
                 // Update recording with final file info and compression metadata
@@ -582,14 +626,14 @@ class AdminExamDetailIndex extends Component
                     'file_size' => $fileSize,
                     'end_time' => now(),
                     'status' => 'completed',
-                    'metadata' => $metadata  // Store compression info
+                    'metadata' => $metadata,  // Store compression info
                 ]);
 
                 \Log::info('📝 Recording record updated with compression info', [
                     'update_result' => $updateResult,
                     'recording_id' => $this->currentRecording->id,
                     'compression_applied' => $metadata['compression_applied'],
-                    'compression_savings' => $metadata['compression_savings']
+                    'compression_savings' => $metadata['compression_savings'],
                 ]);
 
                 \Log::info('🎉 Optimized exam recording saved successfully', [
@@ -598,7 +642,7 @@ class AdminExamDetailIndex extends Component
                     'original_size_mb' => $metadata['original_size_mb'],
                     'final_size_mb' => $metadata['final_size_mb'],
                     'compression_savings' => $metadata['compression_savings'],
-                    'recording_id' => $this->currentRecording->id
+                    'recording_id' => $this->currentRecording->id,
                 ]);
 
                 // Video saved successfully - no alert needed
@@ -609,14 +653,14 @@ class AdminExamDetailIndex extends Component
                     'filename' => $filename,
                     'directory' => $directory,
                     'disk_root' => $disk->path(''),
-                    'save_result' => $saveResult
+                    'save_result' => $saveResult,
                 ]);
             }
         } catch (\Exception $e) {
             \Log::error('💥 Error saving exam recording', [
                 'user_id' => Auth::id(),
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
         }
 
@@ -627,8 +671,8 @@ class AdminExamDetailIndex extends Component
     {
         \Log::info('🛑 stopRecording() method called from PHP', [
             'user_id' => Auth::id(),
-            'has_current_recording' => !is_null($this->currentRecording),
-            'current_recording_status' => $this->currentRecording->status ?? 'no_recording'
+            'has_current_recording' => ! is_null($this->currentRecording),
+            'current_recording_status' => $this->currentRecording->status ?? 'no_recording',
         ]);
 
         // Trigger JavaScript to stop recording and save video first
@@ -657,7 +701,7 @@ class AdminExamDetailIndex extends Component
             \Log::info('🛑 Recording stop triggered, waiting for video save...', [
                 'user_id' => Auth::id(),
                 'recording_id' => $this->currentRecording->id,
-                'note' => 'Status will be updated to completed after video is saved'
+                'note' => 'Status will be updated to completed after video is saved',
             ]);
         }
     }
@@ -669,7 +713,7 @@ class AdminExamDetailIndex extends Component
             'user_timetable_id' => $this->userTimetableId,
             'alert_type' => $alertType,
             'description' => $description,
-            'metadata' => $metadata
+            'metadata' => $metadata,
         ]);
 
         $this->alertCount++;
@@ -699,14 +743,13 @@ class AdminExamDetailIndex extends Component
             AlertHelper::warning('warning', 'Anda telah melakukan beberapa pelanggaran. Hati-hati!');
         }
 
-        return;
     }
 
     public function pageReloaded()
     {
         $this->logAlert('page_reload', 'Halaman ujian di-refresh', [
             'timestamp' => now()->toISOString(),
-            'user_agent' => request()->header('User-Agent')
+            'user_agent' => request()->header('User-Agent'),
         ]);
     }
 
@@ -714,7 +757,7 @@ class AdminExamDetailIndex extends Component
     {
         if ($this->liveSession && is_array($data)) {
             $updateData = [
-                'last_activity' => now()
+                'last_activity' => now(),
             ];
 
             // Update connection status
@@ -737,12 +780,12 @@ class AdminExamDetailIndex extends Component
             }
 
             // Update peer_id if provided (Critical for streaming)
-            if ($this->is_streaming && isset($data['peer_id']) && !empty($data['peer_id'])) {
+            if ($this->is_streaming && isset($data['peer_id']) && ! empty($data['peer_id'])) {
                 $updateData['peer_id'] = $data['peer_id'];
 
                 // If we get a peer_id, we can assume camera is potentially active
-                if (!isset($data['camera_status'])) {
-                     $updateData['camera_status'] = 'active';
+                if (! isset($data['camera_status'])) {
+                    $updateData['camera_status'] = 'active';
                 }
             }
 
@@ -754,7 +797,7 @@ class AdminExamDetailIndex extends Component
     public function saveScreenshot($screenshotData = [])
     {
         try {
-            if (!$this->liveSession || empty($screenshotData['screenshot'])) {
+            if (! $this->liveSession || empty($screenshotData['screenshot'])) {
                 return;
             }
 
@@ -766,15 +809,15 @@ class AdminExamDetailIndex extends Component
             }
 
             // Create filename
-            $filename = 'exam_screenshots/' . $this->userTimetableId . '_' .
-                now()->format('Y-m-d_H-i-s') . '_' .
-                time() . '.jpg';
+            $filename = 'exam_screenshots/'.$this->userTimetableId.'_'.
+                now()->format('Y-m-d_H-i-s').'_'.
+                time().'.jpg';
 
             // Save to storage
             $disk = Storage::disk('public');
             $directory = dirname($filename);
 
-            if (!$disk->exists($directory)) {
+            if (! $disk->exists($directory)) {
                 $disk->makeDirectory($directory);
             }
 
@@ -786,14 +829,14 @@ class AdminExamDetailIndex extends Component
                     'user_id' => Auth::id(),
                     'filename' => $filename,
                     'size' => strlen($imageData),
-                    'timestamp' => $screenshotData['timestamp'] ?? now()
+                    'timestamp' => $screenshotData['timestamp'] ?? now(),
                 ]);
             }
         } catch (\Exception $e) {
             \Log::error('Error saving screenshot', [
                 'user_id' => Auth::id(),
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
         }
     }
@@ -805,7 +848,7 @@ class AdminExamDetailIndex extends Component
             $userModuleQuestion = UserModuleQuestion::findOrFail($this->questionNavigationId);
 
             $userModuleQuestion->update([
-                'is_mark' => !$userModuleQuestion->is_mark
+                'is_mark' => ! $userModuleQuestion->is_mark,
             ]);
 
             $this->isMark = $userModuleQuestion->is_mark;
@@ -836,7 +879,7 @@ class AdminExamDetailIndex extends Component
             ->with([
                 'timetable:id,module_id,company_id',
                 'timetable.module:id,name,duration',
-                'timetable.timetableModule:id,timetable_id,duration'
+                'timetable.timetableModule:id,timetable_id,duration',
             ])
             ->where('user_id', Auth::id())
             ->whereIn('status', ['exam', 'warning'])
@@ -846,10 +889,9 @@ class AdminExamDetailIndex extends Component
             return $redirect;
         }
 
-
         $this->userTimetableId = $this->userTimetable->id;
-    $this->is_recording = (bool) ($this->userTimetable->is_recording ?? false);
-    $this->is_streaming = (bool) ($this->userTimetable->is_streaming ?? false);
+        $this->is_recording = (bool) ($this->userTimetable->is_recording ?? false);
+        $this->is_streaming = (bool) ($this->userTimetable->is_streaming ?? false);
         // $this->checkQuestion();
 
         $this->calculateRemainingTime();
@@ -875,15 +917,15 @@ class AdminExamDetailIndex extends Component
 
             if ($userTimetable) {
                 $userTimetable->update([
-                    'status'   => 'done',
+                    'status' => 'done',
                     'end_exam' => now(),
-                    'mark'     => 0,
+                    'mark' => 0,
                 ]);
             }
 
             session()->flash('saved', [
                 'title' => 'Ujian Telah Selesai!',
-                'text'  => "Terima kasih telah mengerjakan ujian. Nilai Anda: 0/100",
+                'text' => 'Terima kasih telah mengerjakan ujian. Nilai Anda: 0/100',
             ]);
 
             return redirect()->route('admin.exam.timetable');
@@ -892,7 +934,7 @@ class AdminExamDetailIndex extends Component
 
     private function validateExamStatus()
     {
-        if (!$this->userTimetable) {
+        if (! $this->userTimetable) {
             return redirect()->route('admin.exam.timetable');
         }
 
@@ -906,6 +948,7 @@ class AdminExamDetailIndex extends Component
 
         if ($this->userTimetable->status === 'suspend') {
             session()->flash('error', 'Sesi ujian Anda telah di-suspend oleh pengawas.');
+
             return redirect()->route('admin.exam.timetable');
         }
 
@@ -937,11 +980,11 @@ class AdminExamDetailIndex extends Component
 
                 foreach ($answers as $index => $answer) {
                     $this->question_answers[] = [
-                        'id'       => $answer->id,
+                        'id' => $answer->id,
                         'alphabet' => chr(64 + $index + 1),
-                        'context'  => $answer->context,
-                        'images'   => collect(json_decode($images, true)),
-                        'latex'    => $answer->latex,
+                        'context' => $answer->context,
+                        'images' => collect(json_decode($images, true)),
+                        'latex' => $answer->latex,
                         'latex_preview_png' => $answer->latex_preview_png,
                     ];
                 }
@@ -952,7 +995,7 @@ class AdminExamDetailIndex extends Component
             // Jika tidak ada soal, set default values dan log error
             \Log::warning('No questions found for user timetable', [
                 'user_id' => Auth::id(),
-                'user_timetable_id' => $this->userTimetableId
+                'user_timetable_id' => $this->userTimetableId,
             ]);
 
             $this->questionNavigationId = null;
@@ -970,9 +1013,8 @@ class AdminExamDetailIndex extends Component
     {
         $timetable = $this->userTimetable;
 
-
         // Check if start_exam is set, otherwise set it to now
-        if (!$this->userTimetable->start_exam) {
+        if (! $this->userTimetable->start_exam) {
             $this->userTimetable->update(['start_exam' => now()]);
             $this->userTimetable->refresh();
         }
@@ -988,7 +1030,7 @@ class AdminExamDetailIndex extends Component
             'start_exam' => $this->userTimetable->start_exam,
             'duration' => $duration,
             'pause_total_seconds' => $pauseSeconds,
-            'remaining_seconds' => $this->remainingTime
+            'remaining_seconds' => $this->remainingTime,
         ]);
     }
 
@@ -996,11 +1038,11 @@ class AdminExamDetailIndex extends Component
     public function resumeTimerIfPaused(): int
     {
         $this->userTimetable = UserTimetable::select('id', 'paused_at', 'pause_total_seconds')->find($this->userTimetableId) ?? $this->userTimetable;
-        if (!$this->userTimetable) {
+        if (! $this->userTimetable) {
             return 0;
         }
 
-        if (!is_null($this->userTimetable->paused_at)) {
+        if (! is_null($this->userTimetable->paused_at)) {
             $pausedAt = Carbon::parse($this->userTimetable->paused_at);
             // Ensure delta is a positive integer
             $delta = (int) abs(now()->diffInSeconds($pausedAt));
@@ -1020,6 +1062,7 @@ class AdminExamDetailIndex extends Component
 
         // Recalculate and return latest remaining time
         $this->calculateRemainingTime();
+
         return (int) $this->remainingTime;
     }
 
@@ -1027,6 +1070,7 @@ class AdminExamDetailIndex extends Component
     public function getRemainingTime(): int
     {
         $this->calculateRemainingTime();
+
         return (int) $this->remainingTime;
     }
 
@@ -1082,7 +1126,7 @@ class AdminExamDetailIndex extends Component
         $currentQuestion = UserModuleQuestion::select('id', 'is_mark', 'timetable_answer_id', 'timetable_question_id')
             ->with([
                 'timetableQuestion:id,question,description,latex,latex_preview_png,images',
-                'timetableQuestion.answers:id,timetable_question_id,context,images,latex,latex_preview_png,order'
+                'timetableQuestion.answers:id,timetable_question_id,context,images,latex,latex_preview_png,order',
             ])
             ->find($this->questionNavigationId);
 
@@ -1091,11 +1135,12 @@ class AdminExamDetailIndex extends Component
             $this->timetable_answer_id = $currentQuestion->timetable_answer_id ? (string) $currentQuestion->timetable_answer_id : null;
 
             $questionModel = $currentQuestion->timetableQuestion;
-            if (!$questionModel) {
+            if (! $questionModel) {
                 $this->question = 'Tidak ada soal yang tersedia.';
                 $this->description = '';
                 $this->images = collect();
                 $this->question_answers = [];
+
                 return;
             }
 
@@ -1114,7 +1159,7 @@ class AdminExamDetailIndex extends Component
                 ->get();
 
             $this->question_answers = $answers->map(
-                fn($ans, $i) => [
+                fn ($ans, $i) => [
                     'id' => (string) $ans->id,
                     'alphabet' => chr(65 + $i),
                     'context' => $ans->context,
@@ -1175,7 +1220,6 @@ class AdminExamDetailIndex extends Component
             $this->updateNavigationStatus();
         }
 
-        return;
     }
 
     private function updatePercentage()
@@ -1200,7 +1244,7 @@ class AdminExamDetailIndex extends Component
     {
         $this->saveCurrentAnswer();
         $this->questionNavigationId = $id;
-        
+
         $current = UserModuleQuestion::where('id', $id)->select('order')->first();
         $this->questionNavigationOrder = $current?->order;
 
@@ -1219,7 +1263,7 @@ class AdminExamDetailIndex extends Component
             \Log::warning('⚠️ Client triggered timeExpired but server has time remaining', [
                 'client_remaining' => 0,
                 'server_remaining' => $this->remainingTime,
-                'user_id' => Auth::id()
+                'user_id' => Auth::id(),
             ]);
 
             // Sync client timer instead of finishing
@@ -1256,7 +1300,7 @@ class AdminExamDetailIndex extends Component
         \Log::info('🏁 finishExam() called', [
             'user_id' => Auth::id(),
             'user_timetable_id' => $this->userTimetableId,
-            'has_current_recording' => !is_null($this->currentRecording)
+            'has_current_recording' => ! is_null($this->currentRecording),
         ]);
 
         // Wait for video to be completely saved before finishing exam
@@ -1320,14 +1364,14 @@ class AdminExamDetailIndex extends Component
             ');
             \Log::info('✅ Video save process initiated with callback');
         } catch (\Exception $e) {
-            \Log::error('❌ Error initiating video save: ' . $e->getMessage());
+            \Log::error('❌ Error initiating video save: '.$e->getMessage());
         }
 
         // Initial logging - exam finish process started
         \Log::info('📡 Exam finish process initiated, waiting for video save...', [
             'user_id' => Auth::id(),
             'user_timetable_id' => $this->userTimetableId,
-            'recording_status' => $this->currentRecording ? $this->currentRecording->status : 'no_recording'
+            'recording_status' => $this->currentRecording ? $this->currentRecording->status : 'no_recording',
         ]);
 
         // Note: Actual exam completion will happen in completeExamFinalization()
@@ -1345,7 +1389,7 @@ class AdminExamDetailIndex extends Component
         \Log::info('⏸ suspendExam() called', [
             'user_id' => Auth::id(),
             'user_timetable_id' => $this->userTimetableId,
-            'has_current_recording' => !is_null($this->currentRecording)
+            'has_current_recording' => ! is_null($this->currentRecording),
         ]);
 
         try {
@@ -1389,7 +1433,7 @@ class AdminExamDetailIndex extends Component
             ');
             \Log::info('✅ Suspend video save process initiated');
         } catch (\Exception $e) {
-            \Log::error('❌ Error initiating suspend video save: ' . $e->getMessage());
+            \Log::error('❌ Error initiating suspend video save: '.$e->getMessage());
         }
     }
 
@@ -1402,7 +1446,7 @@ class AdminExamDetailIndex extends Component
         \Log::info('🎯 completeExamFinalization() called after video save', [
             'user_id' => Auth::id(),
             'user_timetable_id' => $this->userTimetableId,
-            'recording_status' => $this->currentRecording ? $this->currentRecording->status : 'no_recording'
+            'recording_status' => $this->currentRecording ? $this->currentRecording->status : 'no_recording',
         ]);
 
         // Tutup live session
@@ -1410,7 +1454,7 @@ class AdminExamDetailIndex extends Component
             $this->liveSession->update([
                 'is_active' => false,
                 'connection_status' => 'disconnected',
-                'end_time' => now()
+                'end_time' => now(),
             ]);
         }
 
@@ -1419,8 +1463,9 @@ class AdminExamDetailIndex extends Component
             ->where('user_id', Auth::id())
             ->first();
 
-        if (!$userTimetable) {
+        if (! $userTimetable) {
             \Log::error('❌ No active user timetable found for exam completion');
+
             return redirect()->route('admin.exam.timetable');
         }
 
@@ -1428,7 +1473,7 @@ class AdminExamDetailIndex extends Component
             ->with(['timetableAnswer:id,is_correct'])
             ->where('user_timetable_id', $userTimetable->id)
             ->get();
-        
+
         $totalQuestions = $userTimetableQuestions->count();
         $correctAnswers = 0;
         $wrongAnswers = 0;
@@ -1455,13 +1500,13 @@ class AdminExamDetailIndex extends Component
         }
 
         // Bulk update statuses
-        if (!empty($correctIds)) {
+        if (! empty($correctIds)) {
             UserModuleQuestion::whereIn('id', $correctIds)->update(['status' => 'correct']);
         }
-        if (!empty($wrongIds)) {
+        if (! empty($wrongIds)) {
             UserModuleQuestion::whereIn('id', $wrongIds)->update(['status' => 'wrong']);
         }
-        if (!empty($unansweredIds)) {
+        if (! empty($unansweredIds)) {
             UserModuleQuestion::whereIn('id', $unansweredIds)->update(['status' => 'unanswered']);
         }
 
@@ -1481,15 +1526,15 @@ class AdminExamDetailIndex extends Component
             'total_questions' => $totalQuestions,
             'correct_answers' => $correctAnswers,
             'final_mark' => $mark,
-            'recording_completed' => $this->currentRecording ? $this->currentRecording->status === 'completed' : false
+            'recording_completed' => $this->currentRecording ? $this->currentRecording->status === 'completed' : false,
         ]);
 
         // Redirect after successful completion
         $this->js('
             console.log("✅ Exam finalization completed successfully!");
-            console.log("📊 Final Score: ' . $mark . '/' . $totalQuestions . ' (' . $mark . '%)");
+            console.log("📊 Final Score: '.$mark.'/'.$totalQuestions.' ('.$mark.'%)");
 
-            // alert("✅ Ujian berhasil diselesaikan!\\n📊 Nilai: ' . $mark . '/100\\n🎬 Video recording tersimpan");
+            // alert("✅ Ujian berhasil diselesaikan!\\n📊 Nilai: '.$mark.'/100\\n🎬 Video recording tersimpan");
 
             // Immediate redirect since everything is now complete
             window.location.href = "/admin/exam/timetable";
@@ -1498,7 +1543,7 @@ class AdminExamDetailIndex extends Component
         session()->flash('saved', [
             'title' => 'Ujian Telah Selesai!',
             // 'text' => "Terima kasih telah mengerjakan ujian. Nilai Anda: {$mark}/100",
-            'text' => "Terima kasih telah mengerjakan ujian",
+            'text' => 'Terima kasih telah mengerjakan ujian',
         ]);
 
         // Redirect after all processes are complete
@@ -1513,7 +1558,7 @@ class AdminExamDetailIndex extends Component
         \Log::info('🎯 completeSuspendFinalization() called after video save', [
             'user_id' => Auth::id(),
             'user_timetable_id' => $this->userTimetableId,
-            'recording_status' => $this->currentRecording ? $this->currentRecording->status : 'no_recording'
+            'recording_status' => $this->currentRecording ? $this->currentRecording->status : 'no_recording',
         ]);
 
         // Tutup live session
@@ -1521,7 +1566,7 @@ class AdminExamDetailIndex extends Component
             $this->liveSession->update([
                 'is_active' => false,
                 'connection_status' => 'disconnected',
-                'end_time' => now()
+                'end_time' => now(),
             ]);
         }
 
@@ -1530,8 +1575,9 @@ class AdminExamDetailIndex extends Component
             ->where('user_id', Auth::id())
             ->first();
 
-        if (!$userTimetable) {
+        if (! $userTimetable) {
             \Log::error('❌ No active user timetable found for suspend completion');
+
             return redirect()->route('admin.exam.timetable');
         }
 
@@ -1553,7 +1599,7 @@ class AdminExamDetailIndex extends Component
                 ]);
             }
         } catch (\Throwable $e) {
-            \Log::warning('⚠️ Gagal finalisasi rekaman pada suspend: ' . $e->getMessage());
+            \Log::warning('⚠️ Gagal finalisasi rekaman pada suspend: '.$e->getMessage());
         }
 
         // Hitung nilai dari jawaban yang sudah ada sebelum suspend
@@ -1561,7 +1607,7 @@ class AdminExamDetailIndex extends Component
             ->with(['timetableAnswer:id,is_correct'])
             ->where('user_timetable_id', $userTimetable->id)
             ->get();
-            
+
         $totalQuestions = $userTimetableQuestions->count();
         $correctAnswers = 0;
 
@@ -1584,13 +1630,13 @@ class AdminExamDetailIndex extends Component
         }
 
         // Bulk update statuses
-        if (!empty($correctIds)) {
+        if (! empty($correctIds)) {
             UserModuleQuestion::whereIn('id', $correctIds)->update(['status' => 'correct']);
         }
-        if (!empty($wrongIds)) {
+        if (! empty($wrongIds)) {
             UserModuleQuestion::whereIn('id', $wrongIds)->update(['status' => 'wrong']);
         }
-        if (!empty($unansweredIds)) {
+        if (! empty($unansweredIds)) {
             UserModuleQuestion::whereIn('id', $unansweredIds)->update(['status' => 'unanswered']);
         }
 
@@ -1611,6 +1657,7 @@ class AdminExamDetailIndex extends Component
         ');
 
         session()->flash('error', 'Sesi ujian Anda telah di-suspend oleh pengawas.');
+
         return redirect()->route('admin.exam.timetable');
     }
 

@@ -6,12 +6,12 @@ use App\Models\Master\Question\Module;
 use App\Models\Master\RatingScale\RatingScale;
 use App\Models\Master\Timetable\Timetable;
 use App\Models\User;
-use App\Models\User\UserTimetable;
-use App\Models\User\UserModuleQuestion; // Added for answer stats
+use App\Models\User\UserModuleQuestion;
+use App\Models\User\UserTimetable; // Added for answer stats
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class AdminReportFullExamResultIndex extends Component
 {
@@ -20,13 +20,19 @@ class AdminReportFullExamResultIndex extends Component
     protected $paginationTheme = 'bootstrap';
 
     public $perPage = 10;
+
     public $search = '';
+
     public $user_id = '';
+
     public $module_id = '';
+
     public $timetable_id = '';
 
     public $users = [];
+
     public $modules = [];
+
     public $timetables = [];
 
     public function mount()
@@ -64,7 +70,7 @@ class AdminReportFullExamResultIndex extends Component
     public function getResultStats($userTimetableId)
     {
         $questions = UserModuleQuestion::where('user_timetable_id', $userTimetableId)->get();
-        
+
         return [
             'total' => $questions->count(),
             'correct' => $questions->where('status', 'correct')->count(),
@@ -105,15 +111,15 @@ class AdminReportFullExamResultIndex extends Component
                 'wrong' => $questions->where('status', 'wrong')->count(),
                 'check' => $questions->where('status', 'check')->count(),
                 'answered' => $questions->whereNotNull('timetable_answer_id')->count(),
-                'unanswered' => $questions->filter(function($q) {
-                     return empty($q->answer_id) && empty($q->essay_answer);
+                'unanswered' => $questions->filter(function ($q) {
+                    return empty($q->answer_id) && empty($q->essay_answer);
                 })->count(),
             ];
         }
 
         return view('livewire.admin.report.full-exam-result.admin-report-full-exam-result-index', [
             'examResults' => $paginatedResults,
-            'resultStats' => $resultStats
+            'resultStats' => $resultStats,
         ])
             ->extends('layout.app')
             ->section('content');
@@ -148,7 +154,7 @@ class AdminReportFullExamResultIndex extends Component
 
         foreach ($examResults as $result) {
             $gradeDetails[$result->id] = $this->getGradeDetail($result->mark);
-            
+
             $questions = $result->userModuleQuestions;
             $resultStats[$result->id] = [
                 'total' => $questions->count(),
@@ -156,12 +162,11 @@ class AdminReportFullExamResultIndex extends Component
                 'wrong' => $questions->where('status', 'wrong')->count(),
                 'check' => $questions->where('status', 'check')->count(),
                 'answered' => $questions->whereNotNull('timetable_answer_id')->count(), // Explicitly answered
-                'unanswered' => $questions->filter(function($q) {
-                     return empty($q->answer_id) && empty($q->essay_answer);
+                'unanswered' => $questions->filter(function ($q) {
+                    return empty($q->answer_id) && empty($q->essay_answer);
                 })->count(),
             ];
         }
-
 
         $company = Auth::user()->company()->with('companyDetail')->first();
 
@@ -179,8 +184,8 @@ class AdminReportFullExamResultIndex extends Component
             ->setOption('margin-left', 10);
 
         return response()->streamDownload(
-            fn () => print($pdf->output()),
-            'laporan-hasil-lengkap-' . date('Y-m-d-H-i-s') . '.pdf'
+            fn () => print ($pdf->output()),
+            'laporan-hasil-lengkap-'.date('Y-m-d-H-i-s').'.pdf'
         );
     }
 
@@ -195,7 +200,7 @@ class AdminReportFullExamResultIndex extends Component
         if ($this->user_id) {
             $user = $this->users->find($this->user_id);
             if ($user) {
-                $summary['user'] = $user->name . ' (' . $user->nim . ')';
+                $summary['user'] = $user->name.' ('.$user->nim.')';
             }
         }
 

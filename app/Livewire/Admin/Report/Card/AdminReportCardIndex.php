@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Report\Card;
 
 use App\Models\Company\Company;
 use App\Models\Master\Timetable\Timetable;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -13,7 +14,9 @@ class AdminReportCardIndex extends Component
     use WithPagination;
 
     public $search;
+
     public $perPage = 10;
+
     protected $paginationTheme = 'bootstrap';
 
     public function render()
@@ -26,10 +29,10 @@ class AdminReportCardIndex extends Component
 
         if ($this->search) {
             $query->where(function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%')
-                  ->orWhereHas('module', function ($q) {
-                      $q->where('name', 'like', '%' . $this->search . '%');
-                  });
+                $q->where('name', 'like', '%'.$this->search.'%')
+                    ->orWhereHas('module', function ($q) {
+                        $q->where('name', 'like', '%'.$this->search.'%');
+                    });
             });
         }
 
@@ -37,30 +40,32 @@ class AdminReportCardIndex extends Component
 
         return view('livewire.admin.report.card.admin-report-card-index', [
             'timetables' => $timetables,
-            'companyData' => $companyData
+            'companyData' => $companyData,
         ])->extends('layout.app')->section('content');
     }
 
     public function printParticipantCards($timetableId)
     {
         $timetable = Timetable::with(['module', 'userTimetables.user'])->find($timetableId);
-        if (!$timetable) return;
+        if (! $timetable) {
+            return;
+        }
 
-        $company = \Illuminate\Support\Facades\Auth::user()->company()->with('companyDetail')->first();
+        $company = Auth::user()->company()->with('companyDetail')->first();
 
-         // Sort by name
-         $timetable->userTimetables = $timetable->userTimetables->sortBy(function($ut) {
+        // Sort by name
+        $timetable->userTimetables = $timetable->userTimetables->sortBy(function ($ut) {
             return $ut->user->name;
         });
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('livewire.admin.report.timetable.admin-report-timetable-card-pdf', [
+        $pdf = Pdf::loadView('livewire.admin.report.timetable.admin-report-timetable-card-pdf', [
             'timetable' => $timetable,
-            'company' => $company
+            'company' => $company,
         ])->setPaper('a4', 'portrait');
 
         return response()->streamDownload(
-            fn () => print($pdf->output()),
-            'kartu-peserta-' . $timetable->name . '.pdf'
+            fn () => print ($pdf->output()),
+            'kartu-peserta-'.$timetable->name.'.pdf'
         );
     }
 }

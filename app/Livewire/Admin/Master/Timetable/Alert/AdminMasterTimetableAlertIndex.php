@@ -3,30 +3,48 @@
 namespace App\Livewire\Admin\Master\Timetable\Alert;
 
 use App\Models\Exam\ExamAlert;
-use Livewire\Component;
-use App\Models\Master\Timetable\Timetable;
 use App\Models\Master\Question\Module;
+use App\Models\Master\Timetable\Timetable;
 use App\Models\User;
 use Auth;
-use Livewire\WithPagination;
 use Carbon\Carbon;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class AdminMasterTimetableAlertIndex extends Component
 {
     use WithPagination;
-    public $timetable_id, $timetable, $modules = [], $supervisors = [], $module_id, $getSupervisors = [];
-    public $search = '', $perPage = 5, $start_time, $end_time;
+
+    public $timetable_id;
+
+    public $timetable;
+
+    public $modules = [];
+
+    public $supervisors = [];
+
+    public $module_id;
+
+    public $getSupervisors = [];
+
+    public $search = '';
+
+    public $perPage = 5;
+
+    public $start_time;
+
+    public $end_time;
 
     public function mount($timetable_id = null)
     {
         $this->timetable_id = $timetable_id;
 
-        if (!$this->timetable_id) {
+        if (! $this->timetable_id) {
             return redirect()->route('admin.master.timetable');
         }
 
         $timetable = Timetable::with('userTimetables')->find($this->timetable_id);
-        if (!$timetable) {
+        if (! $timetable) {
             return redirect()->route('admin.master.timetable');
         }
 

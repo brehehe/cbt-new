@@ -2,7 +2,6 @@
 
 namespace App\Traits\Company;
 
-use App\Models\Company\Company;
 use Illuminate\Support\Facades\Crypt;
 
 trait CompanyTrait
@@ -12,15 +11,19 @@ trait CompanyTrait
     {
         $one_healthy = $organization_id = $client_id = $client_secret = null;
 
-        if (!$company) return [$organization_id, $client_id, $client_secret];
+        if (! $company) {
+            return [$organization_id, $client_id, $client_secret];
+        }
 
         $one_healthy = $this->getCompanyHasOneHealth($company)?->oneHealthy;
 
-        if (!$one_healthy) return [$organization_id, $client_id, $client_secret];
+        if (! $one_healthy) {
+            return [$organization_id, $client_id, $client_secret];
+        }
 
         $organization_id = Crypt::decryptString($one_healthy?->organization_id);
-        $client_id       = Crypt::decryptString($one_healthy?->client_id);
-        $client_secret   = Crypt::decryptString($one_healthy?->client_secret);
+        $client_id = Crypt::decryptString($one_healthy?->client_id);
+        $client_secret = Crypt::decryptString($one_healthy?->client_secret);
 
         return [$organization_id, $client_id, $client_secret];
     }

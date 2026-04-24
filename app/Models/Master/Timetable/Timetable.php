@@ -6,25 +6,26 @@ use App\Models\Classmate\Classmate;
 use App\Models\Company\Company;
 use App\Models\Master\Exam\ExamRoom;
 use App\Models\Master\Exam\ExamSession;
-use App\Models\User\UserTimetable;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Master\Question\Module;
 use App\Models\Master\Question\ModuleQuestion;
 use App\Models\Timetable\TimetableAnswer;
 use App\Models\Timetable\TimetableModule;
 use App\Models\Timetable\TimetableQuestion;
+use App\Models\User\UserTimetable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class Timetable extends Model
 {
     //
-    use SoftDeletes, HasUuids, \App\Traits\LogsSystemActivity;
+    use \App\Traits\LogsSystemActivity, HasUuids, SoftDeletes;
+
     protected $guarded = ['id'];
 
     public function company()
@@ -71,7 +72,7 @@ class Timetable extends Model
         static::addGlobalScope('user_scope', function (Builder $builder) {
             $user = Auth::user();
 
-            if (!$user || !$user->hasRole('Anonymous')) {
+            if (! $user || ! $user->hasRole('Anonymous')) {
                 $builder->where(function ($query) use ($user) {
                     $query->where('company_id', optional($user?->company)?->id)
                         ->orWhere('is_simulation', 'true')
@@ -93,7 +94,7 @@ class Timetable extends Model
                 DB::transaction(function () use ($model) {
                     $module = Module::select('id', 'studys', 'user_id', 'question_type_id', 'name', 'description', 'duration', 'random_question', 'question_pick_type')
                         ->find($model->module_id);
-                    if (!$module) {
+                    if (! $module) {
                         return;
                     }
 
@@ -130,7 +131,7 @@ class Timetable extends Model
                             },
                             'question.answers' => function ($q) {
                                 $q->withoutGlobalScope('user_scope')->select('id', 'question_id', 'alphabet', 'context', 'images', 'latex', 'latex_preview_pdf', 'latex_preview_png', 'is_correct', 'order');
-                            }
+                            },
                         ])
                         ->chunkById(200, function ($moduleQuestions) use ($timetableModule) {
                             $moduleQuestions = $moduleQuestions->unique('question_id');
@@ -150,7 +151,7 @@ class Timetable extends Model
 
                             foreach ($moduleQuestions as $moduleQuestion) {
                                 $question = $moduleQuestion->question;
-                                if (!$question) {
+                                if (! $question) {
                                     continue;
                                 }
 
@@ -222,7 +223,7 @@ class Timetable extends Model
                                 }
                             }
 
-                            if (!empty($questionUpserts)) {
+                            if (! empty($questionUpserts)) {
                                 TimetableQuestion::upsert(
                                     $questionUpserts,
                                     ['timetable_module_id', 'question_id'],
@@ -250,7 +251,7 @@ class Timetable extends Model
                                     ]
                                 );
 
-                                if (!empty($answerUpserts)) {
+                                if (! empty($answerUpserts)) {
                                     TimetableAnswer::upsert(
                                         $answerUpserts,
                                         ['timetable_question_id', 'answer_id'],
@@ -266,7 +267,7 @@ class Timetable extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
-        $term = '%' . $term . '%';
+        $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id', 'name', 'start_time', 'end_time', 'description'], 'ILIKE', $term);
@@ -280,8 +281,6 @@ class Timetable extends Model
 
     /**
      * Get the examRoom that owns the Timetable
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function examRoom(): BelongsTo
     {
@@ -290,8 +289,6 @@ class Timetable extends Model
 
     /**
      * Get the examSession that owns the Timetable
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function examSession(): BelongsTo
     {

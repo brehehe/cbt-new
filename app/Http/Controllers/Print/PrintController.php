@@ -8,7 +8,6 @@ use App\Models\Company\Company;
 use App\Models\Master\Exam\ExamRoom;
 use App\Models\Master\Exam\ExamSession;
 use App\Models\Master\Timetable\Timetable;
-use Illuminate\Http\Request;
 
 class PrintController extends Controller
 {

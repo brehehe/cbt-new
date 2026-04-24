@@ -18,14 +18,14 @@ class MaterialCategoryService
     {
         $material_category = MaterialCategory::updateOrCreate(
             [
-                'id' => $request['id'] ?? null
+                'id' => $request['id'] ?? null,
             ],
             [
-                'company_id'           => $request['company_id'] ?? null,
-                'topic_id'             => $request['topic_id'] ?? null,
+                'company_id' => $request['company_id'] ?? null,
+                'topic_id' => $request['topic_id'] ?? null,
                 'material_category_id' => $request['material_category_id'] ?? null,
-                'name'                 => $request['name'] ?? null,
-                'description'          => $request['description'] ?? null,
+                'name' => $request['name'] ?? null,
+                'description' => $request['description'] ?? null,
             ]
         );
 

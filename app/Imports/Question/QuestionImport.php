@@ -12,11 +12,11 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 class QuestionImport implements ToCollection
 {
     /**
-    * @param Collection $collection
-    */
+     * @param  Collection  $collection
+     */
     public function __construct(
         protected string $study_id,
-        protected string $import_type = 'pg', 
+        protected string $import_type = 'pg',
     ) {}
 
     public function collection(Collection $collections)
@@ -57,20 +57,20 @@ class QuestionImport implements ToCollection
 
             for ($i = 0; $i < count($header); $i++) {
                 if (trim($collections[0][$i]) != $header[$i]) {
-                    throw new Exception("Header " . $header[$i] . " Tidak di temukan. Harap periksa kembali template anda.");
+                    throw new Exception('Header '.$header[$i].' Tidak di temukan. Harap periksa kembali template anda.');
                 }
             }
 
             $user = Auth::user();
 
             QuestionImportJob::dispatch($this->study_id, $user, $collections, $this->import_type);
-        } catch (Exception | \Throwable $th) {
+        } catch (Exception|\Throwable $th) {
             $error = [
                 'message' => $th->getMessage(),
-                'file'    => $th->getFile(),
-                'line'    => $th->getLine(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
             ];
-            Log::error("Ada kesalahan saat Question Import", $error);
+            Log::error('Ada kesalahan saat Question Import', $error);
         }
     }
 }

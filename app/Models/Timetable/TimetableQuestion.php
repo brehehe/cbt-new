@@ -2,24 +2,28 @@
 
 namespace App\Models\Timetable;
 
+use App\Models\Category\CategoryQuestion;
 use App\Models\Company\Company;
 use App\Models\Master\Question\Question;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Category\CategoryQuestion;
 
 class TimetableQuestion extends Model
 {
     //
-    use SoftDeletes, HasUuids;
+    use HasUuids, SoftDeletes;
+
     protected $guarded = ['id'];
 
     const TYPE_SINGLE = 'single';
+
     const TYPE_MULTIPLE = 'multiple';
+
     const TYPE_ESSAY = 'essay';
 
     public function company()
@@ -49,7 +53,7 @@ class TimetableQuestion extends Model
         static::addGlobalScope('user_scope', function (Builder $builder) {
             $user = Auth::user();
 
-            if (!$user || !$user->hasRole('Anonymous')) {
+            if (! $user || ! $user->hasRole('Anonymous')) {
                 $builder->where(function ($query) use ($user) {
                     $query->where('company_id', optional($user?->company)?->id)
                         ->orWhereHas('timetableModule.timetable', function ($q) {
@@ -71,7 +75,7 @@ class TimetableQuestion extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
-        $term = '%' . $term . '%';
+        $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id'], 'ILIKE', $term);
@@ -80,8 +84,6 @@ class TimetableQuestion extends Model
 
     /**
      * Get the question that owns the TimetableQuestion
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function question(): BelongsTo
     {
@@ -90,6 +92,6 @@ class TimetableQuestion extends Model
 
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

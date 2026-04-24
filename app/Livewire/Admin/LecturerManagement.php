@@ -6,47 +6,78 @@ use App\Models\User;
 use App\Models\User\UserDetail;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Spatie\Permission\Models\Role;
 
 class LecturerManagement extends Component
 {
     use WithPagination;
 
     public $search = '';
+
     public $facultyFilter = '';
+
     public $departmentFilter = '';
+
     public $positionFilter = '';
+
     public $showModal = false;
+
     public $editMode = false;
+
     public $selectedLecturerId = null;
 
     // Form properties
     public $name = '';
+
     public $email = '';
+
     public $lecturer_id = '';
+
     public $lecturer_nidn = '';
+
     public $lecturer_nip = '';
+
     public $lecturer_department = '';
+
     public $lecturer_faculty = '';
+
     public $lecturer_position = '';
+
     public $lecturer_functional_position = '';
+
     public $lecturer_education_level = '';
+
     public $lecturer_specialization = '';
+
     public $lecturer_expertise = '';
+
     public $lecturer_status = 'active';
+
     public $lecturer_type = 'full_time';
+
     public $birth_place = '';
+
     public $birth_date = '';
+
     public $gender = '';
+
     public $religion = '';
+
     public $nationality = 'Indonesian';
+
     public $marital_status = 'single';
+
     public $address = '';
+
     public $city = '';
+
     public $province = '';
+
     public $phone = '';
+
     public $mobile_phone = '';
+
     public $identity_type = 'KTP';
+
     public $identity_number = '';
 
     protected $rules = [
@@ -95,11 +126,11 @@ class LecturerManagement extends Component
             ->with(['userDetail'])
             ->whereHas('userDetail', function ($q) {
                 if ($this->search) {
-                    $q->where('lecturer_id', 'ilike', '%' . $this->search . '%')
-                        ->orWhere('lecturer_nidn', 'ilike', '%' . $this->search . '%')
+                    $q->where('lecturer_id', 'ilike', '%'.$this->search.'%')
+                        ->orWhere('lecturer_nidn', 'ilike', '%'.$this->search.'%')
                         ->orWhereHas('user', function ($userQuery) {
-                            $userQuery->where('name', 'ilike', '%' . $this->search . '%')
-                                ->orWhere('email', 'ilike', '%' . $this->search . '%');
+                            $userQuery->where('name', 'ilike', '%'.$this->search.'%')
+                                ->orWhere('email', 'ilike', '%'.$this->search.'%');
                         });
                 }
 
@@ -140,7 +171,7 @@ class LecturerManagement extends Component
             'lecturers' => $lecturers,
             'faculties' => $faculties,
             'departments' => $departments,
-            'positions' => $positions
+            'positions' => $positions,
         ]);
     }
 
@@ -192,9 +223,9 @@ class LecturerManagement extends Component
     public function save()
     {
         if ($this->editMode) {
-            $this->rules['email'] = 'required|email|unique:users,email,' . $this->selectedLecturerId;
-            $this->rules['lecturer_id'] = 'required|string|unique:user_details,lecturer_id,' . $this->selectedLecturerId . ',user_id';
-            $this->rules['lecturer_nidn'] = 'required|string|unique:user_details,lecturer_nidn,' . $this->selectedLecturerId . ',user_id';
+            $this->rules['email'] = 'required|email|unique:users,email,'.$this->selectedLecturerId;
+            $this->rules['lecturer_id'] = 'required|string|unique:user_details,lecturer_id,'.$this->selectedLecturerId.',user_id';
+            $this->rules['lecturer_nidn'] = 'required|string|unique:user_details,lecturer_nidn,'.$this->selectedLecturerId.',user_id';
         }
 
         $this->validate();
@@ -244,7 +275,7 @@ class LecturerManagement extends Component
                     'name' => $this->name,
                     'email' => $this->email,
                     'password' => bcrypt('password123'),
-                    'email_verified_at' => now()
+                    'email_verified_at' => now(),
                 ]);
 
                 $user->assignRole('Dosen');
@@ -276,7 +307,7 @@ class LecturerManagement extends Component
                     'identity_type' => $this->identity_type,
                     'identity_number' => $this->identity_number,
                     'verification_status' => 'pending',
-                    'status' => 'active'
+                    'status' => 'active',
                 ]);
 
                 session()->flash('message', 'Data dosen berhasil ditambahkan.');
@@ -284,7 +315,7 @@ class LecturerManagement extends Component
 
             $this->closeModal();
         } catch (\Exception $e) {
-            session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            session()->flash('error', 'Terjadi kesalahan: '.$e->getMessage());
         }
     }
 
@@ -297,7 +328,7 @@ class LecturerManagement extends Component
 
             session()->flash('message', 'Data dosen berhasil dihapus.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            session()->flash('error', 'Terjadi kesalahan: '.$e->getMessage());
         }
     }
 
@@ -338,7 +369,7 @@ class LecturerManagement extends Component
             'identity_type',
             'identity_number',
             'selectedLecturerId',
-            'editMode'
+            'editMode',
         ]);
     }
 }

@@ -3,22 +3,13 @@
 namespace App\Livewire\Admin\Master\Setting;
 
 use App\Helpers\AlertHelper;
-use App\Http\Controllers\API\OneHealth\Auth\AuthController;
 use App\Models\Company\Company;
 use App\Models\Company\CompanyDetail;
 use App\Models\Company\CompanyService;
-use App\Models\Company\CompanyServiceHistory;
-use App\Models\Company\CompanyServiceMonth;
 use App\Models\Country\Country;
-use App\service\apiservice;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class AdminMasterSettingIndex extends Component
 {
@@ -45,8 +36,11 @@ class AdminMasterSettingIndex extends Component
     public $code;
 
     public $code_name;
+
     public $name;
+
     public $code_region;
+
     public $region;
 
     public $email_company;
@@ -95,24 +89,40 @@ class AdminMasterSettingIndex extends Component
 
     // SEB Configuration
     public $seb_use_encryption;
+
     public $seb_encryption_key;
+
     public $seb_show_taskbar;
+
     public $seb_show_reload_button;
+
     public $seb_show_time;
+
     public $seb_show_input_language;
+
     public $seb_allow_quit;
+
     public $seb_allow_spell_check;
+
     public $seb_enable_private_clipboard;
+
     public $seb_browser_exam_key;
 
     // App Installers
     public $app_windows;
+
     public $app_windows_old;
+
     public $app_mac;
+
     public $app_mac_old;
+
     public $app_android;
+
     public $app_android_old;
+
     public $app_ios;
+
     public $app_ios_old;
 
     // Service
@@ -310,7 +320,7 @@ class AdminMasterSettingIndex extends Component
             ]);
 
             if ($this->logo) {
-                $randomName = Str::random(40) . '.' . $this->logo->getClientOriginalExtension();
+                $randomName = Str::random(40).'.'.$this->logo->getClientOriginalExtension();
                 $logoPath = $this->logo->storeAs('public/company', $randomName);
                 $this->logo = $logoPath; // untuk simpan di database
             } else {
@@ -318,7 +328,7 @@ class AdminMasterSettingIndex extends Component
             }
 
             if ($this->logo_potrait) {
-                $randomName = Str::random(40) . '.' . $this->logo_potrait->getClientOriginalExtension();
+                $randomName = Str::random(40).'.'.$this->logo_potrait->getClientOriginalExtension();
                 $logo_potraitPath = $this->logo_potrait->storeAs('public/company', $randomName);
                 $this->logo_potrait = $logo_potraitPath; // untuk simpan di database
             } else {
@@ -326,7 +336,7 @@ class AdminMasterSettingIndex extends Component
             }
 
             if ($this->background_login) {
-                $randomName = Str::random(40) . '.' . $this->background_login->getClientOriginalExtension();
+                $randomName = Str::random(40).'.'.$this->background_login->getClientOriginalExtension();
                 $background_loginPath = $this->background_login->storeAs('public/company', $randomName);
                 $this->background_login = $background_loginPath; // untuk simpan di database
             } else {
@@ -335,28 +345,28 @@ class AdminMasterSettingIndex extends Component
 
             // App Installer Uploads
             if ($this->app_windows) {
-                $randomName = 'windows_' . Str::random(10) . '.' . $this->app_windows->getClientOriginalExtension();
+                $randomName = 'windows_'.Str::random(10).'.'.$this->app_windows->getClientOriginalExtension();
                 $this->app_windows = $this->app_windows->storeAs('public/company/apps', $randomName);
             } else {
                 $this->app_windows = $this->app_windows_old;
             }
 
             if ($this->app_mac) {
-                $randomName = 'mac_' . Str::random(10) . '.' . $this->app_mac->getClientOriginalExtension();
+                $randomName = 'mac_'.Str::random(10).'.'.$this->app_mac->getClientOriginalExtension();
                 $this->app_mac = $this->app_mac->storeAs('public/company/apps', $randomName);
             } else {
                 $this->app_mac = $this->app_mac_old;
             }
 
             if ($this->app_android) {
-                $randomName = 'android_' . Str::random(10) . '.' . $this->app_android->getClientOriginalExtension();
+                $randomName = 'android_'.Str::random(10).'.'.$this->app_android->getClientOriginalExtension();
                 $this->app_android = $this->app_android->storeAs('public/company/apps', $randomName);
             } else {
                 $this->app_android = $this->app_android_old;
             }
 
             if ($this->app_ios) {
-                $randomName = 'ios_' . Str::random(10) . '.' . $this->app_ios->getClientOriginalExtension();
+                $randomName = 'ios_'.Str::random(10).'.'.$this->app_ios->getClientOriginalExtension();
                 $this->app_ios = $this->app_ios->storeAs('public/company/apps', $randomName);
             } else {
                 $this->app_ios = $this->app_ios_old;
@@ -426,8 +436,6 @@ class AdminMasterSettingIndex extends Component
             return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
         }
     }
-
-
 
     public function render()
     {

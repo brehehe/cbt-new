@@ -5,23 +5,35 @@ namespace App\Livewire\Admin\Master\Classmate\Detail;
 use App\Helpers\AlertHelper;
 use App\Models\Classmate\Classmate;
 use App\Models\Classmate\ClassmateStudent;
-use Livewire\Component;
-use Livewire\WithPagination;
 use App\Models\User;
 use Auth;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class AdminMasterClassmateDetailIndex extends Component
 {
     use WithPagination;
+
     protected $paginationTheme = 'tailwind';
-    public $perPage = 8, $search;
+
+    public $perPage = 8;
+
+    public $search;
+
     public $classmate_id;
+
     public $name;
+
     public $description;
+
     public $selectedStudents = [];
+
     public $openStudentModal = false;
+
     public $users = [];
+
     public $user_id;
+
     public $type_study = 'general';
 
     public function mount($id)
@@ -55,6 +67,7 @@ class AdminMasterClassmateDetailIndex extends Component
             $classmate->type_study = $this->type_study;
             $classmate->save();
         }
+
         return AlertHelper::success('Berhasil', 'Data berhasil diperbarui.');
     }
 
@@ -102,7 +115,7 @@ class AdminMasterClassmateDetailIndex extends Component
             ->orderBy('name', 'asc');
 
         $pageResults = $query->paginate($this->perPage, ['*'], 'modalPage');
-        $pageIds = $pageResults->pluck('id')->map(fn($id) => (string)$id)->toArray();
+        $pageIds = $pageResults->pluck('id')->map(fn ($id) => (string) $id)->toArray();
 
         if ($selectAll) {
             $this->selectedStudents = array_values(array_unique(array_merge($this->selectedStudents, $pageIds)));
@@ -116,7 +129,7 @@ class AdminMasterClassmateDetailIndex extends Component
         if ($selectAll) {
             $this->selectedStudents = User::role(['Mahasiswa'])
                 ->search($this->search)
-                ->pluck('id')->map(fn($id) => (string)$id)->toArray();
+                ->pluck('id')->map(fn ($id) => (string) $id)->toArray();
         } else {
             $this->selectedStudents = [];
         }
@@ -135,8 +148,10 @@ class AdminMasterClassmateDetailIndex extends Component
                 }
             }
             $this->closeModalStudent();
+
             return AlertHelper::success('Berhasil', 'Data mahasiswa berhasil disimpan.');
         }
+
         return AlertHelper::error('Gagal', 'Tidak ada mahasiswa yang dipilih.');
     }
 
@@ -150,12 +165,15 @@ class AdminMasterClassmateDetailIndex extends Component
         $classmateStudent = ClassmateStudent::find($id[0]);
         if ($classmateStudent) {
             $classmateStudent->delete();
+
             return AlertHelper::success('Berhasil', 'Data mahasiswa berhasil dihapus.');
         }
+
         return AlertHelper::error('Gagal', 'Data mahasiswa tidak ditemukan.');
     }
 
     public $selectedDeleteStudents = [];
+
     public $selectAllDelete = false;
 
     public function updatedSelectAllDelete($value)
@@ -163,7 +181,7 @@ class AdminMasterClassmateDetailIndex extends Component
         if ($value) {
             $this->selectedDeleteStudents = ClassmateStudent::search($this->search)
                 ->where('classmate_id', $this->classmate_id)
-                ->pluck('id')->map(fn($id) => (string)$id)->toArray();
+                ->pluck('id')->map(fn ($id) => (string) $id)->toArray();
         } else {
             $this->selectedDeleteStudents = [];
         }
@@ -174,6 +192,7 @@ class AdminMasterClassmateDetailIndex extends Component
         if (empty($this->selectedDeleteStudents)) {
             return AlertHelper::error('Gagal', 'Tidak ada data mahasiswa yang dipilih.');
         }
+
         return AlertHelper::confirmDelete('deleteSelected', 'Apakah Anda yakin ingin menghapus data mahasiswa yang dipilih?', 'selected');
     }
 
@@ -185,6 +204,7 @@ class AdminMasterClassmateDetailIndex extends Component
         ClassmateStudent::whereIn('id', $this->selectedDeleteStudents)->delete();
         $this->selectedDeleteStudents = [];
         $this->selectAllDelete = false;
+
         return AlertHelper::success('Berhasil', 'Data mahasiswa terpilih berhasil dihapus.');
     }
 

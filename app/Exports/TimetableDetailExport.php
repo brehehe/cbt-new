@@ -2,17 +2,20 @@
 
 namespace App\Exports;
 
-use App\Models\User\UserTimetable;
 use App\Models\Master\RatingScale\RatingScale;
+use App\Models\User\UserTimetable;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class TimetableDetailExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize
+class TimetableDetailExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping
 {
     protected $timetable_id;
+
     protected $search;
+
     protected $ratingScales;
 
     public function __construct($timetable_id, $search = '')
@@ -23,7 +26,7 @@ class TimetableDetailExport implements FromCollection, WithHeadings, WithMapping
     }
 
     /**
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function collection()
     {
@@ -33,9 +36,6 @@ class TimetableDetailExport implements FromCollection, WithHeadings, WithMapping
             ->get();
     }
 
-    /**
-     * @return array
-     */
     public function headings(): array
     {
         return [
@@ -52,8 +52,7 @@ class TimetableDetailExport implements FromCollection, WithHeadings, WithMapping
     }
 
     /**
-     * @param mixed $userTimetable
-     * @return array
+     * @param  mixed  $userTimetable
      */
     public function map($userTimetable): array
     {
@@ -64,7 +63,7 @@ class TimetableDetailExport implements FromCollection, WithHeadings, WithMapping
         $unanswered = $userTimetable->userModuleQuestions->whereNull('timetable_answer_id')->count();
         $correct = $userTimetable->userModuleQuestions->where('status', 'correct')->count();
         $wrong = $userTimetable->userModuleQuestions->where('status', 'wrong')->count();
-        
+
         $mark = $userTimetable->mark;
         $grade = '-';
         if ($mark !== null) {

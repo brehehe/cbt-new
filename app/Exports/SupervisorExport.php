@@ -3,16 +3,17 @@
 namespace App\Exports;
 
 use App\Models\User;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Illuminate\Support\Facades\Auth;
 
-class SupervisorExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize
+class SupervisorExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping
 {
     /**
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function collection()
     {
@@ -25,9 +26,6 @@ class SupervisorExport implements FromCollection, WithHeadings, WithMapping, Sho
             ->get();
     }
 
-    /**
-     * @return array
-     */
     public function headings(): array
     {
         return [
@@ -40,8 +38,7 @@ class SupervisorExport implements FromCollection, WithHeadings, WithMapping, Sho
     }
 
     /**
-     * @param mixed $supervisor
-     * @return array
+     * @param  mixed  $supervisor
      */
     public function map($supervisor): array
     {

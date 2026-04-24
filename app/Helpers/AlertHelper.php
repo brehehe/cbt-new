@@ -10,14 +10,14 @@ class AlertHelper
      * Palet warna standar untuk semua jenis alert
      */
     private static array $colors = [
-        'primary'   => '#4F46E5', // Indigo-600
+        'primary' => '#4F46E5', // Indigo-600
         'secondary' => '#6B7280', // Gray-500
-        'success'   => '#10B981', // Emerald-500
-        'error'     => '#EF4444', // Red-500
-        'warning'   => '#F59E0B', // Amber-500
-        'info'      => '#3B82F6', // Blue-500
-        'question'  => '#6366F1', // Indigo-500
-        'dark'      => '#1F2937', // Gray-800
+        'success' => '#10B981', // Emerald-500
+        'error' => '#EF4444', // Red-500
+        'warning' => '#F59E0B', // Amber-500
+        'info' => '#3B82F6', // Blue-500
+        'question' => '#6366F1', // Indigo-500
+        'dark' => '#1F2937', // Gray-800
     ];
 
     /**
@@ -28,31 +28,31 @@ class AlertHelper
             'icon' => 'success',
             'timer' => 3000,
             'title' => 'Berhasil',
-            'confirmText' => 'OK'
+            'confirmText' => 'OK',
         ],
         'error' => [
             'icon' => 'error',
             'timer' => 3000,
             'title' => 'Gagal',
-            'confirmText' => 'OK'
+            'confirmText' => 'OK',
         ],
         'warning' => [
             'icon' => 'warning',
             'timer' => 3000,
             'title' => 'Perhatian',
-            'confirmText' => 'OK'
+            'confirmText' => 'OK',
         ],
         'info' => [
             'icon' => 'info',
             'timer' => 3000,
             'title' => 'Informasi',
-            'confirmText' => 'OK'
+            'confirmText' => 'OK',
         ],
         'question' => [
             'icon' => 'question',
             'timer' => 3000,
             'title' => 'Konfirmasi',
-            'confirmText' => 'OK'
+            'confirmText' => 'OK',
         ],
     ];
 
@@ -81,7 +81,7 @@ class AlertHelper
                     'popup' => 'animate__animated animate__fadeInRight rounded-lg shadow-2xl border',
                     'title' => 'text-base font-semibold text-gray-800',
                     'content' => 'text-sm text-gray-600 mt-1',
-                    'timerProgressBar' => 'progress-bar-' . $type,
+                    'timerProgressBar' => 'progress-bar-'.$type,
                 ],
                 'showConfirmButton' => false,
                 'timerProgressBar' => $timer > 0,
@@ -127,14 +127,14 @@ class AlertHelper
     /**
      * Menampilkan dialog konfirmasi kustom
      *
-     * @param string $title Judul dialog
-     * @param string $text Text dialog
-     * @param string|null $confirmText Text tombol konfirmasi
-     * @param string $cancelText Text tombol batal
-     * @param string|null $confirmColor Warna tombol konfirmasi
-     * @param string|null $cancelColor Warna tombol batal
-     * @param string|array $confirmAction Nama action atau array [action, params]
-     * @param string $type Tipe konfirmasi (question, warning, dll)
+     * @param  string  $title  Judul dialog
+     * @param  string  $text  Text dialog
+     * @param  string|null  $confirmText  Text tombol konfirmasi
+     * @param  string  $cancelText  Text tombol batal
+     * @param  string|null  $confirmColor  Warna tombol konfirmasi
+     * @param  string|null  $cancelColor  Warna tombol batal
+     * @param  string|array  $confirmAction  Nama action atau array [action, params]
+     * @param  string  $type  Tipe konfirmasi (question, warning, dll)
      */
     public static function confirm(
         ?string $title,
@@ -149,9 +149,9 @@ class AlertHelper
         $type = strtolower($type);
         $config = self::$alertConfig[$type] ?? self::$alertConfig['question'];
 
-        $confirmText  = $confirmText ?? $config['confirmText'];
+        $confirmText = $confirmText ?? $config['confirmText'];
         $confirmColor = $confirmColor ?? self::$colors['primary'];
-        $cancelColor  = $cancelColor ?? self::$colors['secondary'];
+        $cancelColor = $cancelColor ?? self::$colors['secondary'];
 
         $alert = LivewireAlert::title($title)
             ->text($text)
@@ -163,7 +163,7 @@ class AlertHelper
                 'width' => '500px',
                 'padding' => '10px',
                 'background' => '#ffffff',
-                'icon'      => $config['icon'],
+                'icon' => $config['icon'],
                 'iconColor' => $confirmColor,
                 'showClass' => [
                     'popup' => 'animate__animated animate__fadeInDown animate__faster',
@@ -172,11 +172,11 @@ class AlertHelper
                     'popup' => 'animate__animated animate__fadeOutUp animate__faster',
                 ],
                 'customClass' => [
-                    'title'         => 'text-xl font-bold text-gray-800',
-                    'content'       => 'text-gray-600 text-base',
+                    'title' => 'text-xl font-bold text-gray-800',
+                    'content' => 'text-gray-600 text-base',
                     'confirmButton' => 'rounded-lg px-6 py-3 font-medium text-white',
-                    'cancelButton'  => 'rounded-lg px-6 py-3 font-medium text-white',
-                    'popup'         => 'rounded-xl shadow-2xl border-0',
+                    'cancelButton' => 'rounded-lg px-6 py-3 font-medium text-white',
+                    'popup' => 'rounded-xl shadow-2xl border-0',
                 ],
                 'buttonsStyling' => true,
             ]);
@@ -184,9 +184,9 @@ class AlertHelper
         // Handle confirmAction: bisa string, array 1-3 elemen
         if (is_array($confirmAction)) {
             $actionName = $confirmAction[0];
-            $params     = $confirmAction[1] ?? [];
+            $params = $confirmAction[1] ?? [];
 
-            if (!is_array($params)) {
+            if (! is_array($params)) {
                 $params = [$params];
             }
 
@@ -201,9 +201,9 @@ class AlertHelper
     /**
      * Menampilkan dialog konfirmasi hapus data
      *
-     * @param string $text Pesan konfirmasi
-     * @param mixed $id ID data yang akan dihapus atau parameter lainnya
-     * @param string $action Nama action Livewire
+     * @param  string  $text  Pesan konfirmasi
+     * @param  mixed  $id  ID data yang akan dihapus atau parameter lainnya
+     * @param  string  $action  Nama action Livewire
      */
     public static function confirmDelete(?string $action = 'delete', ?string $text = 'Apakah Anda yakin ingin menghapus data ini?', $id = null): void
     {
@@ -224,9 +224,9 @@ class AlertHelper
     /**
      * Menampilkan dialog konfirmasi simpan data
      *
-     * @param string $text Pesan konfirmasi
-     * @param mixed $params Parameter tambahan (opsional)
-     * @param string $action Nama action Livewire
+     * @param  string  $text  Pesan konfirmasi
+     * @param  mixed  $params  Parameter tambahan (opsional)
+     * @param  string  $action  Nama action Livewire
      */
     public static function confirmSave(?string $action = 'save', ?string $text = 'Apakah Anda yakin ingin menyimpan perubahan ini?', $params = null): void
     {
@@ -247,9 +247,9 @@ class AlertHelper
     /**
      * Menampilkan dialog konfirmasi simpan dan keluar
      *
-     * @param string $text Pesan konfirmasi
-     * @param mixed $params Parameter tambahan (opsional)
-     * @param string $action Nama action Livewire
+     * @param  string  $text  Pesan konfirmasi
+     * @param  mixed  $params  Parameter tambahan (opsional)
+     * @param  string  $action  Nama action Livewire
      */
     public static function confirmSaveAndExit(?string $action = 'saveAndExit', ?string $text = 'Simpan perubahan dan keluar?', $params = null): void
     {
@@ -270,9 +270,9 @@ class AlertHelper
     /**
      * Menampilkan dialog konfirmasi publikasi
      *
-     * @param string $text Pesan konfirmasi
-     * @param mixed $params Parameter tambahan (opsional)
-     * @param string $action Nama action Livewire
+     * @param  string  $text  Pesan konfirmasi
+     * @param  mixed  $params  Parameter tambahan (opsional)
+     * @param  string  $action  Nama action Livewire
      */
     public static function confirmPublish(?string $action = 'publish', ?string $text = 'Apakah Anda yakin ingin mempublikasikan data ini?', $params = null): void
     {

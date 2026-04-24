@@ -2,10 +2,13 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\ServiceProvider;
 use App\Models\Company\Company;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\ServiceProvider;
+use Spatie\Activitylog\Models\Activity;
+use Stevebauman\Location\Facades\Location;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -39,17 +42,17 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Global Activity Log Metadata Injection
-        \Spatie\Activitylog\Models\Activity::saving(function ($activity) {
+        Activity::saving(function ($activity) {
             // Only inject if not already present
-            if (!isset($activity->properties['ip_address'])) {
+            if (! isset($activity->properties['ip_address'])) {
                 $ip = request()->ip() ?? '127.0.0.1';
-                
+
                 // Attempt GeoIP lookup
                 $location = null;
                 try {
                     // Skip location for local IPs to avoid errors/delays
                     if ($ip !== '127.0.0.1' && $ip !== '::1') {
-                        $position = \Stevebauman\Location\Facades\Location::get($ip);
+                        $position = Location::get($ip);
                         if ($position) {
                             $location = [
                                 'country' => $position->countryName,
@@ -60,15 +63,15 @@ class AppServiceProvider extends ServiceProvider
                         }
                     }
                 } catch (\Throwable $e) {
-                    \Illuminate\Support\Facades\Log::warning('GeoIP lookup failed: ' . $e->getMessage());
+                    Log::warning('GeoIP lookup failed: '.$e->getMessage());
                 }
 
                 $activity->properties = $activity->properties->merge([
                     'ip_address' => $ip,
                     'user_agent' => request()->userAgent() ?? 'System / CLI',
-                    'location'   => $location,
-                    'url'        => request()->fullUrl(),
-                    'method'     => request()->method(),
+                    'location' => $location,
+                    'url' => request()->fullUrl(),
+                    'method' => request()->method(),
                 ]);
             }
         });

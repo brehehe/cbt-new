@@ -20,13 +20,12 @@ class SyncModuleQuestionsJob implements ShouldQueue
         public array $categoryQuestionSettings,
         public array $topicQuestionSettings,
         public ?string $companyId
-    ) {
-    }
+    ) {}
 
     public function handle(ModuleService $moduleService): void
     {
         $module = Module::find($this->moduleId);
-        if (!$module) {
+        if (! $module) {
             return;
         }
 

@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Auth;
 class ModuleQuestion extends Model
 {
     //
-    use SoftDeletes, HasUuids, \App\Traits\LogsSystemActivity;
+    use \App\Traits\LogsSystemActivity, HasUuids, SoftDeletes;
+
     protected $guarded = ['id'];
 
     public function company()
@@ -29,7 +30,7 @@ class ModuleQuestion extends Model
         static::addGlobalScope('user_scope', function (Builder $builder) {
             $user = Auth::user();
 
-            if (!$user || !$user->hasRole('Anonymous')) {
+            if (! $user || ! $user->hasRole('Anonymous')) {
                 $builder->where('company_id', optional($user?->company)?->id)->orderBy('order', 'asc');
             }
 
@@ -45,7 +46,7 @@ class ModuleQuestion extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
-        $term = '%' . $term . '%';
+        $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id'], 'ILIKE', $term);
@@ -54,8 +55,6 @@ class ModuleQuestion extends Model
 
     /**
      * Get the module that owns the ModuleQuestion
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function module(): BelongsTo
     {
@@ -64,8 +63,6 @@ class ModuleQuestion extends Model
 
     /**
      * Get the question that owns the ModuleQuestion
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function question(): BelongsTo
     {
@@ -74,8 +71,6 @@ class ModuleQuestion extends Model
 
     /**
      * Get the study that owns the ModuleQuestion
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function study(): BelongsTo
     {

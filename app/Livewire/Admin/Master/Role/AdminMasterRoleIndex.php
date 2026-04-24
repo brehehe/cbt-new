@@ -11,6 +11,7 @@ use Livewire\WithPagination;
 class AdminMasterRoleIndex extends Component
 {
     use WithPagination;
+
     protected $paginationTheme = 'bootstrap'; // atau 'tailwind' sesuai UI
 
     protected $queryString = [
@@ -19,8 +20,11 @@ class AdminMasterRoleIndex extends Component
     ];
 
     public $perPage = 5;
+
     public $search = '';
+
     public $data_id;
+
     public $name;
 
     // public function hydrate()
@@ -37,6 +41,7 @@ class AdminMasterRoleIndex extends Component
     {
         $this->resetValidation();
         $this->reset(['data_id', 'name']);
+
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
 
@@ -54,10 +59,9 @@ class AdminMasterRoleIndex extends Component
             'name' => 'required|string|max:255',
         ]);
 
-
         $role = Role::where('name', $this->name)->first();
 
-        if (!$role) {
+        if (! $role) {
             $role = Role::create([
                 'name' => $this->name,
                 'guard_name' => 'web',
@@ -69,11 +73,11 @@ class AdminMasterRoleIndex extends Component
             ->first();
 
         if ($roleCompany) {
-            if (!$this->data_id) {
+            if (! $this->data_id) {
                 return AlertHelper::error('Gagal', 'Role ini sudah ada di perusahaan Anda.');
             }
         } else {
-            $roleCompany = new RoleCompany();
+            $roleCompany = new RoleCompany;
             $roleCompany->company_id = auth()->user()->company_id;
             $roleCompany->role_id = $role->uuid;
         }
@@ -82,6 +86,7 @@ class AdminMasterRoleIndex extends Component
         $role->save();
 
         $this->closeModal();
+
         return AlertHelper::success('Berhasil', 'Data role berhasil disimpan.');
     }
 

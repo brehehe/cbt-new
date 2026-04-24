@@ -6,16 +6,16 @@ use App\Models\Company\Company;
 use App\Models\Master\Timetable\Timetable;
 use App\Models\User;
 use App\Models\User\UserTimetable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class ExamLiveSession extends Model
 {
-    use SoftDeletes, HasUuids;
+    use HasUuids, SoftDeletes;
 
     protected $fillable = [
         'timetable_id',
@@ -42,7 +42,7 @@ class ExamLiveSession extends Model
         'browser_info',
         'device_info',
         'location_info',
-        'end_time'
+        'end_time',
     ];
 
     protected $casts = [
@@ -52,7 +52,7 @@ class ExamLiveSession extends Model
         'browser_info' => 'array',
         'device_info' => 'array',
         'location_info' => 'array',
-        'end_time' => 'datetime'
+        'end_time' => 'datetime',
     ];
 
     protected static function boot()
@@ -62,7 +62,7 @@ class ExamLiveSession extends Model
         static::addGlobalScope('user_scope', function (Builder $builder) {
             $user = Auth::user();
 
-            if ($user && !$user->hasRole('Anonymous')) {
+            if ($user && ! $user->hasRole('Anonymous')) {
                 $builder->where('company_id', optional($user->company)->id);
             }
         });
@@ -125,7 +125,7 @@ class ExamLiveSession extends Model
     {
         $this->update([
             'last_activity' => now(),
-            'connection_status' => 'connected'
+            'connection_status' => 'connected',
         ]);
     }
 
@@ -133,7 +133,7 @@ class ExamLiveSession extends Model
     {
         $this->update([
             'connection_status' => 'disconnected',
-            'is_active' => false
+            'is_active' => false,
         ]);
     }
 
@@ -179,7 +179,10 @@ class ExamLiveSession extends Model
 
     public function getProgressPercentageAttribute()
     {
-        if ($this->total_questions == 0) return 0;
+        if ($this->total_questions == 0) {
+            return 0;
+        }
+
         return round(($this->answered_questions / $this->total_questions) * 100, 1);
     }
 
@@ -188,9 +191,15 @@ class ExamLiveSession extends Model
         $alerts = $this->alert_count;
         $warnings = $this->warning_count;
 
-        if ($alerts >= 5 || $warnings >= 10) return 'high';
-        if ($alerts >= 3 || $warnings >= 5) return 'medium';
-        if ($alerts >= 1 || $warnings >= 1) return 'low';
+        if ($alerts >= 5 || $warnings >= 10) {
+            return 'high';
+        }
+        if ($alerts >= 3 || $warnings >= 5) {
+            return 'medium';
+        }
+        if ($alerts >= 1 || $warnings >= 1) {
+            return 'low';
+        }
 
         return 'none';
     }

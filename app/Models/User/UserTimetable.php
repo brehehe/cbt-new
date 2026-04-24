@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Auth;
 
 class UserTimetable extends Model
 {
-    use SoftDeletes, HasUuids;
+    use HasUuids, SoftDeletes;
+
     protected $guarded = ['id'];
 
     protected $casts = [
@@ -48,7 +49,7 @@ class UserTimetable extends Model
         static::addGlobalScope('user_scope', function (Builder $builder) {
             $user = Auth::user();
 
-            if (!$user || !$user->hasRole('Anonymous')) {
+            if (! $user || ! $user->hasRole('Anonymous')) {
                 $builder->where(function ($query) use ($user) {
                     $query->where('company_id', optional($user?->company)?->id)
                         ->orWhereHas('timetable', function ($q) {
@@ -77,7 +78,7 @@ class UserTimetable extends Model
         $mark = $total > 0 ? round(($correct / $total) * 100, 2) : 0;
 
         $this->update(['mark' => $mark]);
-        
+
         return $mark;
     }
 

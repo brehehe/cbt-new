@@ -3,21 +3,16 @@
 namespace App\Models\Company;
 
 use App\Models\User;
-use Exception;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Throwable;
 
 class Company extends Model
 {
     //
-    use HasFactory, HasUuids, SoftDeletes, \App\Traits\LogsSystemActivity;
+    use \App\Traits\LogsSystemActivity, HasFactory, HasUuids, SoftDeletes;
 
     protected $guarded = ['id'];
 
@@ -42,8 +37,6 @@ class Company extends Model
 
     /**
      * Get the user associated with the Company
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function user(): HasOne
     {
@@ -52,8 +45,6 @@ class Company extends Model
 
     /**
      * Get the companyDetail associated with the Company
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function companyDetail(): HasOne
     {

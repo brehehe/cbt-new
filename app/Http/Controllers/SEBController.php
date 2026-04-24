@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use App\Models\Master\Timetable\Timetable;
 use App\Models\Company\Company;
+use App\Models\Master\Timetable\Timetable;
+use Illuminate\Http\Request;
 
 class SEBController extends Controller
 {
@@ -45,7 +44,7 @@ class SEBController extends Controller
             $timetable = Timetable::withoutGlobalScope('user_scope')->findOrFail($timetableId);
 
             // Check if timetable requires SEB
-            if (!$timetable->requiresSEB()) {
+            if (! $timetable->requiresSEB()) {
                 return response()->json([
                     'error' => 'This exam does not require Safe Exam Browser',
                     'timetable' => $timetable->name,
@@ -84,7 +83,7 @@ class SEBController extends Controller
         // Complete SEB configuration based on official schema
         $config = [
             // Basic exam settings
-            'startURL' => $appUrl . '/login',
+            'startURL' => $appUrl.'/login',
             'originatorVersion' => '3.10.1',
 
             // Browser Exam Key for validation
@@ -132,9 +131,9 @@ class SEBController extends Controller
                 [
                     'active' => true,
                     'action' => 1, // 0=block, 1=allow
-                    'expression' => $appUrl . '/*',
+                    'expression' => $appUrl.'/*',
                     'regex' => false,
-                ]
+                ],
             ],
 
             // Session & cookies
@@ -221,16 +220,16 @@ class SEBController extends Controller
         $dict = $xml->addChild('dict');
 
         // Add all configuration keys
-        $this->addPlistString($dict, 'startURL', $appUrl . '/login');
+        $this->addPlistString($dict, 'startURL', $appUrl.'/login');
         $this->addPlistString($dict, 'originatorVersion', '3.10.1'); // SEB Ver for Windows
 
-        if (!empty($browserExamKey)) {
+        if (! empty($browserExamKey)) {
             $this->addPlistString($dict, 'browserExamKey', $browserExamKey);
         }
 
         // Quit settings
         $this->addPlistBool($dict, 'allowQuit', $allowQuit);
-        $this->addPlistBool($dict, 'ignoreExitKeys', true); 
+        $this->addPlistBool($dict, 'ignoreExitKeys', true);
         $this->addPlistString($dict, 'hashedQuitPassword', hash('sha256', $quitPassword));
         $this->addPlistString($dict, 'quitURL', '');
         $this->addPlistBool($dict, 'quitURLConfirm', true);
@@ -298,7 +297,7 @@ class SEBController extends Controller
         $ruleDict = $array->addChild('dict');
         $this->addPlistBool($ruleDict, 'active', true);
         $this->addPlistInteger($ruleDict, 'action', 1);
-        $this->addPlistString($ruleDict, 'expression', $appUrl . '/*');
+        $this->addPlistString($ruleDict, 'expression', $appUrl.'/*');
         $this->addPlistBool($ruleDict, 'regex', false);
 
         // Session & Cookies
@@ -336,7 +335,7 @@ class SEBController extends Controller
             $plainXml = $dom->saveXML();
 
             // Handle Encryption (AES-256)
-            if ($useEncryption && !empty($encryptionKey)) {
+            if ($useEncryption && ! empty($encryptionKey)) {
                 // SEB Password Encryption according to spec
                 // It's a standard GZip + Encryption process usually, but complex in PHP.
                 // However, SEB Client supports "Encryption of configuration files"
@@ -367,7 +366,7 @@ class SEBController extends Controller
             return $plainXml;
 
         } catch (\Exception $e) {
-             return $xml->asXML();
+            return $xml->asXML();
         }
     }
 
@@ -399,10 +398,10 @@ class SEBController extends Controller
         $dict = $xml->addChild('dict');
 
         // Basic settings
-        $this->addPlistString($dict, 'startURL', $appUrl . '/login');
+        $this->addPlistString($dict, 'startURL', $appUrl.'/login');
         $this->addPlistString($dict, 'originatorVersion', '3.10.1');
 
-        if (!empty($browserExamKey)) {
+        if (! empty($browserExamKey)) {
             $this->addPlistString($dict, 'browserExamKey', $browserExamKey);
         }
 
@@ -413,102 +412,102 @@ class SEBController extends Controller
         $this->addPlistString($dict, 'quitURL', '');
         $this->addPlistBool($dict, 'quitURLConfirm', true);
 
-         // Security
-         $this->addPlistBool($dict, 'enableSebBrowser', true);
-         $this->addPlistBool($dict, 'blockPopUpWindows', true);
-         $this->addPlistBool($dict, 'allowVideoCapture', true);
-         $this->addPlistBool($dict, 'allowAudioCapture', true);
-         $this->addPlistBool($dict, 'allowSpellCheck', $allowSpellCheck);
-         $this->addPlistBool($dict, 'allowDictionaryLookup', false);
-         $this->addPlistBool($dict, 'enablePlugIns', false);
-         $this->addPlistBool($dict, 'enableJava', false);
-         $this->addPlistBool($dict, 'enableJavaScript', true);
+        // Security
+        $this->addPlistBool($dict, 'enableSebBrowser', true);
+        $this->addPlistBool($dict, 'blockPopUpWindows', true);
+        $this->addPlistBool($dict, 'allowVideoCapture', true);
+        $this->addPlistBool($dict, 'allowAudioCapture', true);
+        $this->addPlistBool($dict, 'allowSpellCheck', $allowSpellCheck);
+        $this->addPlistBool($dict, 'allowDictionaryLookup', false);
+        $this->addPlistBool($dict, 'enablePlugIns', false);
+        $this->addPlistBool($dict, 'enableJava', false);
+        $this->addPlistBool($dict, 'enableJavaScript', true);
 
-         // Private Clipboard
-         $this->addPlistBool($dict, 'enablePrivateClipboard', $enablePrivateClipboard);
+        // Private Clipboard
+        $this->addPlistBool($dict, 'enablePrivateClipboard', $enablePrivateClipboard);
 
-         // Browser settings - FULLSCREEN KIOSK MODE
-         $this->addPlistInteger($dict, 'browserViewMode', 0); // 0=fullscreen
-         $this->addPlistString($dict, 'mainBrowserWindowWidth', '100%');
-         $this->addPlistString($dict, 'mainBrowserWindowHeight', '100%');
-         $this->addPlistBool($dict, 'enableBrowserWindowToolbar', true);
-         $this->addPlistBool($dict, 'hideBrowserWindowToolbar', false);
-         $this->addPlistBool($dict, 'showMenuBar', false);
+        // Browser settings - FULLSCREEN KIOSK MODE
+        $this->addPlistInteger($dict, 'browserViewMode', 0); // 0=fullscreen
+        $this->addPlistString($dict, 'mainBrowserWindowWidth', '100%');
+        $this->addPlistString($dict, 'mainBrowserWindowHeight', '100%');
+        $this->addPlistBool($dict, 'enableBrowserWindowToolbar', true);
+        $this->addPlistBool($dict, 'hideBrowserWindowToolbar', false);
+        $this->addPlistBool($dict, 'showMenuBar', false);
 
-         // Taskbar
-         $this->addPlistBool($dict, 'showTaskBar', $showTaskBar);
-         $this->addPlistInteger($dict, 'taskBarHeight', 40);
-         $this->addPlistBool($dict, 'showTime', $showTime);
-         $this->addPlistBool($dict, 'showInputLanguage', $showInputLanguage);
+        // Taskbar
+        $this->addPlistBool($dict, 'showTaskBar', $showTaskBar);
+        $this->addPlistInteger($dict, 'taskBarHeight', 40);
+        $this->addPlistBool($dict, 'showTime', $showTime);
+        $this->addPlistBool($dict, 'showInputLanguage', $showInputLanguage);
 
-         // Kiosk Mode - Maximum Security
-         $this->addPlistBool($dict, 'createNewDesktop', true);
-         $this->addPlistBool($dict, 'killExplorerShell', true);
-         $this->addPlistInteger($dict, 'browserScreenKeyboard', 0);
+        // Kiosk Mode - Maximum Security
+        $this->addPlistBool($dict, 'createNewDesktop', true);
+        $this->addPlistBool($dict, 'killExplorerShell', true);
+        $this->addPlistInteger($dict, 'browserScreenKeyboard', 0);
 
-         // Additional Kiosk Settings
-         $this->addPlistBool($dict, 'touchOptimized', false);
-         $this->addPlistBool($dict, 'enableTouchExit', false);
-         $this->addPlistInteger($dict, 'allowedDisplaysMaxNumber', 1);
-         $this->addPlistBool($dict, 'allowedDisplayBuiltin', true);
-         $this->addPlistBool($dict, 'allowDisplayMirroringOSX', false);
+        // Additional Kiosk Settings
+        $this->addPlistBool($dict, 'touchOptimized', false);
+        $this->addPlistBool($dict, 'enableTouchExit', false);
+        $this->addPlistInteger($dict, 'allowedDisplaysMaxNumber', 1);
+        $this->addPlistBool($dict, 'allowedDisplayBuiltin', true);
+        $this->addPlistBool($dict, 'allowDisplayMirroringOSX', false);
 
-         // Window Control
-         $this->addPlistBool($dict, 'allowSwitchToApplications', false);
-         $this->addPlistBool($dict, 'allowUserSwitching', false);
-         $this->addPlistBool($dict, 'enableAppSwitcherCheck', true);
-         $this->addPlistBool($dict, 'forceAppFolderInstall', true);
+        // Window Control
+        $this->addPlistBool($dict, 'allowSwitchToApplications', false);
+        $this->addPlistBool($dict, 'allowUserSwitching', false);
+        $this->addPlistBool($dict, 'enableAppSwitcherCheck', true);
+        $this->addPlistBool($dict, 'forceAppFolderInstall', true);
 
-         // Navigation
-         $this->addPlistBool($dict, 'allowBrowsingBackForward', false);
-         $this->addPlistInteger($dict, 'newBrowserWindowByLinkPolicy', 2);
-         $this->addPlistInteger($dict, 'newBrowserWindowByScriptPolicy', 2);
-         $this->addPlistBool($dict, 'showReloadButton', $showReloadButton);
-         $this->addPlistBool($dict, 'showReloadWarning', true);
+        // Navigation
+        $this->addPlistBool($dict, 'allowBrowsingBackForward', false);
+        $this->addPlistInteger($dict, 'newBrowserWindowByLinkPolicy', 2);
+        $this->addPlistInteger($dict, 'newBrowserWindowByScriptPolicy', 2);
+        $this->addPlistBool($dict, 'showReloadButton', $showReloadButton);
+        $this->addPlistBool($dict, 'showReloadWarning', true);
 
-         // URL Filter
-         $this->addPlistBool($dict, 'urlFilterEnable', true);
-         $this->addPlistBool($dict, 'urlFilterEnableContentFilter', false);
+        // URL Filter
+        $this->addPlistBool($dict, 'urlFilterEnable', true);
+        $this->addPlistBool($dict, 'urlFilterEnableContentFilter', false);
 
-         $dict->addChild('key', 'urlFilterRules');
-         $array = $dict->addChild('array');
-         $ruleDict = $array->addChild('dict');
-         $this->addPlistBool($ruleDict, 'active', true);
-         $this->addPlistInteger($ruleDict, 'action', 1);
-         $this->addPlistString($ruleDict, 'expression', $appUrl . '/*');
-         $this->addPlistBool($ruleDict, 'regex', false);
+        $dict->addChild('key', 'urlFilterRules');
+        $array = $dict->addChild('array');
+        $ruleDict = $array->addChild('dict');
+        $this->addPlistBool($ruleDict, 'active', true);
+        $this->addPlistInteger($ruleDict, 'action', 1);
+        $this->addPlistString($ruleDict, 'expression', $appUrl.'/*');
+        $this->addPlistBool($ruleDict, 'regex', false);
 
-         // Session & Cookies
-         $this->addPlistBool($dict, 'examSessionClearCookiesOnStart', false);
-         $this->addPlistBool($dict, 'examSessionClearCookiesOnEnd', true);
-         $this->addPlistBool($dict, 'removeBrowserProfile', false);
+        // Session & Cookies
+        $this->addPlistBool($dict, 'examSessionClearCookiesOnStart', false);
+        $this->addPlistBool($dict, 'examSessionClearCookiesOnEnd', true);
+        $this->addPlistBool($dict, 'removeBrowserProfile', false);
 
-         // Display
-         $this->addPlistInteger($dict, 'allowedDisplaysMaxNumber', 1);
-         $this->addPlistBool($dict, 'allowedDisplayBuiltin', true);
+        // Display
+        $this->addPlistInteger($dict, 'allowedDisplaysMaxNumber', 1);
+        $this->addPlistBool($dict, 'allowedDisplayBuiltin', true);
 
-         // Touch & Audio
-         $this->addPlistBool($dict, 'enableTouchExit', false);
-         $this->addPlistBool($dict, 'touchOptimized', false);
-         $this->addPlistBool($dict, 'audioControlEnabled', true);
-         $this->addPlistBool($dict, 'audioMute', false);
-         $this->addPlistBool($dict, 'audioSetVolumeLevel', false);
+        // Touch & Audio
+        $this->addPlistBool($dict, 'enableTouchExit', false);
+        $this->addPlistBool($dict, 'touchOptimized', false);
+        $this->addPlistBool($dict, 'audioControlEnabled', true);
+        $this->addPlistBool($dict, 'audioMute', false);
+        $this->addPlistBool($dict, 'audioSetVolumeLevel', false);
 
-         // Additional
-         $this->addPlistBool($dict, 'allowPreferencesWindow', false);
-         $this->addPlistBool($dict, 'enableZoomPage', true);
-         $this->addPlistBool($dict, 'enableZoomText', true);
-         $this->addPlistInteger($dict, 'zoomMode', 0);
-         $this->addPlistBool($dict, 'allowDownUploads', false);
-         $this->addPlistInteger($dict, 'sebConfigPurpose', 1);
+        // Additional
+        $this->addPlistBool($dict, 'allowPreferencesWindow', false);
+        $this->addPlistBool($dict, 'enableZoomPage', true);
+        $this->addPlistBool($dict, 'enableZoomText', true);
+        $this->addPlistInteger($dict, 'zoomMode', 0);
+        $this->addPlistBool($dict, 'allowDownUploads', false);
+        $this->addPlistInteger($dict, 'sebConfigPurpose', 1);
 
-         // Format XML
-         $dom = new \DOMDocument('1.0');
-         $dom->preserveWhiteSpace = false;
-         $dom->formatOutput = true;
-         $dom->loadXML($xml->asXML());
+        // Format XML
+        $dom = new \DOMDocument('1.0');
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($xml->asXML());
 
-         return $dom->saveXML();
+        return $dom->saveXML();
     }
 
     /**
@@ -535,7 +534,7 @@ class SEBController extends Controller
     private function addPlistInteger($dict, $key, $value)
     {
         $dict->addChild('key', $key);
-        $dict->addChild('integer', (string)$value);
+        $dict->addChild('integer', (string) $value);
     }
 
     /**

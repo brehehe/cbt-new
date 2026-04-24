@@ -19,9 +19,11 @@ class DashboardTest extends TestCase
     public function test_authenticated_users_can_visit_the_dashboard(): void
     {
         $user = User::factory()->create();
+        $user->assignRole('admin'); // Pastikan user punya role admin agar bisa akses dashboard admin
+
         $this->actingAs($user);
 
-        $response = $this->get('/dashboard');
+        $response = $this->get(route('admin.dashboard'));
         $response->assertStatus(200);
     }
 }

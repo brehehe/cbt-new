@@ -2,23 +2,26 @@
 
 namespace App\Livewire\Admin\Exam\LiveStream;
 
-use App\Models\Exam\ExamLiveSession;
 use App\Models\Exam\ExamAlert;
-use App\Models\Exam\ExamRecording;
+use App\Models\Exam\ExamLiveSession;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
 
 class AdminExamLiveStreamIndex extends Component
 {
     use WithPagination;
 
     public $selectedSessionId = null;
+
     public $selectedSession = null;
+
     public $viewMode = 'grid'; // grid, single, gallery
+
     public $filterStatus = 'all'; // all, active, warning, error
+
     public $sortBy = 'last_activity'; // last_activity, name, alerts
+
     public $sortDirection = 'desc';
 
     protected $listeners = [
@@ -26,7 +29,7 @@ class AdminExamLiveStreamIndex extends Component
         'selectSession',
         'takeSnapshot',
         'sendMessage',
-        'terminateSession'
+        'terminateSession',
     ];
 
     public function mount()
@@ -76,14 +79,16 @@ class AdminExamLiveStreamIndex extends Component
     {
         $targetSessionId = $sessionId ?? $this->selectedSessionId;
 
-        if (!$targetSessionId) return;
+        if (! $targetSessionId) {
+            return;
+        }
 
         $session = ExamLiveSession::find($targetSessionId);
         if ($session) {
             // Trigger snapshot capture
             $this->dispatch('captureSnapshot', $targetSessionId);
 
-            session()->flash('success', 'Snapshot berhasil diambil untuk ' . $session->user->name);
+            session()->flash('success', 'Snapshot berhasil diambil untuk '.$session->user->name);
         }
     }
 
@@ -99,14 +104,14 @@ class AdminExamLiveStreamIndex extends Component
                 'timetable_id' => $session->timetable_id,
                 'user_timetable_id' => $session->user_timetable_id,
                 'alert_type' => 'supervisor_message',
-                'description' => 'Pesan dari supervisor: ' . $message,
+                'description' => 'Pesan dari supervisor: '.$message,
                 'metadata' => [
                     'sender' => Auth::user()->name,
-                    'timestamp' => now()->toISOString()
-                ]
+                    'timestamp' => now()->toISOString(),
+                ],
             ]);
 
-            session()->flash('success', 'Pesan berhasil dikirim ke ' . $session->user->name);
+            session()->flash('success', 'Pesan berhasil dikirim ke '.$session->user->name);
         }
     }
 
@@ -116,7 +121,7 @@ class AdminExamLiveStreamIndex extends Component
         if ($session) {
             $session->update([
                 'is_active' => false,
-                'connection_status' => 'terminated'
+                'connection_status' => 'terminated',
             ]);
 
             // Log termination
@@ -127,11 +132,11 @@ class AdminExamLiveStreamIndex extends Component
                 'description' => 'Sesi dihentikan oleh supervisor',
                 'metadata' => [
                     'terminated_by' => Auth::user()->name,
-                    'timestamp' => now()->toISOString()
-                ]
+                    'timestamp' => now()->toISOString(),
+                ],
             ]);
 
-            session()->flash('success', 'Sesi ujian ' . $session->user->name . ' telah dihentikan');
+            session()->flash('success', 'Sesi ujian '.$session->user->name.' telah dihentikan');
         }
     }
 
@@ -148,7 +153,7 @@ class AdminExamLiveStreamIndex extends Component
             'userTimetable',
             'examRecordings' => function ($query) {
                 $query->orderBy('created_at', 'desc')->limit(5);
-            }
+            },
         ])->find($this->selectedSessionId);
     }
 
@@ -160,9 +165,8 @@ class AdminExamLiveStreamIndex extends Component
         // Apply filters
         switch ($this->filterStatus) {
             case 'active':
-                $query->where('connection_status', 'connected')
-                    // ->where('camera_status', 'active')
-                ;
+                $query->where('connection_status', 'connected');
+                // ->where('camera_status', 'active')
                 break;
             case 'warning':
                 $query->where(function ($q) {
@@ -217,7 +221,7 @@ class AdminExamLiveStreamIndex extends Component
             'total' => $total,
             'active' => $active,
             'warning' => $warning,
-            'error' => $error
+            'error' => $error,
         ];
     }
 
@@ -225,7 +229,7 @@ class AdminExamLiveStreamIndex extends Component
     {
         return view('livewire.admin.exam.live-stream.admin-exam-live-stream-index', [
             'sessions' => $this->getActiveSessionsProperty(),
-            'stats' => $this->getSessionStatsProperty()
+            'stats' => $this->getSessionStatsProperty(),
         ])->extends('layout.app')->section('content');
     }
 }

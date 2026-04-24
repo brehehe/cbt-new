@@ -2,9 +2,9 @@
 
 namespace Database\Factories\User;
 
+use App\Models\Company\Company;
 use App\Models\User;
 use App\Models\User\UserDetail;
-use App\Models\Company\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class UserDetailFactory extends Factory
@@ -46,7 +46,7 @@ class UserDetailFactory extends Factory
 
     public function student(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'student_id' => $this->faker->unique()->numerify('2024####'),
             'student_program' => $this->faker->randomElement([
                 'Teknik Informatika',
@@ -58,21 +58,21 @@ class UserDetailFactory extends Factory
                 'Akuntansi',
                 'Ekonomi',
                 'Hukum',
-                'Psikologi'
+                'Psikologi',
             ]),
             'student_faculty' => $this->faker->randomElement([
                 'Fakultas Teknik',
                 'Fakultas Ekonomi dan Bisnis',
                 'Fakultas Hukum',
                 'Fakultas Psikologi',
-                'Fakultas Kedokteran'
+                'Fakultas Kedokteran',
             ]),
             'student_department' => $this->faker->randomElement([
                 'Teknik Informatika',
                 'Sistem Informasi',
                 'Teknik Elektro',
                 'Manajemen',
-                'Akuntansi'
+                'Akuntansi',
             ]),
             'student_class' => $this->faker->randomElement(['A', 'B', 'C', 'D']),
             'student_semester' => $this->faker->numberBetween(1, 8),
@@ -87,7 +87,7 @@ class UserDetailFactory extends Factory
 
     public function lecturer(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'lecturer_id' => $this->faker->unique()->numerify('LEC####'),
             'lecturer_nidn' => $this->faker->unique()->numerify('##########'),
             'lecturer_nip' => $this->faker->unique()->numerify('##################'),
@@ -96,25 +96,25 @@ class UserDetailFactory extends Factory
                 'Sistem Informasi',
                 'Teknik Elektro',
                 'Manajemen',
-                'Akuntansi'
+                'Akuntansi',
             ]),
             'lecturer_faculty' => $this->faker->randomElement([
                 'Fakultas Teknik',
                 'Fakultas Ekonomi dan Bisnis',
                 'Fakultas Hukum',
-                'Fakultas Psikologi'
+                'Fakultas Psikologi',
             ]),
             'lecturer_position' => $this->faker->randomElement([
                 'Asisten Ahli',
                 'Lektor',
                 'Lektor Kepala',
-                'Profesor'
+                'Profesor',
             ]),
             'lecturer_functional_position' => $this->faker->randomElement([
                 'Dosen',
                 'Kepala Program Studi',
                 'Dekan',
-                'Wakil Dekan'
+                'Wakil Dekan',
             ]),
             'lecturer_education_level' => $this->faker->randomElement(['S2', 'S3']),
             'lecturer_specialization' => $this->faker->randomElement([
@@ -125,14 +125,14 @@ class UserDetailFactory extends Factory
                 'Database Systems',
                 'Human Computer Interaction',
                 'Computer Graphics',
-                'Machine Learning'
+                'Machine Learning',
             ]),
             'lecturer_expertise' => $this->faker->randomElement([
                 'Programming',
                 'Data Analysis',
                 'System Design',
                 'Research',
-                'Teaching'
+                'Teaching',
             ]),
             'lecturer_status' => $this->faker->randomElement(['active', 'inactive', 'leave']),
             'lecturer_type' => $this->faker->randomElement(['full_time', 'part_time', 'contract']),
@@ -142,7 +142,7 @@ class UserDetailFactory extends Factory
 
     public function verified(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'verification_status' => 'verified',
             'verified_at' => now(),
             'verified_by' => User::factory(),
@@ -151,7 +151,7 @@ class UserDetailFactory extends Factory
 
     public function withSpecialNeeds(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'special_needs' => true,
             'special_needs_description' => $this->faker->sentence,
         ]);
@@ -159,7 +159,7 @@ class UserDetailFactory extends Factory
 
     public function withCertifications(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'certifications' => [
                 [
                     'name' => 'Microsoft Certified: Azure Fundamentals',
@@ -167,7 +167,7 @@ class UserDetailFactory extends Factory
                     'issue_date' => $this->faker->date(),
                     'expiry_date' => $this->faker->dateTimeBetween('now', '+3 years')->format('Y-m-d'),
                     'credential_id' => $this->faker->uuid,
-                    'added_at' => now()->toISOString()
+                    'added_at' => now()->toISOString(),
                 ],
                 [
                     'name' => 'AWS Certified Solutions Architect',
@@ -175,9 +175,9 @@ class UserDetailFactory extends Factory
                     'issue_date' => $this->faker->date(),
                     'expiry_date' => $this->faker->dateTimeBetween('now', '+3 years')->format('Y-m-d'),
                     'credential_id' => $this->faker->uuid,
-                    'added_at' => now()->toISOString()
-                ]
-            ]
+                    'added_at' => now()->toISOString(),
+                ],
+            ],
         ]);
     }
 }

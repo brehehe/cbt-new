@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Auth;
 class Classmate extends Model
 {
     //
-    use SoftDeletes, HasUuids, \App\Traits\LogsSystemActivity;
+    use \App\Traits\LogsSystemActivity, HasUuids, SoftDeletes;
+
     protected $guarded = ['id'];
 
     public function company()
@@ -27,7 +28,7 @@ class Classmate extends Model
         static::addGlobalScope('user_scope', function (Builder $builder) {
             $user = Auth::user();
 
-            if ($user && !$user->hasRole('Anonymous') && $user->company_id) {
+            if ($user && ! $user->hasRole('Anonymous') && $user->company_id) {
                 $builder->where('company_id', $user->company_id);
             }
 
@@ -50,7 +51,7 @@ class Classmate extends Model
             return;
         }
 
-        $term = '%' . $term . '%';
+        $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id', 'name', 'description'], 'ILIKE', $term);

@@ -2,24 +2,21 @@
 
 namespace App\Http\Controllers\Api\Exam;
 
+use Agence104\LiveKit\AccessToken;
+use Agence104\LiveKit\AccessTokenOptions;
+use Agence104\LiveKit\VideoGrant;
 use App\Http\Controllers\Controller;
 use App\Models\Exam\ExamAlert;
 use App\Models\Exam\ExamLiveSession;
 use App\Models\Exam\ExamRecording;
 use App\Models\User\UserModuleQuestion;
 use App\Models\User\UserTimetable;
-use App\Services\Exam\RecordingFinalizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Agence104\LiveKit\AccessToken;
-use Agence104\LiveKit\AccessTokenOptions;
-use Agence104\LiveKit\VideoGrant;
 
 class ExamApiController extends Controller
 {
@@ -38,16 +35,17 @@ class ExamApiController extends Controller
             ->select('id', 'user_id', 'status', 'start_exam', 'pause_total_seconds', 'is_recording', 'is_streaming', 'company_id', 'timetable_id')
             ->with([
                 'user:id,name,nim,username',
-                'timetable' => function($q) {
+                'timetable' => function ($q) {
                     $q->withoutGlobalScopes()->select('id', 'module_id', 'company_id', 'is_simulation');
                 },
-                'timetable.module' => function($q) {
+                'timetable.module' => function ($q) {
                     $q->withoutGlobalScopes()->select('id', 'name', 'duration');
                 },
             ])
             ->where('id', $userTimetableId)
             ->firstOrFail();
 
+<<<<<<< Updated upstream
         $this->userTimetableId = $userTimetableId;
         $this->userTimetable = $userTimetable;
 
@@ -56,6 +54,17 @@ class ExamApiController extends Controller
         // dan menambahkannya ke 'pause_total_seconds'
         $this->remainingTime = $this->resumeTimerIfPaused();
 
+=======
+        // 1. Calculate Remaining Time
+        if (! $userTimetable->start_exam) {
+            $userTimetable->update(['start_exam' => now()]);
+        }
+        $startTime = Carbon::parse($userTimetable->start_exam);
+        $duration = $userTimetable->timetable->module->duration ?? 60;
+        $pauseSeconds = (int) ($userTimetable->pause_total_seconds ?? 0);
+        $endTime = $startTime->addMinutes($duration)->addSeconds($pauseSeconds);
+        $remainingTime = max(0, $endTime->timestamp - now()->timestamp);
+>>>>>>> Stashed changes
 
         // 2. Fetch Questions & Navigation
         $questionSelects = ['id', 'is_mark', 'timetable_answer_id', 'timetable_question_id', 'order'];
@@ -66,26 +75,26 @@ class ExamApiController extends Controller
         $questions = UserModuleQuestion::withoutGlobalScopes()
             ->select($questionSelects)
             ->with([
-                'timetableQuestion' => function($q) {
+                'timetableQuestion' => function ($q) {
                     $q->withoutGlobalScopes()->select('id', 'type', 'question', 'description', 'latex', 'latex_preview_png', 'images');
                 },
-                'timetableQuestion.answers' => function($q) {
+                'timetableQuestion.answers' => function ($q) {
                     $q->withoutGlobalScopes()->select('id', 'timetable_question_id', 'context', 'images', 'latex', 'latex_preview_png', 'order');
-                }
+                },
             ])
             ->where('user_timetable_id', $userTimetableId)
             ->orderBy('order')
             ->get()
             ->values();
 
-        $navigation = $questions->map(function($q) use ($hasEssayAnswerColumn) {
+        $navigation = $questions->map(function ($q) use ($hasEssayAnswerColumn) {
             $essayAnswer = $hasEssayAnswerColumn ? ($q->essay_answer ?? null) : null;
 
             return [
                 'id' => $q->id,
-                'isMarked' => (bool)$q->is_mark,
-                'isAnswered' => !is_null($q->timetable_answer_id) || !empty($essayAnswer),
-                'order' => $q->order
+                'isMarked' => (bool) $q->is_mark,
+                'isAnswered' => ! is_null($q->timetable_answer_id) || ! empty($essayAnswer),
+                'order' => $q->order,
             ];
         })->values();
 
@@ -109,8 +118,8 @@ class ExamApiController extends Controller
             'navigation' => $navigation,
             'alertCount' => $alertCount,
             'liveSession' => $liveSession,
-            'isRecordingEnabled' => (bool)$userTimetable->is_recording,
-            'isStreamingEnabled' => (bool)$userTimetable->is_streaming,
+            'isRecordingEnabled' => (bool) $userTimetable->is_recording,
+            'isStreamingEnabled' => (bool) $userTimetable->is_streaming,
         ]);
     }
 
@@ -129,11 +138,11 @@ class ExamApiController extends Controller
         ]);
 
         $userModuleQuestion = UserModuleQuestion::findOrFail($validated['question_navigation_id']);
-        
+
         // Ensure student owns this question
         $userTimetable = UserTimetable::findOrFail($userModuleQuestion->user_timetable_id);
-        if ($userTimetable->user_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
-             return response()->json(['error' => 'Unauthorized'], 403);
+        if ($userTimetable->user_id !== Auth::id() && ! Auth::user()->hasRole('admin')) {
+            return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         $payload = [
@@ -161,7 +170,7 @@ class ExamApiController extends Controller
 
         $userModuleQuestion = UserModuleQuestion::findOrFail($validated['question_navigation_id']);
         $userModuleQuestion->update([
-            'is_mark' => !$userModuleQuestion->is_mark
+            'is_mark' => ! $userModuleQuestion->is_mark,
         ]);
 
         return response()->json(['is_mark' => $userModuleQuestion->is_mark]);
@@ -180,13 +189,13 @@ class ExamApiController extends Controller
         ]);
 
         $userTimetable = UserTimetable::findOrFail($validated['user_timetable_id']);
-        
+
         ExamAlert::create([
             'timetable_id' => $userTimetable->timetable_id,
             'user_timetable_id' => $userTimetable->id,
             'alert_type' => $validated['alert_type'],
             'description' => $validated['description'],
-            'metadata' => $validated['metadata'] ?? []
+            'metadata' => $validated['metadata'] ?? [],
         ]);
 
         $alertCount = ExamAlert::where('user_timetable_id', $userTimetable->id)->count();
@@ -219,15 +228,17 @@ class ExamApiController extends Controller
             ->where('status', 'recording')
             ->first();
 
-        if (!$currentRecording) {
+        if (! $currentRecording) {
             $userTimetable = UserTimetable::find($userTimetableId);
-            if (!$userTimetable) return response()->json(['error' => 'Timetable not found'], 404);
+            if (! $userTimetable) {
+                return response()->json(['error' => 'Timetable not found'], 404);
+            }
             $currentRecording = ExamRecording::create([
-                'timetable_id'      => $userTimetable->timetable_id,
+                'timetable_id' => $userTimetable->timetable_id,
                 'user_timetable_id' => $userTimetableId,
-                'user_id'           => $userTimetable->user_id,
-                'start_time'        => now(),
-                'status'            => 'recording'
+                'user_id' => $userTimetable->user_id,
+                'start_time' => now(),
+                'status' => 'recording',
             ]);
         }
 
@@ -235,19 +246,19 @@ class ExamApiController extends Controller
         if ($request->hasFile('chunkBlob')) {
             $videoData = file_get_contents($request->file('chunkBlob')->getRealPath());
         } else {
-            if (!preg_match('/^data:video\/[^;]+/', $chunkBlob)) {
+            if (! preg_match('/^data:video\/[^;]+/', $chunkBlob)) {
                 return response()->json(['error' => 'Invalid chunk format'], 400);
             }
             $videoData = base64_decode(preg_replace('#^data:video/[^;]+;.*base64,#i', '', $chunkBlob));
         }
-        
+
         if ($videoData === false || empty($videoData)) {
-             return response()->json(['error' => 'No video data received'], 400);
+            return response()->json(['error' => 'No video data received'], 400);
         }
 
         // Save file
-        $baseDir = 'exam_recordings/chunks/' . $userTimetableId;
-        $filename = $baseDir . '/' . $currentRecording->id . '_chunk_' . $chunkNumber . '.webm';
+        $baseDir = 'exam_recordings/chunks/'.$userTimetableId;
+        $filename = $baseDir.'/'.$currentRecording->id.'_chunk_'.$chunkNumber.'.webm';
         Storage::disk('public')->put($filename, $videoData);
 
         $currentRecording->update([
@@ -272,18 +283,20 @@ class ExamApiController extends Controller
         $videoBlob = $request->videoBlob;
 
         $userTimetable = UserTimetable::find($userTimetableId);
-        if (!$userTimetable) return response()->json(['error' => 'Timetable not found'], 404);
+        if (! $userTimetable) {
+            return response()->json(['error' => 'Timetable not found'], 404);
+        }
 
         $currentRecording = ExamRecording::where('user_timetable_id', $userTimetableId)
             ->where('status', 'recording')
             ->first();
 
-        if (!$currentRecording) {
+        if (! $currentRecording) {
             $currentRecording = ExamRecording::create([
                 'timetable_id' => $userTimetable->timetable_id,
                 'user_timetable_id' => $userTimetableId,
                 'start_time' => now(),
-                'status' => 'recording'
+                'status' => 'recording',
             ]);
         }
 
@@ -291,19 +304,19 @@ class ExamApiController extends Controller
         if ($request->hasFile('videoBlob')) {
             $videoData = file_get_contents($request->file('videoBlob')->getRealPath());
         } else {
-            if (!preg_match('/^data:video\/[^;]+/', $videoBlob)) {
+            if (! preg_match('/^data:video\/[^;]+/', $videoBlob)) {
                 return response()->json(['error' => 'Invalid video format'], 400);
             }
             $videoData = base64_decode(preg_replace('#^data:video/[^;]+;.*base64,#i', '', $videoBlob));
         }
-        
+
         if ($videoData === false || empty($videoData)) {
-             return response()->json(['error' => 'No video data received'], 400);
+            return response()->json(['error' => 'No video data received'], 400);
         }
 
         // Save file
-        $baseDir = 'exam_recordings/' . $userTimetableId;
-        $filename = $baseDir . '/' . $currentRecording->id . '_full.webm';
+        $baseDir = 'exam_recordings/'.$userTimetableId;
+        $filename = $baseDir.'/'.$currentRecording->id.'_full.webm';
         Storage::disk('public')->put($filename, $videoData);
 
         // Save to database directly
@@ -311,7 +324,7 @@ class ExamApiController extends Controller
             'video_path' => $filename,
             'file_size' => strlen($videoData),
             'end_time' => now(),
-            'status' => 'completed' // Mark as completed since no chunk merging is needed
+            'status' => 'completed', // Mark as completed since no chunk merging is needed
         ]);
 
         return response()->json(['success' => true]);
@@ -325,11 +338,11 @@ class ExamApiController extends Controller
         $isAdmin = Auth::user() && Auth::user()->hasRole(['Admin', 'Super Admin', 'Pengawas', 'admin']);
 
         $liveSession = ExamLiveSession::where('user_timetable_id', $userTimetableId)
-            ->when(!$isAdmin, function($query) {
+            ->when(! $isAdmin, function ($query) {
                 $query->where('user_id', Auth::id());
             })
             ->first();
-        
+
         if ($liveSession) {
             $connStatus = strtolower($request->connection_status ?? 'connected');
             if ($connStatus === 'connection error') {
@@ -365,27 +378,28 @@ class ExamApiController extends Controller
             ->where('status', 'recording')
             ->first();
 
-        if (!$currentRecording) {
+        if (! $currentRecording) {
             return response()->json(['error' => 'No active recording found'], 404);
         }
 
-        $chunksDir = storage_path('app/public/exam_recordings/chunks/' . $userTimetableId);
-        $outputDir = storage_path('app/public/exam_recordings/' . $userTimetableId);
-        $outputFile = $outputDir . '/' . $currentRecording->id . '_merged.webm';
-        $concatFile = $chunksDir . '/concat_list.txt';
+        $chunksDir = storage_path('app/public/exam_recordings/chunks/'.$userTimetableId);
+        $outputDir = storage_path('app/public/exam_recordings/'.$userTimetableId);
+        $outputFile = $outputDir.'/'.$currentRecording->id.'_merged.webm';
+        $concatFile = $chunksDir.'/concat_list.txt';
 
         // Ensure output dir exists
-        if (!is_dir($outputDir)) {
+        if (! is_dir($outputDir)) {
             mkdir($outputDir, 0755, true);
         }
 
         // Find all chunk files, sorted numerically
-        $chunkPattern = $chunksDir . '/' . $currentRecording->id . '_chunk_*.webm';
+        $chunkPattern = $chunksDir.'/'.$currentRecording->id.'_chunk_*.webm';
         $chunkFiles = glob($chunkPattern);
 
         if (empty($chunkFiles)) {
             // No chunks found — mark as failed
             $currentRecording->update(['status' => 'failed', 'end_time' => now()]);
+
             return response()->json(['error' => 'No chunks found to merge'], 422);
         }
 
@@ -393,37 +407,38 @@ class ExamApiController extends Controller
         usort($chunkFiles, function ($a, $b) {
             preg_match('/_chunk_(\d+)\.webm$/', $a, $mA);
             preg_match('/_chunk_(\d+)\.webm$/', $b, $mB);
-            return (int)($mA[1] ?? 0) <=> (int)($mB[1] ?? 0);
+
+            return (int) ($mA[1] ?? 0) <=> (int) ($mB[1] ?? 0);
         });
 
         // Write FFmpeg concat list
-        $lines = array_map(fn($f) => "file '" . str_replace("'", "'\\''", $f) . "'", $chunkFiles);
+        $lines = array_map(fn ($f) => "file '".str_replace("'", "'\\''", $f)."'", $chunkFiles);
         file_put_contents($concatFile, implode("\n", $lines));
 
         // Run FFmpeg in the background (non-blocking)
         $ffmpegBin = '/usr/bin/ffmpeg';
         $cmd = escapeshellcmd(
-            "$ffmpegBin -y -f concat -safe 0 -i " . escapeshellarg($concatFile) .
-            " -c copy " . escapeshellarg($outputFile)
-        ) . " > /dev/null 2>&1 &";
+            "$ffmpegBin -y -f concat -safe 0 -i ".escapeshellarg($concatFile).
+            ' -c copy '.escapeshellarg($outputFile)
+        ).' > /dev/null 2>&1 &';
 
         exec($cmd);
 
         // Mark as completed and store final path
-        $relPath = 'exam_recordings/' . $userTimetableId . '/' . $currentRecording->id . '_merged.webm';
+        $relPath = 'exam_recordings/'.$userTimetableId.'/'.$currentRecording->id.'_merged.webm';
         $currentRecording->update([
-            'status'     => 'merging',
+            'status' => 'merging',
             'video_path' => $relPath,
-            'end_time'   => now(),
+            'end_time' => now(),
         ]);
 
-        Log::info('[Recording] FFmpeg merge triggered for recording #' . $currentRecording->id, [
+        Log::info('[Recording] FFmpeg merge triggered for recording #'.$currentRecording->id, [
             'chunks' => count($chunkFiles),
             'output' => $outputFile,
         ]);
 
         return response()->json([
-            'success'     => true,
+            'success' => true,
             'chunk_count' => count($chunkFiles),
             'output_path' => $relPath,
         ]);
@@ -432,22 +447,21 @@ class ExamApiController extends Controller
     /**
      * Finish the exam.
      */
-
     public function finishExam($userTimetableId)
     {
         $userTimetable = UserTimetable::where('id', $userTimetableId)
             ->whereIn('status', ['exam', 'warning'])
             ->firstOrFail();
-        
-        if ($userTimetable->user_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
-             return response()->json(['error' => 'Unauthorized'], 403);
+
+        if ($userTimetable->user_id !== Auth::id() && ! Auth::user()->hasRole('admin')) {
+            return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         // Calculate score
         $questions = UserModuleQuestion::where('user_timetable_id', $userTimetableId)
             ->with(['timetableAnswer', 'timetableQuestion'])
             ->get();
-        
+
         $total = $questions->count();
         $correct = 0;
 
@@ -460,6 +474,7 @@ class ExamApiController extends Controller
                 } else {
                     $q->update(['status' => 'unanswered']);
                 }
+
                 continue;
             }
 
@@ -480,20 +495,20 @@ class ExamApiController extends Controller
         $userTimetable->update([
             'status' => 'done',
             'end_exam' => now(),
-            'mark' => $mark
+            'mark' => $mark,
         ]);
 
         // Close live session
         ExamLiveSession::where('user_timetable_id', $userTimetableId)->update([
             'is_active' => false,
-            'end_time' => now()
+            'end_time' => now(),
         ]);
 
         // Finalization background job removed because recording is now saved fully without chunking.
 
         return response()->json([
             'success' => true,
-            'redirect_url' => route('admin.exam.timetable')
+            'redirect_url' => route('admin.exam.timetable'),
         ]);
     }
 
@@ -509,23 +524,23 @@ class ExamApiController extends Controller
         $apiSecret = config('services.livekit.api_secret');
         $serverUrl = config('services.livekit.host');
 
-        if (!$apiKey || !$apiSecret || !$serverUrl) {
+        if (! $apiKey || ! $apiSecret || ! $serverUrl) {
             return response()->json(['error' => 'LiveKit credentials not configured'], 500);
         }
 
-        $roomName = 'exam_' . $userTimetable->timetable_id;
-        $identity = 'student_' . $user->id;
+        $roomName = 'exam_'.$userTimetable->timetable_id;
+        $identity = 'student_'.$user->id;
 
         // 1. Define participant and room details
-        $tokenOptions = (new AccessTokenOptions())
+        $tokenOptions = (new AccessTokenOptions)
             ->setIdentity($identity)
             ->setMetadata(json_encode([
                 'name' => $user->name,
-                'user_timetable_id' => $userTimetableId
+                'user_timetable_id' => $userTimetableId,
             ]));
 
         // 2. Define the video grants
-        $videoGrant = (new VideoGrant())
+        $videoGrant = (new VideoGrant)
             ->setRoomJoin()
             ->setRoomName($roomName)
             ->setCanPublish(true)
@@ -547,8 +562,9 @@ class ExamApiController extends Controller
         } catch (\Exception $e) {
             Log::error('LiveKit Token Generation Failed', [
                 'error' => $e->getMessage(),
-                'user_id' => $user->id
+                'user_id' => $user->id,
             ]);
+
             return response()->json(['error' => 'Failed to generate token'], 500);
         }
     }
@@ -559,7 +575,7 @@ class ExamApiController extends Controller
     public function getMonitoringSessions($timetableId)
     {
         // Ensure only admins/supervisors can access
-        if (!Auth::user() || !Auth::user()->hasRole(['Admin', 'Super Admin', 'Pengawas', 'admin'])) {
+        if (! Auth::user() || ! Auth::user()->hasRole(['Admin', 'Super Admin', 'Pengawas', 'admin'])) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -567,7 +583,7 @@ class ExamApiController extends Controller
             ->where('timetable_id', $timetableId)
             ->where('is_active', true)
             ->get()
-            ->map(function($session) {
+            ->map(function ($session) {
                 return [
                     'id' => $session->id,
                     'user_id' => $session->user_id,
@@ -580,13 +596,13 @@ class ExamApiController extends Controller
                     'total_questions' => $session->total_questions,
                     'current_question' => $session->current_question_number,
                     'last_activity' => $session->last_activity ? $session->last_activity->toIso8601String() : null,
-                    'identity' => 'student_' . $session->user_id,
+                    'identity' => 'student_'.$session->user_id,
                 ];
             });
 
         return response()->json([
             'success' => true,
-            'sessions' => $sessions
+            'sessions' => $sessions,
         ]);
     }
 
@@ -596,7 +612,7 @@ class ExamApiController extends Controller
     public function getMonitoringToken($timetableId)
     {
         // Ensure only admins/supervisors can access
-        if (!Auth::user() || !Auth::user()->hasRole(['Admin', 'Super Admin', 'Pengawas', 'admin'])) {
+        if (! Auth::user() || ! Auth::user()->hasRole(['Admin', 'Super Admin', 'Pengawas', 'admin'])) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -604,18 +620,18 @@ class ExamApiController extends Controller
         $apiSecret = config('services.livekit.api_secret');
         $serverUrl = config('services.livekit.host');
 
-        if (!$apiKey || !$apiSecret || !$serverUrl) {
+        if (! $apiKey || ! $apiSecret || ! $serverUrl) {
             return response()->json(['error' => 'LiveKit credentials not configured'], 500);
         }
 
-        $roomName = 'exam_' . $timetableId;
-        $identity = 'admin_' . Auth::id();
+        $roomName = 'exam_'.$timetableId;
+        $identity = 'admin_'.Auth::id();
 
-        $tokenOptions = (new AccessTokenOptions())
+        $tokenOptions = (new AccessTokenOptions)
             ->setIdentity($identity);
 
         // Admin can join and subscribe, but doesn't need to publish
-        $videoGrant = (new VideoGrant())
+        $videoGrant = (new VideoGrant)
             ->setRoomJoin()
             ->setRoomName($roomName)
             ->setCanPublish(false)
@@ -634,6 +650,7 @@ class ExamApiController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Admin LiveKit Token Generation Failed', ['error' => $e->getMessage()]);
+
             return response()->json(['error' => 'Failed to generate admin token'], 500);
         }
     }

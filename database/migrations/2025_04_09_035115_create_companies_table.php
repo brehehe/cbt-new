@@ -47,7 +47,7 @@ return new class extends Migration
             $table->boolean('is_lifetime')->default(false);
             $table->boolean('is_mark')->default(false);
 
-            //akses token
+            // akses token
             $table->longText('one_health_access_token')->nullable()->comment('save auth access token');
 
             $table->timestamps();

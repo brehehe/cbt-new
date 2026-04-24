@@ -12,6 +12,7 @@ use Livewire\WithPagination;
 class AdminExamHistoryTimetableIndex extends Component
 {
     use WithPagination;
+
     protected $paginationTheme = 'bootstrap'; // atau 'tailwind' sesuai UI
 
     protected $queryString = [
@@ -20,9 +21,13 @@ class AdminExamHistoryTimetableIndex extends Component
     ];
 
     public $perPage = 5;
+
     public $data_id;
+
     public $search;
+
     public $timetable_id;
+
     public $timetables = [];
 
     public function mount()
@@ -48,11 +53,11 @@ class AdminExamHistoryTimetableIndex extends Component
             ->whereHas('timetable') // <-- hanya tampil jika timetable masih ada
             ->where(function ($query) {
                 $query->whereHas('timetable', function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%');
+                    $q->where('name', 'like', '%'.$this->search.'%');
                 })
                     ->orWhereHas('user', function ($q) {
-                        $q->where('name', 'like', '%' . $this->search . '%')
-                            ->orWhere('email', 'like', '%' . $this->search . '%');
+                        $q->where('name', 'like', '%'.$this->search.'%')
+                            ->orWhere('email', 'like', '%'.$this->search.'%');
                     });
             })
             ->where('user_id', Auth::id())
@@ -65,5 +70,4 @@ class AdminExamHistoryTimetableIndex extends Component
             ->extends('layout.app')
             ->section('content');
     }
-
 }

@@ -4,7 +4,6 @@ namespace Database\Seeders\Master\Question;
 
 use App\Models\Company\Company;
 use App\Models\Master\Question\QuestionType;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class QuestionTypeSeeder extends Seeder
@@ -17,12 +16,12 @@ class QuestionTypeSeeder extends Seeder
         //
         $datas = [
             [
-                'name'        => 'PMB',
-                'description' => 'Penerimaan Mahasiswa Baru'
+                'name' => 'PMB',
+                'description' => 'Penerimaan Mahasiswa Baru',
             ],
             [
-                'name'        => 'Ujian',
-                'description' => 'Ujian'
+                'name' => 'Ujian',
+                'description' => 'Ujian',
             ],
         ];
 
@@ -31,7 +30,7 @@ class QuestionTypeSeeder extends Seeder
         foreach ($companys as $company) {
             foreach ($datas as $data) {
                 QuestionType::create([
-                    'name'        => $data['name'],
+                    'name' => $data['name'],
                     'description' => $data['description'],
                     'company_id' => $company->id,
                 ]);

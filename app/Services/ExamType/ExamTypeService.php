@@ -18,12 +18,12 @@ class ExamTypeService
     {
         $exam_type = ExamType::updateOrCreate(
             [
-                'id' => $request['id'] ?? null
+                'id' => $request['id'] ?? null,
             ],
             [
-                'company_id'           => $request['company_id'] ?? null,
-                'name'                 => $request['name'] ?? null,
-                'description'          => $request['description'] ?? null,
+                'company_id' => $request['company_id'] ?? null,
+                'name' => $request['name'] ?? null,
+                'description' => $request['description'] ?? null,
             ]
         );
 

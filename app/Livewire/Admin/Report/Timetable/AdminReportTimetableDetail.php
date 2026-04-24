@@ -2,24 +2,24 @@
 
 namespace App\Livewire\Admin\Report\Timetable;
 
-use App\Models\Master\Timetable\Timetable;
 use App\Models\Timetable\TimetableAnswer;
 use App\Models\Timetable\TimetableModule;
-use App\Models\Timetable\TimetableQuestion;
 use App\Models\User\UserModuleQuestion;
 use App\Models\User\UserTimetable;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class AdminReportTimetableDetail extends Component
 {
     use WithPagination;
+
     protected $paginationTheme = 'bootstrap';
-    public $perPage = 10, $search;
+
+    public $perPage = 10;
+
+    public $search;
 
     public $timetable_module;
 
@@ -44,7 +44,7 @@ class AdminReportTimetableDetail extends Component
                 'user',
                 'userModuleQuestions' => function ($q) use ($questionSelects) {
                     $q->select($questionSelects);
-                }
+                },
             ])
             ->paginate($this->perPage);
 
@@ -78,6 +78,7 @@ class AdminReportTimetableDetail extends Component
             ->groupBy('timetable_question_id')
             ->map(function ($items) {
                 $order = $items->first()?->order;
+
                 return $order ? chr(64 + $order) : '-';
             })
             ->toArray();
@@ -109,7 +110,8 @@ class AdminReportTimetableDetail extends Component
             'correctCounts' => $correctCounts,
         ])->setPaper('a4', 'landscape');
 
-        $fileName = 'rekap-jadwal-' . ($this->timetable_module?->timetable_id ?? 'timetable') . '.pdf';
+        $fileName = 'rekap-jadwal-'.($this->timetable_module?->timetable_id ?? 'timetable').'.pdf';
+
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
         }, $fileName);
@@ -128,6 +130,7 @@ class AdminReportTimetableDetail extends Component
                 return [chr(64 + ($key + 1)), $value];
             }
         }
+
         return '-';
     }
 
@@ -141,6 +144,4 @@ class AdminReportTimetableDetail extends Component
 
         return $hasColumn;
     }
-
-
 }

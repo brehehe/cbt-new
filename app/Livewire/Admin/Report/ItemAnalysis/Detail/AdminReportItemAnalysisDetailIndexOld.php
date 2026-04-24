@@ -2,26 +2,29 @@
 
 namespace App\Livewire\Admin\Report\ItemAnalysis\Detail;
 
-use Livewire\Component;
 use App\Models\Master\Timetable\Timetable;
-use App\Models\Timetable\TimetableModule;
-use App\Models\Timetable\TimetableQuestion;
-use App\Models\Timetable\TimetableAnswer;
-use App\Models\User\UserTimetable;
 use App\Models\User\UserModuleQuestion;
-use Illuminate\Support\Facades\DB;
+use App\Models\User\UserTimetable;
+use Livewire\Component;
 
 class AdminReportItemAnalysisDetailIndexOld extends Component
 {
     protected $paginationTheme = 'bootstrap';
 
     public $timetableId;
+
     public $timetable;
+
     public $timetableModule;
+
     public $timetableQuestions;
+
     public $userTimetables;
+
     public $itemAnalysisData = [];
+
     public $perPage = 10;
+
     public $search = '';
 
     public function mount($id)
@@ -80,7 +83,7 @@ class AdminReportItemAnalysisDetailIndexOld extends Component
             $userScores[$userTimetable->id] = [
                 'score' => $totalCorrect,
                 'user_id' => $userTimetable->user_id,
-                'user_name' => $userTimetable->user->name
+                'user_name' => $userTimetable->user->name,
             ];
         }
 
@@ -109,7 +112,7 @@ class AdminReportItemAnalysisDetailIndexOld extends Component
             'upper_group_total' => $discriminationData['upper_group_total'],
             'lower_group_total' => $discriminationData['lower_group_total'],
             'option_analysis' => $optionAnalysis,
-            'reliability_contribution' => $this->calculateReliabilityContribution($difficultyIndex, $discriminationData['discrimination_index'])
+            'reliability_contribution' => $this->calculateReliabilityContribution($difficultyIndex, $discriminationData['discrimination_index']),
         ];
     }
 
@@ -124,7 +127,7 @@ class AdminReportItemAnalysisDetailIndexOld extends Component
                 'upper_group_correct' => 0,
                 'lower_group_correct' => 0,
                 'upper_group_total' => 0,
-                'lower_group_total' => 0
+                'lower_group_total' => 0,
             ];
         }
 
@@ -157,7 +160,7 @@ class AdminReportItemAnalysisDetailIndexOld extends Component
             'upper_group_correct' => $upperCorrect,
             'lower_group_correct' => $lowerCorrect,
             'upper_group_total' => $groupSize,
-            'lower_group_total' => $groupSize
+            'lower_group_total' => $groupSize,
         ];
     }
 
@@ -174,7 +177,7 @@ class AdminReportItemAnalysisDetailIndexOld extends Component
                 'option' => $option,
                 'selected_count' => $selectedCount,
                 'percentage' => round($percentage, 1),
-                'is_correct' => $option->is_correct
+                'is_correct' => $option->is_correct,
             ];
         }
 
@@ -183,10 +186,10 @@ class AdminReportItemAnalysisDetailIndexOld extends Component
         if ($unanswered > 0) {
             $percentage = ($unanswered / $userResponses->count()) * 100;
             $optionAnalysis[] = [
-                'option' => (object)['alphabet' => 'X', 'context' => 'Tidak dijawab'],
+                'option' => (object) ['alphabet' => 'X', 'context' => 'Tidak dijawab'],
                 'selected_count' => $unanswered,
                 'percentage' => round($percentage, 1),
-                'is_correct' => false
+                'is_correct' => false,
             ];
         }
 
@@ -195,17 +198,31 @@ class AdminReportItemAnalysisDetailIndexOld extends Component
 
     public function getDifficultyLevel($index)
     {
-        if ($index >= 0.7) return 'Mudah';
-        if ($index >= 0.3) return 'Sedang';
+        if ($index >= 0.7) {
+            return 'Mudah';
+        }
+        if ($index >= 0.3) {
+            return 'Sedang';
+        }
+
         return 'Sukar';
     }
 
     public function getDiscriminationLevel($index)
     {
-        if ($index >= 0.4) return 'Sangat Baik';
-        if ($index >= 0.3) return 'Baik';
-        if ($index >= 0.2) return 'Cukup';
-        if ($index >= 0.1) return 'Buruk';
+        if ($index >= 0.4) {
+            return 'Sangat Baik';
+        }
+        if ($index >= 0.3) {
+            return 'Baik';
+        }
+        if ($index >= 0.2) {
+            return 'Cukup';
+        }
+        if ($index >= 0.1) {
+            return 'Buruk';
+        }
+
         return 'Sangat Buruk';
     }
 
@@ -214,6 +231,7 @@ class AdminReportItemAnalysisDetailIndexOld extends Component
         // Kontribusi terhadap reliabilitas = P × Q × D
         // P = difficulty index, Q = 1-P, D = discrimination index
         $q = 1 - $difficulty;
+
         return round($difficulty * $q * $discrimination, 4);
     }
 
@@ -232,14 +250,14 @@ class AdminReportItemAnalysisDetailIndexOld extends Component
             'upper_group_total' => 0,
             'lower_group_total' => 0,
             'option_analysis' => [],
-            'reliability_contribution' => 0
+            'reliability_contribution' => 0,
         ];
     }
 
     public function render()
     {
         return \view('livewire.admin.report.item-analysis.detail.admin-report-item-analysis-detail-index', [
-            'itemAnalysisData' => $this->itemAnalysisData
+            'itemAnalysisData' => $this->itemAnalysisData,
         ])->extends('layout.app')->section('content');
     }
 }

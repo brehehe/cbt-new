@@ -2,6 +2,7 @@
 
 namespace App\Services\Exam;
 
+use App\Models\Exam\ExamRecording;
 use Illuminate\Support\Facades\Storage;
 
 class RecordingFinalizer
@@ -12,16 +13,16 @@ class RecordingFinalizer
      */
     public static function finalizeFullExamRecording(string $userTimetableId): array
     {
-        $baseDir = 'exam_recordings/chunks/' . $userTimetableId;
+        $baseDir = 'exam_recordings/chunks/'.$userTimetableId;
         $disk = Storage::disk('public');
 
         // Fetch all related recording sessions
-        $recordings = \App\Models\Exam\ExamRecording::where('user_timetable_id', $userTimetableId)
+        $recordings = ExamRecording::where('user_timetable_id', $userTimetableId)
             ->orderBy('start_time', 'asc')
             ->get();
 
         $recordingIds = $recordings->pluck('id')->toArray();
-        $manifestPath = $baseDir . '/full_manifest.json';
+        $manifestPath = $baseDir.'/full_manifest.json';
         $mergedRelPath = null;
         $totalSize = 0;
         $chunkFiles = [];
@@ -31,8 +32,11 @@ class RecordingFinalizer
             $chunkFiles = array_values(array_filter($files, function ($f) use ($recordingIds) {
                 // Check if file starts with any of our session IDs
                 foreach ($recordingIds as $rid) {
-                    if (str_contains($f, $rid . '_chunk_')) return true;
+                    if (str_contains($f, $rid.'_chunk_')) {
+                        return true;
+                    }
                 }
+
                 return false;
             }));
 
@@ -46,11 +50,13 @@ class RecordingFinalizer
                     if ($ridA !== $ridB) {
                         $orderA = array_search($ridA, $recordingIds);
                         $orderB = array_search($ridB, $recordingIds);
+
                         return $orderA <=> $orderB;
                     }
 
                     $na = (int) preg_replace('/.*_chunk_(\d+)\.webm$/', '$1', $a);
                     $nb = (int) preg_replace('/.*_chunk_(\d+)\.webm$/', '$1', $b);
+
                     return $na <=> $nb;
                 });
 
@@ -59,7 +65,7 @@ class RecordingFinalizer
                 }
 
                 if (count($chunkFiles) > 0) {
-                    $mergedRelPath = $baseDir . '/full_exam_recording.webm';
+                    $mergedRelPath = $baseDir.'/full_exam_recording.webm';
                     $mergedAbsPath = $disk->path($mergedRelPath);
                     @unlink($mergedAbsPath);
 
@@ -68,20 +74,20 @@ class RecordingFinalizer
                         copy($disk->path($chunkFiles[0]), $mergedAbsPath);
                     } else {
                         $ffmpegPath = trim((string) shell_exec('which ffmpeg'));
-                        if (!empty($ffmpegPath)) {
-                            $concatListPath = $disk->path($baseDir . '/concat.txt');
+                        if (! empty($ffmpegPath)) {
+                            $concatListPath = $disk->path($baseDir.'/concat.txt');
                             $listLines = [];
                             foreach ($chunkFiles as $cf) {
-                                $listLines[] = "file '" . $disk->path($cf) . "'";
+                                $listLines[] = "file '".$disk->path($cf)."'";
                             }
                             file_put_contents($concatListPath, implode(PHP_EOL, $listLines));
 
-                            $cmd = escapeshellcmd($ffmpegPath) . ' -y -f concat -safe 0 -i ' . escapeshellarg($concatListPath) . ' -fflags +genpts -c:v libvpx-vp9 -speed 6 -crf 32 -b:v 0 -c:a libvorbis -b:a 128k ' . escapeshellarg($mergedAbsPath) . ' 2>&1';
+                            $cmd = escapeshellcmd($ffmpegPath).' -y -f concat -safe 0 -i '.escapeshellarg($concatListPath).' -fflags +genpts -c:v libvpx-vp9 -speed 6 -crf 32 -b:v 0 -c:a libvorbis -b:a 128k '.escapeshellarg($mergedAbsPath).' 2>&1';
                             $output = [];
                             $ret = 0;
                             exec($cmd, $output, $ret);
 
-                            if (!($ret === 0 && file_exists($mergedAbsPath) && filesize($mergedAbsPath) > 0)) {
+                            if (! ($ret === 0 && file_exists($mergedAbsPath) && filesize($mergedAbsPath) > 0)) {
                                 // Fallback raw concat if transcoding failed (rare)
                                 @unlink($mergedAbsPath);
                                 foreach ($chunkFiles as $cf) {
@@ -96,7 +102,7 @@ class RecordingFinalizer
                         }
                     }
 
-                    if (!file_exists($mergedAbsPath) || filesize($mergedAbsPath) == 0) {
+                    if (! file_exists($mergedAbsPath) || filesize($mergedAbsPath) == 0) {
                         $mergedRelPath = null;
                     }
                 }
@@ -107,7 +113,7 @@ class RecordingFinalizer
         }
 
         // Update all related recording records for this timetable
-        \App\Models\Exam\ExamRecording::where('user_timetable_id', $userTimetableId)->update([
+        ExamRecording::where('user_timetable_id', $userTimetableId)->update([
             'video_path' => $mergedRelPath ?: $manifestPath,
             'file_size' => $totalSize,
             'status' => 'completed',

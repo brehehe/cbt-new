@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Auth;
 class QuestionType extends Model
 {
     //
-    use SoftDeletes, HasUuids, \App\Traits\LogsSystemActivity;
+    use \App\Traits\LogsSystemActivity, HasUuids, SoftDeletes;
+
     protected $guarded = ['id'];
 
     public function company()
@@ -28,7 +29,7 @@ class QuestionType extends Model
         static::addGlobalScope('user_scope', function (Builder $builder) {
             $user = Auth::user();
 
-            if (!$user || !$user->hasRole('Anonymous')) {
+            if (! $user || ! $user->hasRole('Anonymous')) {
                 $builder->where('company_id', optional($user?->company)?->id)->orderBy('order', 'asc');
             }
 
@@ -44,7 +45,7 @@ class QuestionType extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
-        $term = '%' . $term . '%';
+        $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
             $query->whereAny(['company_id', 'name', 'description'], 'ILIKE', $term);
@@ -53,8 +54,6 @@ class QuestionType extends Model
 
     /**
      * Get all of the modules for the QuestionType
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function modules(): HasMany
     {
@@ -63,8 +62,6 @@ class QuestionType extends Model
 
     /**
      * Get all of the questions for the Topic
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function questions(): HasMany
     {

@@ -9,27 +9,32 @@ use App\Models\Timetable\TimetableQuestion;
 use App\Models\User;
 use App\Models\User\UserModuleQuestion;
 use App\Models\User\UserTimetable;
-use Livewire\Component;
-use Livewire\WithPagination;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Livewire\Component;
+use Livewire\WithPagination;
 use Session;
 
 class AdminExamTimetableIndex extends Component
 {
     use WithPagination;
+
     protected $paginationTheme = 'bootstrap'; // atau 'tailwind' sesuai UI
 
     protected $queryString = [
         // 'page' => ['except' => 1],
         'search' => ['except' => ''],
     ];
+
     public $perPage = 5;
+
     public $data_id;
+
     public $search;
+
     public $code;
 
     public function mount()
@@ -47,12 +52,14 @@ class AdminExamTimetableIndex extends Component
     public function openModalStartExam($id)
     {
         $this->data_id = $id;
+
         return $this->dispatch('open-modal', ['id' => 'modal-start-exam']);
     }
 
     public function closeModalStartExam()
     {
         $this->reset(['data_id', 'code']);
+
         return $this->dispatch('close-modal', ['id' => 'modal-start-exam']);
     }
 
@@ -71,8 +78,9 @@ class AdminExamTimetableIndex extends Component
                 ->where('company_id', Auth::user()->company_id)
                 ->find($this->data_id);
 
-            if (!$timeTable) {
+            if (! $timeTable) {
                 AlertHelper::error('Gagal', 'Token Yang Dimasukan Tidak Sesuai');
+
                 return;
             }
 
@@ -110,7 +118,7 @@ class AdminExamTimetableIndex extends Component
 
             $modulesQuestions = collect();
 
-            if ($questionPickType === 'category' && !empty($categorySettings)) {
+            if ($questionPickType === 'category' && ! empty($categorySettings)) {
                 foreach ($categorySettings as $categoryId => $settings) {
                     foreach (['default', 'easy', 'medium', 'hard'] as $difficulty) {
                         $take = (int) ($settings[$difficulty] ?? 0);
@@ -145,7 +153,7 @@ class AdminExamTimetableIndex extends Component
                         $modulesQuestions = $modulesQuestions->merge($query->limit($take)->get());
                     }
                 }
-            } elseif ($questionPickType === 'topic' && !empty($topicSettings)) {
+            } elseif ($questionPickType === 'topic' && ! empty($topicSettings)) {
                 foreach ($topicSettings as $topicId => $settings) {
                     foreach (['default', 'easy', 'medium', 'hard'] as $difficulty) {
                         $take = (int) ($settings[$difficulty] ?? 0);
@@ -252,7 +260,7 @@ class AdminExamTimetableIndex extends Component
                 ];
             }
 
-            if (!empty($userModuleQuestionsData)) {
+            if (! empty($userModuleQuestionsData)) {
                 // Bulk insert in chunks to avoid single query limits if very large
                 $chunks = array_chunk($userModuleQuestionsData, 200);
                 foreach ($chunks as $chunk) {
@@ -265,10 +273,12 @@ class AdminExamTimetableIndex extends Component
                 'title' => 'Ujian Telah Dimulai!',
                 'text' => 'Anda berhasil memulai ujian!',
             ]);
+
             return redirect()->route('admin.exam.warning');
         } catch (\Throwable $th) {
             DB::rollback();
-            AlertHelper::error('Gagal' . $th->getMessage());
+            AlertHelper::error('Gagal'.$th->getMessage());
+
             return Log::error($th->getMessage());
         }
     }
@@ -281,7 +291,7 @@ class AdminExamTimetableIndex extends Component
     public function confirmBackExam($id)
     {
         $userTimetable = UserTimetable::find($id);
-        if (!$userTimetable) {
+        if (! $userTimetable) {
             return AlertHelper::error('Gagal', 'Data Ujian Tidak Ditemukan');
         }
 
@@ -291,11 +301,13 @@ class AdminExamTimetableIndex extends Component
 
         if ($userTimetable->status == 'warning') {
             Session::put('user_timetable_id', $id);
+
             return redirect()->route('admin.exam.warning');
         }
 
         if ($userTimetable->status == 'exam') {
             Session::put('user_timetable_id', $id);
+
             return redirect()->route('admin.exam.detail');
         }
     }
@@ -315,8 +327,8 @@ class AdminExamTimetableIndex extends Component
             // ->whereNotNull('code')
             ->when($this->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('name', 'ilike', '%' . $search . '%')
-                        ->orWhere('description', 'ilike', '%' . $search . '%');
+                    $q->where('name', 'ilike', '%'.$search.'%')
+                        ->orWhere('description', 'ilike', '%'.$search.'%');
                 });
             })
             ->where('is_simulation', 'false')
@@ -336,7 +348,6 @@ class AdminExamTimetableIndex extends Component
         //     });
         // }
 
-
         if ($auth->hasRole(['Mahasiswa'])) {
             // $timetables->where('study_id', $auth->study_id);
             if ($auth->classmateStudent) {
@@ -346,7 +357,7 @@ class AdminExamTimetableIndex extends Component
             }
         }
 
-        if (!empty($userTimetableStatusDone)) {
+        if (! empty($userTimetableStatusDone)) {
             $timetables->whereNotIn('id', $userTimetableStatusDone);
         }
 

@@ -2,9 +2,12 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Timetable\TimetableAnswer;
+use App\Models\User\UserModuleQuestion;
 use App\Models\User\UserTimetable;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class CheckUserTimetable
@@ -12,7 +15,7 @@ class CheckUserTimetable
     public function handle(Request $request, Closure $next)
     {
         // Skip check jika user belum login
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return $next($request);
         }
 
@@ -20,13 +23,20 @@ class CheckUserTimetable
         $currentRoute = $request->route()->getName();
         if (in_array($currentRoute, [
             'admin.exam.detail',
+<<<<<<< Updated upstream
             'admin.exam.detail.react',  // React exam page — sudah di route yang benar
+=======
+>>>>>>> Stashed changes
             'admin.exam.warning',
             'login',
             'logout',
             'register',
             'password.request',
+<<<<<<< Updated upstream
             'password.reset'
+=======
+            'password.reset',
+>>>>>>> Stashed changes
         ])) {
             return $next($request);
         }
@@ -37,8 +47,9 @@ class CheckUserTimetable
 
         if ($userTimetable) {
             // Check if timetable still exists, if deleted then delete userTimetable as well
-            if (!$userTimetable->timetable) {
+            if (! $userTimetable->timetable) {
                 $userTimetable->delete();
+
                 return redirect()->route('admin.exam.timetable');
             }
 
@@ -46,24 +57,24 @@ class CheckUserTimetable
             if ($userTimetable->start_exam) {
                 // Eager load necessary relationships if not already loaded
                 $userTimetable->load(['timetable.module:id,duration']);
-                
-                $startTime = \Illuminate\Support\Carbon::parse($userTimetable->start_exam);
+
+                $startTime = Carbon::parse($userTimetable->start_exam);
                 $duration = $userTimetable->timetable->module->duration ?? 60;
                 $pauseSeconds = (int) ($userTimetable->pause_total_seconds ?? 0);
-                
+
                 // Add a small buffer (e.g., 30 seconds) to account for network latency
                 $endTime = $startTime->addMinutes($duration)->addSeconds($pauseSeconds)->addSeconds(30);
 
                 if (now()->greaterThan($endTime)) {
                     // Time expired - Finalize Exam Logic
-                    $userTimetableQuestions = \App\Models\User\UserModuleQuestion::where('user_timetable_id', $userTimetable->id)->get();
-                    
+                    $userTimetableQuestions = UserModuleQuestion::where('user_timetable_id', $userTimetable->id)->get();
+
                     $totalQuestions = $userTimetableQuestions->count();
                     $correctAnswers = 0;
 
                     foreach ($userTimetableQuestions as $question) {
                         if ($question->timetable_answer_id) {
-                            $answer = \App\Models\Timetable\TimetableAnswer::find($question->timetable_answer_id);
+                            $answer = TimetableAnswer::find($question->timetable_answer_id);
                             if ($answer && $answer->is_correct) {
                                 $question->update(['status' => 'correct']);
                                 $correctAnswers++;
@@ -83,11 +94,11 @@ class CheckUserTimetable
                         'end_exam' => now(),
                         'mark' => $mark,
                     ]);
-                    
+
                     // Add flash message
                     session()->flash('saved', [
                         'title' => 'Ujian Telah Selesai!',
-                        'text' => "Waktu ujian telah habis. Terima kasih telah mengerjakan ujian.",
+                        'text' => 'Waktu ujian telah habis. Terima kasih telah mengerjakan ujian.',
                     ]);
 
                     return redirect()->route('admin.exam.timetable');
