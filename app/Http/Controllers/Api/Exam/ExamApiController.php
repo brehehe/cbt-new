@@ -23,6 +23,10 @@ use Agence104\LiveKit\VideoGrant;
 
 class ExamApiController extends Controller
 {
+    protected $userTimetableId;
+    protected $userTimetable;
+    protected $remainingTime = 0;
+
     /**
      * Get the initial state of the exam for the student.
      */
@@ -44,15 +48,14 @@ class ExamApiController extends Controller
             ->where('id', $userTimetableId)
             ->firstOrFail();
 
-        // 1. Calculate Remaining Time
-        if (!$userTimetable->start_exam) {
-            $userTimetable->update(['start_exam' => now()]);
-        }
-        $startTime = Carbon::parse($userTimetable->start_exam);
-        $duration = $userTimetable->timetable->module->duration ?? 60;
-        $pauseSeconds = (int) ($userTimetable->pause_total_seconds ?? 0);
-        $endTime = $startTime->addMinutes($duration)->addSeconds($pauseSeconds);
-        $remainingTime = max(0, $endTime->timestamp - now()->timestamp);
+        $this->userTimetableId = $userTimetableId;
+        $this->userTimetable = $userTimetable;
+
+        // 1. Resume timer jika sebelumnya di-pause (oleh admin atau force logout)
+        // Ini akan menghitung selisih waktu dari 'paused_at' sampai 'now' 
+        // dan menambahkannya ke 'pause_total_seconds'
+        $this->remainingTime = $this->resumeTimerIfPaused();
+
 
         // 2. Fetch Questions & Navigation
         $questionSelects = ['id', 'is_mark', 'timetable_answer_id', 'timetable_question_id', 'order'];
@@ -101,7 +104,7 @@ class ExamApiController extends Controller
 
         return response()->json([
             'userTimetable' => $userTimetable,
-            'remainingTime' => $remainingTime,
+            'remainingTime' => (int) $this->remainingTime,
             'questions' => $questions,
             'navigation' => $navigation,
             'alertCount' => $alertCount,
@@ -648,4 +651,63 @@ class ExamApiController extends Controller
 
         return $hasColumn;
     }
+
+    /**
+     * Resume timer jika status sedang di-pause.
+     * Menghitung akumulasi waktu jeda dan mengupdate database.
+     */
+    public function resumeTimerIfPaused(): int
+    {
+        // Refresh data terbaru dari database
+        $this->userTimetable = UserTimetable::withoutGlobalScopes()
+            ->select('id', 'paused_at', 'pause_total_seconds', 'start_exam', 'timetable_id')
+            ->with(['timetable.module:id,duration'])
+            ->find($this->userTimetableId) ?? $this->userTimetable;
+
+        if (!$this->userTimetable) {
+            return 0;
+        }
+
+        if (!is_null($this->userTimetable->paused_at)) {
+            $pausedAt = Carbon::parse($this->userTimetable->paused_at);
+            // Hitung berapa detik ujian terhenti (dari paused_at sampai sekarang)
+            $delta = (int) abs(now()->diffInSeconds($pausedAt));
+            $newTotal = (int) ($this->userTimetable->pause_total_seconds ?? 0) + $delta;
+
+            $this->userTimetable->update([
+                'pause_total_seconds' => $newTotal,
+                'paused_at' => null,
+            ]);
+
+            Log::info('⏯️ Resumed timer, accumulated pause seconds', [
+                'user_timetable_id' => $this->userTimetable->id,
+                'added_seconds' => $delta,
+                'pause_total_seconds' => $newTotal,
+            ]);
+        }
+
+        // Hitung ulang sisa waktu setelah update
+        $this->calculateRemainingTime();
+        return (int) $this->remainingTime;
+    }
+
+    /**
+     * Kalkulasi sisa waktu berdasarkan start_exam, duration, dan pause_total_seconds.
+     */
+    private function calculateRemainingTime()
+    {
+        if (!$this->userTimetable || !$this->userTimetable->start_exam) {
+            $this->remainingTime = 0;
+            return;
+        }
+
+        $startTime = Carbon::parse($this->userTimetable->start_exam);
+        // Pastikan relasi module sudah ada
+        $duration = $this->userTimetable->timetable->module->duration ?? 60;
+        $pauseSeconds = (int) ($this->userTimetable->pause_total_seconds ?? 0);
+        
+        $endTime = $startTime->addMinutes($duration)->addSeconds($pauseSeconds);
+        $this->remainingTime = max(0, $endTime->timestamp - now()->timestamp);
+    }
 }
+

@@ -19,12 +19,13 @@ class CheckUserTimetable
         // Skip check jika sudah berada di route tujuan atau route auth
         $currentRoute = $request->route()->getName();
         if (in_array($currentRoute, [
-            'admin.exam.detail', 
-            'admin.exam.warning', 
-            'login', 
-            'logout', 
-            'register', 
-            'password.request', 
+            'admin.exam.detail',
+            'admin.exam.detail.react',  // React exam page — sudah di route yang benar
+            'admin.exam.warning',
+            'login',
+            'logout',
+            'register',
+            'password.request',
             'password.reset'
         ])) {
             return $next($request);

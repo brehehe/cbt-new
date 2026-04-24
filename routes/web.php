@@ -462,6 +462,11 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
 
     // Exam API Routes (using web middleware for session persistence)
     Route::prefix('api/exam')->middleware('auth')->group(function () {
+        // Auth Check Routes — ditangani AuthCheckController
+        // GET /api/exam/ping        → cek apakah session masih valid (401 jika expired)
+        // GET /api/exam/{id}/status → cek is_active ExamLiveSession (deteksi force-logout)
+        Route::get('/ping', [App\Http\Controllers\Api\Auth\AuthCheckController::class, 'ping']);
+
         Route::get('/{user_timetable_id}/data', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'getInitialState']);
         Route::post('/save-answer', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'saveAnswer']);
         Route::post('/toggle-mark', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'toggleMark']);
@@ -476,6 +481,9 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
         // Admin Monitoring API
         Route::get('/admin/monitoring/{timetable_id}/sessions', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'getMonitoringSessions']);
         Route::get('/admin/monitoring/{timetable_id}/token', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'getMonitoringToken']);
+
+        // Auth Check Routes — status ujian (cek ExamLiveSession.is_active)
+        Route::get('/{user_timetable_id}/status', [App\Http\Controllers\Api\Auth\AuthCheckController::class, 'examStatus']);
 
         Route::post('/{user_timetable_id}/finish', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'finishExam']);
     });

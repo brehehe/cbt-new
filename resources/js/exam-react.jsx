@@ -11,6 +11,11 @@ if (token) {
     axios.defaults.headers.common['X-CSRF-TOKEN'] = token;
 }
 
+// Wajib: agar Laravel mengembalikan 401 JSON (bukan redirect 302 ke /login)
+// saat session dihapus/expired. Tanpa ini, Laravel redirect ke /login dan
+// interceptor 401 di useLiveSession.js tidak pernah terpicu.
+axios.defaults.headers.common['Accept'] = 'application/json';
+
 // 1. Student Exam Interface
 const rootElement = document.getElementById('exam-app');
 if (rootElement) {

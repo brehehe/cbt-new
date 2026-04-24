@@ -26,7 +26,8 @@ class AdminSessionIndex extends Component
 
     public function render()
     {
-        $query = DB::table('sessions')->whereNotNull('user_id');
+        $query = DB::table(config('session.table', 'sessions'))
+            ->whereNotNull('user_id');
 
         if ($this->search) {
             $query->where(function($q) {
@@ -38,11 +39,12 @@ class AdminSessionIndex extends Component
         $sessions = $query->orderBy('last_activity', 'desc')->paginate($this->perPage);
 
         $userIds = collect($sessions->items())->pluck('user_id')->filter()->unique();
-        $users = User::whereIn('id', $userIds)->get()->keyBy('id');
+        $users   = User::whereIn('id', $userIds)->get()->keyBy('id');
 
         return view('livewire.admin.session.admin-session-index', [
-            'sessions' => $sessions,
-            'users' => $users,
+            'sessions'       => $sessions,
+            'users'          => $users,
+            'session_driver' => config('session.driver'),
         ])->extends('layout.app')->section('content');
     }
 
@@ -59,33 +61,28 @@ class AdminSessionIndex extends Component
     public function forceLogoutUser($userId)
     {
         try {
-            DB::table(config('session.table', 'sessions'))
+            // Layer 1: Hapus session dari database
+            $deletedCount = DB::table(config('session.table', 'sessions'))
                 ->where('user_id', $userId)
                 ->delete();
 
-            // Putuskan semua live session user
-            $liveSessions = ExamLiveSession::query()
+            // Putuskan semua live session user di monitoring
+            ExamLiveSession::query()
                 ->where('user_id', $userId)
-                ->get();
-
-            foreach ($liveSessions as $session) {
-                $session->update([
-                    'is_active' => false,
+                ->update([
+                    'is_active'         => false,
                     'connection_status' => 'disconnected',
-                    'last_activity' => Carbon::now(),
+                    'last_activity'     => Carbon::now(),
                 ]);
-            }
 
-            // Pause timer pada UserTimetable yang aktif untuk user ini
+            // Pause timer pada UserTimetable yang aktif
             UserTimetable::query()
                 ->where('user_id', $userId)
                 ->whereIn('status', ['exam', 'warning'])
                 ->whereNull('paused_at')
-                ->update([
-                    'paused_at' => Carbon::now(),
-                ]);
+                ->update(['paused_at' => Carbon::now()]);
 
-            AlertHelper::success('Berhasil', 'Akun di-logout dari semua perangkat dan sesi ujian diputus.');
+            AlertHelper::success('Berhasil', "Akun di-logout ({$deletedCount} sesi dihapus) dan sesi ujian diputus.");
         } catch (\Throwable $e) {
             AlertHelper::warning('Perhatian', 'Gagal logout akun: ' . $e->getMessage());
         }
@@ -96,27 +93,26 @@ class AdminSessionIndex extends Component
         try {
             $currentUserId = auth()->id();
 
-            // Dapatkan semua sesi aktif kecuali admin yang sedang login
-            $sessionsToLogout = DB::table(config('session.table', 'sessions'))
+            // Dapatkan semua user_id yang punya sesi aktif kecuali diri sendiri
+            $userIds = DB::table(config('session.table', 'sessions'))
                 ->whereNotNull('user_id')
                 ->where('user_id', '!=', $currentUserId)
-                ->get();
-
-            $userIds = $sessionsToLogout->pluck('user_id')->filter()->unique();
+                ->pluck('user_id')
+                ->unique();
 
             if ($userIds->isNotEmpty()) {
-                // Delete session
+                // Delete session database
                 DB::table(config('session.table', 'sessions'))
                     ->whereIn('user_id', $userIds)
                     ->delete();
 
-                // Putuskan live session
+                // Putuskan live session monitoring
                 ExamLiveSession::query()
                     ->whereIn('user_id', $userIds)
                     ->update([
-                        'is_active' => false,
+                        'is_active'         => false,
                         'connection_status' => 'disconnected',
-                        'last_activity' => Carbon::now(),
+                        'last_activity'     => Carbon::now(),
                     ]);
 
                 // Pause ujian
@@ -124,9 +120,7 @@ class AdminSessionIndex extends Component
                     ->whereIn('user_id', $userIds)
                     ->whereIn('status', ['exam', 'warning'])
                     ->whereNull('paused_at')
-                    ->update([
-                        'paused_at' => Carbon::now(),
-                    ]);
+                    ->update(['paused_at' => Carbon::now()]);
             }
 
             AlertHelper::success('Berhasil', 'Semua akun berhasil di force logout.');

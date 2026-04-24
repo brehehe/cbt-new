@@ -129,51 +129,48 @@ class AdminMasterTimetableSessionIndex extends Component
     }
 
     /**
-     * Force logout account by deleting all web sessions for the user.
+     * Force logout account — SESSION_DRIVER=database.
+     *
+     * Layer 1: Hapus baris session dari tabel 'sessions'.
+     * Layer 2: Update ExamLiveSession.is_active = false →
+     *          React polling /api/exam/{id}/status mendeteksi & redirect ke /logout.
      */
     public function forceLogoutUser($userId)
     {
         try {
-            \DB::table(config('session.table', 'sessions'))
+            // Layer 1: Hapus session dari database
+            $deletedCount = \DB::table(config('session.table', 'sessions'))
                 ->where('user_id', $userId)
                 ->delete();
 
-            // Putuskan semua live session user pada jadwal ini agar ujian langsung berhenti di sisi user
-            $liveSessions = ExamLiveSession::query()
+            \Log::info("ForceLogout: Deleted {$deletedCount} DB session(s) for user #{$userId}");
+
+            // Layer 2: Putuskan ExamLiveSession → React polling mendeteksi dalam ≤8 detik
+            ExamLiveSession::query()
                 ->where('user_id', $userId)
                 ->where('timetable_id', $this->timetable_id)
-                ->get();
-
-            foreach ($liveSessions as $session) {
-                $session->update([
+                ->update([
                     'is_active' => false,
                     'connection_status' => 'disconnected',
                     'last_activity' => Carbon::now(),
                     'end_time' => Carbon::now(),
                 ]);
-            }
 
-            // Pause timer pada UserTimetable yang aktif untuk user ini pada timetable terkait
-            $userTimetable = UserTimetable::query()
+            // Pause timer pada UserTimetable yang aktif
+            UserTimetable::query()
                 ->where('user_id', $userId)
                 ->where('timetable_id', $this->timetable_id)
                 ->whereIn('status', ['exam', 'warning'])
-                ->first();
+                ->whereNull('paused_at')
+                ->update(['paused_at' => Carbon::now()]);
 
-            if ($userTimetable) {
-                // Set paused_at jika belum diset (hindari overwrite bila sudah paused)
-                if (is_null($userTimetable->paused_at)) {
-                    $userTimetable->update([
-                        'paused_at' => Carbon::now(),
-                    ]);
-                }
-            }
-
-            AlertHelper::success('Berhasil', 'Akun di-logout dari semua perangkat dan sesi ujian diputus.');
+            AlertHelper::success('Berhasil', "Akun di-logout ({$deletedCount} sesi dihapus) dan ujian diputus.");
         } catch (\Throwable $e) {
+            \Log::error("ForceLogout error: " . $e->getMessage());
             AlertHelper::warning('Perhatian', 'Gagal logout akun: ' . $e->getMessage());
         }
     }
+
 
     public function render()
     {

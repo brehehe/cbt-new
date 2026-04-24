@@ -2,6 +2,19 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Room, RoomEvent, VideoPresets } from 'livekit-client';
 
+// Global interceptor: jika session expired/dihapus admin => redirect login
+axios.interceptors.response.use(
+    response => response,
+    error => {
+        if (error.response && error.response.status === 401) {
+            // Tandai agar tidak muncul konfirmasi leave
+            window.isFinishingExam = true;
+            window.location.href = '/login';
+        }
+        return Promise.reject(error);
+    }
+);
+
 export const useLiveSession = (userTimetableId, isEnabled) => {
     const [connectionStatus, setConnectionStatus] = useState('disconnected');
 
@@ -43,7 +56,7 @@ export const useLiveSession = (userTimetableId, isEnabled) => {
         }
     }, [userTimetableId, isEnabled]);
 
-    // Heartbeat every 30 seconds
+    // Heartbeat + session check every 15 seconds
     useEffect(() => {
         if (!isEnabled) return;
 
@@ -56,12 +69,44 @@ export const useLiveSession = (userTimetableId, isEnabled) => {
                     }
                 });
              } catch (error) {
+                // 401 sudah ditangani oleh interceptor di atas
                 console.error("Heartbeat failed", error);
              }
-        }, 30000);
+        }, 15000);
 
         return () => clearInterval(heartbeat);
     }, [userTimetableId, isEnabled, connectionStatus]);
+
+    // Polling deteksi force-logout oleh admin (dual strategy, setiap 8 detik)
+    // Layer 1: /ping → 401 jika session Redis dihapus
+    // Layer 2: /{id}/status → cek is_active ExamLiveSession (selalu diupdate forceLogoutUser)
+    useEffect(() => {
+        const checkSession = setInterval(async () => {
+            try {
+                // Layer 1: cek auth via ping
+                const pingRes = await axios.get('/api/exam/ping');
+                const ct = pingRes.headers?.['content-type'] ?? '';
+                if (ct.includes('text/html')) {
+                    // Dapat HTML = di-redirect ke login (302 → 200)
+                    window.isFinishingExam = true;
+                    window.location.href = '/login';
+                    return;
+                }
+
+                // Layer 2: cek status live session langsung dari DB
+                const statusRes = await axios.get(`/api/exam/${userTimetableId}/status`);
+                if (statusRes.data?.redirect) {
+                    window.isFinishingExam = true;
+                    window.location.href = statusRes.data.redirect;
+                }
+            } catch (error) {
+                // 401 dari /ping ditangani interceptor → redirect /login
+                // Error network/500 diabaikan agar tidak false-positive
+            }
+        }, 8000); // setiap 8 detik
+
+        return () => clearInterval(checkSession);
+    }, [userTimetableId]);
 
     useEffect(() => {
         let roomInstance;
