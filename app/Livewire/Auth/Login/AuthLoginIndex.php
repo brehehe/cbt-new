@@ -670,7 +670,11 @@ class AuthLoginIndex extends Component
     {
         $company = Company::first();
 
-        return view('livewire.auth.login.auth-login-index', [
+        $view = config('app.new_template', false)
+            ? 'livewire.auth.login.auth-login-index-new'
+            : 'livewire.auth.login.auth-login-index';
+
+        return view($view, [
             'company' => $company,
         ])
             ->extends('layout.auth.app')

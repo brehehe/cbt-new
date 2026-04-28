@@ -54,49 +54,47 @@ const MonitorSidebar = ({
 
     return (
         <aside className={`
-            fixed right-0 lg:relative z-50 h-full lg:h-auto w-80 bg-white border-l border-gray-200 transition-transform duration-300 ease-in-out
+            fixed right-0 lg:relative z-50 h-full lg:h-auto w-80 bg-white/80 backdrop-blur-2xl border-l border-white shadow-[-10px_0_30px_rgba(0,0,0,0.02)] transition-transform duration-300 ease-in-out
             ${isOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
         `}>
             {/* Header Mobile */}
-            <div className="flex items-center justify-between p-4 border-b bg-gray-50 lg:hidden">
-                <h3 className="font-bold text-gray-800">Profil & Monitoring</h3>
+            <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-white/50 lg:hidden">
+                <h3 className="font-bold text-gray-800">Profile & Monitoring 🚀</h3>
                 <button onClick={() => setIsOpen(false)} className="text-gray-500 hover:text-gray-700">
                     <X className="w-6 h-6" />
                 </button>
             </div>
 
             {/* Profile Section */}
-            <div className="p-6 border-b bg-gray-50/30 flex flex-col items-center">
-                <div className="w-20 h-20 bg-orange-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg mb-4 ring-4 ring-orange-50">
+            <div className="p-6 border-b border-gray-100 bg-white/50 flex flex-col items-center relative overflow-hidden">
+                <div className="absolute -top-10 -right-10 w-32 h-32 bg-orange-100 rounded-full blur-2xl opacity-60"></div>
+                <div className="relative w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-black shadow-xl mb-4 bg-gradient-to-tr from-orange-500 to-amber-500 ring-4 ring-white">
                     {user?.name ? user.name.substring(0, 2).toUpperCase() : 'ST'}
                 </div>
-                <h3 className="font-bold text-gray-800 text-lg text-center line-clamp-2">{user?.name || 'Student'}</h3>
-                <p className="text-sm text-orange-600 font-bold tracking-wider mt-1">{user?.nim || 'Peserta Ujian'}</p>
-                {/* <div className="mt-3 px-3 py-1 bg-orange-50 text-orange-700 rounded-full text-[10px] uppercase font-bold tracking-wider border border-orange-100 flex items-center gap-1">
-                    <ShieldCheck className="w-3 h-3" /> Akun Terverifikasi
-                </div> */}
+                <h3 className="font-black text-gray-800 text-xl text-center line-clamp-2 relative z-10">{user?.name || 'Student'}</h3>
+                <p className="text-sm text-orange-500 font-bold tracking-wider mt-1 relative z-10">{user?.nim || 'Peserta Ujian'}</p>
             </div>
 
             {/* Camera Monitor */}
-            <div className="p-5 border-b">
+            <div className="p-5 border-b border-gray-100 bg-white/30">
                 <div className="flex items-center justify-between mb-4">
-                    <h4 className="font-bold text-gray-800 flex items-center gap-2">
-                        <Camera className="w-4 h-4 text-orange-600" /> Monitor Camera
+                    <h4 className="font-black text-slate-700 flex items-center gap-2">
+                        <Camera className="w-5 h-5 text-orange-500" /> Cam Monitor
                     </h4>
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => setCameraVisible(!cameraVisible)}
-                            className="p-1 hover:bg-gray-100 rounded-md transition-colors text-gray-400 hover:text-orange-600"
+                            className="p-1.5 hover:bg-white rounded-lg transition-colors text-slate-400 hover:text-orange-500 hover:shadow-sm"
                             title={cameraVisible ? "Sembunyikan Kamera" : "Tampilkan Kamera"}
                         >
                             {cameraVisible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                         </button>
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest ${cameraActive ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-gray-100 text-gray-500'}`}>
+                        <span className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${cameraActive ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-slate-100 text-slate-500'}`}>
                             {cameraActive ? 'Live' : 'Off'}
                         </span>
                     </div>
                 </div>
-                <div className="relative aspect-video bg-black rounded-2xl overflow-hidden shadow-inner group">
+                <div className="relative aspect-video bg-slate-900 rounded-3xl overflow-hidden shadow-inner group border-4 border-slate-100">
                     <video
                         ref={videoRef}
                         autoPlay
@@ -105,38 +103,38 @@ const MonitorSidebar = ({
                         className={`w-full h-full object-cover transition-opacity duration-500 ${cameraActive && cameraVisible ? 'opacity-100' : 'opacity-0'}`}
                     />
                     {(!cameraActive || !cameraVisible) && (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-500 gap-2 bg-gray-50">
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500 gap-2 bg-slate-50">
                             {cameraVisible ? (
                                 <>
                                     <VideoOff className="w-8 h-8 opacity-20" />
-                                    <span className="text-xs font-bold opacity-40 uppercase">Camera Inactive</span>
+                                    <span className="text-xs font-bold opacity-40 uppercase tracking-widest">Camera Inactive</span>
                                 </>
                             ) : (
                                 <>
-                                    <EyeOff className="w-8 h-8 opacity-20 text-orange-600" />
-                                    <span className="text-xs font-bold opacity-40 uppercase">Preview Hidden</span>
+                                    <EyeOff className="w-8 h-8 opacity-20 text-orange-500" />
+                                    <span className="text-xs font-bold opacity-40 uppercase tracking-widest">Preview Hidden</span>
                                 </>
                             )}
                         </div>
                     )}
-                    <div className="absolute bottom-2 left-2 flex items-center gap-1.5 px-2 py-1 bg-black/40 backdrop-blur-md rounded-lg text-[10px] text-white font-bold uppercase border border-white/10">
-                        <div className={`w-1.5 h-1.5 rounded-full ${cameraActive ? 'bg-red-500 animate-pulse' : 'bg-gray-500'}`} />
+                    <div className="absolute bottom-2 left-2 flex items-center gap-2 px-3 py-1.5 bg-black/50 backdrop-blur-md rounded-xl text-[10px] text-white font-bold uppercase border border-white/20 shadow-lg">
+                        <div className={`w-2 h-2 rounded-full ${cameraActive ? 'bg-red-500 animate-pulse' : 'bg-gray-500'}`} />
                         REC • {recordingStatus}
                     </div>
                 </div>
-                <div className="mt-4 p-3 bg-orange-50/50 rounded-xl border border-orange-100/50 flex gap-3">
-                    <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center text-orange-600 flex-none self-center">
-                        <Monitor className="w-4 h-4" />
+                <div className="mt-5 p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border border-orange-100/50 flex gap-4 shadow-sm">
+                    <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-orange-500 flex-none self-center">
+                        <Monitor className="w-5 h-5" />
                     </div>
                     <div className="flex-1">
-                        <div className="text-[10px] text-gray-400 font-bold uppercase">Progres Ujian</div>
-                        <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-sm font-bold text-orange-700">{Math.round(percentage)}%</span>
-                            <span className="text-[10px] text-gray-400 font-medium">Terselesaikan</span>
+                        <div className="text-xs text-orange-400 font-black uppercase tracking-wider mb-1">Progres Ujian</div>
+                        <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-black text-orange-600">{Math.round(percentage)}%</span>
+                            <span className="text-[10px] text-orange-400/80 font-bold uppercase">Selesai</span>
                         </div>
-                        <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="w-full h-2 bg-orange-100 rounded-full overflow-hidden shadow-inner">
                             <div
-                                className="h-full bg-orange-600 rounded-full transition-all duration-700 ease-out"
+                                className="h-full bg-gradient-to-r from-orange-500 to-amber-400 rounded-full transition-all duration-700 ease-out"
                                 style={{ width: `${percentage}%` }}
                             />
                         </div>
@@ -146,40 +144,40 @@ const MonitorSidebar = ({
 
             {/* Status Logs */}
             <div className="p-5 flex-1 overflow-y-auto custom-scrollbar">
-                <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Aktivitas Sesi</h4>
+                <div className="flex items-center justify-between mb-5">
+                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest">Session Logs 📡</h4>
                 </div>
                 <div className="space-y-4">
-                    <div className="flex gap-3">
-                        <div className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center flex-none mt-0.5">
-                            <CheckCircle className="w-3.5 h-3.5" />
+                    <div className="flex gap-3 items-start bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <div className="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center flex-none">
+                            <CheckCircle className="w-4 h-4" />
                         </div>
                         <div>
-                            <p className="text-xs font-bold text-gray-700">Status Streaming</p>
-                            <p className="text-[10px] text-gray-400 mt-0.5">
-                                {connectionStatus?.toLowerCase() === 'connected' ? 'Streaming aktif dan terpantau' : (connectionStatus || 'Menunggu koneksi...')}
+                            <p className="text-xs font-bold text-slate-700">Status Streaming</p>
+                            <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">
+                                {connectionStatus?.toLowerCase() === 'connected' ? 'Streaming aktif & terpantau aman.' : (connectionStatus || 'Streaming aktif dan terpantau')}
                             </p>
                         </div>
                     </div>
-                    <div className="flex gap-3">
-                        <div className="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center flex-none mt-0.5">
-                            <RefreshCcw className="w-3.5 h-3.5" />
+                    <div className="flex gap-3 items-start bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <div className="w-8 h-8 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center flex-none">
+                            <RefreshCcw className="w-4 h-4" />
                         </div>
                         <div>
-                            <p className="text-xs font-bold text-gray-700">Auto-sync Aktif</p>
-                            <p className="text-[10px] text-gray-400 mt-0.5">Sinkronisasi data otomatis berjalan</p>
+                            <p className="text-xs font-bold text-slate-700">Auto-sync Aktif</p>
+                            <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">Sinkronisasi data otomatis berjalan lancar.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Sidebar Footer */}
-            <div className="p-4 border-t bg-gray-50 flex items-center gap-2">
-                <div className="p-2 bg-white rounded-lg border border-gray-200">
+            <div className="p-4 border-t border-slate-100 bg-white/50 flex items-start gap-3 backdrop-blur">
+                <div className="p-2 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-100 shadow-sm flex-none">
                     <Info className="w-4 h-4 text-orange-500" />
                 </div>
-                <p className="text-[10px] text-gray-500 leading-tight">
-                    Keamanan ujian dipantau secara real-time. Pastikan wajah terlihat jelas di kamera.
+                <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
+                    Keamanan ujian dipantau secara real-time. Pastikan wajahmu terlihat jelas di kamera ya! 👀
                 </p>
             </div>
         </aside>

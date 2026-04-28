@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Livewire\Component;
 
-class AdminDashboardIndex extends Component
+class AdminDashboardIndexNew extends Component
 {
     protected $listeners = ['refreshData'];
 
@@ -111,9 +111,9 @@ class AdminDashboardIndex extends Component
             // Calculate weighted average
             $avgResponse = array_sum($measurements) / count($measurements);
 
-            return round($avgResponse, 1) . 'ms';
+            return round($avgResponse, 1).'ms';
         } catch (\Exception $e) {
-            return 'Error: ' . $e->getMessage();
+            return 'Error: '.$e->getMessage();
         }
     }
 
@@ -133,7 +133,7 @@ class AdminDashboardIndex extends Component
                         $diff = $now->diff($bootTime);
                         $totalHours = ($diff->days * 24) + $diff->h;
                         $uptimePercentage = min(($totalHours / (24 * 30)) * 100, 99.9);
-                        $uptime = number_format($uptimePercentage, 1) . '%';
+                        $uptime = number_format($uptimePercentage, 1).'%';
                     }
                 }
             } else {
@@ -143,7 +143,7 @@ class AdminDashboardIndex extends Component
                     $upSeconds = floatval(explode(' ', trim($uptimeData))[0]);
                     $upDays = $upSeconds / 86400;
                     $uptimePercentage = min(($upDays / 30) * 100, 99.9);
-                    $uptime = number_format($uptimePercentage, 1) . '%';
+                    $uptime = number_format($uptimePercentage, 1).'%';
                 }
             }
 
@@ -255,7 +255,7 @@ class AdminDashboardIndex extends Component
             // Calculate average load
             $avgLoad = count($loadMetrics) > 0 ? array_sum($loadMetrics) / count($loadMetrics) : 25;
 
-            return round($avgLoad) . '%';
+            return round($avgLoad).'%';
         } catch (\Exception $e) {
             return '25%'; // Fallback
         }
@@ -295,7 +295,7 @@ class AdminDashboardIndex extends Component
 
             return [
                 'status' => $avgLatency < 100 ? 'excellent' : ($avgLatency < 200 ? 'good' : 'poor'),
-                'avg_latency' => $avgLatency ? round($avgLatency) . 'ms' : 'unavailable',
+                'avg_latency' => $avgLatency ? round($avgLatency).'ms' : 'unavailable',
                 'tests' => $networkTests,
             ];
         } catch (\Exception $e) {
@@ -322,7 +322,7 @@ class AdminDashboardIndex extends Component
                 'php_current' => $this->formatBytes($phpMemory),
                 'php_peak' => $this->formatBytes($phpMemoryPeak),
                 'php_limit' => $phpMemoryLimit,
-                'php_usage_percent' => round($phpMemoryPercent, 1) . '%',
+                'php_usage_percent' => round($phpMemoryPercent, 1).'%',
                 'system_usage' => $systemMemory,
             ];
         } catch (\Exception $e) {
@@ -337,12 +337,12 @@ class AdminDashboardIndex extends Component
                 $output = shell_exec('wmic cpu get loadpercentage /value');
                 preg_match('/LoadPercentage=(\d+)/', $output, $matches);
 
-                return isset($matches[1]) ? $matches[1] . '%' : 'unavailable';
+                return isset($matches[1]) ? $matches[1].'%' : 'unavailable';
             } else {
                 // Linux CPU usage
                 $load = sys_getloadavg();
 
-                return round($load[0] * 100) . '%';
+                return round($load[0] * 100).'%';
             }
         } catch (\Exception $e) {
             return 'unavailable';
@@ -363,7 +363,7 @@ class AdminDashboardIndex extends Component
                     'used' => $this->formatBytes($diskUsed),
                     'free' => $this->formatBytes($diskFree),
                     'total' => $this->formatBytes($diskTotal),
-                    'usage_percent' => round($diskUsagePercent, 1) . '%',
+                    'usage_percent' => round($diskUsagePercent, 1).'%',
                 ];
             }
 
@@ -421,7 +421,7 @@ class AdminDashboardIndex extends Component
 
         $validLatencies = array_filter($latencies);
         if (count($validLatencies) > 0) {
-            return round(array_sum($validLatencies) / count($validLatencies)) . 'ms';
+            return round(array_sum($validLatencies) / count($validLatencies)).'ms';
         }
 
         return 'unavailable';
@@ -461,7 +461,7 @@ class AdminDashboardIndex extends Component
             if (PHP_OS_FAMILY !== 'Windows') {
                 $temp = shell_exec('cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null');
                 if ($temp) {
-                    return round((int) $temp / 1000) . '°C';
+                    return round((int) $temp / 1000).'°C';
                 }
             }
 
@@ -478,7 +478,7 @@ class AdminDashboardIndex extends Component
             $concurrent = $this->getRealConcurrentUsers();
             $estimatedBandwidth = $concurrent * 0.5; // 0.5 Mbps per user estimate
 
-            return round($estimatedBandwidth, 1) . ' Mbps';
+            return round($estimatedBandwidth, 1).' Mbps';
         } catch (\Exception $e) {
             return 'unavailable';
         }
@@ -496,7 +496,7 @@ class AdminDashboardIndex extends Component
                 $bytes = strlen($data);
                 $kbps = ($bytes / 1024) / $time;
 
-                return round($kbps) . ' KB/s';
+                return round($kbps).' KB/s';
             }
 
             return 'unavailable';
@@ -525,7 +525,7 @@ class AdminDashboardIndex extends Component
                         'total' => $this->formatBytes($total),
                         'used' => $this->formatBytes($used),
                         'available' => $this->formatBytes($available),
-                        'usage_percent' => round($usagePercent, 1) . '%',
+                        'usage_percent' => round($usagePercent, 1).'%',
                     ];
                 }
             } else {
@@ -544,7 +544,7 @@ class AdminDashboardIndex extends Component
                             'total' => $this->formatBytes($total),
                             'used' => $this->formatBytes($used),
                             'available' => $this->formatBytes($available),
-                            'usage_percent' => round($usagePercent, 1) . '%',
+                            'usage_percent' => round($usagePercent, 1).'%',
                         ];
                     }
                 }
@@ -576,13 +576,13 @@ class AdminDashboardIndex extends Component
     private function formatBytes($bytes)
     {
         if ($bytes >= 1024 * 1024 * 1024) {
-            return round($bytes / (1024 * 1024 * 1024), 2) . ' GB';
+            return round($bytes / (1024 * 1024 * 1024), 2).' GB';
         } elseif ($bytes >= 1024 * 1024) {
-            return round($bytes / (1024 * 1024), 2) . ' MB';
+            return round($bytes / (1024 * 1024), 2).' MB';
         } elseif ($bytes >= 1024) {
-            return round($bytes / 1024, 2) . ' KB';
+            return round($bytes / 1024, 2).' KB';
         } else {
-            return $bytes . ' B';
+            return $bytes.' B';
         }
     }
 
@@ -653,7 +653,7 @@ class AdminDashboardIndex extends Component
             // Load user profile with role-based access control
             $this->userProfile = $this->getUserProfileData();
         } catch (\Exception $e) {
-            Session::flash('error', 'Error loading dashboard data: ' . $e->getMessage());
+            Session::flash('error', 'Error loading dashboard data: '.$e->getMessage());
         }
     }
 
@@ -839,7 +839,7 @@ class AdminDashboardIndex extends Component
 
                 $avgResponseTime = $totalResponseTime / $recentExams->count();
 
-                return round($avgResponseTime) . 'ms';
+                return round($avgResponseTime).'ms';
             }
 
             // Method 2: Calculate based on database query performance
@@ -853,7 +853,7 @@ class AdminDashboardIndex extends Component
 
             $calculatedResponseTime = ($dbResponseTime * $loadMultiplier) + rand(50, 150);
 
-            return round(min($calculatedResponseTime, 2000)) . 'ms'; // Cap at 2 seconds
+            return round(min($calculatedResponseTime, 2000)).'ms'; // Cap at 2 seconds
 
         } catch (\Exception $e) {
             // Fallback calculation based on current time
@@ -867,7 +867,7 @@ class AdminDashboardIndex extends Component
                 $baseResponse += rand(10, 40);
             }
 
-            return $baseResponse . 'ms';
+            return $baseResponse.'ms';
         }
     }
 
@@ -896,7 +896,7 @@ class AdminDashboardIndex extends Component
             // Gabungkan rata-rata CPU + Memory
             $serverLoad = ($cpuPercent + $memPercent) / 2;
 
-            return round($serverLoad) . '%';
+            return round($serverLoad).'%';
         } catch (\Exception $e) {
             return 'N/A';
         }
@@ -936,7 +936,7 @@ class AdminDashboardIndex extends Component
                 // Ensure minimum realistic uptime
                 $uptime = max($calculatedUptime, 85.0);
 
-                return number_format($uptime, 1) . '%';
+                return number_format($uptime, 1).'%';
             }
 
             // Fallback: Calculate based on system start time (if available)
@@ -962,7 +962,7 @@ class AdminDashboardIndex extends Component
                     $totalHours = (isset($days[1]) ? $days[1] * 24 : 0) + (isset($hours[1]) ? $hours[1] : 0);
                     $uptimePercentage = min(($totalHours / (24 * 30)) * 100, 99.9); // Based on 30-day period
 
-                    return number_format($uptimePercentage, 1) . '%';
+                    return number_format($uptimePercentage, 1).'%';
                 }
             }
 
@@ -996,7 +996,7 @@ class AdminDashboardIndex extends Component
         $variation = (rand(-10, 10) / 100); // -0.1% to +0.1%
         $uptime = $baseUptime + $variation;
 
-        return number_format(max($uptime, 95.0), 1) . '%';
+        return number_format(max($uptime, 95.0), 1).'%';
     }
 
     private function getUptimeDetails()
@@ -1040,9 +1040,9 @@ class AdminDashboardIndex extends Component
 
             return [
                 'current' => $this->systemPerformance['system_uptime'],
-                'daily' => number_format(max($dailyUptime, 95), 1) . '%',
-                'weekly' => number_format(max($weeklyUptime, 96), 1) . '%',
-                'monthly' => number_format(max($monthlyUptime, 97), 1) . '%',
+                'daily' => number_format(max($dailyUptime, 95), 1).'%',
+                'weekly' => number_format(max($weeklyUptime, 96), 1).'%',
+                'monthly' => number_format(max($monthlyUptime, 97), 1).'%',
                 'incidents' => [
                     'today' => $todayIncidents,
                     'week' => $weeklyIncidents,
@@ -1088,7 +1088,7 @@ class AdminDashboardIndex extends Component
 
         $uptime = $businessHoursExams > 0 ? ($businessHoursSuccess / $businessHoursExams) * 100 : 99.9;
 
-        return number_format(max($uptime, 98), 1) . '%';
+        return number_format(max($uptime, 98), 1).'%';
     }
 
     private function calculateAfterHoursUptime()
@@ -1107,7 +1107,7 @@ class AdminDashboardIndex extends Component
 
         $uptime = $afterHoursExams > 0 ? ($afterHoursSuccess / $afterHoursExams) * 100 : 99.1;
 
-        return number_format(max($uptime, 96), 1) . '%';
+        return number_format(max($uptime, 96), 1).'%';
     }
 
     private function getSystemStatus()
@@ -1141,7 +1141,7 @@ class AdminDashboardIndex extends Component
         if ($daysUntil <= 1) {
             return 'Scheduled for tomorrow 2:00 AM';
         } else {
-            return 'Scheduled for ' . date('l, M j', $nextSunday) . ' at 2:00 AM';
+            return 'Scheduled for '.date('l, M j', $nextSunday).' at 2:00 AM';
         }
     }
 
@@ -1235,8 +1235,8 @@ class AdminDashboardIndex extends Component
         $successRate = $queryCount > 0 ? ($successfulQueries / $queryCount) * 100 : 0;
 
         return [
-            'response_time' => round($responseTime, 2) . 'ms',
-            'success_rate' => round($successRate, 1) . '%',
+            'response_time' => round($responseTime, 2).'ms',
+            'success_rate' => round($successRate, 1).'%',
             'queries_tested' => $queryCount,
             'successful_queries' => $successfulQueries,
         ];
@@ -1276,7 +1276,7 @@ class AdminDashboardIndex extends Component
 
         $totalMemory = $baseMemory + $userMemory + $examMemory;
 
-        return min($totalMemory, 85) . '%';
+        return min($totalMemory, 85).'%';
     }
 
     private function calculateErrorRate()
@@ -1294,14 +1294,14 @@ class AdminDashboardIndex extends Component
 
         $errorRate = ($totalErrors / $totalOperations) * 100;
 
-        return number_format($errorRate, 1) . '%';
+        return number_format($errorRate, 1).'%';
     }
 
     private function calculateThroughput()
     {
         $operationsLastMinute = UserTimetable::where('updated_at', '>=', date('Y-m-d H:i:s', strtotime('-1 minute')))->count();
 
-        return $operationsLastMinute . ' ops/min';
+        return $operationsLastMinute.' ops/min';
     }
 
     private function getPeakConcurrentToday()
@@ -1323,7 +1323,7 @@ class AdminDashboardIndex extends Component
     {
         $currentResponse = (int) str_replace('ms', '', $this->calculateAvgResponseTime());
 
-        return round($currentResponse * 1.3) . 'ms';
+        return round($currentResponse * 1.3).'ms';
     }
 
     private function getTotalRequestsToday()
@@ -1342,7 +1342,7 @@ class AdminDashboardIndex extends Component
             return '100%';
         }
 
-        return number_format(($successToday / $totalToday) * 100, 1) . '%';
+        return number_format(($successToday / $totalToday) * 100, 1).'%';
     }
 
     private function getStatusIndicators()
@@ -1406,15 +1406,7 @@ class AdminDashboardIndex extends Component
 
     public function render()
     {
-        $viewName = config('app.new_template', false)
-            ? 'livewire.admin.dashboard.admin-dashboard-index-new'
-            : 'livewire.admin.dashboard.admin-dashboard-index';
-
-        $layoutName = config('app.new_template', false)
-            ? 'layout.app-horizontal'
-            : 'layout.app';
-
-        return view($viewName, [
+        return view('livewire.admin.dashboard.admin-dashboard-index-new', [
             'totalUsers' => $this->totalUsers,
             'activeExams' => $this->activeExams,
             'totalExamTypes' => $this->totalExamTypes,
@@ -1431,6 +1423,6 @@ class AdminDashboardIndex extends Component
             'systemPerformance' => $this->systemPerformance,
             'uptimeDetails' => $this->uptimeDetails,
             'userProfile' => $this->userProfile,
-        ])->extends($layoutName)->section('content');
+        ])->extends('layout.app-horizontal')->section('content');
     }
 }

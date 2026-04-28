@@ -361,10 +361,18 @@ class AdminExamTimetableIndex extends Component
             $timetables->whereNotIn('id', $userTimetableStatusDone);
         }
 
-        return view('livewire.admin.exam.timetable.admin-exam-timetable-index', [
+        $viewName = config('app.new_template', false)
+            ? 'livewire.admin.exam.timetable.admin-exam-timetable-index-new'
+            : 'livewire.admin.exam.timetable.admin-exam-timetable-index';
+
+        $layoutName = config('app.new_template', false)
+            ? 'layout.app-horizontal'
+            : 'layout.app';
+
+        return view($viewName, [
             'timetables' => $timetables->paginate($this->perPage),
         ])
-            ->extends('layout.app')
+            ->extends($layoutName)
             ->section('content');
     }
 }

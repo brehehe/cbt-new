@@ -64,10 +64,18 @@ class AdminExamHistoryTimetableIndex extends Component
             ->where('status', 'done')
             ->orderBy('created_at', 'desc');
 
-        return view('livewire.admin.exam.history-timetable.admin-exam-history-timetable-index', [
+        $viewName = config('app.new_template', false)
+            ? 'livewire.admin.exam.history-timetable.admin-exam-history-timetable-index-new'
+            : 'livewire.admin.exam.history-timetable.admin-exam-history-timetable-index';
+
+        $layoutName = config('app.new_template', false)
+            ? 'layout.app-horizontal'
+            : 'layout.app';
+
+        return view($viewName, [
             'userTimetables' => $userTimetables->paginate($this->perPage),
         ])
-            ->extends('layout.app')
+            ->extends($layoutName)
             ->section('content');
     }
 }

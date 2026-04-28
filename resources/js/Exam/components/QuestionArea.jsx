@@ -37,7 +37,7 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
     // Debounced save for essay + Save on Unmount
     React.useEffect(() => {
         if (question?.timetable_question?.type !== 'essay') return;
-        
+
         const timeoutId = setTimeout(() => {
             if (essayAnswer !== originalEssayValue) {
                 onSave(selectedAnswerId, isMarked, essayAnswer);
@@ -84,20 +84,23 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.2 }}
-                className="flex flex-col h-full bg-white relative"
+                className="flex flex-col h-full bg-white/70 backdrop-blur-xl border border-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden"
             >
+                {/* Decorative blob */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-orange-100 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+
                 {/* Header Question */}
-                <div className="p-4 lg:p-6 border-b bg-gray-50 flex items-center justify-between relative">
-                    <h2 className="text-xl font-bold text-gray-800">Soal No. {index + 1}</h2>
+                <div className="p-4 lg:p-6 border-b border-gray-100 bg-white/50 flex items-center justify-between relative z-10">
+                    <h2 className="text-xl lg:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-amber-600">Soal No. {index + 1}</h2>
                     <button
                         onClick={handleToggleMark}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all ${isMarked
-                            ? 'bg-yellow-50 border-yellow-400 text-yellow-700 shadow-sm'
-                            : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 transition-all duration-300 font-bold active:scale-95 ${isMarked
+                            ? 'bg-amber-100 border-amber-400 text-amber-700 shadow-[0_4px_15px_rgba(251,191,36,0.2)]'
+                            : 'bg-white border-gray-200 text-gray-500 hover:border-amber-300 hover:bg-amber-50 hover:text-amber-600'
                             }`}
                     >
-                        <HelpCircle className={`w-5 h-5 ${isMarked ? 'fill-yellow-500' : ''}`} />
-                        <span className="font-medium">Ragu-Ragu</span>
+                        <HelpCircle className={`w-5 h-5 ${isMarked ? 'fill-amber-500' : ''}`} />
+                        <span>Ragu-Ragu? 🤔</span>
                     </button>
                 </div>
 
@@ -191,9 +194,9 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
                                     {question?.timetable_question?.answers?.map((answer, i) => (
                                         <label
                                             key={answer.id}
-                                            className={`group relative flex items-start gap-5 p-6 rounded-3xl border-2 cursor-pointer transition-all duration-300 ${selectedAnswerId === answer.id
-                                                ? 'border-orange-600 bg-orange-50/30'
-                                                : 'border-gray-100 bg-white hover:border-orange-300 hover:shadow-xl hover:-translate-y-1'
+                                            className={`group relative flex items-start gap-4 p-4 rounded-3xl border-2 cursor-pointer transition-all duration-300 ${selectedAnswerId === answer.id
+                                                ? 'border-orange-500 bg-orange-50/50 shadow-[0_8px_30px_rgb(249,115,22,0.15)]'
+                                                : 'border-white bg-white/60 backdrop-blur hover:border-orange-300 hover:shadow-xl hover:-translate-y-1'
                                                 }`}
                                         >
                                             <input
@@ -206,16 +209,16 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
 
                                             {/* Alphabet Circle */}
                                             <div className={`flex-none w-10 h-10 rounded-2xl flex items-center justify-center font-black text-lg transition-all duration-300 shadow-sm border-2 ${selectedAnswerId === answer.id
-                                                ? 'bg-orange-600 border-orange-600 text-white rotate-12 scale-110 shadow-orange-200'
+                                                ? 'bg-gradient-to-br from-orange-500 to-amber-500 border-transparent text-white rotate-12 scale-110 shadow-orange-300/50'
                                                 : 'bg-white border-gray-200 text-gray-400 group-hover:border-orange-400 group-hover:text-orange-500'
                                                 }`}>
                                                 {alphabet[i]}
                                             </div>
 
                                             {/* Answer Content */}
-                                            <div className="flex-1 space-y-4 pt-1.5">
+                                            <div className="flex-1 space-y-3 pt-1">
                                                 <LatexHTML
-                                                    className="text-gray-800 text-lg font-bold leading-relaxed"
+                                                    className="text-gray-800 text-base font-bold leading-relaxed"
                                                     html={answer.context}
                                                 />
 
@@ -259,7 +262,7 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
                                             {/* Checkmark Indicator */}
                                             <div className={`flex-none w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${selectedAnswerId === answer.id ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
                                                 }`}>
-                                                <CheckCircle className="w-8 h-8 fill-orange-600 text-white" />
+                                                <CheckCircle className="w-8 h-8 fill-orange-500 text-white" />
                                             </div>
                                         </label>
                                     ))}
@@ -270,7 +273,7 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
                 </div>
 
                 {/* Footer Navigation */}
-                <div className="p-4 lg:p-6 border-t bg-white relative">
+                <div className="p-4 lg:p-6 border-t border-gray-100 bg-white/50 backdrop-blur relative z-10 rounded-b-3xl">
                     {/* Lightbox Overlay */}
                     <AnimatePresence>
                         {viewedImage && (
@@ -304,27 +307,27 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
                         <button
                             onClick={handlePrev}
                             disabled={index === 0}
-                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${index === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 bg-gray-100 hover:bg-gray-200'
+                            className={`flex items-center gap-2 px-6 py-3.5 rounded-2xl font-bold transition-all active:scale-95 ${index === 0 ? 'text-gray-400 bg-gray-100 cursor-not-allowed opacity-70' : 'text-slate-700 bg-white border-2 border-slate-200 hover:border-orange-300 hover:text-orange-600 hover:shadow-lg'
                                 }`}
                         >
                             <ChevronLeft className="w-5 h-5" /> Sebelumnya
                         </button>
 
-                        <div className="text-sm font-bold text-gray-500 hidden sm:block">
-                            Soal {index + 1} dari {total}
+                        <div className="text-sm font-black text-orange-500/50 hidden sm:block bg-orange-50 px-4 py-2 rounded-xl">
+                            {index + 1} / {total}
                         </div>
 
                         {index === total - 1 ? (
                             <button
                                 onClick={onFinish}
-                                className="flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-white transition-all bg-green-600 hover:bg-green-700 shadow-lg shadow-green-200"
+                                className="flex items-center gap-2 px-8 py-3.5 rounded-2xl font-black text-white transition-all bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 shadow-[0_8px_20px_rgba(16,185,129,0.3)] hover:-translate-y-1 active:scale-95"
                             >
-                                <CheckCircle className="w-5 h-5" /> Akhiri Ujian
+                                <CheckCircle className="w-5 h-5" /> Selesai! 🎉
                             </button>
                         ) : (
                             <button
                                 onClick={handleNext}
-                                className="flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-white transition-all bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-200"
+                                className="flex items-center gap-2 px-8 py-3.5 rounded-2xl font-black text-white transition-all bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-[0_8px_20px_rgba(249,115,22,0.3)] hover:-translate-y-1 active:scale-95"
                             >
                                 Selanjutnya <ChevronRight className="w-5 h-5" />
                             </button>
