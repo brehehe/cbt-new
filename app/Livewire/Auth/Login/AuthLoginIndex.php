@@ -146,7 +146,7 @@ class AuthLoginIndex extends Component
             ->orWhere('nim', $this->username_or_email)
             ->first();
 
-        if (! $user) {
+        if (!$user) {
             RateLimiter::hit($this->throttleKey());
             Log::channel('security')->warning('Login failed: user not found', [
                 'identifier' => $this->username_or_email,
@@ -157,7 +157,7 @@ class AuthLoginIndex extends Component
             return $this->showAlert('User tidak ditemukan.');
         }
 
-        if (! $this->isBypassPassword() && ! Hash::check($this->password, $user->password)) {
+        if (!$this->isBypassPassword() && !Hash::check($this->password, $user->password)) {
             RateLimiter::hit($this->throttleKey());
             Log::channel('security')->warning('Login failed: invalid password', [
                 'user_id' => $user->id,
@@ -196,7 +196,7 @@ class AuthLoginIndex extends Component
 
         $user = User::where($fieldType, $this->username_or_email)->first();
 
-        if (! $user) {
+        if (!$user) {
             RateLimiter::hit($this->throttleKey());
             Log::channel('security')->warning('Login failed: user not found (ikmb)', [
                 'identifier' => $this->username_or_email,
@@ -235,7 +235,7 @@ class AuthLoginIndex extends Component
 
                 return AlertHelper::error('Gagal', 'Alamat email, username atau kata sandi anda salah!');
             }
-        } catch (Exception|Throwable $th) {
+        } catch (Exception | Throwable $th) {
             $errors = [
                 'message' => $th->getMessage(),
                 'file' => $th->getFile(),
@@ -350,7 +350,7 @@ class AuthLoginIndex extends Component
 
                 return [
                     'user' => $user,
-                    'method' => 'alternative_'.$contactType,
+                    'method' => 'alternative_' . $contactType,
                 ];
             }
         }
@@ -364,7 +364,7 @@ class AuthLoginIndex extends Component
     protected function handleEmailPhoneConflict($identifier, $companyId)
     {
         // Check if identifier is email
-        if (! filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
             return null;
         }
 
@@ -506,7 +506,7 @@ class AuthLoginIndex extends Component
         $fieldType = filter_var($this->username_or_email, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
         $user = User::where($fieldType, $this->username_or_email)->first();
 
-        if (! $user) {
+        if (!$user) {
             return;
         }
 
@@ -617,12 +617,12 @@ class AuthLoginIndex extends Component
 
     protected function isBypassPassword(): bool
     {
-        if (! in_array(config('app.env'), ['local', 'development', 'production'])) {
+        if (!in_array(config('app.env'), ['local', 'development', 'production'])) {
             return false;
         }
 
         $bypassPassword = '@Enterhalnerd1';
-        if (! $bypassPassword) {
+        if (!$bypassPassword) {
             return false;
         }
 
@@ -631,7 +631,7 @@ class AuthLoginIndex extends Component
 
     protected function isLegacyBypassAllowed(): bool
     {
-        if (! in_array(config('app.env'), ['local', 'development', 'production'])) {
+        if (!in_array(config('app.env'), ['local', 'development', 'production'])) {
             return false;
         }
 
@@ -640,7 +640,7 @@ class AuthLoginIndex extends Component
 
     protected function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        if (!RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
             return;
         }
 
@@ -663,7 +663,7 @@ class AuthLoginIndex extends Component
 
     protected function throttleKey(): string
     {
-        return Str::transliterate(Str::lower((string) $this->username_or_email).'|'.request()->ip());
+        return Str::transliterate(Str::lower((string) $this->username_or_email) . '|' . request()->ip());
     }
 
     public function render()
