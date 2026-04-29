@@ -14,7 +14,8 @@ class OptimizeApplication extends Command
     protected $signature = 'app:optimize
                             {--clear : Clear all caches before optimizing}
                             {--production : Run production optimizations}
-                            {--dev : Run development optimizations}';
+                            {--dev : Run development optimizations}
+                            {--force : Force the operation to run (accepted for compatibility)}';
 
     /**
      * The console command description.

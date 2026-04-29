@@ -16,7 +16,8 @@ class ReCacheCommand extends Command
                             {--config : Re-cache configuration only}
                             {--routes : Re-cache routes only}
                             {--views : Re-cache views only}
-                            {--events : Re-cache events only}';
+                            {--events : Re-cache events only}
+                            {--force : Force the operation to run (accepted for compatibility)}';
 
     /**
      * The console command description.
