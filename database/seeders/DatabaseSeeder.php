@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        Artisan::call('optimize:clear');
+        // Artisan::call('optimize:clear');
 
         $this->call([
             ServiceSeeder::class,
