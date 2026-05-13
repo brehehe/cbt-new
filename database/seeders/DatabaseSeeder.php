@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
         Artisan::call('optimize:clear');
 
         $this->call([
-            ServiceSeeder::class,
+                // ServiceSeeder::class,
             ServiceMonthSeeder::class,
 
                 // Region
