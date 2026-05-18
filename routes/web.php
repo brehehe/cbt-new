@@ -57,6 +57,10 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use Security\SecurityLogIndex;
 
+Route::get('/document', function () {
+    return view('document');
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
@@ -74,7 +78,7 @@ Route::get('/student/onboarding', StudentOnboarding::class)
     ->name('student.onboarding')
     ->middleware(['auth']);
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 // Public Stress Test Route (Only for testing purposes)
 
@@ -304,12 +308,12 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
     Route::get('/clearallsession', function () {
 
         // ========== JIKA BELUM VERIFIKASI PASSWORD ==========
-        if (! session('clearsession_verified')) {
+        if (!session('clearsession_verified')) {
 
             return '
                 <h2>Masukkan Password Admin</h2>
                 <form method="POST" action="/clearallsession/check">
-                    '.csrf_field().'
+                    ' . csrf_field() . '
                     <input type="password" name="password" placeholder="Password"
                         style="padding:10px; width:200px;">
                     <br><br>
@@ -329,7 +333,7 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
 
         <!-- FORM HAPUS SESSION TERPILIH -->
         <form method='POST' action='/clearallsession/confirm'>
-            ".csrf_field()."
+            " . csrf_field() . "
             <table border='1' cellpadding='10' cellspacing='0'>
                 <tr>
                     <th>Pilih</th>
@@ -355,7 +359,7 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
                     <td>{$userName}</td>
                     <td>{$s->ip_address}</td>
                     <td>{$s->user_agent}</td>
-                    <td>".date('Y-m-d H:i:s', $s->last_activity).'</td>
+                    <td>" . date('Y-m-d H:i:s', $s->last_activity) . '</td>
                 </tr>
             ';
         }
@@ -375,7 +379,7 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
 
         <!-- FORM HAPUS SEMUA -->
         <form method='POST' action='/clearallsession/clearall'>
-            ".csrf_field()."
+            " . csrf_field() . "
             <button type='submit' style='padding:10px 20px; background:darkred; color:white;'>
                 Hapus Semua Session (Force Logout Semua User)
             </button>
@@ -404,11 +408,11 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
     });
 
     Route::post('/clearallsession/confirm', function () {
-        if (! session('clearsession_verified')) {
+        if (!session('clearsession_verified')) {
             return redirect('/clearallsession')->with('error', 'Tidak diizinkan.');
         }
 
-        if (! request()->has('sessions')) {
+        if (!request()->has('sessions')) {
             return 'Tidak ada session yang dipilih.';
         }
 
@@ -433,7 +437,7 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
                     ->whereNull('paused_at')
                     ->update(['paused_at' => now()]);
             } catch (Throwable $e) {
-                Log::error('ClearSession Confirm Error: '.$e->getMessage());
+                Log::error('ClearSession Confirm Error: ' . $e->getMessage());
             }
         }
 
@@ -445,7 +449,7 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
     });
 
     Route::post('/clearallsession/clearall', function () {
-        if (! session('clearsession_verified')) {
+        if (!session('clearsession_verified')) {
             return redirect('/clearallsession')->with('error', 'Tidak diizinkan.');
         }
 
@@ -464,7 +468,7 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
                 ->whereNull('paused_at')
                 ->update(['paused_at' => now()]);
         } catch (Throwable $e) {
-            Log::error('ClearSession ClearAll Error: '.$e->getMessage());
+            Log::error('ClearSession ClearAll Error: ' . $e->getMessage());
         }
 
         DB::table('sessions')->truncate();
