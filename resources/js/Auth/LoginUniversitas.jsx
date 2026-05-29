@@ -35,6 +35,14 @@ export default function LoginUniversitas({
     const [errorMsg, setErrorMsg] = useState('');
     const [activeSession, setActiveSession] = useState(null);
 
+    // Register branding CSS variables dynamically on the document root
+    useEffect(() => {
+        const primary = company.color_primary || '#f58634';
+        const secondary = company.color_secondary || '#c3d4ec';
+        document.documentElement.style.setProperty('--primary', primary);
+        document.documentElement.style.setProperty('--secondary', secondary);
+    }, [company]);
+
     // Active session lookup logic
     const checkSessionRequest = useCallback(async (value) => {
         if (!value) {
@@ -128,33 +136,33 @@ export default function LoginUniversitas({
     };
 
     return (
-        <div className="relative h-screen w-full overflow-hidden bg-[#dce0f4] font-sans selection:bg-blue-500 selection:text-white">
+        <div className="relative h-screen w-full overflow-hidden bg-[#dce0f4] font-sans selection:bg-[var(--primary)] selection:text-white">
             
             {/* Advanced Animated Fluid Background */}
             <div className="absolute inset-0 z-0">
-                {/* Gradient Mesh Layers */}
+                {/* Gradient Mesh Layers using dynamic brand colors */}
                 <div className="absolute inset-0 opacity-40">
                     <div 
-                        className="absolute left-0 top-0 h-full w-full animate-pulse bg-gradient-to-br from-blue-500/20 via-indigo-500/15 to-cyan-500/20"
+                        className="absolute left-0 top-0 h-full w-full animate-pulse bg-gradient-to-br from-[var(--primary)]/20 via-[var(--secondary)]/15 to-transparent"
                         style={{ animationDuration: '8s' }}
                     />
                     <div 
-                        className="absolute inset-0 animate-pulse bg-gradient-to-tl from-blue-600/15 via-transparent to-blue-400/20"
+                        className="absolute inset-0 animate-pulse bg-gradient-to-tl from-[var(--primary)]/15 via-transparent to-[var(--secondary)]/10"
                         style={{ animationDuration: '12s', animationDelay: '2s' }}
                     />
                 </div>
 
-                {/* Floating Interactive elements */}
-                <div className="absolute left-20 top-20 h-4 w-4 animate-bounce cursor-pointer rounded-full bg-blue-500/40 blur-[1px] transition-all duration-500 hover:scale-150 hover:bg-blue-400" />
+                {/* Floating Interactive elements colored by primary brand color */}
+                <div className="absolute left-20 top-20 h-4 w-4 animate-bounce cursor-pointer rounded-full bg-[var(--primary)]/40 blur-[1px] transition-all duration-500 hover:scale-150 hover:bg-[var(--primary)]" />
                 <div 
-                    className="absolute right-24 top-1/3 h-8 w-2 animate-pulse cursor-pointer bg-indigo-500/40 rounded transition-all duration-500 hover:h-16 hover:bg-indigo-400"
+                    className="absolute right-24 top-1/3 h-8 w-2 animate-pulse cursor-pointer bg-[var(--secondary)]/40 rounded transition-all duration-500 hover:h-16 hover:bg-[var(--secondary)]"
                     style={{ animationDuration: '4s' }}
                 />
                 <div 
-                    className="absolute bottom-1/4 left-1/4 h-5 w-5 rotate-45 animate-spin cursor-pointer bg-cyan-500/40 transition-all duration-1000 hover:scale-125 hover:bg-cyan-400"
+                    className="absolute bottom-1/4 left-1/4 h-5 w-5 rotate-45 animate-spin cursor-pointer bg-[var(--primary)]/40 transition-all duration-1000 hover:scale-125 hover:bg-[var(--primary)]"
                     style={{ animationDuration: '15s' }}
                 />
-                <div className="absolute bottom-20 right-20 h-1.5 w-12 animate-pulse cursor-pointer bg-blue-600/40 rounded transition-all duration-500 hover:w-20 hover:bg-blue-500" />
+                <div className="absolute bottom-20 right-20 h-1.5 w-12 animate-pulse cursor-pointer bg-[var(--primary)]/40 rounded transition-all duration-500 hover:w-20 hover:bg-[var(--primary)]" />
             </div>
 
             {/* Main Flex Layout Container */}
@@ -207,7 +215,10 @@ export default function LoginUniversitas({
                     {/* Header bar visible ONLY on mobile screens */}
                     <div className="absolute left-4 top-4 z-20 lg:hidden">
                         <div className="inline-flex items-center space-x-3 rounded-2xl border border-white/40 bg-white/80 px-4 py-2 shadow-lg backdrop-blur-xl transition-all duration-300 hover:scale-105">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-md shadow-blue-500/20">
+                            <div 
+                                style={{ backgroundColor: 'var(--primary)' }}
+                                className="flex h-8 w-8 items-center justify-center rounded-xl shadow-md opacity-90"
+                            >
                                 <svg className="h-4.5 w-4.5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11" />
                                 </svg>
@@ -220,7 +231,7 @@ export default function LoginUniversitas({
                     <div className="w-full max-w-md">
                         <div className="relative">
                             {/* Colorful background neon blur behind the card */}
-                            <div className="absolute -inset-1.5 rounded-[2rem] bg-gradient-to-r from-blue-500/20 via-indigo-500/10 to-cyan-500/20 opacity-70 blur-2xl filter" />
+                            <div className="absolute -inset-1.5 rounded-[2rem] bg-gradient-to-r from-[var(--primary)]/20 via-[var(--secondary)]/10 to-transparent opacity-70 blur-2xl filter" />
 
                             {/* Main Card Element */}
                             <div className="relative rounded-[2rem] border border-white/50 bg-white/90 p-6 shadow-[0_20px_50px_rgba(0,0,0,0.08)] backdrop-blur-2xl transition-all duration-500 hover:shadow-[0_30px_70px_rgba(59,130,246,0.12)] lg:p-8">
@@ -281,7 +292,7 @@ export default function LoginUniversitas({
                                     <div className="space-y-1.5">
                                         <label className="text-xs font-bold text-gray-700 tracking-wide">Username / Email / NIM</label>
                                         <div className="relative group">
-                                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors duration-200">
+                                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[var(--primary)] transition-colors duration-200">
                                                 <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                                 </svg>
@@ -293,7 +304,7 @@ export default function LoginUniversitas({
                                                 value={usernameOrEmail}
                                                 onChange={handleUsernameChange}
                                                 placeholder="Masukkan username, email, atau NIM" 
-                                                className="block w-full rounded-xl border border-gray-200 bg-gray-50/50 py-3.5 pl-11 pr-4 text-sm font-medium text-gray-800 placeholder-gray-400 shadow-inner outline-none transition-all duration-200 hover:border-gray-300 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:opacity-50"
+                                                className="block w-full rounded-xl border border-gray-200 bg-gray-50/50 py-3.5 pl-11 pr-4 text-sm font-medium text-gray-800 placeholder-gray-400 shadow-inner outline-none transition-all duration-200 hover:border-gray-300 focus:border-[var(--primary)] focus:bg-white focus:ring-4 focus:ring-[var(--primary)]/10 disabled:opacity-50"
                                             />
                                         </div>
                                     </div>
@@ -302,7 +313,7 @@ export default function LoginUniversitas({
                                     <div className="space-y-1.5">
                                         <label className="text-xs font-bold text-gray-700 tracking-wide">Password</label>
                                         <div className="relative group">
-                                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors duration-200">
+                                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[var(--primary)] transition-colors duration-200">
                                                 <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 7a2 2 0 012 2m0 0a2 2 0 01-2 2m2-2h3m-3.193 2.858L10 17H7v-3l4.858-4.858M17 7a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 </svg>
@@ -314,7 +325,7 @@ export default function LoginUniversitas({
                                                 value={password}
                                                 onChange={(e) => setPassword(e.target.value)}
                                                 placeholder="Masukkan password Anda" 
-                                                className="block w-full rounded-xl border border-gray-200 bg-gray-50/50 py-3.5 pl-11 pr-11 text-sm font-medium text-gray-800 placeholder-gray-400 shadow-inner outline-none transition-all duration-200 hover:border-gray-300 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:opacity-50"
+                                                className="block w-full rounded-xl border border-gray-200 bg-gray-50/50 py-3.5 pl-11 pr-11 text-sm font-medium text-gray-800 placeholder-gray-400 shadow-inner outline-none transition-all duration-200 hover:border-gray-300 focus:border-[var(--primary)] focus:bg-white focus:ring-4 focus:ring-[var(--primary)]/10 disabled:opacity-50"
                                             />
                                             {/* Password visibility toggle icon */}
                                             <button 
@@ -357,7 +368,8 @@ export default function LoginUniversitas({
                                         <button 
                                             type="submit" 
                                             disabled={loading}
-                                            className="relative flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-500 py-3.5 px-4 text-sm font-bold text-white shadow-xl shadow-blue-500/20 transition-all duration-300 hover:scale-[1.02] hover:bg-blue-600 hover:shadow-blue-600/30 focus:outline-none focus:ring-4 focus:ring-blue-500/20 disabled:scale-100 disabled:opacity-60 cursor-pointer"
+                                            style={{ backgroundColor: 'var(--primary)' }}
+                                            className="relative flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 px-4 text-sm font-bold text-white shadow-xl hover:brightness-95 active:scale-[0.98] transition-all disabled:opacity-80 cursor-pointer"
                                         >
                                             {loading ? (
                                                 <div className="h-5 w-5 animate-spin rounded-full border-3 border-white border-t-transparent" />
@@ -384,7 +396,7 @@ export default function LoginUniversitas({
                                                         key={role}
                                                         type="button" 
                                                         onClick={() => handlePrefill(role)}
-                                                        className="flex w-full items-center justify-center rounded-xl border border-gray-150 bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50/50 transition-all duration-200 capitalize"
+                                                        className="flex w-full items-center justify-center rounded-xl border border-gray-150 bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-600 hover:text-[var(--primary)] hover:border-[var(--primary)]/20 hover:bg-[var(--primary)]/5 transition-all duration-200 capitalize"
                                                     >
                                                         {role}
                                                     </button>
@@ -404,7 +416,7 @@ export default function LoginUniversitas({
                                             {appWindows && (
                                                 <a 
                                                     href={appWindows}
-                                                    className="flex items-center gap-1.5 px-3 py-2 bg-blue-50/60 text-blue-700 hover:bg-blue-100/80 rounded-xl text-xs font-bold transition-all hover:scale-105"
+                                                    className="flex items-center gap-1.5 px-3 py-2 bg-[var(--primary)]/5 text-[var(--primary)] hover:bg-[var(--primary)]/10 rounded-xl text-xs font-bold transition-all hover:scale-105"
                                                 >
                                                     <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -415,7 +427,7 @@ export default function LoginUniversitas({
                                             {appMac && (
                                                 <a 
                                                     href={appMac}
-                                                    className="flex items-center gap-1.5 px-3 py-2 bg-gray-50 text-gray-700 hover:bg-gray-100 rounded-xl text-xs font-bold transition-all hover:scale-105"
+                                                    className="flex items-center gap-1.5 px-3 py-2 bg-slate-50 text-slate-700 hover:bg-slate-100 rounded-xl text-xs font-bold transition-all hover:scale-105"
                                                 >
                                                     <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -437,7 +449,7 @@ export default function LoginUniversitas({
                                             {appIos && (
                                                 <a 
                                                     href={appIos}
-                                                    className="flex items-center gap-1.5 px-3 py-2 bg-gray-100 text-gray-800 hover:bg-gray-200 rounded-xl text-xs font-bold transition-all hover:scale-105"
+                                                    className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 text-slate-800 hover:bg-slate-200 rounded-xl text-xs font-bold transition-all hover:scale-105"
                                                 >
                                                     <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                                                         <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.79-1.31.02-2.3-1.23-3.14-2.47-1.72-2.5-3.03-7.07-1.26-10.13 0.88-1.5 2.45-2.47 4.16-2.5 1.3 0 2.52.88 3.3.88 0.77 0 2.22-1.09 3.73-0.93 0.64.03 2.43.26 3.58 1.94-0.09.06-2.14 1.25-2.12 3.72 0.03 2.96 2.59 3.96 2.65 4-0.02.06-0.41 1.41-1.37 2.82h0ZM13 3.5c.67-.82 1.13-1.95 1.01-3.09-0.97.04-2.14.65-2.83 1.46-.61.7-1.12 1.83-0.99 3.05 1.08.08 2.18-.59 2.81-1.42h0Z" />
@@ -464,7 +476,7 @@ export default function LoginUniversitas({
                                     </div>
                                     <div className="h-3 w-px bg-gray-300" />
                                     <div className="flex items-center gap-1.5">
-                                        <svg className="h-3.5 w-3.5 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                        <svg className="h-3.5 w-3.5 text-[var(--primary)]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                                         </svg>
                                         <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Secure</span>
