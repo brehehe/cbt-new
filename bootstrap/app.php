@@ -28,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
     
         $middleware->web(append: [
             SecurityHeaders::class,
+            // \App\Http\Middleware\CheckLicense::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

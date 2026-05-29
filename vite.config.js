@@ -10,6 +10,7 @@ export default defineConfig({
                 "resources/css/app.css",
                 "resources/js/app.js",
                 "resources/js/exam-react.jsx",
+                "resources/js/login-react.jsx",
                 "resources/img/logo_m.png",
             ],
             refresh: ["resources/views/**/*"],
