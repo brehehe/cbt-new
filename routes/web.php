@@ -334,6 +334,7 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
             Route::get('/supervisor', 'Supervisor\AdminMasterSupervisorIndex')->name('admin.master.supervisor');
             Route::get('/study', 'Study\AdminMasterStudyIndex')->name('admin.master.study');
             Route::get('/timetable', 'Timetable\AdminMasterTimetableIndex')->name('admin.master.timetable');
+            Route::get('/timetable/create', 'Timetable\AdminMasterTimetableCreate')->name('admin.master.timetable.create');
             Route::get('/timetable/{timetable_id}/detail', 'Timetable\Detail\AdminMasterTimetableDetailIndex')->name('admin.master.timetable.detail');
             Route::get('/timetable/{timetable_id}/video', 'Timetable\Video\AdminMasterTimetableVideoIndex')->name('admin.master.timetable.video');
             Route::get('/timetable/{timetable_id}/alert', 'Timetable\Alert\AdminMasterTimetableAlertIndex')->name('admin.master.timetable.alert');

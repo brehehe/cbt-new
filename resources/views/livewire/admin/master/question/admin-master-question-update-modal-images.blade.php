@@ -27,10 +27,17 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                     @foreach ($images as $index => $img)
                         <div class="relative group border rounded-lg overflow-hidden flex items-center justify-center bg-gray-50 h-32">
-                            @if (is_string($img))
-                                <img src="{{ asset('storage/' . ltrim($img, '/')) }}" class="max-h-full max-w-full object-contain" alt="Preview Image">
+                            @php
+                                $isString = is_string($img);
+                                $imgUrl = $isString ? asset('storage/' . ltrim($img, '/')) : $img->temporaryUrl();
+                                $fileName = $isString ? $img : $img->getClientOriginalName();
+                            @endphp
+                            @if(preg_match('/\.(mp4|mov|avi|wmv)$/i', $fileName))
+                                <video src="{{ $imgUrl }}" class="max-h-full max-w-full object-contain" controls></video>
+                            @elseif(preg_match('/\.(mp3|wav|ogg)$/i', $fileName))
+                                <audio src="{{ $imgUrl }}" class="max-h-full max-w-full object-contain w-full" controls></audio>
                             @else
-                                <img src="{{ $img->temporaryUrl() }}" class="max-h-full max-w-full object-contain" alt="Preview Image">
+                                <img src="{{ $imgUrl }}" class="max-h-full max-w-full object-contain" alt="Preview Media">
                             @endif
                             <button type="button" wire:click="removeImage({{ $index }})" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-70 group-hover:opacity-100 transition shadow">
                                 <span class="sr-only">Hapus</span>
@@ -42,8 +49,8 @@
                     <!-- Tombol Tambah Gambar (Label bound to hidden file input) -->
                     <label class="border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center h-32 hover:bg-gray-50 hover:border-gray-400 transition cursor-pointer text-gray-500 group">
                         <svg class="w-8 h-8 mb-1 text-gray-400 group-hover:text-blue-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        <span class="text-xs font-medium text-center px-2">Klik untuk<br>Tambah Gambar</span>
-                        <input type="file" wire:model="new_images" multiple accept=".jpg,.jpeg,.png,.webp" class="hidden">
+                        <span class="text-xs font-medium text-center px-2">Klik untuk<br>Tambah Media</span>
+                        <input type="file" wire:model="new_images" multiple accept=".jpg,.jpeg,.png,.webp,.mp4,.mov,.avi,.wmv,.mp3,.wav,.ogg" class="hidden">
                     </label>
                 </div>
 

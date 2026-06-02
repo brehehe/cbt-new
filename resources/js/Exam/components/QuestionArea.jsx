@@ -12,6 +12,11 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
     const [isMarked, setIsMarked] = useState(question?.is_mark);
     const [viewedImage, setViewedImage] = useState(null);
 
+    // Helper functions for media types
+    const getExtension = (filename) => filename?.split('.').pop().toLowerCase();
+    const isVideo = (filename) => ['mp4', 'mov', 'avi', 'wmv', 'webm'].includes(getExtension(filename));
+    const isAudio = (filename) => ['mp3', 'wav', 'ogg'].includes(getExtension(filename));
+
     // Refs to track latest state for unmount saving
     const essayValueRef = React.useRef(essayAnswer);
     const isMarkedRef = React.useRef(isMarked);
@@ -130,24 +135,47 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
 
                                 return (
                                     <div className="flex flex-col gap-10 w-full py-4 text-left">
-                                        {parseImages.map((img, i) => (
-                                            <div
-                                                key={i}
-                                                onClick={() => setViewedImage(`/storage/${img}`)}
-                                                className="group relative rounded-2xl border-2 border-gray-100 overflow-hidden bg-gray-50 shadow-sm hover:shadow-xl transition-all duration-300 cursor-zoom-in"
-                                            >
-                                                <img
-                                                    src={`/storage/${img}`}
-                                                    alt="Question visual"
-                                                    className="w-full h-auto object-contain max-h-[600px] mx-auto mix-blend-multiply"
-                                                />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-6">
-                                                    <div className="bg-white/90 backdrop-blur px-6 py-3 rounded-full flex items-center gap-3 text-sm font-bold text-gray-700 shadow-xl border border-white/50">
-                                                        <ZoomIn className="w-5 h-5 text-orange-600" /> Lihat Gambar Penuh
+                                        {parseImages.map((img, i) => {
+                                            const mediaUrl = `/storage/${img}`;
+                                            if (isVideo(img)) {
+                                                return (
+                                                    <div key={i} className="w-full rounded-2xl overflow-hidden shadow-sm border border-gray-200 bg-black">
+                                                        <video controls controlsList="nodownload" className="w-full h-auto max-h-[600px] mx-auto">
+                                                            <source src={mediaUrl} type={`video/${getExtension(img)}`} />
+                                                            Your browser does not support the video tag.
+                                                        </video>
                                                     </div>
-                                                </div>
-                                            </div>
-                                        ))}
+                                                );
+                                            } else if (isAudio(img)) {
+                                                return (
+                                                    <div key={i} className="w-full rounded-xl overflow-hidden shadow-sm border border-gray-200 bg-gray-50 p-4">
+                                                        <audio controls controlsList="nodownload" className="w-full">
+                                                            <source src={mediaUrl} type={`audio/${getExtension(img)}`} />
+                                                            Your browser does not support the audio tag.
+                                                        </audio>
+                                                    </div>
+                                                );
+                                            } else {
+                                                return (
+                                                    <div
+                                                        key={i}
+                                                        onClick={() => setViewedImage(mediaUrl)}
+                                                        className="group relative rounded-2xl border-2 border-gray-100 overflow-hidden bg-gray-50 shadow-sm hover:shadow-xl transition-all duration-300 cursor-zoom-in"
+                                                    >
+                                                        <img
+                                                            src={mediaUrl}
+                                                            alt="Question visual"
+                                                            className="w-full h-auto object-contain max-h-[600px] mx-auto mix-blend-multiply"
+                                                        />
+                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-6">
+                                                            <div className="bg-white/90 backdrop-blur px-6 py-3 rounded-full flex items-center gap-3 text-sm font-bold text-gray-700 shadow-xl border border-white/50">
+                                                                <ZoomIn className="w-5 h-5 text-orange-600" /> Lihat Gambar Penuh
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+                                        })}
                                     </div>
                                 );
                             })()
@@ -225,19 +253,40 @@ const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish
                                                 {/* Answer Images */}
                                                 {answer.images && JSON.parse(answer.images || '[]').length > 0 && (
                                                     <div className="flex flex-col gap-6 w-full">
-                                                        {JSON.parse(answer.images).map((img, j) => (
-                                                            <div
-                                                                key={j}
-                                                                onClick={(e) => {
-                                                                    e.preventDefault();
-                                                                    e.stopPropagation();
-                                                                    setViewedImage(`/storage/${img}`);
-                                                                }}
-                                                                className="p-1.5 rounded-2xl border border-gray-100 bg-gray-50 hover:bg-white transition-all cursor-zoom-in hover:shadow-xl w-full xl:w-3/4"
-                                                            >
-                                                                <img src={`/storage/${img}`} className="rounded-lg max-h-48 w-auto object-contain" alt="Option visual" />
-                                                            </div>
-                                                        ))}
+                                                        {JSON.parse(answer.images).map((img, j) => {
+                                                            const mediaUrl = `/storage/${img}`;
+                                                            if (isVideo(img)) {
+                                                                return (
+                                                                    <div key={j} onClick={(e) => e.stopPropagation()} className="p-1.5 rounded-2xl border border-gray-100 bg-black w-full xl:w-3/4">
+                                                                        <video controls controlsList="nodownload" className="w-full h-auto max-h-48">
+                                                                            <source src={mediaUrl} type={`video/${getExtension(img)}`} />
+                                                                        </video>
+                                                                    </div>
+                                                                );
+                                                            } else if (isAudio(img)) {
+                                                                return (
+                                                                    <div key={j} onClick={(e) => e.stopPropagation()} className="p-1.5 rounded-xl border border-gray-100 bg-gray-50 w-full xl:w-3/4">
+                                                                        <audio controls controlsList="nodownload" className="w-full">
+                                                                            <source src={mediaUrl} type={`audio/${getExtension(img)}`} />
+                                                                        </audio>
+                                                                    </div>
+                                                                );
+                                                            } else {
+                                                                return (
+                                                                    <div
+                                                                        key={j}
+                                                                        onClick={(e) => {
+                                                                            e.preventDefault();
+                                                                            e.stopPropagation();
+                                                                            setViewedImage(mediaUrl);
+                                                                        }}
+                                                                        className="p-1.5 rounded-2xl border border-gray-100 bg-gray-50 hover:bg-white transition-all cursor-zoom-in hover:shadow-xl w-full xl:w-3/4"
+                                                                    >
+                                                                        <img src={mediaUrl} className="rounded-lg max-h-48 w-auto object-contain" alt="Option visual" />
+                                                                    </div>
+                                                                );
+                                                            }
+                                                        })}
                                                     </div>
                                                 )}
 

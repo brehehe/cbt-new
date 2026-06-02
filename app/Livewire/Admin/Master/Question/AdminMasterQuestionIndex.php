@@ -281,7 +281,7 @@ class AdminMasterQuestionIndex extends Component
 
         foreach ($this->new_images as $new_image) {
             $upload = $this->uploadFile($new_image, $folder);
-            $this->images[] = 'question/'.Carbon::now()->isoFormat('Y').'/'.Carbon::now()->isoFormat('MM').'/'.$upload[1];
+            $this->images[] = $upload[0];
         }
 
         // Reset the input model so it fires updated hook on the next upload

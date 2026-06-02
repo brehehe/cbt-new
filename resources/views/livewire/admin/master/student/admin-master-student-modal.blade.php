@@ -22,7 +22,7 @@
 
         <!-- Body -->
         <div class="px-6 py-4 text-gray-600 overflow-auto" style="max-height: 600px;">
-            <div class="mb-4">
+            <div class="mb-4 hidden">
                 <label class="block text-sm font-medium text-gray-700">
                     Tipe <span class="text-red-600">*</span>
                 </label>

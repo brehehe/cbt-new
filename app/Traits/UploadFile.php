@@ -40,19 +40,20 @@ trait UploadFile
             $savedFileName = $filename.'.'.$extension;
         }
 
-        // DirectoryTrait::createDirectory($where);
-        $this->createDirectory($where);
+        // Clean $where to ensure no double '/public'
+        $whereClean = preg_replace('/^\/?(public\/)?/', '', $where);
 
-        // dd(storage_path("app{$where}/{$savedFileName}"));
+        $this->createDirectory($whereClean);
 
         if (in_array($extension, ['webp'])) {
-
             $new_file = Webp::make($file)->quality(80);
-            $path = $new_file->save(storage_path("app{$where}/{$savedFileName}"));
-
+            $fullPath = storage_path("app/public/{$whereClean}/{$savedFileName}");
+            $path = $new_file->save($fullPath);
+            // Return path relative to public storage so asset() works
+            $path = "{$whereClean}/{$savedFileName}";
         } else {
-
-            $path = $file->storeAs($where, $savedFileName);
+            // Using public disk means it will prepend storage_path('app/public')
+            $path = $file->storeAs($whereClean, $savedFileName, ['disk' => 'public']);
         }
 
         return [$path, $savedFileName];
@@ -108,10 +109,12 @@ trait UploadFile
      */
     private function createDirectory($path)
     {
-        $path = storage_path("app{$path}");
+        // Strip any leading '/public/' or '/' from $path so we always map correctly to storage/app/public/
+        $path = preg_replace('/^\/?(public\/)?/', '', $path);
+        $fullPath = storage_path("app/public/{$path}");
 
-        if (! File::isDirectory($path)) {
-            File::makeDirectory($path, 0777, true, true);
+        if (! File::isDirectory($fullPath)) {
+            File::makeDirectory($fullPath, 0777, true, true);
         }
     }
 

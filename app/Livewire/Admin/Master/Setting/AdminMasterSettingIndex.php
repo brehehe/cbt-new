@@ -66,6 +66,8 @@ class AdminMasterSettingIndex extends Component
     public $background_login;
 
     public $is_mark;
+    
+    public $is_pmb;
 
     public $tax_id;
 
@@ -157,6 +159,7 @@ class AdminMasterSettingIndex extends Component
             'pic_email',
             'companyServices',
             'is_mark',
+            'is_pmb',
             'code_name',
             'region',
             'code_region',
@@ -204,6 +207,7 @@ class AdminMasterSettingIndex extends Component
                 'pic_phone',
                 'pic_email',
                 'is_mark',
+                'is_pmb',
                 'code_name',
                 'region',
                 'code_region',
@@ -247,6 +251,7 @@ class AdminMasterSettingIndex extends Component
                 $this->pic_phone = $company->pic_phone;
                 $this->pic_email = $company->pic_email;
                 $this->is_mark = $company->is_mark;
+                $this->is_pmb = $company->is_pmb;
                 $this->code_name = $company->code_name;
                 $this->region = $company->region;
                 $this->code_region = $company->code_region;
@@ -391,6 +396,7 @@ class AdminMasterSettingIndex extends Component
                 'pic_phone' => $this->pic_phone,
                 'pic_email' => $this->pic_email,
                 'is_mark' => $this->is_mark,
+                'is_pmb' => $this->is_pmb,
                 'code_name' => $this->code_name,
                 'region' => $this->region,
                 'code_region' => $this->code_region,

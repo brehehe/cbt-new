@@ -8,14 +8,14 @@
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div>
-                <button wire:click="openModal()"
+                <a href="{{ route('admin.master.timetable.create') }}"
                     class="{{ in_array(config('app.name_slug'), ['pro-cbt']) ? 'btn btn-warning' : 'btn btn-primary' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     Tambah Jadwal
-                </button>
+                </a>
             </div>
         </div>
     </div>
@@ -56,7 +56,7 @@
                 <thead class="bg-gray-100 text-gray-700">
                     <tr>
                         <th class="w-1 text-center px-3 py-2">No</th>
-                        <th class="px-3 py-2 text-left">Peserta</th>
+                        {{--<th class="px-3 py-2 text-left">Peserta</th>--}}
                         <th class="px-3 py-2 text-left">Nama</th>
                         <th class="px-3 py-2 text-left">Modul</th>
                         <th class="px-3 py-2 text-left">Ruang</th>
@@ -76,7 +76,7 @@
                             <td class="text-center px-3 py-2">
                                 {{ $timetables->firstItem() + $index }}
                             </td>
-                            <td class="px-3 py-2">{{ $timetable?->classmate->name ?? '-' }}</td>
+                            {{--<td class="px-3 py-2">{{ $timetable?->classmate->name ?? '-' }}</td>--}}
                             <td class="px-3 py-2">{{ $timetable?->name ?? '-' }}</td>
                             <td class="px-3 py-2">{{ $timetable?->module->name ?? '-' }}</td>
                             <td class="px-3 py-2">{{ $timetable?->examRoom?->name ?? '-' }}</td>

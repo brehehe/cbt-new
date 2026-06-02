@@ -521,8 +521,7 @@ class AdminMasterQuestionUpdate extends Component
 
         foreach ($this->new_images as $new_image) {
             $upload = $this->uploadFile($new_image, $folder);
-            // $upload[1] is the saved filename (e.g., xxx.webp)
-            $this->images[] = 'question/'.Carbon::now()->isoFormat('Y').'/'.Carbon::now()->isoFormat('MM').'/'.$upload[1];
+            $this->images[] = $upload[0];
         }
         $this->new_images = [];
     }
@@ -541,7 +540,7 @@ class AdminMasterQuestionUpdate extends Component
 
         foreach ($this->answer_new_images as $new_image) {
             $upload = $this->uploadFile($new_image, $folder);
-            $this->answer_images[] = 'answer/'.Carbon::now()->isoFormat('Y').'/'.Carbon::now()->isoFormat('MM').'/'.$upload[1];
+            $this->answer_images[] = $upload[0];
         }
         $this->answer_new_images = [];
     }

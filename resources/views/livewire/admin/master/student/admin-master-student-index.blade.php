@@ -18,14 +18,17 @@
                     </button>
                     <div x-show="openTemplate" x-transition
                         class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
-                        <button type="button" wire:click="downloadTemplate()"
-                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            Template Mahasiswa
-                        </button>
-                        <button type="button" wire:click="downloadTemplateGeneral()"
-                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            Template General
-                        </button>
+                        @if(auth()->user()->company->is_pmb ?? false)
+                            <button type="button" wire:click="downloadTemplateGeneral()"
+                                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                Template PMB
+                            </button>
+                        @else
+                            <button type="button" wire:click="downloadTemplate()"
+                                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                Template Mahasiswa
+                            </button>
+                        @endif
                     </div>
                 </div>
 
@@ -39,18 +42,21 @@
                     </button>
                     <div x-show="openImport" x-transition
                         class="absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
-                        <label
-                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer block">
-                            Import Mahasiswa
-                            <input type="file" wire:model="importFileMahasiswa" accept=".xlsx,.xls" wire:change="import"
-                                class="hidden" />
-                        </label>
-                        <label
-                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer block">
-                            Import General
-                            <input type="file" wire:model="importFileGeneral" accept=".xlsx,.xls"
-                                wire:change="importGeneral" class="hidden" />
-                        </label>
+                        @if(auth()->user()->company->is_pmb ?? false)
+                            <label
+                                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer block">
+                                Import PMB
+                                <input type="file" wire:model="importFileGeneral" accept=".xlsx,.xls"
+                                    wire:change="importGeneral" class="hidden" />
+                            </label>
+                        @else
+                            <label
+                                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer block">
+                                Import Mahasiswa
+                                <input type="file" wire:model="importFileMahasiswa" accept=".xlsx,.xls" wire:change="import"
+                                    class="hidden" />
+                            </label>
+                        @endif
                     </div>
                 </div>
 
@@ -107,11 +113,11 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tipe</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
                 <select wire:model.live="isStudentFilter" class="form-control mt-1">
-                    <option value="">Semua Tipe</option>
+                    <option value="">Semua Kategori</option>
                     <option value="mahasiswa">Mahasiswa</option>
-                    <option value="general">General</option>
+                    <option value="general">{{ (auth()->user()->company->is_pmb ?? false) ? 'PMB' : 'General' }}</option>
                 </select>
             </div>
         </div>
@@ -138,9 +144,9 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Status
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Tipe
-                        </th>
+                        {{--<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Kategori
+                        </th>--}}
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Aksi
                         </th>
@@ -218,21 +224,21 @@
                                     </span>
                                 @endif
                             </td>
-                            <td>
+                            {{--<td>
                                 @php
                                     $typeStudy = $admin->type_study;
                                     $isStudentColors =
                                         $typeStudy == 'mahasiswa'
                                         ? 'bg-green-100 text-green-800'
                                         : 'bg-blue-100 text-blue-800';
-                                    $isStudentLabels = $typeStudy == 'mahasiswa' ? 'Mahasiswa' : 'General';
+                                    $isStudentLabels = $typeStudy == 'mahasiswa' ? 'Mahasiswa' : ((auth()->user()->company->is_pmb ?? false) ? 'PMB' : 'General');
                                 @endphp
 
                                 <span
                                     class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $isStudentColors }}">
                                     {{ $isStudentLabels }}
                                 </span>
-                            </td>
+                            </td>--}}
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <button

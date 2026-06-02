@@ -184,7 +184,7 @@
                                     'icon' => 'fa-user-tie',
                                 ],
                                 [
-                                    'label' => 'Mahasiswa',
+                                    'label' => (auth()->user()->company->is_pmb ?? false) ? 'PMB' : 'Mahasiswa',
                                     'url' => '/admin/master/student',
                                     'pattern' => 'admin/master/student',
                                     'icon' => 'fa-user-graduate',

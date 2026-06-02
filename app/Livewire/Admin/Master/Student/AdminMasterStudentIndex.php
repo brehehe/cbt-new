@@ -179,6 +179,10 @@ class AdminMasterStudentIndex extends Component
 
     public function openModal()
     {
+        if (! $this->data_id) {
+            $company = auth()->user()->company;
+            $this->type_study = ($company && $company->is_pmb) ? 'general' : 'mahasiswa';
+        }
         $this->dispatch('open-modal', ['id' => 'modal']);
     }
 
@@ -1056,6 +1060,10 @@ class AdminMasterStudentIndex extends Component
 
         if ($this->isStudentFilter) {
             $user->where('type_study', $this->isStudentFilter);
+        } else {
+            $company = auth()->user()->company;
+            $defaultType = ($company && $company->is_pmb) ? 'general' : 'mahasiswa';
+            $user->where('type_study', $defaultType);
         }
 
         return $user;
