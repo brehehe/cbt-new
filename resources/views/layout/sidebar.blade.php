@@ -103,18 +103,9 @@
                     @endforeach
                 @endif
 
-                <!-- Divider: Master -->
-                @if (!Auth::user()->hasRole(['Mahasiswa']))
-                    <div>
-                        <div
-                            class="w-full group flex items-center justify-between custom-padding text-xs font-bold {{ $brandColor }} uppercase tracking-wide">
-                            Master
-                        </div>
-                    </div>
-                @endif
-
                 @php
                     $masters = [];
+                    $examSchedules = [];
 
                     if (auth()->check()) {
 
@@ -134,24 +125,6 @@
                                     'url' => '/admin/master/regulation',
                                     'pattern' => 'admin/master/regulation',
                                     'icon' => 'fa-scroll',
-                                ],
-                                [
-                                    'label' => 'Ruang Ujian',
-                                    'url' => route('admin.master.exam-room'),
-                                    'pattern' => ['admin/master/exam-room*'],
-                                    'icon' => 'fa-house',
-                                ],
-                                [
-                                    'label' => 'Sesi Ujian',
-                                    'url' => route('admin.master.exam-session'),
-                                    'pattern' => ['admin/master/exam-session*'],
-                                    'icon' => 'fa-clock',
-                                ],
-                                [
-                                    'label' => 'Jadwal',
-                                    'url' => '/admin/master/timetable',
-                                    'pattern' => 'admin/master/timetable*',
-                                    'icon' => 'fa-calendar',
                                 ],
                                 [
                                     'label' => 'Prodi',
@@ -184,7 +157,7 @@
                                     'icon' => 'fa-user-tie',
                                 ],
                                 [
-                                    'label' => (auth()->user()->company->is_pmb ?? false) ? 'PMB' : 'Mahasiswa',
+                                    'label' => auth()->user()->company->is_pmb === 'all' ? 'Mahasiswa / PMB' : (auth()->user()->company->is_pmb === 'pmb' ? 'PMB' : 'Mahasiswa'),
                                     'url' => '/admin/master/student',
                                     'pattern' => 'admin/master/student',
                                     'icon' => 'fa-user-graduate',
@@ -232,12 +205,6 @@
                                     'icon' => 'fa-database',
                                 ],
                                 [
-                                    'label' => 'Manajemen Sesi',
-                                    'url' => route('admin.session'),
-                                    'pattern' => ['admin/session', 'admin/session/*'],
-                                    'icon' => 'fa-users-gear',
-                                ],
-                                [
                                     'label' => 'Pengaturan',
                                     'url' => route('admin.master.setting'),
                                     'pattern' => ['admin/master/setting', 'admin/master/setting/*'],
@@ -248,6 +215,33 @@
                                     'url' => route('admin.security.log.index'),
                                     'pattern' => ['admin/master/security-log*'],
                                     'icon' => 'fa-shield-halved',
+                                ],
+                            ];
+
+                            $examSchedules = [
+                                [
+                                    'label' => 'Ruang Ujian',
+                                    'url' => route('admin.master.exam-room'),
+                                    'pattern' => ['admin/master/exam-room*'],
+                                    'icon' => 'fa-house',
+                                ],
+                                [
+                                    'label' => 'Sesi Ujian',
+                                    'url' => route('admin.master.exam-session'),
+                                    'pattern' => ['admin/master/exam-session*'],
+                                    'icon' => 'fa-clock',
+                                ],
+                                [
+                                    'label' => 'Manajemen Sesi',
+                                    'url' => route('admin.session'),
+                                    'pattern' => ['admin/session', 'admin/session/*'],
+                                    'icon' => 'fa-users-gear',
+                                ],
+                                [
+                                    'label' => 'Jadwal',
+                                    'url' => '/admin/master/timetable',
+                                    'pattern' => 'admin/master/timetable*',
+                                    'icon' => 'fa-calendar',
                                 ],
                             ];
 
@@ -323,6 +317,21 @@
                                     'icon' => 'fa-scroll',
                                 ],
                                 [
+                                    'label' => 'Prodi',
+                                    'url' => route('admin.master.study'),
+                                    'pattern' => 'admin/master/study',
+                                    'icon' => 'fa-building-columns',
+                                ],
+                                [
+                                    'label' => 'Peserta',
+                                    'url' => '/admin/master/classmate',
+                                    'pattern' => ['admin/master/classmate', 'admin/master/classmate/*'],
+                                    'icon' => 'fa-users',
+                                ],
+                            ];
+
+                            $examSchedules = [
+                                [
                                     'label' => 'Ruang Ujian',
                                     'url' => route('admin.master.exam-room'),
                                     'pattern' => ['admin/master/exam-room*'],
@@ -340,41 +349,64 @@
                                     'pattern' => 'admin/master/timetable*',
                                     'icon' => 'fa-calendar',
                                 ],
-                                [
-                                    'label' => 'Prodi',
-                                    'url' => route('admin.master.study'),
-                                    'pattern' => 'admin/master/study',
-                                    'icon' => 'fa-building-columns',
-                                ],
-                                [
-                                    'label' => 'Peserta',
-                                    'url' => '/admin/master/classmate',
-                                    'pattern' => ['admin/master/classmate', 'admin/master/classmate/*'],
-                                    'icon' => 'fa-users',
-                                ],
                             ];
                         }
 
                     }
                 @endphp
 
+                @if(count($examSchedules) > 0)
+                    <!-- Divider: Ujian & Jadwal -->
+                    <div class="mt-4">
+                        <div
+                            class="w-full group flex items-center justify-between custom-padding text-xs font-bold {{ $brandColor }} uppercase tracking-wide">
+                            Ujian & Jadwal
+                        </div>
+                    </div>
 
-                @foreach ($masters as $master)
-                            @php
-                                $active = Request::is($master['pattern']);
-                            @endphp
-                            <a href="{{ $master['url'] }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
-                                                                {{ $active
-                    ? "bg-[#C3D4EC]/50 $brandColor active-menu"
-                    : "text-gray-600 hover:bg-[#C3D4EC]/20 hover:$brandColor" }}">
-                                <div class="flex items-center gap-3">
-                                    <i
-                                        class="fa-solid {{ $master['icon'] }} text-lg mr-2
-                                                                    {{ $active ? $brandColor : 'text-gray-400 group-hover:' . $brandColor }}"></i>
-                                    <span class="sidebar-text">{{ $master['label'] }}</span>
-                                </div>
-                            </a>
-                @endforeach
+                    @foreach ($examSchedules as $examSchedule)
+                        @php
+                            $active = Request::is($examSchedule['pattern']);
+                        @endphp
+                        <a href="{{ $examSchedule['url'] }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
+                            {{ $active
+                                ? "bg-[#C3D4EC]/50 $brandColor active-menu"
+                                : "text-gray-600 hover:bg-[#C3D4EC]/20 hover:$brandColor" }}">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid {{ $examSchedule['icon'] }} text-lg mr-2
+                                    {{ $active ? $brandColor : 'text-gray-400 group-hover:' . $brandColor }}"></i>
+                                <span class="sidebar-text">{{ $examSchedule['label'] }}</span>
+                            </div>
+                        </a>
+                    @endforeach
+                @endif
+
+                @if(count($masters) > 0)
+                    <!-- Divider: Master -->
+                    <div>
+                        <div
+                            class="w-full group flex items-center justify-between custom-padding text-xs font-bold {{ $brandColor }} uppercase tracking-wide">
+                            Master
+                        </div>
+                    </div>
+
+                    @foreach ($masters as $master)
+                        @php
+                            $active = Request::is($master['pattern']);
+                        @endphp
+                        <a href="{{ $master['url'] }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
+                            {{ $active
+                                ? "bg-[#C3D4EC]/50 $brandColor active-menu"
+                                : "text-gray-600 hover:bg-[#C3D4EC]/20 hover:$brandColor" }}">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid {{ $master['icon'] }} text-lg mr-2
+                                    {{ $active ? $brandColor : 'text-gray-400 group-hover:' . $brandColor }}"></i>
+                                <span class="sidebar-text">{{ $master['label'] }}</span>
+                            </div>
+                        </a>
+                    @endforeach
+                @endif
+
 
                 <!-- Divider: Laporan -->
                 @if (!Auth::user()->hasRole(['Mahasiswa']))

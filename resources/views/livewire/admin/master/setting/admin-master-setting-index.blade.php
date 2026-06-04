@@ -374,13 +374,12 @@
                                 </label>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Penerimaan Mahasiswa Baru (PMB)</label>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" wire:model="is_pmb" class="sr-only peer">
-                                    <div
-                                        class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
-                                    </div>
-                                </label>
+                                <label class="block text-sm font-medium text-gray-700">Tipe Registrasi Peserta</label>
+                                <select wire:model="is_pmb" class="form-control mt-1">
+                                    <option value="non_pmb">Hanya Non-PMB (Mahasiswa)</option>
+                                    <option value="pmb">Hanya PMB</option>
+                                    <option value="all">Semua (Mahasiswa & PMB)</option>
+                                </select>
                             </div>
                         </div>
                     </div>

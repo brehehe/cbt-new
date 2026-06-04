@@ -22,31 +22,33 @@
 
         <!-- Body -->
         <div class="px-6 py-4 text-gray-600 overflow-auto" style="max-height: 600px;">
-            <div class="mb-4 hidden">
-                <label class="block text-sm font-medium text-gray-700">
-                    Tipe <span class="text-red-600">*</span>
-                </label>
+            @if(auth()->user()->company->is_pmb === 'all')
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Tipe <span class="text-red-600">*</span>
+                    </label>
 
 
-                <div class="mt-2 flex space-x-2">
-                    <button type="button" wire:click="$set('type_study', 'mahasiswa')"
-                        class="px-4 py-2 rounded-md border
-                            {{ $type_study === 'mahasiswa' ? 'bg-[color:var(--primary)] text-white border-[color:var(--primary)]' : 'bg-white text-gray-700 border-gray-300' }}">
-                        Kelas
-                    </button>
+                    <div class="mt-2 flex space-x-2">
+                        <button type="button" wire:click="$set('type_study', 'mahasiswa')"
+                            class="px-4 py-2 rounded-md border
+                                {{ $type_study === 'mahasiswa' ? 'bg-[color:var(--primary)] text-white border-[color:var(--primary)]' : 'bg-white text-gray-700 border-gray-300' }}">
+                            Kelas
+                        </button>
 
-                    <button type="button" wire:click="$set('type_study', 'general')"
-                        class="px-4 py-2 rounded-md border
-                            {{ $type_study === 'general' ? 'bg-[color:var(--primary)] text-white border-[color:var(--primary)]' : 'bg-white text-gray-700 border-gray-300' }}">
-                        General
-                    </button>
+                        <button type="button" wire:click="$set('type_study', 'general')"
+                            class="px-4 py-2 rounded-md border
+                                {{ $type_study === 'general' ? 'bg-[color:var(--primary)] text-white border-[color:var(--primary)]' : 'bg-white text-gray-700 border-gray-300' }}">
+                            PMB / General
+                        </button>
+                    </div>
+
+
+                    @error('type_study')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
-
-
-                @error('type_study')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                @enderror
-            </div>
+            @endif
 
             @if ($type_study === 'mahasiswa')
                 <div class="mb-6">

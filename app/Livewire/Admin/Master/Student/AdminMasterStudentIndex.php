@@ -181,7 +181,7 @@ class AdminMasterStudentIndex extends Component
     {
         if (! $this->data_id) {
             $company = auth()->user()->company;
-            $this->type_study = ($company && $company->is_pmb) ? 'general' : 'mahasiswa';
+            $this->type_study = ($company && $company->is_pmb === 'pmb') ? 'general' : 'mahasiswa';
         }
         $this->dispatch('open-modal', ['id' => 'modal']);
     }
@@ -1062,8 +1062,13 @@ class AdminMasterStudentIndex extends Component
             $user->where('type_study', $this->isStudentFilter);
         } else {
             $company = auth()->user()->company;
-            $defaultType = ($company && $company->is_pmb) ? 'general' : 'mahasiswa';
-            $user->where('type_study', $defaultType);
+            if ($company) {
+                if ($company->is_pmb === 'pmb') {
+                    $user->where('type_study', 'general');
+                } elseif ($company->is_pmb === 'non_pmb') {
+                    $user->where('type_study', 'mahasiswa');
+                }
+            }
         }
 
         return $user;

@@ -306,6 +306,7 @@ class AdminMasterSettingIndex extends Component
                 'background_login' => 'nullable|image|max:2048',
                 'color_primary' => 'required',
                 'color_secondary' => 'required',
+                'is_pmb' => 'required|in:non_pmb,pmb,all',
                 'quit_password_seb' => 'nullable|string|max:255',
                 'seb_use_encryption' => 'nullable|boolean',
                 'seb_encryption_key' => 'nullable|string|max:255',

@@ -18,15 +18,16 @@
                     </button>
                     <div x-show="openTemplate" x-transition
                         class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
-                        @if(auth()->user()->company->is_pmb ?? false)
-                            <button type="button" wire:click="downloadTemplateGeneral()"
-                                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                Template PMB
-                            </button>
-                        @else
+                        @if(in_array(auth()->user()->company->is_pmb, ['non_pmb', 'all']))
                             <button type="button" wire:click="downloadTemplate()"
                                 class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                 Template Mahasiswa
+                            </button>
+                        @endif
+                        @if(in_array(auth()->user()->company->is_pmb, ['pmb', 'all']))
+                            <button type="button" wire:click="downloadTemplateGeneral()"
+                                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                Template {{ auth()->user()->company->is_pmb === 'pmb' ? 'PMB' : 'PMB / General' }}
                             </button>
                         @endif
                     </div>
@@ -42,19 +43,20 @@
                     </button>
                     <div x-show="openImport" x-transition
                         class="absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
-                        @if(auth()->user()->company->is_pmb ?? false)
-                            <label
-                                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer block">
-                                Import PMB
-                                <input type="file" wire:model="importFileGeneral" accept=".xlsx,.xls"
-                                    wire:change="importGeneral" class="hidden" />
-                            </label>
-                        @else
+                        @if(in_array(auth()->user()->company->is_pmb, ['non_pmb', 'all']))
                             <label
                                 class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer block">
                                 Import Mahasiswa
                                 <input type="file" wire:model="importFileMahasiswa" accept=".xlsx,.xls" wire:change="import"
                                     class="hidden" />
+                            </label>
+                        @endif
+                        @if(in_array(auth()->user()->company->is_pmb, ['pmb', 'all']))
+                            <label
+                                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer block">
+                                Import {{ auth()->user()->company->is_pmb === 'pmb' ? 'PMB' : 'PMB / General' }}
+                                <input type="file" wire:model="importFileGeneral" accept=".xlsx,.xls"
+                                    wire:change="importGeneral" class="hidden" />
                             </label>
                         @endif
                     </div>
@@ -116,8 +118,12 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
                 <select wire:model.live="isStudentFilter" class="form-control mt-1">
                     <option value="">Semua Kategori</option>
-                    <option value="mahasiswa">Mahasiswa</option>
-                    <option value="general">{{ (auth()->user()->company->is_pmb ?? false) ? 'PMB' : 'General' }}</option>
+                    @if(in_array(auth()->user()->company->is_pmb, ['non_pmb', 'all']))
+                        <option value="mahasiswa">Mahasiswa</option>
+                    @endif
+                    @if(in_array(auth()->user()->company->is_pmb, ['pmb', 'all']))
+                        <option value="general">{{ auth()->user()->company->is_pmb === 'pmb' ? 'PMB' : 'PMB / General' }}</option>
+                    @endif
                 </select>
             </div>
         </div>

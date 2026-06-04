@@ -276,11 +276,9 @@ class AdminMasterTimetableCreate extends Component
         $allExcludeIds = array_values(array_unique(array_merge($excludeIds, $currentSelected)));
 
         $company = Auth::user()->company;
-        $defaultType = ($company && $company->is_pmb) ? 'general' : 'mahasiswa';
 
         $query = User::role(['Mahasiswa'])
-            ->where('company_id', $company->id)
-            ->where('type_study', $defaultType);
+            ->where('company_id', $company->id);
 
         if (count($allExcludeIds) > 0) {
             $query->whereNotIn('id', $allExcludeIds);
@@ -311,13 +309,11 @@ class AdminMasterTimetableCreate extends Component
     public function render()
     {
         $company = Auth::user()->company;
-        $defaultType = ($company && $company->is_pmb) ? 'general' : 'mahasiswa';
 
         $excludeIds = $this->getSelectedStudentsInOtherTabs($this->activeTab);
 
         $query = User::role(['Mahasiswa'])
-            ->where('company_id', $company->id)
-            ->where('type_study', $defaultType);
+            ->where('company_id', $company->id);
 
         if (count($excludeIds) > 0) {
             $query->whereNotIn('id', $excludeIds);
