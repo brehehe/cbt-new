@@ -88,10 +88,10 @@ class AdminMasterModuleQuestionIndex extends Component
     {
         $questionPickType = $this->question_pick_type ?? 'manual';
         $module_questions = collect();
-        $moduleQuestionIds = [];
 
         if ($this->get_module) {
             $moduleQuestionsQuery = $this->get_module->moduleQuestions()
+                ->with(['question.study', 'question.questionType'])
                 ->select('id', 'module_id', 'question_id', 'study_id');
 
             if ($questionPickType === 'manual') {
@@ -103,32 +103,59 @@ class AdminMasterModuleQuestionIndex extends Component
                 $moduleQuestionsQuery->where('question_pick_type', $questionPickType);
             }
 
-            $moduleQuestionIds = $moduleQuestionsQuery->pluck('question_id')->toArray();
             $module_questions = $moduleQuestionsQuery
                 ->orderBy('id', 'desc')
                 ->paginate($this->perPageModule, ['*'], 'module_questions_page');
         }
 
-        $questions = Question::select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect', 'study_id')
-            ->whereNotIn('id', $moduleQuestionIds)
-            ->whereIn('study_id', $this->get_studys ? array_keys($this->get_studys) : [])
-            ->search($this->search);
+        $questions = [];
+        if ($this->openQuestion) {
+            $moduleId = $this->get_module?->id;
+            $questionsQuery = Question::with(['topic', 'study'])
+                ->select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect', 'study_id')
+                ->whereIn('study_id', $this->get_studys ? array_keys($this->get_studys) : []);
 
-        if ($this->filterStudyId) {
-            $questions->where('study_id', $this->filterStudyId);
-        }
+            if ($moduleId) {
+                $questionsQuery->whereNotIn('id', function ($query) use ($moduleId, $questionPickType) {
+                    $query->select('question_id')
+                        ->from('module_questions')
+                        ->where('module_id', $moduleId)
+                        ->whereNull('deleted_at');
 
-        // if ($this->filterQuestionTypeId) {
-        //     $questions->where('question_type_id', $this->filterQuestionTypeId);
-        // }
+                    $user = Auth::user();
+                    if ($user && !$user->hasRole('Anonymous') && optional($user->company)->id) {
+                        $query->where('company_id', $user->company->id);
+                    }
 
-        if ($this->filterTopicId) {
-            $questions->where('topic_id', $this->filterTopicId);
+                    if ($questionPickType === 'manual') {
+                        $query->where(function ($q) {
+                            $q->whereNull('question_pick_type')
+                                ->orWhere('question_pick_type', 'manual');
+                        });
+                    } else {
+                        $query->where('question_pick_type', $questionPickType);
+                    }
+                });
+            }
+
+            if (!empty(trim($this->search))) {
+                $questionsQuery->search($this->search);
+            }
+
+            if ($this->filterStudyId) {
+                $questionsQuery->where('study_id', $this->filterStudyId);
+            }
+
+            if ($this->filterTopicId) {
+                $questionsQuery->where('topic_id', $this->filterTopicId);
+            }
+
+            $questions = $questionsQuery->orderBy('id', 'desc')->paginate($this->perPage);
         }
 
         return view('livewire.admin.master.module.admin-master-module-question-index', [
             'module_questions' => $module_questions,
-            'questions' => $this->openQuestion ? $questions->orderBy('id', 'desc')->paginate($this->perPage) : [],
+            'questions' => $questions,
         ])->extends('layout.app')->section('content');
     }
 
@@ -430,12 +457,13 @@ class AdminMasterModuleQuestionIndex extends Component
 
         try {
             DB::beginTransaction();
+            $questionIds = $this->selected_all ? array_keys($this->selected_all) : [];
             $request = [
                 'id' => $this->data_id,
                 'company_id' => Auth::user()?->company?->id,
                 'module_id' => $this->get_module?->id,
-                'question_id' => $this->selected_all ? array_keys($this->selected_all) : [],
-                'study_id' => Question::whereIn('id', $this->question_id)->pluck('study_id')->first()->id ?? null,
+                'question_id' => $questionIds,
+                'study_id' => Question::whereIn('id', $questionIds)->value('study_id'),
             ];
 
             app(ModuleQuestionService::class)->updateOrCreate($request);
