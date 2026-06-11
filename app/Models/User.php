@@ -276,4 +276,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(ClassmateStudent::class, 'user_id', 'id');
     }
+
+    public function classmateStudents()
+    {
+        return $this->hasMany(ClassmateStudent::class, 'user_id', 'id');
+    }
 }

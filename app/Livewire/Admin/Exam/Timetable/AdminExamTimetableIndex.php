@@ -350,8 +350,9 @@ class AdminExamTimetableIndex extends Component
 
         if ($auth->hasRole(['Mahasiswa'])) {
             // $timetables->where('study_id', $auth->study_id);
-            if ($auth->classmateStudent) {
-                $timetables->where('classmate_id', $auth->classmateStudent->classmate_id);
+            $classmateIds = $auth->classmateStudents()->pluck('classmate_id')->toArray();
+            if (! empty($classmateIds)) {
+                $timetables->whereIn('classmate_id', $classmateIds);
             } else {
                 $timetables->whereNull('classmate_id');
             }
