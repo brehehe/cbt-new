@@ -11,9 +11,9 @@ class BackupController extends Controller
 {
     public function download(Request $request)
     {
-        // Check if user is authenticated
-        if (! Auth::check()) {
-            abort(401, 'Unauthorized. Please login first.');
+        // Check if user is authenticated and is admin
+        if (! Auth::check() || ! Auth::user()->hasRole(['admin', 'superadmin', 'Admin', 'Super Admin'])) {
+            abort(403, 'Akses ditolak. Hanya administrator yang dapat mengunduh backup.');
         }
 
         try {

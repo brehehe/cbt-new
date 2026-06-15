@@ -157,9 +157,11 @@ Route::post('/stream/signaling/{sessionToken}', [LiveStreamController::class, 'h
 Route::post('/stream/update-peer-id', [LiveStreamController::class, 'updatePeerId'])
     ->name('api.stream.update-peer-id');
 
-// Real-time monitoring endpoints
+// Real-time monitoring endpoints (Protected)
 Route::get('/metrics/system', [RealTimeMetricsController::class, 'getSystemMetrics'])
-    ->name('api.metrics.system');
+    ->name('api.metrics.system')
+    ->middleware('auth');
 
 Route::get('/metrics/livestream', [RealTimeMetricsController::class, 'getLiveStreamMetrics'])
-    ->name('api.metrics.livestream');
+    ->name('api.metrics.livestream')
+    ->middleware('auth');

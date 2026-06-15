@@ -30,17 +30,26 @@ class RatingScale extends Model
         });
     }
 
+    private static $cachedScales = null;
+
     public static function getGrade($mark, $companyId = null)
     {
         if ($mark === null) {
             return null;
         }
 
-        // Boundary values (e.g. exactly 85) may match two adjacent grades.
-        // orderBy('order') ensures the higher grade (smaller order) wins.
-        return self::where('min_score', '<=', $mark)
-            ->where('max_score', '>=', $mark)
-            ->orderBy('order')
-            ->first();
+        if (self::$cachedScales === null) {
+            self::$cachedScales = self::orderBy('order')->get();
+        }
+
+        $targetCompanyId = $companyId ?? (auth()->check() ? auth()->user()->company_id : null);
+
+        return self::$cachedScales->first(function ($scale) use ($mark, $targetCompanyId) {
+            $companyMatch = true;
+            if ($targetCompanyId && $scale->company_id) {
+                $companyMatch = ($scale->company_id === $targetCompanyId);
+            }
+            return $companyMatch && $scale->min_score <= $mark && $scale->max_score >= $mark;
+        });
     }
 }

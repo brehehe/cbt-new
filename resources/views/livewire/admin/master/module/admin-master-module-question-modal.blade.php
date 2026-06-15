@@ -55,21 +55,20 @@
                         <table class="w-full table-auto divide-y divide-gray-200">
                             <thead class="bg-gray-50 sticky top-0 z-10">
                                 <tr>
-                                    <th
-                                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        No</th>
-                                    <th
-                                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Prodi</th>
-                                    <th
-                                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Pertanyaan</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">No</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prodi</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipe Ujian</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tingkat Kesulitan</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jenis Soal</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pertanyaan</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @forelse($questions->groupBy('topic.name') as $topicName => $topicQuestions)
                                     <tr class="bg-gray-50">
-                                        <td colspan="3"
+                                        <td colspan="8"
                                             class="px-4 py-2 text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                             <div class="flex items-center justify-between">
                                                 <span>Topik: {{ $topicName ?? 'Tanpa Topik' }}</span>
@@ -84,8 +83,31 @@
                                             <td class="px-4 py-3 text-sm text-gray-900">
                                                 {{ $questions->firstItem() + $loop->parent->index + $index }}
                                             </td>
-                                            <td class="px-4 py-3 text-sm text-gray-900">{{ $result?->study?->name }}</td>
+                                            <td class="px-4 py-3 text-sm text-gray-900">{{ $result?->study?->name ?? '-' }}</td>
+                                            <td class="px-4 py-3 text-sm text-gray-900">{{ $result?->categoryQuestion?->name ?? '-' }}</td>
+                                            <td class="px-4 py-3 text-sm text-gray-900">{{ $result?->questionType?->name ?? '-' }}</td>
+                                            <td class="px-4 py-3 text-sm text-gray-900">
+                                                @if($result->difficulty == 'easy')
+                                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Easy</span>
+                                                @elseif($result->difficulty == 'medium')
+                                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Medium</span>
+                                                @elseif($result->difficulty == 'hard')
+                                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Hard</span>
+                                                @else
+                                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Default</span>
+                                                @endif
+                                            </td>
+                                            <td class="px-4 py-3 text-sm text-gray-900">
+                                                @if(($result->type ?? 'single') == 'single')
+                                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">PG</span>
+                                                @elseif($result->type == 'multiple')
+                                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">Multiple</span>
+                                                @else
+                                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">Essay</span>
+                                                @endif
+                                            </td>
                                             <td class="px-4 py-3 text-sm text-gray-900">{!! $result?->question !!}</td>
+                                            <td class="px-4 py-3 text-sm text-gray-900 text-xs text-gray-500">{!! Str::limit(strip_tags($result?->description), 50) !!}</td>
                                         </tr>
                                     @endforeach
                                 @empty

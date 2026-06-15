@@ -16,7 +16,7 @@ NC='\033[0m'
 
 # Configuration
 INTERVAL=${1:-5}  # Default 5 seconds
-APP_DIR="/var/www/html/drshieldapp/ups.procbt.id"
+APP_DIR="/var/www/html/procbt_id"
 LOG_DIR="/var/log"
 
 echo -e "${BLUE}=====================================================${NC}"

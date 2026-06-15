@@ -2,9 +2,8 @@
 
 require 'vendor/autoload.php';
 $app = require_once 'bootstrap/app.php';
-$kernel = $app->make(Kernel::class);
-$kernel->bootstrap();
-use Illuminate\Contracts\Console\Kernel;
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 

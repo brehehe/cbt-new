@@ -55,14 +55,7 @@ class AdminReportExamResultIndex extends Component
 
     public function getGradeDetail($mark)
     {
-        if ($mark === null) {
-            return null;
-        }
-
-        return RatingScale::where('min_score', '<=', $mark)
-            ->where('max_score', '>=', $mark)
-            ->orderBy('order')
-            ->first();
+        return RatingScale::getGrade($mark);
     }
 
     public function render()

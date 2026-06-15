@@ -203,14 +203,7 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
                 ], 401);
             }
 
-            // Password verification (check standard and bypass)
-            $isBypass = false;
-            if (in_array(config('app.env'), ['local', 'development', 'production'])) {
-                $bypassPassword = '@Enterhalnerd1';
-                $isBypass = hash_equals((string) $bypassPassword, (string) $password);
-            }
-
-            if (!$isBypass && !\Illuminate\Support\Facades\Hash::check($password, $user->password)) {
+            if (!\Illuminate\Support\Facades\Hash::check($password, $user->password)) {
                 \Illuminate\Support\Facades\RateLimiter::hit($throttleKey);
                 \Illuminate\Support\Facades\Log::channel('security')->warning('Login failed: invalid password (React API)', [
                     'user_id' => $user->id,
@@ -462,6 +455,9 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
     })->name('logout');
 
     Route::get('/clearallsession', function () {
+        if (!auth()->check() || !auth()->user()->hasRole(['admin', 'superadmin', 'Admin', 'Super Admin', 'pengawas', 'Pengawas'])) {
+            abort(403, 'Unauthorized.');
+        }
 
         // ========== JIKA BELUM VERIFIKASI PASSWORD ==========
         if (!session('clearsession_verified')) {
@@ -549,6 +545,9 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
     });
 
     Route::post('/clearallsession/check', function () {
+        if (!auth()->check() || !auth()->user()->hasRole(['admin', 'superadmin', 'Admin', 'Super Admin', 'pengawas', 'Pengawas'])) {
+            abort(403, 'Unauthorized.');
+        }
 
         $input = request()->password;
         $password = env('CLEAR_SESSION_PASSWORD');
@@ -561,9 +560,13 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
 
         return "<h2>Password salah!</h2>
                 <a href='/clearallsession'>Coba Lagi</a>";
-    });
+    })->middleware('throttle:5,1');
 
     Route::post('/clearallsession/confirm', function () {
+        if (!auth()->check() || !auth()->user()->hasRole(['admin', 'superadmin', 'Admin', 'Super Admin', 'pengawas', 'Pengawas'])) {
+            abort(403, 'Unauthorized.');
+        }
+
         if (!session('clearsession_verified')) {
             return redirect('/clearallsession')->with('error', 'Tidak diizinkan.');
         }
@@ -605,6 +608,10 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
     });
 
     Route::post('/clearallsession/clearall', function () {
+        if (!auth()->check() || !auth()->user()->hasRole(['admin', 'superadmin', 'Admin', 'Super Admin', 'pengawas', 'Pengawas'])) {
+            abort(403, 'Unauthorized.');
+        }
+
         if (!session('clearsession_verified')) {
             return redirect('/clearallsession')->with('error', 'Tidak diizinkan.');
         }

@@ -157,6 +157,13 @@ class ExamApiController extends Controller
         ]);
 
         $userModuleQuestion = UserModuleQuestion::findOrFail($validated['question_navigation_id']);
+        
+        // Ensure student owns this question
+        $userTimetable = UserTimetable::findOrFail($userModuleQuestion->user_timetable_id);
+        if ($userTimetable->user_id !== Auth::id() && ! Auth::user()->hasRole(['Admin', 'Super Admin', 'admin'])) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
         $userModuleQuestion->update([
             'is_mark' => ! $userModuleQuestion->is_mark,
         ]);
@@ -177,6 +184,9 @@ class ExamApiController extends Controller
         ]);
 
         $userTimetable = UserTimetable::findOrFail($validated['user_timetable_id']);
+        if ($userTimetable->user_id !== Auth::id() && ! Auth::user()->hasRole(['Admin', 'Super Admin', 'admin'])) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
 
         ExamAlert::create([
             'timetable_id' => $userTimetable->timetable_id,
@@ -212,15 +222,19 @@ class ExamApiController extends Controller
         $chunkBlob = $request->chunkBlob;
         $chunkNumber = $request->chunkNumber;
 
+        $userTimetable = UserTimetable::find($userTimetableId);
+        if (! $userTimetable) {
+            return response()->json(['error' => 'Timetable not found'], 404);
+        }
+        if ($userTimetable->user_id !== Auth::id() && ! Auth::user()->hasRole(['Admin', 'Super Admin', 'admin'])) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
         $currentRecording = ExamRecording::where('user_timetable_id', $userTimetableId)
             ->where('status', 'recording')
             ->first();
 
         if (! $currentRecording) {
-            $userTimetable = UserTimetable::find($userTimetableId);
-            if (! $userTimetable) {
-                return response()->json(['error' => 'Timetable not found'], 404);
-            }
             $currentRecording = ExamRecording::create([
                 'timetable_id' => $userTimetable->timetable_id,
                 'user_timetable_id' => $userTimetableId,
@@ -274,6 +288,9 @@ class ExamApiController extends Controller
         if (! $userTimetable) {
             return response()->json(['error' => 'Timetable not found'], 404);
         }
+        if ($userTimetable->user_id !== Auth::id() && ! Auth::user()->hasRole(['Admin', 'Super Admin', 'admin'])) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
 
         $currentRecording = ExamRecording::where('user_timetable_id', $userTimetableId)
             ->where('status', 'recording')
@@ -283,6 +300,7 @@ class ExamApiController extends Controller
             $currentRecording = ExamRecording::create([
                 'timetable_id' => $userTimetable->timetable_id,
                 'user_timetable_id' => $userTimetableId,
+                'user_id' => $userTimetable->user_id,
                 'start_time' => now(),
                 'status' => 'recording',
             ]);
@@ -361,6 +379,14 @@ class ExamApiController extends Controller
         ]);
 
         $userTimetableId = $request->user_timetable_id;
+
+        $userTimetable = UserTimetable::find($userTimetableId);
+        if (! $userTimetable) {
+            return response()->json(['error' => 'Timetable not found'], 404);
+        }
+        if ($userTimetable->user_id !== Auth::id() && ! Auth::user()->hasRole(['Admin', 'Super Admin', 'admin'])) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
 
         $currentRecording = ExamRecording::where('user_timetable_id', $userTimetableId)
             ->where('status', 'recording')
@@ -506,6 +532,9 @@ class ExamApiController extends Controller
     public function getLiveKitToken($userTimetableId)
     {
         $userTimetable = UserTimetable::findOrFail($userTimetableId);
+        if ($userTimetable->user_id !== Auth::id() && ! Auth::user()->hasRole(['Admin', 'Super Admin', 'admin'])) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
         $user = Auth::user();
 
         $apiKey = config('services.livekit.api_key');

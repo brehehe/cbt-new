@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Master\Module;
 
 use App\Helpers\AlertHelper;
+use App\Jobs\Module\SaveManualModuleQuestionsJob;
 use App\Models\Category\CategoryQuestion;
 use App\Models\Master\Question\Module;
 use App\Models\Master\Question\ModuleQuestion;
@@ -12,10 +13,12 @@ use App\Models\Master\Question\Topic;
 use App\Models\Study\Study;
 use App\Services\Module\ModuleQuestionService;
 use App\Services\Module\ModuleService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -111,8 +114,8 @@ class AdminMasterModuleQuestionIndex extends Component
         $questions = [];
         if ($this->openQuestion) {
             $moduleId = $this->get_module?->id;
-            $questionsQuery = Question::with(['topic', 'study'])
-                ->select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect', 'study_id')
+            $questionsQuery = Question::with(['topic', 'study', 'categoryQuestion', 'questionType'])
+                ->select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect', 'study_id', 'difficulty', 'category_question_id', 'type')
                 ->whereIn('study_id', $this->get_studys ? array_keys($this->get_studys) : []);
 
             if ($moduleId) {
@@ -123,7 +126,7 @@ class AdminMasterModuleQuestionIndex extends Component
                         ->whereNull('deleted_at');
 
                     $user = Auth::user();
-                    if ($user && !$user->hasRole('Anonymous') && optional($user->company)->id) {
+                    if ($user && ! $user->hasRole('Anonymous') && optional($user->company)->id) {
                         $query->where('company_id', $user->company->id);
                     }
 
@@ -138,7 +141,7 @@ class AdminMasterModuleQuestionIndex extends Component
                 });
             }
 
-            if (!empty(trim($this->search))) {
+            if (! empty(trim($this->search))) {
                 $questionsQuery->search($this->search);
             }
 
@@ -456,24 +459,19 @@ class AdminMasterModuleQuestionIndex extends Component
         }
 
         try {
-            DB::beginTransaction();
             $questionIds = $this->selected_all ? array_keys($this->selected_all) : [];
-            $request = [
-                'id' => $this->data_id,
-                'company_id' => Auth::user()?->company?->id,
-                'module_id' => $this->get_module?->id,
-                'question_id' => $questionIds,
-                'study_id' => Question::whereIn('id', $questionIds)->value('study_id'),
-            ];
 
-            app(ModuleQuestionService::class)->updateOrCreate($request);
+            // Dispatch background job using supervisor to avoid timeout and N+1 query errors
+            SaveManualModuleQuestionsJob::dispatch(
+                $this->get_module?->id,
+                $questionIds,
+                Auth::user()?->company?->id
+            );
 
-            DB::commit();
             $this->closeModal();
 
-            return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
+            return AlertHelper::success('Berhasil', 'Penyimpanan soal sedang diproses di background. Mohon tunggu beberapa saat.');
         } catch (Exception|Throwable $th) {
-            DB::rollBack();
             $error = [
                 'message' => $th->getMessage(),
                 'file' => $th->getFile(),
@@ -483,6 +481,37 @@ class AdminMasterModuleQuestionIndex extends Component
 
             return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
         }
+    }
+
+    public function exportPdf()
+    {
+        if (! $this->get_module) {
+            return AlertHelper::error('Gagal', 'Modul tidak ditemukan.');
+        }
+
+        // Get all module questions with their question, study, topic, category, answers
+        $moduleQuestions = $this->get_module->moduleQuestions()
+            ->with(['question.study', 'question.topic', 'question.categoryQuestion', 'question.answers'])
+            ->get();
+
+        $questions = $moduleQuestions->map(fn ($mq) => $mq->question)->filter();
+
+        if ($questions->isEmpty()) {
+            return AlertHelper::error('Gagal', 'Tidak ada soal dalam modul ini untuk di-export.');
+        }
+
+        $company = Auth::user()->company;
+
+        $pdf = Pdf::loadView('livewire.admin.master.module.admin-master-module-question-pdf', [
+            'module' => $this->get_module,
+            'questions' => $questions,
+            'company' => $company,
+        ])->setPaper('a4', 'portrait');
+
+        return response()->streamDownload(
+            fn () => print ($pdf->output()),
+            'modul-soal-'.Str::slug($this->get_module->name).'-'.date('Y-m-d-H-i-s').'.pdf'
+        );
     }
 
     public function confirmDelete($id)

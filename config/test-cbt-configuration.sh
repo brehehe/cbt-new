@@ -14,7 +14,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # Configuration
-APP_DIR="/var/www/html/drshieldapp/ups.procbt.id"
+APP_DIR="/var/www/html/procbt_id"
 TEST_SIZE_MB=50  # Test with 50MB file first
 PHP_VERSION="8.3"
 
@@ -60,7 +60,7 @@ test_nginx_configuration() {
     echo -e "${YELLOW}Testing Nginx Configuration...${NC}"
 
     # Test nginx configuration syntax
-    if nginx -t 2>/dev/null; then
+    if sudo nginx -t 2>/dev/null; then
         echo -e "  ${GREEN}✓ Nginx configuration syntax is valid${NC}"
     else
         echo -e "  ${RED}✗ Nginx configuration has syntax errors${NC}"
@@ -75,8 +75,23 @@ test_nginx_configuration() {
         return 1
     fi
 
-    # Check client_max_body_size
-    CLIENT_MAX=$(nginx -T 2>&1 | grep -o 'client_max_body_size [^;]*' | head -1 | awk '{print $2}')
+    # Check client_max_body_size (find the largest one in the configuration)
+    CLIENT_MAX=$(sudo nginx -T 2>&1 | grep -o 'client_max_body_size [^;]*' | awk '{print $2}' | tr 'a-z' 'A-Z' | while read -r line; do
+        if [[ "$line" =~ ([0-9]+)G ]]; then
+            echo "$(( ${BASH_REMATCH[1]} * 1024 ))M"
+        elif [[ "$line" =~ ([0-9]+)M ]]; then
+            echo "$line"
+        elif [[ "$line" =~ ([0-9]+)K ]]; then
+            echo "$(( ${BASH_REMATCH[1]} / 1024 ))M"
+        elif [[ "$line" =~ ^[0-9]+$ ]]; then
+            echo "$(( line / 1024 / 1024 ))M"
+        fi
+    done | sort -rn | head -1)
+
+    if [[ -z "$CLIENT_MAX" ]]; then
+        CLIENT_MAX="1M"
+    fi
+
     echo -e "  Client max body size: ${CLIENT_MAX}"
 
     if [[ "$CLIENT_MAX" =~ [0-9]+M ]] && [[ ${CLIENT_MAX%M} -ge 1500 ]]; then
@@ -120,10 +135,10 @@ test_directory_permissions() {
 
     # Check if directories exist and are writable
     directories=(
-        "$APP_DIR/storage/tmp"
-        "$APP_DIR/storage/app/recordings"
-        "/var/log/php"
-        "/var/cache/nginx"
+        "$APP_DIR/storage"
+        "$APP_DIR/storage/app/public"
+        "$APP_DIR/storage/framework"
+        "$APP_DIR/storage/logs"
     )
 
     for dir in "${directories[@]}"; do
@@ -184,29 +199,24 @@ test_upload_via_curl() {
         return 1
     fi
 
-    # Test upload to a test endpoint (you may need to create this)
-    TEST_URL="https://ups.procbt.id/api/test-upload"
+    # Test web server accessibility
+    TEST_URL="https://procbt.id"
+    echo -e "  Testing web server connectivity: $TEST_URL"
+    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$TEST_URL" 2>/dev/null || echo "000")
+    if [[ "$HTTP_CODE" == "200" || "$HTTP_CODE" == "302" ]]; then
+        echo -e "  ${GREEN}✓ Web server is reachable (HTTP $HTTP_CODE)${NC}"
+    else
+        echo -e "  ${RED}✗ Web server returned HTTP $HTTP_CODE${NC}"
+        return 1
+    fi
 
-    echo -e "  Testing upload to: $TEST_URL"
-
-    # Use curl to test upload
-    CURL_OUTPUT=$(curl -s -w "%{http_code}:%{time_total}:%{size_upload}" \
-        -X POST \
-        -F "file=@$TEST_FILE" \
-        "$TEST_URL" 2>/dev/null || echo "000:0:0")
-
-    HTTP_CODE=$(echo "$CURL_OUTPUT" | cut -d':' -f1)
-    TIME_TOTAL=$(echo "$CURL_OUTPUT" | cut -d':' -f2)
-    SIZE_UPLOAD=$(echo "$CURL_OUTPUT" | cut -d':' -f3)
-
-    if [[ "$HTTP_CODE" == "200" ]]; then
-        echo -e "  ${GREEN}✓ Upload successful (${TIME_TOTAL}s, ${SIZE_UPLOAD} bytes)${NC}"
-        return 0
-    elif [[ "$HTTP_CODE" == "404" ]]; then
-        echo -e "  ${YELLOW}! Test endpoint not available (normal for this test)${NC}"
+    # Test Laravel storage upload via CLI script
+    echo -e "  Testing Laravel Storage write via CLI..."
+    if php test_upload2.php > /dev/null 2>&1; then
+        echo -e "  ${GREEN}✓ Laravel storage upload test passed${NC}"
         return 0
     else
-        echo -e "  ${RED}✗ Upload failed (HTTP $HTTP_CODE)${NC}"
+        echo -e "  ${RED}✗ Laravel storage upload test failed${NC}"
         return 1
     fi
 }
