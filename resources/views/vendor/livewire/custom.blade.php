@@ -39,9 +39,8 @@
         @if (is_array($element))
             @foreach ($element as $page => $url)
                 @if ($page == $paginator->currentPage())
-                    <span
-                        class="relative inline-flex items-center px-3 py-2 border text-white text-sm font-medium"
-                        style="background-color: {{ $companyData->color_primary }}; border-color: {{ $companyData->color_primary }};">
+                    <span class="relative inline-flex items-center px-3 py-2 border text-white text-sm font-medium"
+                        style="background-color: {{ $companyData->color_primary ?? '#f58634' }}; border-color: {{ $companyData->color_primary ?? '#f58634' }};">
                         {{ $page }}
                     </span>
                 @else
