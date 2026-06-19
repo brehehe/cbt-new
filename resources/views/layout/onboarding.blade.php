@@ -15,11 +15,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Onboarding - PRO-CBT</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="{{ asset('fonts/plus-jakarta-sans.css') }}" rel="stylesheet">
 
     <link rel="icon" type="image/png" href="{{asset('storage/' . $company->logo_potrait)}}" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('vendor/font-awesome/css/all.min.css') }}">
     
     <style>
         :root {
@@ -60,7 +59,7 @@
     </div>
 
     @livewireScripts
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
     @stack('scripts')
 </body>
 

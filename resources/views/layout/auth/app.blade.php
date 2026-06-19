@@ -6,9 +6,9 @@
     <title>{{ config('app.name') }} - Admin Login</title>
 
     <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css" />
-    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/all.css">
+    <link href="{{ asset('fonts/inter.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('vendor/tabler-icons/tabler-icons-v3.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('vendor/font-awesome/css/all.min.css') }}">
 
 
     <!-- App -->
@@ -23,7 +23,7 @@
 
     @stack('scripts')
     @livewireScripts
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
 </body>
 
 </html>

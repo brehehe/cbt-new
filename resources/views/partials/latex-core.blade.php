@@ -1,7 +1,7 @@
 <!-- KaTeX CSS and JS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="{{ asset('vendor/katex/katex.min.css') }}">
+<script src="{{ asset('vendor/katex/katex.min.js') }}"></script>
+<script src="{{ asset('vendor/katex/contrib/auto-render.min.js') }}"></script>
 
 <script>
     /**

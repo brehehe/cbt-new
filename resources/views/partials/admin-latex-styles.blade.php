@@ -1,5 +1,5 @@
 <!-- KaTeX Stylesheet -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<link rel="stylesheet" href="{{ asset('vendor/katex/katex.min.css') }}">
 <style>
     /* Custom LaTeX helper styles */
     .latex-inline-math {

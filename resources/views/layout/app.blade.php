@@ -15,27 +15,23 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>PRO-CBT</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="{{ asset('fonts/plus-jakarta-sans.css') }}" rel="stylesheet">
 
 
     <link rel="icon" type="image/png" href="{{asset('storage/' . $company->logo_potrait)}}" />
     <!-- Add Selectize CSS -->
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap5.min.css"
-        integrity="sha512-Ars0BmSwpsUJnWMw+KoUKGKunT7+T8NGK0ORRKj+HT8naZzLSIQoOSIIM3oyaJljgLxFi0xImI5oZkAWEFARSA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="{{ asset('vendor/selectize/css/selectize.bootstrap5.min.css') }}">
     {{--
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
         integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" /> --}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('vendor/flatpickr/flatpickr.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/font-awesome/css/all.min.css') }}">
     <!-- Summernote Lite CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
+    <link href="{{ asset('vendor/summernote/summernote-lite.min.css') }}" rel="stylesheet">
 
     {{-- file pond --}}
-    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet" />
-    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css"
+    <link href="{{ asset('vendor/filepond/filepond.css') }}" rel="stylesheet" />
+    <link href="{{ asset('vendor/filepond-plugin-image-preview/filepond-plugin-image-preview.css') }}"
         rel="stylesheet" />
     <style>
         .shadow-top {
@@ -200,21 +196,19 @@
 
     @filepondScripts
     @livewireScripts
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
     <!-- Add jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ asset('vendor/jquery/jquery-3.6.0.min.js') }}"></script>
 
     <!-- Add Selectize JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js"
-        integrity="sha512-IOebNkvA/HZjMM7MxL0NYeLYEalloZ8ckak+NDtOViP7oiYzG5vn6WVXyrJDiJPhl4yRdmNAG49iuLmhkUdVsQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="{{ asset('vendor/selectize/js/selectize.min.js') }}"></script>
+    <script src="{{ asset('vendor/flatpickr/flatpickr.min.js') }}"></script>
     <!-- Summernote Lite JS -->
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
+    <script src="{{ asset('vendor/summernote/summernote-lite.min.js') }}"></script>
 
     <!-- file pond -->
-    <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
-    <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+    <script src="{{ asset('vendor/filepond-plugin-image-preview/filepond-plugin-image-preview.js') }}"></script>
+    <script src="{{ asset('vendor/filepond/filepond.js') }}"></script>
     <script>
         // Register the plugin
         FilePond.registerPlugin(FilePondPluginImagePreview);

@@ -11,7 +11,7 @@
         ></div>
 
         @push('scripts')
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script src="{{ asset('vendor/chartjs/chart.umd.js') }}"></script>
             @vite(['resources/js/dashboard-react.jsx'])
         @endpush
     @endif

@@ -425,7 +425,7 @@
 </div>
 
 @push('scripts')
-<script src="https://unpkg.com/peerjs@1.5.0/dist/peerjs.min.js"></script>
+<script src="{{ asset('vendor/peerjs/peerjs.min.js') }}"></script>
 <script>
         let peer=null, localStream=null, activeSessions=[], isConnecting=false;
         const PEER_CONFIG = {

@@ -529,7 +529,7 @@
 
 @push('scripts')
     <!-- Include PeerJS for student side -->
-    <script src="https://unpkg.com/peerjs@1.5.0/dist/peerjs.min.js"></script>
+    <script src="{{ asset('vendor/peerjs/peerjs.min.js') }}"></script>
 
     <!-- Test PeerJS loading -->
     <script>

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Video Recording Debug Test</title>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="{{ asset('vendor/axios/axios.min.js') }}"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         .test-section { border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 5px; }

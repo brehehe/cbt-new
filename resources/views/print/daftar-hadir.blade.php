@@ -167,7 +167,7 @@
             </div>
         </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+        <script src="{{ asset('vendor/qrcodejs/qrcode.min.js') }}"></script>
         <script>
             new QRCode(document.getElementById("qrcode"), {
                 // text: "9640007-20240603-04-1",

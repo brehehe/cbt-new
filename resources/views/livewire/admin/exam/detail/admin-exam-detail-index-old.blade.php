@@ -418,7 +418,7 @@
 
 @push('scripts')
     <!-- Include PeerJS for student side -->
-    <script src="https://unpkg.com/peerjs@1.5.0/dist/peerjs.min.js"></script>
+    <script src="{{ asset('vendor/peerjs/peerjs.min.js') }}"></script>
 
     <!-- Test PeerJS loading -->
     <script>
@@ -1072,18 +1072,18 @@
                 // 1️⃣ Load socket.io (ESM)
                 const {
                     io
-                } = await import('https://cdn.socket.io/4.7.5/socket.io.esm.min.js');
+                } = await import('/vendor/socket.io/socket.io.esm.min.js');
 
                 // 2️⃣ Load mediasoup-client (fallback otomatis)
                 try {
                     msc = await import('/js/mediasoup-client.bundle.js');
                 } catch {
                     try {
-                        console.log('⚠️ Local mediasoup-client not found, using unpkg...');
-                        msc = await import('https://unpkg.com/mediasoup-client@3.7.8/lib/index.mjs');
+                        console.log('⚠️ Local mediasoup-client not found, using local fallback...');
+                        msc = await import('/vendor/mediasoup-client/mediasoup-client.mjs');
                     } catch {
-                        console.log('⚠️ unpkg failed, using skypack...');
-                        msc = await import('https://cdn.skypack.dev/mediasoup-client@3.7.8');
+                        console.log('⚠️ Local fallback failed, using local skypack fallback...');
+                        msc = await import('/vendor/mediasoup-client/mediasoup-client-skypack.js');
                     }
                 }
 

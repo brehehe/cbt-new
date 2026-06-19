@@ -14,10 +14,10 @@
     <link rel="manifest"
         href="{{ $setting?->favicon_site_webmanifest && Storage::disk('public')->exists($setting?->favicon_site_webmanifest) ? asset('storage/' . $setting?->favicon_site_webmanifest) : asset('assets/favicon/site.webmanifest') }}">
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+    <link href="{{ asset('fonts/inter.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('vendor/tabler-icons/tabler-icons-v2.min.css') }}">
 
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
+    <link href="{{ asset('vendor/remixicon/remixicon.css') }}" rel="stylesheet" />
     <tallstackui:script />
     @livewireStyles
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -90,7 +90,7 @@
     @stack('scripts')
     @filepondScripts
 
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
     <script src="{{ asset('vendor/livewire-alert/livewire-alert.js') }}"></script>
 
     {{-- <x-livewire-alert::scripts />
