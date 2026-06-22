@@ -40,6 +40,12 @@ class ModuleService
             'topic_question_settings'
         );
 
+        $materialCategoryQuestionSettings = $this->resolveSettings(
+            $request,
+            $existing,
+            'material_category_question_settings'
+        );
+
         $material = Module::updateOrCreate(
             [
                 'id' => $request['id'] ?? null,
@@ -54,9 +60,11 @@ class ModuleService
                 'description' => $request['description'] ?? null,
                 'studys' => json_encode($request['studys']) ?? json_encode([]),
                 'is_all_study' => $request['is_all_study'] ?? false,
+                'is_all_questions' => $request['is_all_questions'] ?? false,
                 'question_pick_type' => $questionPickType,
                 'category_question_settings' => $categoryQuestionSettings,
                 'topic_question_settings' => $topicQuestionSettings,
+                'material_category_question_settings' => $materialCategoryQuestionSettings,
             ]
         );
 
@@ -64,19 +72,94 @@ class ModuleService
             $this->syncModuleQuestionsByCategory($material, $categoryQuestionSettings, $request['company_id'] ?? null);
         } elseif ($questionPickType === 'topic') {
             $this->syncModuleQuestionsByTopic($material, $topicQuestionSettings, $request['company_id'] ?? null);
+        } elseif ($questionPickType === 'material_category') {
+            $this->syncModuleQuestionsByMaterialCategory($material, $materialCategoryQuestionSettings, $request['company_id'] ?? null);
         }
 
         return $material;
     }
 
-    private function syncModuleQuestionsByCategory(Module $module, array $categoryQuestionSettings, ?string $companyId): void
+    private function syncModuleQuestionsByMaterialCategory(Module $module, array $materialCategoryQuestionSettings, ?string $companyId): void
     {
-        $enabledCategoryIds = array_keys($categoryQuestionSettings);
         $now = Carbon::now();
 
-        $targetQuestions = Question::withoutGlobalScope('user_scope')
-            ->whereIn('category_question_id', $enabledCategoryIds)
-            ->get(['id', 'study_id']);
+        $query = Question::withoutGlobalScope('user_scope');
+        if ($module->is_all_questions) {
+            $query->where('company_id', $companyId)
+                ->where('question_type_id', $module->question_type_id)
+                ->whereNotNull('material_category_id');
+        } else {
+            $enabledMaterialCategoryIds = array_keys($materialCategoryQuestionSettings);
+            $query->whereIn('material_category_id', $enabledMaterialCategoryIds);
+        }
+
+        $targetQuestions = $query->get(['id', 'study_id']);
+
+        $targetQuestionIds = $targetQuestions->pluck('id')->toArray();
+
+        DB::transaction(function () use ($module, $targetQuestionIds, $targetQuestions, $companyId, $now) {
+            // Get existing questions in this module for this pick type
+            $existingModuleQuestions = ModuleQuestion::withoutGlobalScope('user_scope')
+                ->where('module_id', $module->id)
+                ->where('question_pick_type', 'material_category')
+                ->get(['id', 'question_id']);
+
+            $existingQuestionIds = $existingModuleQuestions->pluck('question_id')->toArray();
+
+            // 1. Identify questions to remove
+            $toRemoveIds = array_diff($existingQuestionIds, $targetQuestionIds);
+            if (! empty($toRemoveIds)) {
+                ModuleQuestion::withoutGlobalScope('user_scope')
+                    ->where('module_id', $module->id)
+                    ->whereIn('question_id', $toRemoveIds)
+                    ->where('question_pick_type', 'material_category')
+                    ->forceDelete();
+            }
+
+            // 2. Identify questions to add
+            $toAddQuestionIds = array_diff($targetQuestionIds, $existingQuestionIds);
+            if (! empty($toAddQuestionIds)) {
+                $lastOrder = ModuleQuestion::withoutGlobalScope('user_scope')->max('order') ?? 0;
+                $newRecords = [];
+                $targetQuestionsMap = $targetQuestions->keyBy('id');
+
+                foreach ($toAddQuestionIds as $qId) {
+                    $questionData = $targetQuestionsMap->get($qId);
+                    $newRecords[] = [
+                        'id' => (string) Str::uuid(),
+                        'module_id' => $module->id,
+                        'question_id' => $qId,
+                        'company_id' => $companyId,
+                        'study_id' => $questionData->study_id,
+                        'question_pick_type' => 'material_category',
+                        'order' => ++$lastOrder,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+
+                foreach (array_chunk($newRecords, 200) as $chunk) {
+                    ModuleQuestion::insert($chunk);
+                }
+            }
+        });
+    }
+
+    private function syncModuleQuestionsByCategory(Module $module, array $categoryQuestionSettings, ?string $companyId): void
+    {
+        $now = Carbon::now();
+
+        $query = Question::withoutGlobalScope('user_scope');
+        if ($module->is_all_questions) {
+            $query->where('company_id', $companyId)
+                ->where('question_type_id', $module->question_type_id)
+                ->whereNotNull('category_question_id');
+        } else {
+            $enabledCategoryIds = array_keys($categoryQuestionSettings);
+            $query->whereIn('category_question_id', $enabledCategoryIds);
+        }
+
+        $targetQuestions = $query->get(['id', 'study_id']);
 
         $targetQuestionIds = $targetQuestions->pluck('id')->toArray();
 
@@ -130,12 +213,19 @@ class ModuleService
 
     private function syncModuleQuestionsByTopic(Module $module, array $topicQuestionSettings, ?string $companyId): void
     {
-        $enabledTopicIds = array_keys($topicQuestionSettings);
         $now = Carbon::now();
 
-        $targetQuestions = Question::withoutGlobalScope('user_scope')
-            ->whereIn('topic_id', $enabledTopicIds)
-            ->get(['id', 'study_id']);
+        $query = Question::withoutGlobalScope('user_scope');
+        if ($module->is_all_questions) {
+            $query->where('company_id', $companyId)
+                ->where('question_type_id', $module->question_type_id)
+                ->whereNotNull('topic_id');
+        } else {
+            $enabledTopicIds = array_keys($topicQuestionSettings);
+            $query->whereIn('topic_id', $enabledTopicIds);
+        }
+
+        $targetQuestions = $query->get(['id', 'study_id']);
 
         $targetQuestionIds = $targetQuestions->pluck('id')->toArray();
 

@@ -43,11 +43,28 @@
                             <option value="manual">Manual</option>
                             <option value="category">Kategori Soal</option>
                             <option value="topic">Topik</option>
+                            <option value="material_category">Kategori Materi</option>
                         </select>
                         @error('question_pick_type')
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
+                    @if ($question_pick_type !== 'manual')
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700">Ambil Semua Soal?</label>
+                            <div class="flex items-center mt-2">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" wire:model.live="is_all_questions" class="sr-only peer">
+                                    <div
+                                        class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                                    </div>
+                                </label>
+                            </div>
+                            @error('is_all_questions')
+                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    @endif
                     <div class="mb-4">
                         <label for="name" class="block text-sm font-medium text-gray-700">Nama Modul Soal <span
                                 class="text-red-600">*</span></label>
@@ -139,7 +156,7 @@
                         @endif
                     </div>
                 </div>
-                @if ($question_pick_type === 'category')
+                @if ($question_pick_type === 'category' && !$is_all_questions)
                     <div class="mb-4">
                         <div class="flex items-center justify-between mb-2">
                             <label class="block text-sm font-medium text-gray-700">Pengaturan Kategori Soal</label>
@@ -215,7 +232,7 @@
                     </div>
                 @endif
 
-                @if ($question_pick_type === 'topic')
+                @if ($question_pick_type === 'topic' && !$is_all_questions)
                     <div class="mb-4">
                         <div class="flex items-center justify-between mb-2">
                             <label class="block text-sm font-medium text-gray-700">Pengaturan Topik Soal</label>
@@ -279,6 +296,78 @@
                                     @empty
                                         <tr>
                                             <td colspan="6" class="no-data">Tidak ada topik soal</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endif
+                
+                @if ($question_pick_type === 'material_category' && !$is_all_questions)
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-sm font-medium text-gray-700">Pengaturan Kategori Materi</label>
+                            <span class="text-sm text-gray-600">
+                                Total soal: <span
+                                    class="font-semibold text-blue-600">{{ $this->totalMaterialCategoryQuestions }}</span>
+                            </span>
+                        </div>
+                        <div class="overflow-x-auto border rounded-lg">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2">Pilih</th>
+                                        <th rowspan="2">Kategori Materi</th>
+                                        <th colspan="4">Difficulty</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Default</th>
+                                        <th>Easy</th>
+                                        <th>Medium</th>
+                                        <th>Hard</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($material_categories as $material_category)
+                                        @php
+                                            $settings = $material_category_question_settings[$material_category->id] ?? ['enabled' => false];
+                                            $limits = $material_category_question_limits[$material_category->id] ?? ['default' => 0, 'easy' => 0, 'medium' => 0, 'hard' => 0];
+                                        @endphp
+                                        <tr>
+                                            <td class="center">
+                                                <input type="checkbox"
+                                                    wire:model.live="material_category_question_settings.{{ $material_category->id }}.enabled">
+                                            </td>
+                                            <td>{{ $material_category->name }}</td>
+                                            <td class="center">
+                                                <input type="number" min="0" class="mt-1 form-control w-24 text-center"
+                                                    wire:model.live="material_category_question_settings.{{ $material_category->id }}.default"
+                                                    max="{{ $limits['default'] ?? 0 }}" @disabled(!($settings['enabled'] ?? false) || ($limits['default'] ?? 0) === 0)>
+                                                <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['default'] ?? 0 }}</div>
+                                            </td>
+                                            <td class="center">
+                                                <input type="number" min="0" class="mt-1 form-control w-24 text-center"
+                                                    wire:model.live="material_category_question_settings.{{ $material_category->id }}.easy"
+                                                    max="{{ $limits['easy'] ?? 0 }}" @disabled(!($settings['enabled'] ?? false) || ($limits['easy'] ?? 0) === 0)>
+                                                <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['easy'] ?? 0 }}</div>
+                                            </td>
+                                            <td class="center">
+                                                <input type="number" min="0" class="mt-1 form-control w-24 text-center"
+                                                    wire:model.live="material_category_question_settings.{{ $material_category->id }}.medium"
+                                                    max="{{ $limits['medium'] ?? 0 }}" @disabled(!($settings['enabled'] ?? false) || ($limits['medium'] ?? 0) === 0)>
+                                                <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['medium'] ?? 0 }}</div>
+                                            </td>
+                                            <td class="center">
+                                                <input type="number" min="0" class="mt-1 form-control w-24 text-center"
+                                                    wire:model.live="material_category_question_settings.{{ $material_category->id }}.hard"
+                                                    max="{{ $limits['hard'] ?? 0 }}" @disabled(!($settings['enabled'] ?? false) || ($limits['hard'] ?? 0) === 0)>
+                                                <div class="text-xs text-gray-500 mt-1">Max: {{ $limits['hard'] ?? 0 }}</div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="no-data">Tidak ada kategori materi</td>
                                         </tr>
                                     @endforelse
                                 </tbody>

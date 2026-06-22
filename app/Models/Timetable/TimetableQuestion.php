@@ -20,6 +20,10 @@ class TimetableQuestion extends Model
 
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'images' => 'array',
+    ];
+
     const TYPE_SINGLE = 'single';
 
     const TYPE_MULTIPLE = 'multiple';
@@ -88,6 +92,11 @@ class TimetableQuestion extends Model
     public function question(): BelongsTo
     {
         return $this->belongsTo(Question::class, 'question_id', 'id');
+    }
+
+    public function topic(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Master\Question\Topic::class, 'topic_id', 'id');
     }
 
     public function user()

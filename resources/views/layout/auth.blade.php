@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link rel="apple-touch-icon" sizes="180x180"
         href="{{ $setting?->favicon_apple_touch_icon && Storage::disk('public')->exists($setting?->favicon_apple_touch_icon) ? asset('storage/' . $setting?->favicon_apple_touch_icon) : asset('assets/favicon/apple-touch-icon.png') }}">

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\Report\ExamResult;
 
+use App\Exports\ExamResultExport;
 use App\Models\Master\Question\Module;
 use App\Models\Master\RatingScale\RatingScale;
 use App\Models\Master\Timetable\Timetable;
@@ -11,6 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminReportExamResultIndex extends Component
 {
@@ -60,7 +62,7 @@ class AdminReportExamResultIndex extends Component
 
     public function render()
     {
-        $examResults = UserTimetable::with(['user', 'timetable.module'])
+        $examResults = UserTimetable::with(['user', 'timetable.module', 'userModuleQuestions.timetableQuestion.topic'])
             ->search($this->search)
             ->when($this->user_id, function ($query) {
                 $query->where('user_id', $this->user_id);
@@ -85,7 +87,7 @@ class AdminReportExamResultIndex extends Component
 
     public function exportPdf()
     {
-        $examResults = UserTimetable::with(['user', 'timetable.module'])
+        $examResults = UserTimetable::with(['user', 'timetable.module', 'userModuleQuestions.timetableQuestion.topic'])
             ->search($this->search)
             ->when($this->user_id, function ($query) {
                 $query->where('user_id', $this->user_id);
@@ -105,9 +107,17 @@ class AdminReportExamResultIndex extends Component
         $filterSummary = $this->getFilterSummary();
         $gradeDetails = [];
 
+        $allTopics = [];
         foreach ($examResults as $result) {
             $gradeDetails[$result->id] = $this->getGradeDetail($result->mark);
+            foreach ($result->userModuleQuestions as $umq) {
+                $tq = $umq->timetableQuestion;
+                if ($tq && $tq->topic_id) {
+                    $allTopics[$tq->topic_id] = $tq->topic?->name ?? 'Tanpa Topik';
+                }
+            }
         }
+        asort($allTopics);
 
         $company = Auth::user()->company()->with('companyDetail')->first();
 
@@ -134,6 +144,7 @@ class AdminReportExamResultIndex extends Component
             'examResults' => $examResults,
             'filterSummary' => $filterSummary,
             'gradeDetails' => $gradeDetails,
+            'allTopics' => $allTopics,
             'company' => $company,
             'stats' => $stats,
             'gradeDistribution' => $gradeDistribution,
@@ -148,6 +159,55 @@ class AdminReportExamResultIndex extends Component
             fn () => print ($pdf->output()),
             'exam-result-report-'.date('Y-m-d-H-i-s').'.pdf'
         );
+    }
+
+    public function exportExcel()
+    {
+        try {
+            $fileName = 'exam-result-report-'.date('YmdHis').'.xlsx';
+
+            return Excel::download(
+                new ExamResultExport($this->search, $this->user_id, $this->module_id, $this->timetable_id),
+                $fileName
+            );
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Exam Result Excel Export Error: '.$e->getMessage());
+            session()->flash('error', 'Gagal mengekspor data ke Excel.');
+        }
+    }
+
+    public function getTopicStats($userTimetable)
+    {
+        $stats = [];
+        foreach ($userTimetable->userModuleQuestions as $umq) {
+            $tq = $umq->timetableQuestion;
+            if (!$tq) {
+                continue;
+            }
+            $topicName = $tq->topic?->name ?? 'Tanpa Topik';
+            $topicId = $tq->topic_id ?? 'no-topic';
+
+            if (!isset($stats[$topicId])) {
+                $stats[$topicId] = [
+                    'name' => $topicName,
+                    'total' => 0,
+                    'correct' => 0,
+                    'wrong' => 0,
+                    'unanswered' => 0,
+                ];
+            }
+
+            $stats[$topicId]['total']++;
+
+            if (empty($umq->timetable_answer_id)) {
+                $stats[$topicId]['unanswered']++;
+            } elseif ($umq->status === 'correct') {
+                $stats[$topicId]['correct']++;
+            } elseif ($umq->status === 'wrong') {
+                $stats[$topicId]['wrong']++;
+            }
+        }
+        return $stats;
     }
 
     private function getFilterSummary()

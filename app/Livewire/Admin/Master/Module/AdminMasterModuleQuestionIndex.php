@@ -55,6 +55,8 @@ class AdminMasterModuleQuestionIndex extends Component
 
     public $question_pick_type = 'manual';
 
+    public $is_all_questions = false;
+
     public $module_question_id;
 
     public $question_id = [];
@@ -86,6 +88,12 @@ class AdminMasterModuleQuestionIndex extends Component
     public $topic_question_settings = [];
 
     public $topic_question_limits = [];
+
+    public $material_categories = [];
+
+    public $material_category_question_settings = [];
+
+    public $material_category_question_limits = [];
 
     public function render()
     {
@@ -173,6 +181,7 @@ class AdminMasterModuleQuestionIndex extends Component
         $this->random_question = $this->get_module?->random_question;
         $this->question_pick_type = $this->get_module?->question_pick_type ?? 'manual';
         $this->is_all_study = $this->get_module?->is_all_study;
+        $this->is_all_questions = $this->get_module?->is_all_questions ?? false;
 
         $this->studys = json_decode($this->get_module?->studys) ?? [];
         $this->category_questions = CategoryQuestion::select('id', 'name')->get();
@@ -183,6 +192,10 @@ class AdminMasterModuleQuestionIndex extends Component
         $this->initializeTopicQuestionSettings();
         $this->loadTopicQuestionLimits();
         $this->applyTopicQuestionSettings($this->get_module?->topic_question_settings ?? []);
+        $this->material_categories = \App\Models\Master\Question\MaterialCategory::select('id', 'name')->get();
+        $this->initializeMaterialCategoryQuestionSettings();
+        $this->loadMaterialCategoryQuestionLimits();
+        $this->applyMaterialCategoryQuestionSettings($this->get_module?->material_category_question_settings ?? []);
 
         if (Auth::user()?->hasRole('Dosen')) {
             $studyIds = Auth::user()?->studys ?? [];
@@ -210,6 +223,7 @@ class AdminMasterModuleQuestionIndex extends Component
     {
         $this->loadCategoryQuestionLimits();
         $this->loadTopicQuestionLimits();
+        $this->loadMaterialCategoryQuestionLimits();
     }
 
     public function updatedTopicQuestionSettings($value, $key)
@@ -235,6 +249,32 @@ class AdminMasterModuleQuestionIndex extends Component
         }
         if ($current < 0) {
             $this->topic_question_settings[$topicId][$field] = 0;
+        }
+    }
+
+    public function updatedMaterialCategoryQuestionSettings($value, $key)
+    {
+        if (! is_string($key)) {
+            return;
+        }
+
+        $parts = explode('.', $key);
+        if (count($parts) !== 2) {
+            return;
+        }
+
+        [$materialCategoryId, $field] = $parts;
+        if (! in_array($field, ['default', 'easy', 'medium', 'hard'], true)) {
+            return;
+        }
+
+        $max = (int) ($this->material_category_question_limits[$materialCategoryId][$field] ?? 0);
+        $current = (int) ($this->material_category_question_settings[$materialCategoryId][$field] ?? 0);
+        if ($current > $max) {
+            $this->material_category_question_settings[$materialCategoryId][$field] = $max;
+        }
+        if ($current < 0) {
+            $this->material_category_question_settings[$materialCategoryId][$field] = 0;
         }
     }
 
@@ -272,9 +312,10 @@ class AdminMasterModuleQuestionIndex extends Component
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['module_question_id', 'question_id', 'selected_all', 'filterStudyId', 'filterQuestionTypeId', 'filterTopicId', 'search']);
+        $this->reset(['module_question_id', 'question_id', 'selected_all', 'filterStudyId', 'filterQuestionTypeId', 'filterTopicId', 'search', 'material_category_question_settings']);
         $this->perPage = 8;
         $this->openQuestion = false;
+        $this->initializeMaterialCategoryQuestionSettings();
         $this->dispatch('close-modal', ['id' => 'modal-module-question']);
 
         return $this->dispatch('close-modal', ['id' => 'modal']);
@@ -301,7 +342,7 @@ class AdminMasterModuleQuestionIndex extends Component
                 'description' => 'nullable',
                 'duration' => 'required|numeric|min:1',
                 'studys' => 'required|array',
-                'question_pick_type' => 'required|in:manual,category,topic',
+                'question_pick_type' => 'required|in:manual,category,topic,material_category',
                 'category_question_settings.*.enabled' => 'nullable|boolean',
                 'category_question_settings.*.default' => 'nullable|integer|min:0',
                 'category_question_settings.*.easy' => 'nullable|integer|min:0',
@@ -312,6 +353,11 @@ class AdminMasterModuleQuestionIndex extends Component
                 'topic_question_settings.*.easy' => 'nullable|integer|min:0',
                 'topic_question_settings.*.medium' => 'nullable|integer|min:0',
                 'topic_question_settings.*.hard' => 'nullable|integer|min:0',
+                'material_category_question_settings.*.enabled' => 'nullable|boolean',
+                'material_category_question_settings.*.default' => 'nullable|integer|min:0',
+                'material_category_question_settings.*.easy' => 'nullable|integer|min:0',
+                'material_category_question_settings.*.medium' => 'nullable|integer|min:0',
+                'material_category_question_settings.*.hard' => 'nullable|integer|min:0',
             ],
             [
                 'question_type_id.required' => 'Tipe Ujian wajib diisi.',
@@ -329,38 +375,60 @@ class AdminMasterModuleQuestionIndex extends Component
 
         $this->resetErrorBag('category_question_settings');
         $this->resetErrorBag('topic_question_settings');
-        foreach ($this->category_question_settings as $categoryId => $settings) {
-            if (! ($settings['enabled'] ?? false)) {
-                continue;
-            }
-            $limits = $this->category_question_limits[$categoryId] ?? ['default' => 0, 'easy' => 0, 'medium' => 0, 'hard' => 0];
+        $this->resetErrorBag('material_category_question_settings');
 
-            foreach (['default', 'easy', 'medium', 'hard'] as $difficulty) {
-                $value = (int) ($settings[$difficulty] ?? 0);
-                $max = (int) ($limits[$difficulty] ?? 0);
-                if ($value > $max) {
-                    $this->addError(
-                        "category_question_settings.{$categoryId}.{$difficulty}",
-                        "Jumlah soal {$difficulty} melebihi maksimal tersedia ({$max})."
-                    );
+        if (! $this->is_all_questions) {
+            foreach ($this->category_question_settings as $categoryId => $settings) {
+                if (! ($settings['enabled'] ?? false)) {
+                    continue;
+                }
+                $limits = $this->category_question_limits[$categoryId] ?? ['default' => 0, 'easy' => 0, 'medium' => 0, 'hard' => 0];
+
+                foreach (['default', 'easy', 'medium', 'hard'] as $difficulty) {
+                    $value = (int) ($settings[$difficulty] ?? 0);
+                    $max = (int) ($limits[$difficulty] ?? 0);
+                    if ($value > $max) {
+                        $this->addError(
+                            "category_question_settings.{$categoryId}.{$difficulty}",
+                            "Jumlah soal {$difficulty} melebihi maksimal tersedia ({$max})."
+                        );
+                    }
                 }
             }
-        }
 
-        foreach ($this->topic_question_settings as $topicId => $settings) {
-            if (! ($settings['enabled'] ?? false)) {
-                continue;
+            foreach ($this->topic_question_settings as $topicId => $settings) {
+                if (! ($settings['enabled'] ?? false)) {
+                    continue;
+                }
+                $limits = $this->topic_question_limits[$topicId] ?? ['default' => 0, 'easy' => 0, 'medium' => 0, 'hard' => 0];
+
+                foreach (['default', 'easy', 'medium', 'hard'] as $difficulty) {
+                    $value = (int) ($settings[$difficulty] ?? 0);
+                    $max = (int) ($limits[$difficulty] ?? 0);
+                    if ($value > $max) {
+                        $this->addError(
+                            "topic_question_settings.{$topicId}.{$difficulty}",
+                            "Jumlah soal {$difficulty} melebihi maksimal tersedia ({$max})."
+                        );
+                    }
+                }
             }
-            $limits = $this->topic_question_limits[$topicId] ?? ['default' => 0, 'easy' => 0, 'medium' => 0, 'hard' => 0];
 
-            foreach (['default', 'easy', 'medium', 'hard'] as $difficulty) {
-                $value = (int) ($settings[$difficulty] ?? 0);
-                $max = (int) ($limits[$difficulty] ?? 0);
-                if ($value > $max) {
-                    $this->addError(
-                        "topic_question_settings.{$topicId}.{$difficulty}",
-                        "Jumlah soal {$difficulty} melebihi maksimal tersedia ({$max})."
-                    );
+            foreach ($this->material_category_question_settings as $materialCategoryId => $settings) {
+                if (! ($settings['enabled'] ?? false)) {
+                    continue;
+                }
+                $limits = $this->material_category_question_limits[$materialCategoryId] ?? ['default' => 0, 'easy' => 0, 'medium' => 0, 'hard' => 0];
+
+                foreach (['default', 'easy', 'medium', 'hard'] as $difficulty) {
+                    $value = (int) ($settings[$difficulty] ?? 0);
+                    $max = (int) ($limits[$difficulty] ?? 0);
+                    if ($value > $max) {
+                        $this->addError(
+                            "material_category_question_settings.{$materialCategoryId}.{$difficulty}",
+                            "Jumlah soal {$difficulty} melebihi maksimal tersedia ({$max})."
+                        );
+                    }
                 }
             }
         }
@@ -382,9 +450,11 @@ class AdminMasterModuleQuestionIndex extends Component
                 'description' => $this->description,
                 'studys' => $this->studys,
                 'is_all_study' => $this->is_all_study,
+                'is_all_questions' => $this->is_all_questions,
                 'question_pick_type' => $this->question_pick_type,
                 'category_question_settings' => $this->getFilteredCategoryQuestionSettings(),
                 'topic_question_settings' => $this->getFilteredTopicQuestionSettings(),
+                'material_category_question_settings' => $this->getFilteredMaterialCategoryQuestionSettings(),
             ];
 
             $module = app(ModuleService::class)->updateOrCreate($request);
@@ -392,42 +462,70 @@ class AdminMasterModuleQuestionIndex extends Component
                 throw new Exception('Ada kesalahaan saat ModuleService => updateOrCreate', 500);
             }
 
-            if ($this->question_pick_type === 'category' && ! empty($request['category_question_settings'])) {
-                $categoryIds = array_keys($request['category_question_settings']);
-                $questionIds = Question::withoutGlobalScope('user_scope')
-                    ->whereIn('category_question_id', $categoryIds)
-                    ->pluck('id')
-                    ->toArray();
+            if ($this->is_all_questions) {
+                ModuleQuestion::withoutGlobalScope('user_scope')
+                    ->where('module_id', $module->id)
+                    ->update([
+                        'company_id' => Auth::user()?->company?->id,
+                        'question_pick_type' => $this->question_pick_type,
+                    ]);
+            } else {
+                if ($this->question_pick_type === 'category' && ! empty($request['category_question_settings'])) {
+                    $categoryIds = array_keys($request['category_question_settings']);
+                    $questionIds = Question::withoutGlobalScope('user_scope')
+                        ->whereIn('category_question_id', $categoryIds)
+                        ->pluck('id')
+                        ->toArray();
 
-                if (! empty($questionIds)) {
-                    ModuleQuestion::withoutGlobalScope('user_scope')
-                        ->where('module_id', $module->id)
-                        ->whereIn('question_id', $questionIds)
-                        ->update([
-                            'company_id' => Auth::user()?->company?->id,
-                            'question_pick_type' => 'category',
-                        ]);
-                }
-            } elseif ($this->question_pick_type === 'topic' && ! empty($request['topic_question_settings'])) {
-                $topicIds = array_keys($request['topic_question_settings']);
-                $questionIds = Question::withoutGlobalScope('user_scope')
-                    ->whereIn('topic_id', $topicIds)
-                    ->pluck('id')
-                    ->toArray();
+                    if (! empty($questionIds)) {
+                        ModuleQuestion::withoutGlobalScope('user_scope')
+                            ->where('module_id', $module->id)
+                            ->whereIn('question_id', $questionIds)
+                            ->update([
+                                'company_id' => Auth::user()?->company?->id,
+                                'question_pick_type' => 'category',
+                            ]);
+                    }
+                } elseif ($this->question_pick_type === 'topic' && ! empty($request['topic_question_settings'])) {
+                    $topicIds = array_keys($request['topic_question_settings']);
+                    $questionIds = Question::withoutGlobalScope('user_scope')
+                        ->whereIn('topic_id', $topicIds)
+                        ->pluck('id')
+                        ->toArray();
 
-                if (! empty($questionIds)) {
-                    ModuleQuestion::withoutGlobalScope('user_scope')
-                        ->where('module_id', $module->id)
-                        ->whereIn('question_id', $questionIds)
-                        ->update([
-                            'company_id' => Auth::user()?->company?->id,
-                            'question_pick_type' => 'topic',
-                        ]);
+                    if (! empty($questionIds)) {
+                        ModuleQuestion::withoutGlobalScope('user_scope')
+                            ->where('module_id', $module->id)
+                            ->whereIn('question_id', $questionIds)
+                            ->update([
+                                'company_id' => Auth::user()?->company?->id,
+                                'question_pick_type' => 'topic',
+                            ]);
+                    }
+                } elseif ($this->question_pick_type === 'material_category' && ! empty($request['material_category_question_settings'])) {
+                    $materialCategoryIds = array_keys($request['material_category_question_settings']);
+                    $questionIds = Question::withoutGlobalScope('user_scope')
+                        ->whereIn('material_category_id', $materialCategoryIds)
+                        ->pluck('id')
+                        ->toArray();
+
+                    if (! empty($questionIds)) {
+                        ModuleQuestion::withoutGlobalScope('user_scope')
+                            ->where('module_id', $module->id)
+                            ->whereIn('question_id', $questionIds)
+                            ->update([
+                                'company_id' => Auth::user()?->company?->id,
+                                'question_pick_type' => 'material_category',
+                            ]);
+                    }
                 }
             }
 
             $this->get_module = $module;
+            $this->is_all_questions = $module->is_all_questions ?? false;
             $this->applyCategoryQuestionSettings($module->category_question_settings ?? []);
+            $this->applyTopicQuestionSettings($module->topic_question_settings ?? []);
+            $this->applyMaterialCategoryQuestionSettings($module->material_category_question_settings ?? []);
 
             DB::commit();
         } catch (Exception|Throwable $th) {
@@ -717,5 +815,96 @@ class AdminMasterModuleQuestionIndex extends Component
         }
 
         $this->topic_question_limits = $limits;
+    }
+
+    private function initializeMaterialCategoryQuestionSettings(): void
+    {
+        $this->material_category_question_settings = [];
+        foreach ($this->material_categories as $material_category) {
+            $this->material_category_question_settings[$material_category->id] = [
+                'enabled' => false,
+                'default' => 0,
+                'easy' => 0,
+                'medium' => 0,
+                'hard' => 0,
+            ];
+        }
+    }
+
+    private function applyMaterialCategoryQuestionSettings($existingSettings): void
+    {
+        $this->initializeMaterialCategoryQuestionSettings();
+
+        if (is_string($existingSettings)) {
+            $existingSettings = json_decode($existingSettings, true) ?? [];
+        }
+
+        foreach ($existingSettings ?? [] as $materialCategoryId => $settings) {
+            if (! isset($this->material_category_question_settings[$materialCategoryId])) {
+                continue;
+            }
+            $this->material_category_question_settings[$materialCategoryId] = [
+                'enabled' => true,
+                'default' => (int) ($settings['default'] ?? 0),
+                'easy' => (int) ($settings['easy'] ?? 0),
+                'medium' => (int) ($settings['medium'] ?? 0),
+                'hard' => (int) ($settings['hard'] ?? 0),
+            ];
+        }
+    }
+
+    private function getFilteredMaterialCategoryQuestionSettings(): array
+    {
+        $filtered = [];
+        foreach ($this->material_category_question_settings as $materialCategoryId => $settings) {
+            if (! ($settings['enabled'] ?? false)) {
+                continue;
+            }
+
+            $filtered[$materialCategoryId] = [
+                'default' => (int) ($settings['default'] ?? 0),
+                'easy' => (int) ($settings['easy'] ?? 0),
+                'medium' => (int) ($settings['medium'] ?? 0),
+                'hard' => (int) ($settings['hard'] ?? 0),
+            ];
+        }
+
+        return $filtered;
+    }
+
+    private function loadMaterialCategoryQuestionLimits(): void
+    {
+        $limits = [];
+        foreach ($this->material_categories as $material_category) {
+            $limits[$material_category->id] = [
+                'default' => 0,
+                'easy' => 0,
+                'medium' => 0,
+                'hard' => 0,
+            ];
+        }
+
+        $query = Question::withoutGlobalScope('user_scope')
+            ->select('material_category_id', DB::raw("COALESCE(difficulty, 'default') as difficulty"), DB::raw('count(*) as total'))
+            ->whereNotNull('material_category_id');
+
+        if ($this->question_type_id) {
+            $query->where('question_type_id', $this->question_type_id);
+        }
+
+        $rows = $query->groupBy('material_category_id', DB::raw("COALESCE(difficulty, 'default')"))->get();
+
+        foreach ($rows as $row) {
+            if (! isset($limits[$row->material_category_id])) {
+                continue;
+            }
+            $difficulty = $row->difficulty ?? 'default';
+            if (! isset($limits[$row->material_category_id][$difficulty])) {
+                $limits[$row->material_category_id][$difficulty] = 0;
+            }
+            $limits[$row->material_category_id][$difficulty] = (int) $row->total;
+        }
+
+        $this->material_category_question_limits = $limits;
     }
 }

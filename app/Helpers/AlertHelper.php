@@ -77,6 +77,7 @@ class AlertHelper
                 'padding' => '10px',
                 'background' => '#ffffff',
                 'color' => $iconColor,
+                'backdrop' => false,
                 'customClass' => [
                     'popup' => 'animate__animated animate__fadeInRight rounded-lg shadow-2xl border',
                     'title' => 'text-base font-semibold text-gray-800',

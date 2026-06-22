@@ -60,6 +60,7 @@
                 </div>
 
                 <!-- Camera Check -->
+                @if ($userTimetable->timetable->is_camera)
                 <div class="p-4 border rounded-lg">
                     <h3 class="font-medium text-gray-900 mb-2">Periksa Kamera</h3>
 
@@ -167,8 +168,18 @@
                         };
 
                         await getCameras();
+
+                        // Stop camera stream when user navigates away (e.g., clicking "Mulai Ujian")
+                        // This ensures the camera device is released BEFORE the exam page tries to open it.
+                        window.addEventListener('beforeunload', () => {
+                            if (currentStream) {
+                                currentStream.getTracks().forEach(track => track.stop());
+                                currentStream = null;
+                            }
+                        });
                     });
                 </script>
+                @endif
 
                 <!-- Consent Checkbox -->
                 <div class="flex items-start mt-6 space-x-3">

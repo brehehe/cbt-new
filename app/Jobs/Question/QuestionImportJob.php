@@ -67,9 +67,11 @@ class QuestionImportJob implements ShouldQueue
                     $studyName = $this->valueAt($value, 0);
                     $topicName = $this->valueAt($value, 1);
                     $typeName = $this->valueAt($value, 4);
-                    $questionText = $this->valueAt($value, 5);
-                    $description = $this->valueAt($value, 6);
-                    $categoryName = $this->valueAt($value, 13);
+                    $categoryName = $this->valueAt($value, 5);
+                    $questionText = $this->valueAt($value, 6);
+                    $description = $this->valueAt($value, 7);
+                    $questionImageUrl = $this->valueAt($value, 8);
+                    $correctKey = $this->valueAt($value, 19);
                 } else {
                     // Format Essay
                     $studyName = $this->valueAt($value, 0);
@@ -78,7 +80,9 @@ class QuestionImportJob implements ShouldQueue
                     $categoryName = $this->valueAt($value, 5);
                     $questionText = $this->valueAt($value, 6);
                     $description = $this->valueAt($value, 7);
-                    $referenceAnswer = $this->valueAt($value, 8);
+                    $questionImageUrl = $this->valueAt($value, 8);
+                    $referenceAnswer = $this->valueAt($value, 9);
+                    $referenceAnswerImageUrl = $this->valueAt($value, 10);
                 }
 
                 if (! $studyName || ! $topicName || ! $typeName || ! $questionText) {
@@ -89,7 +93,7 @@ class QuestionImportJob implements ShouldQueue
                     continue;
                 }
 
-                $question_type = QuestionType::withoutGlobalScopes()->whereLike('name', "%{$typeName}%")->first();
+                $question_type = QuestionType::withoutGlobalScopes()->where('name', 'like', $typeName)->first();
 
                 if (! $question_type) {
                     Log::warning('Data soal tidak bisa masuk, karena Tipe Soal tidak ditemukan', [
@@ -100,9 +104,10 @@ class QuestionImportJob implements ShouldQueue
                 }
 
                 if ($this->import_type == 'pg') {
-                    for ($j = 7; $j < 11; $j++) {
-                        if (! $this->valueAt($value, $j)) {
-                            Log::warning('Data soal tidak bisa masuk, karena jawaban kosong ', [
+                    $requiredOptionIndices = [9, 11, 13, 15]; // A, B, C, D
+                    foreach ($requiredOptionIndices as $optIdx) {
+                        if (! $this->valueAt($value, $optIdx)) {
+                            Log::warning('Data soal tidak bisa masuk, karena jawaban A/B/C/D kosong ', [
                                 'collection' => $value,
                             ]);
 
@@ -111,7 +116,7 @@ class QuestionImportJob implements ShouldQueue
                     }
                 }
 
-                $study = Study::withoutGlobalScopes()->whereLike('name', "%{$studyName}%")->first();
+                $study = Study::withoutGlobalScopes()->where('name', 'like', $studyName)->first();
 
                 if (! $study && $studyName) {
                     $study = Study::create([
@@ -120,7 +125,7 @@ class QuestionImportJob implements ShouldQueue
                     ]);
                 }
 
-                $topic = $study?->topics()->withoutGlobalScopes()->whereLike('name', "%{$topicName}%")->first();
+                $topic = $study?->topics()->withoutGlobalScopes()->where('name', 'like', $topicName)->first();
 
                 if (! $topic && $topicName) {
                     $topic = Topic::create([
@@ -131,7 +136,7 @@ class QuestionImportJob implements ShouldQueue
                 }
 
                 $materialCategoryName = $this->valueAt($value, 2);
-                $material_category = $topic?->materialCategories()->withoutGlobalScopes()->whereLike('name', "%{$materialCategoryName}%")->first();
+                $material_category = $topic?->materialCategories()->withoutGlobalScopes()->where('name', 'like', $materialCategoryName)->first();
 
                 if (! $material_category && $materialCategoryName) {
                     $material_category = MaterialCategory::create([
@@ -142,21 +147,32 @@ class QuestionImportJob implements ShouldQueue
                 }
 
                 $materialName = $this->valueAt($value, 3);
-                $material = $material_category?->materials()->withoutGlobalScopes()->whereLike('name', "%{$materialName}%")->first();
+                $material = null;
+                if ($materialName) {
+                    if ($material_category) {
+                        $material = $material_category->materials()->withoutGlobalScopes()->where('name', 'like', $materialName)->first();
+                    } else {
+                        $material = Material::withoutGlobalScopes()
+                            ->where('topic_id', $topic?->id)
+                            ->whereNull('material_category_id')
+                            ->where('name', 'like', $materialName)
+                            ->first();
+                    }
 
-                if (! $material && $materialName) {
-                    Material::create([
-                        'company_id' => $this->user?->company?->id,
-                        'topic_id' => $topic?->id,
-                        'material_category_id' => $material_category?->id,
-                        'level' => 1,
-                        'name' => $materialName,
-                    ]);
+                    if (! $material) {
+                        $material = Material::create([
+                            'company_id' => $this->user?->company?->id,
+                            'topic_id' => $topic?->id,
+                            'material_category_id' => $material_category?->id,
+                            'level' => 1,
+                            'name' => $materialName,
+                        ]);
+                    }
                 }
 
                 $categoryQuestion = null;
                 if ($categoryName) {
-                    $categoryQuestion = CategoryQuestion::withoutGlobalScopes()->whereLike('name', "%{$categoryName}%")->first();
+                    $categoryQuestion = CategoryQuestion::withoutGlobalScopes()->where('name', 'like', $categoryName)->first();
                     if (! $categoryQuestion) {
                         $categoryQuestion = CategoryQuestion::create([
                             'company_id' => $this->user?->company?->id,
@@ -175,7 +191,7 @@ class QuestionImportJob implements ShouldQueue
                     'question_type_id' => $question_type?->id,
                     'category_question_id' => $categoryQuestion?->id,
                     'question' => $questionText,
-                    'images' => null,
+                    'images' => $questionImageUrl ? [$questionImageUrl] : null,
                     'old_images' => null,
                     'description' => $description,
                     'weight_correct' => null,
@@ -189,19 +205,27 @@ class QuestionImportJob implements ShouldQueue
                 }
 
                 if ($this->import_type == 'pg') {
-                    $correctKey = $this->valueAt($value, 12);
-                    for ($i = 7; $i <= 11; $i++) {
-                        $answerText = $this->valueAt($value, $i);
+                    $optionsMap = [
+                        'A' => ['text' => 9, 'image' => 10],
+                        'B' => ['text' => 11, 'image' => 12],
+                        'C' => ['text' => 13, 'image' => 14],
+                        'D' => ['text' => 15, 'image' => 16],
+                        'E' => ['text' => 17, 'image' => 18],
+                    ];
+
+                    foreach ($optionsMap as $letter => $indices) {
+                        $answerText = $this->valueAt($value, $indices['text']);
+                        $answerImageUrl = $this->valueAt($value, $indices['image']);
                         if (! $answerText) {
                             continue;
                         }
                         $request_answer = [
                             'company_id' => $this->user?->company?->id,
-                            'alphabet' => null,
+                            'alphabet' => $letter,
                             'context' => $answerText,
-                            'images' => null,
+                            'images' => $answerImageUrl ? [$answerImageUrl] : null,
                             'old_images' => null,
-                            'is_correct' => $i == $this->letterToValue($correctKey) ? true : false,
+                            'is_correct' => strtoupper(trim((string) $correctKey)) === $letter,
                         ];
 
                         $answer = app(AnswerService::class)->updateOrCreate($question, $request_answer);
@@ -216,7 +240,7 @@ class QuestionImportJob implements ShouldQueue
                             'company_id' => $this->user?->company?->id,
                             'alphabet' => null,
                             'context' => $referenceAnswer,
-                            'images' => null,
+                            'images' => $referenceAnswerImageUrl ? [$referenceAnswerImageUrl] : null,
                             'old_images' => null,
                             'is_correct' => true,
                         ];
@@ -239,11 +263,11 @@ class QuestionImportJob implements ShouldQueue
     public function letterToValue(?string $ch): ?int
     {
         static $map = [
-            'A' => 7,
-            'B' => 8,
-            'C' => 9,
-            'D' => 10,
-            'E' => 11,
+            'A' => 9,
+            'B' => 11,
+            'C' => 13,
+            'D' => 15,
+            'E' => 17,
         ];
 
         return $map[strtoupper(trim((string) $ch))] ?? null;
@@ -279,14 +303,9 @@ class QuestionImportJob implements ShouldQueue
             return null;
         }
 
-        // Jika kolom soal kosong (index 5) tapi kolom setelahnya terisi, geser ke kiri
-        if (array_key_exists(5, $row) && ($row[5] === null || $row[5] === '') && array_key_exists(6, $row)) {
-            array_splice($row, 5, 1);
-        }
-
-        // Pastikan minimal 14 kolom (Kategori Soal opsional di index 13)
-        if (count($row) < 14) {
-            $row = array_pad($row, 14, null);
+        // Pastikan minimal 20 kolom
+        if (count($row) < 20) {
+            $row = array_pad($row, 20, null);
         }
 
         return $row;

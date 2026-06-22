@@ -2,6 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import ExamContainer from './Exam/ExamContainer';
 import AdminMonitorContainer from './Exam/Admin/AdminMonitorContainer';
+import QuestionNavDemo from './Exam/QuestionNavDemo';
 
 import axios from 'axios';
 
@@ -20,10 +21,11 @@ axios.defaults.headers.common['Accept'] = 'application/json';
 const rootElement = document.getElementById('exam-app');
 if (rootElement) {
     const userTimetableId = rootElement.getAttribute('data-user-timetable-id');
+    const colorPrimary = rootElement.getAttribute('data-color-primary') || '#1e3a5f';
     const root = createRoot(rootElement);
     root.render(
         <React.StrictMode>
-            <ExamContainer userTimetableId={userTimetableId} />
+            <ExamContainer userTimetableId={userTimetableId} defaultCompanyColor={colorPrimary} />
         </React.StrictMode>
     );
 }
@@ -36,6 +38,17 @@ if (monitorElement) {
     root.render(
         <React.StrictMode>
             <AdminMonitorContainer timetableId={timetableId} />
+        </React.StrictMode>
+    );
+}
+
+// 3. Exam Navigation Demo Sandbox
+const demoElement = document.getElementById('exam-nav-demo-app');
+if (demoElement) {
+    const root = createRoot(demoElement);
+    root.render(
+        <React.StrictMode>
+            <QuestionNavDemo />
         </React.StrictMode>
     );
 }

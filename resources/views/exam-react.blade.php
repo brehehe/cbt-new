@@ -10,6 +10,12 @@
     @vite(['resources/css/app.css', 'resources/js/exam-react.jsx'])
 </head>
 <body class="bg-gray-100">
-    <div id="exam-app" data-user-timetable-id="{{ $userTimetableId }}"></div>
+    @php
+        $userTimetable = \App\Models\User\UserTimetable::withoutGlobalScopes()
+            ->with(['timetable.company'])
+            ->find($userTimetableId);
+        $colorPrimary = $userTimetable->timetable->company->color_primary ?? '#1e3a5f';
+    @endphp
+    <div id="exam-app" data-user-timetable-id="{{ $userTimetableId }}" data-color-primary="{{ $colorPrimary }}"></div>
 </body>
 </html>

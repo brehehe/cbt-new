@@ -1,390 +1,478 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     ChevronLeft, ChevronRight, CheckCircle,
-    HelpCircle, Image as ImageIcon, ZoomIn
+    HelpCircle, Bookmark, Menu, Save
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import LatexHTML from './LatexHTML';
 
-const QuestionArea = ({ question, index, total, onSave, onNext, onPrev, onFinish }) => {
-    const [selectedAnswerId, setSelectedAnswerId] = useState(question?.timetable_answer_id);
-    const [essayAnswer, setEssayAnswer] = useState(question?.essay_answer || '');
-    const [isMarked, setIsMarked] = useState(question?.is_mark);
-    const [viewedImage, setViewedImage] = useState(null);
+const ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-    // Helper functions for media types
-    const getExtension = (filename) => filename?.split('.').pop().toLowerCase();
-    const isVideo = (filename) => ['mp4', 'mov', 'avi', 'wmv', 'webm'].includes(getExtension(filename));
-    const isAudio = (filename) => ['mp3', 'wav', 'ogg'].includes(getExtension(filename));
+const getMediaUrl = (path) => {
+    if (!path) return '';
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    const cleanPath = path.replace(/^\/?storage\/?/, '').replace(/^\//, '');
+    return `/storage/${cleanPath}`;
+};
 
-    // Refs to track latest state for unmount saving
-    const essayValueRef = React.useRef(essayAnswer);
-    const isMarkedRef = React.useRef(isMarked);
-    const originalEssayValue = question.essay_answer || '';
+/* ─── Save Status Badge ─── */
+const SaveBadge = ({ saveStatus, lastSaved, companyColor }) => {
+    const isSync = saveStatus === 'syncing';
+    const cfg = {
+        saving:  { dot: 'bg-amber-400 animate-ping',  txt: 'Menyimpan...',   cls: 'text-amber-600' },
+        syncing: { dot: '',                           txt: 'Sinkronisasi...', cls: '' },
+        saved:   { dot: 'bg-green-500',               txt: 'Tersimpan',       cls: 'text-green-600' },
+        error:   { dot: 'bg-red-500 animate-bounce',  txt: 'Gagal Simpan',    cls: 'text-red-600' },
+    }[saveStatus] || { dot: 'bg-green-500', txt: 'Tersimpan', cls: 'text-green-600' };
 
-    React.useEffect(() => {
-        setSelectedAnswerId(question?.timetable_answer_id);
+    return (
+        <div className="flex items-center gap-1.5 px-2 py-1 bg-white border border-gray-200 rounded-full text-[11px] font-semibold shadow-sm whitespace-nowrap">
+            <span className="relative flex h-2 w-2 flex-none">
+                <span 
+                    className={`absolute inline-flex h-full w-full rounded-full opacity-75 ${isSync ? 'animate-ping' : cfg.dot}`} 
+                    style={isSync ? { backgroundColor: companyColor } : {}}
+                />
+                <span 
+                    className={`relative inline-flex rounded-full h-2 w-2 ${isSync ? '' : cfg.dot.split(' ')[0]}`} 
+                    style={isSync ? { backgroundColor: companyColor } : {}}
+                />
+            </span>
+            <span className={isSync ? '' : cfg.cls} style={isSync ? { color: companyColor } : {}}>{cfg.txt}</span>
+            {saveStatus === 'saved' && lastSaved && (
+                <span className="text-gray-400 font-mono text-[10px] hidden sm:inline">{lastSaved}</span>
+            )}
+        </div>
+    );
+};
+
+/* ─── Main Component ─── */
+const QuestionArea = ({
+    question, index, total, onSave, onNext, onPrev, onFinish,
+    setCurrentIndex, saveStatus, lastSaved, navigation = [], companyColor = '#1e3a5f'
+}) => {
+    const [selectedAnswerId, setSelectedAnswerId] = useState(question?.timetable_answer_id ?? null);
+    const [essayAnswer, setEssayAnswer]           = useState(question?.essay_answer || '');
+    const [isMarked, setIsMarked]                 = useState(!!question?.is_mark);
+
+    const [fontSize, setFontSize] = useState(() => {
+        return localStorage.getItem('exam_font_size') || 'medium';
+    });
+
+    const changeFontSize = (size) => {
+        setFontSize(size);
+        localStorage.setItem('exam_font_size', size);
+    };
+
+    const fontSizes = {
+        small: {
+            question: 'text-xs sm:text-sm leading-relaxed text-gray-800 font-medium',
+            description: 'text-xs text-gray-600 bg-gray-50 rounded-xl p-3 border border-gray-100',
+            answers: 'flex-1 text-xs text-gray-800 leading-relaxed pt-0.5 space-y-2',
+            textarea: 'w-full p-3 border-2 border-gray-200 rounded-xl text-xs text-gray-800 resize-none focus:outline-none transition-colors'
+        },
+        medium: {
+            question: 'text-sm sm:text-base leading-relaxed text-gray-800 font-medium',
+            description: 'text-sm text-gray-600 bg-gray-50 rounded-xl p-3 border border-gray-100',
+            answers: 'flex-1 text-sm text-gray-800 leading-relaxed pt-0.5 space-y-2',
+            textarea: 'w-full p-3 border-2 border-gray-200 rounded-xl text-sm text-gray-800 resize-none focus:outline-none transition-colors'
+        },
+        large: {
+            question: 'text-base sm:text-lg leading-relaxed text-gray-800 font-medium',
+            description: 'text-base text-gray-600 bg-gray-50 rounded-xl p-3 border border-gray-100',
+            answers: 'flex-1 text-base text-gray-800 leading-relaxed pt-0.5 space-y-2',
+            textarea: 'w-full p-3 border-2 border-gray-200 rounded-xl text-base text-gray-800 resize-none focus:outline-none transition-colors'
+        }
+    };
+
+    const essayRef    = useRef(essayAnswer);
+    const markedRef   = useRef(isMarked);
+    const origEssay   = question?.essay_answer || '';
+
+    /* sync when question changes */
+    useEffect(() => {
+        setSelectedAnswerId(question?.timetable_answer_id ?? null);
         setEssayAnswer(question?.essay_answer || '');
-        setIsMarked(question?.is_mark);
+        setIsMarked(!!question?.is_mark);
+        essayRef.current  = question?.essay_answer || '';
+        markedRef.current = !!question?.is_mark;
     }, [question?.id]);
+
+    /* debounced essay save */
+    useEffect(() => {
+        if (question?.timetable_question?.type !== 'essay') return;
+        const t = setTimeout(() => {
+            if (essayRef.current !== origEssay) onSave(selectedAnswerId, markedRef.current, essayRef.current);
+        }, 1000);
+        return () => {
+            clearTimeout(t);
+            if (essayRef.current !== origEssay) onSave(selectedAnswerId, markedRef.current, essayRef.current);
+        };
+    }, [question?.id, essayAnswer]);
 
     const handleAnswerSelect = (id) => {
         setSelectedAnswerId(id);
         onSave(id, isMarked, essayAnswer);
     };
 
-    const handleEssayChange = (e) => {
-        const val = e.target.value;
-        setEssayAnswer(val);
-        essayValueRef.current = val;
-    };
-
-    // Debounced save for essay + Save on Unmount
-    React.useEffect(() => {
-        if (question?.timetable_question?.type !== 'essay') return;
-
-        const timeoutId = setTimeout(() => {
-            if (essayAnswer !== originalEssayValue) {
-                onSave(selectedAnswerId, isMarked, essayAnswer);
-            }
-        }, 1000); // Save after 1 second of no typing
-
-        return () => {
-            clearTimeout(timeoutId);
-            // If the value changed and wasn't saved yet, save it now
-            if (essayValueRef.current !== originalEssayValue) {
-                onSave(selectedAnswerId, isMarkedRef.current, essayValueRef.current);
-            }
-        };
-    }, [question?.id, essayAnswer]);
-
     const handleToggleMark = () => {
-        const newMark = !isMarked;
-        setIsMarked(newMark);
-        isMarkedRef.current = newMark;
-        onSave(selectedAnswerId, newMark, essayAnswer);
+        const next = !isMarked;
+        setIsMarked(next);
+        markedRef.current = next;
+        onSave(selectedAnswerId, next, essayAnswer);
     };
 
-    const handleNext = () => {
-        if (question?.timetable_question?.type === 'essay' && essayAnswer !== originalEssayValue) {
-            onSave(selectedAnswerId, isMarked, essayAnswer);
+    const handleEssayChange = (e) => {
+        const v = e.target.value;
+        setEssayAnswer(v);
+        essayRef.current = v;
+    };
+
+    const saveBeforeNav = () => {
+        if (question?.timetable_question?.type === 'essay' && essayRef.current !== origEssay) {
+            onSave(selectedAnswerId, markedRef.current, essayRef.current);
         }
-        onNext();
     };
 
-    const handlePrev = () => {
-        if (question?.timetable_question?.type === 'essay' && essayAnswer !== originalEssayValue) {
-            onSave(selectedAnswerId, isMarked, essayAnswer);
-        }
-        onPrev();
-    };
+    /* ── Data ── */
+    // API returns: question.timetable_question.answers[].context
+    const questionType = question?.timetable_question?.type;
+    const answers      = question?.timetable_question?.answers
+                      ?? question?.timetable_question?.timetable_answers
+                      ?? [];
 
-    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const answeredCount = navigation.filter(n => n.isAnswered).length;
+
+    /* ── Page strip ── */
+    const RANGE = 2;
+    const pageNums = [];
+    for (let i = Math.max(0, index - RANGE); i <= Math.min(total - 1, index + RANGE); i++) {
+        pageNums.push(i);
+    }
+    const showFirstEllipsis = index > RANGE + 1;
+    const showLastEllipsis  = index < total - RANGE - 2;
 
     return (
-        <AnimatePresence mode="wait">
-            <motion.div
-                key={question.id}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
-                className="flex flex-col h-full bg-white/70 backdrop-blur-xl border border-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden"
-            >
-                {/* Decorative blob */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-orange-100 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+        <div className="flex flex-col h-full overflow-hidden bg-white">
 
-                {/* Header Question */}
-                <div className="p-4 lg:p-6 border-b border-gray-100 bg-white/50 flex items-center justify-between relative z-10">
-                    <h2 className="text-xl lg:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-amber-600">Soal No. {index + 1}</h2>
+            {/* ── Top Bar ── */}
+            <div className="flex-none flex flex-wrap items-center gap-1.5 px-3 py-2 bg-white border-b border-gray-200 shadow-sm z-10">
+                {/* Nav label */}
+                <div className="hidden sm:flex items-center gap-1 text-xs font-semibold text-gray-400 pr-2 border-r border-gray-200 mr-1">
+                    <Menu className="w-3.5 h-3.5" />
+                    <span>Navigasi Soal</span>
+                </div>
+
+                {/* Question # */}
+                <span className="text-xs font-bold text-gray-700 mr-2">Soal {index + 1} dari {total}</span>
+
+                {/* Font Size Selector */}
+                <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1 border border-gray-200">
                     <button
-                        onClick={handleToggleMark}
-                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 transition-all duration-300 font-bold active:scale-95 ${isMarked
-                            ? 'bg-amber-100 border-amber-400 text-amber-700 shadow-[0_4px_15px_rgba(251,191,36,0.2)]'
-                            : 'bg-white border-gray-200 text-gray-500 hover:border-amber-300 hover:bg-amber-50 hover:text-amber-600'
-                            }`}
+                        onClick={() => changeFontSize('small')}
+                        className={`px-2 py-1 rounded text-[10px] font-bold transition-all ${
+                            fontSize === 'small' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-800'
+                        }`}
+                        title="Ukuran Huruf Kecil"
                     >
-                        <HelpCircle className={`w-5 h-5 ${isMarked ? 'fill-amber-500' : ''}`} />
-                        <span>Ragu-Ragu? 🤔</span>
+                        Kecil
+                    </button>
+                    <button
+                        onClick={() => changeFontSize('medium')}
+                        className={`px-2 py-1 rounded text-[10px] font-bold transition-all ${
+                            fontSize === 'medium' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-800'
+                        }`}
+                        title="Ukuran Huruf Sedang"
+                    >
+                        Sedang
+                    </button>
+                    <button
+                        onClick={() => changeFontSize('large')}
+                        className={`px-2 py-1 rounded text-[10px] font-bold transition-all ${
+                            fontSize === 'large' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-800'
+                        }`}
+                        title="Ukuran Huruf Besar"
+                    >
+                        Besar
                     </button>
                 </div>
 
-                {/* Content Area */}
-                <div className="flex-1 overflow-y-auto p-4 lg:p-10 custom-scrollbar">
-                    <div className="max-w-full mx-auto space-y-8">
-                        {/* Question Text */}
-                        <div className="space-y-6">
-                            <div className="prose prose-xl max-w-none text-gray-900 leading-relaxed font-medium text-justify">
-                                <LatexHTML html={question?.timetable_question?.question || 'Soal tidak dapat dimuat.'} />
-                            </div>
-                            {question?.timetable_question?.description && (
-                                <div className="prose prose-xl max-w-none text-gray-900 leading-relaxed font-medium text-justify">
-                                    <LatexHTML
-                                        className="text-orange-600/80 text-sm italic leading-snug font-medium prose-sm prose-orange"
-                                        html={question?.timetable_question?.description}
-                                    />
-                                </div>
-                            )}
+                <div className="flex-1" />
+
+                {/* Ragu-Ragu */}
+                <button
+                    onClick={handleToggleMark}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all shadow-sm active:scale-[0.98]"
+                    style={isMarked
+                        ? { backgroundColor: '#fef9c3', borderColor: '#f59e0b', color: '#92400e' }
+                        : { backgroundColor: '#f8fafc', borderColor: '#e2e8f0', color: '#64748b' }
+                    }
+                >
+                    <HelpCircle className="w-3.5 h-3.5" />
+                    <span>Ragu-Ragu</span>
+                </button>
+
+                {/* Save badge */}
+                <SaveBadge saveStatus={saveStatus} lastSaved={lastSaved} companyColor={companyColor} />
+            </div>
+
+            {/* ── Question Body (scrollable) ── */}
+            <div className="flex-1 overflow-y-auto">
+                <div className="max-w-3xl mx-auto px-4 py-5 space-y-5">
+
+                    {/* Question label */}
+                    <p className="text-xs font-semibold text-gray-400">Soal ke-{index + 1}:</p>
+
+                    {/* Question text */}
+                    <div className={fontSizes[fontSize].question}>
+                        <LatexHTML html={question?.timetable_question?.question || 'Soal tidak dapat dimuat.'} />
+                    </div>
+
+                    {/* Question description / text content */}
+                    {question?.timetable_question?.description && (
+                        <div className={fontSizes[fontSize].description}>
+                            <LatexHTML html={question.timetable_question.description} />
                         </div>
+                    )}
 
-                        {/* Question Images */}
-                        {question?.timetable_question?.images && (
-                            (() => {
-                                const parseImages = JSON.parse(question?.timetable_question?.images || '[]');
-                                if (parseImages.length === 0) return null;
+                    {/* Media files (images, audio, video) */}
+                    {(() => {
+                        let mediaFiles = [];
+                        const imagesVal = question?.timetable_question?.images;
+                        if (imagesVal) {
+                            if (Array.isArray(imagesVal)) {
+                                mediaFiles = imagesVal;
+                            } else if (typeof imagesVal === 'string') {
+                                try {
+                                    mediaFiles = JSON.parse(imagesVal);
+                                } catch (e) {
+                                    if (imagesVal.trim().startsWith('[')) {
+                                        mediaFiles = [];
+                                    } else {
+                                        mediaFiles = [imagesVal];
+                                    }
+                                }
+                            }
+                        }
 
+                        if (mediaFiles.length > 0) {
+                            return (
+                                <div className="mt-4 space-y-4">
+                                    {mediaFiles.map((file, idx) => {
+                                        const url = getMediaUrl(file);
+                                        const isVideo = /\.(mp4|mov|avi|wmv|webm)$/i.test(file);
+                                        const isAudio = /\.(mp3|wav|ogg|m4a)$/i.test(file);
+                                        const isPdf = /\.pdf$/i.test(file);
+                                        const isDoc = /\.(docx?|xlsx?|txt|zip|rar)$/i.test(file);
+
+                                        if (isVideo) {
+                                            return (
+                                                <div key={idx} className="rounded-xl overflow-hidden border border-gray-200 bg-slate-900 shadow-sm max-w-xl mx-auto">
+                                                    <video src={url} className="w-full max-h-[360px] object-contain" controls />
+                                                </div>
+                                            );
+                                        } else if (isAudio) {
+                                            return (
+                                                <div key={idx} className="p-4 rounded-xl border border-gray-200 bg-slate-50 shadow-sm max-w-md mx-auto flex flex-col gap-2">
+                                                    <span className="text-xs text-gray-500 font-semibold truncate flex items-center gap-1.5">
+                                                        🎵 Audio Lampiran {mediaFiles.length > 1 ? `#${idx + 1}` : ''}
+                                                    </span>
+                                                    <audio src={url} className="w-full focus:outline-none" controls />
+                                                </div>
+                                            );
+                                        } else if (isPdf) {
+                                            return (
+                                                <div key={idx} className="p-4 rounded-xl border border-gray-200 bg-red-50 shadow-sm max-w-md mx-auto flex flex-col gap-2 items-center text-center">
+                                                    <span className="text-red-500 font-semibold flex items-center gap-1">📄 PDF Lampiran {mediaFiles.length > 1 ? `#${idx + 1}` : ''}</span>
+                                                    <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 underline font-medium hover:text-blue-800 break-all">
+                                                        Lihat / Unduh Lampiran PDF
+                                                    </a>
+                                                </div>
+                                            );
+                                        } else if (isDoc) {
+                                            return (
+                                                <div key={idx} className="p-4 rounded-xl border border-gray-200 bg-blue-50 shadow-sm max-w-md mx-auto flex flex-col gap-2 items-center text-center">
+                                                    <span className="text-blue-500 font-semibold flex items-center gap-1">📁 Dokumen Lampiran {mediaFiles.length > 1 ? `#${idx + 1}` : ''}</span>
+                                                    <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 underline font-medium hover:text-blue-800 break-all">
+                                                        Unduh Lampiran Dokumen
+                                                    </a>
+                                                </div>
+                                            );
+                                        } else {
+                                            return (
+                                                <div key={idx} className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-sm inline-block max-w-full hover:shadow-md transition-shadow">
+                                                    <img src={url} alt={`Lampiran Soal ${idx + 1}`} className="max-h-[300px] object-contain cursor-zoom-in" onClick={() => window.open(url, '_blank')} />
+                                                </div>
+                                            );
+                                        }
+                                    })}
+                                </div>
+                            );
+                        }
+                        return null;
+                    })()}
+
+                    {/* ── Multiple Choice Answers ── */}
+                    {questionType !== 'essay' && answers.length > 0 && (
+                        <div className="space-y-2.5 pt-1">
+                            {answers.map((answer, i) => {
+                                const isSelected = selectedAnswerId === answer.id;
+                                // answer text lives in `context` field
+                                const answerText = answer.context ?? answer.answer ?? '';
                                 return (
-                                    <div className="flex flex-col gap-10 w-full py-4 text-left">
-                                        {parseImages.map((img, i) => {
-                                            const mediaUrl = `/storage/${img}`;
-                                            if (isVideo(img)) {
-                                                return (
-                                                    <div key={i} className="w-full rounded-2xl overflow-hidden shadow-sm border border-gray-200 bg-black">
-                                                        <video controls controlsList="nodownload" className="w-full h-auto max-h-[600px] mx-auto">
-                                                            <source src={mediaUrl} type={`video/${getExtension(img)}`} />
-                                                            Your browser does not support the video tag.
-                                                        </video>
-                                                    </div>
-                                                );
-                                            } else if (isAudio(img)) {
-                                                return (
-                                                    <div key={i} className="w-full rounded-xl overflow-hidden shadow-sm border border-gray-200 bg-gray-50 p-4">
-                                                        <audio controls controlsList="nodownload" className="w-full">
-                                                            <source src={mediaUrl} type={`audio/${getExtension(img)}`} />
-                                                            Your browser does not support the audio tag.
-                                                        </audio>
-                                                    </div>
-                                                );
-                                            } else {
-                                                return (
-                                                    <div
-                                                        key={i}
-                                                        onClick={() => setViewedImage(mediaUrl)}
-                                                        className="group relative rounded-2xl border-2 border-gray-100 overflow-hidden bg-gray-50 shadow-sm hover:shadow-xl transition-all duration-300 cursor-zoom-in"
-                                                    >
-                                                        <img
-                                                            src={mediaUrl}
-                                                            alt="Question visual"
-                                                            className="w-full h-auto object-contain max-h-[600px] mx-auto mix-blend-multiply"
-                                                        />
-                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-6">
-                                                            <div className="bg-white/90 backdrop-blur px-6 py-3 rounded-full flex items-center gap-3 text-sm font-bold text-gray-700 shadow-xl border border-white/50">
-                                                                <ZoomIn className="w-5 h-5 text-orange-600" /> Lihat Gambar Penuh
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                );
+                                    <button
+                                        key={answer.id}
+                                        onClick={() => handleAnswerSelect(answer.id)}
+                                        className="w-full flex items-start gap-3 p-3 sm:p-3.5 rounded-xl border-2 text-left transition-all duration-150 hover:shadow-sm active:scale-[0.99]"
+                                        style={isSelected
+                                            ? { borderColor: companyColor, backgroundColor: `${companyColor}0f` }
+                                            : { borderColor: '#e5e7eb', backgroundColor: '#fff' }
+                                        }
+                                    >
+                                        {/* Letter circle */}
+                                        <div
+                                            className="flex-none w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-black transition-all"
+                                            style={isSelected
+                                                ? { backgroundColor: companyColor, color: '#fff' }
+                                                : { backgroundColor: '#f1f5f9', color: '#64748b' }
                                             }
-                                        })}
-                                    </div>
-                                );
-                            })()
-                        )}
-
-                        {/* Latex Preview */}
-                        {question?.timetable_question?.latex_preview_png && (
-                            <div className="flex justify-start -mt-4">
-                                <div
-                                    onClick={() => setViewedImage(`/storage/${question?.timetable_question?.latex_preview_png}`)}
-                                    className="group relative p-6 bg-white rounded-2xl border-2 border-dashed border-gray-200 shadow-sm transition-all hover:border-orange-400 hover:shadow-xl cursor-zoom-in"
-                                >
-                                    <img
-                                        src={`/storage/${question?.timetable_question?.latex_preview_png}`}
-                                        alt="Equation"
-                                        className="w-full h-auto object-contain mx-auto mix-blend-multiply"
-                                    />
-                                    <div className="absolute inset-x-0 bottom-3 opacity-0 group-hover:opacity-100 transition-opacity flex justify-center">
-                                        <div className="bg-orange-600/90 backdrop-blur px-3 py-1 rounded-full flex items-center gap-2 text-[10px] font-bold text-white shadow-lg uppercase tracking-wider">
-                                            <ZoomIn className="w-3 h-3" /> Lihat Gambar Penuh
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Answers / Essay Input */}
-                        <div className="pb-20">
-                            {question?.timetable_question?.type === 'essay' ? (
-                                <div className="space-y-4">
-                                    <label className="block text-lg font-bold text-gray-700">Jawaban Anda:</label>
-                                    <textarea
-                                        value={essayAnswer}
-                                        onChange={handleEssayChange}
-                                        placeholder="Ketik jawaban Anda di sini..."
-                                        className="w-full h-64 p-6 rounded-3xl border-2 border-gray-100 focus:border-orange-600 focus:ring-4 focus:ring-orange-100 transition-all text-lg font-medium resize-none shadow-sm"
-                                    />
-                                    <p className="text-sm text-gray-400 italic">
-                                        Jawaban Anda akan disimpan secara otomatis saat Anda mengetik.
-                                    </p>
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-1 gap-4">
-                                    {question?.timetable_question?.answers?.map((answer, i) => (
-                                        <label
-                                            key={answer.id}
-                                            className={`group relative flex items-start gap-4 p-4 rounded-3xl border-2 cursor-pointer transition-all duration-300 ${selectedAnswerId === answer.id
-                                                ? 'border-orange-500 bg-orange-50/50 shadow-[0_8px_30px_rgb(249,115,22,0.15)]'
-                                                : 'border-white bg-white/60 backdrop-blur hover:border-orange-300 hover:shadow-xl hover:-translate-y-1'
-                                                }`}
                                         >
-                                            <input
-                                                type="radio"
-                                                name="answer"
-                                                className="hidden"
-                                                checked={selectedAnswerId === answer.id}
-                                                onChange={() => handleAnswerSelect(answer.id)}
-                                            />
-
-                                            {/* Alphabet Circle */}
-                                            <div className={`flex-none w-10 h-10 rounded-2xl flex items-center justify-center font-black text-lg transition-all duration-300 shadow-sm border-2 ${selectedAnswerId === answer.id
-                                                ? 'bg-gradient-to-br from-orange-500 to-amber-500 border-transparent text-white rotate-12 scale-110 shadow-orange-300/50'
-                                                : 'bg-white border-gray-200 text-gray-400 group-hover:border-orange-400 group-hover:text-orange-500'
-                                                }`}>
-                                                {alphabet[i]}
-                                            </div>
-
-                                            {/* Answer Content */}
-                                            <div className="flex-1 space-y-3 pt-1">
-                                                <LatexHTML
-                                                    className="text-gray-800 text-base font-bold leading-relaxed"
-                                                    html={answer.context}
-                                                />
-
-                                                {/* Answer Images */}
-                                                {answer.images && JSON.parse(answer.images || '[]').length > 0 && (
-                                                    <div className="flex flex-col gap-6 w-full">
-                                                        {JSON.parse(answer.images).map((img, j) => {
-                                                            const mediaUrl = `/storage/${img}`;
-                                                            if (isVideo(img)) {
+                                            {ALPHA[i]}
+                                        </div>
+                                        {/* Answer text & media */}
+                                        <div className={fontSizes[fontSize].answers}>
+                                            <LatexHTML html={answerText} />
+                                            {/* Answer images/media */}
+                                            {(() => {
+                                                let answerMedia = [];
+                                                const ansImages = answer.images;
+                                                if (ansImages) {
+                                                    if (Array.isArray(ansImages)) {
+                                                        answerMedia = ansImages;
+                                                    } else if (typeof ansImages === 'string') {
+                                                        try {
+                                                            answerMedia = JSON.parse(ansImages);
+                                                        } catch (e) {
+                                                            answerMedia = [ansImages];
+                                                        }
+                                                    }
+                                                }
+                                                if (answerMedia.length > 0) {
+                                                    return (
+                                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
+                                                            {answerMedia.map((file, aIdx) => {
+                                                                const aUrl = getMediaUrl(file);
                                                                 return (
-                                                                    <div key={j} onClick={(e) => e.stopPropagation()} className="p-1.5 rounded-2xl border border-gray-100 bg-black w-full xl:w-3/4">
-                                                                        <video controls controlsList="nodownload" className="w-full h-auto max-h-48">
-                                                                            <source src={mediaUrl} type={`video/${getExtension(img)}`} />
-                                                                        </video>
+                                                                    <div key={aIdx} className="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 aspect-video flex items-center justify-center hover:opacity-90 transition-opacity">
+                                                                        <img src={aUrl} alt="Gambar Jawaban" className="max-h-full max-w-full object-contain cursor-pointer" onClick={(e) => { e.stopPropagation(); window.open(aUrl, '_blank'); }} />
                                                                     </div>
                                                                 );
-                                                            } else if (isAudio(img)) {
-                                                                return (
-                                                                    <div key={j} onClick={(e) => e.stopPropagation()} className="p-1.5 rounded-xl border border-gray-100 bg-gray-50 w-full xl:w-3/4">
-                                                                        <audio controls controlsList="nodownload" className="w-full">
-                                                                            <source src={mediaUrl} type={`audio/${getExtension(img)}`} />
-                                                                        </audio>
-                                                                    </div>
-                                                                );
-                                                            } else {
-                                                                return (
-                                                                    <div
-                                                                        key={j}
-                                                                        onClick={(e) => {
-                                                                            e.preventDefault();
-                                                                            e.stopPropagation();
-                                                                            setViewedImage(mediaUrl);
-                                                                        }}
-                                                                        className="p-1.5 rounded-2xl border border-gray-100 bg-gray-50 hover:bg-white transition-all cursor-zoom-in hover:shadow-xl w-full xl:w-3/4"
-                                                                    >
-                                                                        <img src={mediaUrl} className="rounded-lg max-h-48 w-auto object-contain" alt="Option visual" />
-                                                                    </div>
-                                                                );
-                                                            }
-                                                        })}
-                                                    </div>
-                                                )}
-
-                                                {/* Answer Latex */}
-                                                {answer.latex_preview_png && (
-                                                    <div
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                            setViewedImage(`/storage/${answer.latex_preview_png}`);
-                                                        }}
-                                                        className="group inline-block p-4 bg-gray-50 rounded-xl border border-gray-100 hover:border-orange-300 hover:bg-white transition-all cursor-zoom-in relative"
-                                                    >
-                                                        <img src={`/storage/${answer.latex_preview_png}`} className="max-h-24 object-contain mix-blend-multiply" alt="Option equation" />
-                                                        <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <ZoomIn className="w-4 h-4 text-orange-500" />
+                                                            })}
                                                         </div>
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            {/* Checkmark Indicator */}
-                                            <div className={`flex-none w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${selectedAnswerId === answer.id ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
-                                                }`}>
-                                                <CheckCircle className="w-8 h-8 fill-orange-500 text-white" />
-                                            </div>
-                                        </label>
-                                    ))}
-                                </div>
-                            )}
+                                                    );
+                                                }
+                                                return null;
+                                            })()}
+                                        </div>
+                                        {/* Check icon */}
+                                        {isSelected && (
+                                            <CheckCircle
+                                                className="flex-none w-4 h-4 mt-1"
+                                                style={{ color: companyColor }}
+                                            />
+                                        )}
+                                    </button>
+                                );
+                            })}
                         </div>
-                    </div>
+                    )}
+
+                    {/* ── Essay ── */}
+                    {questionType === 'essay' && (
+                        <div className="space-y-2">
+                            <label className="text-xs font-semibold text-gray-500">Jawaban Anda:</label>
+                            <textarea
+                                value={essayAnswer}
+                                onChange={handleEssayChange}
+                                rows={7}
+                                placeholder="Ketik jawaban Anda di sini..."
+                                className={fontSizes[fontSize].textarea}
+                                style={{ '--tw-ring-color': companyColor }}
+                                onFocus={e => e.target.style.borderColor = companyColor}
+                                onBlur={e => e.target.style.borderColor = '#e5e7eb'}
+                            />
+                        </div>
+                    )}
+
+                    {/* No answers placeholder */}
+                    {questionType !== 'essay' && answers.length === 0 && (
+                        <div className="py-6 text-center text-sm text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                            Pilihan jawaban tidak tersedia
+                        </div>
+                    )}
                 </div>
+            </div>
 
-                {/* Footer Navigation */}
-                <div className="p-4 lg:p-6 border-t border-gray-100 bg-white/50 backdrop-blur relative z-10 rounded-b-3xl">
-                    {/* Lightbox Overlay */}
-                    <AnimatePresence>
-                        {viewedImage && (
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                onClick={() => setViewedImage(null)}
-                                className="fixed inset-0 z-[999] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 lg:p-20 cursor-zoom-out"
-                            >
-                                <motion.div
-                                    initial={{ scale: 0.9, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    exit={{ scale: 0.9, opacity: 0 }}
-                                    className="relative max-w-full max-h-full"
-                                >
-                                    <img
-                                        src={viewedImage}
-                                        alt="Viewed image"
-                                        className="max-w-full max-h-[90vh] rounded-xl shadow-2xl object-contain border-4 border-white/10"
-                                    />
-                                    <div className="absolute top-4 right-4 bg-white/20 hover:bg-white/40 backdrop-blur p-2 rounded-full transition-colors">
-                                        <ChevronRight className="w-6 h-6 text-white rotate-45" />
-                                    </div>
-                                </motion.div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+            {/* ── Bottom Navigation ── */}
+            <div className="flex-none border-t border-gray-200 bg-white px-3 py-2.5 flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                {/* Prev */}
+                <button
+                    onClick={() => { saveBeforeNav(); onPrev(); }}
+                    disabled={index === 0}
+                    className="flex items-center gap-1 px-3 py-2 rounded-lg border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all whitespace-nowrap"
+                >
+                    <ChevronLeft className="w-3.5 h-3.5" />
+                    <span>Sebelumnya</span>
+                </button>
 
-                    <div className="max-w-full mx-auto flex items-center justify-between">
+                {/* Page strip */}
+                <div className="flex-1 flex items-center justify-center gap-1 overflow-hidden">
+                    {/* First page */}
+                    {showFirstEllipsis && <>
+                        <button onClick={() => { saveBeforeNav(); setCurrentIndex(0); }} className="w-7 h-7 rounded-md text-xs font-bold text-gray-500 hover:bg-gray-100">1</button>
+                        <span className="text-gray-300 text-xs px-0.5">…</span>
+                    </>}
+
+                    {pageNums.map(n => (
                         <button
-                            onClick={handlePrev}
-                            disabled={index === 0}
-                            className={`flex items-center gap-2 px-6 py-3.5 rounded-2xl font-bold transition-all active:scale-95 ${index === 0 ? 'text-gray-400 bg-gray-100 cursor-not-allowed opacity-70' : 'text-slate-700 bg-white border-2 border-slate-200 hover:border-orange-300 hover:text-orange-600 hover:shadow-lg'
-                                }`}
+                            key={n}
+                            onClick={() => { saveBeforeNav(); setCurrentIndex(n); }}
+                            className="w-7 h-7 rounded-md text-xs font-bold transition-all hover:opacity-80"
+                            style={n === index
+                                ? { backgroundColor: '#1e3a5f', color: '#fff' }
+                                : { backgroundColor: '#f1f5f9', color: '#475569' }
+                            }
                         >
-                            <ChevronLeft className="w-5 h-5" /> Sebelumnya
+                            {n + 1}
                         </button>
+                    ))}
 
-                        <div className="text-sm font-black text-orange-500/50 hidden sm:block bg-orange-50 px-4 py-2 rounded-xl">
-                            {index + 1} / {total}
-                        </div>
-
-                        {index === total - 1 ? (
-                            <button
-                                onClick={onFinish}
-                                className="flex items-center gap-2 px-8 py-3.5 rounded-2xl font-black text-white transition-all bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 shadow-[0_8px_20px_rgba(16,185,129,0.3)] hover:-translate-y-1 active:scale-95"
-                            >
-                                <CheckCircle className="w-5 h-5" /> Selesai! 🎉
-                            </button>
-                        ) : (
-                            <button
-                                onClick={handleNext}
-                                className="flex items-center gap-2 px-8 py-3.5 rounded-2xl font-black text-white transition-all bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-[0_8px_20px_rgba(249,115,22,0.3)] hover:-translate-y-1 active:scale-95"
-                            >
-                                Selanjutnya <ChevronRight className="w-5 h-5" />
-                            </button>
-                        )}
-                    </div>
+                    {/* Last page */}
+                    {showLastEllipsis && <>
+                        <span className="text-gray-300 text-xs px-0.5">…</span>
+                        <button onClick={() => { saveBeforeNav(); setCurrentIndex(total - 1); }} className="w-7 h-7 rounded-md text-xs font-bold text-gray-500 hover:bg-gray-100">{total}</button>
+                    </>}
                 </div>
-            </motion.div>
-        </AnimatePresence>
+
+                {/* Next / Finish */}
+                {index < total - 1 ? (
+                    <button
+                        onClick={() => { saveBeforeNav(); onNext(); }}
+                        className="flex items-center gap-1 px-4 py-2 rounded-lg text-xs font-bold text-white transition-all whitespace-nowrap"
+                        style={{ backgroundColor: companyColor }}
+                    >
+                        <span>Selanjutnya</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                ) : (
+                    <button
+                        onClick={() => onFinish(false)}
+                        className="flex items-center gap-1 px-4 py-2 rounded-lg text-xs font-bold text-white bg-green-600 hover:bg-green-700 transition-all whitespace-nowrap"
+                    >
+                        <CheckCircle className="w-3.5 h-3.5" />
+                        <span>Selesai</span>
+                    </button>
+                )}
+            </div>
+        </div>
     );
 };
 

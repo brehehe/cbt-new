@@ -127,6 +127,16 @@ class AdminMasterSettingIndex extends Component
 
     public $app_ios_old;
 
+    public $enable_camera = true;
+
+    public $enable_recording = true;
+
+    public $enable_streaming = true;
+
+    public $only_admin_generate_token = false;
+
+    public $import_student_timetable = false;
+
     // Service
     public $companyServices = [];
 
@@ -187,6 +197,11 @@ class AdminMasterSettingIndex extends Component
             'app_android_old',
             'app_ios',
             'app_ios_old',
+            'enable_camera',
+            'enable_recording',
+            'enable_streaming',
+            'only_admin_generate_token',
+            'import_student_timetable',
         ]);
 
         if ($tab === 'universitas' || $tab === 'seb') {
@@ -231,6 +246,11 @@ class AdminMasterSettingIndex extends Component
                 'app_mac',
                 'app_android',
                 'app_ios',
+                'enable_camera',
+                'enable_recording',
+                'enable_streaming',
+                'only_admin_generate_token',
+                'import_student_timetable',
             ])->with('companyDetail')->find($this->company_id);
 
             if ($company) {
@@ -277,6 +297,13 @@ class AdminMasterSettingIndex extends Component
                 $this->app_mac_old = $company->app_mac;
                 $this->app_android_old = $company->app_android;
                 $this->app_ios_old = $company->app_ios;
+
+                // Media features settings
+                $this->enable_camera = $company->enable_camera;
+                $this->enable_recording = $company->enable_recording;
+                $this->enable_streaming = $company->enable_streaming;
+                $this->only_admin_generate_token = $company->only_admin_generate_token;
+                $this->import_student_timetable = $company->import_student_timetable;
             }
         } elseif ($tab === 'layanan') {
             $this->companyServices = CompanyService::select('id', 'start_date', 'company_id', 'service_month_id', 'duration_days', 'is_lifetime')->with('serviceMonth:id,name,description', 'company:id,name,description')->where('company_id', $this->company_id)->get();
@@ -323,6 +350,11 @@ class AdminMasterSettingIndex extends Component
                 'app_mac' => 'nullable|file|max:512000',
                 'app_android' => 'nullable|file|max:512000',
                 'app_ios' => 'nullable|file|max:512000',
+                'enable_camera' => 'nullable|boolean',
+                'enable_recording' => 'nullable|boolean',
+                'enable_streaming' => 'nullable|boolean',
+                'only_admin_generate_token' => 'nullable|boolean',
+                'import_student_timetable' => 'nullable|boolean',
             ]);
 
             if ($this->logo) {
@@ -420,6 +452,11 @@ class AdminMasterSettingIndex extends Component
                 'app_mac' => $this->app_mac,
                 'app_android' => $this->app_android,
                 'app_ios' => $this->app_ios,
+                'enable_camera' => $this->enable_camera ?? false,
+                'enable_recording' => $this->enable_recording ?? false,
+                'enable_streaming' => $this->enable_streaming ?? false,
+                'only_admin_generate_token' => $this->only_admin_generate_token ?? false,
+                'import_student_timetable' => $this->import_student_timetable ?? false,
             ]);
 
             CompanyDetail::updateOrCreate([

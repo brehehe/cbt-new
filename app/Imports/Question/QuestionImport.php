@@ -33,11 +33,17 @@ class QuestionImport implements ToCollection
                     'Kategori Soal',
                     'Soal',
                     'Deskripsi Soal',
+                    'URL Gambar Soal',
                     'A',
+                    'URL Gambar A',
                     'B',
+                    'URL Gambar B',
                     'C',
+                    'URL Gambar C',
                     'D',
+                    'URL Gambar D',
                     'E',
+                    'URL Gambar E',
                     'Jawaban',
                 ];
             } else {
@@ -51,7 +57,9 @@ class QuestionImport implements ToCollection
                     'Kategori Soal',
                     'Soal',
                     'Deskripsi Soal',
+                    'URL Gambar Soal',
                     'Jawaban Referensi',
+                    'URL Gambar Jawaban',
                 ];
             }
 

@@ -104,7 +104,7 @@ class AdminExamWarningIndex extends Component
     public function render()
     {
         return view('livewire.admin.exam.warning.admin-exam-warning-index')
-            ->extends('layout.warning')
+            ->extends('layout.warning', ['userTimetable' => $this->userTimetable])
             ->section('content');
     }
 }

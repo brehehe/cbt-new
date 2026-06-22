@@ -32,11 +32,11 @@ class ExamApiController extends Controller
         $hasEssayAnswerColumn = $this->hasEssayAnswerColumn();
 
         $userTimetable = UserTimetable::withoutGlobalScopes()
-            ->select('id', 'user_id', 'status', 'start_exam', 'pause_total_seconds', 'is_recording', 'is_streaming', 'company_id', 'timetable_id')
+            ->select('id', 'user_id', 'status', 'start_exam', 'pause_total_seconds', 'is_camera', 'is_recording', 'is_streaming', 'company_id', 'timetable_id')
             ->with([
                 'user:id,name,nim,username',
                 'timetable' => function ($q) {
-                    $q->withoutGlobalScopes()->select('id', 'module_id', 'company_id', 'is_simulation');
+                    $q->withoutGlobalScopes()->select('id', 'module_id', 'company_id', 'is_simulation', 'is_camera');
                 },
                 'timetable.module' => function ($q) {
                     $q->withoutGlobalScopes()->select('id', 'name', 'duration');
@@ -106,6 +106,7 @@ class ExamApiController extends Controller
             'navigation' => $navigation,
             'alertCount' => $alertCount,
             'liveSession' => $liveSession,
+            'isCameraEnabled' => (bool) $userTimetable->is_camera,
             'isRecordingEnabled' => (bool) $userTimetable->is_recording,
             'isStreamingEnabled' => (bool) $userTimetable->is_streaming,
         ]);

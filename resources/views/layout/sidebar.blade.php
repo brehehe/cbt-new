@@ -193,16 +193,16 @@
                                     'icon' => 'fa-list-ul',
                                 ],
                                 [
-                                    'label' => 'Modul Soal',
-                                    'url' => route('admin.master.module'),
-                                    'pattern' => ['admin/master/module', 'admin/master/module-question/*'],
-                                    'icon' => 'fa-folder-open',
-                                ],
-                                [
                                     'label' => 'Bank Soal',
                                     'url' => route('admin.master.question'),
                                     'pattern' => ['admin/master/question', 'admin/master/question/*'],
                                     'icon' => 'fa-database',
+                                ],
+                                [
+                                    'label' => 'Modul Soal',
+                                    'url' => route('admin.master.module'),
+                                    'pattern' => ['admin/master/module', 'admin/master/module-question/*'],
+                                    'icon' => 'fa-folder-open',
                                 ],
                                 [
                                     'label' => 'Pengaturan',
@@ -291,18 +291,18 @@
                                     'icon' => 'fa-list-ul',
                                 ],
                                 [
-                                    'label' => 'Modul Soal',
-                                    'url' => route('admin.master.module'),
-                                    'pattern' => ['admin/master/module-question', 'admin/master/module-question/*'],
-                                    'icon' => 'fa-folder-open',
-                                ],
-                                [
                                     'label' => 'Bank Soal',
                                     'url' => route('admin.master.question'),
                                     'pattern' => ['admin/master/question', 'admin/master/question/*'],
                                     'icon' => 'fa-database',
-                                ],
-                            ];
+                                    ],
+                                    [
+                                        'label' => 'Modul Soal',
+                                        'url' => route('admin.master.module'),
+                                        'pattern' => ['admin/master/module-question', 'admin/master/module-question/*'],
+                                        'icon' => 'fa-folder-open',
+                                    ],
+                                ];
                         }
 
                         // ============================
@@ -380,6 +380,14 @@
                         </a>
                     @endforeach
                 @endif
+
+                @php
+                    if (optional(auth()->user()->company)->is_pmb === 'pmb') {
+                        $masters = array_values(array_filter($masters, function ($item) {
+                            return $item['label'] !== 'Dosen';
+                        }));
+                    }
+                @endphp
 
                 @if(count($masters) > 0)
                     <!-- Divider: Master -->

@@ -84,7 +84,7 @@
                                     </label>
                                 </div>
                             </td>
-                            <td>{{ $result?->question_pick_type == 'category' ? 'Kategori Soal' : ($result?->question_pick_type == 'topic' ? 'Topik' : 'Manual') }}
+                            <td>{{ $result?->question_pick_type == 'category' ? 'Kategori Soal' : ($result?->question_pick_type == 'topic' ? 'Topik' : ($result?->question_pick_type == 'material_category' ? 'Kategori Materi' : 'Manual')) }}
                             </td>
                             <td>{{ $result?->description }}</td>
                             <td class="center">

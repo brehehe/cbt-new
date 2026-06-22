@@ -75,6 +75,8 @@ class AdminMasterTimetableIndex extends Component
 
     public $is_streaming = false;
 
+    public $is_camera = false;
+
     public function mount()
     {
         Session::forget('timetable_id');
@@ -88,12 +90,83 @@ class AdminMasterTimetableIndex extends Component
         $this->examSessions = ExamSession::where('company_id', Auth::user()->company_id)->get();
     }
 
+    public function openCreateModal()
+    {
+        $this->reset([
+            'data_id',
+            'name',
+            'module_id',
+            'supervisors',
+            'start_time',
+            'end_time',
+            'description',
+            'studys',
+            'classmate_id',
+            'exam_room_id',
+            'exam_session_id',
+            'require_seb',
+            'is_camera',
+            'is_recording',
+            'is_streaming',
+        ]);
+        
+        $company = Auth::user()->company;
+        $this->is_camera = $company ? (bool)$company->enable_camera : true;
+        $this->is_recording = $company ? (bool)$company->enable_recording : true;
+        $this->is_streaming = $company ? (bool)$company->enable_streaming : true;
+
+        return $this->dispatch('open-modal', ['id' => 'modal-timetable']);
+    }
+
     public function openModal()
     {
         $this->is_recording = true;
         $this->is_streaming = true;
 
         return $this->dispatch('open-modal', ['id' => 'modal-timetable']);
+    }
+
+    public function updatedIsCamera($value)
+    {
+        if (!$value) {
+            $this->is_recording = false;
+            $this->is_streaming = false;
+        }
+    }
+
+    public function updatedClassmateId()
+    {
+        Log::info('updatedClassmateId called:', [
+            'classmate_id' => $this->classmate_id,
+        ]);
+        if ($this->classmate_id) {
+            $classmate = Classmate::find($this->classmate_id);
+            if ($classmate) {
+                Log::info('classmate found:', [
+                    'id' => $classmate->id,
+                    'name' => $classmate->name,
+                    'exam_room_id' => $classmate->exam_room_id,
+                    'exam_session_id' => $classmate->exam_session_id,
+                    'exam_date' => $classmate->exam_date,
+                ]);
+                if ($classmate->exam_room_id) {
+                    $this->exam_room_id = $classmate->exam_room_id;
+                }
+                if ($classmate->exam_session_id) {
+                    $this->exam_session_id = $classmate->exam_session_id;
+                }
+                if ($classmate->exam_date) {
+                    $this->start_time = Carbon::parse($classmate->exam_date)->setTime(8, 0)->format('Y-m-d\TH:i');
+                    $this->end_time = Carbon::parse($classmate->exam_date)->setTime(10, 0)->format('Y-m-d\TH:i');
+                }
+                Log::info('properties prefilled:', [
+                    'exam_room_id' => $this->exam_room_id,
+                    'exam_session_id' => $this->exam_session_id,
+                    'start_time' => $this->start_time,
+                    'end_time' => $this->end_time,
+                ]);
+            }
+        }
     }
 
     public function updatedModuleId()
@@ -122,6 +195,7 @@ class AdminMasterTimetableIndex extends Component
             'exam_room_id',
             'exam_session_id',
             'require_seb',
+            'is_camera',
             'is_recording',
             'is_streaming',
         ]);
@@ -144,6 +218,7 @@ class AdminMasterTimetableIndex extends Component
         $this->end_time = Carbon::parse($data->end_time)->format('Y-m-d\TH:i');
         $this->description = $data->description;
         $this->require_seb = $data->require_seb ?? false;
+        $this->is_camera = $data->is_camera ?? false;
         $this->is_recording = $data->is_recording ?? false;
         $this->is_streaming = $data->is_streaming ?? false;
 
@@ -168,13 +243,36 @@ class AdminMasterTimetableIndex extends Component
         $this->openModal();
     }
 
+    public function canGenerateToken()
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return false;
+        }
+
+        $company = $user->company;
+        if ($company && $company->only_admin_generate_token) {
+            return $user->hasRole('Admin');
+        }
+
+        return true;
+    }
+
     public function confirmGenerateToken($id)
     {
+        if (!$this->canGenerateToken()) {
+            AlertHelper::error('Akses Ditolak', 'Hanya Admin yang dapat membuat token!');
+            return;
+        }
         return AlertHelper::confirmWarning('generateToken', 'Apakah Anda Yakin Membuat Token?', $id);
     }
 
     public function generateToken($id)
     {
+        if (!$this->canGenerateToken()) {
+            AlertHelper::error('Akses Ditolak', 'Hanya Admin yang dapat membuat token!');
+            return;
+        }
         try {
             DB::beginTransaction();
             $token = '';
@@ -295,6 +393,7 @@ class AdminMasterTimetableIndex extends Component
                 'description' => $this->description,
                 'studys' => $this->studys ? json_encode(array_keys($this->studys)) : null,
                 'require_seb' => $this->require_seb ?? false,
+                'is_camera' => $this->is_camera ?? false,
                 'is_recording' => $this->is_recording ?? false,
                 'is_streaming' => $this->is_streaming ?? false,
             ]);

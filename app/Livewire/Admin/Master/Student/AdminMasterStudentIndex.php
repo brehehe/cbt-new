@@ -946,8 +946,15 @@ class AdminMasterStudentIndex extends Component
     {
         try {
             $this->validate([
-                'importFileMahasiswa' => 'required|mimes:xlsx,xls|max:5120', // max 5MB
+                'importFileMahasiswa' => 'required|max:5120', // max 5MB
             ]);
+
+            $extension = strtolower($this->importFileMahasiswa->getClientOriginalExtension());
+            if (!in_array($extension, ['xlsx', 'xls'])) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'importFileMahasiswa' => 'Format file harus .xlsx atau .xls'
+                ]);
+            }
 
             Excel::import(new StudentImport('mahasiswa'), $this->importFileMahasiswa);
 
@@ -965,8 +972,15 @@ class AdminMasterStudentIndex extends Component
     {
         try {
             $this->validate([
-                'importFileGeneral' => 'required|mimes:xlsx,xls|max:5120', // max 5MB
+                'importFileGeneral' => 'required|max:5120', // max 5MB
             ]);
+
+            $extension = strtolower($this->importFileGeneral->getClientOriginalExtension());
+            if (!in_array($extension, ['xlsx', 'xls'])) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'importFileGeneral' => 'Format file harus .xlsx atau .xls'
+                ]);
+            }
 
             Excel::import(new StudentImport('general'), $this->importFileGeneral);
 
@@ -984,9 +998,41 @@ class AdminMasterStudentIndex extends Component
     {
         try {
             // Create a simple template with headers
+            $company = auth()->user()->company;
             $headers = [
                 ['Name', 'NIM', 'Username', 'Email', 'Phone', 'Password', 'Program Studi', 'Faculty', 'Department', 'Semester', 'Student Status', 'Address', 'Identity Number'],
             ];
+
+            if ($company && $company->import_student_timetable) {
+                $headers[0][] = 'Sesi';
+                $headers[0][] = 'Ruang';
+                $headers[0][] = 'Tanggal';
+            }
+
+            // Example dummy data rows to prevent confusion (at least 3 rows)
+            $dummyRows = [
+                ['Budi Santoso', '12345678', 'budisantoso', 'budi@example.com', '081234567890', 'password123', 'Teknik Informatika', 'Fakultas Teknik', 'Teknik', '1', 'active', 'Jl. Merdeka No. 10', '3171012345678901'],
+                ['Siti Aminah', '12345679', 'sitiaminah', 'siti@example.com', '081234567891', 'password123', 'Sistem Informasi', 'Fakultas Ilmu Komputer', 'Ilmu Komputer', '3', 'active', 'Jl. Mawar No. 4', '3171012345678902'],
+                ['Ahmad Fauzi', '12345680', 'ahmadfauzi', 'ahmad@example.com', '081234567892', 'password123', 'Manajemen', 'Fakultas Ekonomi', 'Ekonomi', '5', 'active', 'Jl. Melati No. 8', '3171012345678903'],
+            ];
+
+            if ($company && $company->import_student_timetable) {
+                $dummyRows[0][] = 'Sesi 1';
+                $dummyRows[0][] = 'Ruang A';
+                $dummyRows[0][] = '2026-06-22';
+
+                $dummyRows[1][] = 'Sesi 2';
+                $dummyRows[1][] = 'Ruang B';
+                $dummyRows[1][] = '2026-06-22';
+
+                $dummyRows[2][] = 'Sesi 3';
+                $dummyRows[2][] = 'Ruang C';
+                $dummyRows[2][] = '2026-06-23';
+            }
+
+            foreach ($dummyRows as $row) {
+                $headers[] = $row;
+            }
 
             $fileName = 'student_template_mahasiswa.xlsx';
 
@@ -1013,9 +1059,41 @@ class AdminMasterStudentIndex extends Component
     public function downloadTemplateGeneral()
     {
         try {
+            $company = auth()->user()->company;
             $headers = [
                 ['Name', 'NIM', 'Username', 'Email', 'Phone', 'Password', 'Address'],
             ];
+
+            if ($company && $company->import_student_timetable) {
+                $headers[0][] = 'Sesi';
+                $headers[0][] = 'Ruang';
+                $headers[0][] = 'Tanggal';
+            }
+
+            // Example dummy data rows to prevent confusion (at least 3 rows)
+            $dummyRows = [
+                ['Budi Santoso', '12345678', 'budisantoso', 'budi@example.com', '081234567890', 'password123', 'Jl. Merdeka No. 10'],
+                ['Siti Aminah', '12345679', 'sitiaminah', 'siti@example.com', '081234567891', 'password123', 'Jl. Mawar No. 4'],
+                ['Ahmad Fauzi', '12345680', 'ahmadfauzi', 'ahmad@example.com', '081234567892', 'password123', 'Jl. Melati No. 8'],
+            ];
+
+            if ($company && $company->import_student_timetable) {
+                $dummyRows[0][] = 'Sesi 1';
+                $dummyRows[0][] = 'Ruang A';
+                $dummyRows[0][] = '2026-06-22';
+
+                $dummyRows[1][] = 'Sesi 2';
+                $dummyRows[1][] = 'Ruang B';
+                $dummyRows[1][] = '2026-06-22';
+
+                $dummyRows[2][] = 'Sesi 3';
+                $dummyRows[2][] = 'Ruang C';
+                $dummyRows[2][] = '2026-06-23';
+            }
+
+            foreach ($dummyRows as $row) {
+                $headers[] = $row;
+            }
 
             $fileName = 'student_template_general.xlsx';
 

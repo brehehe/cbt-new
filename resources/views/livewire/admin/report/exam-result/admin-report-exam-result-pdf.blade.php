@@ -226,20 +226,59 @@
     <table>
         <thead>
             <tr>
-                <th class="col-no">No</th>
-                <th class="text-left">Nama Mahasiswa</th>
-                <th>NIM/Username</th>
-                <th>Modul</th>
-                <th>Jadwal Ujian</th>
-                <th>Waktu Ujian</th>
-                <th>Nilai</th>
-                <th>Grade</th>
+                <th rowspan="2" class="col-no">No</th>
+                <th rowspan="2" class="text-left">Nama Mahasiswa</th>
+                <th rowspan="2">NIM/Username</th>
+                <th rowspan="2">Modul</th>
+                <th rowspan="2">Jadwal Ujian</th>
+                <th rowspan="2">Waktu Ujian</th>
+                <th rowspan="2">Soal</th>
+                <th rowspan="2">Benar</th>
+                <th rowspan="2">Salah</th>
+                <th rowspan="2">TJ</th>
+                @foreach ($allTopics as $topicId => $topicName)
+                    <th colspan="4" style="background-color: #374151; font-size: 8px;">{{ $topicName }}</th>
+                @endforeach
+                <th rowspan="2">Nilai</th>
+                <th rowspan="2">Grade</th>
+            </tr>
+            <tr>
+                @foreach ($allTopics as $topicId => $topicName)
+                    <th style="font-size: 7px; background-color: #4b5563;">Soal</th>
+                    <th style="font-size: 7px; background-color: #4b5563; color: #10b981;">B</th>
+                    <th style="font-size: 7px; background-color: #4b5563; color: #f59e0b;">S</th>
+                    <th style="font-size: 7px; background-color: #4b5563; color: #ef4444;">TJ</th>
+                @endforeach
             </tr>
         </thead>
         <tbody>
             @forelse ($examResults as $index => $result)
                 @php
                     $gradeDetail = $gradeDetails[$result->id] ?? null;
+                    $totalQ = $result->userModuleQuestions->count();
+                    $correct = $result->userModuleQuestions->where('status', 'correct')->count();
+                    $wrong = $result->userModuleQuestions->where('status', 'wrong')->count();
+                    $unanswered = $result->userModuleQuestions->whereNull('timetable_answer_id')->count();
+
+                    // Calculate topic stats for this student
+                    $topicStats = [];
+                    foreach ($result->userModuleQuestions as $umq) {
+                        $tq = $umq->timetableQuestion;
+                        if ($tq && $tq->topic_id) {
+                            $topicId = $tq->topic_id;
+                            if (!isset($topicStats[$topicId])) {
+                                $topicStats[$topicId] = ['total' => 0, 'correct' => 0, 'wrong' => 0, 'unanswered' => 0];
+                            }
+                            $topicStats[$topicId]['total']++;
+                            if (empty($umq->timetable_answer_id)) {
+                                $topicStats[$topicId]['unanswered']++;
+                            } elseif ($umq->status === 'correct') {
+                                $topicStats[$topicId]['correct']++;
+                            } elseif ($umq->status === 'wrong') {
+                                $topicStats[$topicId]['wrong']++;
+                            }
+                        }
+                    }
                 @endphp
                 <tr>
                     <td>{{ $index + 1 }}</td>
@@ -252,6 +291,21 @@
                         <span style="color: #6b7280; font-size: 8px;">s.d.</span> <br>
                         {{ $result->timetable?->end_time?->format('d/m/y H:i') ?? '-' }}
                     </td>
+                    <td>{{ $totalQ }}</td>
+                    <td style="color: #059669; font-weight: bold;">{{ $correct }}</td>
+                    <td style="color: #dc2626; font-weight: bold;">{{ $wrong }}</td>
+                    <td style="color: #d97706; font-weight: bold;">{{ $unanswered }}</td>
+
+                    @foreach ($allTopics as $topicId => $topicName)
+                        @php
+                            $tStat = $topicStats[$topicId] ?? ['total' => 0, 'correct' => 0, 'wrong' => 0, 'unanswered' => 0];
+                        @endphp
+                        <td>{{ $tStat['total'] }}</td>
+                        <td style="color: #059669;">{{ $tStat['correct'] }}</td>
+                        <td style="color: #dc2626;">{{ $tStat['wrong'] }}</td>
+                        <td style="color: #d97706;">{{ $tStat['unanswered'] }}</td>
+                    @endforeach
+
                     <td class="fw-bold" style="font-size: 11px;">{{ number_format($result->mark, 2) }}</td>
                     <td>
                         @if ($gradeDetail)
@@ -265,7 +319,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8" class="no-data">Tidak ada data yang sesuai dengan kriteria filter.</td>
+                    <td colspan="{{ 12 + (count($allTopics) * 4) }}" class="no-data">Tidak ada data yang sesuai dengan kriteria filter.</td>
                 </tr>
             @endforelse
         </tbody>

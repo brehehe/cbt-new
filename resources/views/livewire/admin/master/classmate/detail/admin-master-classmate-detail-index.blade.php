@@ -111,6 +111,36 @@
                     @enderror
                 </div>
             @endif
+
+            @if (auth()->user()->company->import_student_timetable)
+                <div class="border-t pt-4 mt-4">
+                    <h3 class="text-md font-semibold text-gray-800 mb-3">Hubungkan Peserta Otomatis (Jadwal Import)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="exam_date" class="block text-sm font-medium text-gray-700">Tanggal Ujian</label>
+                            <input type="date" id="exam_date" wire:model.live="exam_date" class="mt-1 form-control" />
+                        </div>
+                        <div>
+                            <label for="exam_session_id" class="block text-sm font-medium text-gray-700">Sesi Ujian</label>
+                            <select id="exam_session_id" wire:model.live="exam_session_id" class="mt-1 form-control">
+                                <option value="">-- Pilih Sesi --</option>
+                                @foreach ($exam_sessions as $session)
+                                    <option value="{{ $session->id }}">{{ $session->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label for="exam_room_id" class="block text-sm font-medium text-gray-700">Ruang Ujian</label>
+                            <select id="exam_room_id" wire:model.live="exam_room_id" class="mt-1 form-control">
+                                <option value="">-- Pilih Ruang --</option>
+                                @foreach ($exam_rooms as $room)
+                                    <option value="{{ $room->id }}">{{ $room->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
         <div class="p-5 bg-white shadow rounded-lg">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">

@@ -15,7 +15,7 @@ axios.interceptors.response.use(
     }
 );
 
-export const useLiveSession = (userTimetableId, isEnabled) => {
+export const useLiveSession = (userTimetableId, isEnabled, sharedStream) => {
     const [connectionStatus, setConnectionStatus] = useState('disconnected');
 
     const connectToLiveKit = useCallback(async () => {
@@ -39,10 +39,15 @@ export const useLiveSession = (userTimetableId, isEnabled) => {
             setConnectionStatus('connected');
 
             // 3. Publish local video
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            let stream = sharedStream;
+            if (!stream) {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            }
             const tracks = stream.getVideoTracks();
             if (tracks.length > 0) {
-                await room.localParticipant.publishTrack(tracks[0]);
+                // Clone the track so LiveKit doesn't stop the original shared track on disconnect/cleanup
+                const trackToPublish = tracks[0].clone();
+                await room.localParticipant.publishTrack(trackToPublish);
             }
 
             room.on(RoomEvent.Disconnected, () => {
@@ -54,7 +59,7 @@ export const useLiveSession = (userTimetableId, isEnabled) => {
             console.error("LiveKit connection failed:", error);
             setConnectionStatus('Connection Error');
         }
-    }, [userTimetableId, isEnabled]);
+    }, [userTimetableId, isEnabled, sharedStream]);
 
     // Heartbeat + session check every 15 seconds
     useEffect(() => {
@@ -110,7 +115,7 @@ export const useLiveSession = (userTimetableId, isEnabled) => {
 
     useEffect(() => {
         let roomInstance;
-        if (isEnabled) {
+        if (isEnabled && sharedStream) {
             connectToLiveKit().then(room => {
                 roomInstance = room;
             });
@@ -118,7 +123,7 @@ export const useLiveSession = (userTimetableId, isEnabled) => {
         return () => {
             if (roomInstance) roomInstance.disconnect();
         };
-    }, [isEnabled, connectToLiveKit]);
+    }, [isEnabled, connectToLiveKit, sharedStream]);
 
     return { connectionStatus };
 };

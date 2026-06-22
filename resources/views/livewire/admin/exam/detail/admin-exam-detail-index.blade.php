@@ -238,12 +238,32 @@
                         @if (!empty($images) && collect($images)->isNotEmpty())
                             <div class="mt-4 flex flex-wrap gap-3">
                                 @foreach ($images as $image)
+                                    @php
+                                        $isUrl = Str::startsWith($image, ['http://', 'https://']);
+                                        $src = $isUrl ? $image : asset('storage/' . ltrim($image, '/'));
+                                    @endphp
                                     <div
                                         class="overflow-hidden rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
-                                        <img src="{{ asset('storage/' . $image) }}" alt="Gambar soal"
-                                            class="object-contain cursor-zoom-in js-zoomable"
-                                            style="max-width: 250px; max-height: 200px;"
-                                            data-zoom-src="{{ asset('storage/' . $image) }}">
+                                        @if(preg_match('/\.(mp4|mov|avi|wmv|webm)$/i', $image))
+                                            <video src="{{ $src }}" class="max-h-[200px] max-w-[250px] object-contain" controls></video>
+                                        @elseif(preg_match('/\.(mp3|wav|ogg|m4a)$/i', $image))
+                                            <audio src="{{ $src }}" class="w-[250px] object-contain" controls></audio>
+                                        @elseif(preg_match('/\.(pdf)$/i', $image))
+                                            <div class="flex flex-col items-center justify-center gap-1 p-2 text-center h-[200px] w-[250px] bg-gray-50 border rounded-lg">
+                                                <i class="fa-solid fa-file-pdf text-3xl text-red-500"></i>
+                                                <a href="{{ $src }}" target="_blank" class="text-xs text-blue-500 underline break-all font-medium">Lihat PDF</a>
+                                            </div>
+                                        @elseif(preg_match('/\.(docx?|xlsx?|txt|zip|rar)$/i', $image))
+                                            <div class="flex flex-col items-center justify-center gap-1 p-2 text-center h-[200px] w-[250px] bg-gray-50 border rounded-lg">
+                                                <i class="fa-solid fa-file text-3xl text-blue-500"></i>
+                                                <a href="{{ $src }}" target="_blank" class="text-xs text-blue-500 underline break-all font-medium">Unduh Dokumen</a>
+                                            </div>
+                                        @else
+                                            <img src="{{ $src }}" alt="Gambar soal"
+                                                class="object-contain cursor-zoom-in js-zoomable"
+                                                style="max-width: 250px; max-height: 200px;"
+                                                data-zoom-src="{{ $src }}">
+                                        @endif
                                     </div>
                                 @endforeach
                             </div>
@@ -291,15 +311,35 @@
 
                                                         {{-- Images --}}
                                                         @if (!empty($question_answer['images']) && collect($question_answer['images'])->isNotEmpty())
-                                                            <div class="mt-3 grid grid-cols-2 md:grid-cols-3 gap-2">
-                                                                @foreach ($question_answer['images'] as $image)
-                                                                    <div class="overflow-hidden rounded-lg border border-gray-200 shadow-sm">
-                                                                        <img src="{{ asset('storage/' . $image) }}" alt="Gambar jawaban"
-                                                                            class="w-full h-auto object-contain cursor-zoom-in js-zoomable max-h-40 bg-gray-50 bg-opacity-50"
-                                                                            data-zoom-src="{{ asset('storage/' . $image) }}">
-                                                                    </div>
-                                                                @endforeach
-                                                            </div>
+                                                             <div class="mt-3 grid grid-cols-2 md:grid-cols-3 gap-2">
+                                                                 @foreach ($question_answer['images'] as $image)
+                                                                     @php
+                                                                         $isUrl = Str::startsWith($image, ['http://', 'https://']);
+                                                                         $src = $isUrl ? $image : asset('storage/' . ltrim($image, '/'));
+                                                                     @endphp
+                                                                     <div class="overflow-hidden rounded-lg border border-gray-200 shadow-sm flex items-center justify-center bg-gray-50 max-h-40 p-2">
+                                                                         @if(preg_match('/\.(mp4|mov|avi|wmv|webm)$/i', $image))
+                                                                             <video src="{{ $src }}" class="max-h-full max-w-full object-contain" controls></video>
+                                                                         @elseif(preg_match('/\.(mp3|wav|ogg|m4a)$/i', $image))
+                                                                             <audio src="{{ $src }}" class="w-full object-contain" controls></audio>
+                                                                         @elseif(preg_match('/\.(pdf)$/i', $image))
+                                                                             <div class="flex flex-col items-center justify-center gap-1 text-center">
+                                                                                 <i class="fa-solid fa-file-pdf text-2xl text-red-500"></i>
+                                                                                 <a href="{{ $src }}" target="_blank" class="text-[10px] text-blue-500 underline break-all font-medium">Lihat PDF</a>
+                                                                             </div>
+                                                                         @elseif(preg_match('/\.(docx?|xlsx?|txt|zip|rar)$/i', $image))
+                                                                             <div class="flex flex-col items-center justify-center gap-1 text-center">
+                                                                                 <i class="fa-solid fa-file text-2xl text-blue-500"></i>
+                                                                                 <a href="{{ $src }}" target="_blank" class="text-[10px] text-blue-500 underline break-all font-medium">Unduh Dokumen</a>
+                                                                             </div>
+                                                                         @else
+                                                                             <img src="{{ $src }}" alt="Gambar jawaban"
+                                                                                 class="w-full h-auto object-contain cursor-zoom-in js-zoomable max-h-40 bg-gray-50 bg-opacity-50"
+                                                                                 data-zoom-src="{{ $src }}">
+                                                                         @endif
+                                                                     </div>
+                                                                 @endforeach
+                                                             </div>
                                                         @endif
 
                                                         {{-- LaTeX Preview --}}

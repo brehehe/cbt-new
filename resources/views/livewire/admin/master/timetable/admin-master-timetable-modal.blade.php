@@ -34,7 +34,7 @@
                     <div>
                         <label for="classmate_id" class="block text-sm font-medium text-gray-700">Peserta <span
                                 class="text-red-600">*</span></label>
-                        <div wire:key="select-{{ rand() }}">
+                        <div wire:ignore wire:key="select-classmate-{{ $classmate_id }}">
                             <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
                                 dropdownParent: 'body',
                                 allowClear: true,
@@ -45,7 +45,7 @@
                             });" wire:model.lazy="classmate_id" id="classmate_id">
                                 <option value="">-- Pilih Peserta --</option>
                                 @foreach ($classmates as $key_cl => $classmate)
-                                    <option value="{{ $key_cl }}">{{ $classmate }}</option>
+                                    <option value="{{ $key_cl }}" {{ $classmate_id == $key_cl ? 'selected' : '' }}>{{ $classmate }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -56,7 +56,7 @@
                     <div>
                         <label for="module_id" class="block text-sm font-medium text-gray-700">Modul <span
                                 class="text-red-600">*</span></label>
-                        <div wire:key="select-{{ rand() }}">
+                        <div wire:ignore wire:key="select-module-{{ $module_id }}">
                             <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
                                 dropdownParent: 'body',
                                 allowClear: true,
@@ -67,7 +67,7 @@
                             });" wire:model.lazy="module_id" id="module_id">
                                 <option value="">-- Pilih Modul --</option>
                                 @foreach ($modules as $key_module => $module)
-                                    <option value="{{ $key_module }}">{{ $module }}</option>
+                                    <option value="{{ $key_module }}" {{ $module_id == $key_module ? 'selected' : '' }}>{{ $module }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -78,7 +78,7 @@
                     <div>
                         <label for="exam_room_id" class="block text-sm font-medium text-gray-700">Ruang Ujian <span
                                 class="text-red-600">*</span></label>
-                        <div wire:key="select-{{ rand() }}">
+                        <div wire:ignore wire:key="select-room-{{ $exam_room_id }}">
                             <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
                                 dropdownParent: 'body',
                                 allowClear: true,
@@ -89,7 +89,7 @@
                             });" wire:model.lazy="exam_room_id" id="exam_room_id">
                                 <option value="">-- Pilih Ruang Ujian --</option>
                                 @foreach ($examRooms as $key => $value)
-                                    <option value="{{ $value->id }}">{{ $value->name }} -
+                                    <option value="{{ $value->id }}" {{ $exam_room_id == $value->id ? 'selected' : '' }}>{{ $value->name }} -
                                         [CODE]:{{ $value?->code }}</option>
                                 @endforeach
                             </select>
@@ -101,7 +101,7 @@
                     <div>
                         <label for="exam_session_id" class="block text-sm font-medium text-gray-700">Sesi Ujian <span
                                 class="text-red-600">*</span></label>
-                        <div wire:key="select-{{ rand() }}">
+                        <div wire:ignore wire:key="select-session-{{ $exam_session_id }}">
                             <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
                                 dropdownParent: 'body',
                                 allowClear: true,
@@ -112,7 +112,7 @@
                             });" wire:model.lazy="exam_session_id" id="exam_session_id">
                                 <option value="">-- Pilih Sesi Ujian --</option>
                                 @foreach ($examSessions as $key => $value)
-                                    <option value="{{ $value->id }}">{{ $value->name }} -
+                                    <option value="{{ $value->id }}" {{ $exam_session_id == $value->id ? 'selected' : '' }}>{{ $value->name }} -
                                         [CODE]:{{ $value?->code }}</option>
                                 @endforeach
                             </select>
@@ -152,18 +152,18 @@
                     <div>
                         <label for="supervisors" class="block text-sm font-medium text-gray-700">Pengawas <span
                                 class="text-red-600">*</span></label>
-                        <div wire:key="select-{{ rand() }}">
+                        <div wire:ignore wire:key="select-supervisors-{{ implode('-', $supervisors ?? []) }}">
                             <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
                                 dropdownParent: 'body',
                                 allowClear: true,
                                 plugins: ['clear_button'],
                                 onChange: function(e) {
-                                    @this.set('supervisors', e ? e : '');
+                                    @this.set('supervisors', e ? (typeof e === 'string' ? e.split(',') : e) : []);
                                 }
                             });" wire:model.lazy="supervisors" id="supervisors" multiple>
                                 <option value="">-- Pilih Pengawas --</option>
                                 @foreach ($getSupervisors as $key_getSupervisor => $getSupervisor)
-                                    <option value="{{ $key_getSupervisor }}">{{ $getSupervisor }}</option>
+                                    <option value="{{ $key_getSupervisor }}" {{ in_array($key_getSupervisor, $supervisors ?? []) ? 'selected' : '' }}>{{ $getSupervisor }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -197,13 +197,19 @@
                     <div class="grid grid-cols-2 gap-4">
                         <label
                             class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer">
-                            <input type="checkbox" wire:model.defer="is_recording"
+                            <input type="checkbox" wire:model="is_camera"
+                                class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2">
+                            <span class="text-sm font-medium text-gray-700">Kamera</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer {{ !$is_camera ? 'opacity-50 cursor-not-allowed' : '' }}">
+                            <input type="checkbox" wire:model="is_recording" {{ !$is_camera ? 'disabled' : '' }}
                                 class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2">
                             <span class="text-sm font-medium text-gray-700">Recording</span>
                         </label>
                         <label
-                            class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer">
-                            <input type="checkbox" wire:model.defer="is_streaming"
+                            class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer {{ !$is_camera ? 'opacity-50 cursor-not-allowed' : '' }}">
+                            <input type="checkbox" wire:model="is_streaming" {{ !$is_camera ? 'disabled' : '' }}
                                 class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2">
                             <span class="text-sm font-medium text-gray-700">Streaming</span>
                         </label>

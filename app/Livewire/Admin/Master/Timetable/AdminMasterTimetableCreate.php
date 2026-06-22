@@ -33,6 +33,7 @@ class AdminMasterTimetableCreate extends Component
     public $getSupervisors = [];
     public $examRooms = [];
     public $examSessions = [];
+    public $classmates = [];
 
     // Participants (dynamic selection parameters)
     public $searchStudent = '';
@@ -50,6 +51,7 @@ class AdminMasterTimetableCreate extends Component
             ->select('name', 'id')->get()->pluck('name', 'id')->toArray();
         $this->examRooms = ExamRoom::where('company_id', Auth::user()->company_id)->get();
         $this->examSessions = ExamSession::where('company_id', Auth::user()->company_id)->get();
+        $this->classmates = Classmate::where('company_id', Auth::user()->company_id)->get();
 
         $this->schedules = [
             $this->createNewScheduleState('Jadwal 1')
@@ -60,6 +62,7 @@ class AdminMasterTimetableCreate extends Component
     {
         return [
             'name' => $name,
+            'classmate_id' => '',
             'module_id' => '',
             'exam_room_id' => '',
             'exam_session_id' => '',
@@ -77,6 +80,39 @@ class AdminMasterTimetableCreate extends Component
 
     public function updatedSchedules($value, $key)
     {
+        if (str_contains($key, 'classmate_id')) {
+            preg_match('/(\d+)/', $key, $matches);
+            if (isset($matches[0])) {
+                $index = $matches[0];
+                $classmateId = $value;
+                if ($classmateId) {
+                    $classmate = Classmate::find($classmateId);
+                    if ($classmate) {
+                        $studentIds = ClassmateStudent::where('classmate_id', $classmateId)
+                            ->pluck('user_id')
+                            ->map(fn($id) => (string)$id)
+                            ->toArray();
+                        $this->schedules[$index]['selectedStudents'] = $studentIds;
+
+                        if (optional(auth()->user()->company)->import_student_timetable) {
+                            if ($classmate->exam_room_id) {
+                                $this->schedules[$index]['exam_room_id'] = $classmate->exam_room_id;
+                            }
+                            if ($classmate->exam_session_id) {
+                                $this->schedules[$index]['exam_session_id'] = $classmate->exam_session_id;
+                            }
+                            if ($classmate->exam_date) {
+                                $this->schedules[$index]['start_time'] = Carbon::parse($classmate->exam_date)->setTime(8, 0)->format('Y-m-d\TH:i');
+                                $this->schedules[$index]['end_time'] = Carbon::parse($classmate->exam_date)->setTime(10, 0)->format('Y-m-d\TH:i');
+                            }
+                        }
+                    }
+                } else {
+                    $this->schedules[$index]['selectedStudents'] = [];
+                }
+            }
+        }
+
         // $key will look like "0.module_id" or "schedules.0.module_id"
         if (str_contains($key, 'module_id')) {
             preg_match('/(\d+)/', $key, $matches);
@@ -90,9 +126,9 @@ class AdminMasterTimetableCreate extends Component
             preg_match('/(\d+)/', $key, $matches);
             if (isset($matches[0]) && $value) {
                 $index = $matches[0];
-                $startTime = Carbon::parse($value)->format('Y-m-d H:i:s');
+                $startTime = Carbon::parse($value)->format('Y-m-d\TH:i');
                 $this->schedules[$index]['start_time'] = $startTime;
-                $this->schedules[$index]['end_time'] = Carbon::parse($startTime)->addHour(2)->format('Y-m-d H:i:s');
+                $this->schedules[$index]['end_time'] = Carbon::parse($startTime)->addHour(2)->format('Y-m-d\TH:i');
                 
                 try {
                     $this->validateOnly("schedules.{$index}.start_time");
@@ -107,7 +143,7 @@ class AdminMasterTimetableCreate extends Component
             preg_match('/(\d+)/', $key, $matches);
             if (isset($matches[0]) && $value) {
                 $index = $matches[0];
-                $this->schedules[$index]['end_time'] = Carbon::parse($value)->format('Y-m-d H:i:s');
+                $this->schedules[$index]['end_time'] = Carbon::parse($value)->format('Y-m-d\TH:i');
                 
                 try {
                     $this->validateOnly("schedules.{$index}.end_time");
@@ -276,6 +312,14 @@ class AdminMasterTimetableCreate extends Component
         $allExcludeIds = array_values(array_unique(array_merge($excludeIds, $currentSelected)));
 
         $company = Auth::user()->company;
+        Log::info('generateStudents called:', [
+            'admin_company_id' => Auth::user()->company_id,
+            'company_id_from_relation' => $company?->id,
+            'generateCount' => $this->generateCount,
+            'exclude_count' => count($excludeIds),
+            'current_selected_count' => count($currentSelected),
+            'all_exclude_count' => count($allExcludeIds),
+        ]);
 
         $query = User::role(['Mahasiswa'])
             ->where('company_id', $company->id);
@@ -288,6 +332,11 @@ class AdminMasterTimetableCreate extends Component
             ->pluck('id')
             ->map(fn($id) => (string) $id)
             ->toArray();
+
+        Log::info('generateStudents query results:', [
+            'found_students_count' => count($students),
+            'students' => $students,
+        ]);
 
         $newSelected = array_values(array_unique(array_merge($currentSelected, $students)));
         $this->schedules[$this->activeTab]['selectedStudents'] = $newSelected;
@@ -331,11 +380,17 @@ class AdminMasterTimetableCreate extends Component
 
     public function submit()
     {
-        $this->validate();
+        try {
+            $this->validate();
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation failed in Timetable Create: ' . json_encode($e->errors()));
+            throw $e;
+        }
 
         // Validate that each schedule has at least one participant
         foreach ($this->schedules as $index => $sched) {
             if (empty($sched['selectedStudents'])) {
+                Log::error("Validation failed: Schedule {$index} has no students.");
                 return AlertHelper::error('Gagal', 'Jadwal "' . ($sched['name'] ?: 'Jadwal ' . ($index + 1)) . '" harus memiliki minimal 1 peserta.');
             }
         }
@@ -347,20 +402,25 @@ class AdminMasterTimetableCreate extends Component
                 $scheduleName = $sched['name'];
                 $uniqueGroupName = $scheduleName . ' - ' . date('YmdHis') . '-' . $index;
 
-                // 1. Create Classmate group
-                $classmate = Classmate::create([
-                    'name' => $uniqueGroupName,
-                    'company_id' => Auth::user()->company_id,
-                    'description' => 'Grup peserta untuk jadwal: ' . $scheduleName,
-                    'type_study' => 'general'
-                ]);
-
-                // 2. Attach Students to Classmate for this room
-                foreach ($sched['selectedStudents'] as $userId) {
-                    ClassmateStudent::create([
-                        'classmate_id' => $classmate->id,
-                        'user_id' => $userId,
+                // 1. Create or use Classmate group
+                if (!empty($sched['classmate_id'])) {
+                    $classmateId = $sched['classmate_id'];
+                } else {
+                    $classmate = Classmate::create([
+                        'name' => $uniqueGroupName,
+                        'company_id' => Auth::user()->company_id,
+                        'description' => 'Grup peserta untuk jadwal: ' . $scheduleName,
+                        'type_study' => 'general'
                     ]);
+                    $classmateId = $classmate->id;
+
+                    // 2. Attach Students to Classmate for this room
+                    foreach ($sched['selectedStudents'] as $userId) {
+                        ClassmateStudent::create([
+                            'classmate_id' => $classmateId,
+                            'user_id' => $userId,
+                        ]);
+                    }
                 }
 
                 // Get study keys from studys array
@@ -369,7 +429,7 @@ class AdminMasterTimetableCreate extends Component
                 // 3. Create Timetable
                 Timetable::create([
                     'company_id' => Auth::user()->company_id,
-                    'classmate_id' => $classmate->id,
+                    'classmate_id' => $classmateId,
                     'name' => $scheduleName,
                     'module_id' => $sched['module_id'],
                     'exam_room_id' => $sched['exam_room_id'],

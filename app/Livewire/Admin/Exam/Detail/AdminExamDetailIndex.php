@@ -65,6 +65,8 @@ class AdminExamDetailIndex extends Component
 
     public $questionNavigationOrder;
 
+    private $userQuestionsCollection = null;
+
     protected $listeners = [
         'timeExpired',
         'saveRecordingVideo' => 'saveRecordingVideo',
@@ -963,32 +965,7 @@ class AdminExamDetailIndex extends Component
             $this->questionNavigationId = $firstQuestion->id;
             $this->questionNavigationOrder = $firstQuestion->order;
             $this->isMark = $firstQuestion->is_mark;
-            $this->question = $firstQuestion->timetableQuestion?->question;
-            $this->description = $firstQuestion->timetableQuestion?->description;
-            $images = $firstQuestion->timetableQuestion?->images;
-            $this->images = collect(json_decode($images ?? '[]', true));
-            $this->question_latex = $firstQuestion->timetableQuestion?->latex;
-            $this->question_latex_preview_png = $firstQuestion->timetableQuestion?->latex_preview_png;
-            $this->number = 1;
             $this->timetable_answer_id = $firstQuestion->timetable_answer_id;
-            $this->question_answers = [];
-            if ($firstQuestion->timetableQuestion) {
-                $answers = $firstQuestion->timetableQuestion
-                    ->answers()
-                    ->orderBy('order', 'asc')
-                    ->get();
-
-                foreach ($answers as $index => $answer) {
-                    $this->question_answers[] = [
-                        'id' => $answer->id,
-                        'alphabet' => chr(64 + $index + 1),
-                        'context' => $answer->context,
-                        'images' => collect(json_decode($images, true)),
-                        'latex' => $answer->latex,
-                        'latex_preview_png' => $answer->latex_preview_png,
-                    ];
-                }
-            }
 
             $this->refreshQuestionData();
         } else {
@@ -1094,20 +1071,19 @@ class AdminExamDetailIndex extends Component
 
     private function getUserQuestions()
     {
-        return UserModuleQuestion::select('id', 'is_mark', 'timetable_module_id', 'timetable_answer_id', 'timetable_question_id', 'order')
-            ->where('user_timetable_id', $this->userTimetableId)
-            ->orderBy('order')
-            ->get();
+        if ($this->userQuestionsCollection === null) {
+            $this->userQuestionsCollection = UserModuleQuestion::select('id', 'is_mark', 'timetable_module_id', 'timetable_answer_id', 'timetable_question_id', 'order')
+                ->where('user_timetable_id', $this->userTimetableId)
+                ->orderBy('order')
+                ->get();
+        }
+
+        return $this->userQuestionsCollection;
     }
 
     private function questionIds()
     {
-        return UserModuleQuestion::select('id')
-            ->where('user_timetable_id', $this->userTimetableId)
-            ->orderBy('order')
-            ->get()
-            ->pluck('id')
-            ->toArray();
+        return $this->getUserQuestions()->pluck('id')->toArray();
     }
 
     private function mapQuestionNumbers($questions)
@@ -1154,9 +1130,9 @@ class AdminExamDetailIndex extends Component
             $index = array_search($currentQuestion->id, $this->questionIds());
             $this->number = $index !== false ? $index + 1 : 1;
 
-            $answers = $questionModel->answers()
-                ->orderBy('order')
-                ->get();
+            $answers = $questionModel->answers
+                ->sortBy('order')
+                ->values();
 
             $this->question_answers = $answers->map(
                 fn ($ans, $i) => [
@@ -1192,7 +1168,7 @@ class AdminExamDetailIndex extends Component
             ]);
 
         $this->reset('timetable_answer_id');
-        $this->refreshQuestionData();
+        $this->userQuestionsCollection = null;
     }
 
     private function navigateToQuestion($direction)
@@ -1215,8 +1191,6 @@ class AdminExamDetailIndex extends Component
             $this->questionNavigationId = $nextQuestion->id;
             $this->questionNavigationOrder = $nextQuestion->order;
             $this->refreshQuestionData();
-            $this->updateCurrentQuestionMark();
-            $this->updatePercentage();
             $this->updateNavigationStatus();
         }
 
@@ -1248,8 +1222,7 @@ class AdminExamDetailIndex extends Component
         $current = UserModuleQuestion::where('id', $id)->select('order')->first();
         $this->questionNavigationOrder = $current?->order;
 
-        $this->updateCurrentQuestionMark();
-        $this->updatePercentage();
+        $this->refreshQuestionData();
         $this->updateNavigationStatus();
         $this->updateLiveSessionProgress(); // Update live session
     }

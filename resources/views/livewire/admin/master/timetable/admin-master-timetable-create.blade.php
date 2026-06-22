@@ -56,9 +56,28 @@
                     <input type="text" id="name" wire:model.defer="schedules.{{ $activeTab }}.name" placeholder="Masukkan Nama Jadwal" class="mt-1 form-control">
                     @error("schedules.{$activeTab}.name") <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
                 </div>
+                @if(optional(auth()->user()->company)->import_student_timetable)
+                <div>
+                    <label for="classmate_id" class="block text-sm font-medium text-gray-700">Peserta (Classmate) <span class="text-red-600">*</span></label>
+                    <div wire:ignore wire:key="select-classmate-wrapper-{{ $activeTab }}-{{ $schedules[$activeTab]['classmate_id'] ?? '' }}">
+                        <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
+                            dropdownParent: 'body',
+                            allowClear: true,
+                            plugins: ['clear_button'],
+                            onChange: function(e) { @this.set('schedules.{{ $activeTab }}.classmate_id', e ? e : ''); }
+                        });" wire:model.lazy="schedules.{{ $activeTab }}.classmate_id" id="classmate_id" wire:key="select-classmate-el-{{ $activeTab }}">
+                            <option value="">-- Pilih Peserta (Classmate) --</option>
+                            @foreach ($classmates as $classmate)
+                                <option value="{{ $classmate->id }}" {{ ($schedules[$activeTab]['classmate_id'] ?? '') == $classmate->id ? 'selected' : '' }}>{{ $classmate->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @error("schedules.{$activeTab}.classmate_id") <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                </div>
+                @endif
                 <div>
                     <label for="module_id" class="block text-sm font-medium text-gray-700">Modul <span class="text-red-600">*</span></label>
-                    <div wire:ignore wire:key="select-module-wrapper-{{ $activeTab }}-{{ count($schedules) }}">
+                    <div wire:ignore wire:key="select-module-wrapper-{{ $activeTab }}-{{ $schedules[$activeTab]['classmate_id'] ?? '' }}-{{ count($schedules) }}">
                         <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
                             dropdownParent: 'body',
                             allowClear: true,
@@ -75,7 +94,7 @@
                 </div>
                 <div>
                     <label for="exam_room_id" class="block text-sm font-medium text-gray-700">Ruang Ujian <span class="text-red-600">*</span></label>
-                    <div wire:ignore wire:key="select-room-wrapper-{{ $activeTab }}-{{ count($schedules) }}">
+                    <div wire:ignore wire:key="select-room-wrapper-{{ $activeTab }}-{{ $schedules[$activeTab]['classmate_id'] ?? '' }}-{{ count($schedules) }}">
                         <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
                             dropdownParent: 'body',
                             allowClear: true,
@@ -93,7 +112,7 @@
                 </div>
                 <div>
                     <label for="exam_session_id" class="block text-sm font-medium text-gray-700">Sesi Ujian <span class="text-red-600">*</span></label>
-                    <div wire:ignore wire:key="select-session-wrapper-{{ $activeTab }}-{{ count($schedules) }}">
+                    <div wire:ignore wire:key="select-session-wrapper-{{ $activeTab }}-{{ $schedules[$activeTab]['classmate_id'] ?? '' }}-{{ count($schedules) }}">
                         <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
                             dropdownParent: 'body',
                             allowClear: true,
@@ -110,12 +129,12 @@
                 </div>
                 <div>
                     <label for="supervisors" class="block text-sm font-medium text-gray-700">Pengawas <span class="text-red-600">*</span></label>
-                    <div wire:ignore wire:key="select-supervisors-wrapper-{{ $activeTab }}-{{ count($schedules) }}">
+                    <div wire:ignore wire:key="select-supervisors-wrapper-{{ $activeTab }}-{{ $schedules[$activeTab]['classmate_id'] ?? '' }}-{{ count($schedules) }}">
                         <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
                             dropdownParent: 'body',
                             allowClear: true,
                             plugins: ['clear_button'],
-                            onChange: function(e) { @this.set('schedules.{{ $activeTab }}.supervisors', e ? e : []); }
+                            onChange: function(e) { @this.set('schedules.{{ $activeTab }}.supervisors', e ? (typeof e === 'string' ? e.split(',') : e) : []); }
                         });" wire:model.lazy="schedules.{{ $activeTab }}.supervisors" id="supervisors" multiple wire:key="select-supervisors-el-{{ $activeTab }}">
                             <option value="">-- Pilih Pengawas --</option>
                             @foreach ($getSupervisors as $key => $supervisor)

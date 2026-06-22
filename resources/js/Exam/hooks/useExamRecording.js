@@ -3,13 +3,14 @@ import axios from 'axios';
 
 const CHUNK_INTERVAL_MS = 30 * 1000; // 30 detik per chunk
 
-export const useExamRecording = (userTimetableId, isEnabled) => {
+export const useExamRecording = (userTimetableId, isEnabled, sharedStream) => {
     const mediaRecorderRef = useRef(null);
     const streamRef = useRef(null);
     const chunkNumberRef = useRef(1);
     const chunkIntervalRef = useRef(null);
     const mimeTypeRef = useRef('');
     const isStoppingRef = useRef(false);
+    const hasStartedRef = useRef(false);
     const [isRecording, setIsRecording] = useState(false);
 
     const getSupportedMimeType = () => {
@@ -91,11 +92,15 @@ export const useExamRecording = (userTimetableId, isEnabled) => {
      * Begin recording: get camera stream, start first chunk, set rotation interval.
      */
     const startRecording = useCallback(async () => {
-        if (!isEnabled || isRecording) return;
+        if (!isEnabled || hasStartedRef.current) return;
+        hasStartedRef.current = true;
         isStoppingRef.current = false;
 
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            let stream = sharedStream;
+            if (!stream) {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            }
             streamRef.current = stream;
 
             const mimeType = getSupportedMimeType();
@@ -115,8 +120,9 @@ export const useExamRecording = (userTimetableId, isEnabled) => {
 
         } catch (err) {
             console.error('[Recording] Error starting recording:', err);
+            hasStartedRef.current = false;
         }
-    }, [isEnabled, isRecording, startNewRecorderSession, rotateChunk]);
+    }, [isEnabled, startNewRecorderSession, rotateChunk, sharedStream]);
 
     /**
      * Stop all recording, upload last chunk, then request server to merge with FFmpeg.
@@ -124,6 +130,7 @@ export const useExamRecording = (userTimetableId, isEnabled) => {
     const stopRecording = useCallback(() => {
         return new Promise((resolve) => {
             isStoppingRef.current = true;
+            hasStartedRef.current = false;
 
             // Clear the rotation interval
             if (chunkIntervalRef.current) {
@@ -135,8 +142,10 @@ export const useExamRecording = (userTimetableId, isEnabled) => {
             const mimeType = mimeTypeRef.current;
 
             const finalize = async () => {
-                // Stop camera tracks
-                streamRef.current?.getTracks().forEach(t => t.stop());
+                // Stop camera tracks only if not using shared stream
+                if (!sharedStream) {
+                    streamRef.current?.getTracks().forEach(t => t.stop());
+                }
                 streamRef.current = null;
                 setIsRecording(false);
 
@@ -173,24 +182,27 @@ export const useExamRecording = (userTimetableId, isEnabled) => {
 
             recorder.stop();
         });
-    }, [uploadChunk, userTimetableId]);
+    }, [uploadChunk, userTimetableId, sharedStream]);
 
 
     // Auto-start and cleanup
     useEffect(() => {
-        if (isEnabled && !isRecording) {
+        if (isEnabled && !hasStartedRef.current && sharedStream) {
             startRecording();
         }
 
         return () => {
             if (isStoppingRef.current) return;
             isStoppingRef.current = true;
+            hasStartedRef.current = false;
             if (chunkIntervalRef.current) clearInterval(chunkIntervalRef.current);
             const recorder = mediaRecorderRef.current;
             if (recorder && recorder.state !== 'inactive') recorder.stop();
-            streamRef.current?.getTracks().forEach(t => t.stop());
+            if (!sharedStream) {
+                streamRef.current?.getTracks().forEach(t => t.stop());
+            }
         };
-    }, [isEnabled]);
+    }, [isEnabled, sharedStream, startRecording]);
 
     return { isRecording, stopRecording };
 };

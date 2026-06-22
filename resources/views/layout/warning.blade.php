@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Peraturan Ujian - CBT System</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ asset('vendor/font-awesome/css/all.min.css') }}">
@@ -127,7 +128,7 @@
         const consentCheckbox = document.getElementById('consent');
         const startButton = document.getElementById('startExam');
         const cameraStatus = document.getElementById('cameraStatus');
-        let cameraActive = false;
+        let cameraActive = {!! $userTimetable->timetable->is_camera ? 'false' : 'true' !!};
 
         // Fungsi inisialisasi kamera
         async function initCamera() {
@@ -177,7 +178,9 @@
         consentCheckbox.addEventListener('change', updateButtonState);
 
         // Jalankan kamera saat halaman dimuat
+        @if ($userTimetable->timetable->is_camera)
         window.addEventListener('DOMContentLoaded', initCamera);
+        @endif
 
 
         // Disable copy/selection

@@ -7,15 +7,23 @@
                     Jadwal</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
-            <div>
-                <a href="{{ route('admin.master.timetable.create') }}"
+            <div class="flex items-center gap-2">
+                <button wire:click="$refresh"
+                    class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 shadow-sm transition">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Refresh
+                </button>
+                <button wire:click="openCreateModal"
                     class="{{ in_array(config('app.name_slug'), ['pro-cbt']) ? 'btn btn-warning' : 'btn btn-primary' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     Tambah Jadwal
-                </a>
+                </button>
             </div>
         </div>
     </div>
@@ -52,7 +60,7 @@
     <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
         <!-- Table Wrapper -->
         <div class="table-container overflow-x-auto">
-            <table class="min-w-full table-auto border-collapse text-sm">
+            <table class="min-w-full table-auto border-collapse text-sm whitespace-nowrap">
                 <thead class="bg-gray-100 text-gray-700">
                     <tr>
                         <th class="w-1 text-center px-3 py-2">No</th>
@@ -64,6 +72,7 @@
                         <th class="px-3 py-2 text-left">Waktu Mulai</th>
                         <th class="px-3 py-2 text-left">Waktu Selesai</th>
                         <th class="px-3 py-2 text-left">Token</th>
+                        <th class="px-3 py-2 text-center">Kamera</th>
                         <th class="px-3 py-2 text-center">Recording</th>
                         <th class="px-3 py-2 text-center">Streaming</th>
                         <th class="w-1 text-center px-3 py-2">Aksi</th>
@@ -97,6 +106,19 @@
                                     </div>
                                 @else
                                     <span class="text-gray-400">-</span>
+                                @endif
+                            </td>
+                            <td class="px-3 py-2">
+                                @if($timetable?->is_camera)
+                                    <span
+                                        class="inline-flex items-center rounded-full bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1">
+                                        Iya
+                                    </span>
+                                @else
+                                    <span
+                                        class="inline-flex items-center rounded-full bg-gray-100 text-gray-600 text-xs font-semibold px-2.5 py-1">
+                                        Tidak
+                                    </span>
                                 @endif
                             </td>
                             <td class="px-3 py-2">
@@ -146,13 +168,15 @@
 
                                             <ul class="py-1 text-sm text-gray-700">
                                                 @if (!$timetable->code)
-                                                    <li>
-                                                        <button wire:click="confirmGenerateToken('{{ $timetable->id }}')"
-                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
-                                                            <i class="fa-solid fa-square-binary mr-2 text-green-600"></i>
-                                                            Generate Token
-                                                        </button>
-                                                    </li>
+                                                    @if ($this->canGenerateToken())
+                                                        <li>
+                                                            <button wire:click="confirmGenerateToken('{{ $timetable->id }}')"
+                                                                class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                                <i class="fa-solid fa-square-binary mr-2 text-green-600"></i>
+                                                                Generate Token
+                                                            </button>
+                                                        </li>
+                                                    @endif
                                                     <li>
                                                         <a href="{{ route('admin.print.daftar-hadir', $timetable->id) }}"
                                                             target="_blank" class="block px-4 py-2 hover:bg-gray-100">

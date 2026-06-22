@@ -497,7 +497,7 @@ class AdminMasterQuestionIndex extends Component
         }
 
         $questions = $this->buildQuestionsQuery()
-            ->with(['study', 'topic', 'categoryQuestion', 'answers'])
+            ->with(['study', 'topic', 'materialCategory', 'material', 'questionType', 'categoryQuestion', 'answers'])
             ->get();
 
         return Excel::download(new QuestionExport($questions), 'bank-soal-'.date('Y-m-d-H-i-s').'.xlsx');
@@ -510,7 +510,7 @@ class AdminMasterQuestionIndex extends Component
         }
 
         $questions = $this->buildQuestionsQuery()
-            ->with(['study', 'topic', 'categoryQuestion', 'answers'])
+            ->with(['study', 'topic', 'materialCategory', 'material', 'questionType', 'categoryQuestion', 'answers'])
             ->get();
 
         $company = Auth::user()->company;

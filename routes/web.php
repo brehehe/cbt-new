@@ -61,6 +61,10 @@ Route::get('/document', function () {
     return view('document');
 });
 
+Route::get('/exam-demo', function () {
+    return view('exam-demo');
+})->name('exam.demo');
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 

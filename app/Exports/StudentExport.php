@@ -17,18 +17,29 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings, Wit
      */
     public function collection()
     {
+        $relations = [
+            'userDetail',
+            'study',
+            'companyRoles' => function ($query) {
+                $query->where('company_id', Auth::user()->company_id);
+            }
+        ];
+
+        if (optional(Auth::user()->company)->import_student_timetable) {
+            $relations[] = 'userDetail.examSession';
+            $relations[] = 'userDetail.examRoom';
+        }
+
         return User::companyRole('Mahasiswa', Auth::user()->company_id)
             ->where('type_user', 'employee')
-            ->with(['userDetail', 'study', 'companyRoles' => function ($query) {
-                $query->where('company_id', Auth::user()->company_id);
-            }])
+            ->with($relations)
             ->orderBy('name', 'asc')
             ->get();
     }
 
     public function headings(): array
     {
-        return [
+        $headers = [
             'Name',
             'NIM',
             'Username',
@@ -41,6 +52,14 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings, Wit
             'Semester',
             'Student Status',
         ];
+
+        if (optional(Auth::user()->company)->import_student_timetable) {
+            $headers[] = 'Sesi';
+            $headers[] = 'Ruang';
+            $headers[] = 'Tanggal';
+        }
+
+        return $headers;
     }
 
     /**
@@ -50,7 +69,7 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings, Wit
     {
         $detail = $student->userDetail;
 
-        return [
+        $row = [
             $student->name,
             $student->nim,
             $student->username ?? '-',
@@ -63,5 +82,13 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings, Wit
             $detail ? ($detail->student_semester ?? '-') : '-',
             $detail ? ($detail->student_status ?? 'active') : 'active',
         ];
+
+        if (optional(Auth::user()->company)->import_student_timetable) {
+            $row[] = $detail && $detail->examSession ? $detail->examSession->name : '-';
+            $row[] = $detail && $detail->examRoom ? $detail->examRoom->name : '-';
+            $row[] = $detail && $detail->exam_date ? $detail->exam_date->format('Y-m-d') : '-';
+        }
+
+        return $row;
     }
 }

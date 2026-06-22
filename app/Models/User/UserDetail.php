@@ -101,12 +101,16 @@ class UserDetail extends Model
         'sub_district_code',
         'district',
         'sub_district',
+        'exam_session_id',
+        'exam_room_id',
+        'exam_date',
     ];
 
     protected $casts = [
         'birth_date' => 'date',
         'student_entry_date' => 'date',
         'student_graduation_date' => 'date',
+        'exam_date' => 'date',
         'lecturer_start_date' => 'date',
         'lecturer_retirement_date' => 'date',
         'student_gpa' => 'decimal:2',
@@ -144,6 +148,16 @@ class UserDetail extends Model
     public function studentAdvisor()
     {
         return $this->belongsTo(User::class, 'student_advisor_id');
+    }
+
+    public function examSession()
+    {
+        return $this->belongsTo(\App\Models\Master\Exam\ExamSession::class, 'exam_session_id');
+    }
+
+    public function examRoom()
+    {
+        return $this->belongsTo(\App\Models\Master\Exam\ExamRoom::class, 'exam_room_id');
     }
 
     // Scopes

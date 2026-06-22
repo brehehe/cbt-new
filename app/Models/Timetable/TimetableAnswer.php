@@ -16,6 +16,10 @@ class TimetableAnswer extends Model
 
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'images' => 'array',
+    ];
+
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id', 'id');

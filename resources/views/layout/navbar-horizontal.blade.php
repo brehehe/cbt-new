@@ -22,7 +22,7 @@
                 ['label' => 'Admin', 'url' => '/admin/master/admin', 'pattern' => 'admin/master/admin', 'icon' => 'fa-user-shield'],
                 ['label' => 'Dosen', 'url' => '/admin/master/lecturer', 'pattern' => 'admin/master/lecturer', 'icon' => 'fa-chalkboard-teacher'],
                 ['label' => 'Pengawas', 'url' => '/admin/master/supervisor', 'pattern' => 'admin/master/supervisor', 'icon' => 'fa-user-tie'],
-                ['label' => 'Mahasiswa', 'url' => '/admin/master/student', 'pattern' => 'admin/master/student', 'icon' => 'fa-user-graduate'],
+                ['label' => optional(auth()->user()->company)->is_pmb === 'all' ? 'Mahasiswa / PMB' : (optional(auth()->user()->company)->is_pmb === 'pmb' ? 'PMB' : 'Mahasiswa'), 'url' => '/admin/master/student', 'pattern' => 'admin/master/student', 'icon' => 'fa-user-graduate'],
                 ['label' => 'Topik Ujian', 'url' => route('admin.master.topic'), 'pattern' => 'admin/master/topic-question', 'icon' => 'fa-tags'],
                 ['label' => 'Kategori Materi', 'url' => route('admin.master.material-category'), 'pattern' => 'admin/master/material-category', 'icon' => 'fa-layer-group'],
                 ['label' => 'Materi', 'url' => route('admin.master.material'), 'pattern' => 'admin/master/material', 'icon' => 'fa-book'],
@@ -56,6 +56,11 @@
                 ['label' => 'Prodi', 'url' => route('admin.master.study'), 'pattern' => 'admin/master/study', 'icon' => 'fa-building-columns'],
                 ['label' => 'Peserta', 'url' => '/admin/master/classmate', 'pattern' => 'admin/master/classmate*', 'icon' => 'fa-users'],
             ];
+        }
+        if (optional(auth()->user()->company)->is_pmb === 'pmb') {
+            $masters = array_values(array_filter($masters, function ($item) {
+                return $item['label'] !== 'Dosen';
+            }));
         }
     }
 

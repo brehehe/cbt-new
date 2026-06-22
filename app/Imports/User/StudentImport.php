@@ -107,6 +107,58 @@ class StudentImport implements ToCollection, WithHeadingRow
                         }
                     }
 
+                    $company = Auth::user()->company;
+                    if ($company && $company->import_student_timetable) {
+                        $examSessionId = null;
+                        $sessionVal = $row['sesi'] ?? $row['sesi_ujian'] ?? $row['exam_session'] ?? null;
+                        if (! empty($sessionVal)) {
+                            $sessionName = trim($sessionVal);
+                            $session = \App\Models\Master\Exam\ExamSession::where('company_id', $currentCompanyId)
+                                ->where('name', $sessionName)
+                                ->first();
+                            if (! $session) {
+                                $session = \App\Models\Master\Exam\ExamSession::create([
+                                    'company_id' => $currentCompanyId,
+                                    'name' => $sessionName,
+                                    'code' => strtoupper(\Illuminate\Support\Str::slug($sessionName)),
+                                    'is_active' => true,
+                                ]);
+                            }
+                            $examSessionId = $session->id;
+                        }
+
+                        $examRoomId = null;
+                        $roomVal = $row['ruang'] ?? $row['ruang_ujian'] ?? $row['exam_room'] ?? null;
+                        if (! empty($roomVal)) {
+                            $roomName = trim($roomVal);
+                            $room = \App\Models\Master\Exam\ExamRoom::where('company_id', $currentCompanyId)
+                                ->where('name', $roomName)
+                                ->first();
+                            if (! $room) {
+                                $room = \App\Models\Master\Exam\ExamRoom::create([
+                                    'company_id' => $currentCompanyId,
+                                    'name' => $roomName,
+                                    'code' => strtoupper(\Illuminate\Support\Str::slug($roomName)),
+                                ]);
+                            }
+                            $examRoomId = $room->id;
+                        }
+
+                        $examDate = null;
+                        $dateVal = $row['tanggal'] ?? $row['tanggal_ujian'] ?? $row['exam_date'] ?? null;
+                        if (! empty($dateVal)) {
+                            try {
+                                $examDate = \Carbon\Carbon::parse($dateVal)->format('Y-m-d');
+                            } catch (Exception $e) {
+                                // silent
+                            }
+                        }
+
+                        $detailData['exam_session_id'] = $examSessionId;
+                        $detailData['exam_room_id'] = $examRoomId;
+                        $detailData['exam_date'] = $examDate;
+                    }
+
                     UserDetail::create($detailData);
 
                     // Assign Student role

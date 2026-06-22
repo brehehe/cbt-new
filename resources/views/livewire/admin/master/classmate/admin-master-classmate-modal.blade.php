@@ -111,6 +111,39 @@
                     @enderror
                 </div>
             @endif
+
+            @if (optional(auth()->user()->company)->import_student_timetable)
+                <div class="border-t pt-4 mt-4">
+                    <h3 class="text-md font-semibold text-gray-800 mb-3">Hubungkan Peserta Otomatis (Jadwal Import)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="exam_date" class="block text-sm font-medium text-gray-700">Tanggal Ujian</label>
+                            <input type="date" id="exam_date" wire:model.live="exam_date" class="mt-1 form-control" />
+                            @error('exam_date') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label for="exam_session_id" class="block text-sm font-medium text-gray-700">Sesi Ujian</label>
+                            <select id="exam_session_id" wire:model.live="exam_session_id" class="mt-1 form-control">
+                                <option value="">-- Pilih Sesi --</option>
+                                @foreach ($exam_sessions as $session)
+                                    <option value="{{ $session->id }}">{{ $session->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('exam_session_id') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label for="exam_room_id" class="block text-sm font-medium text-gray-700">Ruang Ujian</label>
+                            <select id="exam_room_id" wire:model.live="exam_room_id" class="mt-1 form-control">
+                                <option value="">-- Pilih Ruang --</option>
+                                @foreach ($exam_rooms as $room)
+                                    <option value="{{ $room->id }}">{{ $room->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('exam_room_id') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
 
         <!-- Footer -->

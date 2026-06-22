@@ -37,9 +37,18 @@ class AdminMasterClassmateIndex extends Component
 
     public $type_study;
 
+    public $exam_sessions = [];
+    public $exam_rooms = [];
+    public $exam_session_id;
+    public $exam_room_id;
+    public $exam_date;
+
     public function mount()
     {
         $this->users = User::role(['Dosen'])->where('company_id', Auth::user()?->company?->id)->select('id', 'name')->get()->pluck('name', 'id')->toArray();
+        $companyId = Auth::user()?->company?->id;
+        $this->exam_sessions = \App\Models\Master\Exam\ExamSession::where('company_id', $companyId)->get();
+        $this->exam_rooms = \App\Models\Master\Exam\ExamRoom::where('company_id', $companyId)->get();
     }
 
     public function render()
@@ -66,7 +75,7 @@ class AdminMasterClassmateIndex extends Component
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['data_id', 'name', 'description', 'type_study']);
+        $this->reset(['data_id', 'name', 'description', 'type_study', 'exam_session_id', 'exam_room_id', 'exam_date']);
 
         return $this->dispatch('close-modal', ['id' => 'modal']);
     }
@@ -84,6 +93,9 @@ class AdminMasterClassmateIndex extends Component
                 'name' => 'required',
                 'user_id' => $this->type_study == 'mahasiswa' ? 'required|exists:users,id' : 'nullable',
                 'description' => 'nullable',
+                'exam_session_id' => 'nullable|exists:exam_sessions,id',
+                'exam_room_id' => 'nullable|exists:exam_rooms,id',
+                'exam_date' => 'nullable|date',
             ],
             [
                 'type_study.required' => 'Tipe studi wajib diisi.',
@@ -95,7 +107,7 @@ class AdminMasterClassmateIndex extends Component
         try {
             DB::beginTransaction();
 
-            Classmate::updateOrCreate(
+            $classmate = Classmate::updateOrCreate(
                 [
                     'id' => $this->data_id ?? null,
                 ],
@@ -105,8 +117,36 @@ class AdminMasterClassmateIndex extends Component
                     'company_id' => Auth::user()?->company_id,
                     'name' => $this->name ?? null,
                     'description' => $this->description ?? null,
+                    'exam_session_id' => $this->exam_session_id ?: null,
+                    'exam_room_id' => $this->exam_room_id ?: null,
+                    'exam_date' => $this->exam_date ?: null,
                 ]
             );
+
+            if ($this->exam_session_id || $this->exam_room_id || $this->exam_date) {
+                $studentsQuery = User::whereHas('userDetail', function ($query) {
+                    if ($this->exam_session_id) {
+                        $query->where('exam_session_id', $this->exam_session_id);
+                    }
+                    if ($this->exam_room_id) {
+                        $query->where('exam_room_id', $this->exam_room_id);
+                    }
+                    if ($this->exam_date) {
+                        $query->where('exam_date', $this->exam_date);
+                    }
+                })
+                ->where('company_id', Auth::user()->company_id);
+
+                $students = $studentsQuery->pluck('id');
+
+                ClassmateStudent::where('classmate_id', $classmate->id)->delete();
+                foreach ($students as $studentId) {
+                    ClassmateStudent::create([
+                        'classmate_id' => $classmate->id,
+                        'user_id' => $studentId,
+                    ]);
+                }
+            }
 
             DB::commit();
         } catch (Exception|Throwable $th) {

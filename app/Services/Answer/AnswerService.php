@@ -50,19 +50,20 @@ class AnswerService
 
                     return '/'.ltrim($stored, '/');                  // "/answer/2025/11/xxx.jpg"
                 }
-                // String bisa berupa URL lengkap atau path
-                // Coba extract path dari URL
-                $parsed = parse_url($val);
-                if ($parsed !== false && isset($parsed['path'])) {
-                    $path = $parsed['path'];  // /storage/answer/2026/02/xxx.jpg
-                } else {
-                    $path = (string) $val;
+                
+                $valStr = (string) $val;
+
+                if (filter_var($valStr, FILTER_VALIDATE_URL)) {
+                    if (Str::contains($valStr, '/storage/')) {
+                        $path = Str::after($valStr, '/storage/');
+                        return '/' . ltrim($path, '/');
+                    }
+                    return $valStr;
                 }
 
-                // Hilangkan /storage dan buat path relatif
-                $path = Str::of($path)->replaceFirst('/storage', '')->trim('/')->prepend('/')->toString();
+                $path = Str::of($valStr)->replaceFirst('/storage', '')->trim('/')->prepend('/')->toString();
 
-                return $path;  // "/answer/2026/02/xxx.jpg"
+                return $path;
             };
 
             // 1) FINAL = normalisasi semua item di request['images'] (ini sumber kebenaran)

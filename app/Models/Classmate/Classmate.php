@@ -16,6 +16,10 @@ class Classmate extends Model
 
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'exam_date' => 'date',
+    ];
+
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id', 'id');

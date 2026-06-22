@@ -21,6 +21,8 @@ class Module extends Model
     protected $casts = [
         'category_question_settings' => 'array',
         'topic_question_settings' => 'array',
+        'material_category_question_settings' => 'array',
+        'is_all_questions' => 'boolean',
     ];
 
     public function company()

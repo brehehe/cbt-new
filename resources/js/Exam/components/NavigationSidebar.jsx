@@ -1,117 +1,202 @@
-import React from 'react';
-import { X, Search, Info } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import {
+    ChevronLeft, ChevronRight, Flag, CheckCircle,
+    HelpCircle, Circle, Eye, X
+} from 'lucide-react';
 
 const NavigationSidebar = ({
-    navigation,
+    navigation = [],
     currentIndex,
     setCurrentIndex,
     isOpen,
     setIsOpen,
-    companyColor
+    companyColor = '#1e3a5f',
+    visitedIndices = new Set(),
+    skippedIndices = new Set(),
+    onFinish,
 }) => {
-    const answeredCount = navigation.filter(n => n.isAnswered).length;
-    const markedCount = navigation.filter(n => n.isMarked).length;
-    const remainingCount = navigation.length - answeredCount;
+    const [activeFilter, setActiveFilter] = useState('semua');
+    const [isReviewMode, setIsReviewMode] = useState(false);
 
-    return (
-        <aside className={`
-            fixed lg:relative z-50 h-full lg:h-auto w-80 bg-white/80 backdrop-blur-2xl border-l border-white shadow-[-10px_0_30px_rgba(0,0,0,0.02)] transition-transform duration-300 ease-in-out
-            ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        `}>
-            {/* Header Mobile */}
-            <div className="flex items-center justify-between p-4 border-b bg-gray-50 lg:hidden">
-                <h3 className="font-bold text-gray-800">Navigasi Soal</h3>
-                <button onClick={() => setIsOpen(false)} className="text-gray-500 hover:text-gray-700">
-                    <X className="w-6 h-6" />
-                </button>
-            </div>
+    const answered  = navigation.filter(n => n.isAnswered).length;
+    const marked    = navigation.filter(n => n.isMarked).length;
+    const belum     = navigation.length - answered;
+    const pct       = navigation.length > 0 ? Math.round((answered / navigation.length) * 100) : 0;
 
-            {/* Stats Overview */}
-            <div className="p-6 border-b border-gray-100 bg-white/40">
-                <h3 className="hidden lg:block font-black text-xl text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-amber-500 mb-5">Peta Soal 🗺️</h3>
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between text-sm bg-white p-3 rounded-xl shadow-sm border border-gray-50">
-                        <span className="font-bold text-gray-500">Total Soal</span>
-                        <span className="font-black text-orange-600 text-lg">{navigation.length}</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3 text-xs font-bold">
-                        <div className="flex items-center justify-center gap-2 p-3 bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-600 rounded-xl border border-emerald-100 shadow-sm">
-                            <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full shadow-sm" />
-                            <span>Isi: {answeredCount}</span>
-                        </div>
-                        <div className="flex items-center justify-center gap-2 p-3 bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-600 rounded-xl border border-amber-100 shadow-sm">
-                            <div className="w-2.5 h-2.5 bg-amber-500 rounded-full shadow-sm" />
-                            <span>Ragu: {markedCount}</span>
-                        </div>
-                    </div>
+    const filteredIndices = useMemo(() => {
+        const list = navigation.map((n, i) => ({ ...n, idx: i }));
+        switch (activeFilter) {
+            case 'dijawab':  return list.filter(n => n.isAnswered);
+            case 'belum':    return list.filter(n => !n.isAnswered);
+            case 'ragu':     return list.filter(n => n.isMarked);
+            default:         return list;
+        }
+    }, [navigation, activeFilter]);
+
+    const getStatus = (nav, idx) => {
+        if (idx === currentIndex) return 'current';
+        if (nav.isMarked) return 'ragu';
+        if (nav.isAnswered) return 'answered';
+        if (visitedIndices.has(idx)) return 'visited';
+        return 'belum';
+    };
+
+    const statusStyle = (status) => {
+        switch (status) {
+            case 'current':  return { bg: '#1e3a5f', color: '#fff', border: 'transparent', fontWeight: 700 };
+            case 'answered': return { bg: '#16a34a', color: '#fff', border: 'transparent' };
+            case 'ragu':     return { bg: '#f59e0b', color: '#fff', border: 'transparent' };
+            case 'visited':  return { bg: '#f1f5f9', color: '#475569', border: '#cbd5e1' };
+            default:         return { bg: '#fff', color: '#94a3b8', border: '#e2e8f0' };
+        }
+    };
+
+    const filters = [
+        { key: 'semua',   label: 'Semua' },
+        { key: 'dijawab', label: '✓ Dijawab' },
+        { key: 'belum',   label: '✗ Belum' },
+        { key: 'ragu',    label: '* Ragu-Ragu' },
+    ];
+
+    const sidebarContent = (
+        <div className="flex flex-col h-full bg-white border-r border-gray-200" style={{ width: 240 }}>
+
+            {/* ── Sidebar Header ── */}
+            <div className="flex-none p-3 border-b border-gray-100" style={{ backgroundColor: '#1e3a5f' }}>
+                <div className="flex items-center justify-between">
+                    <span className="text-white text-xs font-bold tracking-widest uppercase">Navigasi Soal</span>
+                    <button
+                        onClick={() => setIsOpen(false)}
+                        className="lg:hidden text-white/70 hover:text-white"
+                    >
+                        <X className="w-4 h-4" />
+                    </button>
+                </div>
+                {/* Progress line */}
+                <div className="mt-2 flex items-center justify-between text-white/80 text-[11px]">
+                    <span>Soal {currentIndex + 1} dari {navigation.length}</span>
+                    <span>{pct}%</span>
+                </div>
+                <div className="mt-1.5 h-1.5 bg-white/20 rounded-full overflow-hidden">
+                    <div className="h-full bg-green-400 rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
                 </div>
             </div>
 
-            {/* Map Legends */}
-            <div className="p-5 border-b border-gray-100 bg-white/20">
-                <div className="grid grid-cols-4 gap-2 text-[10px] text-slate-500 uppercase tracking-widest font-black">
-                    <div className="flex flex-col items-center gap-1.5">
-                        <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg shadow-sm ring-2 ring-blue-200 ring-offset-1" />
-                        <span>Now</span>
+            {/* ── Stats Row ── */}
+            <div className="flex-none grid grid-cols-3 border-b border-gray-100">
+                {[
+                    { count: answered, label: 'DIJAWAB',  color: '#16a34a' },
+                    { count: belum,    label: 'BELUM',    color: '#ef4444' },
+                    { count: marked,   label: 'RAGU-RAGU', color: '#f59e0b' },
+                ].map((s, i) => (
+                    <div key={i} className="flex flex-col items-center py-2 border-r border-gray-100 last:border-r-0">
+                        <span className="font-black text-base leading-tight" style={{ color: s.color }}>{s.count}</span>
+                        <span className="text-[8px] font-bold text-gray-400 tracking-wider">{s.label}</span>
                     </div>
-                    <div className="flex flex-col items-center gap-1.5">
-                        <div className="w-6 h-6 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-lg shadow-sm" />
-                        <span>Isi</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-1.5">
-                        <div className="w-6 h-6 bg-gradient-to-br from-amber-400 to-orange-400 rounded-lg shadow-sm" />
-                        <span>Ragu</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-1.5">
-                        <div className="w-6 h-6 bg-slate-100 rounded-lg shadow-inner border border-slate-200" />
-                        <span>Skip</span>
-                    </div>
-                </div>
+                ))}
             </div>
 
-            {/* Grid Map */}
-            <div className="p-5 overflow-y-auto custom-scrollbar" style={{ height: 'calc(100vh - 380px)' }}>
-                <div className="grid grid-cols-5 gap-3">
-                    {navigation.map((item, idx) => {
-                        let bgColor = 'bg-slate-50 text-slate-500 hover:bg-slate-100 border border-slate-200 shadow-sm';
-                        let ringColor = '';
-
-                        if (idx === currentIndex) {
-                            bgColor = 'bg-gradient-to-br from-blue-500 to-cyan-500 text-white shadow-lg shadow-blue-200 border-none';
-                            ringColor = 'ring-4 ring-blue-100 scale-110 z-10';
-                        } else if (item.isMarked) {
-                            bgColor = 'bg-gradient-to-br from-amber-400 to-orange-400 text-white shadow-md shadow-amber-200 border-none hover:opacity-90';
-                        } else if (item.isAnswered) {
-                            bgColor = 'bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-md shadow-emerald-200 border-none hover:opacity-90';
+            {/* ── Filter Tabs ── */}
+            <div className="flex-none px-2 py-2 border-b border-gray-100">
+                <div className="flex gap-1 flex-wrap">
+                    {filters.map(f => (
+                        <button
+                        key={f.key}
+                        onClick={() => setActiveFilter(f.key)}
+                        className="text-[10px] font-bold px-2 py-0.5 rounded-full transition-all border"
+                        style={activeFilter === f.key
+                            ? { backgroundColor: '#1e3a5f', color: '#fff', borderColor: '#1e3a5f' }
+                            : { backgroundColor: '#f8fafc', color: '#64748b', borderColor: '#e2e8f0' }
                         }
+                    >
+                        {f.label}
+                    </button>
+                    ))}
+                </div>
+            </div>
 
+            {/* ── Legend ── */}
+            <div className="flex-none px-2 py-1.5 border-b border-gray-100 bg-gray-50">
+                <div className="flex flex-wrap gap-x-2 gap-y-1">
+                    {[
+                        { color: '#1e3a5f', label: 'Aktif' },
+                        { color: '#16a34a',    label: 'Dijawab' },
+                        { color: '#f59e0b',    label: 'Ragu-Ragu' },
+                        { color: '#cbd5e1',    label: 'Dibuka' },
+                        { color: '#e2e8f0',    label: 'Belum', border: '#cbd5e1' },
+                    ].map((l, i) => (
+                        <div key={i} className="flex items-center gap-1">
+                            <span
+                                className="inline-block w-2 h-2 rounded-full border"
+                                style={{ backgroundColor: l.color, borderColor: l.border || l.color }}
+                            />
+                            <span className="text-[9px] text-gray-500 font-medium">{l.label}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* ── Question Grid ── */}
+            <div className="flex-1 overflow-y-auto p-2">
+                <div className="grid grid-cols-6 gap-1">
+                    {filteredIndices.map((nav) => {
+                        const status = getStatus(nav, nav.idx);
+                        const style  = statusStyle(status);
                         return (
                             <button
-                                key={item.id}
-                                onClick={() => {
-                                    setCurrentIndex(idx);
-                                    if (window.innerWidth < 1024) setIsOpen(false);
+                                key={nav.idx}
+                                onClick={() => { setCurrentIndex(nav.idx); setIsOpen(false); }}
+                                className="relative flex items-center justify-center rounded-md text-[11px] transition-all duration-150 hover:scale-110 active:scale-95 shadow-sm"
+                                style={{
+                                    height: 32,
+                                    backgroundColor: style.bg,
+                                    color: style.color,
+                                    border: `1.5px solid ${style.border}`,
+                                    fontWeight: style.fontWeight || 500,
                                 }}
-                                className={`
-                                    w-11 h-11 rounded-xl flex items-center justify-center font-black text-sm transition-all duration-300 hover:-translate-y-0.5 active:scale-95
-                                    ${bgColor} ${ringColor}
-                                `}
+                                title={`Soal ${nav.idx + 1}`}
                             >
-                                {idx + 1}
+                                {nav.idx + 1}
+                                {nav.isMarked && (
+                                    <span
+                                        className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full"
+                                        style={{ backgroundColor: '#3b82f6' }}
+                                    />
+                                )}
                             </button>
                         );
                     })}
                 </div>
             </div>
 
-            {/* Sidebar Footer Info */}
-            <div className="absolute bottom-0 w-full p-4 border-t bg-gray-50">
-                <div className="flex items-center gap-2 text-xs text-gray-400">
-                    <Info className="w-4 h-4" />
-                    <span>Klik nomor soal untuk berpindah navigasi</span>
-                </div>
+            {/* ── Bottom Actions ── */}
+            <div className="flex-none p-2 border-t border-gray-100 space-y-1.5">
+                <button
+                    onClick={() => onFinish(false)}
+                    className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold bg-green-600 hover:bg-green-700 text-white transition-all shadow-sm"
+                >
+                    <CheckCircle className="w-3.5 h-3.5" />
+                    Selesai Ujian
+                </button>
             </div>
-        </aside>
+        </div>
+    );
+
+    return (
+        <>
+            {/* Desktop: always visible */}
+            <aside className="hidden lg:flex flex-none h-full overflow-hidden">
+                {sidebarContent}
+            </aside>
+
+            {/* Mobile: slide-in overlay */}
+            <aside
+                className={`lg:hidden fixed top-0 left-0 h-full z-50 transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+                style={{ width: 240 }}
+            >
+                {sidebarContent}
+            </aside>
+        </>
     );
 };
 
