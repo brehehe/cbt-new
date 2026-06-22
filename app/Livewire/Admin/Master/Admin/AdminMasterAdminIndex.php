@@ -414,8 +414,15 @@ class AdminMasterAdminIndex extends Component
     {
         try {
             $this->validate([
-                'importFile' => 'required|mimes:xlsx,xls|max:5120', // max 5MB
+                'importFile' => 'required|max:5120', // max 5MB
             ]);
+
+            $extension = strtolower($this->importFile->getClientOriginalExtension());
+            if (!in_array($extension, ['xlsx', 'xls'])) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'importFile' => 'Format file harus .xlsx atau .xls'
+                ]);
+            }
 
             Excel::import(new AdminImport, $this->importFile);
 

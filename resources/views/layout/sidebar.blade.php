@@ -309,26 +309,7 @@
                         // ROLE PENGAWAS
                         // ============================
                         if (auth()->user()->hasRole('Pengawas')) {
-                            $masters = [
-                                [
-                                    'label' => 'Regulasi',
-                                    'url' => '/admin/master/regulation',
-                                    'pattern' => 'admin/master/regulation',
-                                    'icon' => 'fa-scroll',
-                                ],
-                                [
-                                    'label' => 'Prodi',
-                                    'url' => route('admin.master.study'),
-                                    'pattern' => 'admin/master/study',
-                                    'icon' => 'fa-building-columns',
-                                ],
-                                [
-                                    'label' => 'Peserta',
-                                    'url' => '/admin/master/classmate',
-                                    'pattern' => ['admin/master/classmate', 'admin/master/classmate/*'],
-                                    'icon' => 'fa-users',
-                                ],
-                            ];
+                            $masters = [];
 
                             $examSchedules = [
                                 [
@@ -417,7 +398,7 @@
 
 
                 <!-- Divider: Laporan -->
-                @if (!Auth::user()->hasRole(['Mahasiswa']))
+                @if (!Auth::user()->hasRole(['Mahasiswa', 'Pengawas']))
                     <div>
                         <div
                             class="w-full group flex items-center justify-between custom-padding text-xs font-bold {{ $brandColor }} uppercase tracking-wide">
