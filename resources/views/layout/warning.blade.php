@@ -56,12 +56,12 @@
         }
 
         /* Disable text selection */
-        body {
+        /* body {
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
-        }
+        } */
 
         /* Re-enable selection for inputs and textareas */
         input,
@@ -186,8 +186,8 @@
         // Disable copy/selection
         @if(!Auth::user()->hasRole(['Admin', 'Super Admin', 'Pengawas', 'admin']))
             // document.addEventListener('contextmenu', event => event.preventDefault());
-            document.addEventListener('copy', event => event.preventDefault());
-            document.addEventListener('cut', event => event.preventDefault());
+            // document.addEventListener('copy', event => event.preventDefault());
+            // document.addEventListener('cut', event => event.preventDefault());
 
             // Blackout on blur
             const blackoutOverlay = document.getElementById('blackout-overlay');
@@ -225,7 +225,7 @@
             }
 
             // Disable Ctrl+C, Ctrl+V, Ctrl+U, F12, PrintScreen
-            if (
+            /* if (
                 (e.ctrlKey && (e.keyCode === 67 || e.keyCode === 86 || e.keyCode === 85 || e.keyCode === 73 || e.keyCode === 74)) ||
                 (e.metaKey && (e.keyCode === 67 || e.keyCode === 86)) ||
                 e.keyCode === 123 || e.keyCode === 44 || e.key === 'PrintScreen'
@@ -236,7 +236,7 @@
                     navigator.clipboard.writeText('');
                 }
                 return false;
-            }
+            } */
         }, true);
 
         // Anti-debugger

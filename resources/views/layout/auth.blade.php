@@ -25,12 +25,12 @@
     <title>{{ $setting?->website_name ?? 'Burningroom Technology' }}</title>
     <style>
         /* Disable text selection */
-        body {
+        /* body {
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
-        }
+        } */
 
         /* Re-enable selection for inputs and textareas */
         input, textarea {
@@ -49,9 +49,9 @@
     @livewireScripts
     
     <script>
-        document.addEventListener('contextmenu', event => event.preventDefault());
-        document.addEventListener('copy', event => event.preventDefault());
-        document.addEventListener('cut', event => event.preventDefault());
+        // document.addEventListener('contextmenu', event => event.preventDefault());
+        // document.addEventListener('copy', event => event.preventDefault());
+        // document.addEventListener('cut', event => event.preventDefault());
 
 
         // HYPER-AGGRESIVE SHORTCUT DETECTION (Capture Phase)
@@ -67,7 +67,7 @@
 
 
             // Disable Ctrl+C, Ctrl+V, Ctrl+U, F12
-            if (
+            /* if (
                 (e.ctrlKey && (e.keyCode === 67 || e.keyCode === 86 || e.keyCode === 85 || e.keyCode === 73 || e.keyCode === 74)) ||
                 e.keyCode === 123 ||
                 e.keyCode === 44 // PrintScreen
@@ -80,7 +80,7 @@
             }
         }, true);
 
-        });
+        // });
 
         // Disable autocomplete on all inputs
         document.querySelectorAll('input, form').forEach(el => {

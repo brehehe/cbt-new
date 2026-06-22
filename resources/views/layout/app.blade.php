@@ -94,12 +94,12 @@
         }
 
         /* Disable text selection */
-        body {
+        /* body {
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
-        }
+        } */
 
         /* Re-enable selection for inputs and textareas */
         input,
@@ -255,15 +255,15 @@
         //     throttledLog('security.right_click', 'Percobaan klik kanan diblokir');
         // });
 
-        document.addEventListener('copy', event => {
-            event.preventDefault();
-            throttledLog('security.copy', 'Percobaan menyalin konten (copy) diblokir');
-        });
+        // document.addEventListener('copy', event => {
+        //     event.preventDefault();
+        //     throttledLog('security.copy', 'Percobaan menyalin konten (copy) diblokir');
+        // });
 
-        document.addEventListener('cut', event => {
-            event.preventDefault();
-            throttledLog('security.cut', 'Percobaan memotong konten (cut) diblokir');
-        });
+        // document.addEventListener('cut', event => {
+        //     event.preventDefault();
+        //     throttledLog('security.cut', 'Percobaan memotong konten (cut) diblokir');
+        // });
 
         // Blackout on blur
         let blurStartTime = null;
@@ -304,7 +304,7 @@
             }
 
             // Disable Ctrl+C, V, U, I, J, F12, PrintScreen
-            if (
+            /* if (
                 (e.ctrlKey && (e.keyCode === 67 || e.keyCode === 86 || e.keyCode === 85 || e.keyCode === 73 || e.keyCode === 74)) ||
                 (e.metaKey && (e.keyCode === 67 || e.keyCode === 86)) ||
                 e.keyCode === 123 || e.keyCode === 44 || e.key === 'PrintScreen'
@@ -320,7 +320,7 @@
                     navigator.clipboard.writeText('');
                 }
                 return false;
-            }
+            } */
         }, true);
 
         // Anti-debugger
