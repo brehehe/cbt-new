@@ -72,6 +72,12 @@ class AdminMasterModuleIndex extends Component
 
     public $material_category_question_limits = [];
 
+    public $searchCategory = '';
+
+    public $searchTopic = '';
+
+    public $searchMaterialCategory = '';
+
     public function render()
     {
         $modules = Module::withoutGlobalScope('user_scope')->search($this->search)->select('id', 'question_type_id', 'name', 'duration', 'description', 'random_question', 'studys', 'question_pick_type')
@@ -82,8 +88,29 @@ class AdminMasterModuleIndex extends Component
             ->where('is_simulation', 'false')
             ->orderBy('order', 'desc');
 
+        $filteredCategoryQuestions = CategoryQuestion::select('id', 'name')
+            ->when($this->searchCategory, function ($query) {
+                $query->where('name', 'ILIKE', '%' . $this->searchCategory . '%');
+            })
+            ->get();
+
+        $filteredTopics = Topic::select('id', 'name')
+            ->when($this->searchTopic, function ($query) {
+                $query->where('name', 'ILIKE', '%' . $this->searchTopic . '%');
+            })
+            ->get();
+
+        $filteredMaterialCategories = \App\Models\Master\Question\MaterialCategory::select('id', 'name')
+            ->when($this->searchMaterialCategory, function ($query) {
+                $query->where('name', 'ILIKE', '%' . $this->searchMaterialCategory . '%');
+            })
+            ->get();
+
         return view('livewire.admin.master.module.admin-master-module-index', [
             'modules' => $modules->paginate($this->perPage),
+            'category_questions' => $filteredCategoryQuestions,
+            'topics' => $filteredTopics,
+            'material_categories' => $filteredMaterialCategories,
         ])->extends('layout.app')->section('content');
     }
 
@@ -278,7 +305,7 @@ class AdminMasterModuleIndex extends Component
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['data_id', 'question_type_id', 'name', 'duration', 'description', 'random_question', 'studys', 'is_all_study', 'is_all_questions', 'category_question_settings', 'topic_question_settings', 'material_category_question_settings', 'question_pick_type']);
+        $this->reset(['data_id', 'question_type_id', 'name', 'duration', 'description', 'random_question', 'studys', 'is_all_study', 'is_all_questions', 'category_question_settings', 'topic_question_settings', 'material_category_question_settings', 'question_pick_type', 'searchCategory', 'searchTopic', 'searchMaterialCategory']);
         $this->initializeCategoryQuestionSettings();
         $this->initializeTopicQuestionSettings();
         $this->initializeMaterialCategoryQuestionSettings();

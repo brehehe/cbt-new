@@ -95,6 +95,12 @@ class AdminMasterModuleQuestionIndex extends Component
 
     public $material_category_question_limits = [];
 
+    public $searchCategory = '';
+
+    public $searchTopic = '';
+
+    public $searchMaterialCategory = '';
+
     public function render()
     {
         $questionPickType = $this->question_pick_type ?? 'manual';
@@ -112,6 +118,12 @@ class AdminMasterModuleQuestionIndex extends Component
                 });
             } else {
                 $moduleQuestionsQuery->where('question_pick_type', $questionPickType);
+            }
+
+            if (! empty(trim($this->search))) {
+                $moduleQuestionsQuery->whereHas('question', function ($q) {
+                    $q->search($this->search);
+                });
             }
 
             $module_questions = $moduleQuestionsQuery
@@ -164,9 +176,30 @@ class AdminMasterModuleQuestionIndex extends Component
             $questions = $questionsQuery->orderBy('id', 'desc')->paginate($this->perPage);
         }
 
+        $filteredCategoryQuestions = CategoryQuestion::select('id', 'name')
+            ->when($this->searchCategory, function ($query) {
+                $query->where('name', 'ILIKE', '%' . $this->searchCategory . '%');
+            })
+            ->get();
+
+        $filteredTopics = Topic::select('id', 'name')
+            ->when($this->searchTopic, function ($query) {
+                $query->where('name', 'ILIKE', '%' . $this->searchTopic . '%');
+            })
+            ->get();
+
+        $filteredMaterialCategories = \App\Models\Master\Question\MaterialCategory::select('id', 'name')
+            ->when($this->searchMaterialCategory, function ($query) {
+                $query->where('name', 'ILIKE', '%' . $this->searchMaterialCategory . '%');
+            })
+            ->get();
+
         return view('livewire.admin.master.module.admin-master-module-question-index', [
             'module_questions' => $module_questions,
             'questions' => $questions,
+            'category_questions' => $filteredCategoryQuestions,
+            'topics' => $filteredTopics,
+            'material_categories' => $filteredMaterialCategories,
         ])->extends('layout.app')->section('content');
     }
 
@@ -312,7 +345,7 @@ class AdminMasterModuleQuestionIndex extends Component
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['module_question_id', 'question_id', 'selected_all', 'filterStudyId', 'filterQuestionTypeId', 'filterTopicId', 'search', 'material_category_question_settings']);
+        $this->reset(['module_question_id', 'question_id', 'selected_all', 'filterStudyId', 'filterQuestionTypeId', 'filterTopicId', 'search', 'material_category_question_settings', 'searchCategory', 'searchTopic', 'searchMaterialCategory']);
         $this->perPage = 8;
         $this->openQuestion = false;
         $this->initializeMaterialCategoryQuestionSettings();

@@ -164,6 +164,9 @@
                                 Total soal: <span class="font-semibold text-blue-600">{{ $this->totalQuestions }}</span>
                             </span>
                         </div>
+                        <div class="mb-2">
+                            <input type="text" class="form-control form-control-sm" placeholder="Cari Kategori Soal..." wire:model.live="searchCategory">
+                        </div>
                         <div class="overflow-x-auto border rounded-lg">
                             <table class="table">
                                 <thead>
@@ -241,6 +244,9 @@
                                     class="font-semibold text-blue-600">{{ $this->totalTopicQuestions }}</span>
                             </span>
                         </div>
+                        <div class="mb-2">
+                            <input type="text" class="form-control form-control-sm" placeholder="Cari Topik Soal..." wire:model.live="searchTopic">
+                        </div>
                         <div class="overflow-x-auto border rounded-lg">
                             <table class="table">
                                 <thead>
@@ -312,6 +318,9 @@
                                 Total soal: <span
                                     class="font-semibold text-blue-600">{{ $this->totalMaterialCategoryQuestions }}</span>
                             </span>
+                        </div>
+                        <div class="mb-2">
+                            <input type="text" class="form-control form-control-sm" placeholder="Cari Kategori Materi..." wire:model.live="searchMaterialCategory">
                         </div>
                         <div class="overflow-x-auto border rounded-lg">
                             <table class="table">
