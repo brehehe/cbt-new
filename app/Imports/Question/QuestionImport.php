@@ -79,6 +79,7 @@ class QuestionImport implements ToCollection
                 'line' => $th->getLine(),
             ];
             Log::error('Ada kesalahan saat Question Import', $error);
+            throw $th;
         }
     }
 }

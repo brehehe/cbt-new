@@ -250,6 +250,9 @@ class QuestionImportJob implements ShouldQueue
                 }
 
             }
+            if ($this->user) {
+                \Illuminate\Support\Facades\Cache::put('import_status_' . $this->user->id, 'success', 3600);
+            }
         } catch (Exception|Throwable $th) {
             $error = [
                 'message' => $th->getMessage(),
@@ -257,6 +260,12 @@ class QuestionImportJob implements ShouldQueue
                 'line' => $th->getLine(),
             ];
             Log::error('Ada Kesalahaan saat QuestionImportJob', $error);
+
+            if ($this->user) {
+                \Illuminate\Support\Facades\Cache::put('import_status_' . $this->user->id, 'failed:' . $th->getMessage(), 3600);
+            }
+
+            throw $th;
         }
     }
 

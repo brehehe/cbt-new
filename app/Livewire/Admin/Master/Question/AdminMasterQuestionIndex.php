@@ -106,6 +106,21 @@ class AdminMasterQuestionIndex extends Component
 
     public function render()
     {
+        if (Auth::check()) {
+            $statusKey = 'import_status_' . Auth::id();
+            if (\Illuminate\Support\Facades\Cache::has($statusKey)) {
+                $status = \Illuminate\Support\Facades\Cache::get($statusKey);
+                if ($status === 'success') {
+                    \Illuminate\Support\Facades\Cache::forget($statusKey);
+                    AlertHelper::success('Import Berhasil', 'Data soal berhasil diimport secara background.');
+                } elseif (str_starts_with((string) $status, 'failed:')) {
+                    \Illuminate\Support\Facades\Cache::forget($statusKey);
+                    $errorMsg = substr($status, 7);
+                    AlertHelper::error('Import Gagal', 'Kesalahan saat memproses soal di background: ' . $errorMsg);
+                }
+            }
+        }
+
         $questions = $this->buildQuestionsQuery();
 
         return view('livewire.admin.master.question.admin-master-question-index', [
@@ -469,12 +484,16 @@ class AdminMasterQuestionIndex extends Component
 
         try {
             // dd($this->study_id_import, $this->file_import);
+            \Illuminate\Support\Facades\Cache::put('import_status_' . Auth::id(), 'processing', 3600);
+
             Excel::import(
                 new QuestionImport((string) $this->study_id_import, $this->import_type),
                 $this->file_import // <- TemporaryUploadedFile OK
             );
 
         } catch (Exception|Throwable $th) {
+            \Illuminate\Support\Facades\Cache::forget('import_status_' . Auth::id());
+
             $error = [
                 'message' => $th->getMessage(),
                 'file' => $th->getFile(),
@@ -482,7 +501,7 @@ class AdminMasterQuestionIndex extends Component
             ];
             Log::error('Ada Kesalahaan saat AdminMasterModuleIndex => importQuestion', $error);
 
-            return AlertHelper::error('Gagal', 'Ada kesalahan saat import data soal');
+            return AlertHelper::error('Gagal', $th->getMessage());
         }
 
         $this->closeModal();
