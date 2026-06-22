@@ -21,6 +21,8 @@ namespace App\Models\Category{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Question\Question> $questions
  * @property-read int|null $questions_count
@@ -55,6 +57,11 @@ namespace App\Models\Classmate{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $exam_session_id
+ * @property string|null $exam_room_id
+ * @property \Illuminate\Support\Carbon|null $exam_date
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Classmate\ClassmateStudent> $classmateStudents
  * @property-read int|null $classmate_students_count
  * @property-read \App\Models\Company\Company|null $company
@@ -67,6 +74,9 @@ namespace App\Models\Classmate{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereExamDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereExamRoomId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereExamSessionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereOrder($value)
@@ -89,6 +99,8 @@ namespace App\Models\Classmate{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Classmate\Classmate|null $classmate
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\User|null $user
@@ -165,6 +177,14 @@ namespace App\Models\Company{
  * @property string|null $app_mac
  * @property string|null $app_android
  * @property string|null $app_ios
+ * @property string $is_pmb
+ * @property bool $enable_camera
+ * @property bool $enable_recording
+ * @property bool $enable_streaming
+ * @property bool $only_admin_generate_token
+ * @property bool $import_student_timetable
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read Company|null $company
  * @property-read \App\Models\Company\CompanyDetail|null $companyDetail
  * @property-read \App\Models\User|null $user
@@ -189,18 +209,24 @@ namespace App\Models\Company{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereDurationDays($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereEnableCamera($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereEnableRecording($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereEnableStreaming($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereExpiresAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereImportStudentTimetable($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereIndustry($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereIsCentral($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereIsLifetime($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereIsMain($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereIsMark($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereIsPmb($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereLogo($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereLogoPotrait($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereOneHealthAccessToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereOnlyAdminGenerateToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company wherePhone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company wherePicEmail($value)
@@ -257,6 +283,8 @@ namespace App\Models\Company{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyDetail newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyDetail newQuery()
@@ -307,6 +335,8 @@ namespace App\Models\Company{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Company\CompanyServiceMonth> $companyServiceMonths
  * @property-read int|null $company_service_months_count
@@ -348,6 +378,8 @@ namespace App\Models\Company{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyServiceMonth newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyServiceMonth newQuery()
@@ -393,6 +425,8 @@ namespace App\Models\Country{
  * @property int $order
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Country newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Country newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Country onlyTrashed()
@@ -479,6 +513,7 @@ namespace App\Models\Exam{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $peer_id
  * @property string|null $camera_device_id
+ * @property \Illuminate\Support\Carbon|null $end_time
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Exam\ExamAlert> $examAlerts
  * @property-read int|null $exam_alerts_count
@@ -511,6 +546,7 @@ namespace App\Models\Exam{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereCurrentQuestionNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereDeviceInfo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereEndTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamLiveSession whereLastActivity($value)
@@ -550,8 +586,10 @@ namespace App\Models\Exam{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $user_id
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Master\Timetable\Timetable|null $timetable
+ * @property-read \App\Models\User|null $user
  * @property-read \App\Models\User\UserTimetable|null $userTimetable
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording newQuery()
@@ -570,6 +608,7 @@ namespace App\Models\Exam{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereTimetableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereUserTimetableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording whereVideoPath($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamRecording withTrashed(bool $withTrashed = true)
@@ -590,6 +629,8 @@ namespace App\Models\Master\Exam{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Timetable\Timetable> $timeTables
  * @property-read int|null $time_tables_count
@@ -626,6 +667,8 @@ namespace App\Models\Master\Exam{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Timetable\Timetable> $timeTables
  * @property-read int|null $time_tables_count
@@ -660,6 +703,8 @@ namespace App\Models\Master\Exam{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamType newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExamType newQuery()
@@ -696,6 +741,8 @@ namespace App\Models\Master\Question{
  * @property string|null $latex latex source for answer
  * @property string|null $latex_preview_pdf latex preview pdf path
  * @property string|null $latex_preview_png latex preview png path
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Master\Question\Question|null $question
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Answer newModelQuery()
@@ -736,6 +783,8 @@ namespace App\Models\Master\Question{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Master\Question\MaterialCategory|null $materialCategory
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Question\Question> $questions
@@ -775,6 +824,8 @@ namespace App\Models\Master\Question{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, MaterialCategory> $childs
  * @property-read int|null $childs_count
  * @property-read \App\Models\Company\Company|null $company
@@ -824,6 +875,11 @@ namespace App\Models\Master\Question{
  * @property array<array-key, mixed>|null $category_question_settings pengaturan jumlah soal per kategori & difficulty
  * @property string $question_pick_type tipe pengambilan soal: manual/category/topic
  * @property array<array-key, mixed>|null $topic_question_settings pengaturan jumlah soal per topik & difficulty
+ * @property string $is_simulation
+ * @property array<array-key, mixed>|null $material_category_question_settings pengaturan jumlah soal per kategori materi & difficulty
+ * @property bool $is_all_questions apakah mengambil semua soal berdasarkan tipe pengambilan soal
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Question\ModuleQuestion> $moduleQuestions
  * @property-read int|null $module_questions_count
@@ -840,7 +896,10 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereDuration($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereIsAllQuestions($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereIsAllStudy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereIsSimulation($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereMaterialCategoryQuestionSettings($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereQuestionPickType($value)
@@ -869,6 +928,8 @@ namespace App\Models\Master\Question{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property bool $is_check menandai soal sudah dicek atau belum
  * @property string|null $question_pick_type
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Master\Question\Module|null $module
  * @property-read \App\Models\Master\Question\Question|null $question
@@ -919,6 +980,10 @@ namespace App\Models\Master\Question{
  * @property string|null $latex latex source for question
  * @property string|null $latex_preview_pdf latex preview pdf path
  * @property string|null $latex_preview_png latex preview png path
+ * @property string $type single, multiple, essay
+ * @property string $is_simulation
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Question\Answer> $answers
  * @property-read int|null $answers_count
  * @property-read \App\Models\Category\CategoryQuestion|null $categoryQuestion
@@ -945,6 +1010,7 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereDifficulty($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereImages($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereIsSimulation($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereLatex($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereLatexPreviewPdf($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereLatexPreviewPng($value)
@@ -955,6 +1021,7 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereQuestionTypeId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereStudyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereTopicId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Question whereWeightCorrect($value)
@@ -970,11 +1037,13 @@ namespace App\Models\Master\Question{
  * @property string $id
  * @property string|null $company_id
  * @property string $name nama Tipe Ujian
- * @property string $description keteranagan Tipe Ujian
+ * @property string|null $description keteranagan Tipe Ujian
  * @property int $order
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Question\Module> $modules
  * @property-read int|null $modules_count
@@ -1010,6 +1079,8 @@ namespace App\Models\Master\Question{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Question\MaterialCategory> $materialCategories
  * @property-read int|null $material_categories_count
@@ -1048,6 +1119,8 @@ namespace App\Models\Master\RatingScale{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RatingScale newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RatingScale newQuery()
@@ -1196,6 +1269,8 @@ namespace App\Models\Master\Regulation{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Regulation newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Regulation newQuery()
@@ -1239,6 +1314,11 @@ namespace App\Models\Master\Timetable{
  * @property bool $require_seb
  * @property bool $is_recording
  * @property bool $is_streaming
+ * @property string|null $extra_time
+ * @property string $is_simulation
+ * @property bool $is_camera
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Classmate\Classmate|null $classmate
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Master\Exam\ExamRoom|null $examRoom
@@ -1261,8 +1341,11 @@ namespace App\Models\Master\Timetable{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereEndTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereExamRoomId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereExamSessionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereExtraTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereIsCamera($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereIsRecording($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereIsSimulation($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereIsStreaming($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereModuleId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereName($value)
@@ -1301,6 +1384,8 @@ namespace App\Models\Role{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Spatie\Role|null $role
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RoleCompany newModelQuery()
@@ -1331,6 +1416,8 @@ namespace App\Models\Service{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service onlyTrashed()
@@ -1363,6 +1450,8 @@ namespace App\Models\Service{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Service\ServiceMonthDetail> $serviceMonthDetails
  * @property-read int|null $service_month_details_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceMonth newModelQuery()
@@ -1497,6 +1586,8 @@ namespace App\Models\Study{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Question\Topic> $topics
  * @property-read int|null $topics_count
@@ -1528,6 +1619,8 @@ namespace App\Models\SystemSetting{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SystemSetting newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SystemSetting newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SystemSetting onlyTrashed()
@@ -1552,7 +1645,7 @@ namespace App\Models\Timetable{
  * @property string $timetable_question_id
  * @property string|null $alphabet
  * @property string|null $context
- * @property string|null $images
+ * @property array<array-key, mixed>|null $images
  * @property bool $is_correct
  * @property string|null $company_id
  * @property int $order
@@ -1657,7 +1750,7 @@ namespace App\Models\Timetable{
  * @property string|null $question_type_id
  * @property string|null $study_id
  * @property \App\Models\Master\Question\Question|null $question soal
- * @property string|null $images gambar soal
+ * @property array<array-key, mixed>|null $images gambar soal
  * @property string|null $description keterangan soal
  * @property float|null $weight_correct score jika soal ini terjawab benar
  * @property float|null $weight_incorrect score jika soal ini terjawab salah
@@ -1672,11 +1765,13 @@ namespace App\Models\Timetable{
  * @property string|null $latex LaTeX content for question
  * @property string|null $latex_preview_pdf LaTeX preview PDF path
  * @property string|null $latex_preview_png LaTeX preview PNG path
+ * @property string $type single, multiple, essay
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Timetable\TimetableAnswer> $answers
  * @property-read int|null $answers_count
  * @property-read \App\Models\Category\CategoryQuestion|null $categoryQuestion
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Timetable\TimetableModule|null $timetableModule
+ * @property-read \App\Models\Master\Question\Topic|null $topic
  * @property-read \App\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion newQuery()
@@ -1704,6 +1799,7 @@ namespace App\Models\Timetable{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereStudyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereTimetableModuleId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereTopicId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableQuestion whereWeightCorrect($value)
@@ -1740,7 +1836,12 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property bool $user_check
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Classmate\ClassmateStudent|null $classmateStudent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Classmate\ClassmateStudent> $classmateStudents
+ * @property-read int|null $classmate_students_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Company\Company> $companies
  * @property-read int|null $companies_count
  * @property-read \App\Models\Company\Company|null $company
@@ -1790,6 +1891,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereTypeStudy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereTypeUser($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUserCheck($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUsername($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User withTrashed(bool $withTrashed = true)
@@ -1814,6 +1916,8 @@ namespace App\Models\User{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Spatie\Role|null $role
  * @property-read \App\Models\User|null $user
@@ -1868,7 +1972,7 @@ namespace App\Models\User{
  * @property \Illuminate\Support\Carbon|null $birth_date Tanggal lahir
  * @property string|null $birth_place Tempat lahir
  * @property string|null $marital_status Status pernikahan
- * @property string|null $nim Nomor Induk Siswa
+ * @property string|null $nim Nomor Induk Mahasiswa
  * @property string|null $student_program Program studi untuk mahasiswa
  * @property string|null $student_faculty Fakultas untuk mahasiswa
  * @property string|null $student_department Jurusan untuk mahasiswa
@@ -1933,14 +2037,21 @@ namespace App\Models\User{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $exam_session_id
+ * @property string|null $exam_room_id
+ * @property \Illuminate\Support\Carbon|null $exam_date
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
+ * @property-read \App\Models\Master\Exam\ExamRoom|null $examRoom
+ * @property-read \App\Models\Master\Exam\ExamSession|null $examSession
  * @property-read mixed $age
  * @property-read mixed $formatted_phone
  * @property-read mixed $full_name
  * @property-read mixed $is_lecturer
  * @property-read mixed $is_student
  * @property-read \App\Models\User|null $studentAdvisor
- * @property-read \App\Models\User $user
+ * @property-read \App\Models\User|null $user
  * @property-read \App\Models\User|null $verifiedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail active()
  * @method static \Database\Factories\User\UserDetailFactory factory($count = null, $state = [])
@@ -1967,8 +2078,11 @@ namespace App\Models\User{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereEmergencyContactPhone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereEmergencyContactRelation($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereEmployeeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereExamDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereExamHistory($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereExamPreference($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereExamRoomId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereExamSessionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereGender($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereIdentityCardPath($value)
@@ -2063,6 +2177,7 @@ namespace App\Models\User{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property bool $is_show
  * @property-read \App\Models\Master\Question\Answer|null $answer
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Master\Question\ModuleQuestion|null $moduleQuestion
@@ -2080,6 +2195,7 @@ namespace App\Models\User{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion whereIsMark($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion whereIsShow($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserModuleQuestion whereStudyId($value)
@@ -2114,6 +2230,7 @@ namespace App\Models\User{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property bool $is_recording
  * @property bool $is_streaming
+ * @property bool $is_camera
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Master\Timetable\Timetable|null $timetable
  * @property-read \App\Models\User|null $user
@@ -2129,6 +2246,7 @@ namespace App\Models\User{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereEndExam($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereIsCamera($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereIsRecording($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereIsStreaming($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereMark($value)
@@ -2158,6 +2276,8 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UsrSecKey newModelQuery()

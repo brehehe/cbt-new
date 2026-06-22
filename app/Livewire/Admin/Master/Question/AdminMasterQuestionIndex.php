@@ -443,7 +443,11 @@ class AdminMasterQuestionIndex extends Component
     {
         try {
             DB::beginTransaction();
-            app(QuestionService::class)->delete($id[0]);
+            $targetId = is_array($id) ? ($id[0] ?? null) : $id;
+            if (! $targetId) {
+                throw new Exception('ID tidak valid.');
+            }
+            app(QuestionService::class)->delete($targetId);
             DB::commit();
         } catch (Exception|Throwable $th) {
             DB::rollBack();
@@ -452,12 +456,44 @@ class AdminMasterQuestionIndex extends Component
                 'file' => $th->getFile(),
                 'line' => $th->getLine(),
             ];
-            Log::error('Ada Kesalahaan saat AdminMasterModuleIndex => delete', $error);
+            Log::error('Ada Kesalahaan saat AdminMasterQuestionIndex => delete', $error);
 
-            return AlertHelper::error('Gagal', 'Ada kesalahan saat menghapus data');
+            return AlertHelper::error('Gagal', 'Ada kesalahan saat menghapus data: ' . $th->getMessage());
         }
 
         return AlertHelper::success('Berhasil', 'Data berhasil dihapus.');
+    }
+
+    public function bulkDelete()
+    {
+        Log::info('bulkDelete called', ['selected' => $this->selectedQuestions]);
+        if (count($this->selectedQuestions) === 0) {
+            return AlertHelper::error('Gagal', 'Pilih minimal satu soal.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            foreach ($this->selectedQuestions as $id) {
+                app(QuestionService::class)->delete($id);
+            }
+
+            DB::commit();
+        } catch (Exception|Throwable $th) {
+            DB::rollBack();
+            $error = [
+                'message' => $th->getMessage(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
+            ];
+            Log::error('Ada Kesalahaan saat AdminMasterQuestionIndex => bulkDelete', $error);
+
+            return AlertHelper::error('Gagal', 'Ada kesalahan saat menghapus data soal terpilih: ' . $th->getMessage());
+        }
+
+        $this->resetSelection();
+
+        return AlertHelper::success('Berhasil', 'Soal terpilih berhasil dihapus.');
     }
 
     public function openModalImport()

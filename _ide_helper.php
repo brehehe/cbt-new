@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 12.54.1.
+ * Generated for Laravel 12.60.2.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -5267,7 +5267,7 @@ namespace Illuminate\Support\Facades {
          */
         public static function lock($name, $seconds = 0, $owner = null)
         {
-            /** @var \Illuminate\Cache\RedisStore $instance */
+            /** @var \Illuminate\Cache\DatabaseStore $instance */
             return $instance->lock($name, $seconds, $owner);
         }
 
@@ -5281,8 +5281,21 @@ namespace Illuminate\Support\Facades {
          */
         public static function restoreLock($name, $owner)
         {
-            /** @var \Illuminate\Cache\RedisStore $instance */
+            /** @var \Illuminate\Cache\DatabaseStore $instance */
             return $instance->restoreLock($name, $owner);
+        }
+
+        /**
+         * Remove an item from the cache if it is expired.
+         *
+         * @param string $key
+         * @return bool
+         * @static
+         */
+        public static function forgetIfExpired($key)
+        {
+            /** @var \Illuminate\Cache\DatabaseStore $instance */
+            return $instance->forgetIfExpired($key);
         }
 
         /**
@@ -5293,82 +5306,58 @@ namespace Illuminate\Support\Facades {
          */
         public static function flush()
         {
-            /** @var \Illuminate\Cache\RedisStore $instance */
+            /** @var \Illuminate\Cache\DatabaseStore $instance */
             return $instance->flush();
         }
 
         /**
-         * Remove all expired tag set entries.
+         * Get the underlying database connection.
          *
-         * @return void
+         * @return \Illuminate\Database\PostgresConnection
          * @static
          */
-        public static function flushStaleTags()
+        public static function getConnection()
         {
-            /** @var \Illuminate\Cache\RedisStore $instance */
-            $instance->flushStaleTags();
+            /** @var \Illuminate\Cache\DatabaseStore $instance */
+            return $instance->getConnection();
         }
 
         /**
-         * Get the Redis connection instance.
+         * Set the underlying database connection.
          *
-         * @return \Illuminate\Redis\Connections\Connection
-         * @static
-         */
-        public static function connection()
-        {
-            /** @var \Illuminate\Cache\RedisStore $instance */
-            return $instance->connection();
-        }
-
-        /**
-         * Get the Redis connection instance that should be used to manage locks.
-         *
-         * @return \Illuminate\Redis\Connections\Connection
-         * @static
-         */
-        public static function lockConnection()
-        {
-            /** @var \Illuminate\Cache\RedisStore $instance */
-            return $instance->lockConnection();
-        }
-
-        /**
-         * Specify the name of the connection that should be used to store data.
-         *
-         * @param string $connection
-         * @return void
+         * @param \Illuminate\Database\ConnectionInterface $connection
+         * @return \Illuminate\Cache\DatabaseStore
          * @static
          */
         public static function setConnection($connection)
         {
-            /** @var \Illuminate\Cache\RedisStore $instance */
-            $instance->setConnection($connection);
+            /** @var \Illuminate\Cache\DatabaseStore $instance */
+            return $instance->setConnection($connection);
         }
 
         /**
-         * Specify the name of the connection that should be used to manage locks.
+         * Get the connection used to manage locks.
          *
-         * @param string $connection
-         * @return \Illuminate\Cache\RedisStore
+         * @return \Illuminate\Database\PostgresConnection
+         * @static
+         */
+        public static function getLockConnection()
+        {
+            /** @var \Illuminate\Cache\DatabaseStore $instance */
+            return $instance->getLockConnection();
+        }
+
+        /**
+         * Specify the connection that should be used to manage locks.
+         *
+         * @param \Illuminate\Database\ConnectionInterface $connection
+         * @return \Illuminate\Cache\DatabaseStore
          * @static
          */
         public static function setLockConnection($connection)
         {
-            /** @var \Illuminate\Cache\RedisStore $instance */
+            /** @var \Illuminate\Cache\DatabaseStore $instance */
             return $instance->setLockConnection($connection);
-        }
-
-        /**
-         * Get the Redis database instance.
-         *
-         * @return \Illuminate\Contracts\Redis\Factory
-         * @static
-         */
-        public static function getRedis()
-        {
-            /** @var \Illuminate\Cache\RedisStore $instance */
-            return $instance->getRedis();
         }
 
         /**
@@ -5379,7 +5368,7 @@ namespace Illuminate\Support\Facades {
          */
         public static function getPrefix()
         {
-            /** @var \Illuminate\Cache\RedisStore $instance */
+            /** @var \Illuminate\Cache\DatabaseStore $instance */
             return $instance->getPrefix();
         }
 
@@ -5392,7 +5381,7 @@ namespace Illuminate\Support\Facades {
          */
         public static function setPrefix($prefix)
         {
-            /** @var \Illuminate\Cache\RedisStore $instance */
+            /** @var \Illuminate\Cache\DatabaseStore $instance */
             $instance->setPrefix($prefix);
         }
 
@@ -14142,7 +14131,6 @@ namespace Illuminate\Support\Facades {
 
             }
     /**
-     * @method static \BackedEnum|(\BackedEnum|null enum(string $key, string $enumClass, \BackedEnum|null $default = null)
      * @see \Illuminate\Http\Request
      */
     class Request {
@@ -15923,6 +15911,18 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
+         * Determine if the current request is asking for Markdown.
+         *
+         * @return bool
+         * @static
+         */
+        public static function wantsMarkdown()
+        {
+            /** @var \Illuminate\Http\Request $instance */
+            return $instance->wantsMarkdown();
+        }
+
+        /**
          * Determines whether the current requests accepts a given content type.
          *
          * @param string|array $contentTypes
@@ -15970,6 +15970,18 @@ namespace Illuminate\Support\Facades {
         {
             /** @var \Illuminate\Http\Request $instance */
             return $instance->acceptsJson();
+        }
+
+        /**
+         * Determines whether a request accepts Markdown.
+         *
+         * @return bool
+         * @static
+         */
+        public static function acceptsMarkdown()
+        {
+            /** @var \Illuminate\Http\Request $instance */
+            return $instance->acceptsMarkdown();
         }
 
         /**
@@ -20576,6 +20588,7 @@ namespace Illuminate\Support\Facades {
          * @param array $headers
          * @param string|null $disposition
          * @return \Symfony\Component\HttpFoundation\StreamedResponse
+         * @throws UnableToRetrieveMetadata
          * @static
          */
         public static function response($path, $name = null, $headers = [], $disposition = 'inline')
@@ -20593,6 +20606,7 @@ namespace Illuminate\Support\Facades {
          * @param string|null $name
          * @param array $headers
          * @return \Symfony\Component\HttpFoundation\StreamedResponse
+         * @throws UnableToRetrieveMetadata
          * @static
          */
         public static function serve($request, $path, $name = null, $headers = [])
@@ -20609,6 +20623,7 @@ namespace Illuminate\Support\Facades {
          * @param string|null $name
          * @param array $headers
          * @return \Symfony\Component\HttpFoundation\StreamedResponse
+         * @throws UnableToRetrieveMetadata
          * @static
          */
         public static function download($path, $name = null, $headers = [])
@@ -20807,6 +20822,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $path
          * @return string|false
+         * @throws UnableToRetrieveMetadata
          * @static
          */
         public static function mimeType($path)
@@ -23986,6 +24002,15 @@ namespace Flux {
         /**
          * @static
          */
+        public static function nonce()
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->nonce();
+        }
+
+        /**
+         * @static
+         */
         public static function scripts($options = [])
         {
             /** @var \Flux\FluxManager $instance */
@@ -24143,7 +24168,7 @@ namespace Livewire {
     /**
      * @see \Livewire\LivewireManager
      */
-    class Livewire extends \Livewire\LivewireManager {
+    class Livewire {
         /**
          * {@inheritDoc}
          *
@@ -25124,7 +25149,7 @@ namespace Milon\Barcode\Facades {
 
 namespace Opcodes\LogViewer\Facades {
     /**
-     * @see \Opcodes\LogViewer\LogViewerService
+     * @see LogViewerService
      */
     class LogViewer {
         /**
@@ -25468,6 +25493,121 @@ namespace Spatie\SignalAwareCommand\Facades {
         {
             /** @var \Spatie\SignalAwareCommand\Signal $instance */
             return $instance->clearHandlers($signal);
+        }
+
+            }
+    }
+
+namespace Stevebauman\Location\Facades {
+    /**
+     */
+    class Location {
+        /**
+         * Set the current driver to use.
+         *
+         * @static
+         */
+        public static function setDriver($driver)
+        {
+            /** @var \Stevebauman\Location\LocationManager $instance */
+            return $instance->setDriver($driver);
+        }
+
+        /**
+         * Set the default location driver to use.
+         *
+         * @throws DriverDoesNotExistException
+         * @static
+         */
+        public static function setDefaultDriver()
+        {
+            /** @var \Stevebauman\Location\LocationManager $instance */
+            return $instance->setDefaultDriver();
+        }
+
+        /**
+         * Attempt to retrieve the location of the user.
+         *
+         * @static
+         */
+        public static function get($ip = null)
+        {
+            /** @var \Stevebauman\Location\LocationManager $instance */
+            return $instance->get($ip);
+        }
+
+        /**
+         * Set the request resolver callback.
+         *
+         * @static
+         */
+        public static function resolveRequestUsing($callback)
+        {
+            /** @var \Stevebauman\Location\LocationManager $instance */
+            return $instance->resolveRequestUsing($callback);
+        }
+
+        /**
+         * Get the loaded driver instances.
+         *
+         * @return \Stevebauman\Location\Drivers\Driver[]
+         * @static
+         */
+        public static function drivers()
+        {
+            /** @var \Stevebauman\Location\LocationManager $instance */
+            return $instance->drivers();
+        }
+
+        /**
+         * Register a custom macro.
+         *
+         * @param string $name
+         * @param object|callable $macro
+         * @param-closure-this static  $macro
+         * @return void
+         * @static
+         */
+        public static function macro($name, $macro)
+        {
+            \Stevebauman\Location\LocationManager::macro($name, $macro);
+        }
+
+        /**
+         * Mix another object into the class.
+         *
+         * @param object $mixin
+         * @param bool $replace
+         * @return void
+         * @throws \ReflectionException
+         * @static
+         */
+        public static function mixin($mixin, $replace = true)
+        {
+            \Stevebauman\Location\LocationManager::mixin($mixin, $replace);
+        }
+
+        /**
+         * Checks if macro is registered.
+         *
+         * @param string $name
+         * @return bool
+         * @static
+         */
+        public static function hasMacro($name)
+        {
+            return \Stevebauman\Location\LocationManager::hasMacro($name);
+        }
+
+        /**
+         * Flush the existing macros.
+         *
+         * @return void
+         * @static
+         */
+        public static function flushMacros()
+        {
+            \Stevebauman\Location\LocationManager::flushMacros();
         }
 
             }
@@ -25870,6 +26010,13 @@ namespace App\Livewire\Admin\Profile {
             }
     }
 
+namespace App\Livewire\Mahasiswa\Onboarding {
+    /**
+     */
+    class StudentOnboarding extends \Livewire\Component {
+            }
+    }
+
 namespace App\Livewire\Auth\Login {
     /**
      */
@@ -26018,6 +26165,13 @@ namespace App\Livewire\Admin\Master\RatingScale {
             }
     }
 
+namespace App\Livewire\Admin\Master\Security {
+    /**
+     */
+    class SecurityLogIndex extends \Livewire\Component {
+            }
+    }
+
 namespace App\Livewire\Admin\Master\Regulation {
     /**
      */
@@ -26065,6 +26219,10 @@ namespace App\Livewire\Admin\Master\Timetable {
      */
     class AdminMasterTimetableIndex extends \Livewire\Component {
             }
+    /**
+     */
+    class AdminMasterTimetableCreate extends \Livewire\Component {
+            }
     }
 
 namespace App\Livewire\Admin\Master\Timetable\Detail {
@@ -26106,6 +26264,20 @@ namespace App\Livewire\Admin\Master\Timetable\Answer {
     /**
      */
     class AdminMasterTimetableAnswerIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Timetable\Correct {
+    /**
+     */
+    class AdminMasterTimetableCorrectIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Timetable\UserTimetable\Correct {
+    /**
+     */
+    class AdminMasterTimetableUserTimetableCorrectIndex extends \Livewire\Component {
             }
     }
 
@@ -26962,7 +27134,7 @@ namespace  {
          * @param string $pageName
          * @param int|null $page
          * @param \Closure|int|null $total
-         * @return \Illuminate\Pagination\LengthAwarePaginator
+         * @return \Illuminate\Pagination\LengthAwarePaginator<int, TModel>
          * @throws \InvalidArgumentException
          * @static
          */
@@ -26979,7 +27151,7 @@ namespace  {
          * @param array|string $columns
          * @param string $pageName
          * @param int|null $page
-         * @return \Illuminate\Contracts\Pagination\Paginator
+         * @return \Illuminate\Pagination\Paginator<int, TModel>
          * @static
          */
         public static function simplePaginate($perPage = null, $columns = [], $pageName = 'page', $page = null)
@@ -26995,7 +27167,7 @@ namespace  {
          * @param array|string $columns
          * @param string $cursorName
          * @param \Illuminate\Pagination\Cursor|string|null $cursor
-         * @return \Illuminate\Contracts\Pagination\CursorPaginator
+         * @return \Illuminate\Pagination\CursorPaginator<int, TModel>
          * @static
          */
         public static function cursorPaginate($perPage = null, $columns = [], $cursorName = 'cursor', $cursor = null)
@@ -30237,6 +30409,20 @@ namespace  {
         }
 
         /**
+         * Add an "order by" clause to order results by a given sequence of values.
+         *
+         * @param \Illuminate\Contracts\Database\Query\Expression|string $column
+         * @param \Illuminate\Contracts\Support\Arrayable|array $values
+         * @return \Illuminate\Database\Eloquent\Builder<static>
+         * @static
+         */
+        public static function inOrderOf($column, $values)
+        {
+            /** @var \Illuminate\Database\Query\Builder $instance */
+            return $instance->inOrderOf($column, $values);
+        }
+
+        /**
          * Add a raw "order by" clause to the query.
          *
          * @param string $sql
@@ -31414,6 +31600,7 @@ namespace  {
     class DNS2D extends \Milon\Barcode\Facades\DNS2DFacade {}
     class LogViewer extends \Opcodes\LogViewer\Facades\LogViewer {}
     class Signal extends \Spatie\SignalAwareCommand\Facades\Signal {}
+    class Location extends \Stevebauman\Location\Facades\Location {}
     class TallStackUi extends \TallStackUi\Facades\TallStackUi {}
 }
 
