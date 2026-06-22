@@ -49,12 +49,9 @@
             ];
         } elseif (auth()->user()->hasRole('Pengawas')) {
             $masters = [
-                ['label' => 'Regulasi', 'url' => '/admin/master/regulation', 'pattern' => 'admin/master/regulation', 'icon' => 'fa-scroll'],
                 ['label' => 'Ruang Ujian', 'url' => route('admin.master.exam-room'), 'pattern' => 'admin/master/exam-room*', 'icon' => 'fa-house'],
                 ['label' => 'Sesi Ujian', 'url' => route('admin.master.exam-session'), 'pattern' => 'admin/master/exam-session*', 'icon' => 'fa-clock'],
                 ['label' => 'Jadwal', 'url' => '/admin/master/timetable', 'pattern' => 'admin/master/timetable*', 'icon' => 'fa-calendar'],
-                ['label' => 'Prodi', 'url' => route('admin.master.study'), 'pattern' => 'admin/master/study', 'icon' => 'fa-building-columns'],
-                ['label' => 'Peserta', 'url' => '/admin/master/classmate', 'pattern' => 'admin/master/classmate*', 'icon' => 'fa-users'],
             ];
         }
         if (optional(auth()->user()->company)->is_pmb === 'pmb') {
@@ -158,7 +155,7 @@
                 @endif
 
                 <!-- Laporan Dropdown -->
-                @if (!Auth::user()->hasRole(['Mahasiswa']))
+                @if (!Auth::user()->hasRole(['Mahasiswa', 'Pengawas']))
                     <div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false" class="relative">
                         <button
                             class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all duration-200">
@@ -290,7 +287,7 @@
                                 </div>
                             @endif
 
-                            @if (!Auth::user()->hasRole(['Mahasiswa']))
+                            @if (!Auth::user()->hasRole(['Mahasiswa', 'Pengawas']))
                                 <div>
                                     <h4 class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Laporan
                                     </h4>
