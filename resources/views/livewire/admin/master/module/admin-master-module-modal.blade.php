@@ -183,12 +183,12 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($category_questions as $category_question)
+                                    @forelse ($filteredCategoryQuestions as $category_question)
                                         @php
                                             $settings = $category_question_settings[$category_question->id] ?? ['enabled' => false];
                                             $limits = $category_question_limits[$category_question->id] ?? ['default' => 0, 'easy' => 0, 'medium' => 0, 'hard' => 0];
                                         @endphp
-                                        <tr>
+                                        <tr wire:key="modal-cat-{{ $category_question->id }}">
                                             <td class="center">
                                                 <input type="checkbox"
                                                     wire:model.live="category_question_settings.{{ $category_question->id }}.enabled">
@@ -263,12 +263,12 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($topics as $topic)
+                                    @forelse ($filteredTopics as $topic)
                                         @php
                                             $settings = $topic_question_settings[$topic->id] ?? ['enabled' => false];
                                             $limits = $topic_question_limits[$topic->id] ?? ['default' => 0, 'easy' => 0, 'medium' => 0, 'hard' => 0];
                                         @endphp
-                                        <tr>
+                                        <tr wire:key="modal-topic-{{ $topic->id }}">
                                             <td class="center">
                                                 <input type="checkbox"
                                                     wire:model.live="topic_question_settings.{{ $topic->id }}.enabled">
@@ -319,8 +319,18 @@
                                     class="font-semibold text-blue-600">{{ $this->totalMaterialCategoryQuestions }}</span>
                             </span>
                         </div>
-                        <div class="mb-2">
-                            <input type="text" class="form-control form-control-sm" placeholder="Cari Kategori Materi..." wire:model.live="searchMaterialCategory">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+                            <div>
+                                <input type="text" class="form-control form-control-sm" placeholder="Cari Kategori Materi..." wire:model.live="searchMaterialCategory">
+                            </div>
+                            <div>
+                                <select class="form-control form-control-sm" wire:model.live="filterMaterialCategoryTopicId">
+                                    <option value="">Semua Topik</option>
+                                    @foreach ($topics as $topic)
+                                        <option value="{{ $topic->id }}">{{ $topic->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
                         <div class="overflow-x-auto border rounded-lg">
                             <table class="table">
@@ -338,12 +348,12 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($material_categories as $material_category)
+                                    @forelse ($filteredMaterialCategories as $material_category)
                                         @php
                                             $settings = $material_category_question_settings[$material_category->id] ?? ['enabled' => false];
                                             $limits = $material_category_question_limits[$material_category->id] ?? ['default' => 0, 'easy' => 0, 'medium' => 0, 'hard' => 0];
                                         @endphp
-                                        <tr>
+                                        <tr wire:key="modal-mat-{{ $material_category->id }}">
                                             <td class="center">
                                                 <input type="checkbox"
                                                     wire:model.live="material_category_question_settings.{{ $material_category->id }}.enabled">
@@ -388,15 +398,29 @@
         </div>
 
         <!-- Footer -->
-        <div class="flex justify-end gap-2 px-6 py-4 border-t">
-            <button wire:click="closeModal()"
-                class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow transition cursor-pointer">
-                Batal
-            </button>
-            <button wire:click='submit'
-                class="px-4 py-2 bg-primary hover:bg-primary text-white rounded-lg shadow transition">
-                Simpan
-            </button>
+        <div class="flex justify-between items-center px-6 py-4 border-t">
+            <div>
+                @if ($data_id)
+                    <a class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow transition flex items-center gap-2"
+                        href="{{ route('admin.master.module-question', $data_id) }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        Lihat Soal
+                    </a>
+                @endif
+            </div>
+            <div class="flex gap-2">
+                <button wire:click="closeModal()"
+                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow transition cursor-pointer">
+                    Batal
+                </button>
+                <button wire:click='submit'
+                    class="px-4 py-2 bg-primary hover:bg-primary text-white rounded-lg shadow transition">
+                    Simpan
+                </button>
+            </div>
         </div>
     </div>
 </div>

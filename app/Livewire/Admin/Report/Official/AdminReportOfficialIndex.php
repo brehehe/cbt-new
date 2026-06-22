@@ -31,9 +31,9 @@ class AdminReportOfficialIndex extends Component
         // Search filter
         if ($this->search) {
             $query->where(function ($q) {
-                $q->where('name', 'like', '%'.$this->search.'%')
+                $q->where('name', 'ilike', '%'.$this->search.'%')
                     ->orWhereHas('module', function ($q) {
-                        $q->where('name', 'like', '%'.$this->search.'%');
+                        $q->where('name', 'ilike', '%'.$this->search.'%');
                     });
             });
         }

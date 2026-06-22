@@ -101,6 +101,8 @@ class AdminMasterModuleQuestionIndex extends Component
 
     public $searchMaterialCategory = '';
 
+    public $filterMaterialCategoryTopicId = '';
+
     public function render()
     {
         $questionPickType = $this->question_pick_type ?? 'manual';
@@ -188,18 +190,21 @@ class AdminMasterModuleQuestionIndex extends Component
             })
             ->get();
 
-        $filteredMaterialCategories = \App\Models\Master\Question\MaterialCategory::select('id', 'name')
+        $filteredMaterialCategories = \App\Models\Master\Question\MaterialCategory::select('id', 'name', 'topic_id')
             ->when($this->searchMaterialCategory, function ($query) {
                 $query->where('name', 'ILIKE', '%' . $this->searchMaterialCategory . '%');
+            })
+            ->when($this->filterMaterialCategoryTopicId, function ($query) {
+                $query->where('topic_id', $this->filterMaterialCategoryTopicId);
             })
             ->get();
 
         return view('livewire.admin.master.module.admin-master-module-question-index', [
             'module_questions' => $module_questions,
             'questions' => $questions,
-            'category_questions' => $filteredCategoryQuestions,
-            'topics' => $filteredTopics,
-            'material_categories' => $filteredMaterialCategories,
+            'filteredCategoryQuestions' => $filteredCategoryQuestions,
+            'filteredTopics' => $filteredTopics,
+            'filteredMaterialCategories' => $filteredMaterialCategories,
         ])->extends('layout.app')->section('content');
     }
 
@@ -250,6 +255,22 @@ class AdminMasterModuleQuestionIndex extends Component
         }
 
         $this->question_types = QuestionType::select('id', 'name')->get();
+    }
+
+    public function updatingSearch()
+    {
+        $this->resetPage('module_questions_page');
+        $this->resetPage();
+    }
+
+    public function updatingFilterStudyId()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFilterTopicId()
+    {
+        $this->resetPage();
     }
 
     public function updatedQuestionTypeId()
@@ -345,7 +366,7 @@ class AdminMasterModuleQuestionIndex extends Component
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['module_question_id', 'question_id', 'selected_all', 'filterStudyId', 'filterQuestionTypeId', 'filterTopicId', 'search', 'material_category_question_settings', 'searchCategory', 'searchTopic', 'searchMaterialCategory']);
+        $this->reset(['module_question_id', 'question_id', 'selected_all', 'filterStudyId', 'filterQuestionTypeId', 'filterTopicId', 'search', 'material_category_question_settings', 'searchCategory', 'searchTopic', 'searchMaterialCategory', 'filterMaterialCategoryTopicId']);
         $this->perPage = 8;
         $this->openQuestion = false;
         $this->initializeMaterialCategoryQuestionSettings();

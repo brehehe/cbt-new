@@ -196,12 +196,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($category_questions as $category_question)
+                                @forelse ($filteredCategoryQuestions as $category_question)
                                     @php
                                         $settings = $category_question_settings[$category_question->id] ?? ['enabled' => false];
                                         $limits = $category_question_limits[$category_question->id] ?? ['default' => 0, 'easy' => 0, 'medium' => 0, 'hard' => 0];
                                     @endphp
-                                    <tr>
+                                    <tr wire:key="view-cat-{{ $category_question->id }}">
                                         <td class="center">
                                             <input type="checkbox"
                                                 wire:model.live="category_question_settings.{{ $category_question->id }}.enabled">
@@ -264,12 +264,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($topics as $topic)
+                                @forelse ($filteredTopics as $topic)
                                     @php
                                         $settings = $topic_question_settings[$topic->id] ?? ['enabled' => false];
                                         $limits = $topic_question_limits[$topic->id] ?? ['default' => 0, 'easy' => 0, 'medium' => 0, 'hard' => 0];
                                     @endphp
-                                    <tr>
+                                    <tr wire:key="view-topic-{{ $topic->id }}">
                                         <td class="center">
                                             <input type="checkbox"
                                                 wire:model.live="topic_question_settings.{{ $topic->id }}.enabled">
@@ -316,8 +316,18 @@
                     <div class="flex items-center justify-between mb-2">
                         <label class="block text-sm font-medium text-gray-700">Pengaturan Kategori Materi</label>
                     </div>
-                    <div class="mb-2">
-                        <input type="text" class="form-control form-control-sm" placeholder="Cari Kategori Materi..." wire:model.live="searchMaterialCategory">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+                        <div>
+                            <input type="text" class="form-control form-control-sm" placeholder="Cari Kategori Materi..." wire:model.live="searchMaterialCategory">
+                        </div>
+                        <div>
+                            <select class="form-control form-control-sm" wire:model.live="filterMaterialCategoryTopicId">
+                                <option value="">Semua Topik</option>
+                                @foreach ($topics as $topic)
+                                    <option value="{{ $topic->id }}">{{ $topic->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     <div class="overflow-x-auto border rounded-lg">
                         <table class="table">
@@ -332,12 +342,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($material_categories as $material_category)
+                                @forelse ($filteredMaterialCategories as $material_category)
                                     @php
                                         $settings = $material_category_question_settings[$material_category->id] ?? ['enabled' => false];
                                         $limits = $material_category_question_limits[$material_category->id] ?? ['default' => 0, 'easy' => 0, 'medium' => 0, 'hard' => 0];
                                     @endphp
-                                    <tr>
+                                    <tr wire:key="view-mat-{{ $material_category->id }}">
                                         <td class="center">
                                             <input type="checkbox"
                                                 wire:model.live="material_category_question_settings.{{ $material_category->id }}.enabled">

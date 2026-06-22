@@ -48,12 +48,12 @@ class SecurityLogIndex extends Component
         $logs = Activity::where('log_name', $this->logSource)
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
-                    $q->where('description', 'like', '%'.$this->search.'%')
+                    $q->where('description', 'ilike', '%'.$this->search.'%')
                         ->orWhereHas('causer', function ($uq) {
-                            $uq->where('name', 'like', '%'.$this->search.'%');
+                            $uq->where('name', 'ilike', '%'.$this->search.'%');
                         })
-                        ->orWhere('properties->ip_address', 'like', '%'.$this->search.'%')
-                        ->orWhere('subject_type', 'like', '%'.$this->search.'%');
+                        ->orWhere('properties->ip_address', 'ilike', '%'.$this->search.'%')
+                        ->orWhere('subject_type', 'ilike', '%'.$this->search.'%');
                 });
             })
             ->when($this->filterEvent, function ($query) {

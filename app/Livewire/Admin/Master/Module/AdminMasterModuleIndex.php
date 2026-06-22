@@ -78,6 +78,12 @@ class AdminMasterModuleIndex extends Component
 
     public $searchMaterialCategory = '';
 
+    public $filterMaterialCategoryTopicId = '';
+
+    public $viewModuleId = null;
+
+    public $perPageViewQuestions = 5;
+
     public function render()
     {
         $modules = Module::withoutGlobalScope('user_scope')->search($this->search)->select('id', 'question_type_id', 'name', 'duration', 'description', 'random_question', 'studys', 'question_pick_type')
@@ -100,17 +106,47 @@ class AdminMasterModuleIndex extends Component
             })
             ->get();
 
-        $filteredMaterialCategories = \App\Models\Master\Question\MaterialCategory::select('id', 'name')
+        $filteredMaterialCategories = \App\Models\Master\Question\MaterialCategory::select('id', 'name', 'topic_id')
             ->when($this->searchMaterialCategory, function ($query) {
                 $query->where('name', 'ILIKE', '%' . $this->searchMaterialCategory . '%');
             })
+            ->when($this->filterMaterialCategoryTopicId, function ($query) {
+                $query->where('topic_id', $this->filterMaterialCategoryTopicId);
+            })
             ->get();
+
+        $view_module_questions = collect();
+        $view_module = null;
+        if ($this->viewModuleId) {
+            $view_module = Module::find($this->viewModuleId);
+            if ($view_module) {
+                $questionPickType = $view_module->question_pick_type ?? 'manual';
+                $viewModuleQuestionsQuery = $view_module->moduleQuestions()
+                    ->with(['question.study', 'question.questionType'])
+                    ->select('id', 'module_id', 'question_id', 'study_id');
+
+                if ($questionPickType === 'manual') {
+                    $viewModuleQuestionsQuery->where(function ($q) {
+                        $q->whereNull('question_pick_type')
+                            ->orWhere('question_pick_type', 'manual');
+                    });
+                } else {
+                    $viewModuleQuestionsQuery->where('question_pick_type', $questionPickType);
+                }
+
+                $view_module_questions = $viewModuleQuestionsQuery
+                    ->orderBy('id', 'desc')
+                    ->paginate($this->perPageViewQuestions, ['*'], 'view_questions_page');
+            }
+        }
 
         return view('livewire.admin.master.module.admin-master-module-index', [
             'modules' => $modules->paginate($this->perPage),
-            'category_questions' => $filteredCategoryQuestions,
-            'topics' => $filteredTopics,
-            'material_categories' => $filteredMaterialCategories,
+            'filteredCategoryQuestions' => $filteredCategoryQuestions,
+            'filteredTopics' => $filteredTopics,
+            'filteredMaterialCategories' => $filteredMaterialCategories,
+            'view_module_questions' => $view_module_questions,
+            'view_module' => $view_module,
         ])->extends('layout.app')->section('content');
     }
 
@@ -297,6 +333,11 @@ class AdminMasterModuleIndex extends Component
     //     $this->resetPage();
     // }
 
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
     public function openModal()
     {
         return $this->dispatch('open-modal', ['id' => 'modal']);
@@ -305,12 +346,26 @@ class AdminMasterModuleIndex extends Component
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['data_id', 'question_type_id', 'name', 'duration', 'description', 'random_question', 'studys', 'is_all_study', 'is_all_questions', 'category_question_settings', 'topic_question_settings', 'material_category_question_settings', 'question_pick_type', 'searchCategory', 'searchTopic', 'searchMaterialCategory']);
+        $this->reset(['data_id', 'question_type_id', 'name', 'duration', 'description', 'random_question', 'studys', 'is_all_study', 'is_all_questions', 'category_question_settings', 'topic_question_settings', 'material_category_question_settings', 'question_pick_type', 'searchCategory', 'searchTopic', 'searchMaterialCategory', 'filterMaterialCategoryTopicId']);
         $this->initializeCategoryQuestionSettings();
         $this->initializeTopicQuestionSettings();
         $this->initializeMaterialCategoryQuestionSettings();
 
         return $this->dispatch('close-modal', ['id' => 'modal']);
+    }
+
+    public function openViewQuestionsModal($moduleId)
+    {
+        $this->viewModuleId = $moduleId;
+        $this->resetPage('view_questions_page');
+        $this->dispatch('open-modal', ['id' => 'modal-view-questions']);
+    }
+
+    public function closeViewQuestionsModal()
+    {
+        $this->reset(['viewModuleId']);
+        $this->resetPage('view_questions_page');
+        $this->dispatch('close-modal', ['id' => 'modal-view-questions']);
     }
 
     public function submit()

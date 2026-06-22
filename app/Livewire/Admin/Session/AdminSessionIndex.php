@@ -33,8 +33,8 @@ class AdminSessionIndex extends Component
 
         if ($this->search) {
             $query->where(function ($q) {
-                $q->where('ip_address', 'like', '%'.$this->search.'%')
-                    ->orWhere('user_agent', 'like', '%'.$this->search.'%');
+                $q->where('ip_address', 'ilike', '%'.$this->search.'%')
+                    ->orWhere('user_agent', 'ilike', '%'.$this->search.'%');
             });
         }
 
