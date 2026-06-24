@@ -35,13 +35,33 @@
         },
         updateSavedTime() {
             this.lastSavedTime = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        },
+        confirmFinishOnboarding() {
+            Swal.fire({
+                title: 'Selesaikan Simulasi?',
+                text: 'Apakah Anda yakin ingin menyelesaikan panduan onboarding ini dan masuk ke jadwal ujian asli?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#ea580c',
+                cancelButtonColor: '#4b5563',
+                confirmButtonText: 'Ya, Selesai!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.$wire.finish();
+                }
+            });
         }
     }">
 
     <!-- CSS Overrides to Force Full Viewport and Hide Layout Footer -->
     <style>
-        body {
+        html, body {
             overflow: hidden !important;
+            height: 100% !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
         }
         body > div.min-h-screen.flex.flex-col {
             min-height: 0 !important;
@@ -220,7 +240,7 @@
 
             <!-- Bottom Action finish -->
             <div class="flex-none p-2 border-t border-gray-100">
-                <button onclick="confirmFinishOnboarding()" class="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold bg-green-600 hover:bg-green-700 text-white transition-all shadow-sm">
+                <button @click="confirmFinishOnboarding()" class="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold bg-green-600 hover:bg-green-700 text-white transition-all shadow-sm">
                     <i class="fas fa-check-circle"></i>
                     <span>Selesai Ujian</span>
                 </button>
@@ -407,7 +427,7 @@
                     </button>
                 @else
                     <button
-                        onclick="confirmFinishOnboarding()"
+                        @click="confirmFinishOnboarding()"
                         class="flex items-center gap-1 px-4 py-2 rounded-lg text-xs font-bold text-white bg-green-600 hover:bg-green-700 transition-all whitespace-nowrap shadow-sm"
                     >
                         <i class="fas fa-check-circle"></i>
@@ -670,7 +690,7 @@
     </div>
 
     <!-- ── FLOATING GUIDE CONTROLLER (Premium glassmorphism dashboard bar) ── -->
-    <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-50 bg-white/90 backdrop-blur-md p-2.5 rounded-2xl shadow-2xl border border-gray-200 flex flex-wrap items-center gap-2 max-w-[95vw]">
+    <div x-show="showGuide > 0" x-cloak class="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-50 bg-white/90 backdrop-blur-md p-2.5 rounded-2xl shadow-2xl border border-gray-200 flex flex-wrap items-center gap-2 max-w-[95vw]">
         <span class="text-xs font-bold text-gray-500 px-2.5 border-r border-gray-200 hidden md:inline">PANDUAN:</span>
         <button @click="showGuide = 1"
             class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm border"
@@ -702,26 +722,16 @@
             Tutup Panduan
         </button>
     </div>
+
+    <!-- Floating Help Button to Reopen Guide -->
+    <div x-show="showGuide === 0" x-cloak class="absolute bottom-6 right-6 z-50 pointer-events-auto">
+        <button @click="showGuide = 1" class="flex items-center gap-2 px-4 py-2.5 bg-orange-600 hover:bg-orange-700 text-white rounded-full font-bold shadow-lg shadow-orange-200 transition-all hover:scale-[1.05] active:scale-95 text-xs">
+            <i class="fas fa-question-circle text-sm"></i>
+            <span>Buka Panduan</span>
+        </button>
+    </div>
 </div>
 
-<script>
-    function confirmFinishOnboarding() {
-        Swal.fire({
-            title: 'Selesaikan Simulasi?',
-            text: 'Apakah Anda yakin ingin menyelesaikan panduan onboarding ini dan masuk ke jadwal ujian asli?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#ea580c',
-            cancelButtonColor: '#4b5563',
-            confirmButtonText: 'Ya, Selesai!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                @this.call('finish');
-            }
-        });
-    }
-</script>
 
 <style>
     @keyframes bounce-subtle {

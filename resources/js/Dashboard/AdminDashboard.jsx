@@ -283,7 +283,7 @@ export default function AdminDashboard({ userProfile = {} }) {
                         <div className="bg-white/90 rounded-2xl p-6 shadow-sm border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 border-l-4 border-l-amber-500">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Ujian Umat Aktif</p>
+                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Ujian Aktif</p>
                                     <h3 className="text-3xl font-black text-slate-800 mt-2">
                                         {statsData?.activeExams || 0}
                                     </h3>

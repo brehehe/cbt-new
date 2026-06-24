@@ -1,7 +1,7 @@
 @if($currentStep === 2)
     @include('livewire.mahasiswa.onboarding.steps.simulation')
 @else
-    <div class="min-h-screen bg-gradient-to-br from-orange-50 via-white to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="h-full overflow-y-auto bg-gradient-to-br from-orange-50 via-white to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-full mx-auto">
             <!-- Progress Bar -->
             <div class="mb-12">

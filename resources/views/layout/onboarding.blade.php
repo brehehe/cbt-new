@@ -45,17 +45,12 @@
     @livewireStyles
 </head>
 
-<body class="bg-gray-50">
-    <div class="min-h-screen flex flex-col">
+<body class="bg-gray-50 h-screen w-screen overflow-hidden">
+    <div class="h-full w-full flex flex-col overflow-hidden">
         <!-- Main Content -->
-        <main class="flex-grow">
+        <main class="flex-grow h-full overflow-hidden">
             {{ $slot }}
         </main>
-
-        <!-- Footer -->
-        <footer class="p-6 text-center text-gray-400 text-sm">
-            &copy; {{ date('Y') }} PRO-CBT. All rights reserved.
-        </footer>
     </div>
 
     @livewireScripts
