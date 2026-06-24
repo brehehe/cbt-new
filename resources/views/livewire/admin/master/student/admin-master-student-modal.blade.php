@@ -1,7 +1,8 @@
 <div wire:ignore.self id="modal"
-    class="fixed inset-0 bg-overlay hidden items-center justify-center z-50 transition-opacity duration-300 ease-in-out">
-    <div class="bg-white rounded-2xl shadow-2xl w-full transform transition-all scale-95 duration-300 ease-out animate-fade-in"
-        style="max-width: 1000px;">
+    class="fixed inset-0 bg-overlay hidden z-50 overflow-y-auto transition-opacity duration-300 ease-in-out">
+    <div class="flex min-h-full justify-center p-4 items-start w-full">
+        <div class="bg-white rounded-2xl shadow-2xl w-full transform transition-all scale-95 duration-300 ease-out animate-fade-in text-left my-auto"
+            style="max-width: 1000px;">
         <!-- Header -->
         <div class="flex justify-between items-center p-6 border-b">
             <div class="flex items-center gap-2">
@@ -21,7 +22,7 @@
         </div>
 
         <!-- Body -->
-        <div class="px-6 py-4 text-gray-600 overflow-auto" style="max-height: 600px;">
+        <div class="px-6 py-4 text-gray-600 overflow-auto" style="max-height: calc(100vh - 220px); min-height: 200px;">
             @if(auth()->user()->company->is_pmb === 'all')
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700">
@@ -507,6 +508,7 @@
                 class="px-4 py-2 bg-primary hover:bg-primary text-white rounded-lg shadow transition">
                 {{ $data_id ? 'Update' : 'Simpan' }}
             </button>
+        </div>
         </div>
     </div>
 </div>
