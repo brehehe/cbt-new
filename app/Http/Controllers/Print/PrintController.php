@@ -18,7 +18,7 @@ class PrintController extends Controller
         $timetable = Timetable::find($session_id);
         $exam_room = ExamRoom::find($timetable->exam_room_id);
         $exam_session = ExamSession::find($timetable->exam_session_id);
-        $classmateDetail = ClassmateStudent::where('classmate_id', $timetable->classmate_id)->get();
+        $classmateDetail = ClassmateStudent::where('classmate_id', $timetable->classmate_id)->with('user')->get();
 
         return view('print.daftar-hadir', [
             'session_id' => $session_id,
@@ -33,10 +33,10 @@ class PrintController extends Controller
     public function printBeritaAcara($session_id)
     {
         $company = Company::select('id', 'name', 'logo_potrait', 'code_name', 'code_region', 'region')->where('id', auth()->user()->company_id)->first();
-        $timetable = Timetable::find($session_id);
+        $timetable = Timetable::with('module.questionType')->find($session_id);
         $exam_room = ExamRoom::find($timetable->exam_room_id);
         $exam_session = ExamSession::find($timetable->exam_session_id);
-        $classmateDetail = ClassmateStudent::where('classmate_id', $timetable->classmate_id)->get();
+        $classmateDetail = ClassmateStudent::where('classmate_id', $timetable->classmate_id)->with('user')->get();
 
         return view('print.berita-acara', [
             'session_id' => $session_id,
