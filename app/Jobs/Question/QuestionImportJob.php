@@ -145,27 +145,7 @@ class QuestionImportJob implements ShouldQueue
                     continue;
                 }
 
-                if ($this->import_type == 'pg') {
-                    $requiredOptionIndices = [9, 11, 13, 15]; // A, B, C, D
-                    $missingOption = false;
-                    foreach ($requiredOptionIndices as $optIdx) {
-                        if (! $this->valueAt($value, $optIdx)) {
-                            $missingOption = true;
-                            break;
-                        }
-                    }
-                    if ($missingOption) {
-                        Log::warning('Data soal tidak bisa masuk, karena jawaban A/B/C/D kosong ', [
-                            'collection' => $value,
-                        ]);
-                        $warnings[] = [
-                            'row' => $key + 1,
-                            'reason' => 'Pilihan jawaban A, B, C, atau D tidak boleh kosong.',
-                        ];
-
-                        continue;
-                    }
-                }
+                // Removed choice required check to allow empty/single-quoted answers for image-only choices.
 
                 $study = Study::withoutGlobalScopes()
                     ->where('company_id', $this->user?->company?->id)
@@ -286,13 +266,24 @@ class QuestionImportJob implements ShouldQueue
                     foreach ($optionsMap as $letter => $indices) {
                         $answerText = $this->valueAt($value, $indices['text']);
                         $answerImageUrl = $this->valueAt($value, $indices['image']);
-                        if (! $answerText) {
+                        
+                        // Option E is optional; only create it if either text or image is provided.
+                        // Option A, B, C, D are required; we always create them even if empty.
+                        $isE = ($letter === 'E');
+                        if ($isE && ! $answerText && ! $answerImageUrl) {
                             continue;
                         }
+
+                        // If text is empty/null and there is no image, we default text to "'" as requested by the user.
+                        $contextVal = $answerText;
+                        if ($contextVal === null && ! $answerImageUrl) {
+                            $contextVal = "'";
+                        }
+
                         $request_answer = [
                             'company_id' => $this->user?->company?->id,
                             'alphabet' => $letter,
-                            'context' => $answerText,
+                            'context' => $contextVal,
                             'images' => $answerImageUrl ? [$answerImageUrl] : null,
                             'old_images' => null,
                             'is_correct' => strtoupper(trim((string) $correctKey)) === $letter,
