@@ -93,7 +93,10 @@ class QuestionImportJob implements ShouldQueue
                     continue;
                 }
 
-                $question_type = QuestionType::withoutGlobalScopes()->where('name', 'ilike', $typeName)->first();
+                $question_type = QuestionType::withoutGlobalScopes()
+                    ->where('company_id', $this->user?->company?->id)
+                    ->where('name', 'ilike', $typeName)
+                    ->first();
 
                 if (! $question_type) {
                     Log::warning('Data soal tidak bisa masuk, karena Tipe Soal tidak ditemukan', [
@@ -116,7 +119,10 @@ class QuestionImportJob implements ShouldQueue
                     }
                 }
 
-                $study = Study::withoutGlobalScopes()->where('name', 'ilike', $studyName)->first();
+                $study = Study::withoutGlobalScopes()
+                    ->where('company_id', $this->user?->company?->id)
+                    ->where('name', 'ilike', $studyName)
+                    ->first();
 
                 if (! $study && $studyName) {
                     $study = Study::create([
@@ -125,7 +131,11 @@ class QuestionImportJob implements ShouldQueue
                     ]);
                 }
 
-                $topic = $study?->topics()->withoutGlobalScopes()->where('name', 'ilike', $topicName)->first();
+                $topic = $study?->topics()
+                    ->withoutGlobalScopes()
+                    ->where('company_id', $this->user?->company?->id)
+                    ->where('name', 'ilike', $topicName)
+                    ->first();
 
                 if (! $topic && $topicName) {
                     $topic = Topic::create([
@@ -136,7 +146,11 @@ class QuestionImportJob implements ShouldQueue
                 }
 
                 $materialCategoryName = $this->valueAt($value, 2);
-                $material_category = $topic?->materialCategories()->withoutGlobalScopes()->where('name', 'ilike', $materialCategoryName)->first();
+                $material_category = $topic?->materialCategories()
+                    ->withoutGlobalScopes()
+                    ->where('company_id', $this->user?->company?->id)
+                    ->where('name', 'ilike', $materialCategoryName)
+                    ->first();
 
                 if (! $material_category && $materialCategoryName) {
                     $material_category = MaterialCategory::create([
@@ -150,9 +164,14 @@ class QuestionImportJob implements ShouldQueue
                 $material = null;
                 if ($materialName) {
                     if ($material_category) {
-                        $material = $material_category->materials()->withoutGlobalScopes()->where('name', 'ilike', $materialName)->first();
+                        $material = $material_category->materials()
+                            ->withoutGlobalScopes()
+                            ->where('company_id', $this->user?->company?->id)
+                            ->where('name', 'ilike', $materialName)
+                            ->first();
                     } else {
                         $material = Material::withoutGlobalScopes()
+                            ->where('company_id', $this->user?->company?->id)
                             ->where('topic_id', $topic?->id)
                             ->whereNull('material_category_id')
                             ->where('name', 'ilike', $materialName)
@@ -172,7 +191,10 @@ class QuestionImportJob implements ShouldQueue
 
                 $categoryQuestion = null;
                 if ($categoryName) {
-                    $categoryQuestion = CategoryQuestion::withoutGlobalScopes()->where('name', 'ilike', $categoryName)->first();
+                    $categoryQuestion = CategoryQuestion::withoutGlobalScopes()
+                        ->where('company_id', $this->user?->company?->id)
+                        ->where('name', 'ilike', $categoryName)
+                        ->first();
                     if (! $categoryQuestion) {
                         $categoryQuestion = CategoryQuestion::create([
                             'company_id' => $this->user?->company?->id,

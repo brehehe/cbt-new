@@ -1,6 +1,11 @@
 @section('title', 'Bank Soal')
 <div>
     {{-- Stop trying to control. --}}
+    <!-- Global Loading Overlay for Deletion -->
+    <div wire:loading wire:target="delete, bulkDelete">
+        @include('layout.loading')
+    </div>
+
     @include('livewire.admin.master.question.admin-master-question-index-modal-import')
     @include('livewire.admin.master.question.admin-master-question-modal')
     <div class="mb-4">
