@@ -79,7 +79,7 @@ class ModuleService
         return $material;
     }
 
-    private function syncModuleQuestionsByMaterialCategory(Module $module, array $materialCategoryQuestionSettings, ?string $companyId): void
+    public function syncModuleQuestionsByMaterialCategory(Module $module, array $materialCategoryQuestionSettings, ?string $companyId): void
     {
         $now = Carbon::now();
 
@@ -88,12 +88,41 @@ class ModuleService
             $query->where('company_id', $companyId)
                 ->where('question_type_id', $module->question_type_id)
                 ->whereNotNull('material_category_id');
+            $targetQuestions = $query->get(['id', 'study_id']);
         } else {
-            $enabledMaterialCategoryIds = array_keys($materialCategoryQuestionSettings);
-            $query->whereIn('material_category_id', $enabledMaterialCategoryIds);
-        }
+            $targetQuestions = collect();
+            foreach ($materialCategoryQuestionSettings as $materialCategoryId => $settings) {
+                foreach (['default', 'easy', 'medium', 'hard'] as $difficulty) {
+                    $count = (int) ($settings[$difficulty] ?? 0);
+                    if ($count <= 0) {
+                        continue;
+                    }
 
-        $targetQuestions = $query->get(['id', 'study_id']);
+                    $subQuery = Question::withoutGlobalScope('user_scope')
+                        ->where('material_category_id', $materialCategoryId);
+
+                    if ($difficulty === 'default') {
+                        $subQuery->where(function ($q) {
+                            $q->whereNull('difficulty')
+                                ->orWhere('difficulty', 'default');
+                        });
+                    } else {
+                        $subQuery->where('difficulty', $difficulty);
+                    }
+
+                    if ($module->question_type_id) {
+                        $subQuery->where('question_type_id', $module->question_type_id);
+                    }
+
+                    $questions = $subQuery->orderBy('order', 'asc')
+                        ->orderBy('id', 'asc')
+                        ->limit($count)
+                        ->get(['id', 'study_id']);
+
+                    $targetQuestions = $targetQuestions->concat($questions);
+                }
+            }
+        }
 
         $targetQuestionIds = $targetQuestions->pluck('id')->toArray();
 
@@ -145,7 +174,7 @@ class ModuleService
         });
     }
 
-    private function syncModuleQuestionsByCategory(Module $module, array $categoryQuestionSettings, ?string $companyId): void
+    public function syncModuleQuestionsByCategory(Module $module, array $categoryQuestionSettings, ?string $companyId): void
     {
         $now = Carbon::now();
 
@@ -154,12 +183,41 @@ class ModuleService
             $query->where('company_id', $companyId)
                 ->where('question_type_id', $module->question_type_id)
                 ->whereNotNull('category_question_id');
+            $targetQuestions = $query->get(['id', 'study_id']);
         } else {
-            $enabledCategoryIds = array_keys($categoryQuestionSettings);
-            $query->whereIn('category_question_id', $enabledCategoryIds);
-        }
+            $targetQuestions = collect();
+            foreach ($categoryQuestionSettings as $categoryId => $settings) {
+                foreach (['default', 'easy', 'medium', 'hard'] as $difficulty) {
+                    $count = (int) ($settings[$difficulty] ?? 0);
+                    if ($count <= 0) {
+                        continue;
+                    }
 
-        $targetQuestions = $query->get(['id', 'study_id']);
+                    $subQuery = Question::withoutGlobalScope('user_scope')
+                        ->where('category_question_id', $categoryId);
+
+                    if ($difficulty === 'default') {
+                        $subQuery->where(function ($q) {
+                            $q->whereNull('difficulty')
+                                ->orWhere('difficulty', 'default');
+                        });
+                    } else {
+                        $subQuery->where('difficulty', $difficulty);
+                    }
+
+                    if ($module->question_type_id) {
+                        $subQuery->where('question_type_id', $module->question_type_id);
+                    }
+
+                    $questions = $subQuery->orderBy('order', 'asc')
+                        ->orderBy('id', 'asc')
+                        ->limit($count)
+                        ->get(['id', 'study_id']);
+
+                    $targetQuestions = $targetQuestions->concat($questions);
+                }
+            }
+        }
 
         $targetQuestionIds = $targetQuestions->pluck('id')->toArray();
 
@@ -211,7 +269,7 @@ class ModuleService
         });
     }
 
-    private function syncModuleQuestionsByTopic(Module $module, array $topicQuestionSettings, ?string $companyId): void
+    public function syncModuleQuestionsByTopic(Module $module, array $topicQuestionSettings, ?string $companyId): void
     {
         $now = Carbon::now();
 
@@ -220,12 +278,41 @@ class ModuleService
             $query->where('company_id', $companyId)
                 ->where('question_type_id', $module->question_type_id)
                 ->whereNotNull('topic_id');
+            $targetQuestions = $query->get(['id', 'study_id']);
         } else {
-            $enabledTopicIds = array_keys($topicQuestionSettings);
-            $query->whereIn('topic_id', $enabledTopicIds);
-        }
+            $targetQuestions = collect();
+            foreach ($topicQuestionSettings as $topicId => $settings) {
+                foreach (['default', 'easy', 'medium', 'hard'] as $difficulty) {
+                    $count = (int) ($settings[$difficulty] ?? 0);
+                    if ($count <= 0) {
+                        continue;
+                    }
 
-        $targetQuestions = $query->get(['id', 'study_id']);
+                    $subQuery = Question::withoutGlobalScope('user_scope')
+                        ->where('topic_id', $topicId);
+
+                    if ($difficulty === 'default') {
+                        $subQuery->where(function ($q) {
+                            $q->whereNull('difficulty')
+                                ->orWhere('difficulty', 'default');
+                        });
+                    } else {
+                        $subQuery->where('difficulty', $difficulty);
+                    }
+
+                    if ($module->question_type_id) {
+                        $subQuery->where('question_type_id', $module->question_type_id);
+                    }
+
+                    $questions = $subQuery->orderBy('order', 'asc')
+                        ->orderBy('id', 'asc')
+                        ->limit($count)
+                        ->get(['id', 'study_id']);
+
+                    $targetQuestions = $targetQuestions->concat($questions);
+                }
+            }
+        }
 
         $targetQuestionIds = $targetQuestions->pluck('id')->toArray();
 
