@@ -4,6 +4,7 @@ import {
     HelpCircle, Bookmark, Menu, Save
 } from 'lucide-react';
 import LatexHTML from './LatexHTML';
+import MediaViewerModal from './MediaViewerModal';
 
 const ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -52,6 +53,62 @@ const QuestionArea = ({
     const [selectedAnswerId, setSelectedAnswerId] = useState(question?.timetable_answer_id ?? null);
     const [essayAnswer, setEssayAnswer]           = useState(question?.essay_answer || '');
     const [isMarked, setIsMarked]                 = useState(!!question?.is_mark);
+    const [mediaModal, setMediaModal]             = useState({ isOpen: false, url: '', type: '', title: '' });
+
+    const openMediaModal = (url, type, title = '') => {
+        setMediaModal({ isOpen: true, url, type, title });
+    };
+
+    const handleContentClick = (e) => {
+        const img = e.target.closest('img');
+        if (img) {
+            e.preventDefault();
+            e.stopPropagation();
+            let filename = 'Gambar Lampiran';
+            try {
+                const urlObj = new URL(img.src);
+                filename = urlObj.pathname.split('/').pop() || filename;
+            } catch (err) {
+                filename = img.src.split('/').pop() || filename;
+            }
+            openMediaModal(img.src, 'image', decodeURIComponent(filename));
+            return;
+        }
+
+        const link = e.target.closest('a');
+        if (link) {
+            const href = link.getAttribute('href');
+            if (href) {
+                const isVideo = /\.(mp4|mov|avi|wmv|webm)$/i.test(href);
+                const isAudio = /\.(mp3|wav|ogg|m4a)$/i.test(href);
+                const isPdf = /\.pdf$/i.test(href);
+                const isDoc = /\.(docx?|xlsx?|txt|zip|rar)$/i.test(href);
+                const isImage = /\.(png|jpe?g|gif|webp|svg)$/i.test(href);
+
+                let type = '';
+                if (isPdf) type = 'pdf';
+                else if (isImage) type = 'image';
+                else if (isVideo) type = 'video';
+                else if (isAudio) type = 'audio';
+                else if (isDoc) type = 'doc';
+
+                if (type) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    let filename = link.innerText || 'Lampiran';
+                    if (filename.includes('Lihat') || filename.includes('Unduh') || filename.trim().length === 0) {
+                        try {
+                            const urlObj = new URL(href, window.location.origin);
+                            filename = urlObj.pathname.split('/').pop() || filename;
+                        } catch (err) {
+                            filename = href.split('/').pop() || filename;
+                        }
+                    }
+                    openMediaModal(href, type, decodeURIComponent(filename));
+                }
+            }
+        }
+    };
 
     const [fontSize, setFontSize] = useState(() => {
         return localStorage.getItem('exam_font_size') || 'medium';
@@ -151,7 +208,7 @@ const QuestionArea = ({
     const showLastEllipsis  = index < total - RANGE - 2;
 
     return (
-        <div className="flex flex-col h-full overflow-hidden bg-white">
+        <div className="flex flex-col h-full overflow-hidden bg-slate-50">
 
             {/* ── Top Bar ── */}
             <div className="flex-none flex flex-wrap items-center gap-1.5 px-3 py-2 bg-white border-b border-gray-200 shadow-sm z-10">
@@ -215,8 +272,9 @@ const QuestionArea = ({
             </div>
 
             {/* ── Question Body (scrollable) ── */}
-            <div className="flex-1 overflow-y-auto">
-                <div className="max-w-3xl mx-auto px-4 py-5 space-y-5">
+            <div className="flex-1 overflow-y-auto bg-slate-50" onClick={handleContentClick}>
+                <div className="max-w-5xl mx-auto px-4 py-6">
+                    <div className="bg-white border border-gray-250/70 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
 
                     {/* Question label */}
                     <p className="text-xs font-semibold text-gray-400">Soal ke-{index + 1}:</p>
@@ -282,24 +340,35 @@ const QuestionArea = ({
                                             return (
                                                 <div key={idx} className="p-4 rounded-xl border border-gray-200 bg-red-50 shadow-sm max-w-md mx-auto flex flex-col gap-2 items-center text-center">
                                                     <span className="text-red-500 font-semibold flex items-center gap-1">📄 PDF Lampiran {mediaFiles.length > 1 ? `#${idx + 1}` : ''}</span>
-                                                    <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 underline font-medium hover:text-blue-800 break-all">
-                                                        Lihat / Unduh Lampiran PDF
-                                                    </a>
+                                                    <button 
+                                                        onClick={() => openMediaModal(url, 'pdf', `Lampiran PDF #${idx + 1}`)}
+                                                        className="text-xs text-blue-600 underline font-medium hover:text-blue-800 break-all cursor-pointer focus:outline-none"
+                                                    >
+                                                        Lihat Lampiran PDF
+                                                    </button>
                                                 </div>
                                             );
                                         } else if (isDoc) {
                                             return (
                                                 <div key={idx} className="p-4 rounded-xl border border-gray-200 bg-blue-50 shadow-sm max-w-md mx-auto flex flex-col gap-2 items-center text-center">
                                                     <span className="text-blue-500 font-semibold flex items-center gap-1">📁 Dokumen Lampiran {mediaFiles.length > 1 ? `#${idx + 1}` : ''}</span>
-                                                    <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 underline font-medium hover:text-blue-800 break-all">
-                                                        Unduh Lampiran Dokumen
-                                                    </a>
+                                                    <button 
+                                                        onClick={() => openMediaModal(url, 'doc', `Lampiran Dokumen #${idx + 1}`)}
+                                                        className="text-xs text-blue-600 underline font-medium hover:text-blue-800 break-all cursor-pointer focus:outline-none"
+                                                    >
+                                                        Lihat Lampiran Dokumen
+                                                    </button>
                                                 </div>
                                             );
                                         } else {
                                             return (
                                                 <div key={idx} className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-sm inline-block max-w-full hover:shadow-md transition-shadow">
-                                                    <img src={url} alt={`Lampiran Soal ${idx + 1}`} className="max-h-[300px] object-contain cursor-zoom-in" onClick={() => window.open(url, '_blank')} />
+                                                    <img 
+                                                        src={url} 
+                                                        alt={`Lampiran Soal ${idx + 1}`} 
+                                                        className="max-h-[300px] object-contain cursor-zoom-in" 
+                                                        onClick={() => openMediaModal(url, 'image', `Lampiran Soal ${mediaFiles.length > 1 ? `#${idx + 1}` : ''}`)} 
+                                                    />
                                                 </div>
                                             );
                                         }
@@ -362,7 +431,15 @@ const QuestionArea = ({
                                                                 const aUrl = getMediaUrl(file);
                                                                 return (
                                                                     <div key={aIdx} className="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 aspect-video flex items-center justify-center hover:opacity-90 transition-opacity">
-                                                                        <img src={aUrl} alt="Gambar Jawaban" className="max-h-full max-w-full object-contain cursor-pointer" onClick={(e) => { e.stopPropagation(); window.open(aUrl, '_blank'); }} />
+                                                                        <img 
+                                                                            src={aUrl} 
+                                                                            alt="Gambar Jawaban" 
+                                                                            className="max-h-full max-w-full object-contain cursor-pointer" 
+                                                                            onClick={(e) => { 
+                                                                                e.stopPropagation(); 
+                                                                                openMediaModal(aUrl, 'image', `Gambar Jawaban ${ALPHA[i]}${answerMedia.length > 1 ? ` #${aIdx + 1}` : ''}`); 
+                                                                            }} 
+                                                                        />
                                                                     </div>
                                                                 );
                                                             })}
@@ -408,6 +485,7 @@ const QuestionArea = ({
                             Pilihan jawaban tidak tersedia
                         </div>
                     )}
+                    </div>
                 </div>
             </div>
 
@@ -472,6 +550,15 @@ const QuestionArea = ({
                     </button>
                 )}
             </div>
+            {/* Media Viewer Modal */}
+            <MediaViewerModal
+                isOpen={mediaModal.isOpen}
+                onClose={() => setMediaModal(prev => ({ ...prev, isOpen: false }))}
+                url={mediaModal.url}
+                type={mediaModal.type}
+                title={mediaModal.title}
+                companyColor={companyColor}
+            />
         </div>
     );
 };

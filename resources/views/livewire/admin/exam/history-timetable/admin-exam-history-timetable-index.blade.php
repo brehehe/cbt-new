@@ -63,9 +63,9 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Skala
                                 Penilaian</th>
                         @endif
-                        <th
+                        {{--<th
                             class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
-                            Aksi</th>
+                            Aksi</th>--}}
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -101,12 +101,12 @@
                                     </div>
                                 </td>
                             @endif
-                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                            {{--<td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                 <a href="/admin/exam/history-timetable/{{ $userTimetable->timetable_id }}/{{ $userTimetable->id }}"
                                     class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all shadow-md hover:shadow-lg">
                                     <i class="fas fa-eye mr-1.5"></i> Detail
                                 </a>
-                            </td>
+                            </td>--}}
                         </tr>
                     @empty
                         <tr>

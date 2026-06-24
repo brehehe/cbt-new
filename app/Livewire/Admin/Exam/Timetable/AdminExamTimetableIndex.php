@@ -134,7 +134,7 @@ class AdminExamTimetableIndex extends Component
                             }
 
                             $query = TimetableQuestion::withoutGlobalScope('user_scope')
-                                ->select('id', 'study_id', 'question_id')
+                                ->select('id', 'study_id', 'question_id', 'order')
                                 ->where('timetable_module_id', $transactionModule->id)
                                 ->where('category_question_id', $categoryId);
 
@@ -154,7 +154,7 @@ class AdminExamTimetableIndex extends Component
                             if ($transactionModule->random_question) {
                                 $query->inRandomOrder();
                             } else {
-                                $query->orderBy('id');
+                                $query->orderBy('order');
                             }
 
                             $modulesQuestions = $modulesQuestions->merge($query->limit($take)->get());
@@ -169,7 +169,7 @@ class AdminExamTimetableIndex extends Component
                             }
 
                             $query = TimetableQuestion::withoutGlobalScope('user_scope')
-                                ->select('id', 'study_id', 'question_id')
+                                ->select('id', 'study_id', 'question_id', 'order')
                                 ->where('timetable_module_id', $transactionModule->id)
                                 ->where('topic_id', $topicId);
 
@@ -189,7 +189,7 @@ class AdminExamTimetableIndex extends Component
                             if ($transactionModule->random_question) {
                                 $query->inRandomOrder();
                             } else {
-                                $query->orderBy('id');
+                                $query->orderBy('order');
                             }
 
                             $modulesQuestions = $modulesQuestions->merge($query->limit($take)->get());
@@ -204,7 +204,7 @@ class AdminExamTimetableIndex extends Component
                             }
 
                             $query = TimetableQuestion::withoutGlobalScope('user_scope')
-                                ->select('id', 'study_id', 'question_id')
+                                ->select('id', 'study_id', 'question_id', 'order')
                                 ->where('timetable_module_id', $transactionModule->id)
                                 ->where('material_category_id', $materialCategoryId);
 
@@ -224,7 +224,7 @@ class AdminExamTimetableIndex extends Component
                             if ($transactionModule->random_question) {
                                 $query->inRandomOrder();
                             } else {
-                                $query->orderBy('id');
+                                $query->orderBy('order');
                             }
 
                             $modulesQuestions = $modulesQuestions->merge($query->limit($take)->get());
@@ -235,7 +235,7 @@ class AdminExamTimetableIndex extends Component
 
             if ($modulesQuestions->isEmpty()) {
                 $query = TimetableQuestion::withoutGlobalScope('user_scope')
-                    ->select('id', 'study_id', 'question_id')
+                    ->select('id', 'study_id', 'question_id', 'order')
                     ->where('timetable_module_id', $transactionModule->id);
 
                 if (is_array($allowedQuestionIds)) {
@@ -245,18 +245,20 @@ class AdminExamTimetableIndex extends Component
                 if ($transactionModule->random_question) {
                     $query->inRandomOrder();
                 } else {
-                    $query->orderBy('id');
+                    $query->orderBy('order');
                 }
 
                 $modulesQuestions = $query->get();
             }
 
-            if ($transactionModule->random_question && $modulesQuestions->isNotEmpty()) {
-                $modulesQuestions = $modulesQuestions->shuffle()->values();
-            }
-
             if ($modulesQuestions->isNotEmpty()) {
                 $modulesQuestions = $modulesQuestions->unique('id')->values();
+
+                if ($transactionModule->random_question) {
+                    $modulesQuestions = $modulesQuestions->shuffle()->values();
+                } else {
+                    $modulesQuestions = $modulesQuestions->sortBy('order')->values();
+                }
 
                 $selectedTimetableQuestionIds = $modulesQuestions->pluck('id')->filter()->values();
                 $selectedQuestionIds = $modulesQuestions->pluck('question_id')->filter()->values();
