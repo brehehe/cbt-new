@@ -47,7 +47,7 @@
                             <label
                                 class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer block">
                                 Import Mahasiswa
-                                <input type="file" wire:model="importFileMahasiswa" accept=".xlsx,.xls" wire:change="import"
+                                <input type="file" wire:model="importFileMahasiswa" accept=".xlsx,.xls"
                                     class="hidden" />
                             </label>
                         @endif
@@ -56,7 +56,7 @@
                                 class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer block">
                                 Import {{ auth()->user()->company->is_pmb === 'pmb' ? 'PMB' : 'PMB / General' }}
                                 <input type="file" wire:model="importFileGeneral" accept=".xlsx,.xls"
-                                    wire:change="importGeneral" class="hidden" />
+                                    class="hidden" />
                             </label>
                         @endif
                     </div>

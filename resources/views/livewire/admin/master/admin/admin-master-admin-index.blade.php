@@ -17,7 +17,7 @@
                 <label class="btn btn-warning cursor-pointer">
                     <i class="fa-solid fa-file-import mr-1"></i>
                     Import
-                    <input type="file" wire:model="importFile" accept=".xlsx,.xls" wire:change="import"
+                    <input type="file" wire:model="importFile" accept=".xlsx,.xls"
                         class="hidden" />
                 </label>
 

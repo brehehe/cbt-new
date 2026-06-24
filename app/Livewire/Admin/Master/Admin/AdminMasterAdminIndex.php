@@ -410,6 +410,11 @@ class AdminMasterAdminIndex extends Component
         }
     }
 
+    public function updatedImportFile()
+    {
+        $this->import();
+    }
+
     public function import()
     {
         try {
@@ -429,7 +434,9 @@ class AdminMasterAdminIndex extends Component
             $this->reset('importFile');
             AlertHelper::success('Berhasil', 'Data admin berhasil diimpor.');
         } catch (\Illuminate\Validation\ValidationException $e) {
-            AlertHelper::error('Gagal', 'File tidak valid. Pastikan format file adalah Excel (.xlsx atau .xls).');
+            $errorMsg = $e->validator->errors()->first();
+            Log::error('Admin Import Validation Error: '.$errorMsg);
+            AlertHelper::error('Gagal', 'File tidak valid atau terjadi kesalahan: '.$errorMsg);
         } catch (\Exception $e) {
             Log::error('Admin Import Error: '.$e->getMessage());
             AlertHelper::error('Gagal', 'Gagal mengimpor data admin: '.$e->getMessage());

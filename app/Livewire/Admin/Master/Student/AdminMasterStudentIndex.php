@@ -942,6 +942,16 @@ class AdminMasterStudentIndex extends Component
         }
     }
 
+    public function updatedImportFileMahasiswa()
+    {
+        $this->import();
+    }
+
+    public function updatedImportFileGeneral()
+    {
+        $this->importGeneral();
+    }
+
     public function import()
     {
         try {
@@ -961,7 +971,9 @@ class AdminMasterStudentIndex extends Component
             $this->reset('importFileMahasiswa');
             AlertHelper::success('Berhasil', 'Data mahasiswa berhasil diimpor.');
         } catch (ValidationException $e) {
-            AlertHelper::error('Gagal', 'File tidak valid. Pastikan format file adalah Excel (.xlsx atau .xls).');
+            $errorMsg = $e->validator->errors()->first();
+            Log::error('Student Import Validation Error: '.$errorMsg);
+            AlertHelper::error('Gagal', 'File tidak valid atau terjadi kesalahan: '.$errorMsg);
         } catch (\Exception $e) {
             Log::error('Student Import Error: '.$e->getMessage());
             AlertHelper::error('Gagal', 'Gagal mengimpor data mahasiswa: '.$e->getMessage());
@@ -987,7 +999,9 @@ class AdminMasterStudentIndex extends Component
             $this->reset('importFileGeneral');
             AlertHelper::success('Berhasil', 'Data general berhasil diimpor.');
         } catch (ValidationException $e) {
-            AlertHelper::error('Gagal', 'File tidak valid. Pastikan format file adalah Excel (.xlsx atau .xls).');
+            $errorMsg = $e->validator->errors()->first();
+            Log::error('General Import Validation Error: '.$errorMsg);
+            AlertHelper::error('Gagal', 'File tidak valid atau terjadi kesalahan: '.$errorMsg);
         } catch (\Exception $e) {
             Log::error('General Import Error: '.$e->getMessage());
             AlertHelper::error('Gagal', 'Gagal mengimpor data general: '.$e->getMessage());
