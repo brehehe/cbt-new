@@ -52,15 +52,19 @@ class AppServiceProvider extends ServiceProvider
                 try {
                     // Skip location for local IPs to avoid errors/delays
                     if ($ip !== '127.0.0.1' && $ip !== '::1') {
-                        $position = Location::get($ip);
-                        if ($position) {
-                            $location = [
-                                'country' => $position->countryName,
-                                'city' => $position->cityName,
-                                'iso_code' => $position->countryCode,
-                                'timezone' => $position->timezone,
-                            ];
-                        }
+                        $cacheKey = 'geoip_location_' . md5($ip);
+                        $location = \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->addDays(30), function () use ($ip) {
+                            $position = Location::get($ip);
+                            if ($position) {
+                                return [
+                                    'country' => $position->countryName,
+                                    'city' => $position->cityName,
+                                    'iso_code' => $position->countryCode,
+                                    'timezone' => $position->timezone,
+                                ];
+                            }
+                            return null;
+                        });
                     }
                 } catch (\Throwable $e) {
                     Log::warning('GeoIP lookup failed: '.$e->getMessage());

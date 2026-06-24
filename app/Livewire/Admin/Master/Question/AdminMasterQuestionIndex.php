@@ -485,9 +485,25 @@ class AdminMasterQuestionIndex extends Component
         try {
             DB::beginTransaction();
 
-            foreach ($this->selectedQuestions as $id) {
-                app(QuestionService::class)->delete($id);
-            }
+            $questionsCount = count($this->selectedQuestions);
+
+            // Log a single batch activity log for the bulk delete
+            activity('audit')
+                ->event('bulk_deleted')
+                ->withProperties([
+                    'ids' => $this->selectedQuestions,
+                    'count' => $questionsCount,
+                ])
+                ->log("deleted {$questionsCount} Questions");
+
+            // Bulk soft-delete related answers
+            \App\Models\Master\Question\Answer::whereIn('question_id', $this->selectedQuestions)->delete();
+
+            // Bulk soft-delete related module questions
+            \App\Models\Master\Question\ModuleQuestion::whereIn('question_id', $this->selectedQuestions)->delete();
+
+            // Bulk soft-delete the questions themselves
+            Question::whereIn('id', $this->selectedQuestions)->delete();
 
             DB::commit();
         } catch (Exception|Throwable $th) {

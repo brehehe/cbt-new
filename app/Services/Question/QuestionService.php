@@ -153,6 +153,8 @@ class QuestionService
     public function delete($id)
     {
         $result = Question::findOrFail($id);
+        $result->answers()->delete();
+        $result->moduleQuestions()->delete();
         $result->delete();
     }
 }
