@@ -208,13 +208,13 @@
         </div>
     </div>
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-        <div class="flex items-center gap-3">
-            <label class="inline-flex items-center text-sm text-gray-700">
+        <div class="flex items-center gap-3 shrink-0">
+            <label class="inline-flex items-center text-sm text-gray-700 whitespace-nowrap">
                 <input type="checkbox" class="form-checkbox" wire:model.live="selectAll">
-                <span class="ml-2">Pilih semua di halaman ini</span>
+                <span class="ml-2 whitespace-nowrap">Pilih semua di halaman ini</span>
             </label>
             @if (count($selectedQuestions) > 0)
-                <button wire:click="bulkDelete" wire:confirm="Apakah Anda yakin ingin menghapus soal terpilih?" class="btn btn-danger flex items-center gap-2 text-sm py-1 px-3" type="button">
+                <button wire:click="bulkDelete" wire:confirm="Apakah Anda yakin ingin menghapus soal terpilih?" class="btn btn-danger flex items-center gap-2 text-sm py-1 px-3 shrink-0" type="button">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
@@ -223,13 +223,13 @@
             @endif
         </div>
         <div class="flex items-center gap-3 w-full sm:w-auto">
-            <select class="mt-1 form-control" wire:model.live="bulkCategoryQuestionId">
+            <select class="form-control" wire:model.live="bulkCategoryQuestionId">
                 <option value="">Pilih Kategori Soal</option>
                 @foreach ($category_questions as $category_question)
                     <option value="{{ $category_question->id }}">{{ $category_question->name }}</option>
                 @endforeach
             </select>
-            <button wire:click="applyBulkCategory" class="btn btn-primary" type="button">
+            <button wire:click="applyBulkCategory" class="btn btn-primary whitespace-nowrap" type="button">
                 Terapkan
             </button>
         </div>

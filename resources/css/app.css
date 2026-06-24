@@ -1158,6 +1158,7 @@ body {
     font-weight: bold;
     text-align: center;
     color: #555;
+    padding: 3rem 1.5rem;
 }
 
 @keyframes fade-in {
