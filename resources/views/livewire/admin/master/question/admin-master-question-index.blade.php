@@ -8,6 +8,47 @@
 
     @include('livewire.admin.master.question.admin-master-question-index-modal-import')
     @include('livewire.admin.master.question.admin-master-question-modal')
+
+    <!-- Modal for Import Warnings -->
+    <div wire:ignore.self id="modal-import-warnings"
+        class="fixed inset-0 bg-overlay hidden items-center justify-center z-50 transition-opacity duration-300 ease-in-out">
+        <div class="bg-white rounded-2xl shadow-2xl w-full transform transition-all scale-95 duration-300 ease-out animate-fade-in"
+            style="max-width: 600px">
+            <!-- Header -->
+            <div class="flex justify-between items-center p-6 border-b">
+                <div class="flex items-center gap-2">
+                    <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <h2 class="text-xl font-semibold text-gray-800">Detail Catatan Import Soal</h2>
+                </div>
+                <button wire:click="closeModalImportWarnings()"
+                    class="text-gray-500 hover:text-red-500 transition-colors text-2xl leading-none cursor-pointer">
+                    &times;
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="px-6 py-4 text-gray-600 overflow-auto" style="max-height: 60vh">
+                <div class="space-y-3">
+                    @foreach ($importWarnings as $warn)
+                        <div class="flex items-start gap-3 p-3 bg-amber-50/50 rounded-xl border border-amber-100">
+                            <span class="font-bold text-amber-600 whitespace-nowrap bg-amber-100 px-2 py-0.5 rounded-full text-xs">Baris {{ $warn['row'] }}</span>
+                            <span class="flex-grow text-gray-700 leading-relaxed text-xs">{{ $warn['reason'] }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="flex justify-end gap-2 px-6 py-4 border-t">
+                <button wire:click="closeModalImportWarnings()"
+                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow transition cursor-pointer">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
@@ -16,6 +57,12 @@
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div class="flex items-center gap-2">
+                <button wire:click="$refresh" wire:loading.attr="disabled" class="btn btn-secondary flex items-center gap-2" type="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4" wire:loading.class="animate-spin" wire:target="$refresh">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                    </svg>
+                    Refresh
+                </button>
                 @if (config('app.import_question'))
                     <button wire:click="openModalImport()" class="btn btn-primary flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -49,6 +96,33 @@
             </div>
         </div>
     </div>
+
+    @if (!empty($importWarnings))
+        <div class="mb-6 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-2xl shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fade-in transition-all">
+            <div class="flex items-center gap-3">
+                <span class="flex items-center justify-center w-8 h-8 rounded-full bg-amber-100 text-amber-600 shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </span>
+                <div>
+                    <h3 class="text-sm font-bold text-amber-800">Import Selesai dengan Catatan</h3>
+                    <p class="text-xs text-amber-600 mt-0.5">Beberapa baris soal dilewati karena data tidak lengkap.</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 self-end sm:self-center">
+                <button wire:click="openModalImportWarnings()" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-sm transition-all hover:scale-[1.02] active:scale-95 cursor-pointer">
+                    Lihat Detail
+                </button>
+                <button wire:click="$set('importWarnings', [])" class="text-amber-400 hover:text-amber-600 transition-colors p-1 rounded-lg hover:bg-amber-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    @endif
+
     <div class="space-y-6 mb-6">
         <!-- SECTION 1: Informasi Umum Produk -->
         <div class="p-6 bg-white shadow rounded-lg">

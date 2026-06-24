@@ -49,16 +49,41 @@ class QuestionImportJob implements ShouldQueue
     {
         //
         try {
+            $warnings = [];
+
             foreach ($this->collections as $key => $row) {
                 if ($key == 0) {
                     continue;
                 } // Skip header row
+
+                // Check if the original row is completely empty
+                $isEmptyRow = true;
+                if ($row instanceof Collection) {
+                    $rowArray = $row->toArray();
+                } elseif ($row instanceof \Traversable || $row instanceof \ArrayAccess) {
+                    $rowArray = collect($row)->toArray();
+                } else {
+                    $rowArray = (array) $row;
+                }
+                foreach ($rowArray as $colVal) {
+                    if ($colVal !== null && trim((string)$colVal) !== '') {
+                        $isEmptyRow = false;
+                        break;
+                    }
+                }
+                if ($isEmptyRow) {
+                    continue; // Silently skip completely empty rows
+                }
 
                 $value = $this->normalizeRow($row);
                 if ($value === null) {
                     Log::warning('Data soal tidak bisa diproses, format baris tidak valid', [
                         'collection' => $row,
                     ]);
+                    $warnings[] = [
+                        'row' => $key + 1,
+                        'reason' => 'Format baris tidak valid.',
+                    ];
 
                     continue;
                 }
@@ -89,6 +114,16 @@ class QuestionImportJob implements ShouldQueue
                     Log::warning('Data soal tidak bisa masuk, ada field yang kosong', [
                         'collection' => $value,
                     ]);
+                    $missingFields = [];
+                    if (!$studyName) $missingFields[] = 'Prodi';
+                    if (!$topicName) $missingFields[] = 'Topik Soal';
+                    if (!$typeName) $missingFields[] = 'Tipe Soal';
+                    if (!$questionText) $missingFields[] = 'Soal';
+
+                    $warnings[] = [
+                        'row' => $key + 1,
+                        'reason' => 'Ada field wajib yang kosong: ' . implode(', ', $missingFields),
+                    ];
 
                     continue;
                 }
@@ -102,20 +137,33 @@ class QuestionImportJob implements ShouldQueue
                     Log::warning('Data soal tidak bisa masuk, karena Tipe Soal tidak ditemukan', [
                         'collection' => $value,
                     ]);
+                    $warnings[] = [
+                        'row' => $key + 1,
+                        'reason' => 'Tipe Soal "' . $typeName . '" tidak ditemukan.',
+                    ];
 
                     continue;
                 }
 
                 if ($this->import_type == 'pg') {
                     $requiredOptionIndices = [9, 11, 13, 15]; // A, B, C, D
+                    $missingOption = false;
                     foreach ($requiredOptionIndices as $optIdx) {
                         if (! $this->valueAt($value, $optIdx)) {
-                            Log::warning('Data soal tidak bisa masuk, karena jawaban A/B/C/D kosong ', [
-                                'collection' => $value,
-                            ]);
-
-                            continue 2;
+                            $missingOption = true;
+                            break;
                         }
+                    }
+                    if ($missingOption) {
+                        Log::warning('Data soal tidak bisa masuk, karena jawaban A/B/C/D kosong ', [
+                            'collection' => $value,
+                        ]);
+                        $warnings[] = [
+                            'row' => $key + 1,
+                            'reason' => 'Pilihan jawaban A, B, C, atau D tidak boleh kosong.',
+                        ];
+
+                        continue;
                     }
                 }
 
@@ -273,6 +321,9 @@ class QuestionImportJob implements ShouldQueue
 
             }
             if ($this->user) {
+                if (! empty($warnings)) {
+                    \Illuminate\Support\Facades\Cache::put('import_warnings_' . $this->user->id, $warnings, 3600);
+                }
                 \Illuminate\Support\Facades\Cache::put('import_status_' . $this->user->id, 'success', 3600);
             }
         } catch (Exception|Throwable $th) {

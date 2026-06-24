@@ -104,6 +104,8 @@ class AdminMasterQuestionIndex extends Component
 
     public $isLimited = false;
 
+    public $importWarnings = [];
+
     public function render()
     {
         if (Auth::check()) {
@@ -112,7 +114,15 @@ class AdminMasterQuestionIndex extends Component
                 $status = \Illuminate\Support\Facades\Cache::get($statusKey);
                 if ($status === 'success') {
                     \Illuminate\Support\Facades\Cache::forget($statusKey);
-                    AlertHelper::success('Import Berhasil', 'Data soal berhasil diimport secara background.');
+                    
+                    $warningKey = 'import_warnings_' . Auth::id();
+                    if (\Illuminate\Support\Facades\Cache::has($warningKey)) {
+                        $this->importWarnings = \Illuminate\Support\Facades\Cache::get($warningKey);
+                        \Illuminate\Support\Facades\Cache::forget($warningKey);
+                        AlertHelper::warning('Import Selesai dengan Catatan', 'Beberapa baris soal dilewati karena data tidak lengkap.');
+                    } else {
+                        AlertHelper::success('Import Berhasil', 'Data soal berhasil diimport secara background.');
+                    }
                 } elseif (str_starts_with((string) $status, 'failed:')) {
                     \Illuminate\Support\Facades\Cache::forget($statusKey);
                     $errorMsg = substr($status, 7);
@@ -499,6 +509,16 @@ class AdminMasterQuestionIndex extends Component
     public function openModalImport()
     {
         return $this->dispatch('open-modal', ['id' => 'modal-import-question']);
+    }
+
+    public function openModalImportWarnings()
+    {
+        return $this->dispatch('open-modal', ['id' => 'modal-import-warnings']);
+    }
+
+    public function closeModalImportWarnings()
+    {
+        return $this->dispatch('close-modal', ['id' => 'modal-import-warnings']);
     }
 
     public function importQuestion()
