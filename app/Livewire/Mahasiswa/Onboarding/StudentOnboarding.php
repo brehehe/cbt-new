@@ -171,6 +171,11 @@ class StudentOnboarding extends Component
     public function prevStep()
     {
         $this->currentStep--;
+        $user = Auth::user();
+        $this->name = $this->name ?: $user->name;
+        $this->nim = $this->nim ?: ($user->userDetail->nim ?? $user->nim ?? '');
+        $this->phone = $this->phone ?: ($user->userDetail->phone ?? $user->phone ?? '');
+        $this->address = $this->address ?: ($user->userDetail->address ?? '');
     }
 
     public function finish()
