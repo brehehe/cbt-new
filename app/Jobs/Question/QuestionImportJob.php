@@ -174,18 +174,21 @@ class QuestionImportJob implements ShouldQueue
                 }
 
                 $materialCategoryName = $this->valueAt($value, 2);
-                $material_category = $topic?->materialCategories()
-                    ->withoutGlobalScopes()
-                    ->where('company_id', $this->user?->company?->id)
-                    ->where('name', 'ilike', $materialCategoryName)
-                    ->first();
+                $material_category = null;
+                if ($materialCategoryName) {
+                    $material_category = $topic?->materialCategories()
+                        ->withoutGlobalScopes()
+                        ->where('company_id', $this->user?->company?->id)
+                        ->where('name', 'ilike', $materialCategoryName)
+                        ->first();
 
-                if (! $material_category && $materialCategoryName) {
-                    $material_category = MaterialCategory::create([
-                        'company_id' => $this->user?->company?->id,
-                        'topic_id' => $topic?->id,
-                        'name' => $materialCategoryName,
-                    ]);
+                    if (! $material_category) {
+                        $material_category = MaterialCategory::create([
+                            'company_id' => $this->user?->company?->id,
+                            'topic_id' => $topic?->id,
+                            'name' => $materialCategoryName,
+                        ]);
+                    }
                 }
 
                 $materialName = $this->valueAt($value, 3);

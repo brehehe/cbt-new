@@ -65,7 +65,30 @@ class QuestionPaketSeeder extends Seeder
                 $collection->push(collect($header)); // header baris pertama
 
                 foreach ($selected as $row) {
-                    $collection->push(collect($row));
+                    // Map 13 columns to 20 columns for QuestionImportJob compatibility
+                    $mappedRow = [
+                        $row[0] ?? null,  // 0: Prodi
+                        $row[1] ?? null,  // 1: Topik Soal
+                        $row[2] ?? null,  // 2: Kategori Materi
+                        $row[3] ?? null,  // 3: Materi Soal
+                        $row[4] ?? null,  // 4: Tipe Soal
+                        null,             // 5: Kategori Soal
+                        $row[5] ?? null,  // 6: Soal
+                        $row[6] ?? null,  // 7: Deskripsi Soal
+                        null,             // 8: URL Gambar Soal
+                        $row[7] ?? null,  // 9: A
+                        null,             // 10: URL Gambar A
+                        $row[8] ?? null,  // 11: B
+                        null,             // 12: URL Gambar B
+                        $row[9] ?? null,  // 13: C
+                        null,             // 14: URL Gambar C
+                        $row[10] ?? null, // 15: D
+                        null,             // 16: URL Gambar D
+                        $row[11] ?? null, // 17: E
+                        null,             // 18: URL Gambar E
+                        $row[12] ?? null, // 19: Jawaban
+                    ];
+                    $collection->push(collect($mappedRow));
                 }
 
                 // Dispatch ke Job Import
