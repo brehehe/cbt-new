@@ -67,7 +67,7 @@ export default function AdminDashboard({ userProfile = {} }) {
             const ctx = chartRef.current.getContext('2d');
             if (ctx) {
                 const colors = getBrandingColors();
-                
+
                 // Clean up existing chart instances to prevent leaks
                 if (chartInstance.current) {
                     chartInstance.current.destroy();
@@ -167,7 +167,7 @@ export default function AdminDashboard({ userProfile = {} }) {
 
     return (
         <div className="w-full font-sans selection:bg-[var(--primary)] selection:text-white">
-            
+
             {/* Header greeting block */}
             <div className="mb-6">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -198,8 +198,8 @@ export default function AdminDashboard({ userProfile = {} }) {
                         )}
 
                         {/* Refresh button with spinner */}
-                        <button 
-                            onClick={handleManualRefresh} 
+                        <button
+                            onClick={handleManualRefresh}
                             disabled={refreshing || loadingStats}
                             style={{ backgroundColor: 'var(--primary)' }}
                             className="inline-flex items-center px-4 py-2.5 hover:brightness-95 active:scale-95 disabled:opacity-80 text-white text-xs font-bold rounded-xl shadow-lg transition-all w-full sm:w-auto justify-center cursor-pointer"
@@ -231,7 +231,7 @@ export default function AdminDashboard({ userProfile = {} }) {
                 <>
                     {/* Primary statistics grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        
+
                         {/* Card 1: Total Users */}
                         <div className="bg-white/90 rounded-2xl p-6 shadow-sm border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 border-l-4 border-l-[var(--primary)]">
                             <div className="flex items-center justify-between">
@@ -242,8 +242,8 @@ export default function AdminDashboard({ userProfile = {} }) {
                                     </h3>
                                     <div className="flex items-center mt-2.5">
                                         <span className="text-[10px] font-extrabold text-[var(--primary)] bg-[var(--primary)]/10 px-2.5 py-1 rounded-lg">
-                                            {statsData?.monthlyStats?.new_users_this_month > 0 
-                                                ? `+${statsData.monthlyStats.new_users_this_month} Bulan Ini` 
+                                            {statsData?.monthlyStats?.new_users_this_month > 0
+                                                ? `+${statsData.monthlyStats.new_users_this_month} Bulan Ini`
                                                 : 'Pengguna Terdaftar'}
                                         </span>
                                     </div>
@@ -327,7 +327,7 @@ export default function AdminDashboard({ userProfile = {} }) {
 
                     {/* Secondary statistics grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        
+
                         {/* Metric: Completed Exams */}
                         <div className="bg-white/80 rounded-2xl p-5 shadow-sm border border-slate-100 flex items-center justify-between">
                             <div>
@@ -407,7 +407,7 @@ export default function AdminDashboard({ userProfile = {} }) {
 
                     {/* Analytics Graphics Panel */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                        
+
                         {/* Graph Canvas */}
                         <div className="lg:col-span-2 bg-white/90 rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between">
                             <div className="flex items-center justify-between mb-4">
@@ -424,13 +424,13 @@ export default function AdminDashboard({ userProfile = {} }) {
                         {/* Status Distributions */}
                         <div className="bg-white/90 rounded-2xl p-6 shadow-sm border border-slate-100">
                             <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wide mb-5">Pembagian Status Ujian</h3>
-                            
+
                             <div className="space-y-4">
                                 {statsData?.examStatistics ? (
                                     Object.entries(statsData.examStatistics).map(([status, count]) => {
                                         const sum = Object.values(statsData.examStatistics).reduce((a, b) => a + b, 0);
                                         const pct = sum > 0 ? ((count / sum) * 100).toFixed(1) : 0;
-                                        
+
                                         const colorMap = {
                                             done: { text: 'text-emerald-700', bg: 'bg-emerald-500', pill: 'bg-emerald-50' },
                                             exam: { text: 'text-blue-700', bg: 'bg-blue-500', pill: 'bg-blue-50' },
@@ -450,11 +450,11 @@ export default function AdminDashboard({ userProfile = {} }) {
                                                         <span className="text-[10px] text-slate-400 font-bold ml-1.5">({pct}%)</span>
                                                     </div>
                                                 </div>
-                                                
+
                                                 {/* Percentage bar */}
                                                 <div className="h-2 w-full bg-slate-200/50 rounded-full overflow-hidden">
-                                                    <div 
-                                                        className={`h-full rounded-full ${styles.bg}`} 
+                                                    <div
+                                                        className={`h-full rounded-full ${styles.bg}`}
                                                         style={{ width: `${pct}%`, transition: 'width 1s ease-in-out' }}
                                                     />
                                                 </div>
@@ -473,13 +473,13 @@ export default function AdminDashboard({ userProfile = {} }) {
 
                     {/* Live Monitoring and Alerts Section */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                        
+
                         {/* Live Session Details */}
                         <div className="bg-white/90 rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between">
                             <div>
                                 <div className="flex items-center justify-between mb-5">
                                     <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wide">Analisis Pemantauan Sesi Aktif</h3>
-                                    <a 
+                                    <a
                                         href="/admin/exam/live-stream"
                                         className="text-xs font-bold text-blue-500 hover:text-blue-600 transition-colors"
                                     >
@@ -527,8 +527,8 @@ export default function AdminDashboard({ userProfile = {} }) {
                         <div className="bg-white/90 rounded-2xl p-6 shadow-sm border border-slate-100">
                             <div className="flex items-center justify-between mb-5">
                                 <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wide">Peringatan Kritis Keamanan</h3>
-                                <a 
-                                    href="/admin/exam/monitor" 
+                                <a
+                                    href="/admin/exam/monitor"
                                     className="text-xs font-bold text-blue-500 hover:text-blue-600 transition-colors"
                                 >
                                     Log Monitor →
@@ -575,7 +575,7 @@ export default function AdminDashboard({ userProfile = {} }) {
 
                     {/* Upcoming and Recent Data Tables Grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                        
+
                         {/* Upcoming exams */}
                         <div className="bg-white/90 rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between">
                             <div>
