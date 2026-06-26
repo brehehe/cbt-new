@@ -19,6 +19,7 @@ class AdminReportItemAnalysisIndex extends Component
     public function render()
     {
         $timetables = Timetable::search($this->search)
+            ->with(['module'])
             ->select('id', 'name', 'module_id', 'start_time', 'end_time', 'description', 'code')
             ->latest()->paginate($this->perPage);
 

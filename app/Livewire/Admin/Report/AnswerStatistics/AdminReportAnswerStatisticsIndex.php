@@ -16,19 +16,11 @@ class AdminReportAnswerStatisticsIndex extends Component
 
     public $answerStats = [];
 
-    public $timetables = [];
-
     public $timetable = null;
 
     public function mount()
     {
-        $companyId = Auth::user()?->company_id;
-
-        $this->timetables = Timetable::query()
-            ->with('module:id,name')
-            ->where('company_id', $companyId)
-            ->orderBy('start_time', 'desc')
-            ->get(['id', 'name', 'module_id', 'start_time']);
+        //
     }
 
     public function updatedTimetableId($value)
@@ -155,7 +147,16 @@ class AdminReportAnswerStatisticsIndex extends Component
 
     public function render()
     {
-        return view('livewire.admin.report.answer-statistics.admin-report-answer-statistics-index')
+        $companyId = Auth::user()?->company_id;
+        $timetables = Timetable::query()
+            ->with('module:id,name')
+            ->where('company_id', $companyId)
+            ->orderBy('start_time', 'desc')
+            ->get(['id', 'name', 'module_id', 'start_time']);
+
+        return view('livewire.admin.report.answer-statistics.admin-report-answer-statistics-index', [
+            'timetables' => $timetables,
+        ])
             ->extends('layout.app')
             ->section('content');
     }
@@ -166,10 +167,11 @@ class AdminReportAnswerStatisticsIndex extends Component
             return;
         }
 
+        $timetable = Timetable::with('module')->findOrFail($this->timetable_id);
         $company = Auth::user()->company()->with('companyDetail')->first();
 
         $pdf = Pdf::loadView('livewire.admin.report.answer-statistics.admin-report-answer-statistics-pdf', [
-            'timetable' => $this->timetable,
+            'timetable' => $timetable,
             'answerStats' => $this->answerStats,
             'company' => $company,
         ])

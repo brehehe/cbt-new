@@ -25,7 +25,7 @@
 <body>
     <div class="header">
         <h1>Detail Riwayat Ujian</h1>
-        <div class="subtitle">Modul: {{ $timetable_module->module->name ?? '-' }}</div>
+        <div class="subtitle">Modul: {{ $timetable_module->module?->name ?? ($timetable_module->name ?? '-') }}</div>
     </div>
 
     @php
@@ -213,7 +213,7 @@
 
     <div class="header">
         <h1>Daftar Referensi Soal</h1>
-        <div class="subtitle">Modul: {{ $timetable_module->module->name ?? '-' }}</div>
+        <div class="subtitle">Modul: {{ $timetable_module->module?->name ?? ($timetable_module->name ?? '-') }}</div>
     </div>
 
     <table style="table-layout: auto;">

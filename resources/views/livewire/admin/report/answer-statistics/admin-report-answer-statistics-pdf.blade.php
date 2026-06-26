@@ -63,7 +63,7 @@
             <td width="15%"><strong>Ujian</strong></td>
             <td>: {{ $timetable->name }}</td>
             <td width="15%"><strong>Modul</strong></td>
-            <td>: {{ $timetable->module->name }}</td>
+            <td>: {{ $timetable->module?->name ?? '-' }}</td>
         </tr>
         <tr>
             <td><strong>Waktu</strong></td>

@@ -6,7 +6,7 @@
             <div>
                 <h1 class="text-2xl font-bold text-[color:var(--primary)]">
                     Detail Riwayat Ujian</h1>
-                <p class="text-gray-600 my-2">Rekap Nilai dari "{{$timetable_module->module->name}}"</p>
+                <p class="text-gray-600 my-2">Rekap Nilai dari "{{$timetable_module->module?->name ?? ($timetable_module->name ?? 'Unknown Module')}}"</p>
             </div>
             <div>
                 <button wire:click="exportPdf" class="btn btn-primary">

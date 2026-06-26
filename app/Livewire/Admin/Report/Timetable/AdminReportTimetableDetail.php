@@ -119,7 +119,7 @@ class AdminReportTimetableDetail extends Component
 
     public function mount($id)
     {
-        $this->timetable_module = TimetableModule::where('timetable_id', $id)->firstOrFail();
+        $this->timetable_module = TimetableModule::with(['module'])->where('timetable_id', $id)->firstOrFail();
     }
 
     public function getAnswerCorrect($timetable_question_id)
