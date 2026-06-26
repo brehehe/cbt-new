@@ -84,7 +84,7 @@ class AdminMasterTimetableDetailIndex extends Component
     {
         $userTimetables = UserTimetable::search($this->search)
             ->where('timetable_id', $this->timetable_id)
-            ->with(['user', 'timetable']);
+            ->with(['user', 'timetable', 'userModuleQuestions']);
 
         return view('livewire.admin.master.timetable.detail.admin-master-timetable-detail-index', [
             'userTimetables' => $userTimetables->paginate($this->perPage),

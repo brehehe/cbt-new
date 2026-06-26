@@ -512,6 +512,7 @@ class AdminMasterTimetableIndex extends Component
     public function render()
     {
         $timetable = Timetable::query()
+            ->with(['module', 'examRoom', 'examSession'])
             ->when($this->search, function ($query, $search) {
                 $query->where('name', 'ilike', '%'.$search.'%')
                     ->orWhere('start_time', 'ilike', '%'.$search.'%')
@@ -598,6 +599,9 @@ class AdminMasterTimetableIndex extends Component
     {
         try {
             $timetable = Timetable::with([
+                'module',
+                'examRoom',
+                'examSession',
                 'classmate' => function ($q) {
                     $q->with(['classmateStudents.user.userDetail']);
                 },

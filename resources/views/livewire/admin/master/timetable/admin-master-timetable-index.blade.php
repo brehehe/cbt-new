@@ -87,7 +87,7 @@
                             </td>
                             {{--<td class="px-3 py-2">{{ $timetable?->classmate->name ?? '-' }}</td>--}}
                             <td class="px-3 py-2">{{ $timetable?->name ?? '-' }}</td>
-                            <td class="px-3 py-2">{{ $timetable?->module->name ?? '-' }}</td>
+                            <td class="px-3 py-2">{{ $timetable?->module?->name ?? '-' }}</td>
                             <td class="px-3 py-2">{{ $timetable?->examRoom?->name ?? '-' }}</td>
                             <td class="px-3 py-2">{{ $timetable?->examSession?->name ?? '-' }}</td>
                             <td class="px-3 py-2">{{ $timetable?->start_time }}</td>

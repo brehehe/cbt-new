@@ -1134,6 +1134,7 @@ class AdminMasterStudentIndex extends Component
     protected function getUsersQuery()
     {
         $user = User::companyRole('Mahasiswa', Auth::user()->company_id)
+            ->with(['userDetail', 'study'])
             ->search($this->search)
             ->where('type_user', 'employee')
             ->orderBy('name', 'asc');
