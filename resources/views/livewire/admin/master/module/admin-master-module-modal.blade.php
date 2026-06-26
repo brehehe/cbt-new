@@ -134,7 +134,7 @@
                             <div wire:key="studys-select-wrapper-{{ $data_id ?? 'new' }}">
                                 <label for="studys" class="block text-sm font-medium text-gray-700">Prodi <span
                                         class="text-red-600">*</span></label>
-                                <div wire:key="select-studys-{{ $data_id ?? 'new' }}" class="w-full">
+                                <div wire:ignore wire:key="select-studys-{{ $data_id ?? 'new' }}" class="w-full">
                                     <select class="mt-1 form-control w-full" x-data x-ref="input" x-init="$($refs.input).selectize({
                                             dropdownParent: 'body',
                                             allowClear: true,
