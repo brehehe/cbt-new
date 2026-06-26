@@ -28,8 +28,6 @@ class AdminMasterModuleIndex extends Component
 
     public $search;
 
-    public $question_types;
-
     public $data_id;
 
     public $question_type_id;
@@ -54,19 +52,13 @@ class AdminMasterModuleIndex extends Component
 
     public $is_all_study = false;
 
-    public $category_questions = [];
-
     public $category_question_settings = [];
 
     public $category_question_limits = [];
 
-    public $topics = [];
-
     public $topic_question_settings = [];
 
     public $topic_question_limits = [];
-
-    public $material_categories = [];
 
     public $material_category_question_settings = [];
 
@@ -147,20 +139,18 @@ class AdminMasterModuleIndex extends Component
             'filteredMaterialCategories' => $filteredMaterialCategories,
             'view_module_questions' => $view_module_questions,
             'view_module' => $view_module,
+            'topics' => Topic::select('id', 'name')->get(),
+            'question_types' => QuestionType::select('id', 'name')->get(),
         ])->extends('layout.app')->section('content');
     }
 
     public function mount()
     {
         // dd(Auth::user()?->company);
-        $this->question_types = QuestionType::select('id', 'name')->get();
-        $this->category_questions = CategoryQuestion::select('id', 'name')->get();
         $this->initializeCategoryQuestionSettings();
         $this->loadCategoryQuestionLimits();
-        $this->topics = Topic::select('id', 'name')->get();
         $this->initializeTopicQuestionSettings();
         $this->loadTopicQuestionLimits();
-        $this->material_categories = \App\Models\Master\Question\MaterialCategory::select('id', 'name')->get();
         $this->initializeMaterialCategoryQuestionSettings();
         $this->loadMaterialCategoryQuestionLimits();
 
@@ -528,6 +518,11 @@ class AdminMasterModuleIndex extends Component
         $this->is_all_study = $result?->is_all_study ?? false;
         $this->is_all_questions = $result?->is_all_questions ?? false;
         $this->studys = json_decode($result?->studys ?? '[]', true) ?? [];
+
+        $this->loadCategoryQuestionLimits();
+        $this->loadTopicQuestionLimits();
+        $this->loadMaterialCategoryQuestionLimits();
+
         $this->applyCategoryQuestionSettings($result?->category_question_settings ?? []);
         $this->applyTopicQuestionSettings($result?->topic_question_settings ?? []);
         $this->applyMaterialCategoryQuestionSettings($result?->material_category_question_settings ?? []);
@@ -583,7 +578,8 @@ class AdminMasterModuleIndex extends Component
     private function initializeCategoryQuestionSettings(): void
     {
         $this->category_question_settings = [];
-        foreach ($this->category_questions as $category) {
+        $categories = CategoryQuestion::select('id')->get();
+        foreach ($categories as $category) {
             $this->category_question_settings[$category->id] = [
                 'enabled' => false,
                 'default' => 0,
@@ -638,7 +634,8 @@ class AdminMasterModuleIndex extends Component
     private function initializeTopicQuestionSettings(): void
     {
         $this->topic_question_settings = [];
-        foreach ($this->topics as $topic) {
+        $topics = Topic::select('id')->get();
+        foreach ($topics as $topic) {
             $this->topic_question_settings[$topic->id] = [
                 'enabled' => false,
                 'default' => 0,
@@ -693,7 +690,8 @@ class AdminMasterModuleIndex extends Component
     private function loadCategoryQuestionLimits(): void
     {
         $limits = [];
-        foreach ($this->category_questions as $category) {
+        $categories = CategoryQuestion::select('id')->get();
+        foreach ($categories as $category) {
             $limits[$category->id] = [
                 'default' => 0,
                 'easy' => 0,
@@ -729,7 +727,8 @@ class AdminMasterModuleIndex extends Component
     private function loadTopicQuestionLimits(): void
     {
         $limits = [];
-        foreach ($this->topics as $topic) {
+        $topics = Topic::select('id')->get();
+        foreach ($topics as $topic) {
             $limits[$topic->id] = [
                 'default' => 0,
                 'easy' => 0,
@@ -765,7 +764,8 @@ class AdminMasterModuleIndex extends Component
     private function initializeMaterialCategoryQuestionSettings(): void
     {
         $this->material_category_question_settings = [];
-        foreach ($this->material_categories as $material_category) {
+        $material_categories = \App\Models\Master\Question\MaterialCategory::select('id')->get();
+        foreach ($material_categories as $material_category) {
             $this->material_category_question_settings[$material_category->id] = [
                 'enabled' => false,
                 'default' => 0,
@@ -820,7 +820,8 @@ class AdminMasterModuleIndex extends Component
     private function loadMaterialCategoryQuestionLimits(): void
     {
         $limits = [];
-        foreach ($this->material_categories as $material_category) {
+        $material_categories = \App\Models\Master\Question\MaterialCategory::select('id')->get();
+        foreach ($material_categories as $material_category) {
             $limits[$material_category->id] = [
                 'default' => 0,
                 'easy' => 0,

@@ -57,9 +57,6 @@ namespace App\Models\Classmate{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $exam_session_id
- * @property string|null $exam_room_id
- * @property \Illuminate\Support\Carbon|null $exam_date
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Classmate\ClassmateStudent> $classmateStudents
@@ -74,9 +71,6 @@ namespace App\Models\Classmate{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereExamDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereExamRoomId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereExamSessionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Classmate whereOrder($value)
@@ -177,12 +171,6 @@ namespace App\Models\Company{
  * @property string|null $app_mac
  * @property string|null $app_android
  * @property string|null $app_ios
- * @property string $is_pmb
- * @property bool $enable_camera
- * @property bool $enable_recording
- * @property bool $enable_streaming
- * @property bool $only_admin_generate_token
- * @property bool $import_student_timetable
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Company|null $company
@@ -209,24 +197,18 @@ namespace App\Models\Company{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereDurationDays($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereEnableCamera($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereEnableRecording($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereEnableStreaming($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereExpiresAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereImportStudentTimetable($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereIndustry($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereIsCentral($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereIsLifetime($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereIsMain($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereIsMark($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereIsPmb($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereLogo($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereLogoPotrait($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereOneHealthAccessToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereOnlyAdminGenerateToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company wherePhone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company wherePicEmail($value)
@@ -876,8 +858,6 @@ namespace App\Models\Master\Question{
  * @property string $question_pick_type tipe pengambilan soal: manual/category/topic
  * @property array<array-key, mixed>|null $topic_question_settings pengaturan jumlah soal per topik & difficulty
  * @property string $is_simulation
- * @property array<array-key, mixed>|null $material_category_question_settings pengaturan jumlah soal per kategori materi & difficulty
- * @property bool $is_all_questions apakah mengambil semua soal berdasarkan tipe pengambilan soal
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
@@ -896,10 +876,8 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereDuration($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereIsAllQuestions($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereIsAllStudy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereIsSimulation($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereMaterialCategoryQuestionSettings($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereQuestionPickType($value)
@@ -1316,7 +1294,6 @@ namespace App\Models\Master\Timetable{
  * @property bool $is_streaming
  * @property string|null $extra_time
  * @property string $is_simulation
- * @property bool $is_camera
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \App\Models\Classmate\Classmate|null $classmate
@@ -1343,7 +1320,6 @@ namespace App\Models\Master\Timetable{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereExamSessionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereExtraTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereIsCamera($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereIsRecording($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereIsSimulation($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereIsStreaming($value)
@@ -1972,7 +1948,7 @@ namespace App\Models\User{
  * @property \Illuminate\Support\Carbon|null $birth_date Tanggal lahir
  * @property string|null $birth_place Tempat lahir
  * @property string|null $marital_status Status pernikahan
- * @property string|null $nim Nomor Induk Mahasiswa
+ * @property string|null $nim Nomor Induk Siswa
  * @property string|null $student_program Program studi untuk mahasiswa
  * @property string|null $student_faculty Fakultas untuk mahasiswa
  * @property string|null $student_department Jurusan untuk mahasiswa
@@ -2037,9 +2013,6 @@ namespace App\Models\User{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $exam_session_id
- * @property string|null $exam_room_id
- * @property \Illuminate\Support\Carbon|null $exam_date
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
@@ -2078,11 +2051,8 @@ namespace App\Models\User{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereEmergencyContactPhone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereEmergencyContactRelation($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereEmployeeId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereExamDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereExamHistory($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereExamPreference($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereExamRoomId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereExamSessionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereGender($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDetail whereIdentityCardPath($value)
@@ -2230,7 +2200,6 @@ namespace App\Models\User{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property bool $is_recording
  * @property bool $is_streaming
- * @property bool $is_camera
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Master\Timetable\Timetable|null $timetable
  * @property-read \App\Models\User|null $user
@@ -2246,7 +2215,6 @@ namespace App\Models\User{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereEndExam($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereIsCamera($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereIsRecording($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereIsStreaming($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereMark($value)

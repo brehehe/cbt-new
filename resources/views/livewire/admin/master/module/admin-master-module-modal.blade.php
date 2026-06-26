@@ -25,7 +25,7 @@
                     <div class="mb-4">
                         <label for="question_type_id" class="block text-sm font-medium text-gray-700">Tipe Ujian <span
                                 class="text-red-600">*</span></label>
-                        <select class="mt-1 form-control" wire:model='question_type_id'>
+                        <select class="mt-1 form-control" wire:model.live='question_type_id'>
                             <option value="">Pilih Tipe Ujian</option>
                             @foreach ($question_types as $question_type)
                                 <option {{ $question_type?->id == $question_type_id ? 'selected' : '' }}
@@ -50,7 +50,7 @@
                         @enderror
                     </div>
                     @if ($question_pick_type !== 'manual')
-                        <div class="mb-4">
+                        <div class="mb-4" wire:key="is-all-questions-container">
                             <label class="block text-sm font-medium text-gray-700">Ambil Semua Soal?</label>
                             <div class="flex items-center mt-2">
                                 <label class="relative inline-flex items-center cursor-pointer">
@@ -131,10 +131,10 @@
                             @enderror
                         </div>
                         @if (!$is_all_study)
-                            <div>
+                            <div wire:key="studys-select-wrapper">
                                 <label for="studys" class="block text-sm font-medium text-gray-700">Prodi <span
                                         class="text-red-600">*</span></label>
-                                <div wire:key="select-{{ rand() }}" class="w-full">
+                                <div wire:key="select-studys" class="w-full">
                                     <select class="mt-1 form-control w-full" x-data x-ref="input" x-init="$($refs.input).selectize({
                                             dropdownParent: 'body',
                                             allowClear: true,
@@ -157,7 +157,7 @@
                     </div>
                 </div>
                 @if ($question_pick_type === 'category' && !$is_all_questions)
-                    <div class="mb-4">
+                    <div class="mb-4" wire:key="category-settings-section">
                         <div class="flex items-center justify-between mb-2">
                             <label class="block text-sm font-medium text-gray-700">Pengaturan Kategori Soal</label>
                             <span class="text-sm text-gray-600">
@@ -236,7 +236,7 @@
                 @endif
 
                 @if ($question_pick_type === 'topic' && !$is_all_questions)
-                    <div class="mb-4">
+                    <div class="mb-4" wire:key="topic-settings-section">
                         <div class="flex items-center justify-between mb-2">
                             <label class="block text-sm font-medium text-gray-700">Pengaturan Topik Soal</label>
                             <span class="text-sm text-gray-600">
@@ -311,7 +311,7 @@
                 @endif
                 
                 @if ($question_pick_type === 'material_category' && !$is_all_questions)
-                    <div class="mb-4">
+                    <div class="mb-4" wire:key="material-category-settings-section">
                         <div class="flex items-center justify-between mb-2">
                             <label class="block text-sm font-medium text-gray-700">Pengaturan Kategori Materi</label>
                             <span class="text-sm text-gray-600">
