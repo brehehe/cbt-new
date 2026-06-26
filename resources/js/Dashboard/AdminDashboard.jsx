@@ -1,4 +1,4 @@
-cimport React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
 export default function AdminDashboard({ userProfile = {} }) {
