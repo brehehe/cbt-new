@@ -88,7 +88,7 @@
                         <div class="card">
                             <div class="header">
                                 <h3>{{ $company->name ?? 'KARTU PESERTA' }}</h3>
-                                <p>{{ $timetable->name }} | {{ $timetable->module->name }}</p>
+                                <p>{{ $timetable->name }} | {{ $timetable->timetableModule?->name ?? $timetable->module?->name ?? '-' }}</p>
                             </div>
                             
                             <div class="content">

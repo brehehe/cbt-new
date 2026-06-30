@@ -28,6 +28,7 @@ class AdminMasterTimetableCorrectIndex extends Component
     {
         $userTimetables = $this->timetable->userTimetables()
             ->search($this->search)
+            ->with('user')
             ->withCount([
                 'userModuleQuestions as total_essay' => function ($q) {
                     $q->whereHas('timetableQuestion', function ($sq) {

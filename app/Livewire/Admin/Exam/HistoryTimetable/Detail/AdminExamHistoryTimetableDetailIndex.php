@@ -74,7 +74,7 @@ class AdminExamHistoryTimetableDetailIndex extends Component
     {
         $userModuleQuestions = $this->user_timetable->userModuleQuestions()
             ->search($this->search)
-            ->with(['timetableQuestion', 'timetableModule', 'timetableAnswer'])
+            ->with(['timetableQuestion.answers', 'timetableModule', 'timetableAnswer'])
             ->paginate($this->perPage);
 
         return view('livewire.admin.exam.history-timetable.detail.admin-exam-history-timetable-detail-index', [

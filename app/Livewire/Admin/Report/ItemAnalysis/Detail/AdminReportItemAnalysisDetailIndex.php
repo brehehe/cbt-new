@@ -41,7 +41,7 @@ class AdminReportItemAnalysisDetailIndex extends Component
         $this->timetableModule = $this->timetable->timetableModule;
         $this->timetableQuestions = $this->timetableModule->questions()
             ->where('is_check', true)
-            ->with('answers')
+            ->with(['answers', 'user'])
             ->get();
         $this->userTimetables = UserTimetable::where('timetable_id', $this->timetableId)
             ->where('status', 'done')

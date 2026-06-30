@@ -21,19 +21,6 @@ class AdminReportStudentExamResultIndex extends Component
     public $perPage = 10;
 
     // Cache users list for dropdown
-    public $users = [];
-
-    public function mount()
-    {
-        $companyId = Auth::user()?->company_id;
-
-        $this->users = User::query()
-            ->where('company_id', $companyId)
-            // ->role('Mahasiswa')
-            ->orderBy('name', 'asc')
-            ->get(['id', 'name', 'nim', 'username']);
-    }
-
     public function updatingSearch()
     {
         $this->resetPage();
@@ -66,9 +53,18 @@ class AdminReportStudentExamResultIndex extends Component
                 ->paginate($this->perPage);
         }
 
+        $companyId = Auth::user()?->company_id;
+
+        $users = User::query()
+            ->where('company_id', $companyId)
+            // ->role('Mahasiswa')
+            ->orderBy('name', 'asc')
+            ->get(['id', 'name', 'nim', 'username']);
+
         return view('livewire.admin.report.student-exam-result.admin-report-student-exam-result-index', [
             'examResults' => $examResults,
             'selectedUser' => $this->user_id ? User::find($this->user_id) : null,
+            'users' => $users,
         ])
             ->extends('layout.app')
             ->section('content');

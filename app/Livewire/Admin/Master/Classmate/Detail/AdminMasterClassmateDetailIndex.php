@@ -263,6 +263,7 @@ class AdminMasterClassmateDetailIndex extends Component
 
         return view('livewire.admin.master.classmate.detail.admin-master-classmate-detail-index', [
             'mahasiswas' => $this->openStudentModal ? User::role(['Mahasiswa'])
+                ->with('userDetail')
                 ->search($this->search)
                 ->orderBy('name', 'asc')
                 ->paginate($this->perPage, ['*'], 'modalPage') : [],

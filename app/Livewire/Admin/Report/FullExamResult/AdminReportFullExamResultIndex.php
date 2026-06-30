@@ -29,31 +29,6 @@ class AdminReportFullExamResultIndex extends Component
 
     public $timetable_id = '';
 
-    public $users = [];
-
-    public $modules = [];
-
-    public $timetables = [];
-
-    public function mount()
-    {
-        $companyId = Auth::user()?->company_id;
-
-        $this->users = User::query()
-            ->where('company_id', $companyId)
-            ->orderBy('name')
-            ->get(['id', 'name', 'nim', 'username', 'email']);
-
-        $this->modules = Module::query()
-            ->orderBy('name')
-            ->get(['id', 'name']);
-
-        $this->timetables = Timetable::query()
-            ->with('module:id,name')
-            ->orderBy('start_time', 'desc')
-            ->get(['id', 'name', 'module_id', 'start_time', 'end_time']);
-    }
-
     public function getGradeDetail($mark)
     {
         return RatingScale::getGrade($mark);
@@ -110,9 +85,28 @@ class AdminReportFullExamResultIndex extends Component
             ];
         }
 
+        $companyId = Auth::user()?->company_id;
+
+        $users = User::query()
+            ->where('company_id', $companyId)
+            ->orderBy('name')
+            ->get(['id', 'name', 'nim', 'username', 'email']);
+
+        $modules = Module::query()
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        $timetables = Timetable::query()
+            ->with('module:id,name')
+            ->orderBy('start_time', 'desc')
+            ->get(['id', 'name', 'module_id', 'start_time', 'end_time']);
+
         return view('livewire.admin.report.full-exam-result.admin-report-full-exam-result-index', [
             'examResults' => $paginatedResults,
             'resultStats' => $resultStats,
+            'users' => $users,
+            'modules' => $modules,
+            'timetables' => $timetables,
         ])
             ->extends('layout.app')
             ->section('content');
@@ -191,21 +185,21 @@ class AdminReportFullExamResultIndex extends Component
         }
 
         if ($this->user_id) {
-            $user = $this->users->find($this->user_id);
+            $user = User::find($this->user_id);
             if ($user) {
                 $summary['user'] = $user->name.' ('.$user->nim.')';
             }
         }
 
         if ($this->module_id) {
-            $module = $this->modules->find($this->module_id);
+            $module = Module::find($this->module_id);
             if ($module) {
                 $summary['module'] = $module->name;
             }
         }
 
         if ($this->timetable_id) {
-            $timetable = $this->timetables->find($this->timetable_id);
+            $timetable = Timetable::find($this->timetable_id);
             if ($timetable) {
                 $summary['timetable'] = $timetable->name;
             }

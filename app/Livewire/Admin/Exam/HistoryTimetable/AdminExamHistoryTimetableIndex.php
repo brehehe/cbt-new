@@ -42,7 +42,7 @@ class AdminExamHistoryTimetableIndex extends Component
 
     public function render()
     {
-        $userTimetables = UserTimetable::with(['timetable', 'user'])
+        $userTimetables = UserTimetable::with(['timetable.module', 'user'])
             ->whereHas('timetable') // <-- hanya tampil jika timetable masih ada
             ->where(function ($query) {
                 $query->whereHas('timetable', function ($q) {

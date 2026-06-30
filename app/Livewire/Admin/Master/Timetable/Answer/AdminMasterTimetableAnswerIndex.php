@@ -69,7 +69,7 @@ class AdminMasterTimetableAnswerIndex extends Component
     {
         $userModuleQuestions = $this->user_timetable->userModuleQuestions()
             ->search($this->search)
-            ->with(['timetableQuestion', 'timetableModule', 'timetableAnswer'])
+            ->with(['timetableQuestion.answers', 'timetableModule', 'timetableAnswer'])
             ->paginate($this->perPage);
 
         return view('livewire.admin.master.timetable.answer.admin-master-timetable-answer-index', [

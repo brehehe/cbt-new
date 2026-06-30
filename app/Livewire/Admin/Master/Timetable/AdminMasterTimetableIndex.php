@@ -600,6 +600,7 @@ class AdminMasterTimetableIndex extends Component
         try {
             $timetable = Timetable::with([
                 'module',
+                'timetableModule',
                 'examRoom',
                 'examSession',
                 'classmate' => function ($q) {

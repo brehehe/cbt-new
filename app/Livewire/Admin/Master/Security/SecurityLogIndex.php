@@ -45,7 +45,7 @@ class SecurityLogIndex extends Component
 
     public function render()
     {
-        $logs = Activity::where('log_name', $this->logSource)
+        $logs = Activity::with('causer')->where('log_name', $this->logSource)
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('description', 'ilike', '%'.$this->search.'%')

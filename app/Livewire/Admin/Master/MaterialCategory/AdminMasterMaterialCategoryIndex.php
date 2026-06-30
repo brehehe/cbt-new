@@ -40,11 +40,13 @@ class AdminMasterMaterialCategoryIndex extends Component
             ->select('id', 'company_id', 'topic_id', 'material_category_id', 'name', 'description')
             ->with([
                 'topic:id,name',
+                'parent:id,name',
             ]);
         $select_material_categories = MaterialCategory::search($this->search)
             ->select('id', 'company_id', 'topic_id', 'material_category_id', 'name', 'description')
             ->with([
                 'topic:id,name',
+                'parent:id,name',
             ])->when(! empty($this->topic_id), fn ($q) => $q->where('topic_id', $this->topic_id))->get();
 
         $topics = Topic::select('id', 'name')->get();

@@ -62,7 +62,7 @@
                 di <strong>{{ strtoupper($namaKampus) }}</strong> (ruang <strong>{{ $lokasi }}</strong>)
                 telah diselenggarakan
                 <strong>{{ $timetable->name }} Tahun {{ $tahun }}</strong>
-                dengan {{ $timetable->module->questionType->name }} dari pukul
+                dengan {{ $timetable->timetableModule?->questionType?->name ?? $timetable->module?->questionType?->name ?? '-' }} dari pukul
                 <strong>{{ $pukulMulai }}</strong> sampai dengan
                 <strong>{{ $pukulSelesai }}</strong>.
             </p>
