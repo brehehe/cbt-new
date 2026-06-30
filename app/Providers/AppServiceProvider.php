@@ -38,7 +38,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         view()->composer('*', function ($view) {
-            $company = Company::first(); // atau where('slug', config('app.name_slug'))
+            $company = \App\Models\Company\Company::getCached(); // atau where('slug', config('app.name_slug'))
 
             $view->with('companyData', $company);
         });

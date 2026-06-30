@@ -148,7 +148,22 @@ class StudentImport implements ToCollection, WithHeadingRow
                         $dateVal = $row['tanggal'] ?? $row['tanggal_ujian'] ?? $row['exam_date'] ?? null;
                         if (! empty($dateVal)) {
                             try {
-                                $examDate = \Carbon\Carbon::parse($dateVal)->format('Y-m-d');
+                                if (is_numeric($dateVal)) {
+                                    $examDate = \Carbon\Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($dateVal))->format('Y-m-d');
+                                } else {
+                                    $dateStr = trim($dateVal);
+                                    $normalizedDate = str_replace('-', '/', $dateStr);
+                                    if (preg_match('/^\d{1,2}\/\d{1,2}\/\d{2,4}$/', $normalizedDate)) {
+                                        $parts = explode('/', $normalizedDate);
+                                        if (strlen($parts[2]) === 2) {
+                                            $examDate = \Carbon\Carbon::createFromFormat('d/m/y', $normalizedDate)->format('Y-m-d');
+                                        } else {
+                                            $examDate = \Carbon\Carbon::createFromFormat('d/m/Y', $normalizedDate)->format('Y-m-d');
+                                        }
+                                    } else {
+                                        $examDate = \Carbon\Carbon::parse($dateStr)->format('Y-m-d');
+                                    }
+                                }
                             } catch (Exception $e) {
                                 // silent
                             }

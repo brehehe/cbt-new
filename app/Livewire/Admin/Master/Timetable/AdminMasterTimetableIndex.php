@@ -120,9 +120,6 @@ class AdminMasterTimetableIndex extends Component
 
     public function openModal()
     {
-        $this->is_recording = true;
-        $this->is_streaming = true;
-
         return $this->dispatch('open-modal', ['id' => 'modal-timetable']);
     }
 
@@ -218,9 +215,9 @@ class AdminMasterTimetableIndex extends Component
         $this->end_time = Carbon::parse($data->end_time)->format('Y-m-d\TH:i');
         $this->description = $data->description;
         $this->require_seb = $data->require_seb ?? false;
-        $this->is_camera = $data->is_camera ?? false;
-        $this->is_recording = $data->is_recording ?? false;
-        $this->is_streaming = $data->is_streaming ?? false;
+        $this->is_camera = $data?->is_camera ? true : false;
+        $this->is_recording = $data?->is_recording ? true : false;
+        $this->is_streaming = $data?->is_streaming ? true : false;
 
         // Pastikan hasil decode adalah array
         $rawStudys = $data->studys;

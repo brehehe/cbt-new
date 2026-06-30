@@ -203,14 +203,12 @@
                         </label>
                         <label
                             class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer {{ !$is_camera ? 'opacity-50 cursor-not-allowed' : '' }}">
-                            <input type="checkbox" wire:model="is_recording" {{ !$is_camera ? 'disabled' : '' }}
-                                class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2">
+                            <input type="checkbox" wire:model="is_recording" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2">
                             <span class="text-sm font-medium text-gray-700">Recording</span>
                         </label>
                         <label
                             class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer {{ !$is_camera ? 'opacity-50 cursor-not-allowed' : '' }}">
-                            <input type="checkbox" wire:model="is_streaming" {{ !$is_camera ? 'disabled' : '' }}
-                                class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2">
+                            <input type="checkbox" wire:model="is_streaming" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2">
                             <span class="text-sm font-medium text-gray-700">Streaming</span>
                         </label>
                     </div>

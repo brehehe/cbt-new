@@ -50,4 +50,13 @@ class Company extends Model
     {
         return $this->hasOne(CompanyDetail::class, 'company_id', 'id');
     }
+
+    public static function getCached()
+    {
+        static $company = null;
+        if ($company === null) {
+            $company = self::first();
+        }
+        return $company;
+    }
 }

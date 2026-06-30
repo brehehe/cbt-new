@@ -66,7 +66,7 @@ class AuthLoginIndex extends Component
             ],
         ];
 
-        $this->company = Company::first();
+        $this->company = Company::getCached();
 
         // Jika sudah login, langsung redirect ke dashboard
         if (Auth::check()) {
@@ -668,7 +668,7 @@ class AuthLoginIndex extends Component
 
     public function render()
     {
-        $company = Company::first();
+        $company = Company::getCached();
 
         $view = config('app.new_template', false)
             ? 'livewire.auth.login.auth-login-index-new'
