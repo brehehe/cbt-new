@@ -45,7 +45,7 @@ const LatexHTML = memo(({ html, className = "" }) => {
 
     }, [html]);
 
-    return <div ref={containerRef} className={className} />;
+    return <div ref={containerRef} className={`rich-content ${className}`} />;
 }, (prevProps, nextProps) => {
     return prevProps.html === nextProps.html && prevProps.className === nextProps.className;
 });

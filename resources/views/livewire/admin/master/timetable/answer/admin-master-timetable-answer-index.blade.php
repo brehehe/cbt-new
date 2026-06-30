@@ -167,7 +167,7 @@
                             <td class="px-6 py-4 text-sm text-gray-900 font-medium min-w-[200px] max-w-xs"
                                 x-data="{ expanded: false, truncated: false }"
                                 x-init="$nextTick(() => { truncated = $refs.sq.scrollWidth > $refs.sq.clientWidth })">
-                                <div x-ref="sq" :style="expanded ? '' : 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'">
+                                <div x-ref="sq" class="rich-content" :style="expanded ? '' : 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'">
                                     {!! optional($userModuleQuestion->timetableQuestion)->question ?? '-' !!}
                                 </div>
                                 @if($userModuleQuestion->timetableQuestion?->type === 'essay')
@@ -185,7 +185,7 @@
                                 @if($userModuleQuestion->timetableQuestion?->type === 'essay')
                                     <span class="text-gray-400">-</span>
                                 @else
-                                    <div x-ref="ca" :style="expanded ? '' : 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'">
+                                    <div x-ref="ca" class="rich-content" :style="expanded ? '' : 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'">
                                         <span class="font-semibold text-gray-700 mr-1">{{ $letter($labelCorrect) }}.</span>
                                         {!! optional($correctAnswer)->context ?? '-' !!}
                                     </div>
@@ -200,7 +200,7 @@
                                 x-data="{ expanded: false, truncated: false }"
                                 x-init="$nextTick(() => { truncated = $refs.ua.scrollWidth > $refs.ua.clientWidth })">
                                 @if($userModuleQuestion->timetableQuestion?->type === 'essay')
-                                    <div x-ref="ua" class="italic text-gray-700"
+                                    <div x-ref="ua" class="italic text-gray-700 rich-content"
                                         :style="expanded ? '' : 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'">
                                         {!! $userModuleQuestion->essay_answer ?: '<span class="text-gray-400">Tidak ada jawaban</span>' !!}
                                     </div>
@@ -208,7 +208,7 @@
                                         class="mt-1 text-xs text-primary hover:underline focus:outline-none"
                                         x-text="expanded ? 'Sembunyikan' : 'Selengkapnya'"></button>
                                 @elseif($chosenAnswer)
-                                    <div x-ref="ua" :style="expanded ? '' : 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'">
+                                    <div x-ref="ua" class="rich-content" :style="expanded ? '' : 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'">
                                         <span class="font-semibold text-gray-700 mr-1">{{ $letter($labelChosen) }}.</span>
                                         {!! $chosenAnswer->context ?? '-' !!}
                                     </div>

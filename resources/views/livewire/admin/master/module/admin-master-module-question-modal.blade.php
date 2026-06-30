@@ -106,7 +106,7 @@
                                                     <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">Essay</span>
                                                 @endif
                                             </td>
-                                            <td class="px-4 py-3 text-sm text-gray-900">{!! $result?->question !!}</td>
+                                            <td class="px-4 py-3 text-sm text-gray-900"><div class="rich-content">{!! $result?->question !!}</div></td>
                                             <td class="px-4 py-3 text-sm text-gray-900 text-xs text-gray-500">{!! Str::limit(strip_tags($result?->description), 50) !!}</td>
                                         </tr>
                                     @endforeach
