@@ -55,6 +55,33 @@ class Answer extends Model
                     ->whereNot('id', $model?->id)
                     ->update(['is_correct' => false]);
             }
+
+            // Sync with all TimetableAnswer records
+            \App\Models\Timetable\TimetableAnswer::where('answer_id', $model->id)
+                ->update([
+                    'alphabet' => $model->alphabet,
+                    'context' => $model->context,
+                    'images' => $model->images,
+                    'latex' => $model->latex,
+                    'latex_preview_pdf' => $model->latex_preview_pdf,
+                    'latex_preview_png' => $model->latex_preview_png,
+                    'is_correct' => $model->is_correct,
+                    'order' => $model->order,
+                ]);
+
+            // If this answer was marked as correct, sync all sibling answers of this question in the active timetable exams!
+            if ($model->is_correct) {
+                $tqIds = \App\Models\Timetable\TimetableQuestion::withoutGlobalScope('user_scope')
+                    ->where('question_id', $model->question_id)
+                    ->pluck('id')
+                    ->toArray();
+
+                if (!empty($tqIds)) {
+                    \App\Models\Timetable\TimetableAnswer::whereIn('timetable_question_id', $tqIds)
+                        ->whereNot('answer_id', $model->id)
+                        ->update(['is_correct' => false]);
+                }
+            }
         });
     }
 

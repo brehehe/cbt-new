@@ -63,6 +63,31 @@ class Question extends Model
             $modelCreate->order = $lastOrder ? $lastOrder + 1 : 1;
             // $modelCreate->company_id = $modelCreate->company_id ?? auth()->user()->company_id;
         });
+
+        static::saved(function ($model) {
+            \App\Models\Timetable\TimetableQuestion::withoutGlobalScope('user_scope')
+                ->where('question_id', $model->id)
+                ->update([
+                    'study_id' => $model->study_id,
+                    'user_id' => $model->user_id,
+                    'topic_id' => $model->topic_id,
+                    'material_category_id' => $model->material_category_id,
+                    'material_id' => $model->material_id,
+                    'question_type_id' => $model->question_type_id,
+                    'category_question_id' => $model->category_question_id,
+                    'difficulty' => $model->difficulty ?? 'default',
+                    'order' => $model->order ?? 0,
+                    'question' => $model->question,
+                    'images' => $model->images,
+                    'description' => $model->description,
+                    'latex' => $model->latex,
+                    'latex_preview_pdf' => $model->latex_preview_pdf,
+                    'latex_preview_png' => $model->latex_preview_png,
+                    'weight_correct' => $model->weight_correct,
+                    'weight_incorrect' => $model->weight_incorrect,
+                    'type' => $model->type,
+                ]);
+        });
     }
 
     public function scopeSearch(Builder $query, $term): void

@@ -581,6 +581,12 @@ class AdminMasterModuleQuestionIndex extends Component
             $this->applyTopicQuestionSettings($module->topic_question_settings ?? []);
             $this->applyMaterialCategoryQuestionSettings($module->material_category_question_settings ?? []);
 
+            // Sync all active timetables using this module
+            $timetables = \App\Models\Master\Timetable\Timetable::where('module_id', $module->id)->get();
+            foreach ($timetables as $timetable) {
+                \App\Models\Master\Timetable\Timetable::syncModuleQuestions($timetable);
+            }
+
             DB::commit();
         } catch (Exception|Throwable $th) {
             DB::rollBack();
@@ -595,6 +601,38 @@ class AdminMasterModuleQuestionIndex extends Component
         }
 
         return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
+    }
+
+    public function syncAllActiveTimetables()
+    {
+        try {
+            DB::beginTransaction();
+
+            $module = $this->get_module;
+            if (!$module) {
+                return AlertHelper::error('Gagal', 'Modul tidak ditemukan.');
+            }
+
+            $timetables = \App\Models\Master\Timetable\Timetable::where('module_id', $module->id)->get();
+            if ($timetables->isEmpty()) {
+                return AlertHelper::info('Info', 'Tidak ada jadwal ujian aktif menggunakan modul ini.');
+            }
+
+            foreach ($timetables as $timetable) {
+                \App\Models\Master\Timetable\Timetable::syncModuleQuestions($timetable);
+            }
+
+            DB::commit();
+        } catch (Exception|Throwable $th) {
+            DB::rollBack();
+            Log::error('Ada Kesalahaan saat syncAllActiveTimetables', [
+                'message' => $th->getMessage(),
+                'line' => $th->getLine()
+            ]);
+            return AlertHelper::error('Gagal', 'Ada kesalahan saat menyinkronkan data.');
+        }
+
+        return AlertHelper::success('Berhasil', 'Semua jadwal ujian yang menggunakan modul ini berhasil disinkronkan.');
     }
 
     public function modalModuleQuestion()

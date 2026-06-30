@@ -22,7 +22,13 @@
                     Data Modul</h1>
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
-            <div>
+            <div class="flex items-center gap-2">
+                <button wire:click="syncAllActiveTimetables()" wire:loading.attr="disabled" wire:target="syncAllActiveTimetables"
+                    class="btn btn-secondary">
+                    <span wire:target="syncAllActiveTimetables">
+                        Sinkronkan ke Ujian Peserta
+                    </span>
+                </button>
                 <button wire:click="submitModule()" wire:loading.attr="disabled" wire:target="submitModule"
                     class="{{ in_array(config('app.name_slug'), ['pro-cbt']) ? 'btn btn-warning' : 'btn btn-primary' }}">
                     <span wire:target="submitModule">

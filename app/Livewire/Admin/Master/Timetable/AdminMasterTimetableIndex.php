@@ -625,4 +625,45 @@ class AdminMasterTimetableIndex extends Component
             ]);
         }
     }
+
+    public function syncQuestions($id)
+    {
+        try {
+            DB::beginTransaction();
+            $timetable = Timetable::find($id);
+            if (!$timetable) {
+                return AlertHelper::error('Gagal', 'Jadwal tidak ditemukan.');
+            }
+
+            Timetable::syncModuleQuestions($timetable);
+            DB::commit();
+            AlertHelper::success('Berhasil', 'Jadwal "' . $timetable->name . '" berhasil disinkronkan.');
+        } catch (\Throwable $th) {
+            DB::rollback();
+            Log::error('Gagal Sinkronisasi Jadwal: ' . $th);
+            AlertHelper::error('Gagal', 'Gagal menyinkronkan jadwal!');
+        }
+    }
+
+    public function syncAllQuestions()
+    {
+        try {
+            DB::beginTransaction();
+            $timetables = Timetable::where('company_id', Auth::user()->company_id)->get();
+            if ($timetables->isEmpty()) {
+                return AlertHelper::info('Info', 'Tidak ada jadwal ujian untuk disinkronkan.');
+            }
+
+            foreach ($timetables as $timetable) {
+                Timetable::syncModuleQuestions($timetable);
+            }
+
+            DB::commit();
+            AlertHelper::success('Berhasil', 'Semua jadwal ujian berhasil disinkronkan.');
+        } catch (\Throwable $th) {
+            DB::rollback();
+            Log::error('Gagal Sinkronisasi Semua Jadwal: ' . $th);
+            AlertHelper::error('Gagal', 'Gagal menyinkronkan semua jadwal!');
+        }
+    }
 }
