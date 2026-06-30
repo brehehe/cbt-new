@@ -426,6 +426,17 @@
                                     </div>
                                 </label>
                             </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Mode Pengacakan Soal</label>
+                                <select wire:model="random_question_mode" class="form-control mt-1">
+                                    <option value="topic_grouped">Acak Per Topik (Soal diacak dalam topik, urutan topik tetap)</option>
+                                    <option value="fully_random">Acak Total (Semua soal diacak sepenuhnya)</option>
+                                </select>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    <strong>Acak Per Topik:</strong> Soal diacak dalam setiap topik, namun urutan topik tetap (Topik A selalu muncul sebelum Topik B).<br>
+                                    <strong>Acak Total:</strong> Semua soal diacak sepenuhnya tanpa memperhatikan topik.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>

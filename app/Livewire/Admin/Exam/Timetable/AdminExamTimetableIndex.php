@@ -92,6 +92,9 @@ class AdminExamTimetableIndex extends Component
             $topicSettings = $transactionModule?->module?->topic_question_settings ?? [];
             $materialCategorySettings = $transactionModule?->module?->material_category_question_settings ?? [];
 
+            // Baca mode pengacakan dari setting company
+            $randomQuestionMode = Auth::user()?->company?->random_question_mode ?? 'topic_grouped';
+
             $allowedQuestionIds = null;
             if ($module) {
                 $moduleQuestionQuery = ModuleQuestion::withoutGlobalScope('user_scope')
@@ -235,7 +238,7 @@ class AdminExamTimetableIndex extends Component
 
             if ($modulesQuestions->isEmpty()) {
                 $query = TimetableQuestion::withoutGlobalScope('user_scope')
-                    ->select('id', 'study_id', 'question_id', 'order')
+                    ->select('id', 'study_id', 'question_id', 'order', 'topic_id')
                     ->where('timetable_module_id', $transactionModule->id);
 
                 if (is_array($allowedQuestionIds)) {
@@ -243,7 +246,12 @@ class AdminExamTimetableIndex extends Component
                 }
 
                 if ($transactionModule->random_question) {
-                    $query->inRandomOrder();
+                    if ($randomQuestionMode === 'topic_grouped') {
+                        // Urut berdasarkan topic_id asc, soal dalam topik tetap diacak dari main loop
+                        $query->orderBy('topic_id', 'asc');
+                    } else {
+                        $query->inRandomOrder();
+                    }
                 } else {
                     $query->orderBy('order');
                 }
@@ -255,7 +263,17 @@ class AdminExamTimetableIndex extends Component
                 $modulesQuestions = $modulesQuestions->unique('id')->values();
 
                 if ($transactionModule->random_question) {
-                    $modulesQuestions = $modulesQuestions->shuffle()->values();
+                    if ($randomQuestionMode === 'fully_random') {
+                        // Acak Total: acak semua soal sepenuhnya
+                        $modulesQuestions = $modulesQuestions->shuffle()->values();
+                    } else {
+                        // Acak Per Topik (default: topic_grouped):
+                        // Soal sudah diambil per-topik secara acak (inRandomOrder per loop)
+                        // Kita hanya perlu memastikan urutan topik tetap,
+                        // tapi soal dalam setiap topik sudah teracak dari query DB
+                        // Tidak perlu shuffle ulang — urutan collection sudah: topik1(acak), topik2(acak), ...
+                        $modulesQuestions = $modulesQuestions->values();
+                    }
                 } else {
                     $modulesQuestions = $modulesQuestions->sortBy('order')->values();
                 }

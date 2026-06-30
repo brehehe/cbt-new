@@ -137,6 +137,9 @@ class AdminMasterSettingIndex extends Component
 
     public $import_student_timetable = false;
 
+    // Mode pengacakan soal: 'topic_grouped' = acak per topik, 'fully_random' = acak total
+    public $random_question_mode = 'topic_grouped';
+
     // Service
     public $companyServices = [];
 
@@ -202,6 +205,7 @@ class AdminMasterSettingIndex extends Component
             'enable_streaming',
             'only_admin_generate_token',
             'import_student_timetable',
+            'random_question_mode',
         ]);
 
         if ($tab === 'universitas' || $tab === 'seb') {
@@ -251,6 +255,7 @@ class AdminMasterSettingIndex extends Component
                 'enable_streaming',
                 'only_admin_generate_token',
                 'import_student_timetable',
+                'random_question_mode',
             ])->with('companyDetail')->find($this->company_id);
 
             if ($company) {
@@ -304,6 +309,7 @@ class AdminMasterSettingIndex extends Component
                 $this->enable_streaming = $company->enable_streaming;
                 $this->only_admin_generate_token = $company->only_admin_generate_token;
                 $this->import_student_timetable = $company->import_student_timetable;
+                $this->random_question_mode = $company->random_question_mode ?? 'topic_grouped';
             }
         } elseif ($tab === 'layanan') {
             $this->companyServices = CompanyService::select('id', 'start_date', 'company_id', 'service_month_id', 'duration_days', 'is_lifetime')->with('serviceMonth:id,name,description', 'company:id,name,description')->where('company_id', $this->company_id)->get();
@@ -355,6 +361,7 @@ class AdminMasterSettingIndex extends Component
                 'enable_streaming' => 'nullable|boolean',
                 'only_admin_generate_token' => 'nullable|boolean',
                 'import_student_timetable' => 'nullable|boolean',
+                'random_question_mode' => 'nullable|string|in:topic_grouped,fully_random',
             ]);
 
             if ($this->logo) {
@@ -457,6 +464,7 @@ class AdminMasterSettingIndex extends Component
                 'enable_streaming' => $this->enable_streaming ?? false,
                 'only_admin_generate_token' => $this->only_admin_generate_token ?? false,
                 'import_student_timetable' => $this->import_student_timetable ?? false,
+                'random_question_mode' => $this->random_question_mode ?? 'topic_grouped',
             ]);
 
             CompanyDetail::updateOrCreate([
