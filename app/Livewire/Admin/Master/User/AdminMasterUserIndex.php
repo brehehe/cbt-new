@@ -640,6 +640,9 @@ class AdminMasterUserIndex extends Component
     public function render()
     {
         $user = User::companyWithoutRolePasienAndDokter(Auth::user()->company_id)
+            ->with(['companyRoles' => function ($q) {
+                $q->where('company_id', Auth::user()->company_id)->with('role');
+            }])
             ->search($this->search)
             ->where('type_user', 'employee')
             ->orderBy('name', 'asc');

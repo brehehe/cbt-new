@@ -40,6 +40,12 @@ class AppServiceProvider extends ServiceProvider
         view()->composer('*', function ($view) {
             $company = \App\Models\Company\Company::getCached(); // atau where('slug', config('app.name_slug'))
 
+            if (auth()->check() && !auth()->user()->relationLoaded('companyRoles')) {
+                auth()->user()->load(['companyRoles' => function ($q) {
+                    $q->where('company_id', auth()->user()->company_id)->with('role');
+                }]);
+            }
+
             $view->with('companyData', $company);
         });
 

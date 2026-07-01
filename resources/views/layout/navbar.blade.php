@@ -112,7 +112,7 @@
                                 {{ auth()->user()->name ?? 'Admin User' }}
                             </p>
                             <p class="text-xs text-gray-500 truncate max-w-24 lg:max-w-none">
-                                {{ Auth::user()->companyRoles()->where('company_id', Auth::user()->company_id)->first()->role->name ?? 'No Role' }}
+                                {{ Auth::user()->companyRoles->where('company_id', Auth::user()->company_id)->first()->role->name ?? 'No Role' }}
                             </p>
                         </div>
                         <i class="fas fa-chevron-down text-gray-400 hidden sm:block"></i>
@@ -124,7 +124,7 @@
                         <div class="sm:hidden p-3 border-b border-gray-100">
                             <p class="text-sm font-medium text-gray-900">{{ auth()->user()->name ?? 'Admin User' }}</p>
                             <p class="text-xs text-gray-500">
-                                {{ Auth::user()->companyRoles()->where('company_id', Auth::user()->company_id)->first()->role->name ?? 'No Role' }}
+                                {{ Auth::user()->companyRoles->where('company_id', Auth::user()->company_id)->first()->role->name ?? 'No Role' }}
                             </p>
                         </div>
                         <div class="p-2">

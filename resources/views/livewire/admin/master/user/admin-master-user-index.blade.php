@@ -62,8 +62,11 @@
                             <td class="center">{{ $users->firstItem() + $index }}</td>
                             <td>{{ $user->name ?? '-' }}</td>
                             <td>
-                                @if ($user->companyRoles()->where('company_id', Auth::user()->company_id)->first()->role->name)
-                                    {{ $user->companyRoles()->where('company_id', Auth::user()->company_id)->first()->role->name }}
+                                @php
+                                    $userRole = $user->companyRoles->where('company_id', Auth::user()->company_id)->first();
+                                @endphp
+                                @if ($userRole && $userRole->role)
+                                    {{ $userRole->role->name }}
                                 @else
                                     Tidak Ada Role
                                 @endif

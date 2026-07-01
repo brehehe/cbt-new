@@ -195,7 +195,7 @@
                             <p class="text-xs font-bold text-slate-800 leading-tight">
                                 {{ auth()->user()->name ?? 'Admin User' }}</p>
                             <p class="text-[10px] text-slate-500 uppercase tracking-wide">
-                                {{ Auth::user()->companyRoles()->where('company_id', Auth::user()->company_id)->first()->role->name ?? 'No Role' }}
+                                {{ Auth::user()->companyRoles->where('company_id', Auth::user()->company_id)->first()->role->name ?? 'No Role' }}
                             </p>
                         </div>
                         <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>

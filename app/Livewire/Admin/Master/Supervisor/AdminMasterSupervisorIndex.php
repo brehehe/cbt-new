@@ -545,7 +545,12 @@ class AdminMasterSupervisorIndex extends Component
     public function render()
     {
         $query = User::companyRole('Pengawas', Auth::user()->company_id)
-            ->with(['userDetail'])
+            ->with([
+                'userDetail',
+                'companyRoles' => function ($q) {
+                    $q->where('company_id', Auth::user()->company_id);
+                }
+            ])
             ->search($this->search)
             ->where('type_user', 'employee');
 

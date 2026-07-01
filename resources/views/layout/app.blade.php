@@ -1,7 +1,7 @@
 @php
     use App\Models\Company\Company;
 
-    $company = Company::first(); // ambil 1 data pertama
+    $company = Company::getCached(); // ambil 1 data pertama
 
     $primary = $company->color_primary;
     $secondary = $company->color_secondary;

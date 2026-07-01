@@ -1,7 +1,7 @@
 @php
     use App\Models\Company\Company;
 
-    $company = Company::first(); 
+    $company = Company::getCached(); 
 
     $primary = $company->color_primary;
     $secondary = $company->color_secondary;

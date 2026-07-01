@@ -106,7 +106,7 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @php
                                     $companyRole = $supervisor
-                                        ->companyRoles()
+                                        ->companyRoles
                                         ->where('company_id', Auth::user()->company_id)
                                         ->first();
                                     $isActive = $companyRole ? $companyRole->is_active : false;
