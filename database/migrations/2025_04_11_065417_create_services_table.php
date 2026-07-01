@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('name');
             $table->text('description');
-            $table->boolean('is_active')->default('true'); // Status of the service (active, inactive, etc.)
+            $table->boolean('is_active')->default(true); // Status of the service (active, inactive, etc.)
             $table->bigInteger('order')->default(0);
             $table->softDeletes();
             $table->timestamps();

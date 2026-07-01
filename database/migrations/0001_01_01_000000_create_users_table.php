@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('username')->nullable();
             $table->text('photo')->nullable();
             $table->char('phone', 15)->nullable();
+            $table->jsonb('alternative_contacts')->nullable()->comment('Alternative emails/phones for different contexts');
             $table->timestamp('email_verified_at')->nullable();
             $table->jsonb('studys')->nullable()->comment('Array of study programs or departments');
             $table->foreignUuid('study_id')->nullable()->comment('Foreign key to studies table');
@@ -27,7 +28,6 @@ return new class extends Migration
             $table->foreignUuid('user_id')->nullable()->comment('User Referensi untuk relasi diri sendiri');
             $table->foreignUuid('company_id')->nullable();
             $table->bigInteger('order')->default(0);
-            $table->jsonb('alternative_contacts')->nullable()->after('phone')->comment('Alternative emails/phones for different contexts');
             $table->enum('type_user', ['employee', 'patient'])->default('employee')->comment('Type of user: employee, or patient');
             $table->enum('type_study', ['default', 'mahasiswa', 'general'])->default('default')->comment('Type of study: default, mahasiswa, or general');
             $table->boolean('is_head')->default(true)->comment('Apakah role ini adalah kepala dari perusahaan atau tidak');

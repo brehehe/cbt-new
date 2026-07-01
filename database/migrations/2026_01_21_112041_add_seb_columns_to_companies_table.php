@@ -13,15 +13,15 @@ return new class extends Migration
     {
         Schema::table('companies', function (Blueprint $table) {
             $table->boolean('seb_use_encryption')->default(false)->after('quit_password_seb');
-            $table->string('seb_encryption_key')->nullable()->after('seb_use_encryption');
-            $table->boolean('seb_show_taskbar')->default(true)->after('seb_encryption_key');
-            $table->boolean('seb_show_reload_button')->default(true)->after('seb_show_taskbar');
-            $table->boolean('seb_show_time')->default(true)->after('seb_show_reload_button');
-            $table->boolean('seb_show_input_language')->default(true)->after('seb_show_time');
-            $table->boolean('seb_allow_quit')->default(true)->after('seb_show_input_language');
-            $table->boolean('seb_allow_spell_check')->default(false)->after('seb_allow_quit');
-            $table->boolean('seb_enable_private_clipboard')->default(true)->after('seb_allow_spell_check');
-            $table->string('seb_browser_exam_key')->nullable()->after('seb_enable_private_clipboard');
+            $table->string('seb_encryption_key')->nullable();
+            $table->boolean('seb_show_taskbar')->default(true);
+            $table->boolean('seb_show_reload_button')->default(true);
+            $table->boolean('seb_show_time')->default(true);
+            $table->boolean('seb_show_input_language')->default(true);
+            $table->boolean('seb_allow_quit')->default(true);
+            $table->boolean('seb_allow_spell_check')->default(false);
+            $table->boolean('seb_enable_private_clipboard')->default(true);
+            $table->string('seb_browser_exam_key')->nullable();
         });
     }
 

@@ -17,9 +17,9 @@ return new class extends Migration
             $table->text('description');
             $table->integer('duration_days')->default(0); // Duration of the service in days
             $table->decimal('price', 15, 2);
-            $table->boolean('is_trial')->default('false'); // Status of the service (active, inactive, etc.)
-            $table->boolean('is_lifetime')->default('false'); // Status of the service (active, inactive, etc.)
-            $table->boolean('is_active')->default('true'); // Status of the service (active, inactive, etc.)
+            $table->boolean('is_trial')->default(false); // Status of the service (active, inactive, etc.)
+            $table->boolean('is_lifetime')->default(false); // Status of the service (active, inactive, etc.)
+            $table->boolean('is_active')->default(true); // Status of the service (active, inactive, etc.)
             $table->bigInteger('order')->default(0);
             $table->softDeletes();
             $table->timestamps();

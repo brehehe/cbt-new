@@ -17,14 +17,12 @@ return new class extends Migration
         });
 
         // Use raw SQL to update enum type in PostgreSQL
-        // First check if 'check' is already in the enum by trying to add it
-        try {
-            DB::statement("ALTER TYPE user_module_questions_status_enum ADD VALUE IF NOT EXISTS 'check'");
-        } catch (Exception $e) {
-            // Fallback for cases where it's not a native enum or other DBs
-            // In PostgreSQL, if it was created as a native enum, the above is correct.
-            // If it's a check constraint, we might need a different approach.
-            // But let's assume it's a standard Laravel migration on PostgreSQL.
+        if (DB::getDriverName() === 'pgsql') {
+            try {
+                DB::statement("ALTER TYPE user_module_questions_status_enum ADD VALUE IF NOT EXISTS 'check'");
+            } catch (Exception $e) {
+                // Fallback for cases where it's not a native enum or other DBs
+            }
         }
     }
 
