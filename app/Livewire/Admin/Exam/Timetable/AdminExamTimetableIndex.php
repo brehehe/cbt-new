@@ -388,6 +388,7 @@ class AdminExamTimetableIndex extends Component
         $auth = Auth::user();
 
         $timetables = Timetable::query()
+            ->with(['timetableModule.questionType', 'userTimetable'])
             // ->whereNotNull('code')
             ->when($this->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {

@@ -156,20 +156,37 @@
                             </td>
                             <!-- Aksi -->
                             <td class="text-center px-3 py-2 relative">
-                                <div x-data="{ open: false, x: 0, y: 0 }" class="inline-block text-left">
-                                    <button @click="
-                                            open = !open;
-                                            const rect = $el.getBoundingClientRect();
-                                            x = rect.right - 200;
-                                            y = rect.bottom + window.scrollY;
-                                        "
+                                <div x-data="{ open: false, x: 0, y: 0 }"
+                                     x-init="
+                                         $watch('open', value => {
+                                             if (value) {
+                                                 $nextTick(() => {
+                                                     const btn = $refs.btn;
+                                                     const dropdown = $refs.dropdown;
+                                                     if (btn && dropdown) {
+                                                         const rect = btn.getBoundingClientRect();
+                                                         x = rect.right - dropdown.offsetWidth;
+                                                         const spaceBelow = window.innerHeight - rect.bottom;
+                                                         if (spaceBelow < dropdown.offsetHeight + 10) {
+                                                             y = rect.top + window.scrollY - dropdown.offsetHeight - 4;
+                                                         } else {
+                                                             y = rect.bottom + window.scrollY + 4;
+                                                         }
+                                                     }
+                                                 });
+                                             }
+                                         })
+                                     "
+                                     class="inline-block text-left">
+                                    <button x-ref="btn"
+                                        @click="open = !open"
                                         class="px-3 py-2 bg-gray-100 rounded-md hover:bg-gray-200 transition text-gray-700">
                                         <i class="fa-solid fa-ellipsis-vertical"></i>
                                     </button>
 
                                     <!-- Dropdown keluar body -->
                                     <template x-teleport="body">
-                                        <div x-show="open" x-transition.opacity @click.away="open = false"
+                                        <div x-show="open" x-ref="dropdown" x-transition.opacity @click.away="open = false"
                                             class="fixed z-50 w-52 bg-white border border-gray-200 rounded-lg shadow-xl"
                                             :style="`top:${y}px; left:${x}px`">
 

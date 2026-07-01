@@ -43,6 +43,12 @@ class Timetable extends Model
         return $this->hasMany(UserTimetable::class, 'timetable_id', 'id');
     }
 
+    public function userTimetable()
+    {
+        return $this->hasOne(UserTimetable::class, 'timetable_id', 'id')
+            ->where('user_id', Auth::id());
+    }
+
     public function timetableModule()
     {
         return $this->hasOne(TimetableModule::class, 'timetable_id', 'id');
