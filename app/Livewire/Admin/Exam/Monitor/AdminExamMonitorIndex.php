@@ -189,9 +189,9 @@ class AdminExamMonitorIndex extends Component
 
         if ($this->search) {
             $query->whereHas('user', function ($q) {
-                $q->where('name', 'ilike', '%'.$this->search.'%')
-                    ->orWhere('nim', 'ilike', '%'.$this->search.'%')
-                    ->orWhere('username', 'ilike', '%'.$this->search.'%');
+                $q->where('name', 'like', '%'.$this->search.'%')
+                    ->orWhere('nim', 'like', '%'.$this->search.'%')
+                    ->orWhere('username', 'like', '%'.$this->search.'%');
             });
         }
 

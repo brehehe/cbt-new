@@ -169,7 +169,7 @@ class AdminReportItemAnalysisAllIndex extends Component
             })
             ->when($this->search, function ($q) {
                 $term = '%'.$this->search.'%';
-                $q->where('questions.question', 'ilike', $term);
+                $q->where('questions.question', 'like', $term);
             })
             ->groupBy('questions.id', 'questions.question', 'questions.difficulty')
             ->select([

@@ -58,7 +58,7 @@ class Classmate extends Model
         $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id', 'name', 'description'], 'ILIKE', $term);
+            $query->whereAny(['company_id', 'name', 'description'], 'like', $term);
         });
     }
 

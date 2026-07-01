@@ -48,13 +48,13 @@ class ClassmateStudent extends Model
         $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id'], 'ILIKE', $term)
+            $query->whereAny(['company_id'], 'like', $term)
                 ->orWhereHas('user', function ($q) use ($term) {
-                    $q->where('name', 'ILIKE', $term)
-                        ->orWhere('email', 'ILIKE', $term);
+                    $q->where('name', 'like', $term)
+                        ->orWhere('email', 'like', $term);
                 })->orWhereHas('classmate', function ($q) use ($term) {
-                    $q->where('name', 'ILIKE', $term)
-                        ->orWhere('description', 'ILIKE', $term);
+                    $q->where('name', 'like', $term)
+                        ->orWhere('description', 'like', $term);
                 });
         });
     }

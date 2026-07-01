@@ -257,12 +257,12 @@ class User extends Authenticatable
     public function scopeSearch($query, $search)
     {
         return $query->where(function ($q) use ($search) {
-            $q->where('name', 'ilike', "%{$search}%")
-                ->orWhere('email', 'ilike', "%{$search}%")
-                ->orWhere('phone', 'ilike', "%{$search}%")
+            $q->where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")
+                ->orWhere('phone', 'like', "%{$search}%")
                 ->orWhereHas('userDetail', function ($qd) use ($search) {
-                    $qd->where('identity_number', 'ilike', "%{$search}%")
-                        ->orWhere('address', 'ilike', "%{$search}%");
+                    $qd->where('identity_number', 'like', "%{$search}%")
+                        ->orWhere('address', 'like', "%{$search}%");
                 });
         });
     }

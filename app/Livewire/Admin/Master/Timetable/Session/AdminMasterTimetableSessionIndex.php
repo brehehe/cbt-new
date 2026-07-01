@@ -185,7 +185,7 @@ class AdminMasterTimetableSessionIndex extends Component
             ->where('timetable_id', $this->timetable_id)
             ->when($this->search, function ($q) {
                 $q->whereHas('user', function ($uq) {
-                    $uq->where('name', 'ilike', '%'.$this->search.'%');
+                    $uq->where('name', 'like', '%'.$this->search.'%');
                 });
             })
             ->when($this->filterStatus !== 'all', function ($q) {

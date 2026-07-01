@@ -47,7 +47,7 @@ class Regulation extends Model
         $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id'], 'ILIKE', $term);
+            $query->whereAny(['company_id'], 'like', $term);
         });
     }
 }

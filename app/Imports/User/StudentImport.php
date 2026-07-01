@@ -64,7 +64,7 @@ class StudentImport implements ToCollection, WithHeadingRow
                     // Get study_id if program_studi is provided
                     $studyId = null;
                     if (! empty($row['program_studi'])) {
-                        $study = Study::where('name', 'ilike', '%'.$row['program_studi'].'%')->first();
+                        $study = Study::where('name', 'like', '%'.$row['program_studi'].'%')->first();
                         if ($study) {
                             $studyId = $study->id;
                         }

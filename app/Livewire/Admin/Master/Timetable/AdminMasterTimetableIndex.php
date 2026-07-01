@@ -81,7 +81,13 @@ class AdminMasterTimetableIndex extends Component
     {
         Session::forget('timetable_id');
         $this->modules = Module::whereNotNull('category_question_settings')
-            ->whereRaw("category_question_settings <> '{}'::jsonb")
+            ->where(function ($query) {
+                if (DB::getDriverName() === 'pgsql') {
+                    $query->whereRaw("category_question_settings <> '{}'::jsonb");
+                } else {
+                    $query->whereRaw("category_question_settings <> '{}'");
+                }
+            })
             ->pluck('name', 'id')
             ->toArray();
         $this->getSupervisors = User::companyRole('Pengawas', Auth::user()->company_id)->select('name', 'id')->get()->pluck('name', 'id')->toArray();
@@ -511,10 +517,10 @@ class AdminMasterTimetableIndex extends Component
         $timetable = Timetable::query()
             ->with(['module', 'examRoom', 'examSession'])
             ->when($this->search, function ($query, $search) {
-                $query->where('name', 'ilike', '%'.$search.'%')
-                    ->orWhere('start_time', 'ilike', '%'.$search.'%')
-                    ->orWhere('end_time', 'ilike', '%'.$search.'%')
-                    ->orWhere('description', 'ilike', '%'.$search.'%');
+                $query->where('name', 'like', '%'.$search.'%')
+                    ->orWhere('start_time', 'like', '%'.$search.'%')
+                    ->orWhere('end_time', 'like', '%'.$search.'%')
+                    ->orWhere('description', 'like', '%'.$search.'%');
             })
             ->where('is_simulation', 'false')
             ->orderBy('order', 'desc')

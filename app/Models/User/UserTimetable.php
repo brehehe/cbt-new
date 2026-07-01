@@ -85,29 +85,29 @@ class UserTimetable extends Model
     public function scopeSearch($query, $search)
     {
         return $query->where(function ($q) use ($search) {
-            $q->where('start_process', 'ilike', "%{$search}%")
-                ->orWhere('start_exam', 'ilike', "%{$search}%")
-                ->orWhere('end_exam', 'ilike', "%{$search}%")
-                ->orWhere('mark', 'ilike', "%{$search}%")
-                ->orWhere('status', 'ilike', "%{$search}%")
+            $q->where('start_process', 'like', "%{$search}%")
+                ->orWhere('start_exam', 'like', "%{$search}%")
+                ->orWhere('end_exam', 'like', "%{$search}%")
+                ->orWhere('mark', 'like', "%{$search}%")
+                ->orWhere('status', 'like', "%{$search}%")
                 ->orWhereHas('user', function ($qd) use ($search) {
-                    $qd->where('name', 'ilike', "%{$search}%")
-                        ->orWhere('nim', 'ilike', "%{$search}%")
-                        ->orWhere('username', 'ilike', "%{$search}%")
-                        ->orWhere('email', 'ilike', "%{$search}%");
+                    $qd->where('name', 'like', "%{$search}%")
+                        ->orWhere('nim', 'like', "%{$search}%")
+                        ->orWhere('username', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
                 })
                 ->orWhereHas('timetable', function ($qd) use ($search) {
-                    $qd->where('name', 'ilike', "%{$search}%")
-                        ->orWhere('description', 'ilike', "%{$search}%")
-                        ->orWhere('start_time', 'ilike', "%{$search}%")
-                        ->orWhere('end_time', 'ilike', "%{$search}%")
+                    $qd->where('name', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%")
+                        ->orWhere('start_time', 'like', "%{$search}%")
+                        ->orWhere('end_time', 'like', "%{$search}%")
                         ->orWhereHas('module', function ($qd) use ($search) {
-                            $qd->where('name', 'ilike', "%{$search}%")
-                                ->orWhere('description', 'ilike', "%{$search}%");
+                            $qd->where('name', 'like', "%{$search}%")
+                                ->orWhere('description', 'like', "%{$search}%");
                         });
                 })
                 ->orWhereHas('company', function ($qd) use ($search) {
-                    $qd->where('name', 'ilike', "%{$search}%");
+                    $qd->where('name', 'like', "%{$search}%");
                 });
         });
     }

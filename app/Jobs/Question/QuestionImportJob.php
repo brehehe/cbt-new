@@ -130,7 +130,7 @@ class QuestionImportJob implements ShouldQueue
 
                 $question_type = QuestionType::withoutGlobalScopes()
                     ->where('company_id', $this->user?->company?->id)
-                    ->where('name', 'ilike', $typeName)
+                    ->where('name', 'like', $typeName)
                     ->first();
 
                 if (! $question_type) {
@@ -149,7 +149,7 @@ class QuestionImportJob implements ShouldQueue
 
                 $study = Study::withoutGlobalScopes()
                     ->where('company_id', $this->user?->company?->id)
-                    ->where('name', 'ilike', $studyName)
+                    ->where('name', 'like', $studyName)
                     ->first();
 
                 if (! $study && $studyName) {
@@ -162,7 +162,7 @@ class QuestionImportJob implements ShouldQueue
                 $topic = $study?->topics()
                     ->withoutGlobalScopes()
                     ->where('company_id', $this->user?->company?->id)
-                    ->where('name', 'ilike', $topicName)
+                    ->where('name', 'like', $topicName)
                     ->first();
 
                 if (! $topic && $topicName) {
@@ -179,7 +179,7 @@ class QuestionImportJob implements ShouldQueue
                     $material_category = $topic?->materialCategories()
                         ->withoutGlobalScopes()
                         ->where('company_id', $this->user?->company?->id)
-                        ->where('name', 'ilike', $materialCategoryName)
+                        ->where('name', 'like', $materialCategoryName)
                         ->first();
 
                     if (! $material_category) {
@@ -198,14 +198,14 @@ class QuestionImportJob implements ShouldQueue
                         $material = $material_category->materials()
                             ->withoutGlobalScopes()
                             ->where('company_id', $this->user?->company?->id)
-                            ->where('name', 'ilike', $materialName)
+                            ->where('name', 'like', $materialName)
                             ->first();
                     } else {
                         $material = Material::withoutGlobalScopes()
                             ->where('company_id', $this->user?->company?->id)
                             ->where('topic_id', $topic?->id)
                             ->whereNull('material_category_id')
-                            ->where('name', 'ilike', $materialName)
+                            ->where('name', 'like', $materialName)
                             ->first();
                     }
 
@@ -224,7 +224,7 @@ class QuestionImportJob implements ShouldQueue
                 if ($categoryName) {
                     $categoryQuestion = CategoryQuestion::withoutGlobalScopes()
                         ->where('company_id', $this->user?->company?->id)
-                        ->where('name', 'ilike', $categoryName)
+                        ->where('name', 'like', $categoryName)
                         ->first();
                     if (! $categoryQuestion) {
                         $categoryQuestion = CategoryQuestion::create([

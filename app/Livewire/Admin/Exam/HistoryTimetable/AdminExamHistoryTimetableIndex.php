@@ -46,11 +46,11 @@ class AdminExamHistoryTimetableIndex extends Component
             ->whereHas('timetable') // <-- hanya tampil jika timetable masih ada
             ->where(function ($query) {
                 $query->whereHas('timetable', function ($q) {
-                    $q->where('name', 'ilike', '%'.$this->search.'%');
+                    $q->where('name', 'like', '%'.$this->search.'%');
                 })
                     ->orWhereHas('user', function ($q) {
-                        $q->where('name', 'ilike', '%'.$this->search.'%')
-                            ->orWhere('email', 'ilike', '%'.$this->search.'%');
+                        $q->where('name', 'like', '%'.$this->search.'%')
+                            ->orWhere('email', 'like', '%'.$this->search.'%');
                     });
             })
             ->where('user_id', Auth::id())
