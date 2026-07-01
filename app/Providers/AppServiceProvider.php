@@ -26,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Prevent lazy loading in non-production environments to detect N+1 queries
-        \Illuminate\Database\Eloquent\Model::preventLazyLoading(! $this->app->isProduction());
+        // \Illuminate\Database\Eloquent\Model::preventLazyLoading(! $this->app->isProduction());
 
         if (env('APP_ENV') !== 'local') {
             URL::forceScheme('https');
