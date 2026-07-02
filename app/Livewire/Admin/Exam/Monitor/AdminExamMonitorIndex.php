@@ -2,11 +2,15 @@
 
 namespace App\Livewire\Admin\Exam\Monitor;
 
+use App\Exports\ExamMonitorExport;
 use App\Models\Exam\ExamAlert;
 use App\Models\Exam\ExamLiveSession;
 use App\Models\Master\Timetable\Timetable;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminExamMonitorIndex extends Component
 {
@@ -239,11 +243,110 @@ class AdminExamMonitorIndex extends Component
         return $query->paginate(10);
     }
 
+    public function exportExcel()
+    {
+        try {
+            $fileName = 'monitoring-ujian-' . date('YmdHis') . '.xlsx';
+
+            return Excel::download(
+                new ExamMonitorExport(
+                    $this->selectedTimetable,
+                    $this->search,
+                    $this->statusFilter,
+                    $this->riskFilter,
+                    $this->sessionType
+                ),
+                $fileName
+            );
+        } catch (\Exception $e) {
+            Log::error('Exam Monitor Export Excel Error: ' . $e->getMessage());
+            $this->dispatch('swal:alert', [
+                'type'  => 'error',
+                'title' => 'Gagal',
+                'text'  => 'Gagal mengekspor data ke Excel.',
+            ]);
+        }
+    }
+
+    public function exportPdf()
+    {
+        try {
+            $query = ExamLiveSession::with(['user', 'timetable.module', 'userTimetable.userModuleQuestions'])
+                ->orderBy('last_activity', 'desc');
+
+            if ($this->sessionType === 'active') {
+                $query->active();
+            } elseif ($this->sessionType === 'history') {
+                $query->where('is_active', false);
+            }
+
+            if ($this->selectedTimetable) {
+                $query->where('timetable_id', $this->selectedTimetable);
+            }
+
+            if ($this->search) {
+                $query->whereHas('user', function ($q) {
+                    $q->where('name', 'ilike', '%' . $this->search . '%')
+                        ->orWhere('nim', 'ilike', '%' . $this->search . '%')
+                        ->orWhere('username', 'ilike', '%' . $this->search . '%');
+                });
+            }
+
+            if ($this->statusFilter) {
+                $query->where('connection_status', $this->statusFilter);
+            }
+
+            if ($this->riskFilter) {
+                switch ($this->riskFilter) {
+                    case 'high':
+                        $query->where(function ($q) {
+                            $q->where('alert_count', '>=', 5)->orWhere('warning_count', '>=', 10);
+                        });
+                        break;
+                    case 'medium':
+                        $query->where(function ($q) {
+                            $q->whereBetween('alert_count', [3, 4])
+                                ->orWhereBetween('warning_count', [5, 9]);
+                        });
+                        break;
+                    case 'low':
+                        $query->where(function ($q) {
+                            $q->whereBetween('alert_count', [1, 2])
+                                ->orWhereBetween('warning_count', [1, 4]);
+                        });
+                        break;
+                    case 'none':
+                        $query->where('alert_count', 0)->where('warning_count', 0);
+                        break;
+                }
+            }
+
+            $sessions = $query->get();
+
+            $pdf = Pdf::loadView('livewire.admin.exam.monitor.admin-exam-monitor-pdf', [
+                'sessions' => $sessions,
+            ])->setPaper('a4', 'landscape');
+
+            $fileName = 'monitoring-ujian-' . date('YmdHis') . '.pdf';
+
+            return response()->streamDownload(function () use ($pdf) {
+                echo $pdf->output();
+            }, $fileName);
+        } catch (\Exception $e) {
+            Log::error('Exam Monitor Export PDF Error: ' . $e->getMessage());
+            $this->dispatch('swal:alert', [
+                'type'  => 'error',
+                'title' => 'Gagal',
+                'text'  => 'Gagal mengekspor data ke PDF.',
+            ]);
+        }
+    }
+
     public function render()
     {
         return view('livewire.admin.exam.monitor.admin-exam-monitor-index', [
             'activeTimetables' => $this->activeTimtables,
-            'activeSessions' => $this->activeSessions,
+            'activeSessions'   => $this->activeSessions,
         ])->extends('layout.app')->section('content');
     }
 }

@@ -2,15 +2,19 @@
 
 namespace App\Livewire\Admin\Master\Timetable\Session;
 
+use App\Exports\TimetableSessionExport;
 use App\Helpers\AlertHelper;
 use App\Models\Exam\ExamLiveSession;
 use App\Models\Exam\ExamRecording;
 use App\Models\Master\Timetable\Timetable;
 use App\Models\User\UserTimetable;
 use App\Services\Exam\RecordingFinalizer;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminMasterTimetableSessionIndex extends Component
 {
@@ -178,6 +182,64 @@ class AdminMasterTimetableSessionIndex extends Component
         }
     }
 
+
+    public function exportExcel()
+    {
+        try {
+            $timetableName = $this->timetable->name ?? 'sesi';
+            $fileName = 'sesi-ujian-' . str()->slug($timetableName) . '-' . date('YmdHis') . '.xlsx';
+
+            return Excel::download(
+                new TimetableSessionExport($this->timetable_id, $this->search),
+                $fileName
+            );
+        } catch (\Exception $e) {
+            Log::error('Timetable Session Export Excel Error: ' . $e->getMessage());
+            AlertHelper::warning('Perhatian', 'Gagal mengekspor data ke Excel.');
+        }
+    }
+
+    public function exportPdf()
+    {
+        try {
+            $classmateId = $this->timetable->classmate_id;
+
+            $sessions = \App\Models\Classmate\ClassmateStudent::query()
+                ->where('classmate_id', $classmateId)
+                ->when($this->search, function ($q) {
+                    $q->whereHas('user', function ($uq) {
+                        $uq->where('name', 'ilike', '%' . $this->search . '%')
+                           ->orWhere('nim', 'ilike', '%' . $this->search . '%')
+                           ->orWhere('username', 'ilike', '%' . $this->search . '%');
+                    });
+                })
+                ->with([
+                    'user.usrSecKey',
+                    'user.examLiveSessions' => function ($q) {
+                        $q->where('timetable_id', $this->timetable_id);
+                    },
+                    'user.userTimetables' => function ($q) {
+                        $q->where('timetable_id', $this->timetable_id)->with('userModuleQuestions');
+                    },
+                ])
+                ->get();
+
+            $pdf = Pdf::loadView('livewire.admin.master.timetable.session.admin-master-timetable-session-pdf', [
+                'sessions'      => $sessions,
+                'timetableName' => $this->timetable->name ?? 'Sesi Ujian',
+            ])->setPaper('a4', 'landscape');
+
+            $timetableName = $this->timetable->name ?? 'sesi';
+            $fileName = 'sesi-ujian-' . str()->slug($timetableName) . '-' . date('YmdHis') . '.pdf';
+
+            return response()->streamDownload(function () use ($pdf) {
+                echo $pdf->output();
+            }, $fileName);
+        } catch (\Exception $e) {
+            Log::error('Timetable Session Export PDF Error: ' . $e->getMessage());
+            AlertHelper::warning('Perhatian', 'Gagal mengekspor data ke PDF.');
+        }
+    }
 
     public function render()
     {
