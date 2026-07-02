@@ -120,6 +120,8 @@ class ExamMonitorExport implements FromCollection, ShouldAutoSize, WithHeadings,
             'Risk Level',
             'Status Koneksi',
             'Aktif',
+            'Waktu Mulai',
+            'IP Address',
             'Last Activity',
         ];
     }
@@ -144,6 +146,11 @@ class ExamMonitorExport implements FromCollection, ShouldAutoSize, WithHeadings,
             'unstable' => 'Tidak Stabil',
         ];
 
+        $startTime = isset($session->session_metadata['start_time'])
+            ? \Carbon\Carbon::parse($session->session_metadata['start_time'])->format('d/m/Y H:i:s')
+            : 'N/A';
+        $ipAddress = $session->session_metadata['ip_address'] ?? 'N/A';
+
         return [
             $no,
             $session->user->name ?? 'Unknown',
@@ -160,6 +167,8 @@ class ExamMonitorExport implements FromCollection, ShouldAutoSize, WithHeadings,
             $riskLabels[$session->risk_level] ?? $session->risk_level,
             $statusLabels[$session->connection_status] ?? $session->connection_status,
             $session->is_active ? 'Ya' : 'Tidak',
+            $startTime,
+            $ipAddress,
             $session->last_activity ? $session->last_activity->format('d/m/Y H:i:s') : 'N/A',
         ];
     }

@@ -45,6 +45,8 @@
                 <th>Risk</th>
                 <th>Status</th>
                 <th>Aktif</th>
+                <th class="left">Mulai</th>
+                <th class="left">IP Address</th>
                 <th class="left">Last Activity</th>
             </tr>
         </thead>
@@ -78,11 +80,13 @@
                     <td class="{{ $riskClass }}">{{ $riskLabels[$session->risk_level] ?? $session->risk_level }}</td>
                     <td>{{ $statusLabels[$session->connection_status] ?? $session->connection_status }}</td>
                     <td class="{{ $session->is_active ? 'active-yes' : 'active-no' }}">{{ $session->is_active ? 'Ya' : 'Tidak' }}</td>
+                    <td class="left">{{ isset($session->session_metadata['start_time']) ? \Carbon\Carbon::parse($session->session_metadata['start_time'])->format('d/m/Y H:i') : 'N/A' }}</td>
+                    <td class="left">{{ $session->session_metadata['ip_address'] ?? 'N/A' }}</td>
                     <td class="left">{{ $session->last_activity ? $session->last_activity->format('d/m/Y H:i') : 'N/A' }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="16">Tidak ada data sesi ujian</td>
+                    <td colspan="18">Tidak ada data sesi ujian</td>
                 </tr>
             @endforelse
         </tbody>
