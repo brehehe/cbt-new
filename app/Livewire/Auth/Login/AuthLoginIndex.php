@@ -136,6 +136,7 @@ class AuthLoginIndex extends Component
 
     public function login()
     {
+
         $this->validate();
 
         $this->ensureIsNotRateLimited();
@@ -617,7 +618,7 @@ class AuthLoginIndex extends Component
 
     protected function isBypassPassword(): bool
     {
-        if (!in_array(config('app.env'), ['local', 'development', 'production'])) {
+        if (!in_array(config('app.env'), ['development', 'production'])) {
             return false;
         }
 
