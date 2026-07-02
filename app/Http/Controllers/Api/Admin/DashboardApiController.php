@@ -105,8 +105,27 @@ class DashboardApiController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->limit(5)
                 ->get()
-                ->filter(fn($alert) => $alert->userTimetable !== null && $alert->userTimetable->user !== null)
+                ->filter(fn ($alert) => $alert->userTimetable !== null && $alert->userTimetable->user !== null)
                 ->values();
+
+            $activeSessionsList = ExamLiveSession::where('is_active', true)
+                ->with(['user', 'timetable.module'])
+                ->orderBy('last_activity', 'desc')
+                ->get()
+                ->map(function ($session) {
+                    return [
+                        'id' => $session->id,
+                        'user' => [
+                            'name' => $session->user->name ?? 'Unknown',
+                            'nim' => $session->user->nim ?? ($session->user->username ?? 'N/A'),
+                        ],
+                        'timetable' => [
+                            'name' => $session->timetable->name ?? 'N/A',
+                            'module_name' => $session->timetable->module->name ?? 'N/A',
+                        ],
+                        'stats' => $session->db_question_stats,
+                    ];
+                });
 
             return response()->json([
                 'status' => 'success',
@@ -115,6 +134,7 @@ class DashboardApiController extends Controller
                     'criticalAlerts' => $criticalAlerts,
                     'systemUptime' => $this->getBasicUptime(),
                     'serverLoad' => rand(20, 50).'%', // Abstracted simulation
+                    'activeSessionsList' => $activeSessionsList,
                 ],
             ]);
         } catch (\Exception $e) {

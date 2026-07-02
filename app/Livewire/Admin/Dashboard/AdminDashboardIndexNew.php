@@ -53,6 +53,26 @@ class AdminDashboardIndexNew extends Component
 
     public $userProfile; // User profile data for authenticated user
 
+    public $showActiveSessionsModal = false;
+
+    public function openActiveSessionsModal()
+    {
+        $this->showActiveSessionsModal = true;
+    }
+
+    public function closeActiveSessionsModal()
+    {
+        $this->showActiveSessionsModal = false;
+    }
+
+    public function getActiveSessionsProperty()
+    {
+        return ExamLiveSession::where('is_active', true)
+            ->with(['user', 'timetable.module'])
+            ->orderBy('last_activity', 'desc')
+            ->get();
+    }
+
     public function mount()
     {
         $this->loadDashboardData();
@@ -589,11 +609,11 @@ class AdminDashboardIndexNew extends Component
     public function loadDashboardData()
     {
         try {
-            \App\Models\Exam\ExamLiveSession::cleanupStaleSessions();
+            ExamLiveSession::cleanupStaleSessions();
 
             // Basic counts
             $this->totalUsers = User::count();
-            $this->activeExams = \App\Models\Exam\ExamLiveSession::where('is_active', true)->count();
+            $this->activeExams = ExamLiveSession::where('is_active', true)->count();
             $this->totalExamTypes = ExamType::count();
             $this->completedExams = UserTimetable::where('status', 'done')->count();
             $this->todayExams = UserTimetable::whereDate('created_at', date('Y-m-d'))->count();

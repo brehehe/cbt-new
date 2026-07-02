@@ -14,23 +14,31 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 class ExamMonitorExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
     protected $selectedTimetable;
+
     protected $search;
+
     protected $statusFilter;
+
     protected $riskFilter;
+
     protected $sessionType;
+
+    protected $utStatus;
 
     public function __construct(
         string $selectedTimetable = '',
         string $search = '',
         string $statusFilter = '',
         string $riskFilter = '',
-        string $sessionType = 'all'
+        string $sessionType = 'all',
+        string $utStatus = ''
     ) {
         $this->selectedTimetable = $selectedTimetable;
         $this->search = $search;
         $this->statusFilter = $statusFilter;
         $this->riskFilter = $riskFilter;
         $this->sessionType = $sessionType;
+        $this->utStatus = $utStatus;
     }
 
     public function collection(): Collection
@@ -50,9 +58,9 @@ class ExamMonitorExport implements FromCollection, ShouldAutoSize, WithHeadings,
 
         if ($this->search) {
             $query->whereHas('user', function ($q) {
-                $q->where('name', 'ilike', '%' . $this->search . '%')
-                    ->orWhere('nim', 'ilike', '%' . $this->search . '%')
-                    ->orWhere('username', 'ilike', '%' . $this->search . '%');
+                $q->where('name', 'ilike', '%'.$this->search.'%')
+                    ->orWhere('nim', 'ilike', '%'.$this->search.'%')
+                    ->orWhere('username', 'ilike', '%'.$this->search.'%');
             });
         }
 
@@ -83,6 +91,12 @@ class ExamMonitorExport implements FromCollection, ShouldAutoSize, WithHeadings,
                     $query->where('alert_count', 0)->where('warning_count', 0);
                     break;
             }
+        }
+
+        if ($this->utStatus) {
+            $query->whereHas('userTimetable', function ($q) {
+                $q->where('status', $this->utStatus);
+            });
         }
 
         return $query->get();
@@ -118,16 +132,16 @@ class ExamMonitorExport implements FromCollection, ShouldAutoSize, WithHeadings,
         $stats = $session->db_question_stats;
 
         $riskLabels = [
-            'high'   => 'Tinggi',
+            'high' => 'Tinggi',
             'medium' => 'Sedang',
-            'low'    => 'Rendah',
-            'none'   => 'Aman',
+            'low' => 'Rendah',
+            'none' => 'Aman',
         ];
 
         $statusLabels = [
-            'connected'    => 'Terhubung',
+            'connected' => 'Terhubung',
             'disconnected' => 'Terputus',
-            'unstable'     => 'Tidak Stabil',
+            'unstable' => 'Tidak Stabil',
         ];
 
         return [
@@ -141,7 +155,7 @@ class ExamMonitorExport implements FromCollection, ShouldAutoSize, WithHeadings,
             $stats['correct'],
             $stats['wrong'],
             $stats['unanswered'],
-            $stats['percentage'] . '%',
+            $stats['percentage'].'%',
             $session->alert_count,
             $riskLabels[$session->risk_level] ?? $session->risk_level,
             $statusLabels[$session->connection_status] ?? $session->connection_status,
