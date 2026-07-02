@@ -264,7 +264,7 @@ class ExamLiveSession extends Model
             ->where('last_activity', '<', now()->subMinutes(5))
             ->update([
                 'is_active' => false,
-                'connection_status' => 'timeout',
+                'connection_status' => 'disconnected',
             ]);
     }
 }

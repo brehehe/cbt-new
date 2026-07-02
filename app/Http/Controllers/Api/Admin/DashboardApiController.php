@@ -51,8 +51,9 @@ class DashboardApiController extends Controller
                 ->limit(5)
                 ->get();
 
-            // Recent exam results
+            // Recent exam results — only include records where user still exists
             $recentExamResults = UserTimetable::where('status', 'done')
+                ->whereHas('user')
                 ->with(['user', 'timetable.module'])
                 ->orderBy('updated_at', 'desc')
                 ->limit(10)
@@ -98,11 +99,14 @@ class DashboardApiController extends Controller
                 'connection_issues' => rand(0, 3),
             ];
 
-            $criticalAlerts = ExamAlert::where('created_at', '>=', date('Y-m-d H:i:s', strtotime('-1 day')))
+            $criticalAlerts = ExamAlert::whereHas('userTimetable.user')
+                ->where('created_at', '>=', date('Y-m-d H:i:s', strtotime('-1 day')))
                 ->with(['userTimetable.user'])
                 ->orderBy('created_at', 'desc')
                 ->limit(5)
-                ->get();
+                ->get()
+                ->filter(fn($alert) => $alert->userTimetable !== null && $alert->userTimetable->user !== null)
+                ->values();
 
             return response()->json([
                 'status' => 'success',

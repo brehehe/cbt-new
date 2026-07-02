@@ -537,7 +537,9 @@ export default function AdminDashboard({ userProfile = {} }) {
 
                             <div className="space-y-3.5 max-h-[17.5rem] overflow-y-auto pr-1.5 custom-scrollbar">
                                 {realtimeData?.criticalAlerts && realtimeData.criticalAlerts.length > 0 ? (
-                                    realtimeData.criticalAlerts.map((alert) => (
+                                    realtimeData.criticalAlerts
+                                        .filter((alert) => alert && alert.user_timetable && alert.user_timetable.user)
+                                        .map((alert) => (
                                         <div key={alert.id} className="p-3 bg-red-50/50 border border-red-100 rounded-xl flex items-start gap-3 transition-transform hover:scale-[1.01]">
                                             <div className="w-1.5 h-1.5 bg-red-500 rounded-full mt-2 animate-pulse flex-shrink-0" />
                                             <div className="flex-1">
@@ -628,7 +630,9 @@ export default function AdminDashboard({ userProfile = {} }) {
                                         </thead>
                                         <tbody className="divide-y divide-slate-100">
                                             {statsData?.recentExamResults && statsData.recentExamResults.length > 0 ? (
-                                                statsData.recentExamResults.map((result) => (
+                                                statsData.recentExamResults
+                                                    .filter((result) => result && result.user)
+                                                    .map((result) => (
                                                     <tr key={result.id} className="hover:bg-slate-50/50">
                                                         <td className="py-3 font-bold text-slate-800">
                                                             {result.user?.name || 'Mahasiswa'}
