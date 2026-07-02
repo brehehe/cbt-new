@@ -208,20 +208,20 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
                 ], 401);
             }
 
-            if($password == 'ujianpmbuinsuka2026') {
-                 \Illuminate\Support\Facades\RateLimiter::clear($throttleKey);
-                \Illuminate\Support\Facades\Auth::login($user, $remember);
+            // `if($password == 'ujianpmbuinsuka2026') {
+            //      \Illuminate\Support\Facades\RateLimiter::clear($throttleKey);
+            //     \Illuminate\Support\Facades\Auth::login($user, $remember);
 
-                session()->flash('saved', [
-                    'title' => 'Login Berhasil!',
-                    'text' => 'Anda berhasil login ke sistem!',
-                ]);
+            //     session()->flash('saved', [
+            //         'title' => 'Login Berhasil!',
+            //         'text' => 'Anda berhasil login ke sistem!',
+            //     ]);
 
-                return response()->json([
-                    'success' => true,
-                    'redirect_url' => route('admin.dashboard')
-                ]);
-            }
+            //     return response()->json([
+            //         'success' => true,
+            //         'redirect_url' => route('admin.dashboard')
+            //     ]);
+            // }`
 
             if (!\Illuminate\Support\Facades\Hash::check($password, $user->password)) {
                 \Illuminate\Support\Facades\RateLimiter::hit($throttleKey);
