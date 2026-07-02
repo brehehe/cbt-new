@@ -243,6 +243,12 @@
                                     'pattern' => 'admin/master/timetable*',
                                     'icon' => 'fa-calendar',
                                 ],
+                                [
+                                    'label' => 'Monitor Ujian',
+                                    'url' => route('admin.exam.monitor'),
+                                    'pattern' => ['admin/exam/monitor*'],
+                                    'icon' => 'fa-desktop',
+                                ],
                             ];
 
                             if (auth()->user()->username === 'procbt') {
@@ -303,6 +309,15 @@
                                         'icon' => 'fa-folder-open',
                                     ],
                                 ];
+
+                            $examSchedules = [
+                                [
+                                    'label' => 'Monitor Ujian',
+                                    'url' => route('admin.exam.monitor'),
+                                    'pattern' => ['admin/exam/monitor*'],
+                                    'icon' => 'fa-desktop',
+                                ],
+                            ];
                         }
 
                         // ============================
@@ -329,6 +344,12 @@
                                     'url' => '/admin/master/timetable',
                                     'pattern' => 'admin/master/timetable*',
                                     'icon' => 'fa-calendar',
+                                ],
+                                [
+                                    'label' => 'Monitor Ujian',
+                                    'url' => route('admin.exam.monitor'),
+                                    'pattern' => ['admin/exam/monitor*'],
+                                    'icon' => 'fa-desktop',
                                 ],
                             ];
                         }

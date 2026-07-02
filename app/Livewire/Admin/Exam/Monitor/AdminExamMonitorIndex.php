@@ -20,6 +20,8 @@ class AdminExamMonitorIndex extends Component
 
     public $riskFilter = '';
 
+    public $sessionType = 'all';
+
     public $refreshInterval = 5; // seconds
 
     public $autoRefresh = true;
@@ -63,6 +65,11 @@ class AdminExamMonitorIndex extends Component
     }
 
     public function updatedRiskFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSessionType()
     {
         $this->resetPage();
     }
@@ -172,16 +179,19 @@ class AdminExamMonitorIndex extends Component
 
     public function getActiveTimtablesProperty()
     {
-        return Timetable::whereHas('userTimetables', function ($query) {
-            $query->whereIn('status', ['exam', 'warning']);
-        })->with('module')->get();
+        return Timetable::whereHas('userTimetables')->with('module')->get();
     }
 
     public function getActiveSessionsProperty()
     {
-        $query = ExamLiveSession::with(['user', 'timetable.module', 'userTimetable'])
-            ->active()
+        $query = ExamLiveSession::with(['user', 'timetable.module', 'userTimetable.userModuleQuestions'])
             ->orderBy('last_activity', 'desc');
+
+        if ($this->sessionType === 'active') {
+            $query->active();
+        } elseif ($this->sessionType === 'history') {
+            $query->where('is_active', false);
+        }
 
         if ($this->selectedTimetable) {
             $query->where('timetable_id', $this->selectedTimetable);

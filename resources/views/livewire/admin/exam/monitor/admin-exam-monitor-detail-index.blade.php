@@ -142,29 +142,40 @@
             <!-- Progress & Alerts Card -->
             <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Progress & Alerts</h3>
+                @php
+                    $stats = $session->db_question_stats;
+                @endphp
                 <div class="space-y-3">
                     <div>
                         <div class="flex items-center justify-between mb-1">
                             <span class="text-sm text-gray-600">Progress Ujian</span>
-                            <span class="text-sm text-gray-900">{{ $session->progress_percentage }}%</span>
+                            <span class="text-sm text-gray-900">{{ $stats['percentage'] }}%</span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $session->progress_percentage }}%">
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $stats['percentage'] }}%">
                             </div>
                         </div>
                         <p class="text-xs text-gray-500 mt-1">
-                            {{ $session->current_question_number }} dari {{ $session->total_questions }} soal
+                            {{ $stats['answered'] }} dari {{ $stats['total'] }} soal
                         </p>
                     </div>
 
                     <div class="pt-3 border-t border-gray-200 space-y-2">
                         <div class="flex items-center justify-between">
                             <span class="text-sm text-gray-600">Dijawab</span>
-                            <span class="text-sm font-medium text-green-600">{{ $session->answered_questions }}</span>
+                            <span class="text-sm font-medium text-blue-600">{{ $stats['answered'] }}</span>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-600">Ditandai</span>
-                            <span class="text-sm font-medium text-yellow-600">{{ $session->marked_questions }}</span>
+                            <span class="text-sm text-gray-600">Jawaban Benar</span>
+                            <span class="text-sm font-medium text-green-600">{{ $stats['correct'] }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Jawaban Salah</span>
+                            <span class="text-sm font-medium text-red-600">{{ $stats['wrong'] }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Belum Dijawab</span>
+                            <span class="text-sm font-medium text-gray-600">{{ $stats['unanswered'] }}</span>
                         </div>
                         <div class="flex items-center justify-between">
                             <span class="text-sm text-gray-600">Alerts</span>

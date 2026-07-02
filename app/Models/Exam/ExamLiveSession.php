@@ -214,4 +214,36 @@ class ExamLiveSession extends Model
             default => 'gray'
         };
     }
+
+    public function getDbQuestionStatsAttribute()
+    {
+        $userTimetable = $this->userTimetable;
+        if (!$userTimetable) {
+            return [
+                'total' => 0,
+                'answered' => 0,
+                'correct' => 0,
+                'wrong' => 0,
+                'unanswered' => 0,
+                'percentage' => 0,
+            ];
+        }
+
+        $questions = $userTimetable->userModuleQuestions;
+        $total = $questions->count();
+        $answered = $questions->whereNotNull('timetable_answer_id')->count();
+        $correct = $questions->where('status', 'correct')->count();
+        $wrong = $questions->where('status', 'wrong')->count();
+        $unanswered = $questions->whereNull('timetable_answer_id')->count();
+        $percentage = $total > 0 ? round(($answered / $total) * 100, 1) : 0;
+
+        return [
+            'total' => $total,
+            'answered' => $answered,
+            'correct' => $correct,
+            'wrong' => $wrong,
+            'unanswered' => $unanswered,
+            'percentage' => $percentage,
+        ];
+    }
 }

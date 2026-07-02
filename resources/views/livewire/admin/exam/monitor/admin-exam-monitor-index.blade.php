@@ -99,7 +99,7 @@
 
     <!-- Filters -->
     <div class="p-4 mb-6 bg-white border border-gray-200 rounded-lg shadow-sm">
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
             <!-- Timetable Filter -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Jadwal Ujian</label>
@@ -145,13 +145,32 @@
                     <option value="none">Aman</option>
                 </select>
             </div>
+
+            <!-- Session Type Filter -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tipe Sesi</label>
+                <select wire:model.live="sessionType"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="active">Sesi Aktif</option>
+                    <option value="history">Riwayat Ujian (Selesai)</option>
+                    <option value="all">Semua Sesi</option>
+                </select>
+            </div>
         </div>
     </div>
 
     <!-- Live Sessions Table -->
     <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Active Sessions ({{ $activeSessions->total() }})</h3>
+            <h3 class="text-lg font-medium text-gray-900">
+                @if($sessionType === 'active')
+                    Sesi Aktif ({{ $activeSessions->total() }})
+                @elseif($sessionType === 'history')
+                    Riwayat Ujian ({{ $activeSessions->total() }})
+                @else
+                    Semua Sesi Ujian ({{ $activeSessions->total() }})
+                @endif
+            </h3>
         </div>
 
         <div class="overflow-x-auto">
@@ -164,10 +183,6 @@
                             Ujian</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Progress</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Camera</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Alerts</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last
@@ -208,57 +223,32 @@
 
                                         <!-- Progress -->
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-900">
-                                                {{ $session->current_question_number }}/{{ $session->total_questions }}
+                                            @php
+                                                $stats = $session->db_question_stats;
+                                            @endphp
+                                            <div class="text-sm font-semibold text-gray-900">
+                                                {{ $stats['answered'] }}/{{ $stats['total'] }} Soal
                                             </div>
                                             <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
                                                 <div class="bg-blue-600 h-2 rounded-full"
-                                                    style="width: {{ $session->progress_percentage }}%"></div>
+                                                    style="width: {{ $stats['percentage'] }}%"></div>
                                             </div>
-                                            <div class="text-xs text-gray-500 mt-1">{{ $session->progress_percentage }}% completed
+                                            <div class="text-xs text-gray-500 mt-1 mb-2">{{ $stats['percentage'] }}% selesai</div>
+                                            
+                                            <!-- Detail Jawaban -->
+                                            <div class="flex items-center gap-1 text-[10px]">
+                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded font-semibold bg-green-50 text-green-700 border border-green-200" title="Benar">
+                                                    ✓ {{ $stats['correct'] }}
+                                                </span>
+                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded font-semibold bg-red-50 text-red-700 border border-red-200" title="Salah">
+                                                    ✗ {{ $stats['wrong'] }}
+                                                </span>
+                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded font-semibold bg-gray-50 text-gray-700 border border-gray-200" title="Belum Dijawab">
+                                                    ? {{ $stats['unanswered'] }}
+                                                </span>
                                             </div>
                                         </td>
-
-                                        <!-- Connection Status -->
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span @class([
-                                                'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
-                                                'bg-green-100 text-green-800' =>
-                                                    $session->connection_status === 'connected',
-                                                'bg-red-100 text-red-800' => $session->connection_status === 'disconnected',
-                                                'bg-yellow-100 text-yellow-800' =>
-                                                    $session->connection_status === 'unstable',
-                                                'bg-gray-100 text-gray-800' => !in_array($session->connection_status, [
-                                                    'connected',
-                                                    'disconnected',
-                                                    'unstable',
-                                                ]),
-                                            ])>
-                                                {{ ucfirst($session->connection_status) }}
-                                            </span>
-                                        </td>
-
-                                        <!-- Camera Status -->
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span @class([
-                                                'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
-                                                'bg-green-100 text-green-800' => $session->camera_status === 'active',
-                                                'bg-red-100 text-red-800' => in_array($session->camera_status, [
-                                                    'inactive',
-                                                    'error',
-                                                ]),
-                                                'bg-yellow-100 text-yellow-800' => $session->camera_status === 'pending',
-                                                'bg-gray-100 text-gray-800' => !in_array($session->camera_status, [
-                                                    'active',
-                                                    'inactive',
-                                                    'error',
-                                                    'pending',
-                                                ]),
-                                            ])>
-                                                {{ ucfirst($session->camera_status) }}
-                                            </span>
-                                        </td>
-
+                                        
                                         <!-- Alerts -->
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center space-x-2">
@@ -309,21 +299,29 @@
                                                     </button>
                                                 @endif
 
-                                                <button wire:click="terminateSession('{{ $session->id }}')"
-                                                    wire:confirm="Apakah Anda yakin ingin menghentikan sesi ujian ini?"
-                                                    class="text-red-600 hover:text-red-900 p-1 rounded">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M6 18L18 6M6 6l12 12" />
-                                                    </svg>
-                                                </button>
+                                                @if($session->is_active)
+                                                    <button wire:click="terminateSession('{{ $session->id }}')"
+                                                        wire:confirm="Apakah Anda yakin ingin menghentikan sesi ujian ini?"
+                                                        class="text-red-600 hover:text-red-900 p-1 rounded">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
+                                                    </button>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>
                     @empty
                         <tr>
                             <td colspan="8" class="px-6 py-4 text-center text-gray-500">
-                                Tidak ada sesi ujian aktif ditemukan
+                                @if($sessionType === 'active')
+                                    Tidak ada sesi ujian aktif ditemukan
+                                @elseif($sessionType === 'history')
+                                    Tidak ada riwayat sesi ujian ditemukan
+                                @else
+                                    Tidak ada data sesi ujian ditemukan
+                                @endif
                             </td>
                         </tr>
                     @endforelse

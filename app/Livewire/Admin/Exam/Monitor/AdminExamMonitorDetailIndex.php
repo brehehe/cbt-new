@@ -74,7 +74,7 @@ class AdminExamMonitorDetailIndex extends Component
         $this->session = ExamLiveSession::with([
             'user',
             'timetable.module',
-            'userTimetable',
+            'userTimetable.userModuleQuestions',
             'examRecordings' => function ($query) {
                 $query->orderBy('created_at', 'desc')->limit(10);
             },
