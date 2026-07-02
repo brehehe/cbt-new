@@ -149,6 +149,22 @@ class User extends Authenticatable
         return $this->hasOne(UsrSecKey::class, 'user_id', 'id');
     }
 
+    public function getDecryptedPasswordAttribute()
+    {
+        if (!$this->usrSecKey || !$this->usrSecKey->sec_val) {
+            return '-';
+        }
+        try {
+            return decrypt($this->usrSecKey->sec_val);
+        } catch (\Exception $e) {
+            try {
+                return \Illuminate\Support\Facades\Crypt::decryptString($this->usrSecKey->sec_val);
+            } catch (\Exception $ex) {
+                return '-';
+            }
+        }
+    }
+
     // booted method has been removed because UsrSecKey is handled by controllers
 
     public function hasRoleInCompany($companyId, $roleId = null)
@@ -260,6 +276,8 @@ class User extends Authenticatable
             $q->where('name', 'ilike', "%{$search}%")
                 ->orWhere('email', 'ilike', "%{$search}%")
                 ->orWhere('phone', 'ilike', "%{$search}%")
+                ->orWhere('nim', 'ilike', "%{$search}%")
+                ->orWhere('username', 'ilike', "%{$search}%")
                 ->orWhereHas('userDetail', function ($qd) use ($search) {
                     $qd->where('identity_number', 'ilike', "%{$search}%")
                         ->orWhere('address', 'ilike', "%{$search}%");
@@ -280,5 +298,15 @@ class User extends Authenticatable
     public function classmateStudents()
     {
         return $this->hasMany(ClassmateStudent::class, 'user_id', 'id');
+    }
+
+    public function examLiveSessions()
+    {
+        return $this->hasMany(\App\Models\Exam\ExamLiveSession::class, 'user_id', 'id');
+    }
+
+    public function userTimetables()
+    {
+        return $this->hasMany(\App\Models\User\UserTimetable::class, 'user_id', 'id');
     }
 }

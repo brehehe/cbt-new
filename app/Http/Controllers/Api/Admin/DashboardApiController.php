@@ -16,8 +16,10 @@ class DashboardApiController extends Controller
     public function getStats(Request $request)
     {
         try {
+            ExamLiveSession::cleanupStaleSessions();
+
             $totalUsers = User::count();
-            $activeExams = UserTimetable::where('status', 'exam')->count();
+            $activeExams = ExamLiveSession::where('is_active', true)->count();
             $totalExamTypes = ExamType::count();
             $completedExams = UserTimetable::where('status', 'done')->count();
             $todayExams = UserTimetable::whereDate('created_at', date('Y-m-d'))->count();
@@ -84,6 +86,8 @@ class DashboardApiController extends Controller
     public function getRealtime(Request $request)
     {
         try {
+            ExamLiveSession::cleanupStaleSessions();
+
             $activeSessions = ExamLiveSession::where('is_active', true)->count();
             $highRisk = ExamAlert::where('created_at', '>=', date('Y-m-d H:i:s', strtotime('-1 hour')))->count();
 

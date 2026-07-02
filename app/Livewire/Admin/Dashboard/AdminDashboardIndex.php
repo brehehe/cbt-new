@@ -589,9 +589,11 @@ class AdminDashboardIndex extends Component
     public function loadDashboardData()
     {
         try {
+            \App\Models\Exam\ExamLiveSession::cleanupStaleSessions();
+
             // Basic counts
             $this->totalUsers = User::count();
-            $this->activeExams = UserTimetable::where('status', 'exam')->count();
+            $this->activeExams = \App\Models\Exam\ExamLiveSession::where('is_active', true)->count();
             $this->totalExamTypes = ExamType::count();
             $this->completedExams = UserTimetable::where('status', 'done')->count();
             $this->todayExams = UserTimetable::whereDate('created_at', date('Y-m-d'))->count();

@@ -5,12 +5,14 @@
                 <h1 class="text-2xl font-bold text-[color:var(--primary)]">Nilai Ujian Detail</h1>
                 <p class="text-gray-600 text-sm mt-1">Lihat detail hasil ujian dan statistik pengerjaan.</p>
             </div>
-            <div>
-                <button wire:click="exportPdf" class="btn btn-primary">
-                    <i class="fa-solid fa-file-pdf mr-2"></i>
-                    Export PDF
-                </button>
-            </div>
+            @if(!auth()->user()->hasRole('Pengawas'))
+                <div>
+                    <button wire:click="exportPdf" class="btn btn-primary">
+                        <i class="fa-solid fa-file-pdf mr-2"></i>
+                        Export PDF
+                    </button>
+                </div>
+            @endif
         </div>
     </div>
 
@@ -68,42 +70,44 @@
     </div>
 
     {{-- Statistik --}}
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+    <div class="grid grid-cols-2 md:grid-cols-3 {{ auth()->user()->hasRole('Pengawas') ? 'lg:grid-cols-1' : 'lg:grid-cols-6' }} gap-4 mb-6">
         <div>
             <label for="total_soal" class="block text-sm font-medium text-gray-700">Total Soal</label>
             <input disabled type="number" id="total_soal"
                 value="{{ $user_timetable->userModuleQuestions->count() }}"
                 placeholder="Masukkan" class="mt-1 form-control">
         </div>
-        <div>
-            <label for="terjawab" class="block text-sm font-medium text-gray-700">Terjawab</label>
-            <input disabled type="number" id="terjawab"
-                value="{{ $user_timetable->userModuleQuestions->filter(fn($q) => $q->timetable_answer_id || $q->essay_answer)->count() }}"
-                placeholder="Masukkan" class="mt-1 form-control">
-        </div>
-        <div>
-            <label for="tidak_terjawab" class="block text-sm font-medium text-gray-700">Tidak Terjawab</label>
-            <input disabled type="number" id="tidak_terjawab"
-                value="{{ $user_timetable->userModuleQuestions->filter(fn($q) => !$q->timetable_answer_id && !$q->essay_answer)->count() }}"
-                placeholder="Masukkan" class="mt-1 form-control">
-        </div>
-        <div>
-            <label for="benar" class="block text-sm font-medium text-gray-700">Benar</label>
-            <input disabled type="number" id="benar"
-                value="{{ $user_timetable->userModuleQuestions->where('status', 'correct')->count() }}"
-                placeholder="Masukkan" class="mt-1 form-control">
-        </div>
-        <div>
-            <label for="salah" class="block text-sm font-medium text-gray-700">Salah</label>
-            <input disabled type="number" id="salah"
-                value="{{ $user_timetable->userModuleQuestions->where('status', 'wrong')->count() }}"
-                placeholder="Masukkan" class="mt-1 form-control">
-        </div>
-        <div>
-            <label for="nilai" class="block text-sm font-medium text-gray-700">Nilai</label>
-            <input disabled type="number" id="nilai" value="{{ $user_timetable->mark }}"
-                placeholder="Masukkan" class="mt-1 form-control">
-        </div>
+        @if(!auth()->user()->hasRole('Pengawas'))
+            <div>
+                <label for="terjawab" class="block text-sm font-medium text-gray-700">Terjawab</label>
+                <input disabled type="number" id="terjawab"
+                    value="{{ $user_timetable->userModuleQuestions->filter(fn($q) => $q->timetable_answer_id || $q->essay_answer)->count() }}"
+                    placeholder="Masukkan" class="mt-1 form-control">
+            </div>
+            <div>
+                <label for="tidak_terjawab" class="block text-sm font-medium text-gray-700">Tidak Terjawab</label>
+                <input disabled type="number" id="tidak_terjawab"
+                    value="{{ $user_timetable->userModuleQuestions->filter(fn($q) => !$q->timetable_answer_id && !$q->essay_answer)->count() }}"
+                    placeholder="Masukkan" class="mt-1 form-control">
+            </div>
+            <div>
+                <label for="benar" class="block text-sm font-medium text-gray-700">Benar</label>
+                <input disabled type="number" id="benar"
+                    value="{{ $user_timetable->userModuleQuestions->where('status', 'correct')->count() }}"
+                    placeholder="Masukkan" class="mt-1 form-control">
+            </div>
+            <div>
+                <label for="salah" class="block text-sm font-medium text-gray-700">Salah</label>
+                <input disabled type="number" id="salah"
+                    value="{{ $user_timetable->userModuleQuestions->where('status', 'wrong')->count() }}"
+                    placeholder="Masukkan" class="mt-1 form-control">
+            </div>
+            <div>
+                <label for="nilai" class="block text-sm font-medium text-gray-700">Nilai</label>
+                <input disabled type="number" id="nilai" value="{{ $user_timetable->mark }}"
+                    placeholder="Masukkan" class="mt-1 form-control">
+            </div>
+        @endif
     </div>
 
     {{-- Table Controls --}}
@@ -141,9 +145,13 @@
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16 text-center">No</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Soal</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jawaban Benar</th>
+                        @if(!auth()->user()->hasRole('Pengawas'))
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jawaban Benar</th>
+                        @endif
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jawaban Terpilih</th>
-                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Status</th>
+                        @if(!auth()->user()->hasRole('Pengawas'))
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Status</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -179,21 +187,23 @@
                             </td>
 
                             {{-- Jawaban Benar --}}
-                            <td class="px-6 py-4 text-sm text-gray-500 min-w-[150px] max-w-[180px]"
-                                x-data="{ expanded: false, truncated: false }"
-                                x-init="$nextTick(() => { truncated = $refs.ca.scrollWidth > $refs.ca.clientWidth })">
-                                @if($userModuleQuestion->timetableQuestion?->type === 'essay')
-                                    <span class="text-gray-400">-</span>
-                                @else
-                                    <div x-ref="ca" class="rich-content" :style="expanded ? '' : 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'">
-                                        <span class="font-semibold text-gray-700 mr-1">{{ $letter($labelCorrect) }}.</span>
-                                        {!! optional($correctAnswer)->context ?? '-' !!}
-                                    </div>
-                                    <button x-show="truncated || expanded" @click="expanded = !expanded"
-                                        class="mt-1 text-xs text-primary hover:underline focus:outline-none"
-                                        x-text="expanded ? 'Sembunyikan' : 'Selengkapnya'"></button>
-                                @endif
-                            </td>
+                            @if(!auth()->user()->hasRole('Pengawas'))
+                                <td class="px-6 py-4 text-sm text-gray-500 min-w-[150px] max-w-[180px]"
+                                    x-data="{ expanded: false, truncated: false }"
+                                    x-init="$nextTick(() => { truncated = $refs.ca.scrollWidth > $refs.ca.clientWidth })">
+                                    @if($userModuleQuestion->timetableQuestion?->type === 'essay')
+                                        <span class="text-gray-400">-</span>
+                                    @else
+                                        <div x-ref="ca" class="rich-content" :style="expanded ? '' : 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'">
+                                            <span class="font-semibold text-gray-700 mr-1">{{ $letter($labelCorrect) }}.</span>
+                                            {!! optional($correctAnswer)->context ?? '-' !!}
+                                        </div>
+                                        <button x-show="truncated || expanded" @click="expanded = !expanded"
+                                            class="mt-1 text-xs text-primary hover:underline focus:outline-none"
+                                            x-text="expanded ? 'Sembunyikan' : 'Selengkapnya'"></button>
+                                    @endif
+                                </td>
+                            @endif
 
                             {{-- Jawaban Terpilih --}}
                             <td class="px-6 py-4 text-sm text-gray-500 min-w-[150px] max-w-[180px]"
@@ -221,21 +231,23 @@
                             </td>
 
                             {{-- Status --}}
-                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
-                                @if ($userModuleQuestion->status === 'correct')
-                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Benar</span>
-                                @elseif ($userModuleQuestion->status === 'wrong')
-                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Salah</span>
-                                @elseif ($userModuleQuestion->status === 'check')
-                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Menunggu Koreksi</span>
-                                @else
-                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Tidak Terjawab</span>
-                                @endif
-                            </td>
+                            @if(!auth()->user()->hasRole('Pengawas'))
+                                <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
+                                    @if ($userModuleQuestion->status === 'correct')
+                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Benar</span>
+                                    @elseif ($userModuleQuestion->status === 'wrong')
+                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Salah</span>
+                                    @elseif ($userModuleQuestion->status === 'check')
+                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Menunggu Koreksi</span>
+                                    @else
+                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Tidak Terjawab</span>
+                                    @endif
+                                </td>
+                            @endif
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-10 text-center text-gray-500">
+                            <td colspan="{{ auth()->user()->hasRole('Pengawas') ? 3 : 5 }}" class="px-6 py-10 text-center text-gray-500">
                                 <div class="flex flex-col items-center justify-center">
                                     <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

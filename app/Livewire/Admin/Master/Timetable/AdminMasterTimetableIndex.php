@@ -510,6 +510,9 @@ class AdminMasterTimetableIndex extends Component
     {
         $timetable = Timetable::query()
             ->with(['module', 'examRoom', 'examSession'])
+            ->when(auth()->user()->hasRole('Pengawas'), function ($query) {
+                $query->whereJsonContains('supervisors', auth()->id());
+            })
             ->when($this->search, function ($query, $search) {
                 $query->where('name', 'ilike', '%'.$search.'%')
                     ->orWhere('start_time', 'ilike', '%'.$search.'%')

@@ -178,6 +178,14 @@ class AuthLoginIndex extends Component
         RateLimiter::clear($this->throttleKey());
         Auth::login($user, $this->remember);
 
+        if ($user->hasRole('Mahasiswa')) {
+            \Illuminate\Support\Facades\Cache::put(
+                "user_session_{$user->id}",
+                session()->getId(),
+                now()->addMinutes(config('session.lifetime', 120))
+            );
+        }
+
         session()->flash('saved', [
             'title' => 'Login Berhasil!',
             'text' => 'Anda berhasil login ke sistem!',
@@ -218,6 +226,14 @@ class AuthLoginIndex extends Component
 
                 RateLimiter::clear($this->throttleKey());
                 Auth::login($user, $this->remember);
+
+                if ($user->hasRole('Mahasiswa')) {
+                    \Illuminate\Support\Facades\Cache::put(
+                        "user_session_{$user->id}",
+                        session()->getId(),
+                        now()->addMinutes(config('session.lifetime', 120))
+                    );
+                }
 
                 session()->flash('saved', [
                     'title' => 'Login Berhasil!',
@@ -542,12 +558,26 @@ class AuthLoginIndex extends Component
     protected function hasActiveSessionForUser($user)
     {
         try {
+            // 1. Check database session table
             $activeSessions = DB::table(config('session.table', 'sessions'))
                 ->where('user_id', $user->id)
                 ->where('last_activity', '>', time() - config('session.lifetime', 120) * 60)
                 ->count();
 
-            return $activeSessions > 0;
+            if ($activeSessions > 0) {
+                return true;
+            }
+
+            // 2. Check cache/Redis session
+            $lastSessionId = \Illuminate\Support\Facades\Cache::get("user_session_{$user->id}");
+            if ($lastSessionId && $lastSessionId !== session()->getId()) {
+                $sessionData = \Illuminate\Support\Facades\Session::getHandler()->read($lastSessionId);
+                if (!empty($sessionData)) {
+                    return true;
+                }
+            }
+
+            return false;
         } catch (Throwable $e) {
             \Log::warning('Failed checking active sessions for user', [
                 'user_id' => $user->id,

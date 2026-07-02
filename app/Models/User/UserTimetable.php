@@ -42,6 +42,11 @@ class UserTimetable extends Model
         return $this->hasMany(UserModuleQuestion::class, 'user_timetable_id', 'id');
     }
 
+    public function examLiveSession()
+    {
+        return $this->hasOne(\App\Models\Exam\ExamLiveSession::class, 'user_timetable_id', 'id');
+    }
+
     protected static function boot()
     {
         parent::boot();

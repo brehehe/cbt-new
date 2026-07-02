@@ -84,7 +84,7 @@
 
     <!-- Filters -->
     <div class="bg-white rounded-lg shadow mb-6 p-4">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
             <!-- Search -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Cari</label>
@@ -126,6 +126,17 @@
                     @endif
                 </select>
             </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Entries</label>
+                <select wire:model.live="perPage" class="form-control mt-1">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
         </div>
     </div>
 
@@ -144,8 +155,14 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             NIM/Username
                         </th>
+                        {{--<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Password
+                        </th>--}}
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Prodi
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Sesi / Ruang
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Status
@@ -192,12 +209,32 @@
                                     <div class="text-sm text-gray-500">ID: {{ $admin->userDetail->student_id }}</div>
                                 @endif
                             </td>
+                            {{--<td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 bg-gray-100 rounded text-xs font-mono text-gray-800">
+                                    {{ $admin->decrypted_password }}
+                                </span>
+                            </td>--}}
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">
                                     {{ $admin?->study?->name ?? ($admin->userDetail->student_program ?? '-') }}
                                 </div>
                                 @if ($admin->userDetail && $admin->userDetail->student_major)
                                     <div class="text-sm text-gray-500">{{ $admin->userDetail->student_major }}</div>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($admin->userDetail && ($admin->userDetail->examSession || $admin->userDetail->examRoom || $admin->userDetail->exam_date))
+                                    @if($admin->userDetail->examSession)
+                                        <div class="text-sm text-gray-900 font-medium">Sesi: {{ $admin->userDetail->examSession->name }}</div>
+                                    @endif
+                                    @if($admin->userDetail->examRoom)
+                                        <div class="text-sm text-gray-700">Ruang: {{ $admin->userDetail->examRoom->name }}</div>
+                                    @endif
+                                    @if($admin->userDetail->exam_date)
+                                        <div class="text-xs text-gray-500">Tgl: {{ $admin->userDetail->exam_date->format('d/m/Y') }}</div>
+                                    @endif
+                                @else
+                                    <span class="text-gray-400 text-xs">-</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">

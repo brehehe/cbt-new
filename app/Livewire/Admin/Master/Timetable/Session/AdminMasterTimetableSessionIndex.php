@@ -49,23 +49,19 @@ class AdminMasterTimetableSessionIndex extends Component
         $this->timetable = $timetable;
     }
 
-    public function suspendSession($sessionId)
+    public function suspendSession($userId)
     {
-        $session = ExamLiveSession::with(['user', 'timetable'])->find($sessionId);
-        if (! $session) {
-            AlertHelper::warning('Perhatian', 'Sesi tidak ditemukan.');
-
-            return;
+        $session = ExamLiveSession::where('user_id', $userId)->where('timetable_id', $this->timetable_id)->first();
+        if ($session) {
+            $session->update([
+                'is_active' => false,
+                'connection_status' => 'disconnected',
+                'last_activity' => Carbon::now(),
+                'end_time' => Carbon::now(),
+            ]);
         }
 
-        $session->update([
-            'is_active' => false,
-            'connection_status' => 'disconnected',
-            'last_activity' => Carbon::now(),
-            'end_time' => Carbon::now(),
-        ]);
-
-        $userTimetable = UserTimetable::find($session->user_timetable_id);
+        $userTimetable = UserTimetable::where('user_id', $userId)->where('timetable_id', $this->timetable_id)->first();
         if ($userTimetable) {
             $userTimetable->update([
                 'status' => 'suspend',
@@ -96,16 +92,9 @@ class AdminMasterTimetableSessionIndex extends Component
         AlertHelper::success('Berhasil', 'Sesi disuspend dan user di-logout.');
     }
 
-    public function unsuspendSession($sessionId)
+    public function unsuspendSession($userId)
     {
-        $session = ExamLiveSession::with(['user', 'timetable'])->find($sessionId);
-        if (! $session) {
-            AlertHelper::warning('Perhatian', 'Sesi tidak ditemukan.');
-
-            return;
-        }
-
-        $userTimetable = UserTimetable::find($session->user_timetable_id);
+        $userTimetable = UserTimetable::where('user_id', $userId)->where('timetable_id', $this->timetable_id)->first();
         if ($userTimetable) {
             $userTimetable->update([
                 'status' => 'exam',
@@ -150,7 +139,18 @@ class AdminMasterTimetableSessionIndex extends Component
                 ->where('user_id', $userId)
                 ->delete();
 
-            \Log::info("ForceLogout: Deleted {$deletedCount} DB session(s) for user #{$userId}");
+            // Layer 1.5: Hapus session dari Redis/Cache
+            $lastSessionId = \Illuminate\Support\Facades\Cache::get("user_session_{$userId}");
+            if ($lastSessionId) {
+                try {
+                    \Illuminate\Support\Facades\Session::getHandler()->destroy($lastSessionId);
+                } catch (\Throwable $e) {
+                    // Ignore
+                }
+                \Illuminate\Support\Facades\Cache::forget("user_session_{$userId}");
+            }
+
+            \Log::info("ForceLogout: Deleted {$deletedCount} DB session(s) and cleared Redis session for user #{$userId}");
 
             // Layer 2: Putuskan ExamLiveSession → React polling mendeteksi dalam ≤8 detik
             ExamLiveSession::query()
@@ -181,22 +181,37 @@ class AdminMasterTimetableSessionIndex extends Component
 
     public function render()
     {
-        $sessions = ExamLiveSession::query()
-            ->where('timetable_id', $this->timetable_id)
+        $classmateId = $this->timetable->classmate_id;
+
+        $sessions = \App\Models\Classmate\ClassmateStudent::query()
+            ->where('classmate_id', $classmateId)
             ->when($this->search, function ($q) {
                 $q->whereHas('user', function ($uq) {
-                    $uq->where('name', 'ilike', '%'.$this->search.'%');
+                    $uq->where('name', 'ilike', '%'.$this->search.'%')
+                       ->orWhere('nim', 'ilike', '%'.$this->search.'%')
+                       ->orWhere('username', 'ilike', '%'.$this->search.'%');
                 });
             })
             ->when($this->filterStatus !== 'all', function ($q) {
                 if ($this->filterStatus === 'active') {
-                    $q->where('is_active', true);
-                } else {
-                    $q->where('is_active', false)->where('connection_status', $this->filterStatus);
+                    $q->whereHas('user.examLiveSessions', function ($sq) {
+                        $sq->where('timetable_id', $this->timetable_id)->where('is_active', true);
+                    });
+                } elseif ($this->filterStatus === 'disconnected') {
+                    $q->whereHas('user.examLiveSessions', function ($sq) {
+                        $sq->where('timetable_id', $this->timetable_id)->where('is_active', false)->where('connection_status', 'disconnected');
+                    });
                 }
             })
-            ->with(['user', 'timetable', 'userTimetable'])
-            ->orderBy('last_activity', 'desc')
+            ->with([
+                'user.usrSecKey',
+                'user.examLiveSessions' => function($q) {
+                    $q->where('timetable_id', $this->timetable_id);
+                },
+                'user.userTimetables' => function($q) {
+                    $q->where('timetable_id', $this->timetable_id)->with('userModuleQuestions');
+                }
+            ])
             ->paginate($this->perPage);
 
         return view('livewire.admin.master.timetable.session.admin-master-timetable-session-index', [

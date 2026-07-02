@@ -328,28 +328,10 @@
 
                             $examSchedules = [
                                 [
-                                    'label' => 'Ruang Ujian',
-                                    'url' => route('admin.master.exam-room'),
-                                    'pattern' => ['admin/master/exam-room*'],
-                                    'icon' => 'fa-house',
-                                ],
-                                [
-                                    'label' => 'Sesi Ujian',
-                                    'url' => route('admin.master.exam-session'),
-                                    'pattern' => ['admin/master/exam-session*'],
-                                    'icon' => 'fa-clock',
-                                ],
-                                [
                                     'label' => 'Jadwal',
                                     'url' => '/admin/master/timetable',
                                     'pattern' => 'admin/master/timetable*',
                                     'icon' => 'fa-calendar',
-                                ],
-                                [
-                                    'label' => 'Monitor Ujian',
-                                    'url' => route('admin.exam.monitor'),
-                                    'pattern' => ['admin/exam/monitor*'],
-                                    'icon' => 'fa-desktop',
                                 ],
                             ];
                         }

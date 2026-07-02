@@ -81,6 +81,9 @@ class AdminMasterTimetableAnswerIndex extends Component
 
     public function exportPdf()
     {
+        if (Auth::user()->hasRole('Pengawas')) {
+            return;
+        }
         $userModuleQuestions = $this->user_timetable->userModuleQuestions()
             ->search($this->search)
             ->with(['timetableQuestion', 'timetableModule', 'timetableAnswer', 'timetableQuestion.answers'])

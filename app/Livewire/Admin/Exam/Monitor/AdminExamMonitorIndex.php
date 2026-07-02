@@ -184,6 +184,8 @@ class AdminExamMonitorIndex extends Component
 
     public function getActiveSessionsProperty()
     {
+        ExamLiveSession::cleanupStaleSessions();
+
         $query = ExamLiveSession::with(['user', 'timetable.module', 'userTimetable.userModuleQuestions'])
             ->orderBy('last_activity', 'desc');
 

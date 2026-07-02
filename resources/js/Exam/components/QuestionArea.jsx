@@ -53,6 +53,10 @@ const QuestionArea = ({
     const [selectedAnswerId, setSelectedAnswerId] = useState(question?.timetable_answer_id ?? null);
     const [essayAnswer, setEssayAnswer]           = useState(question?.essay_answer || '');
     const [isMarked, setIsMarked]                 = useState(!!question?.is_mark);
+
+    const isAnswered = question?.timetable_question?.type === 'essay'
+        ? (essayAnswer && essayAnswer.trim() !== '')
+        : (selectedAnswerId !== null);
     const [mediaModal, setMediaModal]             = useState({ isOpen: false, url: '', type: '', title: '' });
 
     const openMediaModal = (url, type, title = '') => {
@@ -171,6 +175,7 @@ const QuestionArea = ({
     };
 
     const handleToggleMark = () => {
+        if (!isAnswered) return;
         const next = !isMarked;
         setIsMarked(next);
         markedRef.current = next;
@@ -257,10 +262,13 @@ const QuestionArea = ({
                 {/* Ragu-Ragu */}
                 <button
                     onClick={handleToggleMark}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all shadow-sm active:scale-[0.98]"
+                    disabled={!isAnswered}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all shadow-sm active:scale-[0.98] ${!isAnswered ? 'opacity-50 cursor-not-allowed' : ''}`}
                     style={isMarked
                         ? { backgroundColor: '#fef9c3', borderColor: '#f59e0b', color: '#92400e' }
-                        : { backgroundColor: '#f8fafc', borderColor: '#e2e8f0', color: '#64748b' }
+                        : (!isAnswered
+                            ? { backgroundColor: '#f1f5f9', borderColor: '#cbd5e1', color: '#94a3b8' }
+                            : { backgroundColor: '#f8fafc', borderColor: '#e2e8f0', color: '#64748b' })
                     }
                 >
                     <HelpCircle className="w-3.5 h-3.5" />

@@ -246,4 +246,25 @@ class ExamLiveSession extends Model
             'percentage' => $percentage,
         ];
     }
+
+    public static function cleanupStaleSessions()
+    {
+        // 1. Close sessions where UserTimetable is already marked done
+        self::where('is_active', true)
+            ->whereHas('userTimetable', function ($query) {
+                $query->where('status', 'done');
+            })
+            ->update([
+                'is_active' => false,
+                'connection_status' => 'disconnected',
+            ]);
+
+        // 2. Close sessions with no activity in the last 5 minutes
+        self::where('is_active', true)
+            ->where('last_activity', '<', now()->subMinutes(5))
+            ->update([
+                'is_active' => false,
+                'connection_status' => 'timeout',
+            ]);
+    }
 }

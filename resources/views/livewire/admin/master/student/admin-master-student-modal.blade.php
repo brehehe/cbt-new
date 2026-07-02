@@ -190,6 +190,44 @@
                     </div>
                 </div>
 
+                <!-- Jadwal & Ruang Ujian Section -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Jadwal & Ruang Ujian</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="exam_session_id" class="block text-sm font-medium text-gray-700">Sesi Ujian</label>
+                            <select id="exam_session_id" class="mt-1 form-control" wire:model.defer="exam_session_id">
+                                <option value="">Pilih Sesi</option>
+                                @foreach ($examSessions as $id => $name)
+                                    <option value="{{ $id }}">{{ $name }}</option>
+                                @endforeach
+                            </select>
+                            @error('exam_session_id')
+                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="exam_room_id" class="block text-sm font-medium text-gray-700">Ruang Ujian</label>
+                            <select id="exam_room_id" class="mt-1 form-control" wire:model.defer="exam_room_id">
+                                <option value="">Pilih Ruang</option>
+                                @foreach ($examRooms as $id => $name)
+                                    <option value="{{ $id }}">{{ $name }}</option>
+                                @endforeach
+                            </select>
+                            @error('exam_room_id')
+                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="exam_date" class="block text-sm font-medium text-gray-700">Tanggal Ujian</label>
+                            <input id="exam_date" type="date" wire:model.defer="exam_date" class="mt-1 form-control">
+                            @error('exam_date')
+                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Personal Information Section -->
                 <div class="mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Informasi Pribadi</h3>
@@ -487,7 +525,40 @@
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-                <div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label for="exam_session_id_gen" class="block text-sm font-medium text-gray-700">Sesi Ujian</label>
+                        <select id="exam_session_id_gen" class="mt-1 form-control" wire:model.defer="exam_session_id">
+                            <option value="">Pilih Sesi</option>
+                            @foreach ($examSessions as $id => $name)
+                                <option value="{{ $id }}">{{ $name }}</option>
+                            @endforeach
+                        </select>
+                        @error('exam_session_id')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="exam_room_id_gen" class="block text-sm font-medium text-gray-700">Ruang Ujian</label>
+                        <select id="exam_room_id_gen" class="mt-1 form-control" wire:model.defer="exam_room_id">
+                            <option value="">Pilih Ruang</option>
+                            @foreach ($examRooms as $id => $name)
+                                <option value="{{ $id }}">{{ $name }}</option>
+                            @endforeach
+                        </select>
+                        @error('exam_room_id')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="exam_date_gen" class="block text-sm font-medium text-gray-700">Tanggal Ujian</label>
+                        <input id="exam_date_gen" type="date" wire:model.defer="exam_date" class="mt-1 form-control">
+                        @error('exam_date')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+                <div class="mb-4">
                     <label for="address" class="block text-sm font-medium text-gray-700">Alamat Lengkap</label>
                     <textarea id="address" wire:model.defer="address" placeholder="Contoh: Jl. Raya No. 123, RT 01/RW 02"
                         class="mt-1 form-control" rows="3"></textarea>

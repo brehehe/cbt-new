@@ -5,17 +5,19 @@
                 <h1 class="text-2xl font-bold text-[color:var(--primary)]">
                     Nilai Ujian</h1>
             </div>
-            <div class="flex gap-2">
-                <button wire:click="exportPdf" class="btn btn-primary !bg-red-600 !border-red-700 hover:!bg-red-700">
-                    <i class="fa-solid fa-file-pdf mr-2"></i>
-                    Export PDF
-                </button>
-                <button wire:click="exportExcel"
-                    class="btn btn-primary !bg-green-600 !border-green-700 hover:!bg-green-700">
-                    <i class="fa-solid fa-file-excel mr-2"></i>
-                    Export Excel
-                </button>
-            </div>
+            @if(!auth()->user()->hasRole('Pengawas'))
+                <div class="flex gap-2">
+                    <button wire:click="exportPdf" class="btn btn-primary !bg-red-600 !border-red-700 hover:!bg-red-700">
+                        <i class="fa-solid fa-file-pdf mr-2"></i>
+                        Export PDF
+                    </button>
+                    <button wire:click="exportExcel"
+                        class="btn btn-primary !bg-green-600 !border-green-700 hover:!bg-green-700">
+                        <i class="fa-solid fa-file-excel mr-2"></i>
+                        Export Excel
+                    </button>
+                </div>
+            @endif
         </div>
     </div>
     <div class="grid grid-cols-2 gap-4 mb-4">
@@ -136,11 +138,13 @@
                         <th class="w-1 center">No</th>
                         <th>NIM</th>
                         <th>Nama</th>
-                        <th>Terjawab</th>
-                        <th>Tidak Terjawab</th>
-                        <th>Benar</th>
-                        <th>Salah</th>
-                        <th>Nilai</th>
+                        @if(!auth()->user()->hasRole('Pengawas'))
+                            <th>Terjawab</th>
+                            <th>Tidak Terjawab</th>
+                            <th>Benar</th>
+                            <th>Salah</th>
+                            <th>Nilai</th>
+                        @endif
                         <th class="w-1 center">Aksi</th>
                     </tr>
                 </thead>
@@ -151,22 +155,24 @@
                             <td>{{ $userTimetable->user->nim ?? ($userTimetable->user->username ?? '-') }}
                             </td>
                             <td>{{ $userTimetable->user->name ?? '-' }}</td>
-                            <td>{{ $userTimetable->userModuleQuestions->whereNotNull('timetable_answer_id')->count() }}
-                            </td>
-                            <td>{{ $userTimetable->userModuleQuestions->whereNull('timetable_answer_id')->count() }}
-                            </td>
-                            <td><span
-                                    class="px-2 py-1 rounded bg-green-100 text-green-700 font-semibold">{{ $userTimetable->userModuleQuestions->where('status', 'correct')->count() }}</span>
-                            </td>
-                            <td><span
-                                    class="px-2 py-1 rounded bg-red-100 text-red-700 font-semibold">{{ $userTimetable->userModuleQuestions->where('status', 'wrong')->count() }}</span>
-                            </td>
-                            <td>
-                                {{ $userTimetable->mark }}
-                                <span class="ml-2 px-2 py-1 rounded bg-blue-100 text-blue-700 font-semibold">
-                                    {{ $this->getGrade($userTimetable->mark) }}
-                                </span>
-                            </td>
+                            @if(!auth()->user()->hasRole('Pengawas'))
+                                <td>{{ $userTimetable->userModuleQuestions->whereNotNull('timetable_answer_id')->count() }}
+                                </td>
+                                <td>{{ $userTimetable->userModuleQuestions->whereNull('timetable_answer_id')->count() }}
+                                </td>
+                                <td><span
+                                        class="px-2 py-1 rounded bg-green-100 text-green-700 font-semibold">{{ $userTimetable->userModuleQuestions->where('status', 'correct')->count() }}</span>
+                                </td>
+                                <td><span
+                                        class="px-2 py-1 rounded bg-red-100 text-red-700 font-semibold">{{ $userTimetable->userModuleQuestions->where('status', 'wrong')->count() }}</span>
+                                </td>
+                                <td>
+                                    {{ $userTimetable->mark }}
+                                    <span class="ml-2 px-2 py-1 rounded bg-blue-100 text-blue-700 font-semibold">
+                                        {{ $this->getGrade($userTimetable->mark) }}
+                                    </span>
+                                </td>
+                            @endif
                             <td class="center">
                                 <div class="flex items-center">
                                     <button
@@ -179,7 +185,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="no-data">Tidak ada data</td>
+                            <td colspan="{{ auth()->user()->hasRole('Pengawas') ? 4 : 9 }}" class="no-data">Tidak ada data</td>
                         </tr>
                     @endforelse
                 </tbody>

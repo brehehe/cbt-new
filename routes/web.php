@@ -126,19 +126,28 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
 
             try {
                 $activeSessions = 0;
+                $hasRedisSession = false;
                 if ($user->hasRole('Mahasiswa')) {
                     $activeSessions = \Illuminate\Support\Facades\DB::table(config('session.table', 'sessions'))
                         ->where('user_id', $user->id)
                         ->where('last_activity', '>', time() - config('session.lifetime', 120) * 60)
                         ->count();
+
+                    $lastSessionId = \Illuminate\Support\Facades\Cache::get("user_session_{$user->id}");
+                    if ($lastSessionId && $lastSessionId !== session()->getId()) {
+                        $sessionData = \Illuminate\Support\Facades\Session::getHandler()->read($lastSessionId);
+                        if (!empty($sessionData)) {
+                            $hasRedisSession = true;
+                        }
+                    }
                 }
 
-                if ($activeSessions > 0) {
+                if ($activeSessions > 0 || $hasRedisSession) {
                     return response()->json([
                         'hasActiveSession' => true,
                         'activeSessionInfo' => [
                             'username' => $user->username ?? $user->email,
-                            'session_count' => $activeSessions,
+                            'session_count' => max($activeSessions, 1),
                             'last_seen' => 'Baru saja',
                         ]
                     ]);
@@ -245,7 +254,16 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
                         ->where('last_activity', '>', time() - config('session.lifetime', 120) * 60)
                         ->count();
 
-                    if ($activeSessions > 0) {
+                    $lastSessionId = \Illuminate\Support\Facades\Cache::get("user_session_{$user->id}");
+                    $hasRedisSession = false;
+                    if ($lastSessionId && $lastSessionId !== session()->getId()) {
+                        $sessionData = \Illuminate\Support\Facades\Session::getHandler()->read($lastSessionId);
+                        if (!empty($sessionData)) {
+                            $hasRedisSession = true;
+                        }
+                    }
+
+                    if ($activeSessions > 0 || $hasRedisSession) {
                         return response()->json([
                             'success' => false,
                             'message' => 'Akun sudah login di perangkat lain. Silakan logout dari perangkat lain terlebih dahulu atau hubungi administrator.'
@@ -262,6 +280,15 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
             // Clear rate limiter & perform login
             \Illuminate\Support\Facades\RateLimiter::clear($throttleKey);
             \Illuminate\Support\Facades\Auth::login($user, $remember);
+
+            // Store the session ID in cache for single session enforcement
+            if ($user->hasRole('Mahasiswa')) {
+                \Illuminate\Support\Facades\Cache::put(
+                    "user_session_{$user->id}",
+                    session()->getId(),
+                    now()->addMinutes(config('session.lifetime', 120))
+                );
+            }
 
             session()->flash('saved', [
                 'title' => 'Login Berhasil!',

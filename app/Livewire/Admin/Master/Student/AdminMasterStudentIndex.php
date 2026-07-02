@@ -61,6 +61,16 @@ class AdminMasterStudentIndex extends Component
 
     public $password;
 
+    public $exam_session_id;
+
+    public $exam_room_id;
+
+    public $exam_date;
+
+    public $examSessions = [];
+
+    public $examRooms = [];
+
     public $profile;
 
     public $profile_old;
@@ -189,6 +199,8 @@ class AdminMasterStudentIndex extends Component
     public function mount()
     {
         $this->studys = Study::select('id', 'name')->orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
+        $this->examSessions = \App\Models\Master\Exam\ExamSession::where('company_id', auth()->user()->company_id)->orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
+        $this->examRooms = \App\Models\Master\Exam\ExamRoom::where('company_id', auth()->user()->company_id)->orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
     }
 
     public function closeModal()
@@ -249,6 +261,9 @@ class AdminMasterStudentIndex extends Component
             'photo_old',
             'selectedRows',
             'selectAll',
+            'exam_session_id',
+            'exam_room_id',
+            'exam_date',
         ]);
         $this->resetErrorBag();
         $this->resetValidation();
@@ -331,6 +346,11 @@ class AdminMasterStudentIndex extends Component
                 $this->preferred_language = $detail->preferred_language ?? 'id';
                 $this->verification_status = $detail->verification_status ?? 'pending';
                 $this->notes = $detail->notes;
+
+                // Exam Session, Room, and Date
+                $this->exam_session_id = $detail->exam_session_id;
+                $this->exam_room_id = $detail->exam_room_id;
+                $this->exam_date = $detail->exam_date ? \Carbon\Carbon::parse($detail->exam_date)->format('Y-m-d') : null;
 
                 // Company roles
                 $companyRole = $user
@@ -452,6 +472,11 @@ class AdminMasterStudentIndex extends Component
                 'preferred_language' => 'nullable|string|max:10',
                 'verification_status' => 'nullable|in:pending,verified,rejected',
                 'notes' => 'nullable|string|max:1000',
+
+                // Exam session, room, date
+                'exam_session_id' => 'nullable|exists:exam_sessions,id',
+                'exam_room_id' => 'nullable|exists:exam_rooms,id',
+                'exam_date' => 'nullable|date',
             ], [
                 'study_id.required' => 'Program studi wajib diisi.',
             ]);
@@ -503,6 +528,9 @@ class AdminMasterStudentIndex extends Component
                 'study_id' => 'nullable|exists:studies,id',
                 'password' => $this->data_id ? 'nullable|string|min:8' : 'required|string|min:8',
                 'address' => 'nullable|string|max:500',
+                'exam_session_id' => 'nullable|exists:exam_sessions,id',
+                'exam_room_id' => 'nullable|exists:exam_rooms,id',
+                'exam_date' => 'nullable|date',
             ]);
         }
 
@@ -589,6 +617,9 @@ class AdminMasterStudentIndex extends Component
 
                 $userDetailData = [
                     'address' => $this->address,
+                    'exam_session_id' => $this->exam_session_id,
+                    'exam_room_id' => $this->exam_room_id,
+                    'exam_date' => $this->exam_date,
                 ];
 
                 UserDetail::updateOrCreate(
@@ -807,6 +838,9 @@ class AdminMasterStudentIndex extends Component
     {
         $detailData = [
             'address' => $validatedData['address'],
+            'exam_session_id' => $validatedData['exam_session_id'] ?? null,
+            'exam_room_id' => $validatedData['exam_room_id'] ?? null,
+            'exam_date' => $validatedData['exam_date'] ?? null,
 
             // Student Specific Fields
             'student_id' => $validatedData['student_id'] ?? null,
@@ -1134,7 +1168,7 @@ class AdminMasterStudentIndex extends Component
     protected function getUsersQuery()
     {
         $user = User::companyRole('Mahasiswa', Auth::user()->company_id)
-            ->with(['userDetail', 'study'])
+            ->with(['userDetail.examSession', 'userDetail.examRoom', 'study', 'usrSecKey'])
             ->search($this->search)
             ->where('type_user', 'employee')
             ->orderBy('name', 'asc');
