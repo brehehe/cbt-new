@@ -3,11 +3,14 @@
 namespace App\Models\User;
 
 use App\Models\Company\Company;
+use App\Models\Master\Exam\ExamRoom;
+use App\Models\Master\Exam\ExamSession;
 use App\Models\Master\Region\City;
 use App\Models\Master\Region\District;
 use App\Models\Master\Region\Province;
 use App\Models\Master\Region\SubDistrict;
 use App\Models\User;
+use App\Traits\LogsSystemActivity;
 use App\Traits\Region\RegionTrait;
 use Exception;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -20,7 +23,7 @@ use Throwable;
 
 class UserDetail extends Model
 {
-    use \App\Traits\LogsSystemActivity, HasFactory, HasUuids, RegionTrait, SoftDeletes;
+    use HasFactory, HasUuids, LogsSystemActivity, RegionTrait, SoftDeletes;
 
     protected $guarded = ['id'];
 
@@ -29,6 +32,7 @@ class UserDetail extends Model
         'company_id',
         'employee_id',
         'student_id',
+        'nim',
         'lecturer_id',
         'address',
         'postal_code',
@@ -152,12 +156,12 @@ class UserDetail extends Model
 
     public function examSession()
     {
-        return $this->belongsTo(\App\Models\Master\Exam\ExamSession::class, 'exam_session_id');
+        return $this->belongsTo(ExamSession::class, 'exam_session_id');
     }
 
     public function examRoom()
     {
-        return $this->belongsTo(\App\Models\Master\Exam\ExamRoom::class, 'exam_room_id');
+        return $this->belongsTo(ExamRoom::class, 'exam_room_id');
     }
 
     // Scopes

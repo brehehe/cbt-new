@@ -3,9 +3,13 @@
 namespace App\Imports\User;
 
 use App\Helpers\RoleHelper;
+use App\Models\Company\Company;
+use App\Models\Master\Exam\ExamRoom;
+use App\Models\Master\Exam\ExamSession;
 use App\Models\Study\Study;
 use App\Models\User;
 use App\Models\User\UserDetail;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -13,25 +17,40 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class StudentImport implements ToCollection, WithHeadingRow
 {
     protected ?string $typeStudy;
 
-    public function __construct(?string $typeStudy = null)
+    protected ?string $companyId;
+
+    public int $successCount = 0;
+
+    public int $errorCount = 0;
+
+    public array $errors = [];
+
+    public function __construct(?string $typeStudy = null, ?string $companyId = null)
     {
         $this->typeStudy = $typeStudy;
+        $this->companyId = $companyId;
     }
 
     public function collection(Collection $rows)
     {
         try {
-            $currentCompanyId = Auth::user()->company_id;
-            $successCount = 0;
-            $errorCount = 0;
-            $errors = [];
+            $currentCompanyId = $this->companyId ?? (Auth::check() ? Auth::user()->company_id : null);
+            if (empty($currentCompanyId)) {
+                throw new Exception('Company ID is required for student import.');
+            }
+
+            $this->successCount = 0;
+            $this->errorCount = 0;
+            $this->errors = [];
 
             foreach ($rows as $index => $row) {
                 try {
@@ -40,31 +59,59 @@ class StudentImport implements ToCollection, WithHeadingRow
                     $resolvedTypeStudy = $this->typeStudy ?? (! empty($row['type_study']) ? $row['type_study'] : 'general');
 
                     // Validate required fields
-                    if (empty($row['name']) || empty($row['nim']) || empty($row['email'])) {
-                        throw new Exception('Row '.($index + 2).': Name, NIM, and Email are required');
+                    if (empty($row['name']) || empty($row['email'])) {
+                        throw new Exception('Row '.($index + 2).': Name and Email are required');
                     }
 
                     if ($resolvedTypeStudy === 'general' && empty($row['username'])) {
                         throw new Exception('Row '.($index + 2).': Username is required for general');
                     }
 
-                    // Check if user already exists
-                    $existingUser = User::where(function ($query) use ($row) {
-                        $query->where('email', $row['email'])
-                            ->orWhere('nim', $row['nim']);
-                    })
+                    $rowNim = ! empty($row['nim']) ? trim($row['nim']) : null;
+
+                    // Check if user already exists by email
+                    $existingUser = User::where('email', $row['email'])
                         ->where('company_id', $currentCompanyId)
                         ->where('type_user', 'employee')
                         ->first();
 
                     if ($existingUser) {
-                        throw new Exception('Row '.($index + 2).': User with email/NIM already exists');
+                        throw new Exception('Row '.($index + 2).': User with email already exists');
+                    }
+
+                    // Check if user already exists by NIM (if NIM is provided)
+                    if ($rowNim) {
+                        // Check users table
+                        $existingUserByNim = User::where('nim', $rowNim)
+                            ->where('company_id', $currentCompanyId)
+                            ->where('type_user', 'employee')
+                            ->first();
+
+                        if ($existingUserByNim) {
+                            throw new Exception('Row '.($index + 2).': User with NIM '.$rowNim.' already exists in users table');
+                        }
+
+                        // Check user_details table
+                        $existingUserDetailByNim = UserDetail::where('company_id', $currentCompanyId)
+                            ->where(function ($q) use ($rowNim) {
+                                $q->where('nim', $rowNim)
+                                    ->orWhere('student_id', $rowNim);
+                            })
+                            ->first();
+
+                        if ($existingUserDetailByNim) {
+                            throw new Exception('Row '.($index + 2).': User with NIM '.$rowNim.' already exists in user details');
+                        }
                     }
 
                     // Get study_id if program_studi is provided
                     $studyId = null;
                     if (! empty($row['program_studi'])) {
-                        $study = Study::where('name', 'ilike', '%'.$row['program_studi'].'%')->first();
+                        $operator = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+                        $study = Study::withoutGlobalScope('user_scope')
+                            ->where('company_id', $currentCompanyId)
+                            ->where('name', $operator, '%'.$row['program_studi'].'%')
+                            ->first();
                         if ($study) {
                             $studyId = $study->id;
                         }
@@ -77,7 +124,7 @@ class StudentImport implements ToCollection, WithHeadingRow
                     // Create user
                     $user = User::create([
                         'name' => $row['name'],
-                        'nim' => $row['nim'],
+                        'nim' => $rowNim,
                         'username' => $row['username'] ?? null,
                         'email' => $row['email'],
                         'password' => Hash::make($password),
@@ -91,6 +138,9 @@ class StudentImport implements ToCollection, WithHeadingRow
                     // Create user detail
                     $detailData = [
                         'user_id' => $user->id,
+                        'company_id' => $currentCompanyId,
+                        'student_id' => $rowNim,
+                        'nim' => $rowNim,
                         'address' => $row['address'] ?? null,
                         'student_faculty' => $row['faculty'] ?? null,
                         'student_department' => $row['department'] ?? null,
@@ -107,20 +157,20 @@ class StudentImport implements ToCollection, WithHeadingRow
                         }
                     }
 
-                    $company = Auth::user()->company;
+                    $company = Company::find($currentCompanyId);
                     if ($company && $company->import_student_timetable) {
                         $examSessionId = null;
                         $sessionVal = $row['sesi'] ?? $row['sesi_ujian'] ?? $row['exam_session'] ?? null;
                         if (! empty($sessionVal)) {
                             $sessionName = trim($sessionVal);
-                            $session = \App\Models\Master\Exam\ExamSession::where('company_id', $currentCompanyId)
+                            $session = ExamSession::where('company_id', $currentCompanyId)
                                 ->where('name', $sessionName)
                                 ->first();
                             if (! $session) {
-                                $session = \App\Models\Master\Exam\ExamSession::create([
+                                $session = ExamSession::create([
                                     'company_id' => $currentCompanyId,
                                     'name' => $sessionName,
-                                    'code' => strtoupper(\Illuminate\Support\Str::slug($sessionName)),
+                                    'code' => strtoupper(Str::slug($sessionName)),
                                     'is_active' => true,
                                 ]);
                             }
@@ -131,14 +181,14 @@ class StudentImport implements ToCollection, WithHeadingRow
                         $roomVal = $row['ruang'] ?? $row['ruang_ujian'] ?? $row['exam_room'] ?? null;
                         if (! empty($roomVal)) {
                             $roomName = trim($roomVal);
-                            $room = \App\Models\Master\Exam\ExamRoom::where('company_id', $currentCompanyId)
+                            $room = ExamRoom::where('company_id', $currentCompanyId)
                                 ->where('name', $roomName)
                                 ->first();
                             if (! $room) {
-                                $room = \App\Models\Master\Exam\ExamRoom::create([
+                                $room = ExamRoom::create([
                                     'company_id' => $currentCompanyId,
                                     'name' => $roomName,
-                                    'code' => strtoupper(\Illuminate\Support\Str::slug($roomName)),
+                                    'code' => strtoupper(Str::slug($roomName)),
                                 ]);
                             }
                             $examRoomId = $room->id;
@@ -149,19 +199,19 @@ class StudentImport implements ToCollection, WithHeadingRow
                         if (! empty($dateVal)) {
                             try {
                                 if (is_numeric($dateVal)) {
-                                    $examDate = \Carbon\Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($dateVal))->format('Y-m-d');
+                                    $examDate = Carbon::instance(Date::excelToDateTimeObject($dateVal))->format('Y-m-d');
                                 } else {
                                     $dateStr = trim($dateVal);
                                     $normalizedDate = str_replace('-', '/', $dateStr);
                                     if (preg_match('/^\d{1,2}\/\d{1,2}\/\d{2,4}$/', $normalizedDate)) {
                                         $parts = explode('/', $normalizedDate);
                                         if (strlen($parts[2]) === 2) {
-                                            $examDate = \Carbon\Carbon::createFromFormat('d/m/y', $normalizedDate)->format('Y-m-d');
+                                            $examDate = Carbon::createFromFormat('d/m/y', $normalizedDate)->format('Y-m-d');
                                         } else {
-                                            $examDate = \Carbon\Carbon::createFromFormat('d/m/Y', $normalizedDate)->format('Y-m-d');
+                                            $examDate = Carbon::createFromFormat('d/m/Y', $normalizedDate)->format('Y-m-d');
                                         }
                                     } else {
-                                        $examDate = \Carbon\Carbon::parse($dateStr)->format('Y-m-d');
+                                        $examDate = Carbon::parse($dateStr)->format('Y-m-d');
                                     }
                                 }
                             } catch (Exception $e) {
@@ -190,20 +240,20 @@ class StudentImport implements ToCollection, WithHeadingRow
                     );
 
                     DB::commit();
-                    $successCount++;
+                    $this->successCount++;
                 } catch (Exception $e) {
                     DB::rollBack();
-                    $errorCount++;
-                    $errors[] = $e->getMessage();
+                    $this->errorCount++;
+                    $this->errors[] = $e->getMessage();
                     Log::error('Student Import Error: '.$e->getMessage());
                 }
             }
 
             // Log summary
             Log::info('Student Import Completed', [
-                'success' => $successCount,
-                'errors' => $errorCount,
-                'details' => $errors,
+                'success' => $this->successCount,
+                'errors' => $this->errorCount,
+                'details' => $this->errors,
             ]);
         } catch (Exception|\Throwable $th) {
             $error = [
