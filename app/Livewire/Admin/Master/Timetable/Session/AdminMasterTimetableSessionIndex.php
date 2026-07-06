@@ -249,9 +249,10 @@ class AdminMasterTimetableSessionIndex extends Component
             ->where('classmate_id', $classmateId)
             ->when($this->search, function ($q) {
                 $q->whereHas('user', function ($uq) {
-                    $uq->where('name', 'ilike', '%'.$this->search.'%')
-                       ->orWhere('nim', 'ilike', '%'.$this->search.'%')
-                       ->orWhere('username', 'ilike', '%'.$this->search.'%');
+                    $operator = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+                    $uq->where('name', $operator, '%'.$this->search.'%')
+                       ->orWhere('nim', $operator, '%'.$this->search.'%')
+                       ->orWhere('username', $operator, '%'.$this->search.'%');
                 });
             })
             ->when($this->filterStatus !== 'all', function ($q) {

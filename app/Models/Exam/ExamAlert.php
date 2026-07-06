@@ -49,7 +49,7 @@ class ExamAlert extends Model
         $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id', 'user_timetable_id', 'timetable_id', 'description'], 'ILIKE', $term);
+            $query->whereAny(['company_id', 'user_timetable_id', 'timetable_id', 'description'], 'like', $term);
         });
     }
 

@@ -49,7 +49,7 @@ class ExamRoom extends Model
         $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id', 'name', 'code', 'description'], 'ILIKE', $term);
+            $query->whereAny(['company_id', 'name', 'code', 'description'], 'like', $term);
         });
     }
 

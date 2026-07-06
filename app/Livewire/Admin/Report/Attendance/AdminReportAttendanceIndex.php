@@ -29,9 +29,9 @@ class AdminReportAttendanceIndex extends Component
 
         if ($this->search) {
             $query->where(function ($q) {
-                $q->where('name', 'ilike', '%'.$this->search.'%')
+                $q->where('name', 'like', '%'.$this->search.'%')
                     ->orWhereHas('module', function ($q) {
-                        $q->where('name', 'ilike', '%'.$this->search.'%');
+                        $q->where('name', 'like', '%'.$this->search.'%');
                     });
             });
         }

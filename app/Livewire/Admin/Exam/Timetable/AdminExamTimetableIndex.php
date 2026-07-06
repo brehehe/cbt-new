@@ -392,8 +392,8 @@ class AdminExamTimetableIndex extends Component
             // ->whereNotNull('code')
             ->when($this->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('name', 'ilike', '%'.$search.'%')
-                        ->orWhere('description', 'ilike', '%'.$search.'%');
+                    $q->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('description', 'like', '%'.$search.'%');
                 });
             })
             ->where('is_simulation', 'false')
@@ -409,7 +409,7 @@ class AdminExamTimetableIndex extends Component
 
         //     $timetables->where(function ($query) use ($auth) {
         //         $query->whereNull('studys')
-        //             ->orWhere('studys', 'ILIKE', '%\\\"' . $auth->study_id . '\\\"%');
+        //             ->orWhere('studys', 'like', '%\\\"' . $auth->study_id . '\\\"%');
         //     });
         // }
 

@@ -105,7 +105,7 @@ class AdminMasterRegulationIndex extends Component
     {
         $regulation = Regulation::query()
             ->when($this->search, function ($query, $search) {
-                $query->where('description', 'ilike', '%'.$search.'%');
+                $query->where('description', 'like', '%'.$search.'%');
             })
             ->orderBy('order', 'asc')
             ->get();

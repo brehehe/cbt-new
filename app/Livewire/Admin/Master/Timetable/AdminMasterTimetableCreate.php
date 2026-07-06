@@ -44,7 +44,13 @@ class AdminMasterTimetableCreate extends Component
     public function mount()
     {
         $this->modules = Module::whereNotNull('category_question_settings')
-            ->whereRaw("category_question_settings <> '{}'::jsonb")
+            ->where(function ($query) {
+                if (DB::getDriverName() === 'pgsql') {
+                    $query->whereRaw("category_question_settings <> '{}'::jsonb");
+                } else {
+                    $query->whereRaw("category_question_settings <> '{}'");
+                }
+            })
             ->pluck('name', 'id')
             ->toArray();
         $this->getSupervisors = User::companyRole('Pengawas', Auth::user()->company_id)

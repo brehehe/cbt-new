@@ -511,11 +511,11 @@ class AdminMasterLecturerIndex extends Component
             ->with(['userDetail'])
             ->whereHas('userDetail', function ($q) {
                 if ($this->search) {
-                    $q->where('lecturer_id', 'ilike', '%'.$this->search.'%')
-                        ->orWhere('lecturer_nidn', 'ilike', '%'.$this->search.'%')
+                    $q->where('lecturer_id', 'like', '%'.$this->search.'%')
+                        ->orWhere('lecturer_nidn', 'like', '%'.$this->search.'%')
                         ->orWhereHas('user', function ($userQuery) {
-                            $userQuery->where('name', 'ilike', '%'.$this->search.'%')
-                                ->orWhere('email', 'ilike', '%'.$this->search.'%');
+                            $userQuery->where('name', 'like', '%'.$this->search.'%')
+                                ->orWhere('email', 'like', '%'.$this->search.'%');
                         });
                 }
 
