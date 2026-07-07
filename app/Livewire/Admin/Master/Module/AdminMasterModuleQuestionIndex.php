@@ -137,8 +137,11 @@ class AdminMasterModuleQuestionIndex extends Component
         if ($this->openQuestion) {
             $moduleId = $this->get_module?->id;
             $questionsQuery = Question::with(['topic', 'study', 'categoryQuestion', 'questionType'])
-                ->select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect', 'study_id', 'difficulty', 'category_question_id', 'type')
-                ->whereIn('study_id', $this->get_studys ? array_keys($this->get_studys) : []);
+                ->select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect', 'study_id', 'difficulty', 'category_question_id', 'type');
+
+            if (Auth::user()?->hasRole('Dosen')) {
+                $questionsQuery->whereIn('study_id', $this->get_studys ? array_keys($this->get_studys) : []);
+            }
 
             if ($moduleId) {
                 $questionsQuery->whereNotIn('id', function ($query) use ($moduleId, $questionPickType) {
@@ -251,7 +254,7 @@ class AdminMasterModuleQuestionIndex extends Component
                 ->pluck('name', 'id')
                 ->toArray();
         } else {
-            $this->get_studys = Study::whereIn('id', $this->studys)->orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
+            $this->get_studys = Study::orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
         }
 
         $this->question_types = QuestionType::select('id', 'name')->get();
