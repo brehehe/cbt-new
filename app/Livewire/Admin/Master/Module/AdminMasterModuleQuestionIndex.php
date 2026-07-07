@@ -853,10 +853,6 @@ class AdminMasterModuleQuestionIndex extends Component
             ->select('category_question_id', DB::raw("COALESCE(difficulty, 'default') as difficulty"), DB::raw('count(*) as total'))
             ->whereNotNull('category_question_id');
 
-        if ($this->question_type_id) {
-            $query->where('question_type_id', $this->question_type_id);
-        }
-
         $rows = $query->groupBy('category_question_id', DB::raw("COALESCE(difficulty, 'default')"))->get();
 
         foreach ($rows as $row) {
@@ -888,10 +884,6 @@ class AdminMasterModuleQuestionIndex extends Component
         $query = Question::withoutGlobalScope('user_scope')
             ->select('topic_id', DB::raw("COALESCE(difficulty, 'default') as difficulty"), DB::raw('count(*) as total'))
             ->whereNotNull('topic_id');
-
-        if ($this->question_type_id) {
-            $query->where('question_type_id', $this->question_type_id);
-        }
 
         $rows = $query->groupBy('topic_id', DB::raw("COALESCE(difficulty, 'default')"))->get();
 
@@ -979,10 +971,6 @@ class AdminMasterModuleQuestionIndex extends Component
         $query = Question::withoutGlobalScope('user_scope')
             ->select('material_category_id', DB::raw("COALESCE(difficulty, 'default') as difficulty"), DB::raw('count(*) as total'))
             ->whereNotNull('material_category_id');
-
-        if ($this->question_type_id) {
-            $query->where('question_type_id', $this->question_type_id);
-        }
 
         $rows = $query->groupBy('material_category_id', DB::raw("COALESCE(difficulty, 'default')"))->get();
 

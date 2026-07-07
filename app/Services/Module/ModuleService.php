@@ -86,7 +86,6 @@ class ModuleService
         $query = Question::withoutGlobalScope('user_scope');
         if ($module->is_all_questions) {
             $query->where('company_id', $companyId)
-                ->where('question_type_id', $module->question_type_id)
                 ->whereNotNull('material_category_id');
             $targetQuestions = $query->get(['id', 'study_id']);
         } else {
@@ -108,10 +107,6 @@ class ModuleService
                         });
                     } else {
                         $subQuery->where('difficulty', $difficulty);
-                    }
-
-                    if ($module->question_type_id) {
-                        $subQuery->where('question_type_id', $module->question_type_id);
                     }
 
                     $questions = $subQuery->orderBy('order', 'asc')
@@ -181,7 +176,6 @@ class ModuleService
         $query = Question::withoutGlobalScope('user_scope');
         if ($module->is_all_questions) {
             $query->where('company_id', $companyId)
-                ->where('question_type_id', $module->question_type_id)
                 ->whereNotNull('category_question_id');
             $targetQuestions = $query->get(['id', 'study_id']);
         } else {
@@ -203,10 +197,6 @@ class ModuleService
                         });
                     } else {
                         $subQuery->where('difficulty', $difficulty);
-                    }
-
-                    if ($module->question_type_id) {
-                        $subQuery->where('question_type_id', $module->question_type_id);
                     }
 
                     $questions = $subQuery->orderBy('order', 'asc')
@@ -276,7 +266,6 @@ class ModuleService
         $query = Question::withoutGlobalScope('user_scope');
         if ($module->is_all_questions) {
             $query->where('company_id', $companyId)
-                ->where('question_type_id', $module->question_type_id)
                 ->whereNotNull('topic_id');
             $targetQuestions = $query->get(['id', 'study_id']);
         } else {
@@ -298,10 +287,6 @@ class ModuleService
                         });
                     } else {
                         $subQuery->where('difficulty', $difficulty);
-                    }
-
-                    if ($module->question_type_id) {
-                        $subQuery->where('question_type_id', $module->question_type_id);
                     }
 
                     $questions = $subQuery->orderBy('order', 'asc')
