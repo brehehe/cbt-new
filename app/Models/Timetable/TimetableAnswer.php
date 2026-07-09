@@ -67,7 +67,7 @@ class TimetableAnswer extends Model
         $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id'], 'like', $term);
+            $query->whereAny(['company_id'], 'ilike', $term);
         });
     }
 }

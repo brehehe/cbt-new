@@ -50,7 +50,7 @@ class Topic extends Model
         $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id', 'name', 'description'], 'like', $term);
+            $query->whereAny(['company_id', 'name', 'description'], 'ilike', $term);
         });
     }
 

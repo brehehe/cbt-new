@@ -60,7 +60,7 @@ class Module extends Model
         $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id', 'name', 'duration', 'description', 'random_question'], 'like', $term);
+            $query->whereAny(['company_id', 'name', 'duration', 'description', 'random_question'], 'ilike', $term);
         });
     }
 

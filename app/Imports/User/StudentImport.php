@@ -107,7 +107,7 @@ class StudentImport implements ToCollection, WithHeadingRow
                     // Get study_id if program_studi is provided
                     $studyId = null;
                     if (! empty($row['program_studi'])) {
-                        $operator = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+                        $operator = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'ilike';
                         $study = Study::withoutGlobalScope('user_scope')
                             ->where('company_id', $currentCompanyId)
                             ->where('name', $operator, '%'.$row['program_studi'].'%')

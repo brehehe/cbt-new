@@ -113,8 +113,8 @@ class AdminMasterStudyIndex extends Component
     public function render()
     {
         $studies = Study::query()
-            ->where('name', 'like', '%'.$this->search.'%')
-            ->orWhere('description', 'like', '%'.$this->search.'%')
+            ->where('name', 'ilike', '%'.$this->search.'%')
+            ->orWhere('description', 'ilike', '%'.$this->search.'%')
             ->orderBy('created_at', 'desc')
             ->paginate($this->perPage);
 

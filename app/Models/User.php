@@ -272,7 +272,7 @@ class User extends Authenticatable
 
     public function scopeSearch($query, $search)
     {
-        $operator = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+        $operator = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'ilike';
 
         return $query->where(function ($q) use ($search, $operator) {
             $q->where('name', $operator, "%{$search}%")

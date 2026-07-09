@@ -88,19 +88,19 @@ class AdminMasterModuleIndex extends Component
 
         $filteredCategoryQuestions = CategoryQuestion::select('id', 'name')
             ->when($this->searchCategory, function ($query) {
-                $query->where('name', 'like', '%' . $this->searchCategory . '%');
+                $query->where('name', 'ilike', '%' . $this->searchCategory . '%');
             })
             ->get();
 
         $filteredTopics = Topic::select('id', 'name')
             ->when($this->searchTopic, function ($query) {
-                $query->where('name', 'like', '%' . $this->searchTopic . '%');
+                $query->where('name', 'ilike', '%' . $this->searchTopic . '%');
             })
             ->get();
 
         $filteredMaterialCategories = \App\Models\Master\Question\MaterialCategory::select('id', 'name', 'topic_id')
             ->when($this->searchMaterialCategory, function ($query) {
-                $query->where('name', 'like', '%' . $this->searchMaterialCategory . '%');
+                $query->where('name', 'ilike', '%' . $this->searchMaterialCategory . '%');
             })
             ->when($this->filterMaterialCategoryTopicId, function ($query) {
                 $query->where('topic_id', $this->filterMaterialCategoryTopicId);
