@@ -55,59 +55,223 @@
                         <table class="w-full table-auto divide-y divide-gray-200">
                             <thead class="bg-gray-50 sticky top-0 z-10">
                                 <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">No</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prodi</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipe Ujian</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tingkat Kesulitan</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jenis Soal</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pertanyaan</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi</th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-16">Pilih</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pertanyaan & Pilihan Jawaban</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Deskripsi / Petunjuk</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @forelse($questions->groupBy('topic.name') as $topicName => $topicQuestions)
                                     <tr class="bg-gray-50">
-                                        <td colspan="8"
-                                            class="px-4 py-2 text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                        <td colspan="3"
+                                            class="px-4 py-2.5 text-xs font-bold text-gray-700 uppercase tracking-wider border-y">
                                             <div class="flex items-center justify-between">
-                                                <span>Topik: {{ $topicName ?? 'Tanpa Topik' }}</span>
-                                                <span class="text-[11px] text-gray-500">{{ $topicQuestions->count() }}
-                                                    soal</span>
+                                                <span class="flex items-center gap-1.5 text-slate-700">
+                                                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
+                                                    Topik: {{ $topicName ?? 'Tanpa Topik' }}
+                                                </span>
+                                                <span class="px-2 py-0.5 rounded-md bg-gray-250 text-[10px] text-gray-600 font-medium">
+                                                    {{ $topicQuestions->count() }} Soal
+                                                </span>
                                             </div>
                                         </td>
                                     </tr>
                                     @foreach($topicQuestions as $index => $result)
-                                        <tr class="hover:bg-gray-50 cursor-pointer {{ $selected_all[$result->id] ?? false ? 'bg-yellow-100' : '' }}"
+                                        @php
+                                            $isSelected = $selected_all[$result->id] ?? false;
+                                        @endphp
+                                        <tr class="hover:bg-slate-50 transition-colors cursor-pointer {{ $isSelected ? 'bg-blue-50/60 border-l-4 border-blue-500' : '' }}"
                                             wire:click="choiceQuestion('{{ $result->id }}')">
-                                            <td class="px-4 py-3 text-sm text-gray-900">
-                                                {{ $questions->firstItem() + $loop->parent->index + $index }}
+                                            
+                                            <!-- Checkbox & Number Column -->
+                                            <td class="px-4 py-4 text-center align-top whitespace-nowrap">
+                                                <div class="flex flex-col items-center justify-center gap-2">
+                                                    <input type="checkbox" 
+                                                        class="form-checkbox h-4.5 w-4.5 text-blue-600 border-gray-350 rounded focus:ring-blue-500 cursor-pointer transition"
+                                                        {{ $isSelected ? 'checked' : '' }}
+                                                        wire:click.stop="choiceQuestion('{{ $result->id }}')">
+                                                    <span class="text-xs font-semibold text-gray-400">
+                                                        #{{ $questions->firstItem() + $loop->parent->index + $index }}
+                                                    </span>
+                                                </div>
                                             </td>
-                                            <td class="px-4 py-3 text-sm text-gray-900">{{ $result?->study?->name ?? '-' }}</td>
-                                            <td class="px-4 py-3 text-sm text-gray-900">{{ $result?->categoryQuestion?->name ?? '-' }}</td>
-                                            <td class="px-4 py-3 text-sm text-gray-900">{{ $result?->questionType?->name ?? '-' }}</td>
-                                            <td class="px-4 py-3 text-sm text-gray-900">
-                                                @if($result->difficulty == 'easy')
-                                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Easy</span>
-                                                @elseif($result->difficulty == 'medium')
-                                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Medium</span>
-                                                @elseif($result->difficulty == 'hard')
-                                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Hard</span>
+
+                                            <!-- Question, Metadata & Answers Column -->
+                                            <td class="px-6 py-4 align-top">
+                                                <div class="flex flex-col gap-3">
+                                                    
+                                                    <!-- Badges Metadata Row -->
+                                                    <div class="flex flex-wrap gap-1.5 items-center">
+                                                        @if($result?->study?->name)
+                                                            <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-semibold border border-slate-200/50">
+                                                                Prodi: {{ $result->study->name }}
+                                                            </span>
+                                                        @endif
+                                                        @if($result?->categoryQuestion?->name)
+                                                            <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-semibold border border-slate-200/50">
+                                                                Kat: {{ $result->categoryQuestion->name }}
+                                                            </span>
+                                                        @endif
+                                                        @if($result?->questionType?->name)
+                                                            <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-semibold border border-slate-200/50">
+                                                                Tipe: {{ $result->questionType->name }}
+                                                            </span>
+                                                        @endif
+                                                        
+                                                        <!-- Difficulty Badge -->
+                                                        @if($result->difficulty == 'easy')
+                                                            <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200/60 uppercase">Easy</span>
+                                                        @elseif($result->difficulty == 'medium')
+                                                            <span class="px-2 py-0.5 rounded bg-amber-50 text-amber-700 text-[10px] font-bold border border-amber-200/60 uppercase">Medium</span>
+                                                        @elseif($result->difficulty == 'hard')
+                                                            <span class="px-2 py-0.5 rounded bg-rose-50 text-rose-700 text-[10px] font-bold border border-rose-200/60 uppercase">Hard</span>
+                                                        @else
+                                                            <span class="px-2 py-0.5 rounded bg-gray-50 text-gray-600 text-[10px] font-bold border border-gray-200/60 uppercase">Default</span>
+                                                        @endif
+
+                                                        <!-- Question Type Badges -->
+                                                        @if(($result->type ?? 'single') == 'single')
+                                                            <span class="px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-[10px] font-bold border border-blue-200/60">Pilihan Ganda</span>
+                                                        @elseif($result->type == 'multiple')
+                                                            <span class="px-2 py-0.5 rounded bg-purple-50 text-purple-700 text-[10px] font-bold border border-purple-200/60">Pilihan Ganda Kompleks</span>
+                                                        @else
+                                                            <span class="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 text-[10px] font-bold border border-indigo-200/60">Essay</span>
+                                                        @endif
+                                                    </div>
+
+                                                    <!-- Question Text -->
+                                                    <div class="rich-content text-sm text-gray-800 font-medium leading-relaxed mt-1">
+                                                        {!! $result?->question !!}
+                                                    </div>
+
+                                                    <!-- Question Images/Files -->
+                                                    @php
+                                                        $qImages = is_array($result->images) ? $result->images : json_decode($result->images, true);
+                                                    @endphp
+                                                    @if (!empty($qImages) && collect($qImages)->isNotEmpty())
+                                                        <div class="mt-2 flex flex-wrap gap-2">
+                                                            @foreach ($qImages as $image)
+                                                                @php
+                                                                    $isUrl = Str::startsWith($image, ['http://', 'https://']);
+                                                                    $src = $isUrl ? $image : asset('storage/' . ltrim($image, '/'));
+                                                                @endphp
+                                                                <div class="overflow-hidden rounded-lg border border-gray-100 shadow-sm bg-white p-1">
+                                                                    @if(preg_match('/\.(mp4|mov|avi|wmv|webm)$/i', $image))
+                                                                        <video src="{{ $src }}" class="max-h-[140px] max-w-[200px] object-contain" controls></video>
+                                                                    @elseif(preg_match('/\.(mp3|wav|ogg|m4a)$/i', $image))
+                                                                        <audio src="{{ $src }}" class="w-[200px] object-contain" controls></audio>
+                                                                    @elseif(preg_match('/\.(pdf)$/i', $image))
+                                                                        <div class="flex flex-col items-center justify-center gap-1 p-2 text-center h-[120px] w-[160px] bg-slate-50 border rounded">
+                                                                            <i class="fa-solid fa-file-pdf text-2xl text-red-500"></i>
+                                                                            <a href="{{ $src }}" target="_blank" class="text-[10px] text-blue-500 underline break-all font-medium">Lihat PDF</a>
+                                                                        </div>
+                                                                    @elseif(preg_match('/\.(docx?|xlsx?|txt|zip|rar)$/i', $image))
+                                                                        <div class="flex flex-col items-center justify-center gap-1 p-2 text-center h-[120px] w-[160px] bg-slate-50 border rounded">
+                                                                            <i class="fa-solid fa-file text-2xl text-blue-500"></i>
+                                                                            <a href="{{ $src }}" target="_blank" class="text-[10px] text-blue-500 underline break-all font-medium">Unduh Dokumen</a>
+                                                                        </div>
+                                                                    @else
+                                                                        <img src="{{ $src }}" alt="Gambar soal"
+                                                                            class="object-contain"
+                                                                            style="max-width: 200px; max-height: 140px;">
+                                                                    @endif
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    @endif
+
+                                                    <!-- Answer Options List -->
+                                                    <div class="mt-2 space-y-2 border-t border-dashed border-gray-100 pt-3">
+                                                        @if($result->type !== 'essay' && $result->answers->isNotEmpty())
+                                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                                @foreach($result->answers->sortBy('alphabet') as $answer)
+                                                                    <div class="flex items-start gap-2.5 p-2 rounded-lg transition border {{ $answer->is_correct ? 'bg-emerald-50/80 border-emerald-200 text-emerald-900 shadow-sm font-medium' : 'bg-gray-50/50 border-gray-100 text-gray-700' }}">
+                                                                        <span class="inline-flex items-center justify-center w-5 h-5 rounded-full {{ $answer->is_correct ? 'bg-emerald-600 text-white' : 'bg-gray-200 text-gray-700' }} font-bold text-[10px] shrink-0 mt-0.5">
+                                                                            {{ $answer->alphabet }}
+                                                                        </span>
+                                                                        <div class="rich-content text-xs leading-relaxed flex-1">
+                                                                            {!! $answer->context !!}
+                                                                            
+                                                                            <!-- Answer Option Images -->
+                                                                            @php
+                                                                                $ansImages = is_array($answer->images) ? $answer->images : json_decode($answer->images, true);
+                                                                            @endphp
+                                                                            @if(!empty($ansImages) && collect($ansImages)->isNotEmpty())
+                                                                                <div class="mt-1.5 flex flex-wrap gap-1.5">
+                                                                                    @foreach($ansImages as $ansImg)
+                                                                                        @php
+                                                                                            $isUrl = Str::startsWith($ansImg, ['http://', 'https://']);
+                                                                                            $src = $isUrl ? $ansImg : asset('storage/' . ltrim($ansImg, '/'));
+                                                                                        @endphp
+                                                                                        <div class="overflow-hidden rounded border border-gray-100 bg-white p-0.5">
+                                                                                            @if(preg_match('/\.(mp4|mov|avi|wmv|webm)$/i', $ansImg))
+                                                                                                <video src="{{ $src }}" class="max-h-[80px] max-w-[120px] object-contain" controls></video>
+                                                                                            @elseif(preg_match('/\.(mp3|wav|ogg|m4a)$/i', $ansImg))
+                                                                                                <audio src="{{ $src }}" class="w-[120px] object-contain" controls></audio>
+                                                                                            @elseif(preg_match('/\.(pdf)$/i', $ansImg))
+                                                                                                <div class="flex flex-col items-center justify-center p-1 text-center h-[70px] w-[100px] bg-slate-50 border rounded text-[8px]">
+                                                                                                    <i class="fa-solid fa-file-pdf text-red-500 text-lg"></i>
+                                                                                                    <a href="{{ $src }}" target="_blank" class="text-blue-500 underline break-all font-medium">PDF</a>
+                                                                                                </div>
+                                                                                            @elseif(preg_match('/\.(docx?|xlsx?|txt|zip|rar)$/i', $ansImg))
+                                                                                                <div class="flex flex-col items-center justify-center p-1 text-center h-[70px] w-[100px] bg-slate-50 border rounded text-[8px]">
+                                                                                                    <i class="fa-solid fa-file text-blue-500 text-lg"></i>
+                                                                                                    <a href="{{ $src }}" target="_blank" class="text-blue-500 underline break-all font-medium">Doc</a>
+                                                                                                </div>
+                                                                                            @else
+                                                                                                <img src="{{ $src }}" alt="Gambar opsi"
+                                                                                                    class="object-contain"
+                                                                                                    style="max-width: 120px; max-height: 80px;">
+                                                                                            @endif
+                                                                                        </div>
+                                                                                    @endforeach
+                                                                                </div>
+                                                                            @endif
+                                                                        </div>
+                                                                        @if($answer->is_correct)
+                                                                            <span class="shrink-0 text-emerald-600 self-center">
+                                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                                                </svg>
+                                                                            </span>
+                                                                        @endif
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
+                                                        @elseif($result->type === 'essay')
+                                                            @php
+                                                                $essayAnswer = $result->answers->where('is_correct', true)->first();
+                                                            @endphp
+                                                            @if($essayAnswer && !empty(trim(strip_tags($essayAnswer->context))))
+                                                                <div class="text-xs text-emerald-950 bg-emerald-50/70 p-3 rounded-lg border border-emerald-100">
+                                                                    <span class="font-bold flex items-center gap-1.5 text-emerald-800 mb-1">
+                                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                        </svg>
+                                                                        Referensi Jawaban Utama:
+                                                                    </span>
+                                                                    <div class="rich-content leading-relaxed mt-1 pl-5">
+                                                                        {!! $essayAnswer->context !!}
+                                                                    </div>
+                                                                </div>
+                                                            @endif
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <!-- Description Column -->
+                                            <td class="px-4 py-4 align-top text-xs text-gray-500">
+                                                @if(!empty(trim(strip_tags($result?->description))))
+                                                    <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100 max-h-40 overflow-y-auto rich-content leading-relaxed">
+                                                        {!! $result?->description !!}
+                                                    </div>
                                                 @else
-                                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Default</span>
+                                                    <span class="text-gray-300 italic">Tidak ada deskripsi</span>
                                                 @endif
                                             </td>
-                                            <td class="px-4 py-3 text-sm text-gray-900">
-                                                @if(($result->type ?? 'single') == 'single')
-                                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">PG</span>
-                                                @elseif($result->type == 'multiple')
-                                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">Multiple</span>
-                                                @else
-                                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">Essay</span>
-                                                @endif
-                                            </td>
-                                            <td class="px-4 py-3 text-sm text-gray-900"><div class="rich-content">{!! $result?->question !!}</div></td>
-                                            <td class="px-4 py-3 text-sm text-gray-900 text-xs text-gray-500">{!! Str::limit(strip_tags($result?->description), 50) !!}</td>
                                         </tr>
                                     @endforeach
                                 @empty

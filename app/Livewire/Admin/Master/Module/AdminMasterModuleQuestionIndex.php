@@ -111,7 +111,7 @@ class AdminMasterModuleQuestionIndex extends Component
         if ($this->get_module) {
             $moduleQuestionsQuery = $this->get_module->moduleQuestions()
                 ->with(['question.study', 'question.questionType'])
-                ->select('id', 'module_id', 'question_id', 'study_id');
+                ->select('id', 'module_id', 'question_id', 'study_id', 'order');
 
             if ($questionPickType === 'manual') {
                 $moduleQuestionsQuery->where(function ($q) {
@@ -129,15 +129,15 @@ class AdminMasterModuleQuestionIndex extends Component
             }
 
             $module_questions = $moduleQuestionsQuery
-                ->orderBy('id', 'desc')
+                ->orderBy('order', 'asc')
                 ->paginate($this->perPageModule, ['*'], 'module_questions_page');
         }
 
         $questions = [];
         if ($this->openQuestion) {
             $moduleId = $this->get_module?->id;
-            $questionsQuery = Question::with(['topic', 'study', 'categoryQuestion', 'questionType'])
-                ->select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect', 'study_id', 'difficulty', 'category_question_id', 'type');
+            $questionsQuery = Question::with(['topic', 'study', 'categoryQuestion', 'questionType', 'answers'])
+                ->select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect', 'study_id', 'difficulty', 'category_question_id', 'type', 'images');
 
             if (Auth::user()?->hasRole('Dosen')) {
                 $questionsQuery->whereIn('study_id', $this->get_studys ? array_keys($this->get_studys) : []);
@@ -685,6 +685,7 @@ class AdminMasterModuleQuestionIndex extends Component
         // Get all module questions with their question, study, topic, category, answers
         $moduleQuestions = $this->get_module->moduleQuestions()
             ->with(['question.study', 'question.topic', 'question.categoryQuestion', 'question.answers'])
+            ->orderBy('order', 'asc')
             ->get();
 
         $questions = $moduleQuestions->map(fn ($mq) => $mq->question)->filter();
