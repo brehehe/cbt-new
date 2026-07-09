@@ -95,7 +95,10 @@ class Question extends Model
         $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id', 'question', 'description'], 'ilike', $term);
+            $query->whereAny(['company_id', 'question', 'description'], 'ilike', $term)
+                ->orWhereHas('answers', function ($q) use ($term) {
+                    $q->where('context', 'ilike', $term);
+                });
         });
     }
 
