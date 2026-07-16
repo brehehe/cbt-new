@@ -1,4 +1,7 @@
 <div>
+    @if($autoRefresh)
+        <div wire:poll.10s="$refresh"></div>
+    @endif
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
@@ -44,6 +47,13 @@
                         placeholder="Cari Sesuatu..." wire:model.live='search'>
                 </div>
             </div>
+
+            <!-- Manual Refresh -->
+            <button wire:click="$refresh" wire:loading.attr="disabled"
+                class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 transition-colors">
+                <i class="fa-solid fa-arrows-rotate" wire:loading.class="animate-spin" wire:target="$refresh"></i>
+                <span>Refresh</span>
+            </button>
 
             <!-- Download Excel -->
             <button wire:click="exportExcel" wire:loading.attr="disabled"

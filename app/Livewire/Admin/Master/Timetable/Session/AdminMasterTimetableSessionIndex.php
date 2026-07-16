@@ -30,6 +30,8 @@ class AdminMasterTimetableSessionIndex extends Component
 
     public $filterStatus = 'all'; // all, active, disconnected
 
+    public $autoRefresh = false;
+
     protected $listeners = [
         'terminateSession',
         'suspendSession',
