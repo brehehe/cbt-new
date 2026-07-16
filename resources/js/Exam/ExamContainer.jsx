@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import {
     AlertTriangle, Clock, Loader2, Shield, Menu, X
@@ -104,10 +104,20 @@ const ExamContainer = ({ userTimetableId, defaultCompanyColor = '#1e3a5f' }) => 
     const [saveStatus, setSaveStatus] = useState('saved');
     const [lastSaved, setLastSaved] = useState('');
 
+    const handleTimeSync = useCallback((serverRemainingTime) => {
+        setRemainingTime(prev => {
+            // Jika selisihnya lebih dari 10 detik, update waktu lokal agar sinkron dengan server
+            if (Math.abs(prev - serverRemainingTime) > 10) {
+                return serverRemainingTime;
+            }
+            return prev;
+        });
+    }, []);
+
     // Hooks
     const { isRecording, stopRecording } = useExamRecording(userTimetableId, examData?.isRecordingEnabled, cameraStream);
     const { isBlackout } = useProctoring(userTimetableId, (count) => setAlertCount(count));
-    const { connectionStatus } = useLiveSession(userTimetableId, examData?.isStreamingEnabled, cameraStream);
+    const { connectionStatus } = useLiveSession(userTimetableId, examData?.isStreamingEnabled, cameraStream, handleTimeSync);
 
     const handleFinishExam = async (isAuto = false) => {
         if (isAuto === true) {

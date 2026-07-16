@@ -15,7 +15,7 @@ axios.interceptors.response.use(
     }
 );
 
-export const useLiveSession = (userTimetableId, isEnabled, sharedStream) => {
+export const useLiveSession = (userTimetableId, isEnabled, sharedStream, onTimeSync) => {
     const [connectionStatus, setConnectionStatus] = useState('disconnected');
 
     const connectToLiveKit = useCallback(async () => {
@@ -103,6 +103,8 @@ export const useLiveSession = (userTimetableId, isEnabled, sharedStream) => {
                 if (statusRes.data?.redirect) {
                     window.isFinishingExam = true;
                     window.location.href = statusRes.data.redirect;
+                } else if (statusRes.data?.remainingTime !== undefined && onTimeSync) {
+                    onTimeSync(statusRes.data.remainingTime);
                 }
             } catch (error) {
                 // 401 dari /ping ditangani interceptor → redirect /login
@@ -111,7 +113,7 @@ export const useLiveSession = (userTimetableId, isEnabled, sharedStream) => {
         }, 8000); // setiap 8 detik
 
         return () => clearInterval(checkSession);
-    }, [userTimetableId]);
+    }, [userTimetableId, onTimeSync]);
 
     useEffect(() => {
         let roomInstance;

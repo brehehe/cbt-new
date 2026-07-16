@@ -54,9 +54,10 @@ class CheckUserTimetable
                 $startTime = Carbon::parse($userTimetable->start_exam);
                 $duration = $userTimetable->timetable->module->duration ?? 60;
                 $pauseSeconds = (int) ($userTimetable->pause_total_seconds ?? 0);
+                $additionalSeconds = (int) ($userTimetable->additional_time_seconds ?? 0);
 
                 // Add a small buffer (e.g., 30 seconds) to account for network latency
-                $endTime = $startTime->addMinutes($duration)->addSeconds($pauseSeconds)->addSeconds(30);
+                $endTime = $startTime->addMinutes($duration)->addSeconds($pauseSeconds)->addSeconds($additionalSeconds)->addSeconds(30);
 
                 if (now()->greaterThan($endTime)) {
                     // Time expired - Finalize Exam Logic

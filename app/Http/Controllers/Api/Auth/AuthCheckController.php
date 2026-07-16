@@ -42,7 +42,9 @@ class AuthCheckController extends Controller
     {
         $userId = Auth::id();
 
-        $userTimetable = UserTimetable::where('id', $userTimetableId)
+        $userTimetable = UserTimetable::withoutGlobalScopes()
+            ->with(['timetable.module'])
+            ->where('id', $userTimetableId)
             ->where('user_id', $userId)
             ->first();
 
@@ -53,10 +55,13 @@ class AuthCheckController extends Controller
         // yang akan mengembalikan 401. Di sini kita hanya cek status ujian di DB.
         $shouldRedirect = $isSuspended;
 
+        $remainingTime = $userTimetable ? $userTimetable->getRemainingTime() : 0;
+
         return response()->json([
             'active' => true, // Default true selama session masih ada (auth middleware pass)
             'suspended' => $isSuspended,
             'redirect' => $shouldRedirect ? '/logout' : null,
+            'remainingTime' => (int) $remainingTime,
         ]);
     }
 }

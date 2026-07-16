@@ -877,7 +877,7 @@ class AdminExamDetailIndex extends Component
 
     private function initializeExam()
     {
-        $this->userTimetable = UserTimetable::select('id', 'user_id', 'status', 'start_exam', 'pause_total_seconds', 'is_recording', 'is_streaming', 'company_id', 'timetable_id')
+        $this->userTimetable = UserTimetable::select('id', 'user_id', 'status', 'start_exam', 'pause_total_seconds', 'additional_time_seconds', 'is_recording', 'is_streaming', 'company_id', 'timetable_id')
             ->with([
                 'timetable:id,module_id,company_id',
                 'timetable.module:id,name,duration',
@@ -998,9 +998,9 @@ class AdminExamDetailIndex extends Component
 
         $startTime = Carbon::parse($this->userTimetable->start_exam);
         $duration = $timetable->timetable->module->duration ?? 60; // Default 60 minutes if not set
-        // Perpanjang waktu selesai dengan akumulasi pause_total_seconds
         $pauseSeconds = (int) ($this->userTimetable->pause_total_seconds ?? 0);
-        $endTime = $startTime->addMinutes($duration)->copy()->addSeconds($pauseSeconds);
+        $additionalSeconds = (int) ($this->userTimetable->additional_time_seconds ?? 0);
+        $endTime = $startTime->addMinutes($duration)->copy()->addSeconds($pauseSeconds)->addSeconds($additionalSeconds);
 
         $this->remainingTime = max(0, $endTime->timestamp - now()->timestamp);
         \Log::info('Countdown calculated', [
@@ -1014,7 +1014,7 @@ class AdminExamDetailIndex extends Component
     // Resume timer jika sedang paused (paused_at != null): tambahkan durasi pause ke akumulasi
     public function resumeTimerIfPaused(): int
     {
-        $this->userTimetable = UserTimetable::select('id', 'paused_at', 'pause_total_seconds')->find($this->userTimetableId) ?? $this->userTimetable;
+        $this->userTimetable = UserTimetable::select('id', 'paused_at', 'pause_total_seconds', 'additional_time_seconds')->find($this->userTimetableId) ?? $this->userTimetable;
         if (! $this->userTimetable) {
             return 0;
         }

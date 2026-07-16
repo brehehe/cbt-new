@@ -56,6 +56,13 @@
                 <span wire:loading.remove wire:target="exportExcel">Excel</span>
             </button>
 
+            <!-- Adjust Time Bulk -->
+            <button onclick="adjustTimeBulk()"
+                class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-60 transition-colors">
+                <i class="fa-solid fa-clock"></i>
+                <span>Sesuaikan Waktu (Semua)</span>
+            </button>
+
             <!-- Download PDF -->
             <button wire:click="exportPdf" wire:loading.attr="disabled"
                 class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-60 transition-colors">
@@ -83,6 +90,7 @@
                         <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status Login / Aktif</th>
                         <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Soal / Terjawab</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aktivitas Terakhir</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Sisa Waktu</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kamera</th>
                         <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[1%]">Aksi</th>
                     </tr>
@@ -114,6 +122,28 @@
                             // Jumlah Soal & Terjawab
                             $totalSoal = $userTimetable ? $userTimetable->userModuleQuestions->count() : 0;
                             $terjawab = $userTimetable ? $userTimetable->userModuleQuestions->filter(fn($q) => $q->timetable_answer_id || $q->essay_answer)->count() : 0;
+
+                            // Sisa Waktu
+                            $sisaWaktuText = '-';
+                            if ($userTimetable) {
+                                if (!$userTimetable->start_exam) {
+                                    $sisaWaktuText = 'Belum Mulai';
+                                } elseif ($userTimetable->status === 'done') {
+                                    $sisaWaktuText = 'Selesai';
+                                } else {
+                                    $remainingSeconds = $userTimetable->getRemainingTime();
+                                    $hours = floor($remainingSeconds / 3600);
+                                    $mins = floor(($remainingSeconds % 3600) / 60);
+                                    $secs = $remainingSeconds % 60;
+                                    $sisaWaktuText = sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
+
+                                    $adjMinutes = (int)(($userTimetable->additional_time_seconds ?? 0) / 60);
+                                    if ($adjMinutes !== 0) {
+                                        $sign = $adjMinutes > 0 ? '+' : '';
+                                        $sisaWaktuText .= " ({$sign}{$adjMinutes}m)";
+                                    }
+                                }
+                            }
                         @endphp
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
@@ -144,6 +174,9 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ $liveSession?->last_activity ?? '-' }}
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-center font-mono font-semibold {{ $userTimetable && $userTimetable->status === 'exam' ? 'text-indigo-600' : 'text-gray-500' }}">
+                                {{ $sisaWaktuText }}
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ $liveSession?->camera_status ?? '-' }}
                             </td>
@@ -171,6 +204,17 @@
                                             wire:confirm="Apakah Anda yakin ingin force logout peserta ini?">
                                             <i class="fa-solid fa-right-from-bracket"></i>
                                         </button>
+                                        @if(in_array($userTimetable->status, ['exam', 'warning', 'suspend']))
+                                            @php
+                                                $currentAdjMinutes = (int)(($userTimetable->additional_time_seconds ?? 0) / 60);
+                                            @endphp
+                                            <button
+                                                class="btn btn-icon text-indigo-600 hover:text-indigo-800 transition-colors edit-btn"
+                                                onclick="adjustTimeIndividual('{{ $user->id }}', {{ $currentAdjMinutes }})"
+                                                title="Sesuaikan Waktu">
+                                                <i class="fa-solid fa-clock"></i>
+                                            </button>
+                                        @endif
                                     </div>
                                 @else
                                     <span class="text-gray-400 text-xs">-</span>
@@ -202,4 +246,55 @@
             </div>
         </div>
     </div>
+
+    <script>
+    function adjustTimeBulk() {
+        Swal.fire({
+            title: 'Sesuaikan Waktu Semua Peserta',
+            text: 'Masukkan jumlah menit untuk ditambahkan/dikurangi ke semua peserta yang sedang aktif (contoh: 15 untuk menambah, -15 untuk mengurangi)',
+            input: 'number',
+            inputAttributes: {
+                step: 1
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#4F46E5',
+            inputValidator: (value) => {
+                if (!value || isNaN(value)) {
+                    return 'Jumlah menit harus berupa angka dan tidak boleh kosong!';
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                @this.call('adjustTimeBulk', result.value);
+            }
+        });
+    }
+
+    function adjustTimeIndividual(userId, currentAdditionMinutes) {
+        Swal.fire({
+            title: 'Sesuaikan Waktu Peserta',
+            text: 'Masukkan total penyesuaian waktu untuk peserta ini (menit):',
+            input: 'number',
+            inputValue: currentAdditionMinutes,
+            inputAttributes: {
+                step: 1
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#4F46E5',
+            inputValidator: (value) => {
+                if (value === '' || isNaN(value)) {
+                    return 'Jumlah menit harus berupa angka dan tidak boleh kosong!';
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                @this.call('adjustTimeIndividual', userId, result.value);
+            }
+        });
+    }
+    </script>
 </div>

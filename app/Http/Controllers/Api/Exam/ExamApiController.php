@@ -32,7 +32,7 @@ class ExamApiController extends Controller
         $hasEssayAnswerColumn = $this->hasEssayAnswerColumn();
 
         $userTimetable = UserTimetable::withoutGlobalScopes()
-            ->select('id', 'user_id', 'status', 'start_exam', 'pause_total_seconds', 'is_camera', 'is_recording', 'is_streaming', 'company_id', 'timetable_id')
+            ->select('id', 'user_id', 'status', 'start_exam', 'pause_total_seconds', 'additional_time_seconds', 'is_camera', 'is_recording', 'is_streaming', 'company_id', 'timetable_id')
             ->with([
                 'user:id,name,nim,username',
                 'timetable' => function ($q) {
@@ -695,7 +695,7 @@ class ExamApiController extends Controller
     {
         // Refresh data terbaru dari database
         $this->userTimetable = UserTimetable::withoutGlobalScopes()
-            ->select('id', 'paused_at', 'pause_total_seconds', 'start_exam', 'timetable_id')
+            ->select('id', 'paused_at', 'pause_total_seconds', 'additional_time_seconds', 'start_exam', 'timetable_id')
             ->with(['timetable.module:id,duration'])
             ->find($this->userTimetableId) ?? $this->userTimetable;
 
@@ -740,8 +740,9 @@ class ExamApiController extends Controller
         // Pastikan relasi module sudah ada
         $duration = $this->userTimetable->timetable->module->duration ?? 60;
         $pauseSeconds = (int) ($this->userTimetable->pause_total_seconds ?? 0);
+        $additionalSeconds = (int) ($this->userTimetable->additional_time_seconds ?? 0);
         
-        $endTime = $startTime->addMinutes($duration)->addSeconds($pauseSeconds);
+        $endTime = $startTime->addMinutes($duration)->addSeconds($pauseSeconds)->addSeconds($additionalSeconds);
         $this->remainingTime = max(0, $endTime->timestamp - now()->timestamp);
     }
 }

@@ -116,4 +116,20 @@ class UserTimetable extends Model
                 });
         });
     }
+
+    public function getRemainingTime()
+    {
+        if (!$this->start_exam) {
+            return 0;
+        }
+
+        $startTime = \Carbon\Carbon::parse($this->start_exam);
+        $duration = $this->timetable->module->duration ?? 60;
+        $pauseSeconds = (int) ($this->pause_total_seconds ?? 0);
+        $additionalSeconds = (int) ($this->additional_time_seconds ?? 0);
+        
+        $endTime = $startTime->copy()->addMinutes($duration)->addSeconds($pauseSeconds)->addSeconds($additionalSeconds);
+        return max(0, $endTime->timestamp - now()->timestamp);
+    }
 }
+

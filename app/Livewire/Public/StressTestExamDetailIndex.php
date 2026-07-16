@@ -1000,9 +1000,10 @@ class StressTestExamDetailIndex extends Component
 
         $startTime = Carbon::parse($this->userTimetable->start_exam);
         $duration = 60000 ?? 60; // Default 60 minutes if not set
-        // Perpanjang waktu selesai dengan akumulasi pause_total_seconds
+        // Perpanjang waktu selesai dengan akumulasi pause_total_seconds dan penyesuaian waktu tambahan
         $pauseSeconds = (int) ($this->userTimetable->pause_total_seconds ?? 0);
-        $endTime = $startTime->addMinutes($duration)->copy()->addSeconds($pauseSeconds);
+        $additionalSeconds = (int) ($this->userTimetable->additional_time_seconds ?? 0);
+        $endTime = $startTime->addMinutes($duration)->copy()->addSeconds($pauseSeconds)->addSeconds($additionalSeconds);
 
         $this->remainingTime = max(0, $endTime->timestamp - now()->timestamp);
         \Log::info('Countdown calculated', [

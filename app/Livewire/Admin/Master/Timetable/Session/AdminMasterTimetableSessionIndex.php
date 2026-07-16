@@ -35,6 +35,8 @@ class AdminMasterTimetableSessionIndex extends Component
         'suspendSession',
         'unsuspendSession',
         'forceLogoutUser',
+        'adjustTimeBulk',
+        'adjustTimeIndividual',
     ];
 
     public function mount($timetable_id = null)
@@ -280,5 +282,74 @@ class AdminMasterTimetableSessionIndex extends Component
         return view('livewire.admin.master.timetable.session.admin-master-timetable-session-index', [
             'sessions' => $sessions,
         ])->extends('layout.app')->section('content');
+    }
+
+    public function adjustTimeBulk($minutes)
+    {
+        $isAdmin = auth()->user() && auth()->user()->hasRole(['Admin', 'Super Admin', 'Pengawas', 'admin']);
+        if (!$isAdmin) {
+            AlertHelper::warning('Akses Ditolak', 'Anda tidak memiliki hak akses untuk melakukan ini.');
+            return;
+        }
+
+        $minutes = (int)$minutes;
+        if ($minutes === 0) {
+            AlertHelper::warning('Perhatian', 'Jumlah menit penyesuaian tidak boleh nol.');
+            return;
+        }
+
+        try {
+            $userTimetables = UserTimetable::withoutGlobalScopes()
+                ->where('timetable_id', $this->timetable_id)
+                ->whereIn('status', ['exam', 'warning', 'suspend'])
+                ->get();
+
+            if ($userTimetables->isEmpty()) {
+                AlertHelper::info('Informasi', 'Tidak ada peserta aktif yang ujiannya dapat disesuaikan.');
+                return;
+            }
+
+            foreach ($userTimetables as $ut) {
+                $ut->additional_time_seconds = ($ut->additional_time_seconds ?? 0) + ($minutes * 60);
+                $ut->save();
+            }
+
+            $sign = $minutes > 0 ? '+' : '';
+            AlertHelper::success('Berhasil', "Waktu ujian untuk semua peserta aktif disesuaikan sebesar {$sign}{$minutes} menit.");
+        } catch (\Throwable $e) {
+            AlertHelper::error('Gagal', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function adjustTimeIndividual($userId, $minutes)
+    {
+        $isAdmin = auth()->user() && auth()->user()->hasRole(['Admin', 'Super Admin', 'Pengawas', 'admin']);
+        if (!$isAdmin) {
+            AlertHelper::warning('Akses Ditolak', 'Anda tidak memiliki hak akses untuk melakukan ini.');
+            return;
+        }
+
+        $minutes = (int)$minutes;
+
+        try {
+            $userTimetable = UserTimetable::withoutGlobalScopes()
+                ->where('user_id', $userId)
+                ->where('timetable_id', $this->timetable_id)
+                ->whereIn('status', ['exam', 'warning', 'suspend'])
+                ->first();
+
+            if (!$userTimetable) {
+                AlertHelper::warning('Perhatian', 'Peserta tidak ditemukan atau tidak sedang aktif.');
+                return;
+            }
+
+            $userTimetable->additional_time_seconds = $minutes * 60;
+            $userTimetable->save();
+
+            $sign = $minutes >= 0 ? '+' : '';
+            AlertHelper::success('Berhasil', "Waktu ujian untuk peserta ini berhasil disesuaikan menjadi {$sign}{$minutes} menit.");
+        } catch (\Throwable $e) {
+            AlertHelper::error('Gagal', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 }
