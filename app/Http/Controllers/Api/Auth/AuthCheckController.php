@@ -50,6 +50,7 @@ class AuthCheckController extends Controller
 
         // Suspend: admin memanggil suspendSession() yang set status='suspend'
         $isSuspended = $userTimetable && $userTimetable->status === 'suspend';
+        $isPaused = $userTimetable && !is_null($userTimetable->paused_at);
 
         // Deteksi logout fisik (session dihapus) sudah ditangani oleh endpoint /ping + middleware auth
         // yang akan mengembalikan 401. Di sini kita hanya cek status ujian di DB.
@@ -60,6 +61,7 @@ class AuthCheckController extends Controller
         return response()->json([
             'active' => true, // Default true selama session masih ada (auth middleware pass)
             'suspended' => $isSuspended,
+            'paused' => $isPaused,
             'redirect' => $shouldRedirect ? '/logout' : null,
             'remainingTime' => (int) $remainingTime,
         ]);

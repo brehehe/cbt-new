@@ -128,6 +128,12 @@ class UserTimetable extends Model
         $pauseSeconds = (int) ($this->pause_total_seconds ?? 0);
         $additionalSeconds = (int) ($this->additional_time_seconds ?? 0);
         
+        if (!is_null($this->paused_at)) {
+            $pausedAt = \Carbon\Carbon::parse($this->paused_at);
+            $currentPauseDelta = (int) abs(now()->diffInSeconds($pausedAt));
+            $pauseSeconds += $currentPauseDelta;
+        }
+
         $endTime = $startTime->copy()->addMinutes($duration)->addSeconds($pauseSeconds)->addSeconds($additionalSeconds);
         return max(0, $endTime->timestamp - now()->timestamp);
     }

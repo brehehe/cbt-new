@@ -32,7 +32,7 @@ class ExamApiController extends Controller
         $hasEssayAnswerColumn = $this->hasEssayAnswerColumn();
 
         $userTimetable = UserTimetable::withoutGlobalScopes()
-            ->select('id', 'user_id', 'status', 'start_exam', 'pause_total_seconds', 'additional_time_seconds', 'is_camera', 'is_recording', 'is_streaming', 'company_id', 'timetable_id')
+            ->select('id', 'user_id', 'status', 'start_exam', 'paused_at', 'pause_total_seconds', 'additional_time_seconds', 'is_camera', 'is_recording', 'is_streaming', 'company_id', 'timetable_id')
             ->with([
                 'user:id,name,nim,username',
                 'timetable' => function ($q) {
@@ -48,10 +48,8 @@ class ExamApiController extends Controller
         $this->userTimetableId = $userTimetableId;
         $this->userTimetable = $userTimetable;
 
-        // 1. Resume timer jika sebelumnya di-pause (oleh admin atau force logout)
-        // Ini akan menghitung selisih waktu dari 'paused_at' sampai 'now' 
-        // dan menambahkannya ke 'pause_total_seconds'
-        $this->remainingTime = $this->resumeTimerIfPaused();
+        // 1. Calculate remaining time
+        $this->calculateRemainingTime();
 
 
         // 2. Fetch Questions & Navigation
@@ -102,6 +100,7 @@ class ExamApiController extends Controller
         return response()->json([
             'userTimetable' => $userTimetable,
             'remainingTime' => (int) $this->remainingTime,
+            'isPaused' => !is_null($userTimetable->paused_at),
             'questions' => $questions,
             'navigation' => $navigation,
             'alertCount' => $alertCount,
@@ -132,6 +131,10 @@ class ExamApiController extends Controller
         $userTimetable = UserTimetable::findOrFail($userModuleQuestion->user_timetable_id);
         if ($userTimetable->user_id !== Auth::id() && ! Auth::user()->hasRole('admin')) {
             return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if (!is_null($userTimetable->paused_at)) {
+            return response()->json(['error' => 'Ujian sedang di-pause oleh pengawas.'], 403);
         }
 
         $payload = [
@@ -742,6 +745,11 @@ class ExamApiController extends Controller
         $pauseSeconds = (int) ($this->userTimetable->pause_total_seconds ?? 0);
         $additionalSeconds = (int) ($this->userTimetable->additional_time_seconds ?? 0);
         
+        if (!is_null($this->userTimetable->paused_at)) {
+            $currentPauseDelta = (int) abs(now()->diffInSeconds(Carbon::parse($this->userTimetable->paused_at)));
+            $pauseSeconds += $currentPauseDelta;
+        }
+
         $endTime = $startTime->addMinutes($duration)->addSeconds($pauseSeconds)->addSeconds($additionalSeconds);
         $this->remainingTime = max(0, $endTime->timestamp - now()->timestamp);
     }

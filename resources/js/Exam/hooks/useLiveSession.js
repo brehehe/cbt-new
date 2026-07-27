@@ -104,7 +104,7 @@ export const useLiveSession = (userTimetableId, isEnabled, sharedStream, onTimeS
                     window.isFinishingExam = true;
                     window.location.href = statusRes.data.redirect;
                 } else if (statusRes.data?.remainingTime !== undefined && onTimeSync) {
-                    onTimeSync(statusRes.data.remainingTime);
+                    onTimeSync(statusRes.data.remainingTime, statusRes.data.paused);
                 }
             } catch (error) {
                 // 401 dari /ping ditangani interceptor → redirect /login

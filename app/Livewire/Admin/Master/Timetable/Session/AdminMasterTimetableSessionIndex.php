@@ -39,6 +39,10 @@ class AdminMasterTimetableSessionIndex extends Component
         'forceLogoutUser',
         'adjustTimeBulk',
         'adjustTimeIndividual',
+        'pauseTimeBulk',
+        'resumeTimeBulk',
+        'pauseTimeIndividual',
+        'resumeTimeIndividual',
     ];
 
     public function mount($timetable_id = null)
@@ -353,5 +357,98 @@ class AdminMasterTimetableSessionIndex extends Component
         } catch (\Throwable $e) {
             AlertHelper::error('Gagal', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+    }
+
+    public function pauseTimeIndividual($userId)
+    {
+        $userTimetable = UserTimetable::withoutGlobalScopes()
+            ->where('user_id', $userId)
+            ->where('timetable_id', $this->timetable_id)
+            ->whereIn('status', ['exam', 'warning'])
+            ->first();
+
+        if (!$userTimetable) {
+            AlertHelper::warning('Perhatian', 'Peserta tidak ditemukan atau tidak sedang ujian.');
+            return;
+        }
+
+        if (!is_null($userTimetable->paused_at)) {
+            AlertHelper::info('Informasi', 'Waktu ujian peserta ini sudah dalam keadaan di-pause.');
+            return;
+        }
+
+        $userTimetable->update(['paused_at' => Carbon::now()]);
+        AlertHelper::success('Berhasil', 'Waktu ujian peserta berhasil di-pause.');
+    }
+
+    public function resumeTimeIndividual($userId)
+    {
+        $userTimetable = UserTimetable::withoutGlobalScopes()
+            ->where('user_id', $userId)
+            ->where('timetable_id', $this->timetable_id)
+            ->first();
+
+        if (!$userTimetable) {
+            AlertHelper::warning('Perhatian', 'Peserta tidak ditemukan.');
+            return;
+        }
+
+        if (is_null($userTimetable->paused_at)) {
+            AlertHelper::info('Informasi', 'Waktu ujian peserta tidak dalam keadaan di-pause.');
+            return;
+        }
+
+        $delta = (int) abs(now()->diffInSeconds(Carbon::parse($userTimetable->paused_at)));
+        $userTimetable->update([
+            'pause_total_seconds' => (int)($userTimetable->pause_total_seconds ?? 0) + $delta,
+            'paused_at' => null,
+            'status' => $userTimetable->status === 'suspend' ? 'exam' : $userTimetable->status,
+        ]);
+
+        AlertHelper::success('Berhasil', 'Waktu ujian peserta berhasil dilanjutkan (resumed).');
+    }
+
+    public function pauseTimeBulk()
+    {
+        $userTimetables = UserTimetable::withoutGlobalScopes()
+            ->where('timetable_id', $this->timetable_id)
+            ->whereIn('status', ['exam', 'warning'])
+            ->whereNull('paused_at')
+            ->get();
+
+        if ($userTimetables->isEmpty()) {
+            AlertHelper::info('Informasi', 'Tidak ada peserta aktif yang perlu di-pause.');
+            return;
+        }
+
+        foreach ($userTimetables as $ut) {
+            $ut->update(['paused_at' => Carbon::now()]);
+        }
+
+        AlertHelper::success('Berhasil', 'Waktu ujian untuk semua peserta aktif berhasil di-pause.');
+    }
+
+    public function resumeTimeBulk()
+    {
+        $userTimetables = UserTimetable::withoutGlobalScopes()
+            ->where('timetable_id', $this->timetable_id)
+            ->whereNotNull('paused_at')
+            ->get();
+
+        if ($userTimetables->isEmpty()) {
+            AlertHelper::info('Informasi', 'Tidak ada peserta yang dalam keadaan di-pause.');
+            return;
+        }
+
+        foreach ($userTimetables as $ut) {
+            $delta = (int) abs(now()->diffInSeconds(Carbon::parse($ut->paused_at)));
+            $ut->update([
+                'pause_total_seconds' => (int)($ut->pause_total_seconds ?? 0) + $delta,
+                'paused_at' => null,
+                'status' => $ut->status === 'suspend' ? 'exam' : $ut->status,
+            ]);
+        }
+
+        AlertHelper::success('Berhasil', 'Waktu ujian untuk semua peserta berhasil dilanjutkan.');
     }
 }

@@ -56,6 +56,11 @@ class CheckUserTimetable
                 $pauseSeconds = (int) ($userTimetable->pause_total_seconds ?? 0);
                 $additionalSeconds = (int) ($userTimetable->additional_time_seconds ?? 0);
 
+                if (!is_null($userTimetable->paused_at)) {
+                    $currentPauseDelta = (int) abs(now()->diffInSeconds(Carbon::parse($userTimetable->paused_at)));
+                    $pauseSeconds += $currentPauseDelta;
+                }
+
                 // Add a small buffer (e.g., 30 seconds) to account for network latency
                 $endTime = $startTime->addMinutes($duration)->addSeconds($pauseSeconds)->addSeconds($additionalSeconds)->addSeconds(30);
 

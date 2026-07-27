@@ -73,6 +73,20 @@
                 <span>Sesuaikan Waktu (Semua)</span>
             </button>
 
+            <!-- Pause Time Bulk -->
+            <button wire:click="pauseTimeBulk" wire:confirm="Apakah Anda yakin ingin mem-pause waktu ujian semua peserta aktif?"
+                class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-amber-600 rounded-lg hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 disabled:opacity-60 transition-colors">
+                <i class="fa-solid fa-pause"></i>
+                <span>Pause Waktu (Semua)</span>
+            </button>
+
+            <!-- Resume Time Bulk -->
+            <button wire:click="resumeTimeBulk" wire:confirm="Apakah Anda yakin ingin melanjutkan waktu ujian semua peserta?"
+                class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-60 transition-colors">
+                <i class="fa-solid fa-play"></i>
+                <span>Lanjutkan Waktu (Semua)</span>
+            </button>
+
             <!-- Download PDF -->
             <button wire:click="exportPdf" wire:loading.attr="disabled"
                 class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-60 transition-colors">
@@ -152,6 +166,10 @@
                                         $sign = $adjMinutes > 0 ? '+' : '';
                                         $sisaWaktuText .= " ({$sign}{$adjMinutes}m)";
                                     }
+
+                                    if (!is_null($userTimetable->paused_at)) {
+                                        $sisaWaktuText .= ' (Di-pause)';
+                                    }
                                 }
                             }
                         @endphp
@@ -214,18 +232,34 @@
                                             wire:confirm="Apakah Anda yakin ingin force logout peserta ini?">
                                             <i class="fa-solid fa-right-from-bracket"></i>
                                         </button>
-                                        @if(in_array($userTimetable->status, ['exam', 'warning', 'suspend']))
-                                            @php
-                                                $currentAdjMinutes = (int)(($userTimetable->additional_time_seconds ?? 0) / 60);
-                                            @endphp
-                                            <button
-                                                class="btn btn-icon text-indigo-600 hover:text-indigo-800 transition-colors edit-btn"
-                                                onclick="adjustTimeIndividual('{{ $user->id }}', {{ $currentAdjMinutes }})"
-                                                title="Sesuaikan Waktu">
-                                                <i class="fa-solid fa-clock"></i>
-                                            </button>
-                                        @endif
-                                    </div>
+                                         @if(in_array($userTimetable->status, ['exam', 'warning', 'suspend']))
+                                             @php
+                                                 $currentAdjMinutes = (int)(($userTimetable->additional_time_seconds ?? 0) / 60);
+                                             @endphp
+                                             <button
+                                                 class="btn btn-icon text-indigo-600 hover:text-indigo-800 transition-colors edit-btn"
+                                                 onclick="adjustTimeIndividual('{{ $user->id }}', {{ $currentAdjMinutes }})"
+                                                 title="Sesuaikan Waktu">
+                                                 <i class="fa-solid fa-clock"></i>
+                                             </button>
+
+                                             @if(!is_null($userTimetable->paused_at))
+                                                 <button
+                                                     class="btn btn-icon text-emerald-600 hover:text-emerald-800 transition-colors edit-btn"
+                                                     wire:click="resumeTimeIndividual('{{ $user->id }}')"
+                                                     title="Lanjutkan Waktu Ujian">
+                                                     <i class="fa-solid fa-play"></i>
+                                                 </button>
+                                             @else
+                                                 <button
+                                                     class="btn btn-icon text-amber-600 hover:text-amber-800 transition-colors edit-btn"
+                                                     wire:click="pauseTimeIndividual('{{ $user->id }}')"
+                                                     title="Pause Waktu Ujian">
+                                                     <i class="fa-solid fa-pause"></i>
+                                                 </button>
+                                             @endif
+                                         @endif
+                                     </div>
                                 @else
                                     <span class="text-gray-400 text-xs">-</span>
                                 @endif

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import {
-    AlertTriangle, Clock, Loader2, Shield, Menu, X
+    AlertTriangle, Clock, Loader2, Shield, Menu, X, Pause
 } from 'lucide-react';
 import QuestionArea from './components/QuestionArea';
 import NavigationSidebar from './components/NavigationSidebar';
@@ -16,6 +16,7 @@ const ExamContainer = ({ userTimetableId, defaultCompanyColor = '#1e3a5f' }) => 
     const [examData, setExamData] = useState(null);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [remainingTime, setRemainingTime] = useState(0);
+    const [isPaused, setIsPaused] = useState(false);
     const [alertCount, setAlertCount] = useState(0);
     const [isNavOpen, setIsNavOpen] = useState(false);
     const [isMonitorOpen, setIsMonitorOpen] = useState(false);
@@ -104,7 +105,10 @@ const ExamContainer = ({ userTimetableId, defaultCompanyColor = '#1e3a5f' }) => 
     const [saveStatus, setSaveStatus] = useState('saved');
     const [lastSaved, setLastSaved] = useState('');
 
-    const handleTimeSync = useCallback((serverRemainingTime) => {
+    const handleTimeSync = useCallback((serverRemainingTime, serverIsPaused) => {
+        if (serverIsPaused !== undefined) {
+            setIsPaused(!!serverIsPaused);
+        }
         setRemainingTime(prev => {
             // Jika selisihnya lebih dari 10 detik, update waktu lokal agar sinkron dengan server
             if (Math.abs(prev - serverRemainingTime) > 10) {
@@ -189,6 +193,7 @@ const ExamContainer = ({ userTimetableId, defaultCompanyColor = '#1e3a5f' }) => 
                 const response = await axios.get(`/api/exam/${userTimetableId}/data`);
                 setExamData(response.data);
                 setRemainingTime(response.data.remainingTime);
+                setIsPaused(!!response.data.isPaused);
                 setAlertCount(response.data.alertCount);
 
                 const answered = new Set([0]);
@@ -247,7 +252,7 @@ const ExamContainer = ({ userTimetableId, defaultCompanyColor = '#1e3a5f' }) => 
 
     // Timer
     useEffect(() => {
-        if (!examData || remainingTime <= 0) return;
+        if (!examData || remainingTime <= 0 || isPaused) return;
         const timer = setInterval(() => {
             setRemainingTime(prev => {
                 if (prev <= 1) {
@@ -259,7 +264,7 @@ const ExamContainer = ({ userTimetableId, defaultCompanyColor = '#1e3a5f' }) => 
             });
         }, 1000);
         return () => clearInterval(timer);
-    }, [examData, remainingTime]);
+    }, [examData, remainingTime, isPaused]);
 
     const formatTime = (seconds) => {
         const h = Math.floor(seconds / 3600);
@@ -441,6 +446,25 @@ const ExamContainer = ({ userTimetableId, defaultCompanyColor = '#1e3a5f' }) => 
                         <h1 className="text-2xl font-extrabold">KONTEN DIALIHKAN</h1>
                         <p className="text-gray-400">Pelanggaran terdeteksi. Harap kembali ke jendela ujian.</p>
                         <button onClick={() => window.focus()} className="px-6 py-2.5 bg-white text-black font-bold rounded-xl hover:bg-gray-100">Kembali ke Ujian</button>
+                    </div>
+                </div>
+            )}
+
+            {/* Pause Overlay */}
+            {isPaused && (
+                <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[9998] flex flex-col items-center justify-center text-white text-center p-6 animate-in fade-in duration-200">
+                    <div className="bg-slate-800/90 border border-amber-500/40 rounded-2xl p-8 max-w-md w-full shadow-2xl flex flex-col items-center">
+                        <div className="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mb-4 animate-pulse">
+                            <Pause className="w-8 h-8" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-amber-300 mb-2">Ujian Di-pause</h2>
+                        <p className="text-gray-300 text-sm mb-5 leading-relaxed">
+                            Waktu ujian sedang di-pause oleh pengawas. Pengerjaan soal dihentikan sementara hingga pengawas melanjutkan ujian.
+                        </p>
+                        <div className="flex items-center gap-2 bg-slate-950/80 px-5 py-2.5 rounded-xl text-amber-400 font-mono text-xl font-bold border border-amber-500/30">
+                            <Clock className="w-5 h-5" />
+                            <span>{formatTime(remainingTime)}</span>
+                        </div>
                     </div>
                 </div>
             )}
