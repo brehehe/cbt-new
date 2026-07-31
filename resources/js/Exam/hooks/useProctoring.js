@@ -7,7 +7,7 @@ export const useProctoring = (userTimetableId, onAlert) => {
     const [fullscreenWarning, setFullscreenWarning] = useState(false);
     const [taskbarWarning, setTaskbarWarning] = useState(null);
 
-    const lastTaskbarAlertTimeRef = useRef(0);
+    const isSEB = typeof navigator !== 'undefined' && /SEB|SafeExamBrowser/i.test(navigator.userAgent);
 
     const logAlert = useCallback(async (type, desc) => {
         try {
@@ -49,13 +49,14 @@ export const useProctoring = (userTimetableId, onAlert) => {
     const handleFullscreenChange = useCallback(() => {
         const active = getIsFullscreen();
         setIsFullscreen(active);
-        if (!active) {
+        // Dalam SEB, SEB sudah merupakan lingkungan kiosk yang terkunci sehingga tidak memunculkan peringatan fullscreen
+        if (!active && !isSEB) {
             logAlert('not_fullscreen', 'Mahasiswa keluar dari mode Fullscreen (Jendela tidak maksimal)');
             setFullscreenWarning(true);
         } else {
             setFullscreenWarning(false);
         }
-    }, [logAlert]);
+    }, [logAlert, isSEB]);
 
     const handleVisibilityChange = useCallback(() => {
         if (document.hidden) {
@@ -67,9 +68,9 @@ export const useProctoring = (userTimetableId, onAlert) => {
     }, [logAlert]);
 
     const handleBlur = useCallback(() => {
-        logAlert('window_blur', 'Mahasiswa kehilangan fokus pada jendela browser');
-        setIsBlackout(true);
-    }, [logAlert]);
+        // Nonaktifkan pencatatan pelanggaran window_blur agar klik pada tombol reload SEB, menu 3 garis pojok kanan, dan taskbar bawah tidak dianggap pelanggaran
+        setIsBlackout(false);
+    }, []);
 
     const handleFocus = useCallback(() => {
         setIsBlackout(false);
@@ -78,21 +79,15 @@ export const useProctoring = (userTimetableId, onAlert) => {
     const handleBeforeUnload = useCallback((e) => {
         if (window.isFinishingExam) return;
 
-        logAlert('page_reload', 'Mahasiswa melakukan reload / refresh halaman');
-
+        // Tampilkan prompt konfirmasi bawaan browser tanpa mencatat sebagai poin pelanggaran
         const msg = "Ujian sedang berlangsung. Apakah Anda yakin ingin memuat ulang halaman?";
         e.returnValue = msg;
         return msg;
-    }, [logAlert]);
+    }, []);
 
     const handleKeyDown = useCallback((e) => {
-        if (
-            e.key === 'F5' ||
-            ((e.ctrlKey || e.metaKey) && (e.key === 'r' || e.key === 'R'))
-        ) {
-            logAlert('page_reload', 'Mahasiswa menekan tombol shortcut reload (F5 / Ctrl+R)');
-        }
-    }, [logAlert]);
+        // Shortcut reload dibiarkan beroperasi tanpa mencatat pelanggaran
+    }, []);
 
     useEffect(() => {
         document.addEventListener('visibilitychange', handleVisibilityChange);
