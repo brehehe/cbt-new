@@ -94,50 +94,12 @@ export const useProctoring = (userTimetableId, onAlert) => {
         }
     }, [logAlert]);
 
-    const handleMouseMove = useCallback((e) => {
-        const thresholdBottom = window.innerHeight - 10;
-        const thresholdTop = 5;
-
-        const isTouchingBottom = e.clientY >= thresholdBottom;
-        const isTouchingTop = e.clientY <= thresholdTop;
-
-        if (isTouchingBottom || isTouchingTop) {
-            const now = Date.now();
-            if (now - lastTaskbarAlertTimeRef.current > 5000) {
-                lastTaskbarAlertTimeRef.current = now;
-                const desc = isTouchingBottom
-                    ? 'Kursor menyentuh area taskbar bawah'
-                    : 'Kursor menyentuh area tombol reload / header browser';
-                logAlert('cursor_taskbar_touch', desc);
-                setTaskbarWarning(desc);
-                setTimeout(() => setTaskbarWarning(null), 4000);
-            }
-        }
-    }, [logAlert]);
-
-    const handleMouseLeave = useCallback((e) => {
-        if (!e.relatedTarget && (e.clientY >= window.innerHeight - 15 || e.clientY <= 5)) {
-            const now = Date.now();
-            if (now - lastTaskbarAlertTimeRef.current > 5000) {
-                lastTaskbarAlertTimeRef.current = now;
-                const desc = e.clientY >= window.innerHeight - 15
-                    ? 'Kursor menyentuh dan keluar ke area taskbar bawah'
-                    : 'Kursor keluar ke area atas browser / tombol reload';
-                logAlert('cursor_taskbar_touch', desc);
-                setTaskbarWarning(desc);
-                setTimeout(() => setTaskbarWarning(null), 4000);
-            }
-        }
-    }, [logAlert]);
-
     useEffect(() => {
         document.addEventListener('visibilitychange', handleVisibilityChange);
         window.addEventListener('blur', handleBlur);
         window.addEventListener('focus', handleFocus);
         window.addEventListener('beforeunload', handleBeforeUnload);
         window.addEventListener('keydown', handleKeyDown);
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseleave', handleMouseLeave);
 
         document.addEventListener('fullscreenchange', handleFullscreenChange);
         document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
@@ -150,8 +112,6 @@ export const useProctoring = (userTimetableId, onAlert) => {
             window.removeEventListener('focus', handleFocus);
             window.removeEventListener('beforeunload', handleBeforeUnload);
             window.removeEventListener('keydown', handleKeyDown);
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseleave', handleMouseLeave);
 
             document.removeEventListener('fullscreenchange', handleFullscreenChange);
             document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
@@ -164,8 +124,6 @@ export const useProctoring = (userTimetableId, onAlert) => {
         handleFocus,
         handleBeforeUnload,
         handleKeyDown,
-        handleMouseMove,
-        handleMouseLeave,
         handleFullscreenChange
     ]);
 
