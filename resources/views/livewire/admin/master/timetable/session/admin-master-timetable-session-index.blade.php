@@ -252,13 +252,6 @@
                                                 :style="`top:${y}px; left:${x}px`">
 
                                                 <ul class="py-1 text-sm text-gray-700">
-                                                    <li>
-                                                        <button wire:click="reopenAndEnterExam('{{ $userTimetable->id }}')"
-                                                            class="w-full text-left px-4 py-2 hover:bg-emerald-50 text-emerald-700 font-semibold border-b border-gray-100 flex items-center gap-2">
-                                                            <i class="fa-solid fa-play text-emerald-600"></i>
-                                                            Masuk / Ujicoba Ujian
-                                                        </button>
-                                                    </li>
 
                                                     @if ($userTimetable->status === 'done')
                                                         <li>
