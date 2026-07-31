@@ -51,7 +51,8 @@ class AdminMasterTimetableAlertIndex extends Component
         $this->modules = Module::select('id', 'name')->get()->pluck('name', 'id')->toArray();
         $this->getSupervisors = User::companyRole('Pengawas', Auth::user()->company_id)->select('name', 'id')->get()->pluck('name', 'id')->toArray();
         $this->timetable = $timetable->toArray();
-        $this->supervisors = json_decode($timetable['supervisors']) ?? [];
+        $supervisorsData = $timetable->supervisors ?? $timetable['supervisors'] ?? [];
+        $this->supervisors = is_array($supervisorsData) ? $supervisorsData : (json_decode($supervisorsData, true) ?: []);
         $this->module_id = $timetable['module_id'];
         $this->start_time = Carbon::parse($timetable->start_time)->format('d/m/Y H:i');
         $this->end_time = Carbon::parse($timetable->end_time)->format('d/m/Y H:i');

@@ -216,7 +216,12 @@ class AdminMasterTimetableIndex extends Component
         $this->exam_room_id = $data->exam_room_id;
         $this->exam_session_id = $data->exam_session_id;
         $this->classmate_id = $data->classmate_id;
-        $this->supervisors = json_decode($data->supervisors, true) ?? [];
+        $supervisorsData = $data->supervisors;
+        if (is_array($supervisorsData)) {
+            $this->supervisors = $supervisorsData;
+        } else {
+            $this->supervisors = json_decode($supervisorsData, true) ?: [];
+        }
         $this->start_time = Carbon::parse($data->start_time)->format('Y-m-d\TH:i');
         $this->end_time = Carbon::parse($data->end_time)->format('Y-m-d\TH:i');
         $this->description = $data->description;
@@ -390,7 +395,7 @@ class AdminMasterTimetableIndex extends Component
                 'module_id' => $this->module_id,
                 'exam_room_id' => $this->exam_room_id,
                 'exam_session_id' => $this->exam_session_id,
-                'supervisors' => json_encode($this->supervisors),
+                'supervisors' => is_array($this->supervisors) ? $this->supervisors : (json_decode($this->supervisors, true) ?: []),
                 'start_time' => $this->start_time,
                 'end_time' => $this->end_time,
                 'description' => $this->description,

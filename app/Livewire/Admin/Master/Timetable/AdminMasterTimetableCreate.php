@@ -440,7 +440,7 @@ class AdminMasterTimetableCreate extends Component
                     'module_id' => $sched['module_id'],
                     'exam_room_id' => $sched['exam_room_id'],
                     'exam_session_id' => $sched['exam_session_id'],
-                    'supervisors' => json_encode($sched['supervisors']),
+                    'supervisors' => is_array($sched['supervisors']) ? $sched['supervisors'] : (json_decode($sched['supervisors'], true) ?: []),
                     'start_time' => $sched['start_time'],
                     'end_time' => $sched['end_time'],
                     'description' => $sched['description'] ?? null,

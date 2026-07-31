@@ -58,7 +58,8 @@ class AdminMasterTimetableDetailIndex extends Component
         $this->timetable = $timetable->toArray();
         $this->start_time = Carbon::parse($timetable->start_time)->format('d/m/Y H:i');
         $this->end_time = Carbon::parse($timetable->end_time)->format('d/m/Y H:i');
-        $this->supervisors = json_decode($timetable['supervisors']) ?? [];
+        $supervisorsData = $timetable->supervisors ?? $timetable['supervisors'] ?? [];
+        $this->supervisors = is_array($supervisorsData) ? $supervisorsData : (json_decode($supervisorsData, true) ?: []);
         $this->module_id = $timetable['module_id'];
     }
 
