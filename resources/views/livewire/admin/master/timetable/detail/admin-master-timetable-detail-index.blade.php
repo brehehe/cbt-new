@@ -3,9 +3,9 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-2xl font-bold text-[color:var(--primary)]">
-                    Nilai Ujian</h1>
+                    {{ auth()->user()->hasRole(['Pengawas', 'pengawas']) ? 'Detail Ujian' : 'Nilai Ujian' }}</h1>
             </div>
-            @if(!auth()->user()->hasRole('Pengawas'))
+            @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
                 <div class="flex gap-2">
                     <button wire:click="exportPdf" class="btn btn-primary !bg-red-600 !border-red-700 hover:!bg-red-700">
                         <i class="fa-solid fa-file-pdf mr-2"></i>
@@ -138,7 +138,7 @@
                         <th class="w-1 center">No</th>
                         <th>NIM</th>
                         <th>Nama</th>
-                        @if(!auth()->user()->hasRole('Pengawas'))
+                        @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
                             <th>Terjawab</th>
                             <th>Tidak Terjawab</th>
                             <th>Benar</th>
@@ -155,7 +155,7 @@
                             <td>{{ $userTimetable->user->nim ?? ($userTimetable->user->username ?? '-') }}
                             </td>
                             <td>{{ $userTimetable->user->name ?? '-' }}</td>
-                            @if(!auth()->user()->hasRole('Pengawas'))
+                            @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
                                 <td>{{ $userTimetable->userModuleQuestions->whereNotNull('timetable_answer_id')->count() }}
                                 </td>
                                 <td>{{ $userTimetable->userModuleQuestions->whereNull('timetable_answer_id')->count() }}
@@ -185,7 +185,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ auth()->user()->hasRole('Pengawas') ? 4 : 9 }}" class="no-data">Tidak ada data</td>
+                            <td colspan="{{ auth()->user()->hasRole(['Pengawas', 'pengawas']) ? 4 : 9 }}" class="no-data">Tidak ada data</td>
                         </tr>
                     @endforelse
                 </tbody>

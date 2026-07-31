@@ -521,8 +521,13 @@ class AdminMasterTimetableIndex extends Component
     {
         $timetable = Timetable::query()
             ->with(['module', 'examRoom', 'examSession'])
-            ->when(auth()->user()->hasRole('Pengawas'), function ($query) {
-                $query->whereJsonContains('supervisors', auth()->id());
+            ->when(auth()->user()->hasRole(['Pengawas', 'pengawas']), function ($query) {
+                $userId = (string) auth()->id();
+                $query->where(function ($q) use ($userId) {
+                    $q->whereJsonContains('supervisors', $userId)
+                      ->orWhereJsonContains('supervisors', (int) $userId)
+                      ->orWhereRaw("supervisors::text LIKE ?", ['%"' . $userId . '"%']);
+                });
             })
             ->when($this->search, function ($query, $search) {
                 $query->where('name', 'ilike', '%'.$search.'%')

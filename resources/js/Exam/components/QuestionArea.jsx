@@ -150,11 +150,16 @@ const QuestionArea = ({
 
     /* sync when question changes */
     useEffect(() => {
+        const hasAns = question?.timetable_question?.type === 'essay'
+            ? !!(question?.essay_answer && question.essay_answer.trim() !== '')
+            : (question?.timetable_answer_id !== null && question?.timetable_answer_id !== undefined);
+            
         setSelectedAnswerId(question?.timetable_answer_id ?? null);
         setEssayAnswer(question?.essay_answer || '');
-        setIsMarked(!!question?.is_mark);
+        const marked = hasAns && !!question?.is_mark;
+        setIsMarked(marked);
         essayRef.current  = question?.essay_answer || '';
-        markedRef.current = !!question?.is_mark;
+        markedRef.current = marked;
     }, [question?.id]);
 
     /* debounced essay save */
@@ -263,8 +268,9 @@ const QuestionArea = ({
                 <button
                     onClick={handleToggleMark}
                     disabled={!isAnswered}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all shadow-sm active:scale-[0.98] ${!isAnswered ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    style={isMarked
+                    title={!isAnswered ? 'Jawab soal terlebih dahulu untuk menandai Ragu-Ragu' : ''}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all shadow-sm active:scale-[0.98] ${!isAnswered ? 'opacity-50 cursor-not-allowed bg-slate-100 border-slate-200 text-slate-400' : ''}`}
+                    style={isMarked && isAnswered
                         ? { backgroundColor: '#fef9c3', borderColor: '#f59e0b', color: '#92400e' }
                         : (!isAnswered
                             ? { backgroundColor: '#f1f5f9', borderColor: '#cbd5e1', color: '#94a3b8' }

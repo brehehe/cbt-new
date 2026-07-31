@@ -19,7 +19,7 @@ const NavigationSidebar = ({
     const [isReviewMode, setIsReviewMode] = useState(false);
 
     const answered  = navigation.filter(n => n.isAnswered).length;
-    const marked    = navigation.filter(n => n.isMarked).length;
+    const marked    = navigation.filter(n => n.isMarked && n.isAnswered).length;
     const belum     = navigation.length - answered;
     const pct       = navigation.length > 0 ? Math.round((answered / navigation.length) * 100) : 0;
 
@@ -28,14 +28,14 @@ const NavigationSidebar = ({
         switch (activeFilter) {
             case 'dijawab':  return list.filter(n => n.isAnswered);
             case 'belum':    return list.filter(n => !n.isAnswered);
-            case 'ragu':     return list.filter(n => n.isMarked);
+            case 'ragu':     return list.filter(n => n.isMarked && n.isAnswered);
             default:         return list;
         }
     }, [navigation, activeFilter]);
 
     const getStatus = (nav, idx) => {
         if (idx === currentIndex) return 'current';
-        if (nav.isMarked) return 'ragu';
+        if (nav.isMarked && nav.isAnswered) return 'ragu';
         if (nav.isAnswered) return 'answered';
         if (visitedIndices.has(idx)) return 'visited';
         return 'belum';

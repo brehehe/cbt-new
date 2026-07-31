@@ -243,7 +243,14 @@ const ExamContainer = ({ userTimetableId, defaultCompanyColor = '#1e3a5f' }) => 
             else if (e.ctrlKey && e.key.toLowerCase() === 'b') {
                 e.preventDefault();
                 const q = examData?.questions?.[currentQuestionIndex];
-                if (q) handleSaveAnswer(q.timetable_answer_id, !q.is_mark, q.essay_answer);
+                if (q) {
+                    const isAns = q.timetable_question?.type === 'essay'
+                        ? (q.essay_answer && q.essay_answer.trim() !== '')
+                        : (q.timetable_answer_id !== null && q.timetable_answer_id !== undefined);
+                    if (isAns) {
+                        handleSaveAnswer(q.timetable_answer_id, !q.is_mark, q.essay_answer);
+                    }
+                }
             }
         };
         if (examData) window.addEventListener('keydown', handleKeyDown);
@@ -276,21 +283,27 @@ const ExamContainer = ({ userTimetableId, defaultCompanyColor = '#1e3a5f' }) => 
     const handleSaveAnswer = async (answerId, isMarked, essayAnswer = null) => {
         setSaveStatus('saving');
         const currentQuestion = examData.questions[currentQuestionIndex];
+        const isAns = currentQuestion?.timetable_question?.type === 'essay'
+            ? (essayAnswer && essayAnswer.trim() !== '')
+            : (answerId !== null && answerId !== undefined);
+
+        const finalIsMarked = isAns ? isMarked : false;
+
         try {
             await axios.post('/api/exam/save-answer', {
                 question_navigation_id: currentQuestion.id,
                 timetable_answer_id: answerId,
                 essay_answer: essayAnswer,
-                is_mark: isMarked
+                is_mark: finalIsMarked
             });
             const newQuestions = [...examData.questions];
             newQuestions[currentQuestionIndex].timetable_answer_id = answerId;
             newQuestions[currentQuestionIndex].essay_answer = essayAnswer;
-            newQuestions[currentQuestionIndex].is_mark = isMarked;
+            newQuestions[currentQuestionIndex].is_mark = finalIsMarked;
 
             const newNavigation = [...examData.navigation];
-            newNavigation[currentQuestionIndex].isAnswered = !!answerId || !!essayAnswer;
-            newNavigation[currentQuestionIndex].isMarked = isMarked;
+            newNavigation[currentQuestionIndex].isAnswered = isAns;
+            newNavigation[currentQuestionIndex].isMarked = finalIsMarked;
 
             setExamData({ ...examData, questions: newQuestions, navigation: newNavigation });
 

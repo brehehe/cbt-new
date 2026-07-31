@@ -75,11 +75,12 @@ class ExamApiController extends Controller
 
         $navigation = $questions->map(function ($q) use ($hasEssayAnswerColumn) {
             $essayAnswer = $hasEssayAnswerColumn ? ($q->essay_answer ?? null) : null;
+            $isAnswered = ! is_null($q->timetable_answer_id) || (! is_null($essayAnswer) && trim($essayAnswer) !== '');
 
             return [
                 'id' => $q->id,
-                'isMarked' => (bool) $q->is_mark,
-                'isAnswered' => ! is_null($q->timetable_answer_id) || ! empty($essayAnswer),
+                'isMarked' => $isAnswered && (bool) $q->is_mark,
+                'isAnswered' => $isAnswered,
                 'order' => $q->order,
             ];
         })->values();
@@ -137,13 +138,17 @@ class ExamApiController extends Controller
             return response()->json(['error' => 'Ujian sedang di-pause oleh pengawas.'], 403);
         }
 
+        $timetableAnswerId = $validated['timetable_answer_id'] ?? null;
+        $essayAnswer = $validated['essay_answer'] ?? null;
+        $isAnswered = ! is_null($timetableAnswerId) || (! is_null($essayAnswer) && trim($essayAnswer) !== '');
+
         $payload = [
-            'timetable_answer_id' => $validated['timetable_answer_id'],
-            'is_mark' => $validated['is_mark'] ?? $userModuleQuestion->is_mark,
+            'timetable_answer_id' => $timetableAnswerId,
+            'is_mark' => $isAnswered ? ($validated['is_mark'] ?? $userModuleQuestion->is_mark) : false,
         ];
 
         if ($hasEssayAnswerColumn) {
-            $payload['essay_answer'] = $validated['essay_answer'] ?? null;
+            $payload['essay_answer'] = $essayAnswer;
         }
 
         $userModuleQuestion->update($payload);
@@ -168,11 +173,24 @@ class ExamApiController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
+        $type = $userModuleQuestion->timetableQuestion->type ?? 'single';
+        $hasEssayAnswer = $this->hasEssayAnswerColumn();
+        $essayAnswer = $hasEssayAnswer ? ($userModuleQuestion->essay_answer ?? null) : null;
+        
+        $isAnswered = $type === 'essay'
+            ? (! is_null($essayAnswer) && trim($essayAnswer) !== '')
+            : (! is_null($userModuleQuestion->timetable_answer_id));
+
+        if (! $isAnswered) {
+            return response()->json(['error' => 'Soal belum dijawab. Ragu-ragu hanya dapat ditandai setelah menjawab soal.'], 422);
+        }
+
+        $newMark = ! $userModuleQuestion->is_mark;
         $userModuleQuestion->update([
-            'is_mark' => ! $userModuleQuestion->is_mark,
+            'is_mark' => $newMark,
         ]);
 
-        return response()->json(['is_mark' => $userModuleQuestion->is_mark]);
+        return response()->json(['is_mark' => $newMark]);
     }
 
     /**

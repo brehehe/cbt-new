@@ -8,13 +8,15 @@
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div class="flex items-center gap-2">
-                <button wire:click="syncAllQuestions()" wire:loading.attr="disabled" wire:target="syncAllQuestions"
-                    class="flex items-center px-3 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm transition">
-                    <svg class="w-4 h-4 mr-1.5 animate-spin-hover" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    Sinkronkan Semua Soal
-                </button>
+                @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
+                    <button wire:click="syncAllQuestions()" wire:loading.attr="disabled" wire:target="syncAllQuestions"
+                        class="flex items-center px-3 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm transition">
+                        <svg class="w-4 h-4 mr-1.5 animate-spin-hover" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Sinkronkan Semua Soal
+                    </button>
+                @endif
                 <button wire:click="$refresh"
                     class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 shadow-sm transition">
                     <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -23,14 +25,16 @@
                     </svg>
                     Refresh
                 </button>
-                <button wire:click="openCreateModal"
-                    class="{{ in_array(config('app.name_slug'), ['pro-cbt']) ? 'btn btn-warning' : 'btn btn-primary' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Tambah Jadwal
-                </button>
+                @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
+                    <button wire:click="openCreateModal"
+                        class="{{ in_array(config('app.name_slug'), ['pro-cbt']) ? 'btn btn-warning' : 'btn btn-primary' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Tambah Jadwal
+                    </button>
+                @endif
             </div>
         </div>
     </div>
@@ -274,13 +278,15 @@
                                                             </button>
                                                         </li>
                                                     @endif
-                                                    <li>
-                                                        <button wire:click="correctIndex('{{ $timetable->id }}')"
-                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
-                                                            <i class="fa-solid fa-check mr-2 text-green-600"></i>
-                                                            Koreksi
-                                                        </button>
-                                                    </li>
+                                                    @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
+                                                        <li>
+                                                            <button wire:click="correctIndex('{{ $timetable->id }}')"
+                                                                class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                                <i class="fa-solid fa-check mr-2 text-green-600"></i>
+                                                                Koreksi
+                                                            </button>
+                                                        </li>
+                                                    @endif
                                                     <li>
                                                         <button wire:click="confirmAlert('{{ $timetable->id }}')"
                                                             class="w-full text-left px-4 py-2 hover:bg-gray-100">
@@ -331,12 +337,14 @@
                                                             Tambah Waktu
                                                         </button>
                                                     </li>
-                                                    <li>
-                                                        <button wire:click="confirmDelete('{{ $timetable->id }}')"
-                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600">
-                                                            <i class="fa-solid fa-trash mr-2"></i> Hapus
-                                                        </button>
-                                                    </li>
+                                                    @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
+                                                        <li>
+                                                            <button wire:click="confirmDelete('{{ $timetable->id }}')"
+                                                                class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600">
+                                                                <i class="fa-solid fa-trash mr-2"></i> Hapus
+                                                            </button>
+                                                        </li>
+                                                    @endif
                                                 @endif
                                             </ul>
                                         </div>

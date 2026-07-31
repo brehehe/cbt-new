@@ -47,10 +47,8 @@
                 ['label' => 'Modul Soal', 'url' => route('admin.master.module'), 'pattern' => 'admin/master/module-question*', 'icon' => 'fa-folder-open'],
                 ['label' => 'Bank Soal', 'url' => route('admin.master.question'), 'pattern' => 'admin/master/question*', 'icon' => 'fa-database'],
             ];
-        } elseif (auth()->user()->hasRole('Pengawas')) {
+        } elseif (auth()->user()->hasRole(['Pengawas', 'pengawas'])) {
             $masters = [
-                ['label' => 'Ruang Ujian', 'url' => route('admin.master.exam-room'), 'pattern' => 'admin/master/exam-room*', 'icon' => 'fa-house'],
-                ['label' => 'Sesi Ujian', 'url' => route('admin.master.exam-session'), 'pattern' => 'admin/master/exam-session*', 'icon' => 'fa-clock'],
                 ['label' => 'Jadwal', 'url' => '/admin/master/timetable', 'pattern' => 'admin/master/timetable*', 'icon' => 'fa-calendar'],
             ];
         }
@@ -92,11 +90,20 @@
             <!-- Desktop Horizontal Menu -->
             <div class="hidden lg:flex items-center gap-1">
                 <!-- Dashboard -->
-                <a href="/admin"
-                    class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 {{ Request::is('admin') ? $bgActive : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                <a href="{{ auth()->user()->hasRole(['Pengawas', 'pengawas']) ? route('pengawas.dashboard') : '/admin' }}"
+                    class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 {{ Request::is('admin') || Request::is('pengawas') ? $bgActive : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
                     <i class="fa-solid fa-house"></i>
                     <span>Dashboard</span>
                 </a>
+
+                <!-- Jadwal Link for Pengawas -->
+                @if (Auth::user()->hasRole(['Pengawas', 'pengawas']))
+                    <a href="/admin/master/timetable"
+                        class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 {{ Request::is('admin/master/timetable*') ? $bgActive : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                        <i class="fa-solid fa-calendar text-indigo-500"></i>
+                        <span>Jadwal</span>
+                    </a>
+                @endif
 
                 <!-- Ujian Dropdown -->
                 @if (Auth::user()->hasRole(['Mahasiswa', 'Admin']))
@@ -126,7 +133,7 @@
                 @endif
 
                 <!-- Master Dropdown (Mega Menu Style for many items) -->
-                @if (!Auth::user()->hasRole(['Mahasiswa']) && count($masters) > 0)
+                @if (!Auth::user()->hasRole(['Mahasiswa', 'Pengawas', 'pengawas']) && count($masters) > 0)
                     <div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false" class="relative">
                         <button
                             class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all duration-200">
@@ -251,10 +258,17 @@
 
                         <div class="flex-1 p-4 space-y-6">
                             <!-- Mobile Dashboard Link -->
-                            <a href="/admin"
-                                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ Request::is('admin') ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600' }} font-bold">
+                            <a href="{{ auth()->user()->hasRole(['Pengawas', 'pengawas']) ? route('pengawas.dashboard') : '/admin' }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ Request::is('admin') || Request::is('pengawas') ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600' }} font-bold">
                                 <i class="fa-solid fa-house"></i> Dashboard
                             </a>
+
+                            @if (Auth::user()->hasRole(['Pengawas', 'pengawas']))
+                                <a href="/admin/master/timetable"
+                                    class="flex items-center gap-3 px-4 py-3 rounded-xl {{ Request::is('admin/master/timetable*') ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600' }} font-bold">
+                                    <i class="fa-solid fa-calendar text-indigo-500"></i> Jadwal
+                                </a>
+                            @endif
 
                             <!-- Mobile Menu Sections -->
                             @if (Auth::user()->hasRole(['Mahasiswa', 'Admin']))
@@ -272,7 +286,7 @@
                                 </div>
                             @endif
 
-                            @if (!Auth::user()->hasRole(['Mahasiswa']) && count($masters) > 0)
+                            @if (!Auth::user()->hasRole(['Mahasiswa', 'Pengawas', 'pengawas']) && count($masters) > 0)
                                 <div>
                                     <h4 class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Data
                                         Master</h4>

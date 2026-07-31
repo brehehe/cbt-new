@@ -53,6 +53,14 @@ class AdminMasterTimetableDetailIndex extends Component
             return redirect()->route('admin.master.timetable');
         }
 
+        if (auth()->user()->hasRole(['Pengawas', 'pengawas'])) {
+            $supervisors = is_array($timetable->supervisors) ? $timetable->supervisors : (json_decode($timetable->supervisors, true) ?? []);
+            $supervisorsStr = array_map('strval', $supervisors);
+            if (!in_array((string)auth()->id(), $supervisorsStr)) {
+                return redirect()->route('admin.master.timetable');
+            }
+        }
+
         $this->modules = Module::select('id', 'name')->get()->pluck('name', 'id')->toArray();
         $this->getSupervisors = User::companyRole('Pengawas', Auth::user()->company_id)->select('name', 'id')->get()->pluck('name', 'id')->toArray();
         $this->timetable = $timetable->toArray();

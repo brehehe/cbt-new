@@ -20,10 +20,12 @@
             <nav class="space-y-1">
                 <!-- Dashboard -->
                 @php
-                    $isActive = Request::is('admin');
+                    $isPengawas = auth()->check() && auth()->user()->hasRole(['Pengawas', 'pengawas']);
+                    $isActive = Request::is('admin') || Request::is('pengawas');
+                    $dashboardUrl = $isPengawas ? route('pengawas.dashboard') : '/admin';
                 @endphp
 
-                <a href="/admin" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
+                <a href="{{ $dashboardUrl }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
                     {{ $isActive
     ? "bg-[#C3D4EC]/50 $brandColor active-menu"
     : "text-gray-600 hover:bg-[#C3D4EC]/20 hover:$brandColor" }}">
@@ -323,7 +325,7 @@
                         // ============================
                         // ROLE PENGAWAS
                         // ============================
-                        if (auth()->user()->hasRole('Pengawas')) {
+                        if (auth()->user()->hasRole(['Pengawas', 'pengawas'])) {
                             $masters = [];
 
                             $examSchedules = [

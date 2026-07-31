@@ -2,10 +2,10 @@
     <div class="mb-6">
         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="text-center md:text-left">
-                <h1 class="text-2xl font-bold text-[color:var(--primary)]">Nilai Ujian Detail</h1>
-                <p class="text-gray-600 text-sm mt-1">Lihat detail hasil ujian dan statistik pengerjaan.</p>
+                <h1 class="text-2xl font-bold text-[color:var(--primary)]">{{ auth()->user()->hasRole(['Pengawas', 'pengawas']) ? 'Detail Ujian' : 'Nilai Ujian Detail' }}</h1>
+                <p class="text-gray-600 text-sm mt-1">Lihat detail hasil pengerjaan ujian.</p>
             </div>
-            @if(!auth()->user()->hasRole('Pengawas'))
+            @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
                 <div>
                     <button wire:click="exportPdf" class="btn btn-primary">
                         <i class="fa-solid fa-file-pdf mr-2"></i>
@@ -70,14 +70,14 @@
     </div>
 
     {{-- Statistik --}}
-    <div class="grid grid-cols-2 md:grid-cols-3 {{ auth()->user()->hasRole('Pengawas') ? 'lg:grid-cols-1' : 'lg:grid-cols-6' }} gap-4 mb-6">
+    <div class="grid grid-cols-2 md:grid-cols-3 {{ auth()->user()->hasRole(['Pengawas', 'pengawas']) ? 'lg:grid-cols-1' : 'lg:grid-cols-6' }} gap-4 mb-6">
         <div>
             <label for="total_soal" class="block text-sm font-medium text-gray-700">Total Soal</label>
             <input disabled type="number" id="total_soal"
                 value="{{ $user_timetable->userModuleQuestions->count() }}"
                 placeholder="Masukkan" class="mt-1 form-control">
         </div>
-        @if(!auth()->user()->hasRole('Pengawas'))
+        @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
             <div>
                 <label for="terjawab" class="block text-sm font-medium text-gray-700">Terjawab</label>
                 <input disabled type="number" id="terjawab"
@@ -145,11 +145,11 @@
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16 text-center">No</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Soal</th>
-                        @if(!auth()->user()->hasRole('Pengawas'))
+                        @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jawaban Benar</th>
                         @endif
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jawaban Terpilih</th>
-                        @if(!auth()->user()->hasRole('Pengawas'))
+                        @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Status</th>
                         @endif
                     </tr>
@@ -231,7 +231,7 @@
                             </td>
 
                             {{-- Status --}}
-                            @if(!auth()->user()->hasRole('Pengawas'))
+                            @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
                                 <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
                                     @if ($userModuleQuestion->status === 'correct')
                                         <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Benar</span>
@@ -247,7 +247,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ auth()->user()->hasRole('Pengawas') ? 3 : 5 }}" class="px-6 py-10 text-center text-gray-500">
+                            <td colspan="{{ auth()->user()->hasRole(['Pengawas', 'pengawas']) ? 2 : 5 }}" class="px-6 py-10 text-center text-gray-500">
                                 <div class="flex flex-col items-center justify-center">
                                     <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
