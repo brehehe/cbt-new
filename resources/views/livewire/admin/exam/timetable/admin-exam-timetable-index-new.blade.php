@@ -84,19 +84,30 @@
                                 {{ Str::limit($timetable->timetableModule->description ?? '-', 50) }}
                             </td>
                             <td class="px-6 py-5 whitespace-nowrap text-center text-sm font-medium">
-                                @if (!$timetable->userTimetable)
-                                    <button
-                                        class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-xs font-bold rounded-xl shadow-sm text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all transform hover:scale-105 active:scale-95"
-                                        wire:click="openModalStartExam('{{ $timetable->id }}')">
-                                        <i class="fa-solid fa-rocket mr-1.5"></i> Masuk
-                                    </button>
-                                @else
-                                    <button
-                                        class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-xs font-bold rounded-xl shadow-sm text-white bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all transform hover:scale-105 active:scale-95"
-                                        wire:click="confirmBackExam('{{ $timetable->userTimetable->id }}')">
-                                        <i class="fa-solid fa-rotate-right mr-1.5"></i> Lanjut
-                                    </button>
-                                @endif
+                                <div class="flex items-center justify-center gap-2">
+                                    @if (!$timetable->userTimetable)
+                                        <button
+                                            class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-xs font-bold rounded-xl shadow-sm text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all transform hover:scale-105 active:scale-95"
+                                            wire:click="openModalStartExam('{{ $timetable->id }}')">
+                                            <i class="fa-solid fa-rocket mr-1.5"></i> Masuk
+                                        </button>
+                                    @else
+                                        <button
+                                            class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-xs font-bold rounded-xl shadow-sm text-white bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all transform hover:scale-105 active:scale-95"
+                                            wire:click="confirmBackExam('{{ $timetable->userTimetable->id }}')">
+                                            <i class="fa-solid fa-rotate-right mr-1.5"></i> Lanjut
+                                        </button>
+                                    @endif
+
+                                    @if(auth()->user()->hasRole(['admin', 'superadmin', 'Admin', 'Super Admin']))
+                                        <button
+                                            class="inline-flex items-center justify-center px-3 py-2 border border-indigo-200 text-xs font-bold rounded-xl text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-all transform hover:scale-105 active:scale-95"
+                                            wire:click="openModalSupervisor('{{ $timetable->id }}')"
+                                            title="Ubah Pengawas Ujian">
+                                            <i class="fa-solid fa-user-shield mr-1.5"></i> Pengawas
+                                        </button>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -151,18 +162,27 @@
                     </div>
                 @endif
 
-                <div class="pt-2">
+                <div class="pt-2 flex gap-2">
                     @if (!$timetable->userTimetable)
                         <button
-                            class="w-full flex justify-center items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all"
+                            class="flex-1 flex justify-center items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all"
                             wire:click="openModalStartExam('{{ $timetable->id }}')">
                             <i class="fa-solid fa-book mr-2"></i> Masuk Ujian
                         </button>
                     @else
                         <button
-                            class="w-full flex justify-center items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all"
+                            class="flex-1 flex justify-center items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all"
                             wire:click="confirmBackExam('{{ $timetable->userTimetable->id }}')">
                             <i class="fa-regular fa-book-open-cover mr-2"></i> Kembali Ujian
+                        </button>
+                    @endif
+
+                    @if(auth()->user()->hasRole(['admin', 'superadmin', 'Admin', 'Super Admin']))
+                        <button
+                            class="flex justify-center items-center px-3 py-2.5 border border-indigo-200 text-sm font-semibold rounded-lg text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-all"
+                            wire:click="openModalSupervisor('{{ $timetable->id }}')"
+                            title="Ubah Pengawas Ujian">
+                            <i class="fa-solid fa-user-shield mr-1"></i> Pengawas
                         </button>
                     @endif
                 </div>

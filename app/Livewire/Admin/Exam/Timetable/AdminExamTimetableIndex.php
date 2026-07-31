@@ -37,6 +37,12 @@ class AdminExamTimetableIndex extends Component
 
     public $code;
 
+    public $timetable_id_supervisor;
+
+    public $selectedSupervisors = [];
+
+    public $availableSupervisors = [];
+
     public function mount()
     {
         if (session()->has('saved')) {
@@ -338,7 +344,13 @@ class AdminExamTimetableIndex extends Component
                 'text' => 'Anda berhasil memulai ujian!',
             ]);
 
-            return redirect()->route('admin.exam.warning');
+            if (Auth::user()->hasRole('Mahasiswa')) {
+                return redirect()->route('admin.exam.warning');
+            }
+
+            return redirect()->route('admin.exam.detail.react', [
+                'userTimetableId' => $UserTimetable->id,
+            ]);
         } catch (\Throwable $th) {
             DB::rollback();
             AlertHelper::error('Gagal'.$th->getMessage());
@@ -372,7 +384,69 @@ class AdminExamTimetableIndex extends Component
         if ($userTimetable->status == 'exam') {
             Session::put('user_timetable_id', $id);
 
-            return redirect()->route('admin.exam.detail');
+            return redirect()->route('admin.exam.detail.react', [
+                'userTimetableId' => $id,
+            ]);
+        }
+    }
+
+    public function openModalSupervisor($id)
+    {
+        $this->timetable_id_supervisor = $id;
+        $timetable = Timetable::find($id);
+
+        if (! $timetable) {
+            AlertHelper::error('Gagal', 'Jadwal tidak ditemukan.');
+            return;
+        }
+
+        $supervisors = $timetable->supervisors;
+        if (is_string($supervisors)) {
+            $supervisors = json_decode($supervisors, true) ?? [];
+        }
+        $this->selectedSupervisors = is_array($supervisors) ? $supervisors : [];
+
+        $this->availableSupervisors = User::companyRole('Pengawas', Auth::user()->company_id)
+            ->select('name', 'id')
+            ->get()
+            ->pluck('name', 'id')
+            ->toArray();
+
+        if (empty($this->availableSupervisors)) {
+            $this->availableSupervisors = User::role(['Pengawas', 'pengawas'])
+                ->select('name', 'id')
+                ->get()
+                ->pluck('name', 'id')
+                ->toArray();
+        }
+
+        return $this->dispatch('open-modal', ['id' => 'modal-change-supervisor']);
+    }
+
+    public function closeModalSupervisor()
+    {
+        $this->reset(['timetable_id_supervisor', 'selectedSupervisors']);
+        return $this->dispatch('close-modal', ['id' => 'modal-change-supervisor']);
+    }
+
+    public function saveSupervisor()
+    {
+        try {
+            $timetable = Timetable::find($this->timetable_id_supervisor);
+            if (! $timetable) {
+                AlertHelper::error('Gagal', 'Jadwal tidak ditemukan.');
+                return;
+            }
+
+            $timetable->update([
+                'supervisors' => array_values(array_filter($this->selectedSupervisors))
+            ]);
+
+            AlertHelper::success('Berhasil', 'Pengawas ujian berhasil diperbarui.');
+            return $this->closeModalSupervisor();
+        } catch (\Throwable $th) {
+            Log::error('saveSupervisor error: ' . $th->getMessage());
+            AlertHelper::error('Gagal', 'Gagal memperbarui pengawas: ' . $th->getMessage());
         }
     }
 

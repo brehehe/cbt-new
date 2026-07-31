@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import {
-    AlertTriangle, Clock, Loader2, Shield, Menu, X, Pause
+    AlertTriangle, Clock, Loader2, Shield, Menu, X, Pause, ArrowLeft, ShieldAlert, Maximize
 } from 'lucide-react';
 import QuestionArea from './components/QuestionArea';
 import NavigationSidebar from './components/NavigationSidebar';
@@ -120,7 +120,7 @@ const ExamContainer = ({ userTimetableId, defaultCompanyColor = '#1e3a5f' }) => 
 
     // Hooks
     const { isRecording, stopRecording } = useExamRecording(userTimetableId, examData?.isRecordingEnabled, cameraStream);
-    const { isBlackout } = useProctoring(userTimetableId, (count) => setAlertCount(count));
+    const { isBlackout, isFullscreen, fullscreenWarning, taskbarWarning, requestFullscreen } = useProctoring(userTimetableId, (count) => setAlertCount(count));
     const { connectionStatus } = useLiveSession(userTimetableId, examData?.isStreamingEnabled, cameraStream, handleTimeSync);
 
     const handleFinishExam = async (isAuto = false) => {
@@ -204,7 +204,7 @@ const ExamContainer = ({ userTimetableId, defaultCompanyColor = '#1e3a5f' }) => 
                 setLastSaved(new Date().toLocaleTimeString());
                 setLoading(false);
 
-                if (response.data.remainingTime <= 0) {
+                if (!response.data.isNoTimeLimit && response.data.remainingTime <= 0) {
                     handleFinishExam(true);
                 }
             } catch (error) {
@@ -259,7 +259,7 @@ const ExamContainer = ({ userTimetableId, defaultCompanyColor = '#1e3a5f' }) => 
 
     // Timer
     useEffect(() => {
-        if (!examData || remainingTime <= 0 || isPaused) return;
+        if (!examData || remainingTime <= 0 || isPaused || examData?.isNoTimeLimit) return;
         const timer = setInterval(() => {
             setRemainingTime(prev => {
                 if (prev <= 1) {
@@ -378,12 +378,33 @@ const ExamContainer = ({ userTimetableId, defaultCompanyColor = '#1e3a5f' }) => 
                     )}
                 </div>
 
-                {/* Right: Timer + Mobile toggles */}
+                {/* Right: Timer + Admin Back Button + Mobile toggles */}
                 <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border" style={{ backgroundColor: `${companyColor}10`, borderColor: `${companyColor}30` }}>
-                        <Clock className="w-4 h-4" style={{ color: '#16a34a' }} />
-                        <span className="font-mono font-bold text-sm tracking-widest" style={{ color: companyColor }}>{formatTime(remainingTime)}</span>
-                    </div>
+                    {examData?.isAdmin && (
+                        <a
+                            href="/admin/exam/timetable"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition border border-slate-200 shadow-sm"
+                            title="Kembali ke Halaman Admin"
+                        >
+                            <ArrowLeft className="w-3.5 h-3.5" />
+                            <span className="hidden sm:inline">Kembali ke Admin</span>
+                        </a>
+                    )}
+
+                    {examData?.isNoTimeLimit ? (
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border bg-emerald-50 border-emerald-200 shadow-sm">
+                            <Clock className="w-4 h-4 text-emerald-600" />
+                            <span className="font-semibold text-xs sm:text-sm text-emerald-700 tracking-wide">
+                                Tanpa Batas Waktu
+                            </span>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border shadow-sm" style={{ backgroundColor: `${companyColor}10`, borderColor: `${companyColor}30` }}>
+                            <Clock className="w-4 h-4" style={{ color: '#16a34a' }} />
+                            <span className="font-mono font-bold text-sm tracking-widest" style={{ color: companyColor }}>{formatTime(remainingTime)}</span>
+                        </div>
+                    )}
+
                     {/* Mobile toggles */}
                     <div className="flex lg:hidden gap-2">
                         <button onClick={() => setIsNavOpen(!isNavOpen)} className="p-1.5 rounded-lg border border-gray-200 text-gray-600"><Menu className="w-4 h-4" /></button>
@@ -478,6 +499,38 @@ const ExamContainer = ({ userTimetableId, defaultCompanyColor = '#1e3a5f' }) => 
                             <Clock className="w-5 h-5" />
                             <span>{formatTime(remainingTime)}</span>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Taskbar / Cursor Warning Banner */}
+            {taskbarWarning && (
+                <div className="fixed top-16 left-1/2 -translate-x-1/2 z-[99999] bg-red-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 animate-bounce border border-red-400 font-medium text-sm">
+                    <AlertTriangle className="w-5 h-5 text-yellow-300 flex-shrink-0" />
+                    <span>⚠️ <strong>Peringatan Pelanggaran:</strong> {taskbarWarning}!</span>
+                </div>
+            )}
+
+            {/* Fullscreen Warning Modal */}
+            {fullscreenWarning && !examData?.isAdmin && (
+                <div className="fixed inset-0 bg-red-950/90 backdrop-blur-md z-[99999] flex flex-col items-center justify-center text-white text-center p-6 animate-in fade-in duration-200">
+                    <div className="bg-slate-900/95 border border-red-500/50 rounded-2xl p-8 max-w-lg w-full shadow-2xl flex flex-col items-center space-y-5">
+                        <div className="w-16 h-16 bg-red-500/20 text-red-400 rounded-full flex items-center justify-center animate-bounce">
+                            <ShieldAlert className="w-10 h-10" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-red-400">PERINGATAN PELANGGARAN!</h2>
+                        <p className="text-gray-300 text-sm leading-relaxed">
+                            Layar tidak dalam mode <strong className="text-white">Fullscreen</strong>. Keluar dari mode fullscreen atau menggeser jendela dianggap sebagai pelanggaran ujian dan dicatat oleh sistem.
+                        </p>
+                        <button
+                            onClick={() => {
+                                requestFullscreen();
+                            }}
+                            className="px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl shadow-lg transition transform hover:scale-105 active:scale-95 flex items-center gap-2"
+                        >
+                            <Maximize className="w-5 h-5" />
+                            Masuk Mode Fullscreen Sekarang
+                        </button>
                     </div>
                 </div>
             )}

@@ -160,195 +160,230 @@
                             </td>
                             <!-- Aksi -->
                             <td class="text-center px-3 py-2 relative">
-                                 <div x-data="{ open: false, x: 0, y: 0 }"
-                                      x-init="
-                                          $watch('open', value => {
-                                              if (value) {
-                                                  $nextTick(() => {
-                                                      const btn = $refs.btn;
-                                                      const dropdown = $refs.dropdown;
-                                                      if (btn && dropdown) {
-                                                          const rect = btn.getBoundingClientRect();
-                                                          const dropdownHeight = dropdown.offsetHeight;
-                                                          const dropdownWidth = dropdown.offsetWidth;
-                                                          
-                                                          x = rect.right + window.scrollX - dropdownWidth;
-                                                          
-                                                          const spaceAbove = rect.top;
-                                                          const spaceBelow = window.innerHeight - rect.bottom;
-                                                          
-                                                          if (spaceBelow < dropdownHeight + 10 && spaceAbove > spaceBelow) {
-                                                              y = rect.top + window.scrollY - dropdownHeight - 4;
-                                                          } else {
-                                                              y = rect.bottom + window.scrollY + 4;
-                                                          }
-                                                      }
-                                                  });
-                                              }
-                                          })
-                                      "
-                                      class="inline-block text-left">
-                                     <button x-ref="btn"
-                                         @click="open = !open"
-                                         class="px-3 py-2 bg-gray-100 rounded-md hover:bg-gray-200 transition text-gray-700">
-                                         <i class="fa-solid fa-ellipsis-vertical"></i>
-                                     </button>
+                                <div class="flex items-center justify-center gap-1.5">
+                                    @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
+                                        <button wire:click="startExamShortcut('{{ $timetable->id }}')"
+                                            class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs font-semibold shadow-sm transition inline-flex items-center gap-1"
+                                            title="Masuk / Ujicoba Halaman Ujian">
+                                            <i class="fa-solid fa-play text-[10px]"></i>
+                                            <span>Ujian</span>
+                                        </button>
+                                    @endif
+                                    <div x-data="{ open: false, x: 0, y: 0 }"
+                                         x-init="
+                                             $watch('open', value => {
+                                                 if (value) {
+                                                     $nextTick(() => {
+                                                         const btn = $refs.btn;
+                                                         const dropdown = $refs.dropdown;
+                                                         if (btn && dropdown) {
+                                                             const rect = btn.getBoundingClientRect();
+                                                             const dropdownHeight = dropdown.offsetHeight;
+                                                             const dropdownWidth = dropdown.offsetWidth;
+                                                             
+                                                             x = rect.right + window.scrollX - dropdownWidth;
+                                                             
+                                                             const spaceAbove = rect.top;
+                                                             const spaceBelow = window.innerHeight - rect.bottom;
+                                                             
+                                                             if (spaceBelow < dropdownHeight + 10 && spaceAbove > spaceBelow) {
+                                                                 y = rect.top + window.scrollY - dropdownHeight - 4;
+                                                             } else {
+                                                                 y = rect.bottom + window.scrollY + 4;
+                                                             }
+                                                         }
+                                                     });
+                                                 }
+                                             })
+                                         "
+                                         class="inline-block text-left">
+                                        <button x-ref="btn"
+                                            @click="open = !open"
+                                            class="px-3 py-2 bg-gray-100 rounded-md hover:bg-gray-200 transition text-gray-700">
+                                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                                        </button>
 
-                                     <!-- Dropdown keluar body -->
-                                     <template x-teleport="body">
-                                         <div x-show="open" x-ref="dropdown" x-transition.opacity @click.away="open = false"
-                                             class="absolute z-50 w-52 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto"
-                                             :style="`top:${y}px; left:${x}px`">
+                                        <!-- Dropdown keluar body -->
+                                        <template x-teleport="body">
+                                            <div x-show="open" x-ref="dropdown" x-transition.opacity @click.away="open = false"
+                                                class="absolute z-50 w-52 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto"
+                                                :style="`top:${y}px; left:${x}px`">
 
-                                            <ul class="py-1 text-sm text-gray-700">
-                                                @if (!$timetable->code)
-                                                    @if ($this->canGenerateToken())
-                                                        <li>
-                                                            <button wire:click="confirmGenerateToken('{{ $timetable->id }}')"
-                                                                class="w-full text-left px-4 py-2 hover:bg-gray-100">
-                                                                <i class="fa-solid fa-square-binary mr-2 text-green-600"></i>
-                                                                Generate Token
-                                                            </button>
-                                                        </li>
-                                                    @endif
-                                                    <li>
-                                                        <a href="{{ route('admin.print.daftar-hadir', $timetable->id) }}"
-                                                            target="_blank" class="block px-4 py-2 hover:bg-gray-100">
-                                                            <i class="fa-solid fa-file-lines mr-2 text-blue-600"></i>
-                                                            Cetak Daftar Hadir
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{{ route('admin.print.berita-acara', $timetable->id) }}"
-                                                            target="_blank" class="block px-4 py-2 hover:bg-gray-100">
-                                                            <i class="fa-solid fa-file-signature mr-2 text-green-600"></i>
-                                                            Cetak Berita Acara
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <button wire:click="printCard('{{ $timetable->id }}')"
-                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
-                                                            <i class="fa-solid fa-id-card mr-2 text-purple-600"></i>
-                                                            Cetak Kartu Peserta
-                                                        </button>
-                                                    </li>
-                                                    <li>
-                                                        <button wire:click="syncQuestions('{{ $timetable->id }}')"
-                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
-                                                            <i class="fa-solid fa-rotate mr-2 text-indigo-600"></i>
-                                                            Sinkronkan Soal
-                                                        </button>
-                                                    </li>
-                                                    <li>
-                                                        <button wire:click="edit('{{ $timetable->id }}')"
-                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
-                                                            <i class="fa-solid fa-pen-to-square mr-2 text-blue-600"></i>
-                                                            Edit
-                                                        </button>
-                                                    </li>
-                                                    <li>
-                                                        <button wire:click="confirmDelete('{{ $timetable->id }}')"
-                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600">
-                                                            <i class="fa-solid fa-trash mr-2"></i> Hapus
-                                                        </button>
-                                                    </li>
-                                                @else
-                                                    @if($timetable->is_streaming)
-                                                        <li>
-                                                            <button wire:click="liveSession('{{ $timetable->id }}')"
-                                                                class="w-full text-left px-4 py-2 hover:bg-gray-100">
-                                                                <i class="fa-solid fa-camera mr-2 text-blue-600"></i>
-                                                                Live Session
-                                                            </button>
-                                                        </li>
-                                                    @endif
-                                                    <li>
-                                                        <button wire:click="sessionIndex('{{ $timetable->id }}')"
-                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
-                                                            <i class="fa-solid fa-users mr-2 text-indigo-600"></i>
-                                                            Kelola Sesi
-                                                        </button>
-                                                    </li>
-                                                    @if($timetable->is_recording)
-                                                        <li>
-                                                            <button wire:click="confirmVideo('{{ $timetable->id }}')"
-                                                                class="w-full text-left px-4 py-2 hover:bg-gray-100">
-                                                                <i class="fa-solid fa-video mr-2 text-green-600"></i>
-                                                                Video
-                                                            </button>
-                                                        </li>
-                                                    @endif
+                                                <ul class="py-1 text-sm text-gray-700">
                                                     @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
                                                         <li>
-                                                            <button wire:click="correctIndex('{{ $timetable->id }}')"
-                                                                class="w-full text-left px-4 py-2 hover:bg-gray-100">
-                                                                <i class="fa-solid fa-check mr-2 text-green-600"></i>
-                                                                Koreksi
+                                                            <button wire:click="startExamShortcut('{{ $timetable->id }}')"
+                                                                class="w-full text-left px-4 py-2 hover:bg-emerald-50 text-emerald-700 font-semibold border-b border-gray-100">
+                                                                <i class="fa-solid fa-play mr-2 text-emerald-600"></i>
+                                                                Masuk / Ujicoba Ujian
                                                             </button>
                                                         </li>
                                                     @endif
-                                                    <li>
-                                                        <button wire:click="confirmAlert('{{ $timetable->id }}')"
-                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
-                                                            <i
-                                                                class="fa-solid fa-triangle-exclamation mr-2 text-yellow-600"></i>
-                                                            Alert
-                                                        </button>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{{ route('admin.print.daftar-hadir', $timetable->id) }}"
-                                                            target="_blank" class="block px-4 py-2 hover:bg-gray-100">
-                                                            <i class="fa-solid fa-file-lines mr-2 text-blue-600"></i>
-                                                            Cetak Daftar Hadir
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{{ route('admin.print.berita-acara', $timetable->id) }}"
-                                                            target="_blank" class="block px-4 py-2 hover:bg-gray-100">
-                                                            <i class="fa-solid fa-file-signature mr-2 text-green-600"></i>
-                                                            Cetak Berita Acara
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <button wire:click="printCard('{{ $timetable->id }}')"
-                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
-                                                            <i class="fa-solid fa-id-card mr-2 text-purple-600"></i>
-                                                            Cetak Kartu Peserta
-                                                        </button>
-                                                    </li>
-                                                    <li>
-                                                        <button wire:click="syncQuestions('{{ $timetable->id }}')"
-                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
-                                                            <i class="fa-solid fa-rotate mr-2 text-indigo-600"></i>
-                                                            Sinkronkan Soal
-                                                        </button>
-                                                    </li>
-                                                    <li>
-                                                        <button wire:click="confirmDetail('{{ $timetable->id }}')"
-                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
-                                                            <i class="fa-solid fa-eye mr-2 text-blue-600"></i>
-                                                            Detail
-                                                        </button>
-                                                    </li>
-                                                    <li>
-                                                        <button wire:click="extraTimeModal('{{ $timetable->id }}')"
-                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100">
-                                                            <i class="fa-solid fa-clock mr-2 text-blue-600"></i>
-                                                            Tambah Waktu
-                                                        </button>
-                                                    </li>
-                                                    @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
+                                                    @if (!$timetable->code)
+                                                        @if ($this->canGenerateToken())
+                                                            <li>
+                                                                <button wire:click="confirmGenerateToken('{{ $timetable->id }}')"
+                                                                    class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                                    <i class="fa-solid fa-square-binary mr-2 text-green-600"></i>
+                                                                    Generate Token
+                                                                </button>
+                                                            </li>
+                                                        @endif
+                                                        <li>
+                                                            <a href="{{ route('admin.print.daftar-hadir', $timetable->id) }}"
+                                                                target="_blank" class="block px-4 py-2 hover:bg-gray-100">
+                                                                <i class="fa-solid fa-file-lines mr-2 text-blue-600"></i>
+                                                                Cetak Daftar Hadir
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="{{ route('admin.print.berita-acara', $timetable->id) }}"
+                                                                target="_blank" class="block px-4 py-2 hover:bg-gray-100">
+                                                                <i class="fa-solid fa-file-signature mr-2 text-green-600"></i>
+                                                                Cetak Berita Acara
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <button wire:click="printCard('{{ $timetable->id }}')"
+                                                                class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                                <i class="fa-solid fa-id-card mr-2 text-purple-600"></i>
+                                                                Cetak Kartu Peserta
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <button wire:click="syncQuestions('{{ $timetable->id }}')"
+                                                                class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                                <i class="fa-solid fa-rotate mr-2 text-indigo-600"></i>
+                                                                Sinkronkan Soal
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <button wire:click="openModalSupervisor('{{ $timetable->id }}')"
+                                                                class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                                <i class="fa-solid fa-user-shield mr-2 text-indigo-600"></i>
+                                                                Ubah Pengawas
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <button wire:click="edit('{{ $timetable->id }}')"
+                                                                class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                                <i class="fa-solid fa-pen-to-square mr-2 text-blue-600"></i>
+                                                                Edit
+                                                            </button>
+                                                        </li>
                                                         <li>
                                                             <button wire:click="confirmDelete('{{ $timetable->id }}')"
                                                                 class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600">
                                                                 <i class="fa-solid fa-trash mr-2"></i> Hapus
                                                             </button>
                                                         </li>
+                                                    @else
+                                                        @if($timetable->is_streaming)
+                                                            <li>
+                                                                <button wire:click="liveSession('{{ $timetable->id }}')"
+                                                                    class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                                    <i class="fa-solid fa-camera mr-2 text-blue-600"></i>
+                                                                    Live Session
+                                                                </button>
+                                                            </li>
+                                                        @endif
+                                                        <li>
+                                                            <button wire:click="sessionIndex('{{ $timetable->id }}')"
+                                                                class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                                <i class="fa-solid fa-users mr-2 text-indigo-600"></i>
+                                                                Kelola Sesi
+                                                            </button>
+                                                        </li>
+                                                        @if($timetable->is_recording)
+                                                            <li>
+                                                                <button wire:click="confirmVideo('{{ $timetable->id }}')"
+                                                                    class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                                    <i class="fa-solid fa-video mr-2 text-green-600"></i>
+                                                                    Video
+                                                                </button>
+                                                            </li>
+                                                        @endif
+                                                        @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
+                                                            <li>
+                                                                <button wire:click="correctIndex('{{ $timetable->id }}')"
+                                                                    class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                                    <i class="fa-solid fa-check mr-2 text-green-600"></i>
+                                                                    Koreksi
+                                                                </button>
+                                                            </li>
+                                                        @endif
+                                                        <li>
+                                                            <button wire:click="confirmAlert('{{ $timetable->id }}')"
+                                                                class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                                <i
+                                                                    class="fa-solid fa-triangle-exclamation mr-2 text-yellow-600"></i>
+                                                                Alert
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <a href="{{ route('admin.print.daftar-hadir', $timetable->id) }}"
+                                                                target="_blank" class="block px-4 py-2 hover:bg-gray-100">
+                                                                <i class="fa-solid fa-file-lines mr-2 text-blue-600"></i>
+                                                                Cetak Daftar Hadir
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="{{ route('admin.print.berita-acara', $timetable->id) }}"
+                                                                target="_blank" class="block px-4 py-2 hover:bg-gray-100">
+                                                                <i class="fa-solid fa-file-signature mr-2 text-green-600"></i>
+                                                                Cetak Berita Acara
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <button wire:click="printCard('{{ $timetable->id }}')"
+                                                                class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                                <i class="fa-solid fa-id-card mr-2 text-purple-600"></i>
+                                                                Cetak Kartu Peserta
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <button wire:click="syncQuestions('{{ $timetable->id }}')"
+                                                                class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                                <i class="fa-solid fa-rotate mr-2 text-indigo-600"></i>
+                                                                Sinkronkan Soal
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <button wire:click="confirmDetail('{{ $timetable->id }}')"
+                                                                class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                                <i class="fa-solid fa-eye mr-2 text-blue-600"></i>
+                                                                Detail
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <button wire:click="extraTimeModal('{{ $timetable->id }}')"
+                                                                class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                                <i class="fa-solid fa-clock mr-2 text-blue-600"></i>
+                                                                Tambah Waktu
+                                                            </button>
+                                                        </li>
+                                                        @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
+                                                            <li>
+                                                                <button wire:click="openModalSupervisor('{{ $timetable->id }}')"
+                                                                    class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                                    <i class="fa-solid fa-user-shield mr-2 text-indigo-600"></i>
+                                                                    Ubah Pengawas
+                                                                </button>
+                                                            </li>
+                                                        @endif
+                                                        @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
+                                                            <li>
+                                                                <button wire:click="confirmDelete('{{ $timetable->id }}')"
+                                                                    class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600">
+                                                                    <i class="fa-solid fa-trash mr-2"></i> Hapus
+                                                                </button>
+                                                            </li>
+                                                        @endif
                                                     @endif
-                                                @endif
-                                            </ul>
-                                        </div>
-                                    </template>
+                                                </ul>
+                                            </div>
+                                        </template>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -376,8 +411,8 @@
             </div>
         </div>
     </div>
-
 </div>
+
 @push('scripts')
     <script>
         function copyToClipboard(text) {

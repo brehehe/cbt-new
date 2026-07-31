@@ -14,8 +14,11 @@ class CheckUserTimetable
 {
     public function handle(Request $request, Closure $next)
     {
-        // Skip check jika user belum login
-        if (! Auth::check()) {
+        $user = Auth::user();
+
+        // Bagi user Admin / Super Admin / Dosen / Pengawas (selain Mahasiswa):
+        // Bebas keluar masuk semua halaman admin tanpa dikunci di halaman ujian dan tanpa batas waktu/timeout otomatis.
+        if ($user->hasAnyRole(['admin', 'superadmin', 'Admin', 'Super Admin', 'dosen', 'Dosen', 'pengawas', 'Pengawas']) || ! $user->hasRole('Mahasiswa')) {
             return $next($request);
         }
 

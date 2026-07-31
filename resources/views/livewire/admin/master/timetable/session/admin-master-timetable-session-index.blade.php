@@ -208,58 +208,132 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ $liveSession?->camera_status ?? '-' }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <td class="px-6 py-4 whitespace-nowrap text-center relative">
                                 @if($userTimetable)
-                                    <div class="flex items-center justify-center gap-2">
-                                        @if ($userTimetable->status === 'suspend')
-                                            <button
-                                                class="btn btn-icon text-green-600 hover:text-green-800 transition-colors edit-btn"
-                                                wire:click="unsuspendSession('{{ $user->id }}')"
-                                                wire:confirm="Apakah Anda yakin ingin mencabut suspend peserta ini?">
-                                                <i class="fa-solid fa-user-check"></i>
-                                            </button>
-                                        @else
-                                            <button
-                                                class="btn btn-icon text-red-600 hover:text-red-800 transition-colors edit-btn"
-                                                wire:click="suspendSession('{{ $user->id }}')"
-                                                wire:confirm="Apakah Anda yakin ingin mensuspend peserta ini?">
-                                                <i class="fa-solid fa-user-slash"></i>
-                                            </button>
-                                        @endif
-                                        <button
-                                            class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn"
-                                            wire:click="forceLogoutUser('{{ $user->id }}')"
-                                            wire:confirm="Apakah Anda yakin ingin force logout peserta ini?">
-                                            <i class="fa-solid fa-right-from-bracket"></i>
+                                    <div x-data="{ open: false, x: 0, y: 0 }"
+                                         x-init="
+                                             $watch('open', value => {
+                                                 if (value) {
+                                                     $nextTick(() => {
+                                                         const btn = $refs.btn;
+                                                         const dropdown = $refs.dropdown;
+                                                         if (btn && dropdown) {
+                                                             const rect = btn.getBoundingClientRect();
+                                                             const dropdownHeight = dropdown.offsetHeight;
+                                                             const dropdownWidth = dropdown.offsetWidth;
+                                                             
+                                                             x = rect.right + window.scrollX - dropdownWidth;
+                                                             
+                                                             const spaceAbove = rect.top;
+                                                             const spaceBelow = window.innerHeight - rect.bottom;
+                                                             
+                                                             if (spaceBelow < dropdownHeight + 10 && spaceAbove > spaceBelow) {
+                                                                 y = rect.top + window.scrollY - dropdownHeight - 4;
+                                                             } else {
+                                                                 y = rect.bottom + window.scrollY + 4;
+                                                             }
+                                                         }
+                                                     });
+                                                 }
+                                             })
+                                         "
+                                         class="inline-block text-left">
+                                        <button x-ref="btn"
+                                            @click="open = !open"
+                                            class="px-2.5 py-1.5 bg-gray-100 rounded-md hover:bg-gray-200 transition text-gray-700 font-semibold text-xs inline-flex items-center gap-1">
+                                            <span>Aksi</span>
+                                            <i class="fa-solid fa-chevron-down text-[10px]"></i>
                                         </button>
-                                         @if(in_array($userTimetable->status, ['exam', 'warning', 'suspend']))
-                                             @php
-                                                 $currentAdjMinutes = (int)(($userTimetable->additional_time_seconds ?? 0) / 60);
-                                             @endphp
-                                             <button
-                                                 class="btn btn-icon text-indigo-600 hover:text-indigo-800 transition-colors edit-btn"
-                                                 onclick="adjustTimeIndividual('{{ $user->id }}', {{ $currentAdjMinutes }})"
-                                                 title="Sesuaikan Waktu">
-                                                 <i class="fa-solid fa-clock"></i>
-                                             </button>
 
-                                             @if(!is_null($userTimetable->paused_at))
-                                                 <button
-                                                     class="btn btn-icon text-emerald-600 hover:text-emerald-800 transition-colors edit-btn"
-                                                     wire:click="resumeTimeIndividual('{{ $user->id }}')"
-                                                     title="Lanjutkan Waktu Ujian">
-                                                     <i class="fa-solid fa-play"></i>
-                                                 </button>
-                                             @else
-                                                 <button
-                                                     class="btn btn-icon text-amber-600 hover:text-amber-800 transition-colors edit-btn"
-                                                     wire:click="pauseTimeIndividual('{{ $user->id }}')"
-                                                     title="Pause Waktu Ujian">
-                                                     <i class="fa-solid fa-pause"></i>
-                                                 </button>
-                                             @endif
-                                         @endif
-                                     </div>
+                                        <!-- Dropdown keluar body -->
+                                        <template x-teleport="body">
+                                            <div x-show="open" x-ref="dropdown" x-transition.opacity @click.away="open = false"
+                                                class="absolute z-50 w-56 bg-white border border-gray-200 rounded-lg shadow-xl max-h-72 overflow-y-auto"
+                                                :style="`top:${y}px; left:${x}px`">
+
+                                                <ul class="py-1 text-sm text-gray-700">
+                                                    <li>
+                                                        <button wire:click="reopenAndEnterExam('{{ $userTimetable->id }}')"
+                                                            class="w-full text-left px-4 py-2 hover:bg-emerald-50 text-emerald-700 font-semibold border-b border-gray-100 flex items-center gap-2">
+                                                            <i class="fa-solid fa-play text-emerald-600"></i>
+                                                            Masuk / Ujicoba Ujian
+                                                        </button>
+                                                    </li>
+
+                                                    @if ($userTimetable->status === 'done')
+                                                        <li>
+                                                            <button wire:click="reopenStudentExam('{{ $userTimetable->id }}')"
+                                                                wire:confirm="Apakah Anda yakin ingin membuka kembali ujian peserta ini? Soal dan jawaban tidak akan ter-reset."
+                                                                class="w-full text-left px-4 py-2 hover:bg-amber-50 text-amber-700 font-semibold flex items-center gap-2">
+                                                                <i class="fa-solid fa-rotate-left text-amber-600"></i>
+                                                                Buka Kembali Ujian Peserta
+                                                            </button>
+                                                        </li>
+                                                    @endif
+
+                                                    @if ($userTimetable->status === 'suspend')
+                                                        <li>
+                                                            <button wire:click="unsuspendSession('{{ $user->id }}')"
+                                                                wire:confirm="Apakah Anda yakin ingin mencabut suspend peserta ini?"
+                                                                class="w-full text-left px-4 py-2 hover:bg-green-50 text-green-700 flex items-center gap-2">
+                                                                <i class="fa-solid fa-user-check text-green-600"></i>
+                                                                Cabut Suspend
+                                                            </button>
+                                                        </li>
+                                                    @else
+                                                        <li>
+                                                            <button wire:click="suspendSession('{{ $user->id }}')"
+                                                                wire:confirm="Apakah Anda yakin ingin mensuspend peserta ini?"
+                                                                class="w-full text-left px-4 py-2 hover:bg-red-50 text-red-700 flex items-center gap-2">
+                                                                <i class="fa-solid fa-user-slash text-red-600"></i>
+                                                                Suspend Peserta
+                                                            </button>
+                                                        </li>
+                                                    @endif
+
+                                                    <li>
+                                                        <button wire:click="forceLogoutUser('{{ $user->id }}')"
+                                                            wire:confirm="Apakah Anda yakin ingin force logout peserta ini?"
+                                                            class="w-full text-left px-4 py-2 hover:bg-blue-50 text-blue-700 flex items-center gap-2">
+                                                            <i class="fa-solid fa-right-from-bracket text-blue-600"></i>
+                                                            Force Logout
+                                                        </button>
+                                                    </li>
+
+                                                    @if(in_array($userTimetable->status, ['exam', 'warning', 'suspend']))
+                                                        @php
+                                                            $currentAdjMinutes = (int)(($userTimetable->additional_time_seconds ?? 0) / 60);
+                                                        @endphp
+                                                        <li>
+                                                            <button onclick="adjustTimeIndividual('{{ $user->id }}', {{ $currentAdjMinutes }})"
+                                                                class="w-full text-left px-4 py-2 hover:bg-indigo-50 text-indigo-700 flex items-center gap-2">
+                                                                <i class="fa-solid fa-clock text-indigo-600"></i>
+                                                                Sesuaikan Waktu
+                                                            </button>
+                                                        </li>
+
+                                                        @if(!is_null($userTimetable->paused_at))
+                                                            <li>
+                                                                <button wire:click="resumeTimeIndividual('{{ $user->id }}')"
+                                                                    class="w-full text-left px-4 py-2 hover:bg-emerald-50 text-emerald-700 flex items-center gap-2">
+                                                                    <i class="fa-solid fa-play text-emerald-600"></i>
+                                                                    Lanjutkan Waktu (Resume)
+                                                                </button>
+                                                            </li>
+                                                        @else
+                                                            <li>
+                                                                <button wire:click="pauseTimeIndividual('{{ $user->id }}')"
+                                                                    class="w-full text-left px-4 py-2 hover:bg-amber-50 text-amber-700 flex items-center gap-2">
+                                                                    <i class="fa-solid fa-pause text-amber-600"></i>
+                                                                    Pause Waktu Ujian
+                                                                </button>
+                                                            </li>
+                                                        @endif
+                                                    @endif
+                                                </ul>
+                                            </div>
+                                        </template>
+                                    </div>
                                 @else
                                     <span class="text-gray-400 text-xs">-</span>
                                 @endif

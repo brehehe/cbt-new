@@ -51,6 +51,12 @@ class AdminMasterTimetableIndex extends Component
 
     public $getSupervisors = [];
 
+    public $timetable_id_supervisor;
+
+    public $selectedSupervisors = [];
+
+    public $availableSupervisors = [];
+
     public $modules = [];
 
     public $studys = [];
@@ -683,6 +689,139 @@ class AdminMasterTimetableIndex extends Component
             DB::rollback();
             Log::error('Gagal Sinkronisasi Semua Jadwal: ' . $th);
             AlertHelper::error('Gagal', 'Gagal menyinkronkan semua jadwal!');
+        }
+    }
+
+    public function startExamShortcut($timetableId)
+    {
+        if (Auth::user()->hasRole(['Pengawas', 'pengawas'])) {
+            return AlertHelper::error('Akses Ditolak', 'Fitur ujicoba ini hanya untuk Admin.');
+        }
+
+        try {
+            $timetable = Timetable::findOrFail($timetableId);
+
+            $userTimetable = UserTimetable::where('user_id', Auth::id())
+                ->where('timetable_id', $timetable->id)
+                ->first();
+
+            if (! $userTimetable) {
+                $userTimetable = UserTimetable::create([
+                    'user_id' => Auth::id(),
+                    'timetable_id' => $timetable->id,
+                    'start_process' => now(),
+                    'start_exam' => now(),
+                    'status' => 'exam',
+                    'studys' => $timetable->studys,
+                    'is_camera' => $timetable->is_camera ?? false,
+                    'is_recording' => $timetable->is_recording ?? false,
+                    'is_streaming' => $timetable->is_streaming ?? false,
+                ]);
+            } else {
+                $userTimetable->update([
+                    'status' => 'exam',
+                    'start_exam' => $userTimetable->start_exam ?? now(),
+                ]);
+            }
+
+            // Populate questions if not already created
+            $questionCount = \App\Models\User\UserModuleQuestion::where('user_timetable_id', $userTimetable->id)->count();
+            if ($questionCount === 0 && $timetable->timetableModule) {
+                $timetableQuestions = \App\Models\Timetable\TimetableQuestion::withoutGlobalScope('user_scope')
+                    ->where('timetable_module_id', $timetable->timetableModule->id)
+                    ->orderBy('order')
+                    ->get();
+
+                $now = now();
+                $companyId = Auth::user()->company_id;
+                $userModuleQuestionsData = [];
+
+                foreach ($timetableQuestions as $index => $tq) {
+                    $userModuleQuestionsData[] = [
+                        'id' => (string) \Illuminate\Support\Str::uuid(),
+                        'user_timetable_id' => $userTimetable->id,
+                        'timetable_module_id' => $timetable->timetableModule->id,
+                        'timetable_question_id' => $tq->id,
+                        'study_id' => $tq->study_id,
+                        'company_id' => $companyId,
+                        'order' => $index + 1,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+
+                if (! empty($userModuleQuestionsData)) {
+                    $chunks = array_chunk($userModuleQuestionsData, 200);
+                    foreach ($chunks as $chunk) {
+                        \App\Models\User\UserModuleQuestion::insert($chunk);
+                    }
+                }
+            }
+
+            return redirect()->route('admin.exam.detail.react', [
+                'userTimetableId' => $userTimetable->id,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('startExamShortcut error: ' . $e->getMessage());
+            return AlertHelper::error('Gagal', 'Terjadi kesalahan saat membuka halaman ujian: ' . $e->getMessage());
+        }
+    }
+
+    public function openModalSupervisor($id)
+    {
+        $this->timetable_id_supervisor = $id;
+        $timetable = Timetable::find($id);
+
+        if (! $timetable) {
+            return AlertHelper::error('Gagal', 'Jadwal tidak ditemukan.');
+        }
+
+        $supervisors = $timetable->supervisors;
+        if (is_string($supervisors)) {
+            $supervisors = json_decode($supervisors, true) ?? [];
+        }
+        $this->selectedSupervisors = is_array($supervisors) ? $supervisors : [];
+
+        $this->availableSupervisors = User::companyRole('Pengawas', Auth::user()->company_id)
+            ->select('name', 'id')
+            ->get()
+            ->pluck('name', 'id')
+            ->toArray();
+
+        if (empty($this->availableSupervisors)) {
+            $this->availableSupervisors = User::role(['Pengawas', 'pengawas'])
+                ->select('name', 'id')
+                ->get()
+                ->pluck('name', 'id')
+                ->toArray();
+        }
+
+        return $this->dispatch('open-modal', ['id' => 'modal-change-supervisor-master']);
+    }
+
+    public function closeModalSupervisor()
+    {
+        $this->reset(['timetable_id_supervisor', 'selectedSupervisors']);
+        return $this->dispatch('close-modal', ['id' => 'modal-change-supervisor-master']);
+    }
+
+    public function saveSupervisor()
+    {
+        try {
+            $timetable = Timetable::find($this->timetable_id_supervisor);
+            if (! $timetable) {
+                return AlertHelper::error('Gagal', 'Jadwal tidak ditemukan.');
+            }
+
+            $timetable->update([
+                'supervisors' => array_values(array_filter($this->selectedSupervisors))
+            ]);
+
+            AlertHelper::success('Berhasil', 'Pengawas ujian berhasil diperbarui.');
+            return $this->closeModalSupervisor();
+        } catch (\Throwable $th) {
+            Log::error('saveSupervisor error: ' . $th->getMessage());
+            return AlertHelper::error('Gagal', 'Gagal memperbarui pengawas: ' . $th->getMessage());
         }
     }
 }

@@ -1125,7 +1125,8 @@ class AdminExamDetailIndex extends Component
             $this->question_latex = $questionModel->latex;
             $this->question_latex_preview_png = $questionModel->latex_preview_png;
             $images = $questionModel->images;
-            $this->images = collect(json_decode($images, true));
+            $parsedImages = is_array($images) ? $images : (is_string($images) ? (json_decode($images, true) ?? []) : []);
+            $this->images = collect($parsedImages);
 
             $index = array_search($currentQuestion->id, $this->questionIds());
             $this->number = $index !== false ? $index + 1 : 1;
@@ -1135,14 +1136,17 @@ class AdminExamDetailIndex extends Component
                 ->values();
 
             $this->question_answers = $answers->map(
-                fn ($ans, $i) => [
-                    'id' => (string) $ans->id,
-                    'alphabet' => chr(65 + $i),
-                    'context' => $ans->context,
-                    'images' => collect(json_decode($ans->images, true)),
-                    'latex' => $ans->latex,
-                    'latex_preview_png' => $ans->latex_preview_png,
-                ]
+                function ($ans, $i) {
+                    $ansImages = is_array($ans->images) ? $ans->images : (is_string($ans->images) ? (json_decode($ans->images, true) ?? []) : []);
+                    return [
+                        'id' => (string) $ans->id,
+                        'alphabet' => chr(65 + $i),
+                        'context' => $ans->context,
+                        'images' => collect($ansImages),
+                        'latex' => $ans->latex,
+                        'latex_preview_png' => $ans->latex_preview_png,
+                    ];
+                }
             )->all();
         }
     }

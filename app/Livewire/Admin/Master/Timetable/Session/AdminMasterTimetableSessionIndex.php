@@ -12,6 +12,7 @@ use App\Services\Exam\RecordingFinalizer;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Maatwebsite\Excel\Facades\Excel;
@@ -450,5 +451,45 @@ class AdminMasterTimetableSessionIndex extends Component
         }
 
         AlertHelper::success('Berhasil', 'Waktu ujian untuk semua peserta berhasil dilanjutkan.');
+    }
+
+    public function reopenAndEnterExam($userTimetableId)
+    {
+        $userTimetable = UserTimetable::find($userTimetableId);
+        if (! $userTimetable) {
+            AlertHelper::error('Gagal', 'Data Ujian Peserta Tidak Ditemukan');
+            return;
+        }
+
+        if (in_array($userTimetable->status, ['done', 'suspend'])) {
+            $userTimetable->update([
+                'status' => 'exam',
+                'end_exam' => null,
+                'paused_at' => null,
+            ]);
+        }
+
+        Session::put('user_timetable_id', $userTimetable->id);
+
+        return redirect()->route('admin.exam.detail.react', [
+            'userTimetableId' => $userTimetable->id,
+        ]);
+    }
+
+    public function reopenStudentExam($userTimetableId)
+    {
+        $userTimetable = UserTimetable::find($userTimetableId);
+        if (! $userTimetable) {
+            AlertHelper::error('Gagal', 'Data Ujian Peserta Tidak Ditemukan');
+            return;
+        }
+
+        $userTimetable->update([
+            'status' => 'exam',
+            'end_exam' => null,
+            'paused_at' => null,
+        ]);
+
+        AlertHelper::success('Berhasil', 'Status ujian peserta telah dikembalikan menjadi Aktif (Exam) tanpa mereset soal & jawaban.');
     }
 }

@@ -34,8 +34,8 @@ class AdminExamWarningIndex extends Component
             return redirect()->route('admin.exam.timetable');
         }
 
-        if ($userTimetable->status == 'exam') {
-            return redirect()->route('admin.exam.detail');
+        if ($userTimetable->status == 'exam' && Auth::user()->hasRole('Mahasiswa')) {
+            return redirect()->route('admin.exam.detail.react', ['userTimetableId' => $userTimetable->id]);
         }
 
         $this->userTimetable = $userTimetable;

@@ -288,3 +288,59 @@
         </div>
     </div>
 </div>
+
+<div wire:ignore.self id="modal-change-supervisor-master"
+    class="fixed inset-0 bg-overlay hidden items-center justify-center z-50 transition-opacity duration-300 ease-in-out">
+    <div class="bg-white rounded-2xl shadow-2xl w-full transform transition-all scale-95 duration-300 ease-out animate-fade-in"
+        style="max-width: 60vh">
+        <!-- Header -->
+        <div class="flex justify-between items-center p-6 border-b">
+            <div class="flex items-center gap-2">
+                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                <h2 class="text-xl font-semibold text-gray-800">Ubah Pengawas</h2>
+            </div>
+            <button wire:click="closeModalSupervisor()"
+                class="text-gray-500 hover:text-red-500 transition-colors text-2xl leading-none cursor-pointer">
+                &times;
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="px-6 py-4 text-gray-600" style="max-height: 70vh; overflow-y: auto;">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Pengawas Ujian</label>
+                    <div class="space-y-2 max-h-60 overflow-y-auto border border-gray-200 rounded-xl p-3 bg-gray-50">
+                        @forelse ($availableSupervisors as $supervisorId => $supervisorName)
+                            <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-white transition cursor-pointer text-sm font-medium text-gray-700">
+                                <input type="checkbox"
+                                    wire:model="selectedSupervisors"
+                                    value="{{ $supervisorId }}"
+                                    class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                                <span>{{ $supervisorName }}</span>
+                            </label>
+                        @empty
+                            <p class="text-sm text-gray-400 text-center py-3">Tidak ada data pengawas tersedia.</p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex justify-end gap-2 px-6 py-4 border-t">
+            <button wire:click="closeModalSupervisor()"
+                class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow transition cursor-pointer">
+                Batal
+            </button>
+            <button wire:click="saveSupervisor()"
+                class="px-4 py-2 bg-primary hover:bg-primary text-white rounded-lg shadow transition cursor-pointer">
+                Simpan
+            </button>
+        </div>
+    </div>
+</div>

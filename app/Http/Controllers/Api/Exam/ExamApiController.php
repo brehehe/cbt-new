@@ -48,8 +48,11 @@ class ExamApiController extends Controller
         $this->userTimetableId = $userTimetableId;
         $this->userTimetable = $userTimetable;
 
+        $user = Auth::user();
+        $isAdmin = $user && ($user->hasAnyRole(['admin', 'superadmin', 'Admin', 'Super Admin', 'dosen', 'Dosen', 'pengawas', 'Pengawas']) || ! $user->hasRole('Mahasiswa'));
+
         // 1. Calculate remaining time
-        $this->calculateRemainingTime();
+        $this->calculateRemainingTime($isAdmin);
 
 
         // 2. Fetch Questions & Navigation
@@ -100,7 +103,9 @@ class ExamApiController extends Controller
 
         return response()->json([
             'userTimetable' => $userTimetable,
-            'remainingTime' => (int) $this->remainingTime,
+            'remainingTime' => $isAdmin ? 9999999 : (int) $this->remainingTime,
+            'isNoTimeLimit' => $isAdmin,
+            'isAdmin' => $isAdmin,
             'isPaused' => !is_null($userTimetable->paused_at),
             'questions' => $questions,
             'navigation' => $navigation,
@@ -750,8 +755,13 @@ class ExamApiController extends Controller
     /**
      * Kalkulasi sisa waktu berdasarkan start_exam, duration, dan pause_total_seconds.
      */
-    private function calculateRemainingTime()
+    private function calculateRemainingTime(bool $isAdmin = false)
     {
+        if ($isAdmin) {
+            $this->remainingTime = 9999999;
+            return;
+        }
+
         if (!$this->userTimetable || !$this->userTimetable->start_exam) {
             $this->remainingTime = 0;
             return;
