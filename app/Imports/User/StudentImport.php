@@ -34,6 +34,8 @@ class StudentImport implements ToCollection, WithHeadingRow
 
     public array $errors = [];
 
+    public array $importResults = [];
+
     public function __construct(?string $typeStudy = null, ?string $companyId = null)
     {
         $this->typeStudy = $typeStudy;
@@ -51,8 +53,17 @@ class StudentImport implements ToCollection, WithHeadingRow
             $this->successCount = 0;
             $this->errorCount = 0;
             $this->errors = [];
+            $this->importResults = [];
+
+            $company = Company::find($currentCompanyId);
+
+            $passwordCache = [];
+            $studyCache = [];
+            $sessionCache = [];
+            $roomCache = [];
 
             foreach ($rows as $index => $row) {
+                $rowNim = ! empty($row['nim']) ? trim($row['nim']) : (! empty($row['username']) ? trim($row['username']) : null);
                 try {
                     DB::beginTransaction();
 
@@ -67,86 +78,121 @@ class StudentImport implements ToCollection, WithHeadingRow
                         throw new Exception('Row '.($index + 2).': Username is required for general');
                     }
 
-                    $rowNim = ! empty($row['nim']) ? trim($row['nim']) : null;
-
-                    // Check if user already exists by email
-                    $existingUser = User::where('email', $row['email'])
-                        ->where('company_id', $currentCompanyId)
-                        ->where('type_user', 'employee')
-                        ->first();
-
-                    if ($existingUser) {
-                        throw new Exception('Row '.($index + 2).': User with email already exists');
-                    }
-
-                    // Check if user already exists by NIM (if NIM is provided)
+                    // Check if user already exists by NIM / Username or Email
+                    $existingUser = null;
                     if ($rowNim) {
-                        // Check users table
-                        $existingUserByNim = User::where('nim', $rowNim)
+                        $existingUser = User::where('company_id', $currentCompanyId)
+                            ->where('type_user', 'employee')
+                            ->where(function ($q) use ($rowNim) {
+                                $q->where('nim', $rowNim)
+                                    ->orWhere('username', $rowNim);
+                            })
+                            ->first();
+                    } else {
+                        $existingUser = User::where('email', $row['email'])
                             ->where('company_id', $currentCompanyId)
                             ->where('type_user', 'employee')
                             ->first();
-
-                        if ($existingUserByNim) {
-                            throw new Exception('Row '.($index + 2).': User with NIM '.$rowNim.' already exists in users table');
-                        }
-
-                        // Check user_details table
-                        $existingUserDetailByNim = UserDetail::where('company_id', $currentCompanyId)
-                            ->where(function ($q) use ($rowNim) {
-                                $q->where('nim', $rowNim)
-                                    ->orWhere('student_id', $rowNim);
-                            })
-                            ->first();
-
-                        if ($existingUserDetailByNim) {
-                            throw new Exception('Row '.($index + 2).': User with NIM '.$rowNim.' already exists in user details');
-                        }
                     }
 
                     // Get study_id if program_studi is provided
                     $studyId = null;
                     if (! empty($row['program_studi'])) {
-                        $operator = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'ilike';
-                        $study = Study::withoutGlobalScope('user_scope')
-                            ->where('company_id', $currentCompanyId)
-                            ->where('name', $operator, '%'.$row['program_studi'].'%')
-                            ->first();
-                        if ($study) {
-                            $studyId = $study->id;
+                        $studyKey = trim($row['program_studi']);
+                        if (! array_key_exists($studyKey, $studyCache)) {
+                            $operator = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'ilike';
+                            $study = Study::withoutGlobalScope('user_scope')
+                                ->where('company_id', $currentCompanyId)
+                                ->where('name', $operator, '%'.$studyKey.'%')
+                                ->first();
+                            $studyCache[$studyKey] = $study ? $study->id : null;
                         }
+                        $studyId = $studyCache[$studyKey];
                     }
 
-                    // Default password if not provided
-                    $password = ! empty($row['password']) ? $row['password'] : 'password123';
+                    // Password handling
+                    $passwordStr = ! empty($row['password']) ? (string) $row['password'] : null;
+                    $hashedPassword = null;
+                    if ($passwordStr !== null) {
+                        if (! isset($passwordCache[$passwordStr])) {
+                            $passwordCache[$passwordStr] = Hash::make($passwordStr);
+                        }
+                        $hashedPassword = $passwordCache[$passwordStr];
+                    }
+
                     $typeStudy = $resolvedTypeStudy;
+                    $isUpdate = false;
 
-                    // Create user
-                    $user = User::create([
-                        'name' => $row['name'],
-                        'nim' => $rowNim,
-                        'username' => $row['username'] ?? null,
-                        'email' => $row['email'],
-                        'password' => Hash::make($password),
-                        'phone' => $row['phone'] ?? '0',
-                        'study_id' => $studyId,
-                        'company_id' => $currentCompanyId,
-                        'type_user' => 'employee',
-                        'type_study' => $typeStudy,
-                    ]);
+                    if ($existingUser) {
+                        $isUpdate = true;
+                        $updateData = [
+                            'name' => $row['name'],
+                            'email' => $row['email'],
+                            'phone' => ! empty($row['phone']) ? $row['phone'] : $existingUser->phone,
+                            'type_study' => $typeStudy,
+                        ];
+                        if ($studyId) {
+                            $updateData['study_id'] = $studyId;
+                        }
+                        if ($hashedPassword) {
+                            $updateData['password'] = $hashedPassword;
+                        }
+                        if ($rowNim && empty($existingUser->nim)) {
+                            $updateData['nim'] = $rowNim;
+                        }
+                        if (! empty($row['username']) && empty($existingUser->username)) {
+                            $updateData['username'] = $row['username'];
+                        }
 
-                    // Create user detail
+                        $existingUser->update($updateData);
+                        $user = $existingUser;
+                    } else {
+                        // Create new user
+                        if (! $hashedPassword) {
+                            $defaultPasswordStr = 'password123';
+                            if (! isset($passwordCache[$defaultPasswordStr])) {
+                                $passwordCache[$defaultPasswordStr] = Hash::make($defaultPasswordStr);
+                            }
+                            $hashedPassword = $passwordCache[$defaultPasswordStr];
+                        }
+
+                        $user = User::create([
+                            'name' => $row['name'],
+                            'nim' => $rowNim,
+                            'username' => $row['username'] ?? null,
+                            'email' => $row['email'],
+                            'password' => $hashedPassword,
+                            'phone' => $row['phone'] ?? '0',
+                            'study_id' => $studyId,
+                            'company_id' => $currentCompanyId,
+                            'type_user' => 'employee',
+                            'type_study' => $typeStudy,
+                        ]);
+                    }
+
+                    // User Detail Data
                     $detailData = [
                         'user_id' => $user->id,
                         'company_id' => $currentCompanyId,
-                        'student_id' => $rowNim,
-                        'nim' => $rowNim,
-                        'address' => $row['address'] ?? null,
-                        'student_faculty' => $row['faculty'] ?? null,
-                        'student_department' => $row['department'] ?? null,
-                        'student_semester' => $row['semester'] ?? null,
-                        'student_status' => $row['student_status'] ?? 'active',
+                        'student_id' => $rowNim ?? $user->nim,
+                        'nim' => $rowNim ?? $user->nim,
                     ];
+
+                    if (! empty($row['address'])) {
+                        $detailData['address'] = $row['address'];
+                    }
+                    if (! empty($row['faculty'])) {
+                        $detailData['student_faculty'] = $row['faculty'];
+                    }
+                    if (! empty($row['department'])) {
+                        $detailData['student_department'] = $row['department'];
+                    }
+                    if (! empty($row['semester'])) {
+                        $detailData['student_semester'] = $row['semester'];
+                    }
+                    if (! empty($row['student_status'])) {
+                        $detailData['student_status'] = $row['student_status'];
+                    }
 
                     // Handle identity_number encryption if provided
                     if (! empty($row['identity_number'])) {
@@ -157,41 +203,46 @@ class StudentImport implements ToCollection, WithHeadingRow
                         }
                     }
 
-                    $company = Company::find($currentCompanyId);
                     if ($company && $company->import_student_timetable) {
                         $examSessionId = null;
                         $sessionVal = $row['sesi'] ?? $row['sesi_ujian'] ?? $row['exam_session'] ?? null;
                         if (! empty($sessionVal)) {
                             $sessionName = trim($sessionVal);
-                            $session = ExamSession::where('company_id', $currentCompanyId)
-                                ->where('name', $sessionName)
-                                ->first();
-                            if (! $session) {
-                                $session = ExamSession::create([
-                                    'company_id' => $currentCompanyId,
-                                    'name' => $sessionName,
-                                    'code' => strtoupper(Str::slug($sessionName)),
-                                    'is_active' => true,
-                                ]);
+                            if (! isset($sessionCache[$sessionName])) {
+                                $session = ExamSession::where('company_id', $currentCompanyId)
+                                    ->where('name', $sessionName)
+                                    ->first();
+                                if (! $session) {
+                                    $session = ExamSession::create([
+                                        'company_id' => $currentCompanyId,
+                                        'name' => $sessionName,
+                                        'code' => strtoupper(Str::slug($sessionName)),
+                                        'is_active' => true,
+                                    ]);
+                                }
+                                $sessionCache[$sessionName] = $session->id;
                             }
-                            $examSessionId = $session->id;
+                            $examSessionId = $sessionCache[$sessionName];
                         }
 
                         $examRoomId = null;
                         $roomVal = $row['ruang'] ?? $row['ruang_ujian'] ?? $row['exam_room'] ?? null;
                         if (! empty($roomVal)) {
                             $roomName = trim($roomVal);
-                            $room = ExamRoom::where('company_id', $currentCompanyId)
-                                ->where('name', $roomName)
-                                ->first();
-                            if (! $room) {
-                                $room = ExamRoom::create([
-                                    'company_id' => $currentCompanyId,
-                                    'name' => $roomName,
-                                    'code' => strtoupper(Str::slug($roomName)),
-                                ]);
+                            if (! isset($roomCache[$roomName])) {
+                                $room = ExamRoom::where('company_id', $currentCompanyId)
+                                    ->where('name', $roomName)
+                                    ->first();
+                                if (! $room) {
+                                    $room = ExamRoom::create([
+                                        'company_id' => $currentCompanyId,
+                                        'name' => $roomName,
+                                        'code' => strtoupper(Str::slug($roomName)),
+                                    ]);
+                                }
+                                $roomCache[$roomName] = $room->id;
                             }
-                            $examRoomId = $room->id;
+                            $examRoomId = $roomCache[$roomName];
                         }
 
                         $examDate = null;
@@ -224,27 +275,46 @@ class StudentImport implements ToCollection, WithHeadingRow
                         $detailData['exam_date'] = $examDate;
                     }
 
-                    UserDetail::create($detailData);
-
-                    // Assign Student role
-                    $isHead = true;
-                    $isActive = true;
-
-                    RoleHelper::assignRoleToUserInCompany(
-                        $user,
-                        'Mahasiswa',
-                        $currentCompanyId,
-                        null,
-                        $isHead,
-                        $isActive
+                    UserDetail::updateOrCreate(
+                        ['user_id' => $user->id, 'company_id' => $currentCompanyId],
+                        $detailData
                     );
+
+                    // Assign Student role if new user
+                    if (! $isUpdate) {
+                        RoleHelper::assignRoleToUserInCompany(
+                            $user,
+                            'Mahasiswa',
+                            $currentCompanyId,
+                            null,
+                            true,
+                            true
+                        );
+                    }
 
                     DB::commit();
                     $this->successCount++;
+                    $this->importResults[] = [
+                        'row' => $index + 2,
+                        'name' => ! empty($row['name']) ? $row['name'] : '-',
+                        'nim' => ! empty($rowNim) ? $rowNim : (! empty($row['username']) ? $row['username'] : '-'),
+                        'email' => ! empty($row['email']) ? $row['email'] : '-',
+                        'status' => 'Berhasil',
+                        'reason' => $isUpdate ? 'Data diperbarui (Update)' : 'Data baru ditambahkan',
+                    ];
                 } catch (Exception $e) {
                     DB::rollBack();
                     $this->errorCount++;
-                    $this->errors[] = $e->getMessage();
+                    $errMsg = $e->getMessage();
+                    $this->errors[] = $errMsg;
+                    $this->importResults[] = [
+                        'row' => $index + 2,
+                        'name' => ! empty($row['name']) ? $row['name'] : '-',
+                        'nim' => ! empty($rowNim) ? $rowNim : (! empty($row['username']) ? $row['username'] : '-'),
+                        'email' => ! empty($row['email']) ? $row['email'] : '-',
+                        'status' => 'Gagal',
+                        'reason' => $errMsg,
+                    ];
                     Log::error('Student Import Error: '.$e->getMessage());
                 }
             }

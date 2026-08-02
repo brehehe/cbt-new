@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Master\Student;
 
 use App\Exports\StudentExport;
+use App\Exports\StudentImportReportExport;
 use App\Helpers\AlertHelper;
 use App\Helpers\RoleHelper;
 use App\Imports\User\StudentImport;
@@ -187,6 +188,12 @@ class AdminMasterStudentIndex extends Component
 
     public $importFileGeneral;
 
+    public $importSummary = null;
+
+    public $showImportSummary = false;
+
+    public $showFailedOnly = false;
+
     public function openModal()
     {
         if (! $this->data_id) {
@@ -201,6 +208,11 @@ class AdminMasterStudentIndex extends Component
         $this->studys = Study::select('id', 'name')->orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
         $this->examSessions = \App\Models\Master\Exam\ExamSession::where('company_id', auth()->user()->company_id)->orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
         $this->examRooms = \App\Models\Master\Exam\ExamRoom::where('company_id', auth()->user()->company_id)->orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
+
+        if (session()->has('last_student_import_summary')) {
+            $this->importSummary = session()->get('last_student_import_summary');
+            $this->showImportSummary = true;
+        }
     }
 
     public function closeModal()
@@ -397,11 +409,6 @@ class AdminMasterStudentIndex extends Component
                     'required',
                     'email',
                     'max:255',
-                    Rule::unique('users', 'email')
-                        ->where('type_user', 'employee')
-                        ->where('company_id', $currentCompanyId)
-                        ->whereNull('deleted_at')
-                        ->ignore($this->data_id),
                 ],
                 'password' => $this->data_id ? 'nullable|string|min:8' : 'required|string|min:8',
                 'profile' => 'nullable|image|max:2048',
@@ -409,22 +416,12 @@ class AdminMasterStudentIndex extends Component
                     'nullable',
                     'string',
                     'max:15',
-                    Rule::unique('users', 'phone')
-                        ->where('type_user', 'employee')
-                        ->where('company_id', $currentCompanyId)
-                        ->whereNull('deleted_at')
-                        ->ignore($this->data_id),
                 ],
                 'username' => [
                     'nullable',
                     'string',
                     'regex:/^\S*$/u', // tidak boleh ada spasi
                     'max:255',
-                    Rule::unique('users', 'username')
-                        ->where('type_user', 'employee')
-                        ->where('company_id', $currentCompanyId)
-                        ->whereNull('deleted_at')
-                        ->ignore($this->data_id),
                 ],
                 'address' => 'nullable|string|max:500',
                 'identity_number' => 'nullable|string|max:20',
@@ -1000,10 +997,31 @@ class AdminMasterStudentIndex extends Component
                 ]);
             }
 
-            Excel::import(new StudentImport('mahasiswa'), $this->importFileMahasiswa);
+            $import = new StudentImport('mahasiswa');
+            Excel::import($import, $this->importFileMahasiswa);
+
+            $total = count($import->importResults);
+            $success = $import->successCount;
+            $failed = $import->errorCount;
+            $percentage = $total > 0 ? round(($success / $total) * 100, 2) : 0;
+
+            $this->importSummary = [
+                'title' => 'Mahasiswa',
+                'total' => $total,
+                'success' => $success,
+                'failed' => $failed,
+                'percentage' => $percentage,
+                'results' => $import->importResults,
+            ];
+            $this->showImportSummary = true;
+            session()->put('last_student_import_summary', $this->importSummary);
 
             $this->reset('importFileMahasiswa');
-            AlertHelper::success('Berhasil', 'Data mahasiswa berhasil diimpor.');
+            if ($failed === 0) {
+                AlertHelper::success('Berhasil', "Seluruh data mahasiswa ($success data) berhasil diimpor.");
+            } else {
+                AlertHelper::warning('Selesai dengan Catatan', "$success data berhasil diimpor, $failed data gagal. Silakan periksa detail laporan.");
+            }
         } catch (ValidationException $e) {
             $errorMsg = $e->validator->errors()->first();
             Log::error('Student Import Validation Error: '.$errorMsg);
@@ -1028,10 +1046,31 @@ class AdminMasterStudentIndex extends Component
                 ]);
             }
 
-            Excel::import(new StudentImport('general'), $this->importFileGeneral);
+            $import = new StudentImport('general');
+            Excel::import($import, $this->importFileGeneral);
+
+            $total = count($import->importResults);
+            $success = $import->successCount;
+            $failed = $import->errorCount;
+            $percentage = $total > 0 ? round(($success / $total) * 100, 2) : 0;
+
+            $this->importSummary = [
+                'title' => auth()->user()->company && auth()->user()->company->is_pmb === 'pmb' ? 'PMB' : 'PMB / General',
+                'total' => $total,
+                'success' => $success,
+                'failed' => $failed,
+                'percentage' => $percentage,
+                'results' => $import->importResults,
+            ];
+            $this->showImportSummary = true;
+            session()->put('last_student_import_summary', $this->importSummary);
 
             $this->reset('importFileGeneral');
-            AlertHelper::success('Berhasil', 'Data general berhasil diimpor.');
+            if ($failed === 0) {
+                AlertHelper::success('Berhasil', "Seluruh data peserta ($success data) berhasil diimpor.");
+            } else {
+                AlertHelper::warning('Selesai dengan Catatan', "$success data berhasil diimpor, $failed data gagal. Silakan periksa detail laporan.");
+            }
         } catch (ValidationException $e) {
             $errorMsg = $e->validator->errors()->first();
             Log::error('General Import Validation Error: '.$errorMsg);
@@ -1040,6 +1079,24 @@ class AdminMasterStudentIndex extends Component
             Log::error('General Import Error: '.$e->getMessage());
             AlertHelper::error('Gagal', 'Gagal mengimpor data general: '.$e->getMessage());
         }
+    }
+
+    public function downloadImportReport()
+    {
+        if (empty($this->importSummary['results'])) {
+            AlertHelper::error('Gagal', 'Tidak ada data laporan import.');
+            return;
+        }
+
+        $fileName = 'Laporan_Import_Peserta_'.date('YmdHis').'.xlsx';
+        return Excel::download(new StudentImportReportExport($this->importSummary['results']), $fileName);
+    }
+
+    public function closeImportSummary()
+    {
+        $this->showImportSummary = false;
+        $this->importSummary = null;
+        session()->forget('last_student_import_summary');
     }
 
     public function downloadTemplate()

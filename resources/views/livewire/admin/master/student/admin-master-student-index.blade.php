@@ -82,6 +82,103 @@
         </div>
     </div>
 
+    <!-- Import Loading Indicator -->
+    <div wire:loading wire:target="importFileMahasiswa, importFileGeneral" class="mb-6 w-full">
+        <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-3">
+                <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="font-semibold text-sm">Sedang mengunggah & memproses data peserta Excel... Mohon tunggu sebentar.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Tracking Result UI -->
+    @if($showImportSummary && $importSummary)
+        <div class="mb-6 bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-lg font-bold text-gray-800 tracking-wide uppercase">
+                    PESERTA {{ strtoupper($importSummary['title'] ?? 'PMB') }} :
+                </h3>
+                <button type="button" wire:click="closeImportSummary" class="text-gray-400 hover:text-gray-600 font-bold text-lg px-2">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Summary Alert Box (matching reference image) -->
+            <div class="bg-[#fefae0] border border-[#f3e9c4] rounded-lg px-5 py-4 mb-4 text-[#785b12] font-semibold text-base shadow-inner">
+                <span>Data Peserta : <strong class="text-[#523e0a] font-extrabold text-lg">{{ $importSummary['success'] }}</strong></span>
+                <span class="mx-2">/</span>
+                <span>Data Gagal : <strong class="text-red-700 font-extrabold text-lg">{{ $importSummary['failed'] }}</strong></span>
+                <span class="mx-2">/</span>
+                <span>Total Data : <strong class="text-[#523e0a] font-extrabold text-lg">{{ $importSummary['total'] }}</strong></span>
+            </div>
+
+            <!-- Progress Bar (matching reference image) -->
+            <div class="w-full bg-gray-200 rounded-full h-7 mb-4 overflow-hidden shadow-inner relative">
+                <div class="h-7 rounded-full text-white font-bold text-xs flex items-center justify-center transition-all duration-500 shadow"
+                     style="width: {{ max($importSummary['percentage'], 5) }}%; background-color: #48bb78; background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent); background-size: 1rem 1rem;">
+                    {{ $importSummary['percentage'] }} %
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" wire:click="downloadImportReport" class="btn btn-sm btn-success text-white">
+                        <i class="fa-solid fa-file-excel mr-1.5"></i>
+                        Download Report Excel (Berhasil & Gagal)
+                    </button>
+                </div>
+
+                <button type="button" wire:click="closeImportSummary" class="btn btn-sm btn-outline text-gray-600 border-gray-300 hover:bg-gray-100">
+                    Tutup Laporan
+                </button>
+            </div>
+
+            <!-- Failed Rows Table -->
+            @if(($importSummary['failed'] ?? 0) > 0)
+                <div class="mt-4 border-t border-gray-200 pt-4">
+                    <h4 class="text-sm font-semibold text-red-700 mb-2 flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-exclamation text-red-600"></i> Rincian Data yang Gagal Diimpor:
+                    </h4>
+                    <div class="overflow-x-auto max-h-64 border rounded-lg shadow-inner">
+                        <table class="min-w-full divide-y divide-gray-200 text-xs">
+                            <thead class="bg-gray-100 sticky top-0">
+                                <tr>
+                                    <th class="px-3 py-2 text-left font-semibold text-gray-700">Baris Excel</th>
+                                    <th class="px-3 py-2 text-left font-semibold text-gray-700">Nama</th>
+                                    <th class="px-3 py-2 text-left font-semibold text-gray-700">NIM / Username</th>
+                                    <th class="px-3 py-2 text-left font-semibold text-gray-700">Email</th>
+                                    <th class="px-3 py-2 text-left font-semibold text-red-700">Alasan Gagal</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-100">
+                                @foreach($importSummary['results'] as $res)
+                                    @if(($res['status'] ?? '') === 'Gagal')
+                                        <tr class="hover:bg-red-50">
+                                            <td class="px-3 py-2 font-mono font-bold text-gray-700">#{{ $res['row'] }}</td>
+                                            <td class="px-3 py-2 text-gray-800">{{ $res['name'] }}</td>
+                                            <td class="px-3 py-2 text-gray-700 font-mono">{{ $res['nim'] }}</td>
+                                            <td class="px-3 py-2 text-gray-700">{{ $res['email'] }}</td>
+                                            <td class="px-3 py-2 text-red-600 font-medium">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-800">
+                                                    {{ $res['reason'] }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @endif
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            @endif
+        </div>
+    @endif
+
     <!-- Filters -->
     <div class="bg-white rounded-lg shadow mb-6 p-4">
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
