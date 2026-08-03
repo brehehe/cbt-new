@@ -62,6 +62,7 @@ class ExamApiController extends Controller
         }
 
         $questions = UserModuleQuestion::withoutGlobalScopes()
+            ->whereNull('deleted_at')
             ->select($questionSelects)
             ->with([
                 'timetableQuestion' => function ($q) {
