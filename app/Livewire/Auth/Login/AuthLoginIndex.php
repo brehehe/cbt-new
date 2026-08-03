@@ -557,35 +557,8 @@ class AuthLoginIndex extends Component
      */
     protected function hasActiveSessionForUser($user)
     {
-        try {
-            // 1. Check database session table
-            $activeSessions = DB::table(config('session.table', 'sessions'))
-                ->where('user_id', $user->id)
-                ->where('last_activity', '>', time() - config('session.lifetime', 120) * 60)
-                ->count();
-
-            if ($activeSessions > 0) {
-                return true;
-            }
-
-            // 2. Check cache/Redis session
-            $lastSessionId = \Illuminate\Support\Facades\Cache::get("user_session_{$user->id}");
-            if ($lastSessionId && $lastSessionId !== session()->getId()) {
-                $sessionData = \Illuminate\Support\Facades\Session::getHandler()->read($lastSessionId);
-                if (!empty($sessionData)) {
-                    return true;
-                }
-            }
-
-            return false;
-        } catch (Throwable $e) {
-            \Log::warning('Failed checking active sessions for user', [
-                'user_id' => $user->id,
-                'error' => $e->getMessage(),
-            ]);
-
-            return false;
-        }
+        // Nonaktif sementara
+        return false;
     }
 
     /**

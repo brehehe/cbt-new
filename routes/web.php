@@ -124,6 +124,7 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
                 return response()->json(['hasActiveSession' => false, 'activeSessionInfo' => null]);
             }
 
+            /*
             try {
                 $activeSessions = 0;
                 $hasRedisSession = false;
@@ -158,6 +159,7 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
                     'error' => $e->getMessage(),
                 ]);
             }
+            */
 
             return response()->json(['hasActiveSession' => false, 'activeSessionInfo' => null]);
         });
@@ -246,7 +248,8 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
                 ], 401);
             }
 
-            // Single session enforcement for Mahasiswa
+            /*
+            // Single session enforcement for Mahasiswa (Nonaktif sementara)
             if ($user->hasRole('Mahasiswa')) {
                 try {
                     $activeSessions = \Illuminate\Support\Facades\DB::table(config('session.table', 'sessions'))
@@ -276,6 +279,7 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
                     ]);
                 }
             }
+            */
 
             // Clear rate limiter & perform login
             \Illuminate\Support\Facades\RateLimiter::clear($throttleKey);
