@@ -725,7 +725,9 @@ class AdminMasterTimetableIndex extends Component
             }
 
             // Populate questions if not already created
-            $questionCount = \App\Models\User\UserModuleQuestion::where('user_timetable_id', $userTimetable->id)->count();
+            $questionCount = \App\Models\User\UserModuleQuestion::withoutGlobalScopes()
+                ->where('user_timetable_id', $userTimetable->id)
+                ->count();
             if ($questionCount === 0 && $timetable->timetableModule) {
                 $timetableQuestions = \App\Models\Timetable\TimetableQuestion::withoutGlobalScope('user_scope')
                     ->where('timetable_module_id', $timetable->timetableModule->id)

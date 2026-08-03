@@ -312,29 +312,36 @@ class AdminExamTimetableIndex extends Component
                 'is_streaming' => $timeTable?->is_streaming ?? false,
             ]);
 
-            $userModuleQuestionsData = [];
-            $now = Carbon::now();
-            $companyId = Auth::user()->company_id;
+            // Prevent double/duplicate insertion if questions already exist for this user timetable
+            $hasExistingQuestions = UserModuleQuestion::withoutGlobalScopes()
+                ->where('user_timetable_id', $UserTimetable->id)
+                ->exists();
 
-            foreach ($modulesQuestions as $index => $moduleQuestion) {
-                $userModuleQuestionsData[] = [
-                    'id' => (string) Str::uuid(),
-                    'user_timetable_id' => $UserTimetable->id,
-                    'timetable_module_id' => $transactionModule->id,
-                    'timetable_question_id' => $moduleQuestion->id,
-                    'study_id' => $moduleQuestion->study_id,
-                    'company_id' => $companyId,
-                    'order' => $index + 1,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ];
-            }
+            if (! $hasExistingQuestions) {
+                $userModuleQuestionsData = [];
+                $now = Carbon::now();
+                $companyId = Auth::user()->company_id;
 
-            if (! empty($userModuleQuestionsData)) {
-                // Bulk insert in chunks to avoid single query limits if very large
-                $chunks = array_chunk($userModuleQuestionsData, 200);
-                foreach ($chunks as $chunk) {
-                    UserModuleQuestion::insert($chunk);
+                foreach ($modulesQuestions as $index => $moduleQuestion) {
+                    $userModuleQuestionsData[] = [
+                        'id' => (string) Str::uuid(),
+                        'user_timetable_id' => $UserTimetable->id,
+                        'timetable_module_id' => $transactionModule->id,
+                        'timetable_question_id' => $moduleQuestion->id,
+                        'study_id' => $moduleQuestion->study_id,
+                        'company_id' => $companyId,
+                        'order' => $index + 1,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+
+                if (! empty($userModuleQuestionsData)) {
+                    // Bulk insert in chunks to avoid single query limits if very large
+                    $chunks = array_chunk($userModuleQuestionsData, 200);
+                    foreach ($chunks as $chunk) {
+                        UserModuleQuestion::insert($chunk);
+                    }
                 }
             }
 
