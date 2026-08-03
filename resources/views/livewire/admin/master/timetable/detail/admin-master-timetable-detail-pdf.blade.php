@@ -27,6 +27,7 @@
                 <th>No</th>
                 <th class="left">NIM</th>
                 <th class="left">Nama</th>
+                <th>Total Soal</th>
                 <th>Terjawab</th>
                 <th>Tidak Terjawab</th>
                 <th>Benar</th>
@@ -37,13 +38,14 @@
         <tbody>
             @forelse ($userTimetables as $index => $userTimetable)
                 @php
-                    $counts = $countMap[$userTimetable->id] ?? ['answered' => 0, 'unanswered' => 0, 'correct' => 0, 'wrong' => 0];
+                    $counts = $countMap[$userTimetable->id] ?? ['total' => 0, 'answered' => 0, 'unanswered' => 0, 'correct' => 0, 'wrong' => 0];
                     $grade = $gradeMap[$userTimetable->id] ?? '-';
                 @endphp
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td class="left">{{ $userTimetable->user->nim ?? ($userTimetable->user->username ?? '-') }}</td>
                     <td class="left">{{ $userTimetable->user->name ?? '-' }}</td>
+                    <td>{{ $counts['total'] }}</td>
                     <td>{{ $counts['answered'] }}</td>
                     <td>{{ $counts['unanswered'] }}</td>
                     <td class="badge-ok">{{ $counts['correct'] }}</td>
@@ -52,7 +54,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8">Tidak ada data</td>
+                    <td colspan="9">Tidak ada data</td>
                 </tr>
             @endforelse
         </tbody>

@@ -139,6 +139,7 @@
                         <th>NIM</th>
                         <th>Nama</th>
                         @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
+                            <th>Total Soal</th>
                             <th>Terjawab</th>
                             <th>Tidak Terjawab</th>
                             <th>Benar</th>
@@ -156,6 +157,7 @@
                             </td>
                             <td>{{ $userTimetable->user->name ?? '-' }}</td>
                             @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
+                                <td><span class="px-2 py-1 rounded bg-slate-100 text-slate-700 font-semibold">{{ $userTimetable->userModuleQuestions->count() }}</span></td>
                                 <td>{{ $userTimetable->userModuleQuestions->whereNotNull('timetable_answer_id')->count() }}
                                 </td>
                                 <td>{{ $userTimetable->userModuleQuestions->whereNull('timetable_answer_id')->count() }}
@@ -185,7 +187,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ auth()->user()->hasRole(['Pengawas', 'pengawas']) ? 4 : 9 }}" class="no-data">Tidak ada data</td>
+                            <td colspan="{{ auth()->user()->hasRole(['Pengawas', 'pengawas']) ? 4 : 10 }}" class="no-data">Tidak ada data</td>
                         </tr>
                     @endforelse
                 </tbody>

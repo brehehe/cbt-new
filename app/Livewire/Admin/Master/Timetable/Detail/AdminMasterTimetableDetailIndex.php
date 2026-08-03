@@ -124,6 +124,7 @@ class AdminMasterTimetableDetailIndex extends Component
             }
 
             $countMap[$userTimetable->id] = [
+                'total' => $userTimetable->userModuleQuestions->count(),
                 'answered' => $userTimetable->userModuleQuestions->whereNotNull('timetable_answer_id')->count(),
                 'unanswered' => $userTimetable->userModuleQuestions->whereNull('timetable_answer_id')->count(),
                 'correct' => $userTimetable->userModuleQuestions->where('status', 'correct')->count(),

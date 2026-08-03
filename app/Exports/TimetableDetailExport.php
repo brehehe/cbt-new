@@ -42,6 +42,7 @@ class TimetableDetailExport implements FromCollection, ShouldAutoSize, WithHeadi
             'No',
             'NIM',
             'Nama',
+            'Total Soal',
             'Terjawab',
             'Tidak Terjawab',
             'Benar',
@@ -59,6 +60,7 @@ class TimetableDetailExport implements FromCollection, ShouldAutoSize, WithHeadi
         static $no = 0;
         $no++;
 
+        $totalQuestions = $userTimetable->userModuleQuestions->count();
         $answered = $userTimetable->userModuleQuestions->whereNotNull('timetable_answer_id')->count();
         $unanswered = $userTimetable->userModuleQuestions->whereNull('timetable_answer_id')->count();
         $correct = $userTimetable->userModuleQuestions->where('status', 'correct')->count();
@@ -77,6 +79,7 @@ class TimetableDetailExport implements FromCollection, ShouldAutoSize, WithHeadi
             $no,
             $userTimetable->user->nim ?? ($userTimetable->user->username ?? '-'),
             $userTimetable->user->name ?? '-',
+            $totalQuestions,
             $answered,
             $unanswered,
             $correct,
