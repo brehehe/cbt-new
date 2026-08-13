@@ -102,6 +102,12 @@ class ExamApiController extends Controller
             ->where('status', 'recording')
             ->first();
 
+        $timetable = $userTimetable->timetable;
+        $isSimulation = $timetable ? $timetable->isSimulation() : false;
+        $allowsRepeat = $timetable ? $timetable->allowsRepeat() : false;
+        $requiresToken = $timetable ? $timetable->requiresToken() : true;
+        $tokenCode = $timetable ? $timetable->code : null;
+
         return response()->json([
             'userTimetable' => $userTimetable,
             'remainingTime' => $isAdmin ? 9999999 : (int) $this->remainingTime,
@@ -115,6 +121,112 @@ class ExamApiController extends Controller
             'isCameraEnabled' => (bool) $userTimetable->is_camera,
             'isRecordingEnabled' => (bool) $userTimetable->is_recording,
             'isStreamingEnabled' => (bool) $userTimetable->is_streaming,
+            'isSimulation' => $isSimulation,
+            'allowsRepeat' => $allowsRepeat,
+            'requiresToken' => $requiresToken,
+            'tokenCode' => $tokenCode,
+        ]);
+    }
+
+    public function restartExam(Request $request, $userTimetableId = null)
+    {
+        $id = $userTimetableId ?: $request->input('user_timetable_id');
+
+        $oldUserTimetable = UserTimetable::withoutGlobalScopes()
+            ->with(['timetable' => function ($q) {
+                $q->withoutGlobalScopes();
+            }])
+            ->findOrFail($id);
+
+        if ($oldUserTimetable->user_id !== Auth::id() && ! Auth::user()->hasAnyRole(['admin', 'superadmin', 'Admin', 'Super Admin', 'pengawas', 'Pengawas'])) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if (! $oldUserTimetable->canResetOrRepeat()) {
+            return response()->json(['error' => 'Ujian ini tidak mendukung pengulangan.'], 403);
+        }
+
+        $newUserTimetableId = null;
+
+        DB::transaction(function () use ($id, $oldUserTimetable, &$newUserTimetableId) {
+            $timetable = $oldUserTimetable->timetable;
+            $userId = Auth::id() ?: $oldUserTimetable->user_id;
+
+            $attemptCount = UserTimetable::withoutGlobalScopes()
+                ->where('user_id', $userId)
+                ->where('timetable_id', $timetable->id)
+                ->count();
+
+            $nextAttempt = $attemptCount + 1;
+
+            $newUserTimetable = UserTimetable::create([
+                'user_id' => $userId,
+                'timetable_id' => $timetable->id,
+                'start_process' => now(),
+                'studys' => $timetable->studys,
+                'company_id' => $timetable->company_id,
+                'is_camera' => $timetable?->is_camera ?? false,
+                'is_recording' => $timetable?->is_recording ?? false,
+                'is_streaming' => $timetable?->is_streaming ?? false,
+                'status' => 'warning',
+                'attempt' => $nextAttempt,
+            ]);
+
+            $newUserTimetableId = $newUserTimetable->id;
+
+            $oldQuestions = UserModuleQuestion::withoutGlobalScopes()
+                ->where('user_timetable_id', $oldUserTimetable->id)
+                ->orderBy('order')
+                ->get();
+
+            $now = now();
+            $userModuleQuestionsData = [];
+
+            if ($oldQuestions->isNotEmpty()) {
+                foreach ($oldQuestions as $q) {
+                    $userModuleQuestionsData[] = [
+                        'id' => (string) Str::uuid(),
+                        'user_timetable_id' => $newUserTimetable->id,
+                        'timetable_module_id' => $q->timetable_module_id,
+                        'timetable_question_id' => $q->timetable_question_id,
+                        'study_id' => $q->study_id,
+                        'company_id' => $q->company_id,
+                        'order' => $q->order,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+            } else if ($timetable->timetableModule) {
+                $tqs = TimetableQuestion::withoutGlobalScope('user_scope')
+                    ->where('timetable_module_id', $timetable->timetableModule->id)
+                    ->get();
+                foreach ($tqs as $index => $tq) {
+                    $userModuleQuestionsData[] = [
+                        'id' => (string) Str::uuid(),
+                        'user_timetable_id' => $newUserTimetable->id,
+                        'timetable_module_id' => $timetable->timetableModule->id,
+                        'timetable_question_id' => $tq->id,
+                        'study_id' => $tq->study_id,
+                        'company_id' => $timetable->company_id,
+                        'order' => $index + 1,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+            }
+
+            if (! empty($userModuleQuestionsData)) {
+                foreach (array_chunk($userModuleQuestionsData, 200) as $chunk) {
+                    UserModuleQuestion::insert($chunk);
+                }
+            }
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Simulasi ujian berhasil diulang.',
+            'new_user_timetable_id' => $newUserTimetableId,
+            'redirect_url' => "/exam/detail/{$newUserTimetableId}/react",
         ]);
     }
 

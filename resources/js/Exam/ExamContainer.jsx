@@ -322,11 +322,87 @@ const ExamContainer = ({ userTimetableId, defaultCompanyColor = '#1e3a5f' }) => 
     };
 
 
+    const handleRestartExam = async () => {
+        const result = await Swal.fire({
+            title: 'Mulai Ulang Simulasi?',
+            text: 'Jawaban pada sesi ini akan di-reset untuk mengulang simulasi dari awal.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#16a34a',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Ya, Ulang Sekarang',
+            cancelButtonText: 'Batal'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                Swal.fire({ title: 'Mereset simulasi...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+                await axios.post(`/api/exam/${userTimetableId}/restart`);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Simulasi Diulang',
+                    text: 'Silakan kerjakan simulasi kembali.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                window.location.reload();
+            } catch (error) {
+                console.error('Failed to restart exam:', error);
+                Swal.fire('Gagal', 'Gagal mereset simulasi ujian.', 'error');
+            }
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gray-50">
                 <Loader2 className="w-10 h-10 animate-spin" style={{ color: defaultCompanyColor }} />
                 <span className="ml-3 text-base font-medium text-gray-600">Memproses data ujian...</span>
+            </div>
+        );
+    }
+
+    if (examData?.status === 'done') {
+        const mark = examData.userTimetable?.mark ?? 0;
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center bg-gray-50">
+                <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 max-w-md w-full flex flex-col items-center space-y-4">
+                    <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-2xl font-bold">
+                        ✓
+                    </div>
+                    <h1 className="text-2xl font-bold text-gray-800">Ujian Telah Selesai</h1>
+                    <p className="text-sm text-gray-500">
+                        Terima kasih telah menyelesaikan ujian ini.
+                    </p>
+                    <div className="bg-gray-50 rounded-xl p-4 w-full border border-gray-200">
+                        <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">Nilai Simulasi</span>
+                        <span className="text-3xl font-extrabold text-indigo-600">{mark}</span>
+                    </div>
+
+                    {examData.allowsRepeat ? (
+                        <div className="w-full pt-2 space-y-3">
+                            <button
+                                onClick={handleRestartExam}
+                                className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow transition flex items-center justify-center gap-2 text-sm"
+                            >
+                                🔄 Coba Simulasi Lagi
+                            </button>
+                            <a
+                                href="/admin/exam/timetable"
+                                className="block w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl text-xs transition"
+                            >
+                                Kembali ke Jadwal Ujian
+                            </a>
+                        </div>
+                    ) : (
+                        <a
+                            href="/admin/exam/timetable"
+                            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow transition text-sm block"
+                        >
+                            Kembali ke Jadwal Ujian
+                        </a>
+                    )}
+                </div>
             </div>
         );
     }

@@ -58,6 +58,12 @@ class AdminExamTimetableIndex extends Component
     public function openModalStartExam($id)
     {
         $this->data_id = $id;
+        $timetable = Timetable::withoutGlobalScopes()->find($id);
+
+        if ($timetable && !$timetable->requiresToken()) {
+            $this->code = $timetable->code ?? 'NO_TOKEN';
+            return $this->submitStartExam();
+        }
 
         return $this->dispatch('open-modal', ['id' => 'modal-start-exam']);
     }
@@ -71,18 +77,28 @@ class AdminExamTimetableIndex extends Component
 
     public function submitStartExam()
     {
-        $this->validate([
-            'code' => 'required',
-        ], [
-            'code.required' => 'Kode Ujian Wajib Diisi',
-        ]);
+        $targetTimetable = Timetable::withoutGlobalScopes()->find($this->data_id);
+        $requiresToken = $targetTimetable ? $targetTimetable->requiresToken() : true;
+
+        if ($requiresToken) {
+            $this->validate([
+                'code' => 'required',
+            ], [
+                'code.required' => 'Kode Ujian Wajib Diisi',
+            ]);
+        }
 
         try {
-            DB::begintransaction();
-            $timeTable = Timetable::select('id', 'code', 'company_id', 'studys', 'is_camera', 'is_recording', 'is_streaming')
-                ->where('code', $this->code)
-                ->where('company_id', Auth::user()->company_id)
-                ->find($this->data_id);
+            DB::beginTransaction();
+            $query = Timetable::withoutGlobalScopes()
+                ->select('id', 'code', 'company_id', 'studys', 'is_camera', 'is_recording', 'is_streaming', 'require_token')
+                ->where('company_id', Auth::user()->company_id);
+
+            if ($requiresToken) {
+                $query->where('code', trim($this->code));
+            }
+
+            $timeTable = $query->find($this->data_id);
 
             if (! $timeTable) {
                 AlertHelper::error('Gagal', 'Token Yang Dimasukan Tidak Sesuai');
@@ -373,12 +389,19 @@ class AdminExamTimetableIndex extends Component
 
     public function confirmBackExam($id)
     {
-        $userTimetable = UserTimetable::find($id);
+        $userTimetable = UserTimetable::withoutGlobalScopes()->with('timetable')->find($id);
         if (! $userTimetable) {
             return AlertHelper::error('Gagal', 'Data Ujian Tidak Ditemukan');
         }
 
         if (in_array($userTimetable->status, ['done', 'suspend'])) {
+            if ($userTimetable->canResetOrRepeat()) {
+                Session::put('user_timetable_id', $id);
+                return redirect()->route('admin.exam.detail.react', [
+                    'userTimetableId' => $id,
+                ]);
+            }
+
             return AlertHelper::error('Gagal', 'Ujian Sudah Selesai');
         }
 
@@ -394,6 +417,107 @@ class AdminExamTimetableIndex extends Component
             return redirect()->route('admin.exam.detail.react', [
                 'userTimetableId' => $id,
             ]);
+        }
+    }
+
+    public function repeatExam($userTimetableId)
+    {
+        $oldUserTimetable = UserTimetable::withoutGlobalScopes()
+            ->with(['timetable' => function ($q) {
+                $q->withoutGlobalScopes();
+            }])
+            ->find($userTimetableId);
+
+        if (! $oldUserTimetable || ! $oldUserTimetable->canResetOrRepeat()) {
+            return AlertHelper::error('Gagal', 'Jadwal ujian ini tidak diizinkan untuk diulang.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $timetable = $oldUserTimetable->timetable;
+            $userId = Auth::id() ?: $oldUserTimetable->user_id;
+
+            $attemptCount = UserTimetable::withoutGlobalScopes()
+                ->where('user_id', $userId)
+                ->where('timetable_id', $timetable->id)
+                ->count();
+
+            $nextAttempt = $attemptCount + 1;
+
+            $newUserTimetable = UserTimetable::create([
+                'user_id' => $userId,
+                'timetable_id' => $timetable->id,
+                'start_process' => Carbon::now(),
+                'studys' => $timetable->studys,
+                'company_id' => $timetable->company_id,
+                'is_camera' => $timetable?->is_camera ?? false,
+                'is_recording' => $timetable?->is_recording ?? false,
+                'is_streaming' => $timetable?->is_streaming ?? false,
+                'status' => 'warning',
+                'attempt' => $nextAttempt,
+            ]);
+
+            $oldQuestions = UserModuleQuestion::withoutGlobalScopes()
+                ->where('user_timetable_id', $oldUserTimetable->id)
+                ->orderBy('order')
+                ->get();
+
+            $now = Carbon::now();
+            $userModuleQuestionsData = [];
+
+            if ($oldQuestions->isNotEmpty()) {
+                foreach ($oldQuestions as $q) {
+                    $userModuleQuestionsData[] = [
+                        'id' => (string) Str::uuid(),
+                        'user_timetable_id' => $newUserTimetable->id,
+                        'timetable_module_id' => $q->timetable_module_id,
+                        'timetable_question_id' => $q->timetable_question_id,
+                        'study_id' => $q->study_id,
+                        'company_id' => $q->company_id,
+                        'order' => $q->order,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+            } else if ($timetable->timetableModule) {
+                $tqs = TimetableQuestion::withoutGlobalScope('user_scope')
+                    ->where('timetable_module_id', $timetable->timetableModule->id)
+                    ->get();
+                foreach ($tqs as $index => $tq) {
+                    $userModuleQuestionsData[] = [
+                        'id' => (string) Str::uuid(),
+                        'user_timetable_id' => $newUserTimetable->id,
+                        'timetable_module_id' => $timetable->timetableModule->id,
+                        'timetable_question_id' => $tq->id,
+                        'study_id' => $tq->study_id,
+                        'company_id' => $timetable->company_id,
+                        'order' => $index + 1,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+            }
+
+            if (! empty($userModuleQuestionsData)) {
+                foreach (array_chunk($userModuleQuestionsData, 200) as $chunk) {
+                    UserModuleQuestion::insert($chunk);
+                }
+            }
+
+            DB::commit();
+
+            Session::put('user_timetable_id', $newUserTimetable->id);
+            if (Auth::user()?->hasRole('Mahasiswa')) {
+                return redirect()->route('admin.exam.warning');
+            }
+
+            return redirect()->route('admin.exam.detail.react', [
+                'userTimetableId' => $newUserTimetable->id,
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return AlertHelper::error('Gagal', 'Gagal membuat sesi pengulangan: ' . $th->getMessage());
         }
     }
 
@@ -459,10 +583,18 @@ class AdminExamTimetableIndex extends Component
 
     public function render()
     {
-        $userTimetableStatusDone = UserTimetable::query()
+        $userTimetableStatusDone = UserTimetable::withoutGlobalScopes()
             ->where('user_id', Auth::id())
             ->whereIn('status', ['done', 'suspend'])
-            ->get()
+            ->whereHas('timetable', function ($q) {
+                $q->withoutGlobalScopes()
+                  ->where(function ($sub) {
+                      $sub->whereNull('allow_repeat')->orWhere('allow_repeat', false);
+                  })
+                  ->where(function ($sub) {
+                      $sub->whereNull('is_simulation')->orWhere('is_simulation', 'false');
+                  });
+            })
             ->pluck('timetable_id')
             ->toArray();
 
@@ -477,7 +609,11 @@ class AdminExamTimetableIndex extends Component
                         ->orWhere('description', 'ilike', '%'.$search.'%');
                 });
             })
-            ->where('is_simulation', 'false')
+            // Menampilkan ujian resmi dan simulasi yang diizinkan
+            ->where(function ($q) {
+                $q->where('is_simulation', 'false')
+                  ->orWhere('is_simulation', 'true');
+            })
             ->where(function ($query) {
                 $now = Carbon::now();
                 $query->where('start_time', '<=', $now->copy()->addMinutes(5))

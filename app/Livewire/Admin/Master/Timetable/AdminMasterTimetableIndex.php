@@ -83,6 +83,14 @@ class AdminMasterTimetableIndex extends Component
 
     public $is_camera = false;
 
+    public $is_simulation = 'false';
+
+    public $allow_repeat = false;
+
+    public $require_token = true;
+
+    public $filter_simulation = 'all';
+
     public function mount()
     {
         Session::forget('timetable_id');
@@ -120,7 +128,13 @@ class AdminMasterTimetableIndex extends Component
             'is_camera',
             'is_recording',
             'is_streaming',
+            'is_simulation',
+            'allow_repeat',
+            'require_token',
         ]);
+        $this->is_simulation = 'false';
+        $this->allow_repeat = false;
+        $this->require_token = true;
         
         $company = Auth::user()->company;
         $this->is_camera = $company ? (bool)$company->enable_camera : true;
@@ -207,6 +221,9 @@ class AdminMasterTimetableIndex extends Component
             'is_camera',
             'is_recording',
             'is_streaming',
+            'is_simulation',
+            'allow_repeat',
+            'require_token',
         ]);
 
         return $this->dispatch('close-modal', ['id' => 'modal-timetable']);
@@ -235,6 +252,9 @@ class AdminMasterTimetableIndex extends Component
         $this->is_camera = $data?->is_camera ? true : false;
         $this->is_recording = $data?->is_recording ? true : false;
         $this->is_streaming = $data?->is_streaming ? true : false;
+        $this->is_simulation = $data?->is_simulation ?? 'false';
+        $this->allow_repeat = (bool)($data?->allow_repeat ?? false);
+        $this->require_token = (bool)($data?->require_token ?? true);
 
         // Pastikan hasil decode adalah array
         $rawStudys = $data->studys;
@@ -392,6 +412,18 @@ class AdminMasterTimetableIndex extends Component
         try {
             DB::beginTransaction();
 
+            $existingData = $this->data_id ? Timetable::find($this->data_id) : null;
+            $code = $existingData?->code;
+            if (!$code) {
+                $codeAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                $token = '';
+                $max = strlen($codeAlphabet);
+                for ($i = 0; $i < 6; $i++) {
+                    $token .= $codeAlphabet[random_int(0, $max - 1)];
+                }
+                $code = $token;
+            }
+
             Timetable::updateOrCreate([
                 'id' => $this->data_id,
             ], [
@@ -410,6 +442,10 @@ class AdminMasterTimetableIndex extends Component
                 'is_camera' => $this->is_camera ?? false,
                 'is_recording' => $this->is_recording ?? false,
                 'is_streaming' => $this->is_streaming ?? false,
+                'is_simulation' => $this->is_simulation ?? 'false',
+                'allow_repeat' => (bool)$this->allow_repeat,
+                'require_token' => (bool)$this->require_token,
+                'code' => $code,
             ]);
 
             DB::commit();
@@ -541,7 +577,9 @@ class AdminMasterTimetableIndex extends Component
                     ->orWhere('end_time', 'ilike', '%'.$search.'%')
                     ->orWhere('description', 'ilike', '%'.$search.'%');
             })
-            ->where('is_simulation', 'false')
+            ->when($this->filter_simulation !== 'all', function ($query) {
+                $query->where('is_simulation', $this->filter_simulation);
+            })
             ->orderBy('order', 'desc')
             ->paginate($this->perPage);
 

@@ -46,7 +46,9 @@ class Timetable extends Model
     public function userTimetable()
     {
         return $this->hasOne(UserTimetable::class, 'timetable_id', 'id')
-            ->where('user_id', Auth::id());
+            ->withoutGlobalScopes()
+            ->where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc');
     }
 
     public function timetableModule()
@@ -61,7 +63,33 @@ class Timetable extends Model
         'require_seb' => 'boolean',
         'is_recording' => 'boolean',
         'is_streaming' => 'boolean',
+        'allow_repeat' => 'boolean',
+        'require_token' => 'boolean',
     ];
+
+    /**
+     * Check if timetable is a simulation
+     */
+    public function isSimulation(): bool
+    {
+        return $this->is_simulation === 'true' || $this->is_simulation === true || $this->is_simulation === 1;
+    }
+
+    /**
+     * Check if timetable allows repeat attempts
+     */
+    public function allowsRepeat(): bool
+    {
+        return $this->allow_repeat || $this->isSimulation();
+    }
+
+    /**
+     * Check if timetable requires token input
+     */
+    public function requiresToken(): bool
+    {
+        return $this->require_token !== false && $this->require_token !== 0 && $this->require_token !== 'false';
+    }
 
     /**
      * Check if timetable requires Safe Exam Browser

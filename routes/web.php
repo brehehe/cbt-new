@@ -727,6 +727,7 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
         Route::get('/{user_timetable_id}/status', [App\Http\Controllers\Api\Auth\AuthCheckController::class, 'examStatus']);
 
         Route::post('/{user_timetable_id}/finish', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'finishExam']);
+        Route::post('/{user_timetable_id}/restart', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'restartExam']);
     });
 
     Route::get('/stress-test/exam/{userTimetableId}', StressTestExamDetailIndex::class)->name('public.stress-test.exam');

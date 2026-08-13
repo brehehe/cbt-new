@@ -20,6 +20,7 @@ class UserTimetable extends Model
     protected $casts = [
         'is_recording' => 'boolean',
         'is_streaming' => 'boolean',
+        'attempt' => 'integer',
     ];
 
     public function company()
@@ -45,6 +46,14 @@ class UserTimetable extends Model
     public function examLiveSession()
     {
         return $this->hasOne(\App\Models\Exam\ExamLiveSession::class, 'user_timetable_id', 'id');
+    }
+
+    public function canResetOrRepeat(): bool
+    {
+        if (! $this->timetable) {
+            return false;
+        }
+        return $this->timetable->allowsRepeat();
     }
 
     protected static function boot()

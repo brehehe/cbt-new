@@ -71,7 +71,25 @@
                         <tr class="hover:bg-gray-50 transition-colors duration-200">
                             <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
                                 {{ $timetables->firstItem() + $index }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{{ $timetable->name ?? '-' }}
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
+                                <div>{{ $timetable->name ?? '-' }}</div>
+                                <div class="flex flex-wrap gap-1 mt-1">
+                                    @if ($timetable->isSimulation())
+                                        <span class="inline-flex items-center rounded bg-purple-100 px-1.5 py-0.5 text-xs font-semibold text-purple-700">
+                                            Simulasi
+                                        </span>
+                                    @endif
+                                    @if ($timetable->allowsRepeat())
+                                        <span class="inline-flex items-center rounded bg-blue-100 px-1.5 py-0.5 text-xs font-semibold text-blue-700">
+                                            Dapat Diulang
+                                        </span>
+                                    @endif
+                                    @if (!$timetable->requiresToken())
+                                        <span class="inline-flex items-center rounded bg-emerald-100 px-1.5 py-0.5 text-xs font-semibold text-emerald-700">
+                                            Tanpa Token
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span
@@ -100,11 +118,24 @@
                                             <i class="fa-solid fa-book mr-1.5"></i> Masuk
                                         </button>
                                     @else
-                                        <button
-                                            class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-primary hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all shadow-md hover:shadow-lg"
-                                            wire:click="confirmBackExam('{{ $timetable->userTimetable->id }}')">
-                                            <i class="fa-regular fa-book-open-cover mr-1.5"></i> Kembali
-                                        </button>
+                                        @if ($timetable->userTimetable->status === 'done' && $timetable->allowsRepeat())
+                                            <button
+                                                class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none transition-all shadow-md"
+                                                wire:click="repeatExam('{{ $timetable->userTimetable->id }}')">
+                                                <i class="fa-solid fa-rotate-right mr-1.5"></i> Ulang Ujian
+                                            </button>
+                                            <button
+                                                class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none transition-all"
+                                                wire:click="confirmBackExam('{{ $timetable->userTimetable->id }}')">
+                                                <i class="fa-solid fa-eye mr-1.5"></i> Hasil
+                                            </button>
+                                        @else
+                                            <button
+                                                class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-primary hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all shadow-md hover:shadow-lg"
+                                                wire:click="confirmBackExam('{{ $timetable->userTimetable->id }}')">
+                                                <i class="fa-regular fa-book-open-cover mr-1.5"></i> Kembali
+                                            </button>
+                                        @endif
                                     @endif
 
                                     @if(auth()->user()->hasRole(['admin', 'superadmin', 'Admin', 'Super Admin']))
@@ -143,7 +174,7 @@
     <div class="md:hidden space-y-4 mb-6">
         @forelse ($timetables as $timetable)
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 space-y-4 relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-4">
+                <div class="absolute top-0 right-0 p-4 flex flex-col items-end gap-1">
                     <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                         {{ $timetable->timetableModule->questionType->name ?? '-' }}
                     </span>
@@ -151,7 +182,24 @@
 
                 <div>
                     <h3 class="text-lg font-bold text-gray-900 pr-16">{{ $timetable->name ?? '-' }}</h3>
-                    <p class="text-sm text-gray-500 font-medium">{{ $timetable->timetableModule->name ?? '-' }}</p>
+                    <div class="flex flex-wrap gap-1 mt-1">
+                        @if ($timetable->isSimulation())
+                            <span class="inline-flex items-center rounded bg-purple-100 px-1.5 py-0.5 text-xs font-semibold text-purple-700">
+                                Simulasi
+                            </span>
+                        @endif
+                        @if ($timetable->allowsRepeat())
+                            <span class="inline-flex items-center rounded bg-blue-100 px-1.5 py-0.5 text-xs font-semibold text-blue-700">
+                                Dapat Diulang
+                            </span>
+                        @endif
+                        @if (!$timetable->requiresToken())
+                            <span class="inline-flex items-center rounded bg-emerald-100 px-1.5 py-0.5 text-xs font-semibold text-emerald-700">
+                                Tanpa Token
+                            </span>
+                        @endif
+                    </div>
+                    <p class="text-sm text-gray-500 font-medium mt-1">{{ $timetable->timetableModule->name ?? '-' }}</p>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 py-2 border-t border-b border-gray-100">
@@ -173,7 +221,7 @@
                     </div>
                 @endif
 
-                <div class="pt-2 flex gap-2">
+                <div class="pt-2 flex flex-wrap gap-2">
                     @if (!$timetable->userTimetable)
                         <button
                             class="flex-1 flex justify-center items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all"
@@ -181,11 +229,24 @@
                             <i class="fa-solid fa-book mr-2"></i> Masuk Ujian
                         </button>
                     @else
-                        <button
-                            class="flex-1 flex justify-center items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all"
-                            wire:click="confirmBackExam('{{ $timetable->userTimetable->id }}')">
-                            <i class="fa-regular fa-book-open-cover mr-2"></i> Kembali Ujian
-                        </button>
+                        @if ($timetable->userTimetable->status === 'done' && $timetable->allowsRepeat())
+                            <button
+                                class="flex-1 flex justify-center items-center px-3 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-green-600 hover:bg-green-700 transition-all"
+                                wire:click="repeatExam('{{ $timetable->userTimetable->id }}')">
+                                <i class="fa-solid fa-rotate-right mr-1.5"></i> Ulang Ujian
+                            </button>
+                            <button
+                                class="flex-1 flex justify-center items-center px-3 py-2.5 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-all"
+                                wire:click="confirmBackExam('{{ $timetable->userTimetable->id }}')">
+                                <i class="fa-solid fa-eye mr-1.5"></i> Lihat Hasil
+                            </button>
+                        @else
+                            <button
+                                class="flex-1 flex justify-center items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all"
+                                wire:click="confirmBackExam('{{ $timetable->userTimetable->id }}')">
+                                <i class="fa-regular fa-book-open-cover mr-2"></i> Kembali Ujian
+                            </button>
+                        @endif
                     @endif
 
                     @if(auth()->user()->hasRole(['admin', 'superadmin', 'Admin', 'Super Admin']))

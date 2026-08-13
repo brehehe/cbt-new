@@ -41,18 +41,31 @@
 
     <!-- Table Controls -->
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <div class="flex items-center bg-white rounded-lg shadow-sm border border-gray-200 px-3 py-2 w-full md:w-auto">
-            <span class="text-sm text-gray-600 mr-2">Tampil</span>
-            <select
-                class="form-select text-sm border-none focus:ring-0 p-0 text-gray-700 font-semibold bg-transparent w-12"
-                wire:model.live='perPage'>
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
-            <span class="text-sm text-gray-600 ml-2">data</span>
+        <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center bg-white rounded-lg shadow-sm border border-gray-200 px-3 py-2">
+                <span class="text-sm text-gray-600 mr-2">Tampil</span>
+                <select
+                    class="form-select text-sm border-none focus:ring-0 p-0 text-gray-700 font-semibold bg-transparent w-12"
+                    wire:model.live='perPage'>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+                <span class="text-sm text-gray-600 ml-2">data</span>
+            </div>
+
+            <div class="flex items-center bg-white rounded-lg shadow-sm border border-gray-200 px-3 py-2">
+                <span class="text-sm text-gray-600 mr-2">Filter</span>
+                <select
+                    class="form-select text-sm border-none focus:ring-0 p-0 text-gray-700 font-semibold bg-transparent"
+                    wire:model.live='filter_simulation'>
+                    <option value="all">Semua Jadwal</option>
+                    <option value="false">Ujian Resmi</option>
+                    <option value="true">Simulasi / Latihan</option>
+                </select>
+            </div>
         </div>
 
         <div class="w-full md:w-72">
@@ -97,7 +110,26 @@
                                 {{ $timetables->firstItem() + $index }}
                             </td>
                             {{--<td class="px-3 py-2">{{ $timetable?->classmate->name ?? '-' }}</td>--}}
-                            <td class="px-3 py-2">{{ $timetable?->name ?? '-' }}</td>
+                            <td class="px-3 py-2">
+                                <div class="font-medium text-gray-900">{{ $timetable?->name ?? '-' }}</div>
+                                <div class="flex flex-wrap gap-1 mt-1">
+                                    @if ($timetable->isSimulation())
+                                        <span class="inline-flex items-center rounded bg-purple-100 px-1.5 py-0.5 text-xs font-semibold text-purple-700">
+                                            Simulasi
+                                        </span>
+                                    @endif
+                                    @if ($timetable->allowsRepeat())
+                                        <span class="inline-flex items-center rounded bg-blue-100 px-1.5 py-0.5 text-xs font-semibold text-blue-700">
+                                            Dapat Diulang
+                                        </span>
+                                    @endif
+                                    @if (!$timetable->requiresToken())
+                                        <span class="inline-flex items-center rounded bg-emerald-100 px-1.5 py-0.5 text-xs font-semibold text-emerald-700">
+                                            Tanpa Token
+                                        </span>
+                                    @endif
+                                </div>
+                            </td>
                             <td class="px-3 py-2">{{ $timetable?->module?->name ?? '-' }}</td>
                             <td class="px-3 py-2">{{ $timetable?->examRoom?->name ?? '-' }}</td>
                             <td class="px-3 py-2">{{ $timetable?->examSession?->name ?? '-' }}</td>
@@ -105,7 +137,11 @@
                             <td class="px-3 py-2">{{ $timetable?->end_time }}</td>
                             <!-- Token -->
                             <td class="px-3 py-2">
-                                @if ($timetable->code)
+                                @if (!$timetable->requiresToken())
+                                    <span class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold px-2.5 py-0.5">
+                                        Tanpa Token
+                                    </span>
+                                @elseif ($timetable->code)
                                     <div class="flex items-center gap-2">
                                         <span
                                             class="font-mono text-sm bg-gray-100 px-2 py-1 rounded">{{ $timetable->code }}</span>
@@ -219,7 +255,7 @@
                                                             </button>
                                                         </li>
                                                     @endif
-                                                    @if (!$timetable->code)
+                                                    @if ($timetable->requiresToken() && !$timetable->code)
                                                         @if ($this->canGenerateToken())
                                                             <li>
                                                                 <button wire:click="confirmGenerateToken('{{ $timetable->id }}')"

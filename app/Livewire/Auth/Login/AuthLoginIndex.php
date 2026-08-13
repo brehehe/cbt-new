@@ -45,7 +45,7 @@ class AuthLoginIndex extends Component
     public function mount()
     {
         // $this->is_credentials = in_array(config('app.env'), ['local', 'development']) ? true : false;
-        $this->is_credentials = config('app.login_is_credentials', false);
+        $this->is_credentials = config('app.login_is_credentials', true);
 
         $this->credentials = [
             'admin' => [
@@ -53,7 +53,7 @@ class AuthLoginIndex extends Component
                 'password' => '12345678',
             ],
             'dosen' => [
-                'username_or_email' => 'muhammad.irfan@university.ac.id',
+                'username_or_email' => 'muhammad.irfan@test.com',
                 'password' => 'password123',
             ],
             'pengawas' => [
