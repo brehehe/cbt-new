@@ -45,7 +45,7 @@
                         <thead>
                             <tr>
                                 <th style="width: 30px;">No</th>
-                                <th class="text-left" style="width: 150px;">Nama Mahasiswa</th>
+                                <th class="text-left" style="width: 150px;">Nama {{ student_label() }}</th>
                                 @foreach ($questionChunk as $q)
                                     <th style="font-size: 8px;">{{ $timetable_questions->search($q) + 1 }}</th>
                                 @endforeach
@@ -99,7 +99,7 @@
                         <thead>
                             <tr>
                                 <th style="width: 30px;">No</th>
-                                <th class="text-left" style="width: 150px;">Nama Mahasiswa</th>
+                                <th class="text-left" style="width: 150px;">Nama {{ student_label() }}</th>
                                 @foreach ($questionChunk as $q)
                                     <th style="font-size: 8px;">{{ $timetable_questions->search($q) + 1 }}</th>
                                 @endforeach
@@ -191,7 +191,7 @@
             <thead>
                 <tr>
                     <th style="width: 30px;">No</th>
-                    <th class="text-left">Nama Mahasiswa</th>
+                    <th class="text-left">Nama {{ student_label() }}</th>
                     <th style="width: 50px;">Benar (PG)</th>
                     <th style="width: 50px;">Nilai</th>
                 </tr>

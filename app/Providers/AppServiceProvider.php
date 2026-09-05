@@ -17,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        require_once app_path('Helpers/FormatHelper.php');
     }
 
     /**
@@ -50,42 +50,44 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Global Activity Log Metadata Injection
-        Activity::saving(function ($activity) {
-            // Only inject if not already present
-            if (! isset($activity->properties['ip_address'])) {
-                $ip = request()->ip() ?? '127.0.0.1';
+        if (class_exists(Activity::class)) {
+            Activity::saving(function ($activity) {
+                // Only inject if not already present
+                if (! isset($activity->properties['ip_address'])) {
+                    $ip = request()->ip() ?? '127.0.0.1';
 
-                // Attempt GeoIP lookup
-                $location = null;
-                try {
-                    // Skip location for local IPs to avoid errors/delays
-                    if ($ip !== '127.0.0.1' && $ip !== '::1') {
-                        $cacheKey = 'geoip_location_' . md5($ip);
-                        $location = \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->addDays(30), function () use ($ip) {
-                            $position = Location::get($ip);
-                            if ($position) {
-                                return [
-                                    'country' => $position->countryName,
-                                    'city' => $position->cityName,
-                                    'iso_code' => $position->countryCode,
-                                    'timezone' => $position->timezone,
-                                ];
-                            }
-                            return null;
-                        });
+                    // Attempt GeoIP lookup
+                    $location = null;
+                    try {
+                        // Skip location for local IPs to avoid errors/delays
+                        if ($ip !== '127.0.0.1' && $ip !== '::1' && class_exists(Location::class)) {
+                            $cacheKey = 'geoip_location_' . md5($ip);
+                            $location = \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->addDays(30), function () use ($ip) {
+                                $position = Location::get($ip);
+                                if ($position) {
+                                    return [
+                                        'country' => $position->countryName,
+                                        'city' => $position->cityName,
+                                        'iso_code' => $position->countryCode,
+                                        'timezone' => $position->timezone,
+                                    ];
+                                }
+                                return null;
+                            });
+                        }
+                    } catch (\Throwable $e) {
+                        Log::warning('GeoIP lookup failed: '.$e->getMessage());
                     }
-                } catch (\Throwable $e) {
-                    Log::warning('GeoIP lookup failed: '.$e->getMessage());
-                }
 
-                $activity->properties = $activity->properties->merge([
-                    'ip_address' => $ip,
-                    'user_agent' => request()->userAgent() ?? 'System / CLI',
-                    'location' => $location,
-                    'url' => request()->fullUrl(),
-                    'method' => request()->method(),
-                ]);
-            }
-        });
+                    $activity->properties = $activity->properties->merge([
+                        'ip_address' => $ip,
+                        'user_agent' => request()->userAgent() ?? 'System / CLI',
+                        'location' => $location,
+                        'url' => request()->fullUrl(),
+                        'method' => request()->method(),
+                    ]);
+                }
+            });
+        }
     }
 }

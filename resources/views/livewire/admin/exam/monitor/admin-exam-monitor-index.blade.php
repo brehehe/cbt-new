@@ -3,7 +3,7 @@
     <div class="flex flex-col gap-4 mb-6 lg:flex-row lg:items-center lg:justify-between">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Live Exam Monitoring</h1>
-            <p class="text-sm text-gray-600">Monitor Mahasiswa yang sedang mengerjakan ujian secara real-time</p>
+            <p class="text-sm text-gray-600">Monitor {{ student_label() }} yang sedang mengerjakan ujian secara real-time</p>
         </div>
 
         <div class="flex flex-col gap-2 lg:flex-row lg:items-center">
@@ -138,7 +138,7 @@
 
             <!-- Search -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Cari Mahasiswa</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Cari {{ student_label() }}</label>
                 <input type="text" wire:model.live.debounce.300ms="search" placeholder="Nama, NIM, Username..."
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
@@ -213,7 +213,7 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Mahasiswa</th>
+                            {{ student_label() }}</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Ujian</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">

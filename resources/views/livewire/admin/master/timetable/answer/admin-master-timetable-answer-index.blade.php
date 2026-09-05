@@ -271,10 +271,8 @@
                     sampai <span class="font-medium">{{ $userModuleQuestions->lastItem() }}</span>
                     dari <span class="font-medium">{{ $userModuleQuestions->total() }}</span> hasil
                 </div>
-                <div class="flex justify-center">
-                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        {{ $userModuleQuestions->links('vendor.livewire.custom') }}
-                    </nav>
+                <div class="w-full md:w-auto flex justify-center">
+                    {{ $userModuleQuestions->links('vendor.livewire.custom') }}
                 </div>
             </div>
         </div>

@@ -25,9 +25,9 @@
     <!-- Filter Controls -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
         <div>
-            <label for="filter_user" class="block text-sm font-medium text-gray-700">Mahasiswa</label>
+            <label for="filter_user" class="block text-sm font-medium text-gray-700">{{ student_label() }}</label>
             <select id="filter_user" class="mt-1 form-control" wire:model.live="user_id">
-                <option value="">Semua Mahasiswa</option>
+                <option value="">Semua {{ student_label() }}</option>
                 @foreach ($users as $user)
                     <option value="{{ $user->id }}">
                         {{ $user->name ?? '-' }}
@@ -98,7 +98,7 @@
                     <tr>
                         <th class="w-1 center">Detail</th>
                         <th class="w-1 center">No</th>
-                        <th>Nama Mahasiswa</th>
+                        <th>Nama {{ student_label() }}</th>
                         <th>NIM/Username</th>
                         <th>Modul</th>
                         <th>Jadwal</th>

@@ -39,6 +39,8 @@ class AdminMasterTimetableIndex extends Component
 
     public $module_id;
 
+    public $total_questions;
+
     public $supervisors = [];
 
     public $start_time;
@@ -116,6 +118,7 @@ class AdminMasterTimetableIndex extends Component
             'data_id',
             'name',
             'module_id',
+            'total_questions',
             'supervisors',
             'start_time',
             'end_time',
@@ -236,6 +239,7 @@ class AdminMasterTimetableIndex extends Component
         $this->data_id = $data->id;
         $this->name = $data->name;
         $this->module_id = $data->module_id;
+        $this->total_questions = $data->total_questions;
         $this->exam_room_id = $data->exam_room_id;
         $this->exam_session_id = $data->exam_session_id;
         $this->classmate_id = $data->classmate_id;
@@ -431,6 +435,7 @@ class AdminMasterTimetableIndex extends Component
                 'classmate_id' => $this->classmate_id,
                 'name' => $this->name,
                 'module_id' => $this->module_id,
+                'total_questions' => !empty($this->total_questions) ? (int)$this->total_questions : null,
                 'exam_room_id' => $this->exam_room_id,
                 'exam_session_id' => $this->exam_session_id,
                 'supervisors' => is_array($this->supervisors) ? $this->supervisors : (json_decode($this->supervisors, true) ?: []),

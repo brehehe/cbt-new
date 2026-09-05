@@ -221,74 +221,72 @@ const QuestionArea = ({
         <div className="flex flex-col h-full overflow-hidden bg-slate-50">
 
             {/* ── Top Bar ── */}
-            <div className="flex-none flex flex-wrap items-center gap-1.5 px-3 py-2 bg-white border-b border-gray-200 shadow-sm z-10">
-                {/* Nav label */}
-                <div className="hidden sm:flex items-center gap-1 text-xs font-semibold text-gray-400 pr-2 border-r border-gray-200 mr-1">
-                    <Menu className="w-3.5 h-3.5" />
-                    <span>Navigasi Soal</span>
+            <div className="flex-none px-3 sm:px-4 py-2 bg-white border-b border-gray-200 flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
+                <div className="flex items-center gap-2">
+                    <span className="font-bold text-xs sm:text-sm px-2.5 py-1 rounded-lg text-white whitespace-nowrap shadow-2xs"
+                        style={{ backgroundColor: companyColor }}>
+                        Soal {index + 1}
+                    </span>
+
+                    {/* Font size picker */}
+                    <div className="flex items-center bg-gray-100 p-0.5 rounded-lg border border-gray-200">
+                        <button
+                            onClick={() => changeFontSize('small')}
+                            className={`px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold transition-all ${
+                                fontSize === 'small' ? 'bg-white text-gray-800 shadow-2xs' : 'text-gray-500 hover:text-gray-800'
+                            }`}
+                            title="Ukuran Huruf Kecil"
+                        >
+                            A-
+                        </button>
+                        <button
+                            onClick={() => changeFontSize('medium')}
+                            className={`px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold transition-all ${
+                                fontSize === 'medium' ? 'bg-white text-gray-800 shadow-2xs' : 'text-gray-500 hover:text-gray-800'
+                            }`}
+                            title="Ukuran Huruf Sedang"
+                        >
+                            A
+                        </button>
+                        <button
+                            onClick={() => changeFontSize('large')}
+                            className={`px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold transition-all ${
+                                fontSize === 'large' ? 'bg-white text-gray-800 shadow-2xs' : 'text-gray-500 hover:text-gray-800'
+                            }`}
+                            title="Ukuran Huruf Besar"
+                        >
+                            A+
+                        </button>
+                    </div>
                 </div>
 
-                {/* Question # */}
-                <span className="text-xs font-bold text-gray-700 mr-2">Soal {index + 1} dari {total}</span>
+                <div className="flex items-center gap-2 ml-auto">
+                    {/* Ragu-Ragu */}
+                    <button
+                        onClick={handleToggleMark}
+                        disabled={!isAnswered}
+                        title={!isAnswered ? 'Jawab soal terlebih dahulu untuk menandai Ragu-Ragu' : ''}
+                        className={`flex items-center gap-1 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border text-[11px] sm:text-xs font-semibold transition-all shadow-2xs active:scale-[0.98] ${!isAnswered ? 'opacity-50 cursor-not-allowed bg-slate-100 border-slate-200 text-slate-400' : 'cursor-pointer'}`}
+                        style={isMarked && isAnswered
+                            ? { backgroundColor: '#fef9c3', borderColor: '#f59e0b', color: '#92400e' }
+                            : (!isAnswered
+                                ? { backgroundColor: '#f1f5f9', borderColor: '#cbd5e1', color: '#94a3b8' }
+                                : { backgroundColor: '#f8fafc', borderColor: '#e2e8f0', color: '#64748b' })
+                        }
+                    >
+                        <HelpCircle className="w-3.5 h-3.5" />
+                        <span className="hidden xs:inline">Ragu-Ragu</span>
+                    </button>
 
-                {/* Font Size Selector */}
-                <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1 border border-gray-200">
-                    <button
-                        onClick={() => changeFontSize('small')}
-                        className={`px-2 py-1 rounded text-[10px] font-bold transition-all ${
-                            fontSize === 'small' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-800'
-                        }`}
-                        title="Ukuran Huruf Kecil"
-                    >
-                        Kecil
-                    </button>
-                    <button
-                        onClick={() => changeFontSize('medium')}
-                        className={`px-2 py-1 rounded text-[10px] font-bold transition-all ${
-                            fontSize === 'medium' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-800'
-                        }`}
-                        title="Ukuran Huruf Sedang"
-                    >
-                        Sedang
-                    </button>
-                    <button
-                        onClick={() => changeFontSize('large')}
-                        className={`px-2 py-1 rounded text-[10px] font-bold transition-all ${
-                            fontSize === 'large' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-800'
-                        }`}
-                        title="Ukuran Huruf Besar"
-                    >
-                        Besar
-                    </button>
+                    {/* Save badge */}
+                    <SaveBadge saveStatus={saveStatus} lastSaved={lastSaved} companyColor={companyColor} />
                 </div>
-
-                <div className="flex-1" />
-
-                {/* Ragu-Ragu */}
-                <button
-                    onClick={handleToggleMark}
-                    disabled={!isAnswered}
-                    title={!isAnswered ? 'Jawab soal terlebih dahulu untuk menandai Ragu-Ragu' : ''}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all shadow-sm active:scale-[0.98] ${!isAnswered ? 'opacity-50 cursor-not-allowed bg-slate-100 border-slate-200 text-slate-400' : ''}`}
-                    style={isMarked && isAnswered
-                        ? { backgroundColor: '#fef9c3', borderColor: '#f59e0b', color: '#92400e' }
-                        : (!isAnswered
-                            ? { backgroundColor: '#f1f5f9', borderColor: '#cbd5e1', color: '#94a3b8' }
-                            : { backgroundColor: '#f8fafc', borderColor: '#e2e8f0', color: '#64748b' })
-                    }
-                >
-                    <HelpCircle className="w-3.5 h-3.5" />
-                    <span>Ragu-Ragu</span>
-                </button>
-
-                {/* Save badge */}
-                <SaveBadge saveStatus={saveStatus} lastSaved={lastSaved} companyColor={companyColor} />
             </div>
 
             {/* ── Question Body (scrollable) ── */}
             <div className="flex-1 overflow-y-auto bg-slate-50" onClick={handleContentClick}>
-                <div className="max-w-5xl mx-auto px-4 py-6">
-                    <div className="bg-white border border-gray-250/70 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+                <div className="max-w-5xl mx-auto px-2 sm:px-4 py-3 sm:py-6">
+                    <div className="bg-white border border-gray-200/90 rounded-xl sm:rounded-2xl shadow-xs p-4 sm:p-8 space-y-4 sm:space-y-6">
 
                     {/* Question label */}
                     <p className="text-xs font-semibold text-gray-400">Soal ke-{index + 1}:</p>
@@ -504,22 +502,27 @@ const QuestionArea = ({
             </div>
 
             {/* ── Bottom Navigation ── */}
-            <div className="flex-none border-t border-gray-200 bg-white px-3 py-2.5 flex items-center gap-2 flex-wrap sm:flex-nowrap">
+            <div className="flex-none border-t border-gray-200 bg-white px-3 py-2 sm:py-2.5 flex items-center justify-between gap-2">
                 {/* Prev */}
                 <button
                     onClick={() => { saveBeforeNav(); onPrev(); }}
                     disabled={index === 0}
-                    className="flex items-center gap-1 px-3 py-2 rounded-lg border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all whitespace-nowrap"
+                    className="flex items-center justify-center gap-1 px-2.5 sm:px-3 py-2 rounded-lg border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all whitespace-nowrap shadow-2xs cursor-pointer"
                 >
-                    <ChevronLeft className="w-3.5 h-3.5" />
-                    <span>Sebelumnya</span>
+                    <ChevronLeft className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+                    <span className="hidden xs:inline">Sebelumnya</span>
                 </button>
 
-                {/* Page strip */}
-                <div className="flex-1 flex items-center justify-center gap-1 overflow-hidden">
+                {/* Mobile Question Indicator (Shown on small screens) */}
+                <div className="flex sm:hidden items-center justify-center text-xs font-bold text-gray-700 bg-gray-100 px-3 py-1.5 rounded-lg">
+                    <span>{index + 1} / {total}</span>
+                </div>
+
+                {/* Page strip (Shown on tablet and desktop) */}
+                <div className="hidden sm:flex flex-1 items-center justify-center gap-1 overflow-hidden">
                     {/* First page */}
                     {showFirstEllipsis && <>
-                        <button onClick={() => { saveBeforeNav(); setCurrentIndex(0); }} className="w-7 h-7 rounded-md text-xs font-bold text-gray-500 hover:bg-gray-100">1</button>
+                        <button onClick={() => { saveBeforeNav(); setCurrentIndex(0); }} className="w-7 h-7 rounded-md text-xs font-bold text-gray-500 hover:bg-gray-100 cursor-pointer">1</button>
                         <span className="text-gray-300 text-xs px-0.5">…</span>
                     </>}
 
@@ -527,7 +530,7 @@ const QuestionArea = ({
                         <button
                             key={n}
                             onClick={() => { saveBeforeNav(); setCurrentIndex(n); }}
-                            className="w-7 h-7 rounded-md text-xs font-bold transition-all hover:opacity-80"
+                            className="w-7 h-7 rounded-md text-xs font-bold transition-all hover:opacity-80 cursor-pointer"
                             style={n === index
                                 ? { backgroundColor: '#1e3a5f', color: '#fff' }
                                 : { backgroundColor: '#f1f5f9', color: '#475569' }
@@ -540,7 +543,7 @@ const QuestionArea = ({
                     {/* Last page */}
                     {showLastEllipsis && <>
                         <span className="text-gray-300 text-xs px-0.5">…</span>
-                        <button onClick={() => { saveBeforeNav(); setCurrentIndex(total - 1); }} className="w-7 h-7 rounded-md text-xs font-bold text-gray-500 hover:bg-gray-100">{total}</button>
+                        <button onClick={() => { saveBeforeNav(); setCurrentIndex(total - 1); }} className="w-7 h-7 rounded-md text-xs font-bold text-gray-500 hover:bg-gray-100 cursor-pointer">{total}</button>
                     </>}
                 </div>
 
@@ -548,18 +551,18 @@ const QuestionArea = ({
                 {index < total - 1 ? (
                     <button
                         onClick={() => { saveBeforeNav(); onNext(); }}
-                        className="flex items-center gap-1 px-4 py-2 rounded-lg text-xs font-bold text-white transition-all whitespace-nowrap"
+                        className="flex items-center justify-center gap-1 px-3 sm:px-4 py-2 rounded-lg text-xs font-bold text-white transition-all whitespace-nowrap shadow-2xs cursor-pointer"
                         style={{ backgroundColor: companyColor }}
                     >
                         <span>Selanjutnya</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
+                        <ChevronRight className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                     </button>
                 ) : (
                     <button
                         onClick={() => onFinish(false)}
-                        className="flex items-center gap-1 px-4 py-2 rounded-lg text-xs font-bold text-white bg-green-600 hover:bg-green-700 transition-all whitespace-nowrap"
+                        className="flex items-center justify-center gap-1 px-3 sm:px-4 py-2 rounded-lg text-xs font-bold text-white bg-green-600 hover:bg-green-700 transition-all whitespace-nowrap shadow-2xs cursor-pointer"
                     >
-                        <CheckCircle className="w-3.5 h-3.5" />
+                        <CheckCircle className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                         <span>Selesai</span>
                     </button>
                 )}

@@ -256,41 +256,70 @@ class AdminMasterLecturerIndex extends Component
 
     public function submit()
     {
-        // Dynamic validation rules
-        $rules = [
-            'name' => 'required|string|max:255',
-            'studys' => 'required',
-            'lecturer_faculty' => 'nullable|string|max:255',
-            'lecturer_position' => 'nullable|string|max:255',
-            'lecturer_education_level' => 'required|string|max:255',
-            'lecturer_specialization' => 'nullable|string|max:255',
-            'birth_place' => 'required|string|max:255',
-            'birth_date' => 'required|date',
-            'gender' => 'required|in:male,female',
-            'phone' => 'nullable|string|max:20',
-            'mobile_phone' => 'nullable|string|max:20',
-            'address' => 'required|string|max:500',
-            'city' => 'required|string|max:255',
-            'province' => 'required|string|max:255',
-            'studys' => 'required|array|min:1',
-        ];
+        if (is_shorinji()) {
+            $rules = [
+                'name' => 'required|string|max:255',
+                'studys' => 'nullable',
+                'lecturer_faculty' => 'nullable|string|max:255',
+                'lecturer_position' => 'nullable|string|max:255',
+                'lecturer_education_level' => 'nullable|string|max:255',
+                'lecturer_specialization' => 'nullable|string|max:255',
+                'birth_place' => 'nullable|string|max:255',
+                'birth_date' => 'nullable|date',
+                'gender' => 'nullable|in:male,female',
+                'phone' => 'nullable|string|max:20',
+                'mobile_phone' => 'nullable|string|max:20',
+                'address' => 'nullable|string|max:500',
+                'city' => 'nullable|string|max:255',
+                'province' => 'nullable|string|max:255',
+            ];
 
-        $messages = [
-            'studys.required' => 'Prodi wajib diisi.',
-            'studys.array' => 'Prodi harus berupa array.',
-            'studys.min' => 'Pilih minimal satu Prodi.',
-        ];
-
-        if ($this->editMode) {
-            $rules['email'] = 'required|email|unique:users,email,'.$this->data_id.',id';
-            $rules['lecturer_id'] = 'required|string|unique:user_details,lecturer_id,'.$this->data_id.',user_id';
-            $rules['lecturer_nidn'] = 'required|string|unique:user_details,lecturer_nidn,'.$this->data_id.',user_id';
+            if ($this->editMode) {
+                $rules['email'] = 'required|email|unique:users,email,'.$this->data_id.',id';
+                if (!empty($this->lecturer_id)) {
+                    $rules['lecturer_id'] = 'nullable|string|unique:user_details,lecturer_id,'.$this->data_id.',user_id';
+                }
+                if (!empty($this->lecturer_nidn)) {
+                    $rules['lecturer_nidn'] = 'nullable|string|unique:user_details,lecturer_nidn,'.$this->data_id.',user_id';
+                }
+            } else {
+                $rules['email'] = 'required|email|unique:users,email';
+                if (!empty($this->lecturer_id)) {
+                    $rules['lecturer_id'] = 'nullable|string|unique:user_details,lecturer_id';
+                }
+                if (!empty($this->lecturer_nidn)) {
+                    $rules['lecturer_nidn'] = 'nullable|string|unique:user_details,lecturer_nidn';
+                }
+                $rules['password'] = 'nullable|string|min:6';
+            }
         } else {
-            // For create mode: strict unique validation + password required
-            $rules['email'] = 'required|email|unique:users,email';
-            $rules['lecturer_id'] = 'required|string|unique:user_details,lecturer_id';
-            $rules['lecturer_nidn'] = 'required|string|unique:user_details,lecturer_nidn';
-            $rules['password'] = 'required|string|min:8';
+            $rules = [
+                'name' => 'required|string|max:255',
+                'studys' => 'required|array|min:1',
+                'lecturer_faculty' => 'nullable|string|max:255',
+                'lecturer_position' => 'nullable|string|max:255',
+                'lecturer_education_level' => 'required|string|max:255',
+                'lecturer_specialization' => 'nullable|string|max:255',
+                'birth_place' => 'required|string|max:255',
+                'birth_date' => 'required|date',
+                'gender' => 'required|in:male,female',
+                'phone' => 'nullable|string|max:20',
+                'mobile_phone' => 'nullable|string|max:20',
+                'address' => 'required|string|max:500',
+                'city' => 'required|string|max:255',
+                'province' => 'required|string|max:255',
+            ];
+
+            if ($this->editMode) {
+                $rules['email'] = 'required|email|unique:users,email,'.$this->data_id.',id';
+                $rules['lecturer_id'] = 'required|string|unique:user_details,lecturer_id,'.$this->data_id.',user_id';
+                $rules['lecturer_nidn'] = 'required|string|unique:user_details,lecturer_nidn,'.$this->data_id.',user_id';
+            } else {
+                $rules['email'] = 'required|email|unique:users,email';
+                $rules['lecturer_id'] = 'required|string|unique:user_details,lecturer_id';
+                $rules['lecturer_nidn'] = 'required|string|unique:user_details,lecturer_nidn';
+                $rules['password'] = 'required|string|min:8';
+            }
         }
 
         $this->validate($rules);
@@ -352,7 +381,7 @@ class AdminMasterLecturerIndex extends Component
 
                 RoleHelper::assignRoleToUserInCompany($user, 'Dosen', Auth::user()->company_id);
 
-                AlertHelper::success('Berhasil', 'Data dosen berhasil diperbarui.');
+                AlertHelper::success('Berhasil', 'Data ' . strtolower(lecturer_label()) . ' berhasil diperbarui.');
             } else {
                 $user = User::create([
                     'name' => $this->name,
@@ -395,7 +424,7 @@ class AdminMasterLecturerIndex extends Component
 
                 RoleHelper::assignRoleToUserInCompany($user, 'Dosen', Auth::user()->company_id);
 
-                AlertHelper::success('Berhasil', 'Data dosen berhasil ditambahkan.');
+                AlertHelper::success('Berhasil', 'Data ' . strtolower(lecturer_label()) . ' berhasil ditambahkan.');
             }
 
             DB::commit();

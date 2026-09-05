@@ -49,30 +49,167 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- SMART BATCH SELECTION & QUANTITY PICKER BAR -->
+                @php
+                    $currentPageIds = ($questions instanceof \Illuminate\Pagination\LengthAwarePaginator || $questions instanceof \Illuminate\Pagination\Paginator) ? $questions->pluck('id')->toArray() : [];
+                    $isAllPageSelected = !empty($currentPageIds) && collect($currentPageIds)->every(fn($id) => isset($selected_all[$id]));
+                    $selectedCount = count($selected_all);
+                    $totalCount = $totalQuestionsCount ?? (is_countable($questions) ? count($questions) : 0);
+                    $isAllFilteredSelected = $totalCount > 0 && $selectedCount >= $totalCount;
+                @endphp
+
+                <!-- Box 1: Input Jumlah Soal & Preset Tahap -->
+                <div class="bg-gradient-to-r from-blue-50/90 to-indigo-50/90 border border-blue-200/80 rounded-xl p-3.5 mb-4 shadow-2xs">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                        <!-- Custom Number Input & Picker Buttons -->
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-xs font-bold text-gray-700 flex items-center gap-1.5">
+                                <i class="fas fa-magic text-blue-600"></i>
+                                <span>Pilih Jumlah Soal:</span>
+                            </span>
+                            <div class="flex items-center gap-1">
+                                <input type="number" 
+                                    min="1" 
+                                    max="{{ max($totalCount, 1) }}" 
+                                    wire:model.live="selectCountInput" 
+                                    class="w-20 px-2 py-1 text-xs font-bold text-center bg-white border border-blue-300 rounded-lg shadow-2xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500" 
+                                    placeholder="100">
+                                <span class="text-xs text-gray-500 font-medium">soal</span>
+                            </div>
+                            <button type="button" 
+                                wire:click="selectFirstCount({{ (int)$selectCountInput ?: 100 }})" 
+                                class="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer"
+                                title="Pilih {{ (int)$selectCountInput ?: 100 }} soal pertama secara berurutan sesuai urutan nomor 1">
+                                <i class="fas fa-sort-numeric-down text-[11px]"></i>
+                                <span>Pilih {{ (int)$selectCountInput ?: 100 }} Soal Pertama (Urut)</span>
+                            </button>
+                            <button type="button" 
+                                wire:click="selectRandomCount({{ (int)$selectCountInput ?: 100 }})" 
+                                class="inline-flex items-center gap-1 px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer"
+                                title="Pilih {{ (int)$selectCountInput ?: 100 }} soal secara acak (random)">
+                                <i class="fas fa-random text-[11px]"></i>
+                                <span>Pilih {{ (int)$selectCountInput ?: 100 }} Soal Acak</span>
+                            </button>
+                        </div>
+
+                        <!-- Tahap Presets Buttons -->
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mr-1">Tahap:</span>
+                            <button type="button" wire:click="selectRange(1, 100)" class="px-2 py-1 text-xs font-semibold rounded-md bg-white hover:bg-blue-100 text-blue-800 border border-blue-200 transition-colors cursor-pointer shadow-2xs" title="Pilih Soal 1 s/d 100">
+                                Tahap 1 (1–100)
+                            </button>
+                            <button type="button" wire:click="selectRange(101, 200)" class="px-2 py-1 text-xs font-semibold rounded-md bg-white hover:bg-blue-100 text-blue-800 border border-blue-200 transition-colors cursor-pointer shadow-2xs" title="Pilih Soal 101 s/d 200">
+                                Tahap 2 (101–200)
+                            </button>
+                            <button type="button" wire:click="selectRange(201, 300)" class="px-2 py-1 text-xs font-semibold rounded-md bg-white hover:bg-blue-100 text-blue-800 border border-blue-200 transition-colors cursor-pointer shadow-2xs" title="Pilih Soal 201 s/d 300">
+                                Tahap 3 (201–300)
+                            </button>
+                            <button type="button" wire:click="selectRange(301, 400)" class="px-2 py-1 text-xs font-semibold rounded-md bg-white hover:bg-blue-100 text-blue-800 border border-blue-200 transition-colors cursor-pointer shadow-2xs" title="Pilih Soal 301 s/d 400">
+                                Tahap 4 (301–400)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Box 2: Quick Selection Actions & Status Bar -->
+                <div class="flex flex-wrap items-center justify-between gap-3 p-2.5 bg-gray-50/80 border border-gray-200 rounded-xl mb-4 text-xs">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <!-- Select All on Current Page -->
+                        <label class="flex items-center gap-2 px-2.5 py-1.5 bg-white border border-gray-200 rounded-lg shadow-2xs font-semibold text-gray-700 cursor-pointer hover:bg-gray-50 transition select-none">
+                            <input type="checkbox" 
+                                class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                                wire:click="toggleSelectAllPage(@js($currentPageIds))"
+                                {{ $isAllPageSelected ? 'checked' : '' }}>
+                            <span>Pilih di Halaman Ini ({{ count($currentPageIds) }})</span>
+                        </label>
+
+                        <!-- Select All Filtered Questions across all pages -->
+                        @if($totalCount > count($currentPageIds))
+                            <button type="button" 
+                                wire:click="toggleSelectAllFiltered"
+                                class="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-blue-200 text-blue-700 rounded-lg shadow-2xs font-semibold hover:bg-blue-50 transition cursor-pointer">
+                                <i class="fas fa-check-double text-blue-600"></i>
+                                <span>{{ $isAllFilteredSelected ? 'Batalkan Semua' : 'Pilih Semua Total (' . $totalCount . ' Soal)' }}</span>
+                            </button>
+                        @endif
+
+                        <!-- Deselect button -->
+                        @if($selectedCount > 0)
+                            <button type="button"
+                                wire:click="deselectAll"
+                                class="flex items-center gap-1 px-2.5 py-1.5 bg-white border border-red-200 text-red-600 rounded-lg shadow-2xs font-semibold hover:bg-red-50 transition cursor-pointer">
+                                <i class="fas fa-times"></i>
+                                <span>Kosongkan Pilihan</span>
+                            </button>
+                        @endif
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-1.5 text-gray-600 font-medium">
+                            <span>Tampilkan:</span>
+                            <select wire:model.live="perPage" class="px-2 py-1 text-xs font-semibold bg-white border border-gray-300 rounded-lg shadow-2xs">
+                                <option value="8">8 / hal</option>
+                                <option value="20">20 / hal</option>
+                                <option value="50">50 / hal</option>
+                                <option value="100">100 / hal</option>
+                                <option value="200">200 / hal</option>
+                            </select>
+                        </div>
+
+                        <div class="text-gray-500 font-medium flex items-center gap-1.5">
+                            <span>Tersedia:</span>
+                            <span class="font-bold text-gray-800">{{ $totalCount }} Soal</span>
+                            <span>·</span>
+                            <span class="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 font-bold">{{ $selectedCount }} Terpilih</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Table Section -->
                 <div class="bg-white rounded-lg shadow border">
                     <div class="overflow-x-auto">
                         <table class="w-full table-auto divide-y divide-gray-200">
                             <thead class="bg-gray-50 sticky top-0 z-10">
                                 <tr>
-                                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-16">Pilih</th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-16">
+                                        <div class="flex flex-col items-center justify-center gap-1">
+                                            <input type="checkbox" 
+                                                class="form-checkbox h-4.5 w-4.5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                                                wire:click="toggleSelectAllPage(@js($currentPageIds))"
+                                                {{ $isAllPageSelected ? 'checked' : '' }}
+                                                title="Pilih / Batalkan semua soal di halaman ini">
+                                            <span class="text-[10px] text-gray-400 font-normal">Semua</span>
+                                        </div>
+                                    </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pertanyaan & Pilihan Jawaban</th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Deskripsi / Petunjuk</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @forelse($questions->groupBy('topic.name') as $topicName => $topicQuestions)
+                                    @php
+                                        $topicIds = $topicQuestions->pluck('id')->toArray();
+                                        $isTopicAllSelected = !empty($topicIds) && collect($topicIds)->every(fn($id) => isset($selected_all[$id]));
+                                    @endphp
                                     <tr class="bg-gray-50">
                                         <td colspan="3"
                                             class="px-4 py-2.5 text-xs font-bold text-gray-700 uppercase tracking-wider border-y">
                                             <div class="flex items-center justify-between">
-                                                <span class="flex items-center gap-1.5 text-slate-700">
-                                                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                    </svg>
-                                                    Topik: {{ $topicName ?? 'Tanpa Topik' }}
-                                                </span>
-                                                <span class="px-2 py-0.5 rounded-md bg-gray-250 text-[10px] text-gray-600 font-medium">
+                                                <label class="flex items-center gap-2 cursor-pointer select-none">
+                                                    <input type="checkbox" 
+                                                        class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                                                        wire:click.stop="toggleSelectTopic(@js($topicIds))"
+                                                        {{ $isTopicAllSelected ? 'checked' : '' }}
+                                                        title="Pilih / Batalkan semua soal pada topik ini">
+                                                    <span class="flex items-center gap-1.5 text-slate-700">
+                                                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                        Topik: {{ $topicName ?? 'Tanpa Topik' }}
+                                                    </span>
+                                                </label>
+                                                <span class="px-2 py-0.5 rounded-md bg-gray-200 text-[10px] text-gray-600 font-medium">
                                                     {{ $topicQuestions->count() }} Soal
                                                 </span>
                                             </div>
@@ -293,24 +430,47 @@
         @endif
 
         <!-- Footer -->
-        <div class="flex justify-between items-center gap-4 px-6 py-4 border-t">
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 px-6 py-4 border-t bg-gray-50/50 flex-shrink-0">
             <!-- Info total soal terpilih (kiri) -->
-            <span class="text-sm font-medium text-gray-700">
-                Total soal terpilih:
-                <span class="text-blue-600 font-semibold">
-                    {{ count($selected_all) }}
+            <div class="flex items-center gap-3">
+                <span class="text-sm font-medium text-gray-700">
+                    Total soal terpilih:
+                    <span class="text-blue-600 font-bold text-base">
+                        {{ count($selected_all) }}
+                    </span>
+                    @if(isset($totalQuestionsCount) && $totalQuestionsCount > 0)
+                        <span class="text-xs text-gray-400">/ {{ $totalQuestionsCount }} soal tersedia</span>
+                    @endif
                 </span>
-            </span>
+                
+                @if(count($selected_all) > 0)
+                    <button type="button"
+                        wire:click="deselectAll" 
+                        class="text-xs text-red-500 hover:text-red-700 font-semibold underline transition cursor-pointer">
+                        Batal Pilih Semua
+                    </button>
+                @endif
+            </div>
 
             <!-- Tombol aksi (kanan) -->
-            <div class="flex gap-2">
+            <div class="flex flex-wrap items-center gap-2">
+                @if(isset($totalQuestionsCount) && $totalQuestionsCount > 0 && count($selected_all) < $totalQuestionsCount)
+                    <button type="button"
+                        wire:click="selectAllFiltered"
+                        class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs font-semibold rounded-lg shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+                        <i class="fas fa-check-double text-xs"></i>
+                        Pilih Semua ({{ $totalQuestionsCount }} Soal)
+                    </button>
+                @endif
+
                 <button wire:click="closeModal()"
-                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow transition cursor-pointer">
+                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium rounded-lg shadow-sm transition cursor-pointer">
                     Batal
                 </button>
                 <button wire:click='submitModuleQuestion()'
-                    class="px-4 py-2 bg-primary hover:bg-primary text-white rounded-lg shadow transition">
-                    Simpan
+                    class="px-5 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-lg shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+                    <i class="fas fa-save text-xs"></i>
+                    Simpan ({{ count($selected_all) }})
                 </button>
             </div>
         </div>

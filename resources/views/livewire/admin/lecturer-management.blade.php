@@ -1,8 +1,8 @@
 <div class="container mx-auto px-4 py-6">
     <!-- Header -->
     <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900 mb-2">Manajemen Data Dosen</h1>
-        <p class="text-gray-600">Kelola data dosen dalam sistem CBT</p>
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">Manajemen Data {{ lecturer_label() }}</h1>
+        <p class="text-gray-600">Kelola data {{ strtolower(lecturer_label()) }} dalam sistem CBT</p>
     </div>
 
     <!-- Flash Messages -->
@@ -24,7 +24,7 @@
             <!-- Search -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Cari</label>
-                <input type="text" wire:model.live="search" placeholder="ID Dosen, NIDN, Nama, Email..."
+                <input type="text" wire:model.live="search" placeholder="ID {{ lecturer_label() }}, NIDN, Nama, Email..."
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
 
@@ -52,15 +52,15 @@
                 </select>
             </div>
 
-            <!-- Position Filter -->
+            <!-- Status Filter -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Jabatan</label>
-                <select wire:model.live="positionFilter"
+                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select wire:model.live="statusFilter"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Semua Jabatan</option>
-                    @foreach ($positions as $position)
-                        <option value="{{ $position }}">{{ $position }}</option>
-                    @endforeach
+                    <option value="">Semua Status</option>
+                    <option value="active">Aktif</option>
+                    <option value="inactive">Non-Aktif</option>
+                    <option value="retired">Pensiun</option>
                 </select>
             </div>
 
@@ -68,7 +68,7 @@
             <div>
                 <button wire:click="openModal"
                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-150">
-                    Tambah Dosen
+                    Tambah {{ lecturer_label() }}
                 </button>
             </div>
         </div>
@@ -81,7 +81,7 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Dosen
+                            {{ lecturer_label() }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             ID/NIDN
@@ -177,7 +177,7 @@
                     <!-- Modal Header -->
                     <div class="flex justify-between items-center pb-3 border-b">
                         <h3 class="text-lg font-medium text-gray-900">
-                            {{ $editMode ? 'Edit Data Dosen' : 'Tambah Data Dosen' }}
+                            {{ $editMode ? 'Edit Data ' . lecturer_label() : 'Tambah Data ' . lecturer_label() }}
                         </h3>
                         <button wire:click="closeModal" class="text-gray-400 hover:text-gray-600">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -215,7 +215,7 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">ID Dosen</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">ID {{ lecturer_label() }}</label>
                                     <input type="text" wire:model="lecturer_id"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     @error('lecturer_id')
@@ -311,7 +311,7 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Status Dosen</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Status {{ lecturer_label() }}</label>
                                     <select wire:model="lecturer_status"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         <option value="active">Aktif</option>
@@ -321,7 +321,7 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Tipe Dosen</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Tipe {{ lecturer_label() }}</label>
                                     <select wire:model="lecturer_type"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         <option value="full_time">Full Time</option>

@@ -62,6 +62,7 @@ class ModuleService
                 'is_all_study' => $request['is_all_study'] ?? false,
                 'is_all_questions' => $request['is_all_questions'] ?? false,
                 'question_pick_type' => $questionPickType,
+                'total_questions' => !empty($request['total_questions']) ? (int)$request['total_questions'] : null,
                 'category_question_settings' => $categoryQuestionSettings,
                 'topic_question_settings' => $topicQuestionSettings,
                 'material_category_question_settings' => $materialCategoryQuestionSettings,

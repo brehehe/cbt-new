@@ -617,7 +617,7 @@
                                     <span class="text-sm text-red-500">{{ $message }}</span>
                                 @enderror
 
-                                @if ($logo)
+                                @if (!empty($logo) && is_object($logo) && method_exists($logo, 'temporaryUrl'))
                                     <div class="mt-2">
                                         <img src="{{ $logo->temporaryUrl() }}" class="h-20 rounded shadow mb-1">
                                         <button type="button" wire:click="removeLogo"

@@ -146,10 +146,14 @@ class AnswerService
             }
 
             // 🔹 Simpan ke database
+            $matchAttributes = ! empty($request['id'])
+                ? ['id' => $request['id']]
+                : ['question_id' => $question->id, 'alphabet' => $alphabet];
+
             $answer = Answer::withoutGlobalScope('user_scope')
                 ->withTrashed()
                 ->updateOrCreate(
-                    ['id' => $request['id'] ?? null],
+                    $matchAttributes,
                     [
                         'question_id' => $question->id,
                         'company_id' => $request['company_id'] ?? null,
@@ -159,6 +163,7 @@ class AnswerService
                         'latex' => $request['latex'] ?? ($existingAnswer?->latex ?? null),
                         'images' => json_encode($imagePaths),
                         'is_correct' => $isCorrect,
+                        'deleted_at' => null,
                     ]
                 );
 

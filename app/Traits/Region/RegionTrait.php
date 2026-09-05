@@ -2,7 +2,6 @@
 
 namespace App\Traits\Region;
 
-use App\Http\Controllers\API\OneHealth\MasterData\RegionController;
 use App\Models\Master\Region\City;
 use App\Models\Master\Region\District;
 use App\Models\Master\Region\Province;
@@ -18,8 +17,9 @@ trait RegionTrait
             ->get()
             ->toArray();
 
-        if (empty($details)) {
-            (new RegionController)->getProvince();
+        if (empty($details) && class_exists('App\Http\Controllers\API\OneHealth\MasterData\RegionController')) {
+            $controllerClass = 'App\Http\Controllers\API\OneHealth\MasterData\RegionController';
+            (new $controllerClass)->getProvince();
 
             $details = Province::select('code', 'name')
                 ->orderBy('name', 'asc')
@@ -38,11 +38,12 @@ trait RegionTrait
             ->get()
             ->toArray();
 
-        if (empty($details)) {
+        if (empty($details) && class_exists('App\Http\Controllers\API\OneHealth\MasterData\RegionController')) {
             $request = new Request;
             $request->merge(['province_codes' => $provinceCode]);
 
-            (new RegionController)->getCity($request);
+            $controllerClass = 'App\Http\Controllers\API\OneHealth\MasterData\RegionController';
+            (new $controllerClass)->getCity($request);
 
             $details = City::where('parent_code', $provinceCode)
                 ->select('code', 'name')
@@ -62,11 +63,12 @@ trait RegionTrait
             ->get()
             ->toArray();
 
-        if (empty($details)) {
+        if (empty($details) && class_exists('App\Http\Controllers\API\OneHealth\MasterData\RegionController')) {
             $request = new Request;
             $request->merge(['city_codes' => $cityCode]);
 
-            (new RegionController)->getDistrict($request);
+            $controllerClass = 'App\Http\Controllers\API\OneHealth\MasterData\RegionController';
+            (new $controllerClass)->getDistrict($request);
 
             $details = District::where('parent_code', $cityCode)
                 ->select('code', 'name')
@@ -86,11 +88,12 @@ trait RegionTrait
             ->get()
             ->toArray();
 
-        if (empty($details)) {
+        if (empty($details) && class_exists('App\Http\Controllers\API\OneHealth\MasterData\RegionController')) {
             $request = new Request;
             $request->merge(['district_codes' => $districtCode]);
 
-            (new RegionController)->getSubDistrist($request);
+            $controllerClass = 'App\Http\Controllers\API\OneHealth\MasterData\RegionController';
+            (new $controllerClass)->getSubDistrist($request);
 
             $details = SubDistrict::where('parent_code', $districtCode)
                 ->select('code', 'name')

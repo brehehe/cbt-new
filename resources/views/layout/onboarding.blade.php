@@ -18,6 +18,7 @@
     <link href="{{ asset('fonts/plus-jakarta-sans.css') }}" rel="stylesheet">
 
     <link rel="icon" type="image/png" href="{{asset('storage/' . $company->logo_potrait)}}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('vendor/font-awesome/css/all.min.css') }}">
     
     <style>
@@ -45,10 +46,10 @@
     @livewireStyles
 </head>
 
-<body class="bg-gray-50 h-screen w-screen overflow-hidden">
-    <div class="h-full w-full flex flex-col overflow-hidden">
+<body class="bg-gray-50 min-h-screen w-full text-gray-900 font-sans antialiased overflow-x-hidden">
+    <div class="min-h-screen w-full flex flex-col">
         <!-- Main Content -->
-        <main class="flex-grow h-full overflow-hidden">
+        <main class="flex-grow w-full flex flex-col">
             {{ $slot }}
         </main>
     </div>

@@ -18,7 +18,7 @@
                 <!-- Modal Header -->
                 <div class="flex justify-between items-center pb-3 border-b">
                     <h3 class="text-lg font-medium text-gray-900">
-                        {{ $editMode ? 'Edit Data Dosen' : 'Tambah Data Dosen' }}
+                        {{ $editMode ? 'Edit Data ' . lecturer_label() : 'Tambah Data ' . lecturer_label() }}
                     </h3>
                     <button wire:click="closeModal" class="text-gray-400 hover:text-gray-600">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -67,7 +67,7 @@
                             @endif
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">ID Dosen <span
+                                <label class="block text-sm font-medium text-gray-700 mb-1">ID {{ lecturer_label() }} <span
                                         class="text-red-500">*</span></label>
                                 <input type="text" wire:model="lecturer_id" class="form-control mt-1">
                                 @error('lecturer_id')
@@ -132,7 +132,7 @@
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Status Dosen</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Status {{ lecturer_label() }}</label>
                                 <select wire:model="lecturer_status" class="form-control mt-1">
                                     <option value="active">Aktif</option>
                                     <option value="inactive">Non-Aktif</option>
@@ -141,7 +141,7 @@
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Tipe Dosen</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tipe {{ lecturer_label() }}</label>
                                 <select wire:model="lecturer_type" class="form-control mt-1">
                                     <option value="full_time">Full Time</option>
                                     <option value="part_time">Part Time</option>

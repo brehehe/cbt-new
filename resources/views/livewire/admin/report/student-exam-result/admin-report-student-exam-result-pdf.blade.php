@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Laporan Hasil Ujian Mahasiswa</title>
+    <title>Laporan Hasil Ujian {{ student_label() }}</title>
     <style>
         body {
             font-family: sans-serif;
@@ -99,12 +99,12 @@
         <div class="company-name">{{ $company->name }}</div>
         <div class="company-address">{{ $company->companyDetail->address ?? '' }}</div>
 
-        <div class="report-title">LAPORAN HASIL UJIAN MAHASISWA</div>
+        <div class="report-title">LAPORAN HASIL UJIAN {{ strtoupper(student_label()) }}</div>
     </div>
 
     <table class="student-info">
         <tr>
-            <td class="info-label">Nama Mahasiswa</td>
+            <td class="info-label">Nama {{ student_label() }}</td>
             <td>: {{ $user->name }}</td>
             <td class="info-label">Dicetak Tanggal</td>
             <td>: {{ date('d M Y') }}</td>

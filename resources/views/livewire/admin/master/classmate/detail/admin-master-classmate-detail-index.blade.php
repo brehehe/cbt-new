@@ -63,7 +63,7 @@
                     @enderror
                 </div>
                 <div class="mb-4">
-                    <label for="user_id" class="block text-sm font-medium text-gray-700">Dosen <span
+                    <label for="user_id" class="block text-sm font-medium text-gray-700">{{ lecturer_label() }} <span
                             class="text-red-600">*</span></label>
                     <div wire:key="select-{{ rand() }}">
                         <select class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
@@ -74,7 +74,7 @@
                                         @this.set('user_id', e ? e : '');
                                     }
                                 });" wire:model.lazy="user_id" id="user_id">
-                            <option value="">-- Pilih Dosen --</option>
+                            <option value="">-- Pilih {{ lecturer_label() }} --</option>
                             @foreach ($users as $key_user => $user)
                                 <option value="{{ $key_user }}">{{ $user }}</option>
                             @endforeach
@@ -147,7 +147,7 @@
                 <div class="flex items-center">
                 <div class="flex flex-col mb-2 sm:mb-0">
                     <h1 class="text-2xl font-bold text-[color:var(--primary)]">
-                        Data Mahasiswa
+                        Data {{ student_label() }}
                     </h1>
                     <div class="flex items-center mt-2 text-sm text-gray-500">
                         <span class="mr-2">Tampilkan</span>

@@ -20,9 +20,9 @@
                 ['label' => 'Prodi', 'url' => route('admin.master.study'), 'pattern' => 'admin/master/study', 'icon' => 'fa-building-columns'],
                 ['label' => 'Peserta', 'url' => '/admin/master/classmate', 'pattern' => 'admin/master/classmate*', 'icon' => 'fa-users'],
                 ['label' => 'Admin', 'url' => '/admin/master/admin', 'pattern' => 'admin/master/admin', 'icon' => 'fa-user-shield'],
-                ['label' => 'Dosen', 'url' => '/admin/master/lecturer', 'pattern' => 'admin/master/lecturer', 'icon' => 'fa-chalkboard-teacher'],
+                ['label' => lecturer_label(), 'url' => '/admin/master/lecturer', 'pattern' => 'admin/master/lecturer', 'icon' => 'fa-chalkboard-teacher'],
                 ['label' => 'Pengawas', 'url' => '/admin/master/supervisor', 'pattern' => 'admin/master/supervisor', 'icon' => 'fa-user-tie'],
-                ['label' => optional(auth()->user()->company)->is_pmb === 'all' ? 'Mahasiswa / PMB' : (optional(auth()->user()->company)->is_pmb === 'pmb' ? 'PMB' : 'Mahasiswa'), 'url' => '/admin/master/student', 'pattern' => 'admin/master/student', 'icon' => 'fa-user-graduate'],
+                ['label' => (!is_shorinji() && optional(auth()->user()->company)->is_pmb === 'pmb') ? 'PMB' : (optional(auth()->user()->company)->is_pmb === 'all' ? (student_label().' / PMB') : student_label()), 'url' => '/admin/master/student', 'pattern' => 'admin/master/student', 'icon' => 'fa-user-graduate'],
                 ['label' => 'Topik Ujian', 'url' => route('admin.master.topic'), 'pattern' => 'admin/master/topic-question', 'icon' => 'fa-tags'],
                 ['label' => 'Kategori Materi', 'url' => route('admin.master.material-category'), 'pattern' => 'admin/master/material-category', 'icon' => 'fa-layer-group'],
                 ['label' => 'Materi', 'url' => route('admin.master.material'), 'pattern' => 'admin/master/material', 'icon' => 'fa-book'],
@@ -52,9 +52,9 @@
                 ['label' => 'Jadwal', 'url' => '/admin/master/timetable', 'pattern' => 'admin/master/timetable*', 'icon' => 'fa-calendar'],
             ];
         }
-        if (optional(auth()->user()->company)->is_pmb === 'pmb') {
+        if (optional(auth()->user()->company)->is_pmb === 'pmb' && !is_shorinji()) {
             $masters = array_values(array_filter($masters, function ($item) {
-                return $item['label'] !== 'Dosen';
+                return !in_array($item['label'], ['Dosen', 'Pelatih', lecturer_label()]);
             }));
         }
     }
@@ -63,7 +63,7 @@
         ['label' => 'Riwayat Jadwal Ujian', 'route' => route('admin.report.timetable'), 'match' => 'admin/report/timetable*', 'icon' => 'fa-file-alt'],
         ['label' => 'Laporan Hasil Ujian', 'route' => route('admin.report.exam-result'), 'match' => 'admin/report/exam-result', 'icon' => 'fa-clipboard-list'],
         ['label' => 'Laporan Statistik Jawaban', 'route' => route('admin.report.answer-statistics'), 'match' => 'admin/report/answer-statistics', 'icon' => 'fa-chart-pie'],
-        ['label' => 'Laporan Hasil Ujian Mahasiswa', 'route' => route('admin.report.student-exam-result'), 'match' => 'admin/report/student-exam-result', 'icon' => 'fa-clipboard-list'],
+        ['label' => 'Laporan Hasil Ujian '.student_label(), 'route' => route('admin.report.student-exam-result'), 'match' => 'admin/report/student-exam-result', 'icon' => 'fa-clipboard-list'],
         ['label' => 'Analisis Butir Soal', 'route' => route('admin.report.item-analysis'), 'match' => 'admin/report/item-analysis*', 'icon' => 'fa-chart-line'],
         ['label' => 'Analisis Butir Soal (Semua)', 'route' => route('admin.report.item-analysis-all'), 'match' => 'admin/report/item-analysis-all', 'icon' => 'fa-chart-simple'],
     ];

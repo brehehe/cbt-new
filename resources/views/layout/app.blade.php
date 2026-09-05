@@ -18,12 +18,10 @@
     <link href="{{ asset('fonts/plus-jakarta-sans.css') }}" rel="stylesheet">
 
 
-    <link rel="icon" type="image/png" href="{{asset('storage/' . $company->logo_potrait)}}" />
+    <link rel="icon" type="image/x-icon" href="{{ (!empty($company?->logo_potrait) && \Illuminate\Support\Facades\Storage::disk('public')->exists($company->logo_potrait)) ? asset('storage/' . $company->logo_potrait) : asset('favicon.ico') }}" />
     <!-- Add Selectize CSS -->
     <link rel="stylesheet" href="{{ asset('vendor/selectize/css/selectize.bootstrap5.min.css') }}">
-    {{--
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-        integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" /> --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('vendor/flatpickr/flatpickr.min.css') }}">
     <link rel="stylesheet" href="{{ asset('vendor/font-awesome/css/all.min.css') }}">
     <!-- Summernote Lite CSS -->

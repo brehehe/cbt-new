@@ -522,6 +522,7 @@ namespace App\Models\Exam{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Exam\ExamRecording> $examRecordings
  * @property-read int|null $exam_recordings_count
  * @property-read mixed $camera_status_color
+ * @property-read mixed $db_question_stats
  * @property-read mixed $progress_percentage
  * @property-read mixed $risk_color
  * @property-read mixed $risk_level
@@ -880,6 +881,7 @@ namespace App\Models\Master\Question{
  * @property string $is_simulation
  * @property array<array-key, mixed>|null $material_category_question_settings pengaturan jumlah soal per kategori materi & difficulty
  * @property bool $is_all_questions apakah mengambil semua soal berdasarkan tipe pengambilan soal
+ * @property int|null $total_questions
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
@@ -909,6 +911,7 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereRandomQuestion($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereStudys($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereTopicQuestionSettings($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereTotalQuestions($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module withTrashed(bool $withTrashed = true)
@@ -1319,6 +1322,9 @@ namespace App\Models\Master\Timetable{
  * @property string|null $extra_time
  * @property string $is_simulation
  * @property bool $is_camera
+ * @property bool $allow_repeat
+ * @property bool $require_token
+ * @property int|null $total_questions
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \App\Models\Classmate\Classmate|null $classmate
@@ -1335,6 +1341,7 @@ namespace App\Models\Master\Timetable{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable search($term)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereAllowRepeat($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereClassmateId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereCompanyId($value)
@@ -1354,10 +1361,12 @@ namespace App\Models\Master\Timetable{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereRequireSeb($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereRequireToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereStartTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereStudyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereStudys($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereSupervisors($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereTotalQuestions($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable withoutTrashed()
@@ -1705,6 +1714,7 @@ namespace App\Models\Timetable{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null $total_questions
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Timetable\TimetableAnswer> $answers
  * @property-read int|null $answers_count
  * @property-read \App\Models\Company\Company|null $company
@@ -1733,6 +1743,7 @@ namespace App\Models\Timetable{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereRandomQuestion($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereStudys($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereTimetableId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereTotalQuestions($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule withTrashed(bool $withTrashed = true)
@@ -1822,6 +1833,7 @@ namespace App\Models{
  * @property string|null $username
  * @property string|null $photo
  * @property string|null $phone
+ * @property string|null $alternative_contacts Alternative emails/phones for different contexts
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property array<array-key, mixed>|null $studys Array of study programs or departments
  * @property string|null $study_id Foreign key to studies table
@@ -1830,7 +1842,6 @@ namespace App\Models{
  * @property string|null $user_id User Referensi untuk relasi diri sendiri
  * @property string|null $company_id
  * @property int $order
- * @property string|null $alternative_contacts Alternative emails/phones for different contexts
  * @property string $type_user Type of user: employee, or patient
  * @property string $type_study Type of study: default, mahasiswa, or general
  * @property bool $is_head Apakah role ini adalah kepala dari perusahaan atau tidak
@@ -1850,6 +1861,9 @@ namespace App\Models{
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User\UserCompanyRole> $companyRoles
  * @property-read int|null $company_roles_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Exam\ExamLiveSession> $examLiveSessions
+ * @property-read int|null $exam_live_sessions_count
+ * @property-read mixed $decrypted_password
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Spatie\Permission> $permissions
@@ -1859,6 +1873,8 @@ namespace App\Models{
  * @property-read \App\Models\Study\Study|null $study
  * @property-read User|null $user
  * @property-read \App\Models\User\UserDetail|null $userDetail
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User\UserTimetable> $userTimetables
+ * @property-read int|null $user_timetables_count
  * @property-read \App\Models\UsrSecKey|null $usrSecKey
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User active()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User companyChoice($companyId, $is_head = false)
@@ -2234,7 +2250,10 @@ namespace App\Models\User{
  * @property bool $is_recording
  * @property bool $is_streaming
  * @property bool $is_camera
+ * @property int $additional_time_seconds
+ * @property int $attempt
  * @property-read \App\Models\Company\Company|null $company
+ * @property-read \App\Models\Exam\ExamLiveSession|null $examLiveSession
  * @property-read \App\Models\Master\Timetable\Timetable|null $timetable
  * @property-read \App\Models\User|null $user
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User\UserModuleQuestion> $userModuleQuestions
@@ -2244,6 +2263,8 @@ namespace App\Models\User{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable search($search)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereAdditionalTimeSeconds($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereAttempt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereCompanyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereDeletedAt($value)

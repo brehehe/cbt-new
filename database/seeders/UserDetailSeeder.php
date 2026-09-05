@@ -301,11 +301,14 @@ class UserDetailSeeder extends Seeder
             RoleHelper::assignRoleToUserInCompany($user, 'Mahasiswa', $companyId);
         }
 
+        $studentPrefix = config('app.is_shorinji', false) ? 'Kenshi' : 'Mahasiswa';
+        $studentUsernamePrefix = strtolower($studentPrefix);
+
         for ($i = 1; $i <= 10; $i++) {
             $mahasiswa = User::create([
-                'name' => 'Mahasiswa '.($i),
-                'email' => 'mahasiswa'.($i).'@gmail.com',
-                'username' => Str::replace(' ', '', strtolower('Mahasiswa '.($i))),
+                'name' => $studentPrefix.' '.($i),
+                'email' => $studentUsernamePrefix.($i).'@gmail.com',
+                'username' => Str::replace(' ', '', strtolower($studentPrefix.' '.($i))),
                 'password' => Hash::make('password123'),
                 'email_verified_at' => now(),
                 'company_id' => $companyId,
@@ -364,9 +367,9 @@ class UserDetailSeeder extends Seeder
 
         for ($i = 11; $i <= 50; $i++) {
             $mahasiswa = User::create([
-                'name' => 'Mahasiswa '.($i),
-                'email' => 'mahasiswa'.($i).'@gmail.com',
-                'username' => Str::replace(' ', '', strtolower('Mahasiswa '.($i))),
+                'name' => $studentPrefix.' '.($i),
+                'email' => $studentUsernamePrefix.($i).'@gmail.com',
+                'username' => Str::replace(' ', '', strtolower($studentPrefix.' '.($i))),
                 'password' => Hash::make('password123'),
                 'email_verified_at' => now(),
                 'company_id' => $companyId,
@@ -423,10 +426,13 @@ class UserDetailSeeder extends Seeder
 
     private function createSampleLecturers($companyId)
     {
+        $isShorinji = config('app.is_shorinji', false);
+
         $lecturerData = [
             [
-                'name' => 'Dr. Muhammad Irfan, S.Kom., M.T.',
-                'email' => 'muhammad.irfan@university.ac.id',
+                'name' => $isShorinji ? 'Pelatih 1' : 'Dr. Muhammad Irfan, S.Kom., M.T.',
+                'email' => $isShorinji ? 'pelatih1@gmail.com' : 'muhammad.irfan@university.ac.id',
+                'username' => $isShorinji ? 'pelatih1' : 'dr.muhammadirfan,s.kom.,m.t.',
                 'lecturer_id' => 'LEC001',
                 'lecturer_nidn' => '0315088901',
                 'lecturer_nip' => '197908152008121001',
@@ -440,8 +446,9 @@ class UserDetailSeeder extends Seeder
                 'gender' => 'male',
             ],
             [
-                'name' => 'Prof. Dr. Sari Wijayanti, S.Si., M.Kom.',
-                'email' => 'sari.wijayanti@university.ac.id',
+                'name' => $isShorinji ? 'Pelatih 2' : 'Prof. Dr. Sari Wijayanti, S.Si., M.Kom.',
+                'email' => $isShorinji ? 'pelatih2@gmail.com' : 'sari.wijayanti@university.ac.id',
+                'username' => $isShorinji ? 'pelatih2' : 'prof.dr.sariwijayanti,s.si.,m.kom.',
                 'lecturer_id' => 'LEC002',
                 'lecturer_nidn' => '0310077502',
                 'lecturer_nip' => '197507102002122001',
@@ -455,8 +462,9 @@ class UserDetailSeeder extends Seeder
                 'gender' => 'female',
             ],
             [
-                'name' => 'Bambang Kurniawan, S.T., M.T.',
-                'email' => 'bambang.kurniawan@university.ac.id',
+                'name' => $isShorinji ? 'Pelatih 3' : 'Bambang Kurniawan, S.T., M.T.',
+                'email' => $isShorinji ? 'pelatih3@gmail.com' : 'bambang.kurniawan@university.ac.id',
+                'username' => $isShorinji ? 'pelatih3' : 'bambangkurniawan,s.t.,m.t.',
                 'lecturer_id' => 'LEC003',
                 'lecturer_nidn' => '0320118301',
                 'lecturer_nip' => '198311202010121002',
@@ -470,8 +478,9 @@ class UserDetailSeeder extends Seeder
                 'gender' => 'male',
             ],
             [
-                'name' => 'Dr. Rina Kartika, S.E., M.M.',
-                'email' => 'rina.kartika@university.ac.id',
+                'name' => $isShorinji ? 'Pelatih 4' : 'Dr. Rina Kartika, S.E., M.M.',
+                'email' => $isShorinji ? 'pelatih4@gmail.com' : 'rina.kartika@university.ac.id',
+                'username' => $isShorinji ? 'pelatih4' : 'dr.rinakartika,s.e.,m.m.',
                 'lecturer_id' => 'LEC004',
                 'lecturer_nidn' => '0305068001',
                 'lecturer_nip' => '198006052005122002',
@@ -485,8 +494,9 @@ class UserDetailSeeder extends Seeder
                 'gender' => 'female',
             ],
             [
-                'name' => 'Agus Setiawan, S.E., M.Ak.',
-                'email' => 'agus.setiawan@university.ac.id',
+                'name' => $isShorinji ? 'Pelatih 5' : 'Agus Setiawan, S.E., M.Ak.',
+                'email' => $isShorinji ? 'pelatih5@gmail.com' : 'agus.setiawan@university.ac.id',
+                'username' => $isShorinji ? 'pelatih5' : 'agussetiawan,s.e.,m.ak.',
                 'lecturer_id' => 'LEC005',
                 'lecturer_nidn' => '0312098501',
                 'lecturer_nip' => '198509122012121001',
@@ -505,7 +515,7 @@ class UserDetailSeeder extends Seeder
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'username' => Str::replace(' ', '', strtolower($data['name'])),
+                'username' => $data['username'] ?? Str::replace(' ', '', strtolower($data['name'])),
                 'password' => Hash::make('password123'),
                 'email_verified_at' => now(),
                 'company_id' => $companyId,

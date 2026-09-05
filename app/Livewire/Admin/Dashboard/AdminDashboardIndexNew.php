@@ -691,7 +691,7 @@ class AdminDashboardIndexNew extends Component
             // Mahasiswa can only view their own profile with academic information
             return [
                 'user' => $currentUser->load('userDetail'),
-                'role' => 'Mahasiswa',
+                'role' => student_label(),
                 'can_view_others' => true,
                 'show_academic_info' => true,
             ];
@@ -707,7 +707,7 @@ class AdminDashboardIndexNew extends Component
             // Dosen can view their profile
             return [
                 'user' => $currentUser->load('userDetail'),
-                'role' => 'Dosen',
+                'role' => lecturer_label(),
                 'can_view_others' => false,
                 'show_academic_info' => false,
             ];

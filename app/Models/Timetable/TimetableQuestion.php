@@ -57,7 +57,7 @@ class TimetableQuestion extends Model
         static::addGlobalScope('user_scope', function (Builder $builder) {
             $user = Auth::user();
 
-            if (! $user || ! $user->hasRole('Anonymous')) {
+            if ($user && ! $user->hasRole('Anonymous')) {
                 $builder->where(function ($query) use ($user) {
                     $query->where('company_id', optional($user?->company)?->id)
                         ->orWhereHas('timetableModule.timetable', function ($q) {

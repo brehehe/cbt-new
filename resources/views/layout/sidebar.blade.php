@@ -147,7 +147,7 @@
                                     'icon' => 'fa-user-shield',
                                 ],
                                 [
-                                    'label' => 'Dosen',
+                                    'label' => lecturer_label(),
                                     'url' => '/admin/master/lecturer',
                                     'pattern' => 'admin/master/lecturer',
                                     'icon' => 'fa-chalkboard-teacher',
@@ -159,7 +159,7 @@
                                     'icon' => 'fa-user-tie',
                                 ],
                                 [
-                                    'label' => auth()->user()->company->is_pmb === 'all' ? 'Mahasiswa / PMB' : (auth()->user()->company->is_pmb === 'pmb' ? 'PMB' : 'Mahasiswa'),
+                                    'label' => (!is_shorinji() && auth()->user()->company->is_pmb === 'pmb') ? 'PMB' : (auth()->user()->company->is_pmb === 'all' ? (student_label().' / PMB') : student_label()),
                                     'url' => '/admin/master/student',
                                     'pattern' => 'admin/master/student',
                                     'icon' => 'fa-user-graduate',
@@ -368,9 +368,9 @@
                 @endif
 
                 @php
-                    if (optional(auth()->user()->company)->is_pmb === 'pmb') {
+                    if (optional(auth()->user()->company)->is_pmb === 'pmb' && !is_shorinji()) {
                         $masters = array_values(array_filter($masters, function ($item) {
-                            return $item['label'] !== 'Dosen';
+                            return !in_array($item['label'], ['Dosen', 'Pelatih', lecturer_label()]);
                         }));
                     }
                 @endphp
@@ -438,7 +438,7 @@
                                 'icon' => 'fa-chart-pie',
                             ],
                             [
-                                'label' => 'Laporan Hasil Ujian Mahasiswa',
+                                'label' => 'Laporan Hasil Ujian '.student_label(),
                                 'route' => route('admin.report.student-exam-result'),
                                 'match' => ['admin/report/student-exam-result'],
                                 'icon' => 'fa-clipboard-list',

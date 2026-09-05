@@ -1,4 +1,4 @@
-@section('title', 'Dashboard Mahasiswa')
+@section('title', 'Dashboard '.student_label())
 
 @push('styles')
     <style>
@@ -116,7 +116,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold text-[color:var(--primary)]">
-                    Halo, {{ Auth::user()->name ?? 'Mahasiswa' }}! 👋</h1>
+                    Halo, {{ Auth::user()->name ?? student_label() }}! 👋</h1>
                 <p class="text-gray-600 mt-1">Siap untuk mengikuti ujian hari ini?</p>
                 <p class="text-sm text-gray-500">{{ \Carbon\Carbon::now()->format('l, j F Y') }}</p>
             </div>

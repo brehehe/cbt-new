@@ -46,7 +46,7 @@
         <div class="flex items-center justify-between mb-6">
             <h3 class="text-lg font-semibold text-gray-800">
                 @if ($userProfile['show_academic_info'])
-                    📚 Informasi Akademik Mahasiswa
+                    📚 Informasi Akademik {{ student_label() }}
                 @else
                     👤 Informasi Profil {{ $userProfile['role'] }}
                 @endif
@@ -101,7 +101,7 @@
                         <h4 class="text-sm font-semibold text-[color:var(--primary)]">
                             Informasi Penting</h4>
                         <p class="text-sm text-[color:var(--primary)] mt-1">
-                            Anda login sebagai <strong>Mahasiswa</strong>. Informasi profil pribadi Anda hanya dapat
+                            Anda login sebagai <strong>{{ student_label() }}</strong>. Informasi profil pribadi Anda hanya dapat
                             dilihat oleh Anda sendiri.
                             Jika ada kesalahan data, silakan hubungi administrator.
                         </p>

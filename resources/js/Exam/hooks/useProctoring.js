@@ -51,7 +51,7 @@ export const useProctoring = (userTimetableId, onAlert) => {
         setIsFullscreen(active);
         // Dalam SEB, SEB sudah merupakan lingkungan kiosk yang terkunci sehingga tidak memunculkan peringatan fullscreen
         if (!active && !isSEB) {
-            logAlert('not_fullscreen', 'Mahasiswa keluar dari mode Fullscreen (Jendela tidak maksimal)');
+            logAlert('not_fullscreen', 'Peserta keluar dari mode Fullscreen (Jendela tidak maksimal)');
             setFullscreenWarning(true);
         } else {
             setFullscreenWarning(false);
@@ -60,7 +60,7 @@ export const useProctoring = (userTimetableId, onAlert) => {
 
     const handleVisibilityChange = useCallback(() => {
         if (document.hidden) {
-            logAlert('tab_switch', 'Mahasiswa berpindah tab / meninggalkan halaman');
+            logAlert('tab_switch', 'Peserta berpindah tab / meninggalkan halaman');
             setIsBlackout(true);
         } else {
             setIsBlackout(false);

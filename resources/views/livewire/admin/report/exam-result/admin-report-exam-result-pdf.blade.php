@@ -227,7 +227,7 @@
         <thead>
             <tr>
                 <th rowspan="2" class="col-no">No</th>
-                <th rowspan="2" class="text-left">Nama Mahasiswa</th>
+                <th rowspan="2" class="text-left">Nama {{ student_label() }}</th>
                 <th rowspan="2">NIM/Username</th>
                 <th rowspan="2">Modul</th>
                 <th rowspan="2">Jadwal Ujian</th>

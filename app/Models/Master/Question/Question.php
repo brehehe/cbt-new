@@ -47,21 +47,20 @@ class Question extends Model
         static::addGlobalScope('user_scope', function (Builder $builder) {
             $user = Auth::user();
 
-            if (! $user || ! $user->hasRole('Anonymous')) {
+            if ($user && ! $user->hasRole('Anonymous')) {
                 $builder->where(function ($query) use ($user) {
                     $query->where('company_id', optional($user?->company)?->id)
                         ->orWhere('is_simulation', 'true')
                         ->orWhereNull('company_id');
                 });
             }
-
-            $builder->orderBy('order', 'asc');
         });
 
         static::creating(function ($modelCreate) {
-            $lastOrder = static::max('order');
-            $modelCreate->order = $lastOrder ? $lastOrder + 1 : 1;
-            // $modelCreate->company_id = $modelCreate->company_id ?? auth()->user()->company_id;
+            if (empty($modelCreate->order)) {
+                $lastOrder = static::max('order');
+                $modelCreate->order = $lastOrder ? $lastOrder + 1 : 1;
+            }
         });
 
         static::saved(function ($model) {

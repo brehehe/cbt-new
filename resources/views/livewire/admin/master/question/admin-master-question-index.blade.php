@@ -207,158 +207,319 @@
             </div>
         </div>
     </div>
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-        <div class="flex items-center gap-3 shrink-0">
-            <label class="inline-flex items-center text-sm text-gray-700 whitespace-nowrap">
-                <input type="checkbox" class="form-checkbox" wire:model.live="selectAll">
-                <span class="ml-2 whitespace-nowrap">Pilih semua di halaman ini</span>
-            </label>
-            @if (count($selectedQuestions) > 0)
-                <button wire:click="bulkDelete" wire:confirm="Apakah Anda yakin ingin menghapus soal terpilih?" class="btn btn-danger flex items-center gap-2 text-sm py-1 px-3 shrink-0" type="button">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Hapus Terpilih ({{ count($selectedQuestions) }})
+    <div x-data="{ openAll: false, openRows: {} }">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+            <div class="flex flex-wrap items-center gap-3 shrink-0">
+                <label class="inline-flex items-center text-sm text-gray-700 whitespace-nowrap cursor-pointer">
+                    <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600 rounded" wire:model.live="selectAll">
+                    <span class="ml-2 whitespace-nowrap font-medium">Pilih semua di halaman ini</span>
+                </label>
+
+                @if ($questions->total() > count($selectedQuestions))
+                    <button type="button" wire:click="selectAllFiltered" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-colors cursor-pointer">
+                        Pilih Semua {{ number_format($questions->total(), 0, ',', '.') }} Soal Terfilter
+                    </button>
+                @endif
+
+                @if (count($selectedQuestions) > 0)
+                    <button type="button" wire:click="deselectAll" class="text-xs text-gray-500 hover:text-gray-700 underline cursor-pointer">
+                        Batalkan Pilihan
+                    </button>
+
+                    <button wire:click="bulkDelete" wire:confirm="Apakah Anda yakin ingin menghapus {{ count($selectedQuestions) }} soal terpilih?" class="btn btn-danger flex items-center gap-2 text-sm py-1 px-3 shrink-0" type="button">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Hapus Terpilih ({{ count($selectedQuestions) }})
+                    </button>
+                @endif
+
+                <!-- Expand / Collapse All Accordion Button -->
+                <button type="button"
+                    @click="openAll = !openAll; if(!openAll) openRows = {}"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs font-semibold rounded-lg shadow-2xs transition-all cursor-pointer">
+                    <i class="fas" :class="openAll ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    <span x-text="openAll ? 'Tutup Semua Accordion' : 'Buka Semua Accordion'"></span>
                 </button>
-            @endif
+            </div>
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <select class="form-control" wire:model.live="bulkCategoryQuestionId">
+                    <option value="">Pilih Kategori Soal</option>
+                    @foreach ($category_questions as $category_question)
+                        <option value="{{ $category_question->id }}">{{ $category_question->name }}</option>
+                    @endforeach
+                </select>
+                <button wire:click="applyBulkCategory" class="btn btn-primary whitespace-nowrap" type="button">
+                    Terapkan
+                </button>
+            </div>
         </div>
-        <div class="flex items-center gap-3 w-full sm:w-auto">
-            <select class="form-control" wire:model.live="bulkCategoryQuestionId">
-                <option value="">Pilih Kategori Soal</option>
-                @foreach ($category_questions as $category_question)
-                    <option value="{{ $category_question->id }}">{{ $category_question->name }}</option>
-                @endforeach
-            </select>
-            <button wire:click="applyBulkCategory" class="btn btn-primary whitespace-nowrap" type="button">
-                Terapkan
-            </button>
+
+        @if (count($selectedQuestions) > 0)
+            <div class="mb-4 px-4 py-2.5 bg-blue-50/80 border border-blue-200 rounded-xl flex items-center justify-between gap-3 text-xs text-blue-900 font-medium animate-fade-in">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-check-circle text-blue-600 text-sm"></i>
+                    <span><strong>{{ count($selectedQuestions) }} soal</strong> telah dipilih.</span>
+                </div>
+                @if (count($selectedQuestions) < $questions->total())
+                    <button type="button" wire:click="selectAllFiltered" class="font-bold text-blue-700 hover:text-blue-900 underline cursor-pointer">
+                        Pilih semua {{ number_format($questions->total(), 0, ',', '.') }} soal dalam hasil pencarian ini
+                    </button>
+                @endif
+            </div>
+        @endif
+
+        <!-- Table Section with Accordion -->
+        <div class="bg-white rounded-xl shadow-xs border border-gray-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50/80 border-b border-gray-200 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                        <tr>
+                            <th class="px-4 py-3.5 text-center w-12">
+                                <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600 rounded cursor-pointer" wire:model.live="selectAll">
+                            </th>
+                            <th class="px-3 py-3.5 text-center w-14">No</th>
+                            <th class="px-5 py-3.5 text-left">Pertanyaan & Pilihan Jawaban</th>
+                            <th class="px-4 py-3.5 text-left w-36">Prodi & Topik</th>
+                            <th class="px-4 py-3.5 text-center w-28">Difficulty</th>
+                            <th class="px-4 py-3.5 text-center w-24">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 bg-white">
+                        @forelse ($questions as $index => $result)
+                            @php
+                                $globalIndex = $questions->firstItem() + $index;
+                                $isRestricted = config('app.limit_question_view') && $globalIndex > config('app.limit_question_count', 5);
+                                $qImages = is_array($result?->images) ? $result->images : json_decode($result?->images ?? '[]', true);
+                            @endphp
+                            <tr class="hover:bg-slate-50/70 transition-colors group">
+                                <td class="px-4 py-4 text-center align-top whitespace-nowrap">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600 rounded cursor-pointer"
+                                        wire:model.live="selectedQuestions"
+                                        value="{{ $result->id }}" {{ $isRestricted ? 'disabled' : '' }}>
+                                </td>
+                                <td class="px-3 py-4 text-center align-top whitespace-nowrap">
+                                    <div class="flex flex-col items-center gap-1.5">
+                                        <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200">
+                                            #{{ $globalIndex }}
+                                        </span>
+                                        @if (!$isRestricted)
+                                            <button type="button"
+                                                @click="openRows['{{ $result->id }}'] = !(openRows['{{ $result->id }}'] ?? openAll)"
+                                                class="w-6 h-6 rounded-full bg-slate-50 hover:bg-blue-100 text-slate-500 hover:text-blue-600 transition flex items-center justify-center cursor-pointer text-[10px]"
+                                                title="Buka / Tutup Detail">
+                                                <i class="fas transition-transform duration-200"
+                                                    :class="(openRows['{{ $result->id }}'] ?? openAll) ? 'fa-chevron-up text-blue-600' : 'fa-chevron-down'"></i>
+                                            </button>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="px-5 py-4 align-top">
+                                    <div class="{{ $isRestricted ? 'blur-[3px] select-none' : '' }} flex flex-col gap-2.5">
+                                        <!-- Badges Row -->
+                                        <div class="flex flex-wrap items-center gap-1.5">
+                                            @if($result?->study?->name)
+                                                <span class="px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-[10px] font-semibold border border-blue-200/60">
+                                                    Prodi: {{ $result->study->name }}
+                                                </span>
+                                            @endif
+                                            @if($result?->topic?->name)
+                                                <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-semibold border border-slate-200">
+                                                    Topik: {{ $result->topic->name }}
+                                                </span>
+                                            @endif
+                                            @if($result?->categoryQuestion?->name)
+                                                <span class="px-2 py-0.5 rounded bg-purple-50 text-purple-700 text-[10px] font-semibold border border-purple-200/60">
+                                                    Kat: {{ $result->categoryQuestion->name }}
+                                                </span>
+                                            @endif
+                                            
+                                            @if($result?->difficulty == 'easy')
+                                                <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200/60 uppercase">Easy</span>
+                                            @elseif($result?->difficulty == 'medium')
+                                                <span class="px-2 py-0.5 rounded bg-amber-50 text-amber-700 text-[10px] font-bold border border-amber-200/60 uppercase">Medium</span>
+                                            @elseif($result?->difficulty == 'hard')
+                                                <span class="px-2 py-0.5 rounded bg-rose-50 text-rose-700 text-[10px] font-bold border border-rose-200/60 uppercase">Hard</span>
+                                            @endif
+
+                                            @if(($result->type ?? 'single') == 'single')
+                                                <span class="px-2 py-0.5 rounded bg-sky-50 text-sky-700 text-[10px] font-bold border border-sky-200/60">Pilihan Ganda</span>
+                                            @elseif($result->type == 'multiple')
+                                                <span class="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 text-[10px] font-bold border border-indigo-200/60">Pilihan Ganda Kompleks</span>
+                                            @else
+                                                <span class="px-2 py-0.5 rounded bg-violet-50 text-violet-700 text-[10px] font-bold border border-violet-200/60">Essay</span>
+                                            @endif
+                                        </div>
+
+                                        <!-- Question Context -->
+                                        <div class="rich-content text-[13.5px] text-gray-900 font-medium leading-relaxed cursor-pointer"
+                                            @click="openRows['{{ $result->id }}'] = !(openRows['{{ $result->id }}'] ?? openAll)">
+                                            {!! $result?->question !!}
+                                        </div>
+
+                                        <!-- Expandable Accordion Body -->
+                                        <div x-show="openRows['{{ $result->id }}'] ?? openAll"
+                                            x-transition:enter="transition ease-out duration-200"
+                                            x-transition:enter-start="opacity-0 -translate-y-1"
+                                            x-transition:enter-end="opacity-100 translate-y-0"
+                                            class="pt-3 mt-2 border-t border-dashed border-gray-200 space-y-3">
+                                            
+                                            <!-- Media Attachments -->
+                                            @if (!empty($qImages) && collect($qImages)->isNotEmpty())
+                                                <div class="flex flex-wrap gap-2">
+                                                    @foreach ($qImages as $image)
+                                                        @php
+                                                            $isUrl = \Illuminate\Support\Str::startsWith($image, ['http://', 'https://']);
+                                                            $src = $isUrl ? $image : asset('storage/' . ltrim($image, '/'));
+                                                        @endphp
+                                                        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white p-1.5 shadow-2xs">
+                                                            @if(preg_match('/\.(mp4|mov|avi|wmv|webm)$/i', $image))
+                                                                <video src="{{ $src }}" class="max-h-[160px] max-w-[240px] rounded-lg object-contain" controls></video>
+                                                            @elseif(preg_match('/\.(mp3|wav|ogg|m4a)$/i', $image))
+                                                                <audio src="{{ $src }}" class="w-[240px] object-contain" controls></audio>
+                                                            @elseif(preg_match('/\.(pdf)$/i', $image))
+                                                                <div class="flex flex-col items-center justify-center gap-1.5 p-3 text-center h-[120px] w-[160px] bg-slate-50 rounded-lg border border-slate-200">
+                                                                    <i class="fa-solid fa-file-pdf text-3xl text-red-500"></i>
+                                                                    <a href="{{ $src }}" target="_blank" class="text-[11px] text-blue-600 underline font-semibold break-all">Lihat PDF</a>
+                                                                </div>
+                                                            @elseif(preg_match('/\.(docx?|xlsx?|txt|zip|rar)$/i', $image))
+                                                                <div class="flex flex-col items-center justify-center gap-1.5 p-3 text-center h-[120px] w-[160px] bg-slate-50 rounded-lg border border-slate-200">
+                                                                    <i class="fa-solid fa-file text-3xl text-blue-500"></i>
+                                                                    <a href="{{ $src }}" target="_blank" class="text-[11px] text-blue-600 underline font-semibold break-all">Unduh Dokumen</a>
+                                                                </div>
+                                                            @else
+                                                                <img src="{{ $src }}" alt="Gambar soal"
+                                                                    class="rounded-lg object-contain max-h-[160px] max-w-[240px]">
+                                                            @endif
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+
+                                            <!-- Choices and Answers -->
+                                            <div class="space-y-2">
+                                                @if($result?->type !== 'essay' && $result?->answers && $result->answers->isNotEmpty())
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                                                        @foreach($result->answers->sortBy('alphabet') as $answer)
+                                                            <div class="flex items-start gap-2.5 p-2.5 rounded-xl transition border {{ $answer->is_correct ? 'bg-emerald-50/80 border-emerald-300 text-emerald-950 font-medium shadow-2xs' : 'bg-gray-50/60 border-gray-200/80 text-gray-700 hover:bg-gray-50' }}">
+                                                                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full {{ $answer->is_correct ? 'bg-emerald-600 text-white shadow-2xs' : 'bg-gray-200 text-gray-700' }} font-bold text-[10px] shrink-0 mt-0.5">
+                                                                    {{ $answer->alphabet }}
+                                                                </span>
+                                                                <div class="rich-content text-xs leading-relaxed flex-1">
+                                                                    {!! $answer->context !!}
+                                                                    
+                                                                    @php
+                                                                        $ansImages = is_array($answer->images) ? $answer->images : json_decode($answer->images ?? '[]', true);
+                                                                    @endphp
+                                                                    @if (!empty($ansImages) && collect($ansImages)->isNotEmpty())
+                                                                        <div class="mt-2 flex flex-wrap gap-1.5">
+                                                                            @foreach ($ansImages as $image)
+                                                                                @php
+                                                                                    $isUrl = \Illuminate\Support\Str::startsWith($image, ['http://', 'https://']);
+                                                                                    $src = $isUrl ? $image : asset('storage/' . ltrim($image, '/'));
+                                                                                @endphp
+                                                                                <div class="overflow-hidden rounded-lg border border-gray-200 bg-white p-1 shadow-2xs">
+                                                                                    <img src="{{ $src }}" alt="Gambar opsi" class="object-contain max-h-[90px] max-w-[140px] rounded">
+                                                                                </div>
+                                                                            @endforeach
+                                                                        </div>
+                                                                    @endif
+                                                                </div>
+                                                                @if($answer->is_correct)
+                                                                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 text-xs shrink-0 self-center" title="Kunci Jawaban">
+                                                                        <i class="fas fa-check text-[10px]"></i>
+                                                                    </span>
+                                                                @endif
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                @elseif($result?->type === 'essay')
+                                                    @php
+                                                        $essayAnswer = $result?->answers?->first();
+                                                    @endphp
+                                                    @if($essayAnswer && !empty(trim(strip_tags($essayAnswer->context))))
+                                                        <div class="bg-indigo-50/60 p-3 rounded-xl border border-indigo-200/70 text-xs text-indigo-950">
+                                                            <span class="font-bold flex items-center gap-1.5 text-indigo-700 mb-1">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
+                                                                Referensi Jawaban Utama:
+                                                            </span>
+                                                            <div class="rich-content leading-relaxed pl-5 font-normal">
+                                                                {!! $essayAnswer->context !!}
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                @endif
+                                            </div>
+
+                                            <!-- Description / Petunjuk -->
+                                            @if(!empty(trim(strip_tags($result?->description))))
+                                                <div class="p-2.5 bg-slate-50/80 border border-slate-200/80 rounded-xl text-xs text-slate-600">
+                                                    <span class="font-bold text-slate-700 flex items-center gap-1.5 mb-0.5">
+                                                        <i class="fas fa-info-circle text-blue-500 text-[11px]"></i> Petunjuk / Deskripsi Soal:
+                                                    </span>
+                                                    <div class="rich-content leading-relaxed pl-4">
+                                                        {!! $result->description !!}
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="px-4 py-4 align-top text-xs text-gray-700">
+                                    <div class="{{ $isRestricted ? 'blur-[3px] select-none' : '' }} flex flex-col gap-1">
+                                        <span class="font-bold text-gray-800">{{ $result?->study?->name ?? '-' }}</span>
+                                        <span class="text-gray-500">{{ $result?->topic?->name ?? '-' }}</span>
+                                    </div>
+                                </td>
+
+                                <td class="px-4 py-4 align-top text-center">
+                                    <div class="{{ $isRestricted ? 'blur-[3px] select-none' : '' }} flex flex-col items-center gap-1">
+                                        <span class="text-xs font-semibold text-gray-600">
+                                            {{ $result?->difficulty == 'default' || empty($result?->difficulty) ? '-' : ucfirst($result?->difficulty) }}
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <td class="px-4 py-4 text-center align-top">
+                                    @if ($isRestricted)
+                                        <div class="flex flex-col items-center justify-center gap-1">
+                                            <i class="fas fa-lock text-gray-400"></i>
+                                            <span class="text-[8px] text-gray-400 font-semibold uppercase leading-tight text-center">Terkunci</span>
+                                        </div>
+                                    @else
+                                        <div class="flex items-center justify-center gap-1.5">
+                                            <a class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition flex items-center justify-center shadow-2xs"
+                                                title="Edit Soal"
+                                                href="{{ route('admin.master.question.update', $result) }}">
+                                                <i class="fas fa-pen-to-square text-xs"></i>
+                                            </a>
+                                            <button class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition flex items-center justify-center shadow-2xs cursor-pointer"
+                                                title="Hapus Soal"
+                                                wire:click="confirmDelete('{{ $result->id }}')">
+                                                <i class="fas fa-trash-alt text-xs"></i>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="py-8 text-center text-sm text-gray-500">
+                                    <div class="flex flex-col items-center justify-center gap-2">
+                                        <i class="fas fa-inbox text-3xl text-gray-300"></i>
+                                        <span>Tidak ada data soal</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-    <!-- Table Section -->
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <input type="checkbox" class="form-checkbox" wire:model.live="selectAll">
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prodi
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Topik
-                            Soal</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Kategori Soal
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Jenis</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Difficulty</th>
-                        <th
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[1%] text-center">
-                            Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse ($questions as $index => $result)
-                        @php
-                            $globalIndex = $questions->firstItem() + $index;
-                            $isRestricted = config('app.limit_question_view') && $globalIndex > config('app.limit_question_count', 5);
-                        @endphp
-                        <tr class="hover:bg-gray-50 {{ $isRestricted ? 'bg-gray-50/50' : '' }} relative">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <input type="checkbox" class="form-checkbox" wire:model.live="selectedQuestions"
-                                    value="{{ $result->id }}" {{ $isRestricted ? 'disabled' : '' }}>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $globalIndex }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <div class="{{ $isRestricted ? 'blur-[3px] select-none' : '' }}">
-                                    {{ $result?->study?->name }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <div class="{{ $isRestricted ? 'blur-[3px] select-none' : '' }}">
-                                    {{ $result?->topic?->name }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <div class="{{ $isRestricted ? 'blur-[3px] select-none' : '' }}">
-                                    {{ $result?->categoryQuestion?->name ?? '-' }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <div class="{{ $isRestricted ? 'blur-[3px] select-none' : '' }}">
-                                    @if (($result->type ?? 'single') == 'single')
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                            Single
-                                        </span>
-                                    @elseif($result->type == 'multiple')
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
-                                            Multiple
-                                        </span>
-                                    @else
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                            Essay
-                                        </span>
-                                    @endif
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <div class="{{ $isRestricted ? 'blur-[3px] select-none' : '' }}">
-                                    {{ $result?->difficulty == 'default' ? '-' : ucfirst($result?->difficulty) }}
-                                </div>
-                            </td>
-                            <td class="center">
-                                @if ($isRestricted)
-                                    <div class="flex flex-col items-center justify-center gap-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                        </svg>
-                                        <span
-                                            class="text-[8px] text-gray-400 font-semibold uppercase leading-tight text-center">
-                                            Hubungi admin jika<br>ingin melihat detail soal
-                                        </span>
-                                    </div>
-                                @else
-                                    <div class="flex items-center">
-                                        <a class="btn btn-icon text-blue-600 hover:text-blue-800 transition-colors edit-btn"
-                                            href="{{ route('admin.master.question.update', $result) }}">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                            </svg>
-                                        </a>
-                                        <button
-                                            class="btn btn-icon text-red-600 hover:text-red-800 transition-colors delete-btn"
-                                            wire:click="confirmDelete('{{ $result->id }}')">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                @endif
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="10" class="no-data">Tidak ada data</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
 
         <!-- Pagination -->
         <div class="px-5 py-4 bg-gray-50/80 border-t border-gray-200">

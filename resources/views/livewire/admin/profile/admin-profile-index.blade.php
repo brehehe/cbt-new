@@ -33,11 +33,11 @@
                         @if($user->userDetail)
                             <p class="text-sm text-blue-100 mt-1">
                                 @if(Auth::user()->hasRole('Mahasiswa'))
-                                    Mahasiswa
+                                    {{ student_label() }}
                                 @elseif(Auth::user()->hasRole('Admin'))
                                     Administrator
                                 @elseif(Auth::user()->hasRole('Dosen'))
-                                    Dosen
+                                    {{ lecturer_label() }}
                                 @elseif(Auth::user()->hasRole('Pengawas'))
                                     Pengawas
                                 @else

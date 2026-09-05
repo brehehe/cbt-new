@@ -14,6 +14,7 @@
 <div wire:key="step-3" class="animate-fadeIn w-full h-screen overflow-hidden flex flex-col bg-gray-100 relative font-sans text-gray-900" 
     x-data="{ 
         showGuide: 1, 
+        activeTooltip: null,
         fontSize: localStorage.getItem('exam_font_size') || 'medium',
         isNavOpen: false,
         isMonitorOpen: false,
@@ -37,20 +38,25 @@
             this.lastSavedTime = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         },
         confirmFinishOnboarding() {
-            Swal.fire({
-                title: 'Selesaikan Simulasi?',
-                text: 'Apakah Anda yakin ingin menyelesaikan panduan onboarding ini dan masuk ke jadwal ujian asli?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#ea580c',
-                cancelButtonColor: '#4b5563',
-                confirmButtonText: 'Ya, Selesai!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    this.$wire.finish();
-                }
-            });
+            const swalInstance = window.Swal || (typeof Swal !== 'undefined' ? Swal : null);
+            if (swalInstance) {
+                swalInstance.fire({
+                    title: 'Selesaikan Simulasi?',
+                    text: 'Apakah Anda yakin ingin menyelesaikan panduan onboarding ini dan masuk ke jadwal ujian asli?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ea580c',
+                    cancelButtonColor: '#4b5563',
+                    confirmButtonText: 'Ya, Selesai!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.$wire.finish();
+                    }
+                });
+            } else if (window.confirm('Apakah Anda yakin ingin menyelesaikan panduan onboarding ini dan masuk ke jadwal ujian asli?')) {
+                this.$wire.finish();
+            }
         }
     }">
 
@@ -79,19 +85,53 @@
         [x-cloak] {
             display: none !important;
         }
+
+        /* Tooltip behavior on mouse hover and mobile tap */
+        .has-tooltip {
+            position: relative;
+        }
+        .has-tooltip .tooltip-box {
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+            pointer-events: none;
+        }
+        .has-tooltip:hover .tooltip-box {
+            visibility: visible !important;
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
     </style>
 
     <!-- ── Top Header ── -->
-    <header class="flex-none flex items-center justify-between px-4 py-2.5 bg-white border-b border-gray-200 shadow-sm z-30">
-        <!-- Left: logo / shield + title + Kembali ke Profil button -->
-        <div class="flex items-center gap-3">
-            <button wire:click="prevStep" class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition-all shadow-sm">
-                <i class="fas fa-arrow-left"></i>
-                <span>Kembali</span>
+    <header class="flex-none flex items-center justify-between px-2.5 sm:px-4 py-2 sm:py-2.5 bg-white border-b border-gray-200 shadow-sm z-30 min-h-[52px]">
+        <!-- Left: Kembali button + logo / shield + title -->
+        <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+            <button wire:click="prevStep" 
+                title="Kembali ke Profil Mahasiswa"
+                class="flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg sm:rounded-xl text-xs font-bold transition-all shadow-sm">
+                <i class="fas fa-arrow-left text-xs"></i>
+                <span class="hidden sm:inline">Kembali</span>
             </button>
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-orange-600/10">
-                <i class="fas fa-shield-alt text-orange-600"></i>
+            
+            <!-- Shield Logo Container with Title Tooltip -->
+            <div class="has-tooltip relative shrink-0" 
+                 @click="activeTooltip = activeTooltip === 'title' ? null : 'title'">
+                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center bg-orange-600/10 cursor-pointer transition-transform hover:scale-105 active:scale-95">
+                    <i class="fas fa-shield-alt text-orange-600 text-xs sm:text-sm"></i>
+                </div>
+                <!-- Floating Tooltip for Judul Soal / Sesi -->
+                <div class="tooltip-box absolute left-0 top-full mt-2 flex flex-col z-[999] px-3 py-2 bg-gray-900 text-white text-[11px] font-medium rounded-xl shadow-2xl whitespace-nowrap border border-gray-700"
+                     :class="activeTooltip === 'title' ? '!visible !opacity-100 !translate-y-0' : ''">
+                    <span class="font-bold text-orange-400 flex items-center gap-1.5">
+                        <i class="fas fa-shield-alt text-[10px]"></i> Simulasi Ujian
+                    </span>
+                    <span class="text-[10px] text-gray-300 mt-0.5">Panduan Onboarding PRO-CBT</span>
+                    <div class="absolute -top-1.5 left-3 w-3 h-3 bg-gray-900 rotate-45 border-l border-t border-gray-700"></div>
+                </div>
             </div>
+            
             <div class="leading-tight hidden sm:block">
                 <div class="font-bold text-sm text-gray-800">Simulasi Ujian</div>
                 <div class="text-[10px] text-gray-400 flex items-center gap-1">
@@ -101,27 +141,89 @@
             </div>
         </div>
         
-        <!-- Center: Student name + Progress info -->
+        <!-- Center: Student name + Progress info (Desktop only) -->
         <div class="hidden md:flex items-center gap-2 text-sm font-medium">
             <span class="text-gray-700 font-semibold">{{ $user->name }}</span>
             <span class="text-gray-300">·</span>
             <span class="text-gray-500 text-xs">{{ $answeredCount }} / {{ count($simQuestions) }} soal dijawab</span>
         </div>
         
-        <!-- Right: Timer clock box + Mobile Drawer Menu buttons -->
-        <div class="flex items-center gap-3">
-            <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border bg-orange-600/10 border-orange-600/30">
-                <i class="fas fa-clock text-green-600 text-sm"></i>
-                <span class="font-mono font-bold text-sm tracking-widest text-orange-600" x-text="formatTime(time)"></span>
+        <!-- Right: Info Panduan + Timer + Mobile Drawer Menu buttons -->
+        <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+            <!-- Info / Panduan Icon Button with Tooltip -->
+            <div class="has-tooltip relative shrink-0" 
+                 @click="activeTooltip = activeTooltip === 'info' ? null : 'info'">
+                <button @click="showGuide = (showGuide > 0 ? 0 : 1)" 
+                    class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-all shadow-sm cursor-pointer"
+                    :class="showGuide > 0 ? 'bg-gray-900 text-white hover:bg-gray-800' : 'bg-orange-600 hover:bg-orange-700 text-white shadow-orange-200'">
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </button>
+                <div class="tooltip-box absolute right-0 top-full mt-2 flex flex-col z-[999] px-3 py-1.5 bg-gray-900 text-white text-[11px] font-medium rounded-xl shadow-2xl whitespace-nowrap border border-gray-700"
+                     :class="activeTooltip === 'info' ? '!visible !opacity-100 !translate-y-0' : ''">
+                    <span class="font-bold text-orange-400 flex items-center gap-1.5">
+                        <i class="fas fa-info-circle text-[10px]"></i> <span x-text="showGuide > 0 ? 'Tutup Panduan' : 'Buka Panduan'"></span>
+                    </span>
+                    <span class="text-[10px] text-gray-300 mt-0.5">Petunjuk interaktif fitur simulasi</span>
+                    <div class="absolute -top-1.5 right-3 w-3 h-3 bg-gray-900 rotate-45 border-l border-t border-gray-700"></div>
+                </div>
             </div>
-            <!-- Mobile toggle drawers -->
-            <div class="flex lg:hidden gap-2">
-                <button @click="isNavOpen = !isNavOpen; isMonitorOpen = false" class="p-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">
-                    <i class="fas fa-bars text-sm"></i>
-                </button>
-                <button @click="isMonitorOpen = !isMonitorOpen; isNavOpen = false" class="p-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">
-                    <i class="fas fa-shield-alt text-sm"></i>
-                </button>
+
+            <!-- Timer Countdown with Tooltip -->
+            <div class="has-tooltip relative shrink-0" 
+                 @click="activeTooltip = activeTooltip === 'timer' ? null : 'timer'">
+                <div class="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border bg-orange-600/10 border-orange-600/30 cursor-pointer">
+                    <i class="fas fa-clock text-green-600 text-[11px] sm:text-xs"></i>
+                    <span class="font-mono font-bold text-xs sm:text-sm tracking-wide sm:tracking-widest text-orange-600" x-text="formatTime(time)"></span>
+                </div>
+                <div class="tooltip-box absolute right-0 top-full mt-2 flex flex-col z-[999] px-3 py-1.5 bg-gray-900 text-white text-[11px] font-medium rounded-xl shadow-2xl whitespace-nowrap border border-gray-700"
+                     :class="activeTooltip === 'timer' ? '!visible !opacity-100 !translate-y-0' : ''">
+                    <span class="font-bold text-green-400 flex items-center gap-1.5">
+                        <i class="fas fa-hourglass-half text-[10px]"></i> Sisa Waktu Ujian
+                    </span>
+                    <span class="text-[10px] text-gray-300 mt-0.5">Hitung mundur otomatis</span>
+                    <div class="absolute -top-1.5 right-4 w-3 h-3 bg-gray-900 rotate-45 border-l border-t border-gray-700"></div>
+                </div>
+            </div>
+
+            <!-- Mobile toggle drawers (compact icon buttons on mobile) -->
+            <div class="flex lg:hidden gap-1 sm:gap-1.5">
+                <!-- Navigasi Soal Button with Tooltip -->
+                <div class="has-tooltip relative" 
+                     @click="activeTooltip = activeTooltip === 'nav' ? null : 'nav'">
+                    <button @click="isNavOpen = !isNavOpen; isMonitorOpen = false" 
+                        class="w-7 h-7 sm:w-auto sm:px-2.5 sm:py-1.5 rounded-lg border border-gray-200 text-gray-700 bg-gray-50 hover:bg-gray-100 flex items-center justify-center sm:gap-1 text-xs font-bold shadow-sm active:scale-95 transition-all">
+                        <i class="fas fa-th text-orange-600 text-xs"></i>
+                        <span class="hidden sm:inline text-[11px]">Soal</span>
+                    </button>
+                    <div class="tooltip-box absolute right-0 top-full mt-2 flex flex-col z-[999] px-3 py-1.5 bg-gray-900 text-white text-[11px] font-medium rounded-xl shadow-2xl whitespace-nowrap border border-gray-700"
+                         :class="activeTooltip === 'nav' ? '!visible !opacity-100 !translate-y-0' : ''">
+                        <span class="font-bold text-orange-400 flex items-center gap-1.5">
+                            <i class="fas fa-th text-[10px]"></i> Daftar Soal
+                        </span>
+                        <span class="text-[10px] text-gray-300 mt-0.5">Buka navigasi nomor soal</span>
+                        <div class="absolute -top-1.5 right-2.5 w-3 h-3 bg-gray-900 rotate-45 border-l border-t border-gray-700"></div>
+                    </div>
+                </div>
+
+                <!-- Panel Pengawas Button with Tooltip -->
+                <div class="has-tooltip relative" 
+                     @click="activeTooltip = activeTooltip === 'mon' ? null : 'mon'">
+                    <button @click="isMonitorOpen = !isMonitorOpen; isNavOpen = false" 
+                        class="w-7 h-7 sm:w-auto sm:px-2.5 sm:py-1.5 rounded-lg border border-gray-200 text-gray-700 bg-gray-50 hover:bg-gray-100 flex items-center justify-center sm:gap-1 text-xs font-bold shadow-sm active:scale-95 transition-all">
+                        <i class="fas fa-shield-alt text-orange-600 text-xs"></i>
+                        <span class="hidden sm:inline text-[11px]">Pengawas</span>
+                    </button>
+                    <div class="tooltip-box absolute right-0 top-full mt-2 flex flex-col z-[999] px-3 py-1.5 bg-gray-900 text-white text-[11px] font-medium rounded-xl shadow-2xl whitespace-nowrap border border-gray-700"
+                         :class="activeTooltip === 'mon' ? '!visible !opacity-100 !translate-y-0' : ''">
+                        <span class="font-bold text-orange-400 flex items-center gap-1.5">
+                            <i class="fas fa-shield-alt text-[10px]"></i> Panel Pengawas
+                        </span>
+                        <span class="text-[10px] text-gray-300 mt-0.5">Status proctoring kamera</span>
+                        <div class="absolute -top-1.5 right-2.5 w-3 h-3 bg-gray-900 rotate-45 border-l border-t border-gray-700"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -551,39 +653,38 @@
         <div class="absolute inset-0 bg-black/30 pointer-events-auto" x-show="showGuide > 0 && showGuide <= 5" @click="showGuide = 0" x-cloak></div>
 
         <!-- GUIDE 1: Header Info -->
-        <div class="absolute left-1/2 top-16 transform -translate-x-1/2 w-[28rem] max-w-[95vw] bg-gray-900 border-2 border-white p-5 rounded-xl shadow-2xl text-white pointer-events-auto animate-bounce-subtle"
+        <div class="fixed inset-x-3 sm:inset-x-auto top-14 sm:top-20 sm:left-1/2 sm:-translate-x-1/2 max-w-lg sm:w-[28rem] mx-auto bg-gray-900 border-2 border-white p-4 sm:p-5 rounded-2xl shadow-2xl text-white pointer-events-auto animate-float-subtle"
             x-show="showGuide === 1" x-cloak>
-            <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-4 h-4 bg-gray-900 border-l-2 border-t-2 border-white rotate-45"></div>
-            <div class="flex items-center gap-2 mb-3">
+            <div class="absolute -top-2.5 left-1/2 -translate-x-1/2 w-4 h-4 bg-gray-900 border-l-2 border-t-2 border-white rotate-45"></div>
+            <div class="flex items-center gap-2 mb-2.5 sm:mb-3">
                 <div class="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-xs font-bold shadow-md shadow-orange-500/50">1</div>
-                <span class="font-bold text-base text-orange-400">Header Informasi Ujian</span>
+                <span class="font-bold text-sm sm:text-base text-orange-400">Header Informasi Ujian</span>
             </div>
-            <div class="text-[13px] text-gray-300 leading-relaxed flex flex-col gap-3 font-medium">
-                <p>Bagian atas halaman ujian ini sangat penting karena memuat informasi utama sesi Anda:</p>
-                <ul class="list-disc pl-4 space-y-1.5 marker:text-orange-500">
-                    <li><b>Nama Sesi & Modul:</b> Menunjukkan nama tes/mata pelajaran yang sedang Anda kerjakan saat ini.</li>
-                    <li><b>Waktu Tersisa:</b> Indikator waktu berjalan mundur (countdown). Pastikan untuk selalu memperhatikan sisa waktu. Jika waktu habis, jawaban Anda akan terkirim otomatis.</li>
-                    <li><b>Selesai Ujian:</b> Tombol untuk mengakhiri ujian jika Anda sudah selesai menjawab semua soal.</li>
+            <div class="text-xs sm:text-[13px] text-gray-300 leading-relaxed flex flex-col gap-2.5 sm:gap-3 font-medium">
+                <p>Bagian atas halaman ujian ini memuat informasi utama sesi Anda:</p>
+                <ul class="list-disc pl-4 space-y-1 sm:space-y-1.5 marker:text-orange-500 text-[11px] sm:text-xs">
+                    <li><b>Nama Sesi:</b> Menunjukkan tes/mata pelajaran yang aktif.</li>
+                    <li><b>Waktu Tersisa:</b> Countdown otomatis. Jika habis, jawaban tersimpan otomatis.</li>
+                    <li><b>Selesai Ujian:</b> Tombol untuk mengakhiri simulasi.</li>
                 </ul>
-                <button @click="showGuide = 2" class="mt-2 w-full py-2 bg-orange-600 hover:bg-orange-700 text-xs font-bold rounded-lg transition-colors text-center text-white">
+                <button @click="showGuide = 2" class="mt-1 sm:mt-2 w-full py-2.5 bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-xs font-bold rounded-xl transition-colors text-center text-white shadow-md shadow-orange-600/30">
                     Lanjut ke Panel Navigasi &rarr;
                 </button>
             </div>
         </div>
 
         <!-- GUIDE 2: Navigation Sidebar -->
-        <div class="absolute left-[260px] top-24 w-[22rem] max-w-[95vw] bg-gray-900 border-2 border-white p-5 rounded-xl shadow-2xl text-white pointer-events-auto animate-bounce-subtle"
+        <div class="fixed inset-x-3 sm:inset-x-auto top-14 sm:top-24 sm:left-[260px] max-w-lg sm:w-[22rem] mx-auto sm:mx-0 bg-gray-900 border-2 border-white p-4 sm:p-5 rounded-2xl shadow-2xl text-white pointer-events-auto animate-float-subtle"
             x-show="showGuide === 2" x-cloak>
-            <div class="absolute top-8 -left-2.5 w-4 h-4 bg-gray-900 border-b-2 border-l-2 border-white rotate-45"></div>
-            <div class="flex items-center gap-2 mb-3">
+            <div class="hidden sm:block absolute top-8 -left-2.5 w-4 h-4 bg-gray-900 border-b-2 border-l-2 border-white rotate-45"></div>
+            <div class="flex items-center gap-2 mb-2.5 sm:mb-3">
                 <div class="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-xs font-bold shadow-md shadow-orange-500/50">2</div>
-                <span class="font-bold text-base text-orange-400">Panel Navigasi Soal</span>
+                <span class="font-bold text-sm sm:text-base text-orange-400">Panel Navigasi Soal</span>
             </div>
-            <div class="text-[13px] text-gray-300 leading-relaxed mb-3 space-y-2 font-medium">
-                <p>Panel Navigasi berfungsi sebagai peta ujian Anda. Anda dapat langsung berpindah soal dengan mengklik nomornya.</p>
-                <p>Arti status nomor soal:</p>
+            <div class="text-xs sm:text-[13px] text-gray-300 leading-relaxed mb-2.5 space-y-1.5 font-medium">
+                <p>Panel Navigasi berfungsi sebagai peta ujian. Klik tombol <i class="fas fa-th text-orange-400"></i> <b>Soal</b> di atas untuk membuka peta nomor di HP.</p>
             </div>
-            <ul class="text-xs space-y-2 text-gray-300 bg-gray-800/80 p-3 rounded-lg border border-gray-700/50 mb-3">
+            <ul class="text-[11px] sm:text-xs space-y-1.5 text-gray-300 bg-gray-800/80 p-2.5 sm:p-3 rounded-lg border border-gray-700/50 mb-3">
                 <li class="flex items-start gap-2">
                     <div class="w-3.5 h-3.5 mt-0.5 bg-blue-900 rounded-sm shrink-0"></div>
                     <span><strong class="text-blue-400">Biru:</strong> Soal aktif saat ini.</span>
@@ -596,92 +697,86 @@
                     <div class="w-3.5 h-3.5 mt-0.5 bg-yellow-500 rounded-sm shrink-0"></div>
                     <span><strong class="text-yellow-500">Kuning:</strong> Soal ditandai Ragu-Ragu.</span>
                 </li>
-                <li class="flex items-start gap-2">
-                    <div class="w-3.5 h-3.5 mt-0.5 bg-white border border-gray-300 rounded-sm shrink-0"></div>
-                    <span><strong class="text-gray-300">Putih:</strong> Soal belum dijawab.</span>
-                </li>
             </ul>
             <div class="flex gap-2">
-                <button @click="showGuide = 1" class="flex-1 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs font-bold rounded-lg transition-colors border border-gray-700 text-center text-white">
+                <button @click="showGuide = 1" class="flex-1 py-2 bg-gray-800 hover:bg-gray-700 active:bg-gray-900 text-xs font-bold rounded-xl transition-colors border border-gray-700 text-center text-white">
                     &larr; Kembali
                 </button>
-                <button @click="showGuide = 3" class="flex-1 py-1.5 bg-orange-600 hover:bg-orange-700 text-xs font-bold rounded-lg transition-colors text-center text-white">
-                    Lanjut ke Area Soal &rarr;
+                <button @click="showGuide = 3" class="flex-1 py-2 bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-xs font-bold rounded-xl transition-colors text-center text-white shadow-md shadow-orange-600/30">
+                    Lanjut &rarr;
                 </button>
             </div>
         </div>
 
         <!-- GUIDE 3: Question Area -->
-        <div class="absolute left-1/2 top-24 transform -translate-x-1/2 w-[28rem] max-w-[95vw] bg-gray-900 border-2 border-white p-5 rounded-xl shadow-2xl text-white pointer-events-auto animate-bounce-subtle"
+        <div class="fixed inset-x-3 sm:inset-x-auto top-14 sm:top-24 sm:left-1/2 sm:-translate-x-1/2 max-w-lg sm:w-[28rem] mx-auto bg-gray-900 border-2 border-white p-4 sm:p-5 rounded-2xl shadow-2xl text-white pointer-events-auto animate-float-subtle"
             x-show="showGuide === 3" x-cloak>
-            <div class="absolute -top-3 left-[80%] -translate-x-1/2 w-4 h-4 bg-gray-900 border-l-2 border-t-2 border-white rotate-45"></div>
-            <div class="flex items-center gap-2 mb-3">
+            <div class="absolute -top-2.5 left-1/2 -translate-x-1/2 w-4 h-4 bg-gray-900 border-l-2 border-t-2 border-white rotate-45"></div>
+            <div class="flex items-center gap-2 mb-2.5 sm:mb-3">
                 <div class="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-xs font-bold shadow-md shadow-orange-500/50">3</div>
-                <span class="font-bold text-base text-orange-400">Area Soal & Ragu-Ragu</span>
+                <span class="font-bold text-sm sm:text-base text-orange-400">Area Soal & Ragu-Ragu</span>
             </div>
-            <div class="text-[13px] text-gray-300 leading-relaxed flex flex-col gap-3 font-medium">
-                <p>Layar utama tempat Anda membaca narasi soal, mengatur ukuran teks, dan menentukan jawaban Anda.</p>
-                <ul class="list-disc pl-4 space-y-1.5 marker:text-orange-500">
-                    <li><b>Ukuran Teks:</b> Siswa dapat mengubah font size (Kecil, Sedang, Besar) secara instan.</li>
-                    <li><b>Pilihan Jawaban:</b> Klik opsi jawaban untuk langsung memilih.</li>
-                    <li><b>Tombol Ragu-Ragu:</b> Tandai soal jika Anda ingin mengeceknya kembali nanti. Nomor akan berubah menjadi kuning di panel navigasi.</li>
+            <div class="text-xs sm:text-[13px] text-gray-300 leading-relaxed flex flex-col gap-2.5 sm:gap-3 font-medium">
+                <p>Layar utama tempat Anda membaca soal dan menentukan jawaban Anda.</p>
+                <ul class="list-disc pl-4 space-y-1 sm:space-y-1.5 marker:text-orange-500 text-[11px] sm:text-xs">
+                    <li><b>Ukuran Teks:</b> Ubah ukuran font (Kecil, Sedang, Besar).</li>
+                    <li><b>Pilihan Jawaban:</b> Sentuh/klik opsi untuk memilih.</li>
+                    <li><b>Tombol Ragu-Ragu:</b> Tandai soal untuk dicek ulang nanti.</li>
                 </ul>
                 <div class="flex gap-2">
-                    <button @click="showGuide = 2" class="flex-1 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs font-bold rounded-lg transition-colors border border-gray-700 text-center text-white">
+                    <button @click="showGuide = 2" class="flex-1 py-2 bg-gray-800 hover:bg-gray-700 active:bg-gray-900 text-xs font-bold rounded-xl transition-colors border border-gray-700 text-center text-white">
                         &larr; Kembali
                     </button>
-                    <button @click="showGuide = 4" class="flex-1 py-1.5 bg-orange-600 hover:bg-orange-700 text-xs font-bold rounded-lg transition-colors text-center text-white">
-                        Lanjut ke Auto-Save &rarr;
+                    <button @click="showGuide = 4" class="flex-1 py-2 bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-xs font-bold rounded-xl transition-colors text-center text-white shadow-md shadow-orange-600/30">
+                        Lanjut &rarr;
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- GUIDE 4: Auto-Save -->
-        <div class="absolute left-1/2 top-1/3 transform -translate-x-1/2 w-[26rem] max-w-[95vw] bg-gray-900 border-2 border-white p-5 rounded-xl shadow-2xl text-white pointer-events-auto animate-bounce-subtle"
+        <div class="fixed inset-x-3 sm:inset-x-auto top-14 sm:top-1/3 sm:left-1/2 sm:-translate-x-1/2 max-w-lg sm:w-[26rem] mx-auto bg-gray-900 border-2 border-white p-4 sm:p-5 rounded-2xl shadow-2xl text-white pointer-events-auto animate-float-subtle"
             x-show="showGuide === 4" x-cloak>
-            <div class="absolute top-full -mt-2 left-[50%] -translate-x-1/2 w-4 h-4 bg-gray-900 border-b-2 border-r-2 border-white rotate-45"></div>
-            <div class="flex items-center gap-2 mb-3">
+            <div class="flex items-center gap-2 mb-2.5 sm:mb-3">
                 <div class="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-xs font-bold shadow-md shadow-orange-500/50">4</div>
-                <span class="font-bold text-base text-orange-400">Cloud Auto-Save Real-Time</span>
+                <span class="font-bold text-sm sm:text-base text-orange-400">Cloud Auto-Save Real-Time</span>
             </div>
-            <div class="text-[13px] text-gray-300 leading-relaxed mb-2 space-y-2 font-medium">
-                <p>Sistem ujian menggunakan teknologi <b>Penyimpanan Otomatis</b> canggih untuk mencegah kehilangan data Anda.</p>
-                <ul class="list-disc pl-4 space-y-1.5 marker:text-orange-500">
-                    <li><b>Tanpa Tombol Simpan Terpisah:</b> Setiap kali Anda memilih opsi atau mengetik esai, jawaban akan langsung terkirim secara otomatis ke server.</li>
-                    <li><b>Status Tersimpan:</b> Indikator status penyimpanan real-time akan berubah dengan timestamp di kanan atas.</li>
+            <div class="text-xs sm:text-[13px] text-gray-300 leading-relaxed mb-2 space-y-2 font-medium">
+                <p>Sistem ujian menggunakan teknologi <b>Auto-Save</b> otomatis ke server.</p>
+                <ul class="list-disc pl-4 space-y-1 marker:text-orange-500 text-[11px] sm:text-xs">
+                    <li><b>Otomatis Tersimpan:</b> Setiap kali Anda memilih opsi atau mengetik, data langsung tersimpan.</li>
+                    <li><b>Status:</b> Indikator hijau "Tersimpan" di atas menunjukkan status sinkronisasi.</li>
                 </ul>
-                <div class="flex gap-2">
-                    <button @click="showGuide = 3" class="flex-1 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs font-bold rounded-lg transition-colors border border-gray-700 text-center text-white">
+                <div class="flex gap-2 pt-1">
+                    <button @click="showGuide = 3" class="flex-1 py-2 bg-gray-800 hover:bg-gray-700 active:bg-gray-900 text-xs font-bold rounded-xl transition-colors border border-gray-700 text-center text-white">
                         &larr; Kembali
                     </button>
-                    <button @click="showGuide = 5" class="flex-1 py-1.5 bg-orange-600 hover:bg-orange-700 text-xs font-bold rounded-lg transition-colors text-center text-white">
-                        Lanjut ke Kamera &rarr;
+                    <button @click="showGuide = 5" class="flex-1 py-2 bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-xs font-bold rounded-xl transition-colors text-center text-white shadow-md shadow-orange-600/30">
+                        Lanjut &rarr;
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- GUIDE 5: Monitor Sidebar -->
-        <div class="absolute right-[276px] top-24 w-[22rem] max-w-[95vw] bg-gray-900 border-2 border-white p-5 rounded-xl shadow-2xl text-white pointer-events-auto animate-bounce-subtle"
+        <div class="fixed inset-x-3 sm:inset-x-auto top-14 sm:top-24 sm:right-[276px] max-w-lg sm:w-[22rem] mx-auto sm:mx-0 bg-gray-900 border-2 border-white p-4 sm:p-5 rounded-2xl shadow-2xl text-white pointer-events-auto animate-float-subtle"
             x-show="showGuide === 5" x-cloak>
-            <div class="absolute top-8 -right-2.5 w-4 h-4 bg-gray-900 border-r-2 border-t-2 border-white rotate-45"></div>
-            <div class="flex items-center gap-2 mb-3">
+            <div class="hidden sm:block absolute top-8 -right-2.5 w-4 h-4 bg-gray-900 border-r-2 border-t-2 border-white rotate-45"></div>
+            <div class="flex items-center gap-2 mb-2.5 sm:mb-3">
                 <div class="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-xs font-bold shadow-md shadow-orange-500/50">5</div>
-                <span class="font-bold text-base text-orange-400">Pengawasan Kamera & Rekaman</span>
+                <span class="font-bold text-sm sm:text-base text-orange-400">Pengawasan Kamera & Status</span>
             </div>
-            <div class="text-[13px] text-gray-300 leading-relaxed mb-2 space-y-2 font-medium">
-                <p>Sistem terintegrasi dengan teknologi <b>Active Proctoring</b> canggih:</p>
-                <ul class="list-disc pl-4 space-y-1.5 marker:text-orange-500">
-                    <li><b>Kamera Live:</b> Wajah Anda dipantau secara real-time untuk mendeteksi kecurangan.</li>
-                    <li><b>Deteksi Pelanggaran:</b> Sistem mencatat pelanggaran jika Anda keluar dari tab ujian atau memalingkan wajah.</li>
-                    <li><b>Aktivitas Sesi:</b> Log aktivitas realtime menunjukkan koneksi data Anda aman.</li>
+            <div class="text-xs sm:text-[13px] text-gray-300 leading-relaxed mb-2 space-y-1.5 font-medium">
+                <p>Fitur pengawasan digital (klik tombol <i class="fas fa-shield-alt text-orange-400"></i> <b>Pengawas</b> di HP):</p>
+                <ul class="list-disc pl-4 space-y-1 marker:text-orange-500 text-[11px] sm:text-xs">
+                    <li><b>Kamera Live:</b> Memantau integritas peserta ujian secara berkala.</li>
+                    <li><b>Toleransi Pelanggaran:</b> Mencatat peringatan jika keluar tab.</li>
                 </ul>
-                <div class="flex gap-2">
-                    <button @click="showGuide = 4" class="flex-1 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs font-bold rounded-lg transition-colors border border-gray-700 text-center text-white">
+                <div class="flex gap-2 pt-1">
+                    <button @click="showGuide = 4" class="flex-1 py-2 bg-gray-800 hover:bg-gray-700 active:bg-gray-900 text-xs font-bold rounded-xl transition-colors border border-gray-700 text-center text-white">
                         &larr; Kembali
                     </button>
-                    <button @click="showGuide = 0" class="flex-1 py-1.5 bg-green-600 hover:bg-green-700 text-xs font-bold rounded-lg transition-colors text-center text-white">
+                    <button @click="showGuide = 0" class="flex-1 py-2 bg-green-600 hover:bg-green-700 active:bg-green-800 text-xs font-bold rounded-xl transition-colors text-center text-white shadow-md shadow-green-600/30">
                         Tutup & Selesai
                     </button>
                 </div>
@@ -689,75 +784,54 @@
         </div>
     </div>
 
-    <!-- ── FLOATING GUIDE CONTROLLER (Premium glassmorphism dashboard bar) ── -->
-    <div x-show="showGuide > 0" x-cloak class="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-50 bg-white/90 backdrop-blur-md p-2.5 rounded-2xl shadow-2xl border border-gray-200 flex flex-wrap items-center gap-2 max-w-[95vw]">
-        <span class="text-xs font-bold text-gray-500 px-2.5 border-r border-gray-200 hidden md:inline">PANDUAN:</span>
+    <!-- ── FLOATING GUIDE CONTROLLER (Responsive glassmorphism dashboard bar) ── -->
+    <div x-show="showGuide > 0" x-cloak class="fixed bottom-14 sm:bottom-16 left-1/2 transform -translate-x-1/2 z-50 bg-white/95 backdrop-blur-md p-1.5 sm:p-2.5 rounded-2xl shadow-2xl border border-gray-200 flex items-center gap-1 sm:gap-2 max-w-[95vw] overflow-x-auto">
+        <span class="text-[11px] sm:text-xs font-bold text-gray-500 px-2 sm:px-2.5 border-r border-gray-200 hidden sm:inline">PANDUAN:</span>
         <button @click="showGuide = 1"
-            class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm border"
+            class="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all shadow-sm border shrink-0"
             :class="showGuide === 1 ? 'bg-orange-600 border-orange-600 text-white' : 'bg-white border-gray-200 text-gray-500 hover:border-orange-200'">
             1. Info
         </button>
         <button @click="showGuide = 2"
-            class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm border"
+            class="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all shadow-sm border shrink-0"
             :class="showGuide === 2 ? 'bg-orange-600 border-orange-600 text-white' : 'bg-white border-gray-200 text-gray-500 hover:border-orange-200'">
             2. Navigasi
         </button>
         <button @click="showGuide = 3"
-            class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm border"
+            class="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all shadow-sm border shrink-0"
             :class="showGuide === 3 ? 'bg-orange-600 border-orange-600 text-white' : 'bg-white border-gray-200 text-gray-500 hover:border-orange-200'">
             3. Soal
         </button>
         <button @click="showGuide = 4"
-            class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm border"
+            class="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all shadow-sm border shrink-0"
             :class="showGuide === 4 ? 'bg-orange-600 border-orange-600 text-white' : 'bg-white border-gray-200 text-gray-500 hover:border-orange-200'">
             4. Auto-Save
         </button>
         <button @click="showGuide = 5"
-            class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm border"
+            class="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all shadow-sm border shrink-0"
             :class="showGuide === 5 ? 'bg-orange-600 border-orange-600 text-white' : 'bg-white border-gray-200 text-gray-500 hover:border-orange-200'">
             5. Monitor
         </button>
         <button @click="showGuide = 0"
-            class="px-3.5 py-2 rounded-xl text-xs font-bold bg-gray-900 border border-gray-900 text-white hover:bg-gray-800 transition-all shadow-sm ml-2">
-            Tutup Panduan
-        </button>
-    </div>
-
-    <!-- Floating Help Button to Reopen Guide -->
-    <div x-show="showGuide === 0" x-cloak class="absolute bottom-6 right-6 z-50 pointer-events-auto">
-        <button @click="showGuide = 1" class="flex items-center gap-2 px-4 py-2.5 bg-orange-600 hover:bg-orange-700 text-white rounded-full font-bold shadow-lg shadow-orange-200 transition-all hover:scale-[1.05] active:scale-95 text-xs">
-            <i class="fas fa-question-circle text-sm"></i>
-            <span>Buka Panduan</span>
+            class="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold bg-gray-900 border border-gray-900 text-white hover:bg-gray-800 transition-all shadow-sm shrink-0 ml-1">
+            <i class="fas fa-times sm:mr-1"></i> <span class="hidden sm:inline">Tutup</span>
         </button>
     </div>
 </div>
 
 
 <style>
-    @keyframes bounce-subtle {
-        0%, 100% {
-            transform: translate(-50%, 0);
-        }
-        50% {
-            transform: translate(-50%, -6px);
-        }
-    }
-    
-    /* Guide 2 & 5 do not translate X centered */
-    @keyframes bounce-subtle-side {
+    @keyframes float-subtle {
         0%, 100% {
             transform: translateY(0);
         }
         50% {
-            transform: translateY(-6px);
+            transform: translateY(-4px);
         }
     }
 
-    .absolute.left-1\/2.animate-bounce-subtle {
-        animation: bounce-subtle 2s infinite ease-in-out;
-    }
-    .absolute:not(.left-1\/2).animate-bounce-subtle {
-        animation: bounce-subtle-side 2s infinite ease-in-out;
+    .animate-float-subtle {
+        animation: float-subtle 2.5s infinite ease-in-out;
     }
 
     .animate-fadeIn {

@@ -140,13 +140,12 @@ class AdminMasterQuestionIndex extends Component
 
     protected function buildQuestionsQuery()
     {
-        $questions = Question::with(['study', 'topic', 'categoryQuestion'])
-            ->select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect', 'study_id', 'difficulty', 'category_question_id', 'type')
+        $questions = Question::with(['study', 'topic', 'materialCategory', 'material', 'categoryQuestion', 'questionType', 'answers'])
+            ->select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect', 'study_id', 'difficulty', 'category_question_id', 'type', 'images', 'order', 'created_at')
             ->search($this->search)
             ->where('is_simulation', 'false')
-            ->orderBy('created_at', 'desc')
-            ->orderBy('order', 'desc')
-            ->orderBy('question', 'asc');
+            ->orderBy('order', 'asc')
+            ->orderBy('created_at', 'asc');
 
         if ($this->filterStudyId) {
             $questions->where('study_id', $this->filterStudyId);
@@ -176,10 +175,38 @@ class AdminMasterQuestionIndex extends Component
         if ($value) {
             $this->selectedQuestions = $this->buildQuestionsQuery()
                 ->pluck('id')
+                ->map(fn ($id) => (string) $id)
                 ->toArray();
         } else {
             $this->selectedQuestions = [];
         }
+    }
+
+    public function selectAllFiltered()
+    {
+        $this->selectedQuestions = $this->buildQuestionsQuery()
+            ->pluck('id')
+            ->map(fn ($id) => (string) $id)
+            ->toArray();
+        $this->selectAll = true;
+    }
+
+    public function selectAllPage()
+    {
+        $currentPageIds = $this->buildQuestionsQuery()
+            ->paginate($this->perPage)
+            ->pluck('id')
+            ->map(fn ($id) => (string) $id)
+            ->toArray();
+
+        $this->selectedQuestions = array_values(array_unique(array_merge($this->selectedQuestions, $currentPageIds)));
+        $this->selectAll = true;
+    }
+
+    public function deselectAll()
+    {
+        $this->selectedQuestions = [];
+        $this->selectAll = false;
     }
 
     public function updatedSelectedQuestions()
@@ -496,14 +523,13 @@ class AdminMasterQuestionIndex extends Component
                 ])
                 ->log("deleted {$questionsCount} Questions");
 
-            // Bulk soft-delete related answers
-            \App\Models\Master\Question\Answer::whereIn('question_id', $this->selectedQuestions)->delete();
-
-            // Bulk soft-delete related module questions
-            \App\Models\Master\Question\ModuleQuestion::whereIn('question_id', $this->selectedQuestions)->delete();
-
-            // Bulk soft-delete the questions themselves
-            Question::whereIn('id', $this->selectedQuestions)->delete();
+            // Bulk soft-delete in safe chunks
+            $chunks = array_chunk($this->selectedQuestions, 500);
+            foreach ($chunks as $chunk) {
+                \App\Models\Master\Question\Answer::whereIn('question_id', $chunk)->delete();
+                \App\Models\Master\Question\ModuleQuestion::whereIn('question_id', $chunk)->delete();
+                Question::whereIn('id', $chunk)->delete();
+            }
 
             DB::commit();
         } catch (Exception|Throwable $th) {

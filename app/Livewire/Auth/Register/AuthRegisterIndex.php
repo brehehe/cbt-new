@@ -42,6 +42,52 @@ class AuthRegisterIndex extends Component
 
     public $payment_registration;
 
+    // Company / Organization Registration Fields
+    public $email_company;
+
+    public $phone;
+
+    public $address;
+
+    public $website;
+
+    public $province;
+
+    public $city;
+
+    public $district;
+
+    public $sub_district;
+
+    public $postal_code;
+
+    public $country;
+
+    public $logo;
+
+    public $tax_id;
+
+    public $industry;
+
+    public $description;
+
+    public $pic_name;
+
+    public $pic_position;
+
+    public $pic_email;
+
+    public $pic_phone;
+
+    public $username;
+
+    public $password_confirmation;
+
+    public function removeLogo()
+    {
+        $this->logo = null;
+    }
+
     public function render()
     {
         $program_studies = ['Farmasi', 'Kebidanan', 'Keperawatan (D-III)', 'Keperawatan (S1)', 'Profesi Ners'];

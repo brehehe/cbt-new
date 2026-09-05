@@ -1,4 +1,4 @@
-@section('title', 'Dashboard Dosen')
+@section('title', 'Dashboard ' . lecturer_label())
 
 @push('styles')
     <style>
@@ -79,8 +79,8 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold text-[color:var(--primary)]">
-                    Selamat Datang, {{ Auth::user()->name ?? 'Dosen' }}!</h1>
-                <p class="text-gray-600 mt-1">Kelola ujian dan monitor performa mahasiswa Anda</p>
+                    Selamat Datang, {{ Auth::user()->name ?? lecturer_label() }}!</h1>
+                <p class="text-gray-600 mt-1">Kelola ujian dan monitor performa {{ strtolower(student_label()) }} Anda</p>
                 <p class="text-sm text-gray-500">{{ \Carbon\Carbon::now()->format('l, j F Y') }}</p>
             </div>
             <div class="flex items-center gap-3">
@@ -138,7 +138,7 @@
             class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 fade-in">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm text-gray-600 mb-1">Mahasiswa Terdaftar</p>
+                    <p class="text-sm text-gray-600 mb-1">{{ student_label() }} Terdaftar</p>
                     <h3 class="text-3xl font-bold text-[color:var(--primary)]">
                         {{ $totalStudents ?? 0 }}
                     </h3>
@@ -367,7 +367,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <!-- Student Performance Chart -->
         <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-800 mb-6">Performa Mahasiswa (7 Hari Terakhir)</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-6">Performa {{ student_label() }} (7 Hari Terakhir)</h3>
             <div class="chart-container" wire:ignore>
                 <canvas id="performanceChart" width="400" height="200"></canvas>
             </div>
@@ -375,7 +375,7 @@
 
         <!-- Recent Student Activities -->
         <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-800 mb-6">Aktivitas Mahasiswa Terbaru</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-6">Aktivitas {{ student_label() }} Terbaru</h3>
 
             @if (isset($recentActivities) && count($recentActivities) > 0)
                 <div class="space-y-3 max-h-64 overflow-y-auto">
@@ -389,7 +389,7 @@
                             </div>
                             <div class="flex-1">
                                 <p class="text-sm font-medium text-gray-800">
-                                    {{ $activity['student_name'] ?? 'Mahasiswa' }}
+                                    {{ $activity['student_name'] ?? student_label() }}
                                 </p>
                                 <p class="text-xs text-gray-600">
                                     {{ $activity['activity'] ?? 'Mengerjakan ujian' }} -

@@ -180,7 +180,7 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 mb-4 gap-4">
             <div>
                 <h3 class="text-xl font-semibold text-gray-800">Peserta Ujian untuk <span class="text-primary font-bold">{{ $schedules[$activeTab]['name'] ?: 'Jadwal ' . ($activeTab + 1) }}</span></h3>
-                <p class="text-xs text-gray-500 mt-1">Mahasiswa yang dipilih di sini tidak akan bisa dipilih di tab jadwal lain pada sesi ini.</p>
+                <p class="text-xs text-gray-500 mt-1">{{ student_label() }} yang dipilih di sini tidak akan bisa dipilih di tab jadwal lain pada sesi ini.</p>
             </div>
             <div class="flex flex-col sm:flex-row gap-3 items-center">
                 <div class="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg p-1">

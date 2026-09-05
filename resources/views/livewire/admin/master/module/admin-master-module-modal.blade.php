@@ -74,34 +74,53 @@
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="mb-4">
-                            <label for="duration" class="block text-sm font-medium text-gray-700">Durasi Pengerjaan
-                                <span class="text-red-600">*</span></label>
-                            <div class="relative mt-1">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-gray-50/80 border border-gray-200/80 rounded-xl mb-4">
+                        <div>
+                            <label for="duration" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                                Durasi Pengerjaan <span class="text-red-600">*</span>
+                            </label>
+                            <div class="relative">
                                 <input type="number" id="duration" wire:model.defer="duration"
-                                    placeholder="Durasi Pengerjaan" class="mt-1 form-control" min="0">
+                                    placeholder="Durasi" class="w-full text-sm rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 pr-14" min="1">
                                 <div
-                                    class="absolute inset-y-0 right-0 flex items-center p-2 pointer-events-none text-gray-500 text-sm">
+                                    class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400 text-xs font-medium">
                                     Menit</div>
                             </div>
                             @error('duration')
-                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                                <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
                             @enderror
                         </div>
-                        <div class="mb-4">
-                            <label for="random_question" class="block text-sm font-medium text-gray-700">Acak Soal
+                        <div>
+                            <label for="total_questions" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                                Jumlah Soal Peserta <span class="text-[11px] text-gray-400 font-normal lowercase">(opsional)</span>
                             </label>
-                            <div class="flex items-center mt-2">
+                            <div class="relative">
+                                <input type="number" id="total_questions" wire:model.defer="total_questions"
+                                    placeholder="Contoh: 100" class="w-full text-sm rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 pr-14" min="1">
+                                <div
+                                    class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400 text-xs font-medium">
+                                    Soal</div>
+                            </div>
+                            <p class="text-[10px] text-gray-400 mt-0.5">Batas soal ujian (Kosongkan = Semua).</p>
+                            @error('total_questions')
+                                <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="random_question" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                                Acak Soal
+                            </label>
+                            <div class="flex items-center gap-3 mt-2">
                                 <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" wire:model="random_question" class="sr-only peer">
                                     <div
                                         class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
                                     </div>
                                 </label>
+                                <span class="text-xs text-gray-500 font-medium">{{ $random_question ? 'Acak' : 'Urut' }}</span>
                             </div>
                             @error('random_question')
-                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                                <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>

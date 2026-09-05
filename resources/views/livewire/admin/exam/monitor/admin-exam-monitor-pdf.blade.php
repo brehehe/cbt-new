@@ -31,7 +31,7 @@
         <thead>
             <tr>
                 <th>No</th>
-                <th class="left">Nama Mahasiswa</th>
+                <th class="left">Nama {{ student_label() }}</th>
                 <th class="left">NIM / Username</th>
                 <th class="left">Jadwal</th>
                 <th class="left">Modul</th>

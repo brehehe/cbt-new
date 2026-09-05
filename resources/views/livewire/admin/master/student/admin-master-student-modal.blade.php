@@ -12,7 +12,7 @@
                         d="M13 16h-1v-4h-1m1-4h.01M12 20.5C6.753 20.5 2.5 16.247 2.5 11S6.753 1.5 12 1.5 21.5 5.753 21.5 11 17.247 20.5 12 20.5z" />
                 </svg>
                 <h2 class="text-xl font-semibold text-gray-800">
-                    {{ $data_id ? 'Edit' : 'Tambah' }} Data Mahasiswa
+                    {{ $data_id ? 'Edit' : 'Tambah' }} Data {{ student_label() }}
                 </h2>
             </div>
             <button wire:click="closeModal"
@@ -166,7 +166,7 @@
                         </div>
                         <div>
                             <label for="student_status" class="block text-sm font-medium text-gray-700">Status
-                                Mahasiswa</label>
+                                {{ student_label() }}</label>
                             <select id="student_status" wire:model.defer="student_status" class="mt-1 form-control">
                                 <option value="active">Aktif</option>
                                 <option value="graduate">Lulus</option>

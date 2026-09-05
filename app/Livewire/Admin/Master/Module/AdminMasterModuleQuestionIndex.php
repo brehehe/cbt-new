@@ -53,6 +53,8 @@ class AdminMasterModuleQuestionIndex extends Component
 
     public $random_question;
 
+    public $total_questions;
+
     public $question_pick_type = 'manual';
 
     public $is_all_questions = false;
@@ -76,6 +78,8 @@ class AdminMasterModuleQuestionIndex extends Component
     public $filterTopicId;
 
     public $selected_all = [];
+
+    public $selected_module_questions = [];
 
     public $openQuestion = false;
 
@@ -103,6 +107,14 @@ class AdminMasterModuleQuestionIndex extends Component
 
     public $filterMaterialCategoryTopicId = '';
 
+    public $selectCountInput = 100;
+
+    public $rangeFromInput = 1;
+
+    public $rangeToInput = 100;
+
+    public $replaceSelectionMode = true;
+
     public function render()
     {
         $questionPickType = $this->question_pick_type ?? 'manual';
@@ -110,7 +122,7 @@ class AdminMasterModuleQuestionIndex extends Component
 
         if ($this->get_module) {
             $moduleQuestionsQuery = $this->get_module->moduleQuestions()
-                ->with(['question.study', 'question.questionType'])
+                ->with(['question.study', 'question.questionType', 'question.categoryQuestion', 'question.topic', 'question.answers'])
                 ->select('id', 'module_id', 'question_id', 'study_id', 'order');
 
             if ($questionPickType === 'manual') {
@@ -134,50 +146,10 @@ class AdminMasterModuleQuestionIndex extends Component
         }
 
         $questions = [];
+        $totalQuestionsCount = 0;
         if ($this->openQuestion) {
-            $moduleId = $this->get_module?->id;
-            $questionsQuery = Question::with(['topic', 'study', 'categoryQuestion', 'questionType', 'answers'])
-                ->select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect', 'study_id', 'difficulty', 'category_question_id', 'type', 'images');
-
-            if (Auth::user()?->hasRole('Dosen')) {
-                $questionsQuery->whereIn('study_id', $this->get_studys ? array_keys($this->get_studys) : []);
-            }
-
-            if ($moduleId) {
-                $questionsQuery->whereNotIn('id', function ($query) use ($moduleId, $questionPickType) {
-                    $query->select('question_id')
-                        ->from('module_questions')
-                        ->where('module_id', $moduleId)
-                        ->whereNull('deleted_at');
-
-                    $user = Auth::user();
-                    if ($user && ! $user->hasRole('Anonymous') && optional($user->company)->id) {
-                        $query->where('company_id', $user->company->id);
-                    }
-
-                    if ($questionPickType === 'manual') {
-                        $query->where(function ($q) {
-                            $q->whereNull('question_pick_type')
-                                ->orWhere('question_pick_type', 'manual');
-                        });
-                    } else {
-                        $query->where('question_pick_type', $questionPickType);
-                    }
-                });
-            }
-
-            if (! empty(trim($this->search))) {
-                $questionsQuery->search($this->search);
-            }
-
-            if ($this->filterStudyId) {
-                $questionsQuery->where('study_id', $this->filterStudyId);
-            }
-
-            if ($this->filterTopicId) {
-                $questionsQuery->where('topic_id', $this->filterTopicId);
-            }
-
+            $questionsQuery = $this->getQuestionsQuery();
+            $totalQuestionsCount = (clone $questionsQuery)->count();
             $questions = $questionsQuery->orderBy('id', 'desc')->paginate($this->perPage);
         }
 
@@ -205,10 +177,61 @@ class AdminMasterModuleQuestionIndex extends Component
         return view('livewire.admin.master.module.admin-master-module-question-index', [
             'module_questions' => $module_questions,
             'questions' => $questions,
+            'totalQuestionsCount' => $totalQuestionsCount,
             'filteredCategoryQuestions' => $filteredCategoryQuestions,
             'filteredTopics' => $filteredTopics,
             'filteredMaterialCategories' => $filteredMaterialCategories,
         ])->extends('layout.app')->section('content');
+    }
+
+    public function getQuestionsQuery()
+    {
+        $questionPickType = $this->question_pick_type ?? 'manual';
+        $moduleId = $this->get_module?->id;
+
+        $questionsQuery = Question::with(['topic', 'study', 'categoryQuestion', 'questionType', 'answers'])
+            ->select('id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'question', 'description', 'weight_correct', 'weight_incorrect', 'study_id', 'difficulty', 'category_question_id', 'type', 'images');
+
+        if (Auth::user()?->hasRole('Dosen')) {
+            $questionsQuery->whereIn('study_id', $this->get_studys ? array_keys($this->get_studys) : []);
+        }
+
+        if ($moduleId) {
+            $questionsQuery->whereNotIn('id', function ($query) use ($moduleId, $questionPickType) {
+                $query->select('question_id')
+                    ->from('module_questions')
+                    ->where('module_id', $moduleId)
+                    ->whereNull('deleted_at');
+
+                $user = Auth::user();
+                if ($user && ! $user->hasRole('Anonymous') && optional($user->company)->id) {
+                    $query->where('company_id', $user->company->id);
+                }
+
+                if ($questionPickType === 'manual') {
+                    $query->where(function ($q) {
+                        $q->whereNull('question_pick_type')
+                            ->orWhere('question_pick_type', 'manual');
+                    });
+                } else {
+                    $query->where('question_pick_type', $questionPickType);
+                }
+            });
+        }
+
+        if (! empty(trim($this->search))) {
+            $questionsQuery->search($this->search);
+        }
+
+        if ($this->filterStudyId) {
+            $questionsQuery->where('study_id', $this->filterStudyId);
+        }
+
+        if ($this->filterTopicId) {
+            $questionsQuery->where('topic_id', $this->filterTopicId);
+        }
+
+        return $questionsQuery;
     }
 
     public function mount($id)
@@ -220,6 +243,7 @@ class AdminMasterModuleQuestionIndex extends Component
         $this->duration = $this->get_module?->duration;
         $this->description = $this->get_module?->description;
         $this->random_question = $this->get_module?->random_question;
+        $this->total_questions = $this->get_module?->total_questions;
         $this->question_pick_type = $this->get_module?->question_pick_type ?? 'manual';
         $this->is_all_study = $this->get_module?->is_all_study;
         $this->is_all_questions = $this->get_module?->is_all_questions ?? false;
@@ -390,6 +414,174 @@ class AdminMasterModuleQuestionIndex extends Component
         }
     }
 
+    public function toggleSelectAllPage(array $pageQuestionIds = [])
+    {
+        if (empty($pageQuestionIds)) {
+            return;
+        }
+
+        $allInPageSelected = true;
+        foreach ($pageQuestionIds as $id) {
+            if (! isset($this->selected_all[$id])) {
+                $allInPageSelected = false;
+                break;
+            }
+        }
+
+        if ($allInPageSelected) {
+            foreach ($pageQuestionIds as $id) {
+                unset($this->selected_all[$id]);
+            }
+        } else {
+            foreach ($pageQuestionIds as $id) {
+                $this->selected_all[$id] = true;
+            }
+        }
+    }
+
+    public function toggleSelectTopic(array $questionIds = [])
+    {
+        if (empty($questionIds)) {
+            return;
+        }
+
+        $allInTopicSelected = true;
+        foreach ($questionIds as $id) {
+            if (! isset($this->selected_all[$id])) {
+                $allInTopicSelected = false;
+                break;
+            }
+        }
+
+        if ($allInTopicSelected) {
+            foreach ($questionIds as $id) {
+                unset($this->selected_all[$id]);
+            }
+        } else {
+            foreach ($questionIds as $id) {
+                $this->selected_all[$id] = true;
+            }
+        }
+    }
+
+    public function selectAllFiltered()
+    {
+        $allIds = $this->getQuestionsQuery()->pluck('id')->toArray();
+        foreach ($allIds as $id) {
+            $this->selected_all[$id] = true;
+        }
+    }
+
+    public function deselectAll()
+    {
+        $this->selected_all = [];
+    }
+
+    public function selectFirstCount($count = null, $replace = null)
+    {
+        $count = (int) ($count ?: $this->selectCountInput);
+        if ($count <= 0) {
+            return;
+        }
+
+        $shouldReplace = $replace !== null ? $replace : $this->replaceSelectionMode;
+        if ($shouldReplace) {
+            $this->selected_all = [];
+        }
+
+        $ids = $this->getQuestionsQuery()
+            ->orderBy('order', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->take($count)
+            ->pluck('id')
+            ->toArray();
+
+        foreach ($ids as $id) {
+            $this->selected_all[$id] = true;
+        }
+    }
+
+    public function selectRandomCount($count = null, $replace = null)
+    {
+        $count = (int) ($count ?: $this->selectCountInput);
+        if ($count <= 0) {
+            return;
+        }
+
+        $shouldReplace = $replace !== null ? $replace : $this->replaceSelectionMode;
+        if ($shouldReplace) {
+            $this->selected_all = [];
+        }
+
+        $ids = $this->getQuestionsQuery()
+            ->inRandomOrder()
+            ->take($count)
+            ->pluck('id')
+            ->toArray();
+
+        foreach ($ids as $id) {
+            $this->selected_all[$id] = true;
+        }
+    }
+
+    public function selectRange($from = null, $to = null, $replace = true)
+    {
+        $from = (int) ($from ?: $this->rangeFromInput);
+        $to = (int) ($to ?: $this->rangeToInput);
+
+        if ($from < 1) {
+            $from = 1;
+        }
+        if ($to < $from) {
+            $to = $from;
+        }
+
+        $limit = $to - $from + 1;
+        $offset = $from - 1;
+
+        if ($replace) {
+            $this->selected_all = [];
+        }
+
+        $ids = $this->getQuestionsQuery()
+            ->orderBy('order', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->skip($offset)
+            ->take($limit)
+            ->pluck('id')
+            ->toArray();
+
+        foreach ($ids as $id) {
+            $this->selected_all[$id] = true;
+        }
+    }
+
+    public function toggleSelectAllFiltered()
+    {
+        $allIds = $this->getQuestionsQuery()->pluck('id')->toArray();
+        if (empty($allIds)) {
+            return;
+        }
+
+        $allSelected = true;
+        foreach ($allIds as $id) {
+            if (! isset($this->selected_all[$id])) {
+                $allSelected = false;
+                break;
+            }
+        }
+
+        if ($allSelected) {
+            foreach ($allIds as $id) {
+                unset($this->selected_all[$id]);
+            }
+        } else {
+            foreach ($allIds as $id) {
+                $this->selected_all[$id] = true;
+            }
+        }
+    }
+
     public function submitModule()
     {
         $this->validate(
@@ -504,6 +696,7 @@ class AdminMasterModuleQuestionIndex extends Component
                 'name' => $this->name,
                 'duration' => $this->duration,
                 'random_question' => $this->random_question,
+                'total_questions' => $this->total_questions,
                 'description' => $this->description,
                 'studys' => $this->studys,
                 'is_all_study' => $this->is_all_study,
@@ -708,6 +901,111 @@ class AdminMasterModuleQuestionIndex extends Component
         );
     }
 
+    public function toggleSelectModuleQuestion($id)
+    {
+        if (isset($this->selected_module_questions[$id])) {
+            unset($this->selected_module_questions[$id]);
+        } else {
+            $this->selected_module_questions[$id] = true;
+        }
+    }
+
+    public function toggleSelectAllModuleQuestions(array $pageIds = [])
+    {
+        if (empty($pageIds)) {
+            return;
+        }
+
+        $allSelected = true;
+        foreach ($pageIds as $id) {
+            if (! isset($this->selected_module_questions[$id])) {
+                $allSelected = false;
+                break;
+            }
+        }
+
+        if ($allSelected) {
+            foreach ($pageIds as $id) {
+                unset($this->selected_module_questions[$id]);
+            }
+        } else {
+            foreach ($pageIds as $id) {
+                $this->selected_module_questions[$id] = true;
+            }
+        }
+    }
+
+    public function selectAllModuleQuestionsFiltered()
+    {
+        $questionPickType = $this->question_pick_type ?? 'manual';
+        $moduleQuestionsQuery = $this->get_module->moduleQuestions();
+
+        if ($questionPickType === 'manual') {
+            $moduleQuestionsQuery->where(function ($q) {
+                $q->whereNull('question_pick_type')
+                    ->orWhere('question_pick_type', 'manual');
+            });
+        } else {
+            $moduleQuestionsQuery->where('question_pick_type', $questionPickType);
+        }
+
+        if (! empty(trim($this->search))) {
+            $moduleQuestionsQuery->whereHas('question', function ($q) {
+                $q->search($this->search);
+            });
+        }
+
+        $allIds = $moduleQuestionsQuery->pluck('id')->toArray();
+        foreach ($allIds as $id) {
+            $this->selected_module_questions[$id] = true;
+        }
+    }
+
+    public function deselectAllModuleQuestions()
+    {
+        $this->selected_module_questions = [];
+    }
+
+    public function confirmDeleteSelected()
+    {
+        $count = count($this->selected_module_questions);
+        if ($count === 0) {
+            return AlertHelper::warning('Peringatan', 'Tidak ada soal yang dipilih untuk dihapus.');
+        }
+
+        return AlertHelper::confirmDelete('deleteSelected', "Anda yakin ingin menghapus {$count} soal terpilih dari modul ini?");
+    }
+
+    public function deleteSelected()
+    {
+        try {
+            DB::beginTransaction();
+
+            $idsToDelete = array_keys($this->selected_module_questions);
+            if (! empty($idsToDelete) && $this->get_module) {
+                $this->get_module->moduleQuestions()
+                    ->whereIn('id', $idsToDelete)
+                    ->delete();
+            }
+
+            $this->selected_module_questions = [];
+
+            DB::commit();
+        } catch (Exception|Throwable $th) {
+            DB::rollBack();
+            $error = [
+                'message' => $th->getMessage(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
+            ];
+            Log::error('Ada Kesalahaan saat AdminMasterModuleQuestionIndex => deleteSelected', $error);
+
+            return AlertHelper::error('Gagal', 'Ada kesalahan saat menghapus soal terpilih');
+        }
+
+        return AlertHelper::success('Berhasil', 'Soal terpilih berhasil dihapus dari modul.');
+    }
+
     public function confirmDelete($id)
     {
         return AlertHelper::confirmDelete('delete', 'Anda yakin ingin menghapus data ini?', $id);
@@ -716,7 +1014,9 @@ class AdminMasterModuleQuestionIndex extends Component
     public function delete($id)
     {
         try {
-            app(ModuleQuestionService::class)->delete($id[0]);
+            $deleteId = is_array($id) ? $id[0] : $id;
+            app(ModuleQuestionService::class)->delete($deleteId);
+            unset($this->selected_module_questions[$deleteId]);
         } catch (Exception|Throwable $th) {
             $error = [
                 'message' => $th->getMessage(),

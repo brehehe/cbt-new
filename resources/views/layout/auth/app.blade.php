@@ -9,6 +9,7 @@
     <!-- Fonts & Icons -->
     <link href="{{ asset('fonts/inter.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('vendor/tabler-icons/tabler-icons-v3.min.css') }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('vendor/font-awesome/css/all.min.css') }}">
 
 

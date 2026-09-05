@@ -105,7 +105,7 @@ class Timetable extends Model
     {
         if ($timetable->module_id) {
             DB::transaction(function () use ($timetable) {
-                $module = Module::select('id', 'studys', 'user_id', 'question_type_id', 'name', 'description', 'duration', 'random_question', 'question_pick_type')
+                $module = Module::select('id', 'studys', 'user_id', 'question_type_id', 'name', 'description', 'duration', 'random_question', 'question_pick_type', 'total_questions')
                     ->find($timetable->module_id);
                 if (! $module) {
                     return;
@@ -124,6 +124,7 @@ class Timetable extends Model
                         'description' => $module->description,
                         'duration' => $module->duration,
                         'random_question' => $module->random_question,
+                        'total_questions' => $timetable->total_questions ?? $module->total_questions,
                     ],
                 );
 
@@ -284,7 +285,7 @@ class Timetable extends Model
         static::addGlobalScope('user_scope', function (Builder $builder) {
             $user = Auth::user();
 
-            if (! $user || ! $user->hasRole('Anonymous')) {
+            if ($user && ! $user->hasRole('Anonymous')) {
                 $builder->where(function ($query) use ($user) {
                     $query->where('company_id', optional($user?->company)?->id)
                         ->orWhere('is_simulation', 'true')

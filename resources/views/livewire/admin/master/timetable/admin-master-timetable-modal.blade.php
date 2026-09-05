@@ -84,6 +84,23 @@
                                 <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
                             @enderror
                         </div>
+
+                        <div>
+                            <label for="total_questions" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                                Jumlah Soal Ujian <span class="text-xs text-gray-400 font-normal lowercase">(opsional - contoh: 100)</span>
+                            </label>
+                            <div class="relative">
+                                <input type="number" id="total_questions" wire:model.defer="total_questions" placeholder="Contoh: 100 (Kosongkan = Gunakan default modul)"
+                                    class="w-full text-sm rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 transition pr-14" min="1">
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400 text-xs font-medium">
+                                    Soal
+                                </div>
+                            </div>
+                            <p class="text-[11px] text-gray-400 mt-0.5">Membatasi jumlah soal yang dikerjakan peserta saat ujian (misal: 100 dari 500 soal pool).</p>
+                            @error('total_questions')
+                                <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
 
                     <!-- Right Col -->

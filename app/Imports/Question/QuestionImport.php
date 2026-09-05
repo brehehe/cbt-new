@@ -22,51 +22,27 @@ class QuestionImport implements ToCollection
     public function collection(Collection $collections)
     {
         try {
-            // head column
-            if ($this->import_type == 'pg') {
-                $header = [
-                    'Prodi',
-                    'Topik Soal',
-                    'Kategori Materi',
-                    'Materi Soal',
-                    'Tipe Soal',
-                    'Kategori Soal',
-                    'Soal',
-                    'Deskripsi Soal',
-                    'URL Gambar Soal',
-                    'A',
-                    'URL Gambar A',
-                    'B',
-                    'URL Gambar B',
-                    'C',
-                    'URL Gambar C',
-                    'D',
-                    'URL Gambar D',
-                    'E',
-                    'URL Gambar E',
-                    'Jawaban',
-                ];
-            } else {
-                // Format Essay
-                $header = [
-                    'Prodi',
-                    'Topik Soal',
-                    'Kategori Materi',
-                    'Materi Soal',
-                    'Tipe Soal',
-                    'Kategori Soal',
-                    'Soal',
-                    'Deskripsi Soal',
-                    'URL Gambar Soal',
-                    'Jawaban Referensi',
-                    'URL Gambar Jawaban',
-                ];
+            if ($collections->isEmpty()) {
+                throw new Exception('File Excel kosong atau tidak memiliki data.');
             }
 
-            for ($i = 0; $i < count($header); $i++) {
-                if (trim($collections[0][$i]) != $header[$i]) {
-                    throw new Exception('Header '.$header[$i].' Tidak di temukan. Harap periksa kembali template anda.');
+            // Find header row dynamically (within the first 50 rows)
+            $foundHeaderRow = false;
+            foreach ($collections as $rowIndex => $row) {
+                if ($rowIndex > 50) {
+                    break;
                 }
+                $rowArray = $row instanceof Collection ? $row->toArray() : (array) $row;
+                foreach ($rowArray as $cell) {
+                    if (is_string($cell) && strtolower(trim($cell)) === 'prodi') {
+                        $foundHeaderRow = true;
+                        break 2;
+                    }
+                }
+            }
+
+            if (! $foundHeaderRow) {
+                throw new Exception('Header Prodi Tidak di temukan. Harap periksa kembali template anda.');
             }
 
             $user = Auth::user();

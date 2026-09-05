@@ -29,7 +29,7 @@ class Answer extends Model
         static::addGlobalScope('user_scope', function (Builder $builder) {
             $user = Auth::user();
 
-            if (! $user || ! $user->hasRole('Anonymous')) {
+            if ($user && ! $user->hasRole('Anonymous')) {
                 $builder->where('company_id', optional($user?->company)?->id)->orderBy('order', 'asc');
             }
 

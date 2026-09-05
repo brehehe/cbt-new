@@ -300,6 +300,12 @@ class AdminExamTimetableIndex extends Component
                     $modulesQuestions = $modulesQuestions->sortBy('order')->values();
                 }
 
+                // Apply question pool limit (e.g. 100 questions out of 500 pool)
+                $limitTotalQuestions = $timeTable->total_questions ?? $transactionModule->total_questions ?? $module?->total_questions ?? null;
+                if ($limitTotalQuestions && (int) $limitTotalQuestions > 0 && $modulesQuestions->count() > (int) $limitTotalQuestions) {
+                    $modulesQuestions = $modulesQuestions->take((int) $limitTotalQuestions)->values();
+                }
+
                 $selectedTimetableQuestionIds = $modulesQuestions->pluck('id')->filter()->values();
                 $selectedQuestionIds = $modulesQuestions->pluck('question_id')->filter()->values();
 

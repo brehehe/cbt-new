@@ -4,8 +4,8 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-2xl font-bold text-[color:var(--primary)]">
-                    Manajemen Data Mahasiswa</h1>
-                <p class="text-gray-600">Kelola data mahasiswa dalam sistem CBT</p>
+                    Manajemen Data {{ student_label() }}</h1>
+                <p class="text-gray-600">Kelola data {{ strtolower(student_label()) }} dalam sistem CBT</p>
             </div>
             <div class="flex gap-2">
                 <!-- Template Dropdown -->
@@ -18,13 +18,13 @@
                     </button>
                     <div x-show="openTemplate" x-transition
                         class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
-                        @if(in_array(auth()->user()->company->is_pmb, ['non_pmb', 'all']))
+                        @if(in_array(auth()->user()->company->is_pmb, ['non_pmb', 'all']) || is_shorinji())
                             <button type="button" wire:click="downloadTemplate()"
                                 class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                Template Mahasiswa
+                                Template {{ student_label() }}
                             </button>
                         @endif
-                        @if(in_array(auth()->user()->company->is_pmb, ['pmb', 'all']))
+                        @if(in_array(auth()->user()->company->is_pmb, ['pmb', 'all']) && !is_shorinji())
                             <button type="button" wire:click="downloadTemplateGeneral()"
                                 class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                 Template {{ auth()->user()->company->is_pmb === 'pmb' ? 'PMB' : 'PMB / General' }}
@@ -42,16 +42,16 @@
                         <i class="fa-solid fa-chevron-down ml-2"></i>
                     </button>
                     <div x-show="openImport" x-transition
-                        class="absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
-                        @if(in_array(auth()->user()->company->is_pmb, ['non_pmb', 'all']))
+                        class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+                        @if(in_array(auth()->user()->company->is_pmb, ['non_pmb', 'all']) || is_shorinji())
                             <label
                                 class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer block">
-                                Import Mahasiswa
+                                Import {{ student_label() }}
                                 <input type="file" wire:model="importFileMahasiswa" accept=".xlsx,.xls"
                                     class="hidden" />
                             </label>
                         @endif
-                        @if(in_array(auth()->user()->company->is_pmb, ['pmb', 'all']))
+                        @if(in_array(auth()->user()->company->is_pmb, ['pmb', 'all']) && !is_shorinji())
                             <label
                                 class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer block">
                                 Import {{ auth()->user()->company->is_pmb === 'pmb' ? 'PMB' : 'PMB / General' }}
@@ -76,7 +76,7 @@
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    Tambah Mahasiswa
+                    Tambah {{ student_label() }}
                 </button>
             </div>
         </div>
@@ -215,10 +215,10 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
                 <select wire:model.live="isStudentFilter" class="form-control mt-1">
                     <option value="">Semua Kategori</option>
-                    @if(in_array(auth()->user()->company->is_pmb, ['non_pmb', 'all']))
-                        <option value="mahasiswa">Mahasiswa</option>
+                    @if(in_array(auth()->user()->company->is_pmb, ['non_pmb', 'all']) || is_shorinji())
+                        <option value="mahasiswa">{{ student_label() }}</option>
                     @endif
-                    @if(in_array(auth()->user()->company->is_pmb, ['pmb', 'all']))
+                    @if(in_array(auth()->user()->company->is_pmb, ['pmb', 'all']) && !is_shorinji())
                         <option value="general">{{ auth()->user()->company->is_pmb === 'pmb' ? 'PMB' : 'PMB / General' }}</option>
                     @endif
                 </select>
@@ -398,7 +398,7 @@
                     @empty
                         <tr>
                             <td colspan="7" class="px-6 py-4 text-center text-gray-500">
-                                Tidak ada data mahasiswa ditemukan.
+                                Tidak ada data {{ strtolower(student_label()) }} ditemukan.
                             </td>
                         </tr>
                     @endforelse

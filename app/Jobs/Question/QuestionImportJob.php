@@ -3,6 +3,7 @@
 namespace App\Jobs\Question;
 
 use App\Models\Category\CategoryQuestion;
+use App\Models\Master\Question\Answer;
 use App\Models\Master\Question\Material;
 use App\Models\Master\Question\MaterialCategory;
 use App\Models\Master\Question\Question;
@@ -35,7 +36,6 @@ class QuestionImportJob implements ShouldQueue
 
     public function __construct($study_id, $user, $collections, $import_type = 'pg')
     {
-        //
         $this->study_id = $study_id;
         $this->user = $user;
         $this->collections = $collections;
@@ -47,17 +47,13 @@ class QuestionImportJob implements ShouldQueue
      */
     public function handle(): void
     {
-        //
         try {
             $warnings = [];
+            $headerMap = [];
+            $orderIndex = 1;
 
             foreach ($this->collections as $key => $row) {
-                if ($key == 0) {
-                    continue;
-                } // Skip header row
-
-                // Check if the original row is completely empty
-                $isEmptyRow = true;
+                // Convert row to array
                 if ($row instanceof Collection) {
                     $rowArray = $row->toArray();
                 } elseif ($row instanceof \Traversable || $row instanceof \ArrayAccess) {
@@ -65,60 +61,78 @@ class QuestionImportJob implements ShouldQueue
                 } else {
                     $rowArray = (array) $row;
                 }
-                foreach ($rowArray as $colVal) {
-                    if ($colVal !== null && trim((string)$colVal) !== '') {
-                        $isEmptyRow = false;
-                        break;
-                    }
-                }
-                if ($isEmptyRow) {
-                    continue; // Silently skip completely empty rows
-                }
 
-                $value = $this->normalizeRow($row);
-                if ($value === null) {
-                    Log::warning('Data soal tidak bisa diproses, format baris tidak valid', [
-                        'collection' => $row,
-                    ]);
-                    $warnings[] = [
-                        'row' => $key + 1,
-                        'reason' => 'Format baris tidak valid.',
-                    ];
-
+                // Check if the original row is completely empty
+                $nonEmptyCells = array_filter($rowArray, fn ($colVal) => $colVal !== null && trim((string) $colVal) !== '');
+                if (empty($nonEmptyCells)) {
                     continue;
                 }
 
-                if ($this->import_type == 'pg') {
-                    $studyName = $this->valueAt($value, 0);
-                    $topicName = $this->valueAt($value, 1);
-                    $typeName = $this->valueAt($value, 4);
-                    $categoryName = $this->valueAt($value, 5);
-                    $questionText = $this->valueAt($value, 6);
-                    $description = $this->valueAt($value, 7);
-                    $questionImageUrl = $this->valueAt($value, 8);
-                    $correctKey = $this->valueAt($value, 19);
-                } else {
-                    // Format Essay
-                    $studyName = $this->valueAt($value, 0);
-                    $topicName = $this->valueAt($value, 1);
-                    $typeName = $this->valueAt($value, 4);
-                    $categoryName = $this->valueAt($value, 5);
-                    $questionText = $this->valueAt($value, 6);
-                    $description = $this->valueAt($value, 7);
-                    $questionImageUrl = $this->valueAt($value, 8);
-                    $referenceAnswer = $this->valueAt($value, 9);
-                    $referenceAnswerImageUrl = $this->valueAt($value, 10);
+                // Detect if this is a Header Row (e.g. contains 'prodi')
+                $firstCell = strtolower(trim((string) ($rowArray[0] ?? '')));
+                if ($firstCell === 'prodi' || $this->rowContainsProdiHeader($rowArray)) {
+                    $headerMap = $this->buildHeaderMap($rowArray);
+                    continue;
                 }
 
-                if (! $studyName || ! $topicName || ! $typeName || ! $questionText) {
-                    Log::warning('Data soal tidak bisa masuk, ada field yang kosong', [
-                        'collection' => $value,
-                    ]);
+                // Detect if this is a Section Title Row (e.g. 'TAHAP 1 (Soal 1-100)')
+                if (count($nonEmptyCells) <= 1) {
+                    continue;
+                }
+
+                // If we haven't found any header yet, skip
+                if (empty($headerMap)) {
+                    continue;
+                }
+
+                // Detect if this row has an extra column shifted before Tipe Soal (e.g. 14 columns where index 5 is 'Pilihan Ganda')
+                $cell5 = strtolower(trim((string) ($rowArray[5] ?? '')));
+                $isShiftedRow = ($cell5 === 'pilihan ganda' || $cell5 === 'essay' || $cell5 === 'single' || $cell5 === 'multiple');
+
+                if ($isShiftedRow && count($rowArray) >= 13) {
+                    $studyName = trim((string) ($rowArray[0] ?? ''));
+                    $topicName = trim((string) ($rowArray[1] ?? ''));
+                    $materialCategoryName = trim((string) ($rowArray[2] ?? ''));
+                    $extraSubMateri = trim((string) ($rowArray[4] ?? ''));
+                    $materialName = trim((string) ($rowArray[3] ?? '')) . ($extraSubMateri !== '' ? ' - ' . $extraSubMateri : '');
+                    $typeName = trim((string) ($rowArray[5] ?? ''));
+                    $categoryName = trim((string) ($rowArray[6] ?? ''));
+                    $questionText = trim((string) ($rowArray[7] ?? ''));
+                    $description = null;
+                    $questionImageUrl = null;
+                    $correctKey = trim((string) ($rowArray[13] ?? ''));
+                    $referenceAnswer = null;
+                    $referenceAnswerImageUrl = null;
+                } else {
+                    $studyName = $this->getMappedValue($rowArray, $headerMap, 'study');
+                    $topicName = $this->getMappedValue($rowArray, $headerMap, 'topic');
+                    $typeName = $this->getMappedValue($rowArray, $headerMap, 'type');
+                    $categoryName = $this->getMappedValue($rowArray, $headerMap, 'category');
+                    $materialCategoryName = $this->getMappedValue($rowArray, $headerMap, 'material_category');
+                    $materialName = $this->getMappedValue($rowArray, $headerMap, 'material');
+                    $questionText = $this->getMappedValue($rowArray, $headerMap, 'question');
+                    $description = $this->getMappedValue($rowArray, $headerMap, 'description');
+                    $questionImageUrl = $this->getMappedValue($rowArray, $headerMap, 'question_image');
+                    $correctKey = $this->getMappedValue($rowArray, $headerMap, 'answer_key');
+                    $referenceAnswer = $this->getMappedValue($rowArray, $headerMap, 'reference_answer');
+                    $referenceAnswerImageUrl = $this->getMappedValue($rowArray, $headerMap, 'reference_answer_image');
+                }
+
+                if (! $questionText) {
+                    continue;
+                }
+
+                // Fallback for study name if not present in row
+                if (! $studyName && $this->study_id) {
+                    $selectedStudy = Study::withoutGlobalScopes()->find($this->study_id);
+                    $studyName = $selectedStudy?->name;
+                }
+
+                if (! $studyName || ! $topicName || ! $questionText) {
                     $missingFields = [];
-                    if (!$studyName) $missingFields[] = 'Prodi';
-                    if (!$topicName) $missingFields[] = 'Topik Soal';
-                    if (!$typeName) $missingFields[] = 'Tipe Soal';
-                    if (!$questionText) $missingFields[] = 'Soal';
+                    if (! $studyName) $missingFields[] = 'Prodi';
+                    if (! $topicName) $missingFields[] = 'Topik Soal';
+                    if (! $questionText) $missingFields[] = 'Soal';
 
                     $warnings[] = [
                         'row' => $key + 1,
@@ -128,55 +142,71 @@ class QuestionImportJob implements ShouldQueue
                     continue;
                 }
 
-                $question_type = QuestionType::withoutGlobalScopes()
-                    ->where('company_id', $this->user?->company?->id)
-                    ->where('name', 'ilike', $typeName)
-                    ->first();
+                // Find or create QuestionType
+                $question_type = null;
+                if ($typeName) {
+                    $question_type = QuestionType::withoutGlobalScopes()
+                        ->where('company_id', $this->user?->company?->id)
+                        ->where('name', 'ilike', $typeName)
+                        ->first();
 
-                if (! $question_type) {
-                    Log::warning('Data soal tidak bisa masuk, karena Tipe Soal tidak ditemukan', [
-                        'collection' => $value,
-                    ]);
-                    $warnings[] = [
-                        'row' => $key + 1,
-                        'reason' => 'Tipe Soal "' . $typeName . '" tidak ditemukan.',
-                    ];
+                    if (! $question_type) {
+                        $question_type = QuestionType::create([
+                            'company_id' => $this->user?->company?->id,
+                            'name' => $typeName,
+                        ]);
+                    }
+                } else {
+                    $question_type = QuestionType::withoutGlobalScopes()
+                        ->where('company_id', $this->user?->company?->id)
+                        ->first();
 
-                    continue;
+                    if (! $question_type) {
+                        $question_type = QuestionType::create([
+                            'company_id' => $this->user?->company?->id,
+                            'name' => 'Ujian',
+                        ]);
+                    }
                 }
 
-                // Removed choice required check to allow empty/single-quoted answers for image-only choices.
+                // Find or create Study
+                $study = null;
+                if ($studyName) {
+                    $study = Study::withoutGlobalScopes()
+                        ->where('company_id', $this->user?->company?->id)
+                        ->where('name', 'ilike', $studyName)
+                        ->first();
 
-                $study = Study::withoutGlobalScopes()
-                    ->where('company_id', $this->user?->company?->id)
-                    ->where('name', 'ilike', $studyName)
-                    ->first();
-
-                if (! $study && $studyName) {
-                    $study = Study::create([
-                        'company_id' => $this->user?->company?->id,
-                        'name' => $studyName,
-                    ]);
+                    if (! $study) {
+                        $study = Study::create([
+                            'company_id' => $this->user?->company?->id,
+                            'name' => $studyName,
+                        ]);
+                    }
                 }
 
-                $topic = $study?->topics()
-                    ->withoutGlobalScopes()
-                    ->where('company_id', $this->user?->company?->id)
-                    ->where('name', 'ilike', $topicName)
-                    ->first();
+                // Find or create Topic
+                $topic = null;
+                if ($study && $topicName) {
+                    $topic = $study->topics()
+                        ->withoutGlobalScopes()
+                        ->where('company_id', $this->user?->company?->id)
+                        ->where('name', 'ilike', $topicName)
+                        ->first();
 
-                if (! $topic && $topicName) {
-                    $topic = Topic::create([
-                        'company_id' => $this->user?->company?->id,
-                        'study_id' => $study?->id,
-                        'name' => $topicName,
-                    ]);
+                    if (! $topic) {
+                        $topic = Topic::create([
+                            'company_id' => $this->user?->company?->id,
+                            'study_id' => $study->id,
+                            'name' => $topicName,
+                        ]);
+                    }
                 }
 
-                $materialCategoryName = $this->valueAt($value, 2);
+                // Find or create MaterialCategory
                 $material_category = null;
-                if ($materialCategoryName) {
-                    $material_category = $topic?->materialCategories()
+                if ($topic && $materialCategoryName) {
+                    $material_category = $topic->materialCategories()
                         ->withoutGlobalScopes()
                         ->where('company_id', $this->user?->company?->id)
                         ->where('name', 'ilike', $materialCategoryName)
@@ -185,15 +215,15 @@ class QuestionImportJob implements ShouldQueue
                     if (! $material_category) {
                         $material_category = MaterialCategory::create([
                             'company_id' => $this->user?->company?->id,
-                            'topic_id' => $topic?->id,
+                            'topic_id' => $topic->id,
                             'name' => $materialCategoryName,
                         ]);
                     }
                 }
 
-                $materialName = $this->valueAt($value, 3);
+                // Find or create Material
                 $material = null;
-                if ($materialName) {
+                if ($topic && $materialName) {
                     if ($material_category) {
                         $material = $material_category->materials()
                             ->withoutGlobalScopes()
@@ -203,7 +233,7 @@ class QuestionImportJob implements ShouldQueue
                     } else {
                         $material = Material::withoutGlobalScopes()
                             ->where('company_id', $this->user?->company?->id)
-                            ->where('topic_id', $topic?->id)
+                            ->where('topic_id', $topic->id)
                             ->whereNull('material_category_id')
                             ->where('name', 'ilike', $materialName)
                             ->first();
@@ -212,7 +242,7 @@ class QuestionImportJob implements ShouldQueue
                     if (! $material) {
                         $material = Material::create([
                             'company_id' => $this->user?->company?->id,
-                            'topic_id' => $topic?->id,
+                            'topic_id' => $topic->id,
                             'material_category_id' => $material_category?->id,
                             'level' => 1,
                             'name' => $materialName,
@@ -220,12 +250,14 @@ class QuestionImportJob implements ShouldQueue
                     }
                 }
 
+                // Find or create CategoryQuestion
                 $categoryQuestion = null;
                 if ($categoryName) {
                     $categoryQuestion = CategoryQuestion::withoutGlobalScopes()
                         ->where('company_id', $this->user?->company?->id)
                         ->where('name', 'ilike', $categoryName)
                         ->first();
+
                     if (! $categoryQuestion) {
                         $categoryQuestion = CategoryQuestion::create([
                             'company_id' => $this->user?->company?->id,
@@ -234,7 +266,17 @@ class QuestionImportJob implements ShouldQueue
                     }
                 }
 
+                // Prevent duplicates: search for existing question by company, study, topic, material, and question text
+                $existingQuestion = Question::withoutGlobalScopes()
+                    ->where('company_id', $this->user?->company?->id)
+                    ->where('study_id', $study?->id)
+                    ->where('topic_id', $topic?->id)
+                    ->where('material_id', $material?->id)
+                    ->where('question', $questionText)
+                    ->first();
+
                 $request_question = [
+                    'id' => $existingQuestion?->id,
                     'user_id' => $this->user?->id,
                     'company_id' => $this->user?->company?->id,
                     'study_id' => $study?->id,
@@ -249,37 +291,36 @@ class QuestionImportJob implements ShouldQueue
                     'description' => $description,
                     'weight_correct' => null,
                     'weight_incorrect' => null,
+                    'order' => $orderIndex++,
                     'type' => ($this->import_type == 'essay') ? Question::TYPE_ESSAY : Question::TYPE_SINGLE,
                 ];
 
                 $question = app(QuestionService::class)->updateOrCreate($request_question);
                 if (! $question) {
-                    throw new Exception('Ada kesalahaan saat QuestionImportJob => QuestionService => updateOrCreate', 500);
+                    throw new Exception('Ada kesalahan saat QuestionImportJob => QuestionService => updateOrCreate', 500);
                 }
 
                 if ($this->import_type == 'pg') {
-                    $optionsMap = [
-                        'A' => ['text' => 9, 'image' => 10],
-                        'B' => ['text' => 11, 'image' => 12],
-                        'C' => ['text' => 13, 'image' => 14],
-                        'D' => ['text' => 15, 'image' => 16],
-                        'E' => ['text' => 17, 'image' => 18],
-                    ];
+                    $letters = ['A', 'B', 'C', 'D', 'E'];
+                    foreach ($letters as $lIdx => $letter) {
+                        if ($isShiftedRow) {
+                            $answerText = trim((string) ($rowArray[8 + $lIdx] ?? ''));
+                            $answerImageUrl = null;
+                        } else {
+                            $keyText = 'opt_' . strtolower($letter);
+                            $keyImg = 'opt_img_' . strtolower($letter);
 
-                    foreach ($optionsMap as $letter => $indices) {
-                        $answerText = $this->valueAt($value, $indices['text']);
-                        $answerImageUrl = $this->valueAt($value, $indices['image']);
-                        
-                        // Option E is optional; only create it if either text or image is provided.
-                        // Option A, B, C, D are required; we always create them even if empty.
+                            $answerText = $this->getMappedValue($rowArray, $headerMap, $keyText);
+                            $answerImageUrl = $this->getMappedValue($rowArray, $headerMap, $keyImg);
+                        }
+
                         $isE = ($letter === 'E');
-                        if ($isE && ! $answerText && ! $answerImageUrl) {
+                        if ($isE && ($answerText === null || $answerText === '') && $answerImageUrl === null) {
                             continue;
                         }
 
-                        // If text is empty/null and there is no image, we default text to "'" as requested by the user.
                         $contextVal = $answerText;
-                        if ($contextVal === null && ! $answerImageUrl) {
+                        if (($contextVal === null || $contextVal === '') && ! $answerImageUrl) {
                             $contextVal = "'";
                         }
 
@@ -294,7 +335,7 @@ class QuestionImportJob implements ShouldQueue
 
                         $answer = app(AnswerService::class)->updateOrCreate($question, $request_answer);
                         if (! $answer) {
-                            throw new Exception('Ada kesalahaan saat QuestionImportJob => AnswerService => updateOrCreate', 500);
+                            throw new Exception('Ada kesalahan saat QuestionImportJob => AnswerService => updateOrCreate', 500);
                         }
                     }
                 } else {
@@ -312,8 +353,8 @@ class QuestionImportJob implements ShouldQueue
                         app(AnswerService::class)->updateOrCreate($question, $request_answer);
                     }
                 }
-
             }
+
             if ($this->user) {
                 if (! empty($warnings)) {
                     \Illuminate\Support\Facades\Cache::put('import_warnings_' . $this->user->id, $warnings, 3600);
@@ -326,7 +367,7 @@ class QuestionImportJob implements ShouldQueue
                 'file' => $th->getFile(),
                 'line' => $th->getLine(),
             ];
-            Log::error('Ada Kesalahaan saat QuestionImportJob', $error);
+            Log::error('Ada Kesalahan saat QuestionImportJob', $error);
 
             if ($this->user) {
                 \Illuminate\Support\Facades\Cache::put('import_status_' . $this->user->id, 'failed:' . $th->getMessage(), 3600);
@@ -336,54 +377,95 @@ class QuestionImportJob implements ShouldQueue
         }
     }
 
-    public function letterToValue(?string $ch): ?int
+    private function rowContainsProdiHeader(array $row): bool
     {
-        static $map = [
-            'A' => 9,
-            'B' => 11,
-            'C' => 13,
-            'D' => 15,
-            'E' => 17,
-        ];
-
-        return $map[strtoupper(trim((string) $ch))] ?? null;
-    }
-
-    private function valueAt($row, int $index): ?string
-    {
-        if ($row instanceof Collection) {
-            $row = $row->toArray();
-        } elseif ($row instanceof \Traversable || $row instanceof \ArrayAccess) {
-            $row = collect($row)->toArray();
+        foreach ($row as $cell) {
+            if (is_string($cell) && strtolower(trim($cell)) === 'prodi') {
+                return true;
+            }
         }
 
-        if (! is_array($row) || ! array_key_exists($index, $row)) {
+        return false;
+    }
+
+    private function buildHeaderMap(array $headerRow): array
+    {
+        $map = [];
+        foreach ($headerRow as $index => $colName) {
+            if ($colName === null) {
+                continue;
+            }
+            $name = strtolower(trim((string) $colName));
+            if ($name === '') {
+                continue;
+            }
+
+            if ($name === 'prodi') {
+                $map['study'] = $index;
+            } elseif (in_array($name, ['topik soal', 'topik'])) {
+                $map['topic'] = $index;
+            } elseif (in_array($name, ['kategori materi', 'kategori materi soal'])) {
+                $map['material_category'] = $index;
+            } elseif (in_array($name, ['materi soal', 'materi'])) {
+                $map['material'] = $index;
+            } elseif (in_array($name, ['tipe soal', 'tipe ujian', 'tipe'])) {
+                $map['type'] = $index;
+            } elseif (in_array($name, ['kategori soal', 'kategori'])) {
+                $map['category'] = $index;
+            } elseif (in_array($name, ['soal', 'pertanyaan'])) {
+                $map['question'] = $index;
+            } elseif (in_array($name, ['deskripsi soal', 'deskripsi', 'petunjuk'])) {
+                $map['description'] = $index;
+            } elseif (in_array($name, ['url gambar soal', 'gambar soal', 'gambar'])) {
+                $map['question_image'] = $index;
+            } elseif ($name === 'a') {
+                $map['opt_a'] = $index;
+            } elseif (in_array($name, ['url gambar a', 'gambar a'])) {
+                $map['opt_img_a'] = $index;
+            } elseif ($name === 'b') {
+                $map['opt_b'] = $index;
+            } elseif (in_array($name, ['url gambar b', 'gambar b'])) {
+                $map['opt_img_b'] = $index;
+            } elseif ($name === 'c') {
+                $map['opt_c'] = $index;
+            } elseif (in_array($name, ['url gambar c', 'gambar c'])) {
+                $map['opt_img_c'] = $index;
+            } elseif ($name === 'd') {
+                $map['opt_d'] = $index;
+            } elseif (in_array($name, ['url gambar d', 'gambar d'])) {
+                $map['opt_img_d'] = $index;
+            } elseif ($name === 'e') {
+                $map['opt_e'] = $index;
+            } elseif (in_array($name, ['url gambar e', 'gambar e'])) {
+                $map['opt_img_e'] = $index;
+            } elseif (in_array($name, ['jawaban', 'kunci jawaban', 'jawaban benar', 'kunci'])) {
+                $map['answer_key'] = $index;
+            } elseif (in_array($name, ['jawaban referensi', 'referensi jawaban', 'kunci essay'])) {
+                $map['reference_answer'] = $index;
+            } elseif (in_array($name, ['url gambar jawaban', 'gambar jawaban'])) {
+                $map['reference_answer_image'] = $index;
+            }
+        }
+
+        return $map;
+    }
+
+    private function getMappedValue(array $row, array $headerMap, string $key): ?string
+    {
+        if (! isset($headerMap[$key])) {
             return null;
         }
 
-        $value = $row[$index];
-        if (is_string($value)) {
-            $value = trim($value);
-        }
-
-        return $value === '' ? null : $value;
-    }
-
-    private function normalizeRow($row): ?array
-    {
-        if ($row instanceof Collection) {
-            $row = $row->toArray();
-        } elseif ($row instanceof \Traversable || $row instanceof \ArrayAccess) {
-            $row = collect($row)->toArray();
-        } elseif (! is_array($row)) {
+        $index = $headerMap[$key];
+        if (! array_key_exists($index, $row)) {
             return null;
         }
 
-        // Pastikan minimal 20 kolom
-        if (count($row) < 20) {
-            $row = array_pad($row, 20, null);
+        $val = $row[$index];
+        if (is_string($val)) {
+            $val = trim($val);
         }
 
-        return $row;
+        return $val === '' || $val === null ? null : (string) $val;
     }
 }

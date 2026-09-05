@@ -40,6 +40,8 @@ class AdminMasterModuleIndex extends Component
 
     public $random_question;
 
+    public $total_questions;
+
     public $question_pick_type = 'manual';
 
     public $is_all_questions = false;
@@ -336,7 +338,7 @@ class AdminMasterModuleIndex extends Component
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['data_id', 'question_type_id', 'name', 'duration', 'description', 'random_question', 'studys', 'is_all_study', 'is_all_questions', 'category_question_settings', 'topic_question_settings', 'material_category_question_settings', 'question_pick_type', 'searchCategory', 'searchTopic', 'searchMaterialCategory', 'filterMaterialCategoryTopicId']);
+        $this->reset(['data_id', 'question_type_id', 'name', 'duration', 'description', 'random_question', 'total_questions', 'studys', 'is_all_study', 'is_all_questions', 'category_question_settings', 'topic_question_settings', 'material_category_question_settings', 'question_pick_type', 'searchCategory', 'searchTopic', 'searchMaterialCategory', 'filterMaterialCategoryTopicId']);
         $this->initializeCategoryQuestionSettings();
         $this->initializeTopicQuestionSettings();
         $this->initializeMaterialCategoryQuestionSettings();
@@ -472,6 +474,7 @@ class AdminMasterModuleIndex extends Component
                 'name' => $this->name,
                 'duration' => $this->duration,
                 'random_question' => $this->random_question,
+                'total_questions' => $this->total_questions,
                 'description' => $this->description,
                 'studys' => $this->studys,
                 'is_all_study' => $this->is_all_study,
@@ -513,6 +516,7 @@ class AdminMasterModuleIndex extends Component
         $this->name = $result?->name;
         $this->duration = $result?->duration;
         $this->random_question = $result?->random_question;
+        $this->total_questions = $result?->total_questions;
         $this->description = $result?->description;
         $this->question_pick_type = $result?->question_pick_type ?? 'manual';
         $this->is_all_study = $result?->is_all_study ?? false;
