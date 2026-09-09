@@ -6,6 +6,7 @@ use App\Exports\QuestionExport;
 use App\Helpers\AlertHelper;
 use App\Imports\Question\QuestionImport;
 use App\Models\Category\CategoryQuestion;
+use App\Models\Master\Question\Answer;
 use App\Models\Master\Question\Material;
 use App\Models\Master\Question\MaterialCategory;
 use App\Models\Master\Question\Question;
@@ -20,6 +21,7 @@ use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Maatwebsite\Excel\Facades\Excel;
@@ -57,6 +59,14 @@ class AdminMasterQuestionIndex extends Component
     public $question;
 
     public $description;
+
+    public $answers_data = [];
+
+    public $correct_answer_alphabet = 'A';
+
+    public $essay_answer = '';
+
+    public $answer_option_images = [];
 
     public $latex;
 
@@ -300,30 +310,79 @@ class AdminMasterQuestionIndex extends Component
         return AlertHelper::success('Berhasil', 'Kategori soal berhasil diperbarui.');
     }
 
+    public function initDefaultAnswers()
+    {
+        $this->answers_data = [
+            ['alphabet' => 'A', 'context' => '', 'latex' => '', 'images' => []],
+            ['alphabet' => 'B', 'context' => '', 'latex' => '', 'images' => []],
+            ['alphabet' => 'C', 'context' => '', 'latex' => '', 'images' => []],
+            ['alphabet' => 'D', 'context' => '', 'latex' => '', 'images' => []],
+            ['alphabet' => 'E', 'context' => '', 'latex' => '', 'images' => []],
+        ];
+        $this->correct_answer_alphabet = 'A';
+        $this->essay_answer = '';
+        $this->answer_option_images = [];
+    }
+
+    public function addAnswerOption()
+    {
+        $count = count($this->answers_data);
+        $nextAlphabet = chr(65 + $count);
+        $this->answers_data[] = [
+            'alphabet' => $nextAlphabet,
+            'context' => '',
+            'latex' => '',
+            'images' => [],
+        ];
+    }
+
+    public function removeAnswerOption($index)
+    {
+        if (count($this->answers_data) > 2) {
+            unset($this->answers_data[$index]);
+            $this->answers_data = array_values($this->answers_data);
+
+            foreach ($this->answers_data as $i => $item) {
+                $this->answers_data[$i]['alphabet'] = chr(65 + $i);
+            }
+
+            $existingAlphabets = array_column($this->answers_data, 'alphabet');
+            if (! in_array($this->correct_answer_alphabet, $existingAlphabets)) {
+                $this->correct_answer_alphabet = $this->answers_data[0]['alphabet'] ?? 'A';
+            }
+        }
+    }
+
+    public function setCorrectAnswer($alphabet)
+    {
+        $this->correct_answer_alphabet = $alphabet;
+    }
+
+    public function updatedAnswerOptionImages($value, $index)
+    {
+        if (isset($this->answer_option_images[$index])) {
+            $folder = '/public/answer/'.Carbon::now()->isoFormat('Y').'/'.Carbon::now()->isoFormat('MM');
+            $upload = $this->uploadFile($this->answer_option_images[$index], $folder);
+            $this->answers_data[$index]['images'] = [$upload[0]];
+            unset($this->answer_option_images[$index]);
+        }
+    }
+
+    public function removeAnswerOptionImage($index)
+    {
+        if (isset($this->answers_data[$index])) {
+            $this->answers_data[$index]['images'] = [];
+        }
+        unset($this->answer_option_images[$index]);
+    }
+
     public function mount()
     {
+        $this->type = Question::TYPE_SINGLE;
+        $this->initDefaultAnswers();
         $this->topics = Topic::select('id', 'name')->get();
         $this->question_types = QuestionType::select('id', 'name')->get();
         $this->category_questions = CategoryQuestion::select('id', 'name')->get();
-        // if (Auth::user()?->hasRole('Dosen')) {
-        //     $studyIds = Auth::user()?->studys ?? [];
-
-        //     // Ensure $studyIds is always an array
-        //     if (is_string($studyIds)) {
-        //         $studyIds = json_decode($studyIds, true) ?? [];
-        //     }
-
-        //     // Ensure it's an array and not null
-        //     $studyIds = is_array($studyIds) ? $studyIds : [];
-
-        //     $this->studys = Study::whereIn('id', $studyIds)
-        //         ->orderBy('name', 'asc')
-        //         ->pluck('name', 'id')
-        //         ->toArray();
-        //     $this->study_id = array_key_first($this->studys);
-        // } else {
-        //     $this->studys = Study::orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
-        // }
         $this->studys = Study::orderBy('name', 'asc')->get()->pluck('name', 'id')->toArray();
     }
 
@@ -376,20 +435,19 @@ class AdminMasterQuestionIndex extends Component
             ->get();
     }
 
-    // public function hydrate()
-    // {
-    //     $this->resetPage();
-    // }
-
     public function openModal()
     {
+        $this->type = Question::TYPE_SINGLE;
+        $this->initDefaultAnswers();
+
         return $this->dispatch('open-modal', ['id' => 'modal']);
     }
 
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['data_id', 'study_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'type', 'question', 'description', 'latex', 'images', 'weight_correct', 'weight_incorrect', 'study_id_import', 'file_import', 'category_question_id', 'import_type']);
+        $this->reset(['data_id', 'study_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'type', 'question', 'description', 'latex', 'images', 'old_images', 'new_images', 'weight_correct', 'weight_incorrect', 'study_id_import', 'file_import', 'category_question_id', 'import_type']);
+        $this->initDefaultAnswers();
         $this->dispatch('close-modal', ['id' => 'modal-import-question']);
 
         return $this->dispatch('close-modal', ['id' => 'modal']);
@@ -397,35 +455,58 @@ class AdminMasterQuestionIndex extends Component
 
     public function submit()
     {
-        $this->validate(
-            [
-                'study_id' => 'required|exists:studies,id',
-                'topic_id' => 'required|exists:topics,id',
-                'category_question_id' => 'required|exists:category_questions,id',
-                'material_category_id' => 'nullable|exists:material_categories,id',
-                'material_id' => 'nullable|exists:materials,id',
-                'question_type_id' => 'required|exists:question_types,id',
-                'type' => 'required|in:single,multiple,essay',
-                'question' => 'required',
-                'latex' => 'nullable',
-                'images.*' => 'nullable|file|mimetypes:image/jpg,image/jpeg,image/png',
-                'description' => 'nullable',
-            ],
-            [
-                'topic_id.required' => 'Topik soal wajib diisi.',
-                'study_id.required' => 'Prodi wajib diisi.',
-                'material_category_id.exists' => 'Kategori materi soal tidak valid.',
-                'material_id.exists' => 'Materi soal tidak valid.',
-                'question_type_id.required' => 'Tipe Ujian wajib diisi.',
-                'question_type_id.exists' => 'Tipe Ujian tidak valid.',
-                'type.required' => 'Jenis soal wajib diisi.',
-                'type.in' => 'Jenis soal tidak valid.',
-                'question.required' => 'Pertanyaan wajib diisi.',
-                'images.*.file' => 'Gambar wajib berupa file.',
-                'images.*.mimes' => 'Gambar hanya berformat : .jpg, .jpeg, .png.',
-                'category_question_id.exists' => 'Kategori soal tidak valid.',
-            ]
-        );
+        $validationRules = [
+            'study_id' => 'required|exists:studies,id',
+            'topic_id' => 'required|exists:topics,id',
+            'category_question_id' => 'required|exists:category_questions,id',
+            'material_category_id' => 'nullable|exists:material_categories,id',
+            'material_id' => 'nullable|exists:materials,id',
+            'question_type_id' => 'required|exists:question_types,id',
+            'type' => 'required|in:single,multiple,essay',
+            'question' => 'required',
+            'latex' => 'nullable',
+            'description' => 'nullable',
+        ];
+
+        $validationMessages = [
+            'topic_id.required' => 'Topik soal wajib diisi.',
+            'study_id.required' => 'Prodi wajib diisi.',
+            'material_category_id.exists' => 'Kategori materi soal tidak valid.',
+            'material_id.exists' => 'Materi soal tidak valid.',
+            'question_type_id.required' => 'Tipe Ujian wajib diisi.',
+            'question_type_id.exists' => 'Tipe Ujian tidak valid.',
+            'type.required' => 'Jenis soal wajib diisi.',
+            'type.in' => 'Jenis soal tidak valid.',
+            'question.required' => 'Pertanyaan wajib diisi.',
+            'category_question_id.exists' => 'Kategori soal tidak valid.',
+        ];
+
+        if ($this->type === 'single' || $this->type === Question::TYPE_SINGLE) {
+            $validationRules['correct_answer_alphabet'] = 'required|string';
+            $validationMessages['correct_answer_alphabet.required'] = 'Kunci jawaban yang benar wajib dipilih.';
+        }
+
+        try {
+            $this->validate($validationRules, $validationMessages);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $firstError = collect($e->errors())->flatten()->first();
+            AlertHelper::error('Validasi Gagal', $firstError ?? 'Mohon lengkapi semua kolom wajib bertanda bintang (*).');
+            throw $e;
+        }
+
+        if ($this->type === 'single' || $this->type === Question::TYPE_SINGLE) {
+            $filledAnswers = array_filter($this->answers_data, fn($a) => !empty(trim($a['context'] ?? '')));
+            if (count($filledAnswers) < 2) {
+                $this->addError('answers_data', 'Minimal 2 pilihan jawaban harus diisi.');
+                return AlertHelper::error('Validasi Gagal', 'Minimal 2 pilihan jawaban harus diisi.');
+            }
+
+            $correctAnswer = collect($this->answers_data)->firstWhere('alphabet', $this->correct_answer_alphabet);
+            if (! $correctAnswer || empty(trim($correctAnswer['context'] ?? ''))) {
+                $this->addError('correct_answer_alphabet', 'Kunci jawaban yang dipilih (Opsi ' . $this->correct_answer_alphabet . ') belum memiliki teks jawaban.');
+                return AlertHelper::error('Validasi Gagal', 'Kunci jawaban yang dipilih (Opsi ' . $this->correct_answer_alphabet . ') belum memiliki teks jawaban.');
+            }
+        }
 
         try {
             DB::beginTransaction();
@@ -454,6 +535,47 @@ class AdminMasterQuestionIndex extends Component
                 throw new Exception('Ada kesalahaan saat QuestionService => updateOrCreate', 500);
             }
 
+            if ($this->type === 'single' || $this->type === Question::TYPE_SINGLE) {
+                foreach ($this->answers_data as $index => $ans) {
+                    $context = trim($ans['context'] ?? '');
+                    if ($context === '') {
+                        continue;
+                    }
+
+                    $alphabet = $ans['alphabet'] ?? chr(65 + $index);
+                    $order = $index + 1;
+                    $isCorrect = ($alphabet === $this->correct_answer_alphabet);
+
+                    $ansImages = [];
+                    if (! empty($ans['images'])) {
+                        foreach ($ans['images'] as $img) {
+                            $cleanPath = Str::after((string) $img, '/storage/');
+                            $ansImages[] = '/' . ltrim($cleanPath, '/');
+                        }
+                    }
+
+                    Answer::withoutGlobalScope('user_scope')->create([
+                        'question_id' => $question->id,
+                        'company_id' => Auth::user()?->company?->id,
+                        'alphabet' => $alphabet,
+                        'order' => $order,
+                        'context' => $context,
+                        'latex' => $ans['latex'] ?? null,
+                        'images' => ! empty($ansImages) ? json_encode($ansImages) : null,
+                        'is_correct' => $isCorrect,
+                    ]);
+                }
+            } elseif ($this->type === 'essay' && ! empty(trim($this->essay_answer ?? ''))) {
+                Answer::withoutGlobalScope('user_scope')->create([
+                    'question_id' => $question->id,
+                    'company_id' => Auth::user()?->company?->id,
+                    'alphabet' => 'A',
+                    'order' => 1,
+                    'context' => trim($this->essay_answer),
+                    'is_correct' => true,
+                ]);
+            }
+
             DB::commit();
         } catch (Exception|Throwable $th) {
             DB::rollBack();
@@ -462,14 +584,14 @@ class AdminMasterQuestionIndex extends Component
                 'file' => $th->getFile(),
                 'line' => $th->getLine(),
             ];
-            Log::error('Ada Kesalahaan saat AdminMasterModuleIndex => submit', $error);
+            Log::error('Ada Kesalahaan saat AdminMasterQuestionIndex => submit', $error);
 
-            return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data');
+            return AlertHelper::error('Gagal', 'Ada kesalahan saat menyimpan data: '.$th->getMessage());
         }
 
         $this->closeModal();
 
-        return AlertHelper::success('Berhasil', 'Data berhasil disimpan.');
+        return AlertHelper::success('Berhasil', 'Data soal beserta pilihan jawaban berhasil disimpan.');
     }
 
     public function confirmDelete($id)
