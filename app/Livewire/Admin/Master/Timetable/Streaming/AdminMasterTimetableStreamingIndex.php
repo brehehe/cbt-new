@@ -2,10 +2,13 @@
 
 namespace App\Livewire\Admin\Master\Timetable\Streaming;
 
+use App\Helpers\AlertHelper;
+use App\Models\Exam\ExamAlert;
 use App\Models\Exam\ExamLiveSession;
 use App\Models\Exam\ExamRecording;
 use App\Models\Master\Timetable\Timetable;
 use App\Services\Exam\RecordingFinalizer;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -28,6 +31,14 @@ class AdminMasterTimetableStreamingIndex extends Component
     public $sortBy = 'last_activity'; // last_activity, name, alerts
 
     public $sortDirection = 'desc';
+
+    public $messageModal = false;
+
+    public $targetSessionId = null;
+
+    public $targetStudentName = '';
+
+    public $supervisorMessageText = '';
 
     protected $listeners = [
         'refreshStreamData',
@@ -115,11 +126,53 @@ class AdminMasterTimetableStreamingIndex extends Component
 
     public function sendMessage($sessionId, $message)
     {
-        $session = ExamLiveSession::find($sessionId);
+        $session = ExamLiveSession::with('user')->find($sessionId);
         if ($session) {
-            // Implement messaging logic here
-            session()->flash('success', 'Pesan berhasil dikirim ke '.$session->user->name);
+            ExamAlert::create([
+                'timetable_id' => $session->timetable_id,
+                'user_timetable_id' => $session->user_timetable_id,
+                'alert_type' => 'supervisor_message',
+                'description' => 'Pesan dari supervisor: ' . $message,
+                'metadata' => [
+                    'sender' => Auth::user() ? Auth::user()->name : 'Pengawas',
+                    'timestamp' => now()->toISOString(),
+                    'is_read' => false,
+                ],
+            ]);
+
+            session()->flash('success', 'Pesan berhasil dikirim ke ' . ($session->user->name ?? 'peserta'));
+            AlertHelper::success('Berhasil', 'Pesan berhasil dikirim ke ' . ($session->user->name ?? 'peserta'));
         }
+    }
+
+    public function openMessageModal($sessionId, $studentName)
+    {
+        $this->targetSessionId = $sessionId;
+        $this->targetStudentName = $studentName;
+        $this->supervisorMessageText = 'Harap kembali fokus ke layar ujian.';
+        $this->messageModal = true;
+    }
+
+    public function closeMessageModal()
+    {
+        $this->messageModal = false;
+        $this->reset(['targetSessionId', 'targetStudentName', 'supervisorMessageText']);
+    }
+
+    public function setTemplateMessage($text)
+    {
+        $this->supervisorMessageText = $text;
+    }
+
+    public function submitSupervisorMessage()
+    {
+        $this->validate([
+            'targetSessionId' => 'required',
+            'supervisorMessageText' => 'required|string|max:500',
+        ]);
+
+        $this->sendMessage($this->targetSessionId, $this->supervisorMessageText);
+        $this->closeMessageModal();
     }
 
     public function terminateSession($sessionId)

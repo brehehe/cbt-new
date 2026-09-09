@@ -237,7 +237,13 @@
                                                  }
                                              })
                                          "
-                                         class="inline-block text-left">
+                                         class="inline-flex items-center text-left">
+                                        <button wire:click="openMessageModal('{{ $userTimetable->id }}', '{{ addslashes($user->name) }}')"
+                                            title="Kirim Pesan / Teguran"
+                                            class="px-2 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-600 rounded-md transition text-xs inline-flex items-center gap-1 font-semibold border border-orange-200 mr-1.5 shadow-sm">
+                                            <i class="fa-solid fa-paper-plane text-[10px]"></i>
+                                            <span>Pesan</span>
+                                        </button>
                                         <button x-ref="btn"
                                             @click="open = !open"
                                             class="px-2.5 py-1.5 bg-gray-100 rounded-md hover:bg-gray-200 transition text-gray-700 font-semibold text-xs inline-flex items-center gap-1">
@@ -252,6 +258,14 @@
                                                 :style="`top:${y}px; left:${x}px`">
 
                                                 <ul class="py-1 text-sm text-gray-700">
+                                                    <li>
+                                                        <button wire:click="openMessageModal('{{ $userTimetable->id }}', '{{ addslashes($user->name) }}')"
+                                                            @click="open = false"
+                                                            class="w-full text-left px-4 py-2 hover:bg-orange-50 text-orange-600 font-semibold flex items-center gap-2">
+                                                            <i class="fa-solid fa-paper-plane text-orange-500"></i>
+                                                            Kirim Pesan / Teguran
+                                                        </button>
+                                                    </li>
 
                                                     @if ($userTimetable->status === 'done')
                                                         <li>
@@ -408,4 +422,76 @@
         });
     }
     </script>
+
+    <!-- Modal Kirim Pesan Supervisor -->
+    @if($messageModal)
+    <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="closeMessageModal"></div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
+                <div class="bg-gradient-to-r from-orange-500 to-amber-600 px-6 py-4 flex items-center justify-between text-white">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white">
+                            <i class="fa-solid fa-paper-plane text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold leading-tight">Kirim Pesan ke Peserta</h3>
+                            <p class="text-xs text-orange-100">Peserta: {{ $targetStudentName }}</p>
+                        </div>
+                    </div>
+                    <button wire:click="closeMessageModal" class="text-white/80 hover:text-white p-1 rounded-lg">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <div class="p-6">
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Pilih Template Pesan:</label>
+                    <div class="grid grid-cols-1 gap-2 mb-4">
+                        <button type="button" wire:click="setTemplateMessage('Harap kembali fokus ke layar ujian.')"
+                            class="text-left px-3 py-2 text-xs rounded-lg border border-gray-200 hover:border-orange-400 hover:bg-orange-50 transition-colors flex items-center gap-2">
+                            <span>🎯</span>
+                            <span>Harap kembali fokus ke layar ujian.</span>
+                        </button>
+                        <button type="button" wire:click="setTemplateMessage('Wajah tidak terdeteksi di kamera, harap posisikan diri dengan benar.')"
+                            class="text-left px-3 py-2 text-xs rounded-lg border border-gray-200 hover:border-orange-400 hover:bg-orange-50 transition-colors flex items-center gap-2">
+                            <span>📷</span>
+                            <span>Wajah tidak terdeteksi di kamera, harap posisikan diri.</span>
+                        </button>
+                        <button type="button" wire:click="setTemplateMessage('Dilarang membuka tab atau aplikasi lain selain ujian.')"
+                            class="text-left px-3 py-2 text-xs rounded-lg border border-gray-200 hover:border-orange-400 hover:bg-orange-50 transition-colors flex items-center gap-2">
+                            <span>⚠️</span>
+                            <span>Dilarang membuka tab / aplikasi lain selain ujian.</span>
+                        </button>
+                        <button type="button" wire:click="setTemplateMessage('Dilarang berbicara atau meminta bantuan orang lain.')"
+                            class="text-left px-3 py-2 text-xs rounded-lg border border-gray-200 hover:border-orange-400 hover:bg-orange-50 transition-colors flex items-center gap-2">
+                            <span>🔇</span>
+                            <span>Dilarang berbicara atau meminta bantuan orang lain.</span>
+                        </button>
+                    </div>
+
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Teks Pesan Peringatan:</label>
+                    <textarea wire:model="supervisorMessageText" rows="3"
+                        class="w-full text-sm rounded-xl border-gray-300 focus:border-orange-500 focus:ring focus:ring-orange-200 resize-none"
+                        placeholder="Ketik pesan peringatan di sini..."></textarea>
+                    @error('supervisorMessageText') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+                </div>
+
+                <div class="px-6 py-4 bg-gray-50 flex items-center justify-end gap-2 border-t border-gray-100">
+                    <button type="button" wire:click="closeMessageModal"
+                        class="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-200 rounded-lg transition-colors">
+                        Batal
+                    </button>
+                    <button type="button" wire:click="submitSupervisorMessage"
+                        class="px-5 py-2 text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 rounded-lg shadow-sm transition-colors flex items-center gap-1.5">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>Kirim Pesan</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>

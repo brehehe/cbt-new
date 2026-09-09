@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Master\Timetable\Session;
 
 use App\Exports\TimetableSessionExport;
 use App\Helpers\AlertHelper;
+use App\Models\Exam\ExamAlert;
 use App\Models\Exam\ExamLiveSession;
 use App\Models\Exam\ExamRecording;
 use App\Models\Master\Timetable\Timetable;
@@ -11,6 +12,7 @@ use App\Models\User\UserTimetable;
 use App\Services\Exam\RecordingFinalizer;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Livewire\Component;
@@ -33,6 +35,14 @@ class AdminMasterTimetableSessionIndex extends Component
 
     public $autoRefresh = false;
 
+    public $messageModal = false;
+
+    public $targetUserTimetableId = null;
+
+    public $targetStudentName = '';
+
+    public $supervisorMessageText = '';
+
     protected $listeners = [
         'terminateSession',
         'suspendSession',
@@ -44,6 +54,7 @@ class AdminMasterTimetableSessionIndex extends Component
         'resumeTimeBulk',
         'pauseTimeIndividual',
         'resumeTimeIndividual',
+        'sendMessage',
     ];
 
     public function mount($timetable_id = null)
@@ -491,5 +502,73 @@ class AdminMasterTimetableSessionIndex extends Component
         ]);
 
         AlertHelper::success('Berhasil', 'Status ujian peserta telah dikembalikan menjadi Aktif (Exam) tanpa mereset soal & jawaban.');
+    }
+
+    public function openMessageModal($userTimetableId, $studentName)
+    {
+        $this->targetUserTimetableId = $userTimetableId;
+        $this->targetStudentName = $studentName;
+        $this->supervisorMessageText = 'Harap kembali fokus ke layar ujian.';
+        $this->messageModal = true;
+    }
+
+    public function closeMessageModal()
+    {
+        $this->messageModal = false;
+        $this->reset(['targetUserTimetableId', 'targetStudentName', 'supervisorMessageText']);
+    }
+
+    public function setTemplateMessage($text)
+    {
+        $this->supervisorMessageText = $text;
+    }
+
+    public function submitSupervisorMessage()
+    {
+        $this->validate([
+            'targetUserTimetableId' => 'required',
+            'supervisorMessageText' => 'required|string|max:500',
+        ]);
+
+        $userTimetable = UserTimetable::find($this->targetUserTimetableId);
+        if ($userTimetable) {
+            ExamAlert::create([
+                'timetable_id' => $userTimetable->timetable_id,
+                'user_timetable_id' => $userTimetable->id,
+                'alert_type' => 'supervisor_message',
+                'description' => 'Pesan dari supervisor: ' . $this->supervisorMessageText,
+                'metadata' => [
+                    'sender' => Auth::user() ? Auth::user()->name : 'Pengawas',
+                    'timestamp' => now()->toISOString(),
+                    'is_read' => false,
+                ],
+            ]);
+
+            AlertHelper::success('Berhasil', 'Pesan peringatan berhasil dikirim ke ' . $this->targetStudentName);
+        } else {
+            AlertHelper::error('Gagal', 'Data ujian peserta tidak ditemukan.');
+        }
+
+        $this->closeMessageModal();
+    }
+
+    public function sendMessage($userTimetableId, $message)
+    {
+        $userTimetable = UserTimetable::with('user')->find($userTimetableId);
+        if ($userTimetable) {
+            ExamAlert::create([
+                'timetable_id' => $userTimetable->timetable_id,
+                'user_timetable_id' => $userTimetable->id,
+                'alert_type' => 'supervisor_message',
+                'description' => 'Pesan dari supervisor: ' . $message,
+                'metadata' => [
+                    'sender' => Auth::user() ? Auth::user()->name : 'Pengawas',
+                    'timestamp' => now()->toISOString(),
+                    'is_read' => false,
+                ],
+            ]);
+
+            AlertHelper::success('Berhasil', 'Pesan berhasil dikirim ke ' . ($userTimetable->user->name ?? 'peserta'));
+        }
     }
 }

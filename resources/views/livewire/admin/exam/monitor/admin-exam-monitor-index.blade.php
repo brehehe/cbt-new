@@ -321,6 +321,12 @@
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                             d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                     </svg>
+                                                <button wire:click="openMessageModal('{{ $session->id }}')"
+                                                    class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition" title="Kirim Peringatan Langsung">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                                    </svg>
                                                 </button>
 
                                                 @if ($session->connection_status === 'connected')
@@ -470,6 +476,73 @@
             </div>
         </div>
     </div>
+    @endif
+
+    {{-- Modal Kirim Pesan Teguran Pengawas --}}
+    @if ($messageModal)
+        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="closeMessageModal"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+                <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
+                    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4 flex items-center justify-between text-white shadow-sm">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xl">💬</span>
+                            <h3 class="text-lg font-bold">Kirim Peringatan ke Peserta</h3>
+                        </div>
+                        <button wire:click="closeMessageModal" class="text-white/80 hover:text-white text-2xl font-bold leading-none">&times;</button>
+                    </div>
+
+                    <div class="p-6 space-y-4">
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-900">
+                            Penerima: <strong class="text-blue-950 font-bold">{{ $targetStudentName }}</strong>
+                            <p class="text-xs text-blue-700 mt-1">Pesan ini akan langsung muncul sebagai pop-up peringatan di tengah layar ujian peserta tanpa menghentikan ujian.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Pilih Template Cepat:</label>
+                            <div class="grid grid-cols-1 gap-1.5">
+                                <button type="button" wire:click="setTemplateMessage('Harap kembali fokus ke layar ujian.')"
+                                    class="text-left text-xs bg-gray-50 hover:bg-blue-50 hover:text-blue-700 border border-gray-200 rounded px-3 py-2 transition font-medium text-gray-700">
+                                    📌 "Harap kembali fokus ke layar ujian."
+                                </button>
+                                <button type="button" wire:click="setTemplateMessage('Pastikan wajah Anda tetap terlihat jelas oleh kamera.')"
+                                    class="text-left text-xs bg-gray-50 hover:bg-blue-50 hover:text-blue-700 border border-gray-200 rounded px-3 py-2 transition font-medium text-gray-700">
+                                    📌 "Pastikan wajah Anda tetap terlihat jelas oleh kamera."
+                                </button>
+                                <button type="button" wire:click="setTemplateMessage('Dilarang berbicara atau menoleh ke samping selama ujian.')"
+                                    class="text-left text-xs bg-gray-50 hover:bg-blue-50 hover:text-blue-700 border border-gray-200 rounded px-3 py-2 transition font-medium text-gray-700">
+                                    📌 "Dilarang berbicara atau menoleh ke samping selama ujian."
+                                </button>
+                                <button type="button" wire:click="setTemplateMessage('Peringatan: Jangan membuka tab atau aplikasi lain!')"
+                                    class="text-left text-xs bg-gray-50 hover:bg-blue-50 hover:text-blue-700 border border-gray-200 rounded px-3 py-2 transition font-medium text-gray-700">
+                                    📌 "Peringatan: Jangan membuka tab atau aplikasi lain!"
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Isi Pesan Peringatan:</label>
+                            <textarea wire:model.defer="supervisorMessageText" rows="3"
+                                placeholder="Tulis pesan peringatan untuk peserta di sini..."
+                                class="w-full border border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-3"></textarea>
+                            @error('supervisorMessageText') <span class="text-xs text-red-500 font-semibold">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 px-6 py-3.5 flex justify-end space-x-2 border-t border-gray-100">
+                        <button type="button" wire:click="closeMessageModal"
+                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                            Batal
+                        </button>
+                        <button type="button" wire:click="submitSupervisorMessage"
+                            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition flex items-center space-x-1.5 shadow-sm">
+                            <span>Kirim Peringatan ke Layar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     @endif
 </div>
 

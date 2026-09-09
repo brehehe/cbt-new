@@ -59,6 +59,67 @@ class AdminExamMonitorIndex extends Component
 
     public $finishTargetInfo = []; // Display info for modal
 
+    // Send Message Modal
+    public $messageModal = false;
+
+    public $targetSessionId = null;
+
+    public $targetStudentName = '';
+
+    public $supervisorMessageText = '';
+
+    public function openMessageModal($sessionId)
+    {
+        $session = ExamLiveSession::with('user')->find($sessionId);
+        if ($session) {
+            $this->targetSessionId = $session->id;
+            $this->targetStudentName = $session->user->name ?? 'Mahasiswa';
+            $this->supervisorMessageText = 'Harap kembali fokus ke layar ujian.';
+            $this->messageModal = true;
+        }
+    }
+
+    public function closeMessageModal()
+    {
+        $this->messageModal = false;
+        $this->targetSessionId = null;
+        $this->targetStudentName = '';
+        $this->supervisorMessageText = '';
+    }
+
+    public function setTemplateMessage($text)
+    {
+        $this->supervisorMessageText = $text;
+    }
+
+    public function submitSupervisorMessage()
+    {
+        $this->validate([
+            'supervisorMessageText' => 'required|string|min:3|max:500',
+        ]);
+
+        if ($this->targetSessionId) {
+            $session = ExamLiveSession::with('user')->find($this->targetSessionId);
+            if ($session) {
+                ExamAlert::create([
+                    'timetable_id' => $session->timetable_id,
+                    'user_timetable_id' => $session->user_timetable_id,
+                    'alert_type' => 'supervisor_message',
+                    'description' => 'Pesan dari supervisor: '.$this->supervisorMessageText,
+                    'metadata' => [
+                        'sender' => auth()->user()->name ?? 'Pengawas Ujian',
+                        'message' => $this->supervisorMessageText,
+                        'is_read' => false,
+                        'timestamp' => now()->toISOString(),
+                    ],
+                ]);
+
+                session()->flash('success', 'Pesan peringatan berhasil dikirim ke '.($session->user->name ?? 'Mahasiswa'));
+            }
+            $this->closeMessageModal();
+        }
+    }
+
     protected $listeners = [
         'refreshData',
         'toggleAutoRefresh',

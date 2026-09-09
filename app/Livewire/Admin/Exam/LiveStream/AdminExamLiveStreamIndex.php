@@ -92,26 +92,69 @@ class AdminExamLiveStreamIndex extends Component
         }
     }
 
+    public $messageModal = false;
+    public $targetSessionId = null;
+    public $targetStudentName = '';
+    public $supervisorMessageText = '';
+
+    public function openMessageModal($sessionId)
+    {
+        $session = ExamLiveSession::with('user')->find($sessionId);
+        if ($session) {
+            $this->targetSessionId = $session->id;
+            $this->targetStudentName = $session->user->name ?? 'Mahasiswa';
+            $this->supervisorMessageText = 'Harap kembali fokus ke layar ujian.';
+            $this->messageModal = true;
+        }
+    }
+
+    public function closeMessageModal()
+    {
+        $this->messageModal = false;
+        $this->targetSessionId = null;
+        $this->targetStudentName = '';
+        $this->supervisorMessageText = '';
+    }
+
+    public function setTemplateMessage($text)
+    {
+        $this->supervisorMessageText = $text;
+    }
+
+    public function submitSupervisorMessage()
+    {
+        $this->validate([
+            'supervisorMessageText' => 'required|string|min:3|max:500',
+        ]);
+
+        if ($this->targetSessionId) {
+            $this->sendMessage($this->targetSessionId, $this->supervisorMessageText);
+            $this->closeMessageModal();
+        }
+    }
+
     public function sendMessage($sessionId, $message)
     {
         $session = ExamLiveSession::find($sessionId);
         if ($session) {
-            // Send message to student (this would be implemented via broadcasting)
-            $this->dispatch('messageSent', $sessionId, $message);
+            $session->loadMissing('user');
 
-            // Log the message as an alert
+            // Log the message as an alert with unread status
             ExamAlert::create([
                 'timetable_id' => $session->timetable_id,
                 'user_timetable_id' => $session->user_timetable_id,
                 'alert_type' => 'supervisor_message',
                 'description' => 'Pesan dari supervisor: '.$message,
                 'metadata' => [
-                    'sender' => Auth::user()->name,
+                    'sender' => Auth::user()->name ?? 'Pengawas Ujian',
+                    'message' => $message,
+                    'is_read' => false,
                     'timestamp' => now()->toISOString(),
                 ],
             ]);
 
-            session()->flash('success', 'Pesan berhasil dikirim ke '.$session->user->name);
+            $this->dispatch('messageSent', $sessionId, $message);
+            session()->flash('success', 'Pesan peringatan berhasil dikirim ke '.($session->user->name ?? 'Mahasiswa'));
         }
     }
 

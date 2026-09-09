@@ -744,6 +744,7 @@ class ExamApiController extends Controller
                 return [
                     'id' => $session->id,
                     'user_id' => $session->user_id,
+                    'user_timetable_id' => $session->user_timetable_id,
                     'name' => $session->user->name ?? 'Unknown',
                     'connection_status' => $session->connection_status,
                     'camera_status' => $session->camera_status,
@@ -863,6 +864,64 @@ class ExamApiController extends Controller
         // Hitung ulang sisa waktu setelah update
         $this->calculateRemainingTime();
         return (int) $this->remainingTime;
+    }
+
+    /**
+     * Send supervisor message to student (Admin Only)
+     */
+    public function sendSupervisorMessage(Request $request)
+    {
+        if (! Auth::user() || ! Auth::user()->hasRole(['Admin', 'Super Admin', 'Pengawas', 'admin'])) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $request->validate([
+            'session_id' => 'nullable|integer',
+            'user_timetable_id' => 'nullable|string',
+            'message' => 'required|string|max:500',
+        ]);
+
+        $timetableId = null;
+        $userTimetableId = $request->user_timetable_id;
+        $studentName = 'peserta';
+
+        if ($request->session_id) {
+            $session = ExamLiveSession::with('user')->find($request->session_id);
+            if ($session) {
+                $timetableId = $session->timetable_id;
+                $userTimetableId = $session->user_timetable_id;
+                $studentName = $session->user->name ?? 'peserta';
+            }
+        }
+
+        if (! $userTimetableId) {
+            return response()->json(['error' => 'Sesi atau peserta tidak ditemukan'], 404);
+        }
+
+        if (! $timetableId) {
+            $ut = \App\Models\User\UserTimetable::find($userTimetableId);
+            if ($ut) {
+                $timetableId = $ut->timetable_id;
+            }
+        }
+
+        $alert = \App\Models\Exam\ExamAlert::create([
+            'timetable_id' => $timetableId,
+            'user_timetable_id' => $userTimetableId,
+            'alert_type' => 'supervisor_message',
+            'description' => 'Pesan dari supervisor: ' . $request->message,
+            'metadata' => [
+                'sender' => Auth::user()->name ?? 'Pengawas',
+                'timestamp' => now()->toISOString(),
+                'is_read' => false,
+            ],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pesan berhasil dikirim ke ' . $studentName,
+            'alert' => $alert,
+        ]);
     }
 
     /**

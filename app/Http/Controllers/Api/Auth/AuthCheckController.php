@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Exam\ExamAlert;
 use App\Models\Exam\ExamLiveSession;
 use App\Models\User\UserTimetable;
 use Illuminate\Http\JsonResponse;
@@ -58,12 +59,53 @@ class AuthCheckController extends Controller
 
         $remainingTime = $userTimetable ? $userTimetable->getRemainingTime() : 0;
 
+        // Cek apakah ada pesan belum dibaca dari pengawas/supervisor
+        $latestAlert = ExamAlert::withoutGlobalScope('user_scope')
+            ->where('user_timetable_id', $userTimetableId)
+            ->where('alert_type', 'supervisor_message')
+            ->where(function ($q) {
+                $q->whereNull('metadata->is_read')
+                  ->orWhere('metadata->is_read', false);
+            })
+            ->latest()
+            ->first();
+
+        $supervisorMessage = null;
+        if ($latestAlert) {
+            $meta = $latestAlert->metadata ?? [];
+            $supervisorMessage = [
+                'id' => $latestAlert->id,
+                'text' => $meta['message'] ?? str_replace('Pesan dari supervisor: ', '', $latestAlert->description),
+                'sender' => $meta['sender'] ?? 'Pengawas Ujian',
+                'timestamp' => $latestAlert->created_at ? $latestAlert->created_at->format('H:i:s') : now()->format('H:i:s'),
+            ];
+        }
+
         return response()->json([
             'active' => true, // Default true selama session masih ada (auth middleware pass)
             'suspended' => $isSuspended,
             'paused' => $isPaused,
             'redirect' => $shouldRedirect ? '/logout' : null,
             'remainingTime' => (int) $remainingTime,
+            'supervisorMessage' => $supervisorMessage,
         ]);
+    }
+
+    /**
+     * Tandai pesan supervisor telah dibaca oleh peserta
+     *
+     * POST /api/exam/message/{alertId}/ack
+     */
+    public function acknowledgeMessage(string $alertId): JsonResponse
+    {
+        $alert = ExamAlert::withoutGlobalScope('user_scope')->find($alertId);
+        if ($alert) {
+            $meta = $alert->metadata ?? [];
+            $meta['is_read'] = true;
+            $meta['read_at'] = now()->toISOString();
+            $alert->update(['metadata' => $meta]);
+        }
+
+        return response()->json(['success' => true]);
     }
 }

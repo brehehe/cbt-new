@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Room, RoomEvent, VideoPresets } from 'livekit-client';
+import Swal from 'sweetalert2';
 
 // Global interceptor: jika session expired/dihapus admin => redirect login
 axios.interceptors.response.use(
@@ -103,8 +104,58 @@ export const useLiveSession = (userTimetableId, isEnabled, sharedStream, onTimeS
                 if (statusRes.data?.redirect) {
                     window.isFinishingExam = true;
                     window.location.href = statusRes.data.redirect;
-                } else if (statusRes.data?.remainingTime !== undefined && onTimeSync) {
-                    onTimeSync(statusRes.data.remainingTime, statusRes.data.paused);
+                } else {
+                    if (statusRes.data?.remainingTime !== undefined && onTimeSync) {
+                        onTimeSync(statusRes.data.remainingTime, statusRes.data.paused);
+                    }
+
+                    // Deteksi pesan peringatan langsung dari pengawas
+                    if (statusRes.data?.supervisorMessage) {
+                        const msg = statusRes.data.supervisorMessage;
+                        if (window.lastSupervisorMsgId !== msg.id) {
+                            window.lastSupervisorMsgId = msg.id;
+
+                            // Bunyikan nada alert jika didukung audio browser
+                            try {
+                                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                                const osc = audioCtx.createOscillator();
+                                const gain = audioCtx.createGain();
+                                osc.type = 'triangle';
+                                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.3);
+                                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                                osc.connect(gain);
+                                gain.connect(audioCtx.destination);
+                                osc.start();
+                                osc.stop(audioCtx.currentTime + 0.3);
+                            } catch (e) {
+                                // Abaikan jika audio blocked oleh browser
+                            }
+
+                            Swal.fire({
+                                title: '⚠️ PERINGATAN PENGAWAS',
+                                html: `
+                                    <div class="text-left text-sm space-y-3 p-1">
+                                        <div class="bg-red-50 border-l-4 border-red-500 p-3.5 rounded-r text-red-900 font-semibold text-base leading-relaxed shadow-sm">
+                                            "${msg.text}"
+                                        </div>
+                                        <div class="flex justify-between items-center text-xs text-slate-500 pt-2 border-t border-slate-200">
+                                            <span>Pengawas: <strong class="text-slate-800 font-semibold">${msg.sender}</strong></span>
+                                            <span class="font-mono">${msg.timestamp}</span>
+                                        </div>
+                                    </div>
+                                `,
+                                icon: 'warning',
+                                confirmButtonText: 'Saya Mengerti',
+                                confirmButtonColor: '#dc2626',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                            }).then(() => {
+                                axios.post(`/api/exam/message/${msg.id}/ack`).catch(err => console.error('Failed to ack message', err));
+                            });
+                        }
+                    }
                 }
             } catch (error) {
                 // 401 dari /ping ditangani interceptor → redirect /login

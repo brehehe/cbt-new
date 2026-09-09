@@ -725,9 +725,11 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
         // Admin Monitoring API
         Route::get('/admin/monitoring/{timetable_id}/sessions', [ExamApiController::class, 'getMonitoringSessions']);
         Route::get('/admin/monitoring/{timetable_id}/token', [ExamApiController::class, 'getMonitoringToken']);
+        Route::post('/admin/monitoring/message', [ExamApiController::class, 'sendSupervisorMessage']);
 
         // Auth Check Routes — status ujian (cek ExamLiveSession.is_active)
         Route::get('/{user_timetable_id}/status', [App\Http\Controllers\Api\Auth\AuthCheckController::class, 'examStatus']);
+        Route::post('/message/{alertId}/ack', [App\Http\Controllers\Api\Auth\AuthCheckController::class, 'acknowledgeMessage']);
 
         Route::post('/{user_timetable_id}/finish', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'finishExam']);
         Route::post('/{user_timetable_id}/restart', [App\Http\Controllers\Api\Exam\ExamApiController::class, 'restartExam']);
