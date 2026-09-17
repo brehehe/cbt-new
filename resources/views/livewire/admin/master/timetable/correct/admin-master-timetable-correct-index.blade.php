@@ -17,7 +17,11 @@
         <div class="flex flex-wrap items-center gap-6">
             <div class="flex-1 min-w-[200px]">
                 <h2 class="text-lg font-bold text-gray-800">{{ $timetable->name }}</h2>
-                <p class="text-sm text-gray-500 italic">{{ $timetable->module->name ?? '-' }}</p>
+                @if(is_lemes() && $timetable->classmate)
+                    <p class="text-sm text-primary font-medium">Kelas: {{ $timetable->classmate->name }}</p>
+                @else
+                    <p class="text-sm text-gray-500 italic">{{ $timetable->module->name ?? '-' }}</p>
+                @endif
             </div>
             <div class="flex gap-4">
                 <div class="bg-blue-50 px-4 py-2 rounded-lg border border-blue-100">

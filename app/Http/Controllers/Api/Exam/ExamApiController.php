@@ -603,9 +603,17 @@ class ExamApiController extends Controller
      */
     public function finishExam($userTimetableId)
     {
-        $userTimetable = UserTimetable::where('id', $userTimetableId)
-            ->whereIn('status', ['exam', 'warning'])
-            ->firstOrFail();
+        $userTimetable = UserTimetable::find($userTimetableId);
+        if (! $userTimetable) {
+            return response()->json(['error' => 'Data ujian tidak ditemukan.'], 404);
+        }
+
+        if ($userTimetable->status === 'done') {
+            return response()->json([
+                'success' => true,
+                'redirect_url' => route('admin.exam.timetable'),
+            ]);
+        }
 
         if ($userTimetable->user_id !== Auth::id() && ! Auth::user()->hasRole('admin')) {
             return response()->json(['error' => 'Unauthorized'], 403);
@@ -662,7 +670,7 @@ class ExamApiController extends Controller
 
         return response()->json([
             'success' => true,
-            'redirect_url' => route('admin.exam.timetable'),
+            'redirect_url' => route('admin.exam.history-timetable'),
         ]);
     }
 

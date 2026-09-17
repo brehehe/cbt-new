@@ -620,6 +620,83 @@ namespace App\Models\Exam{
 	class ExamRecording extends \Eloquent {}
 }
 
+namespace App\Models\Master\DigitalBook{
+/**
+ * @property string $id
+ * @property string|null $company_id
+ * @property string|null $digital_book_category_id
+ * @property string $title
+ * @property string|null $description
+ * @property string $content_type pdf, link, video
+ * @property string|null $file_path
+ * @property string|null $external_url
+ * @property string|null $cover_image
+ * @property int $order
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $author
+ * @property-read \App\Models\Master\DigitalBook\DigitalBookCategory|null $category
+ * @property-read \App\Models\Company\Company|null $company
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Timetable\TimetableDetail> $timetableDetails
+ * @property-read int|null $timetable_details_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook search($term)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook whereAuthor($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook whereContentType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook whereCoverImage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook whereDigitalBookCategoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook whereExternalUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook whereFilePath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBook withoutTrashed()
+ */
+	class DigitalBook extends \Eloquent {}
+}
+
+namespace App\Models\Master\DigitalBook{
+/**
+ * @property string $id
+ * @property string|null $company_id
+ * @property string $name
+ * @property string|null $description
+ * @property int $order
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\DigitalBook\DigitalBook> $books
+ * @property-read int|null $books_count
+ * @property-read \App\Models\Company\Company|null $company
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBookCategory newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBookCategory newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBookCategory onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBookCategory query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBookCategory search($term)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBookCategory whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBookCategory whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBookCategory whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBookCategory whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBookCategory whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBookCategory whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBookCategory whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBookCategory whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBookCategory withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DigitalBookCategory withoutTrashed()
+ */
+	class DigitalBookCategory extends \Eloquent {}
+}
+
 namespace App\Models\Master\Exam{
 /**
  * @property string $id
@@ -1327,11 +1404,15 @@ namespace App\Models\Master\Timetable{
  * @property int|null $total_questions
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Timetable\TimetableAttendance> $attendances
+ * @property-read int|null $attendances_count
  * @property-read \App\Models\Classmate\Classmate|null $classmate
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Master\Exam\ExamRoom|null $examRoom
  * @property-read \App\Models\Master\Exam\ExamSession|null $examSession
  * @property-read \App\Models\Master\Question\Module|null $module
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Timetable\TimetableDetail> $timetableDetails
+ * @property-read int|null $timetable_details_count
  * @property-read \App\Models\Timetable\TimetableModule|null $timetableModule
  * @property-read \App\Models\User\UserTimetable|null $userTimetable
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User\UserTimetable> $userTimetables
@@ -1372,6 +1453,114 @@ namespace App\Models\Master\Timetable{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable withoutTrashed()
  */
 	class Timetable extends \Eloquent {}
+}
+
+namespace App\Models\Master\Timetable{
+/**
+ * @property string $id
+ * @property string $timetable_id
+ * @property string|null $timetable_detail_id
+ * @property string $user_id
+ * @property string|null $scanned_by
+ * @property \Illuminate\Support\Carbon $attended_at
+ * @property string $status present, late, absent
+ * @property string $method camera_scan, manual, student_scan
+ * @property string|null $notes
+ * @property string|null $company_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Company\Company|null $company
+ * @property-read \App\Models\User|null $scanner
+ * @property-read \App\Models\Master\Timetable\Timetable|null $timetable
+ * @property-read \App\Models\Master\Timetable\TimetableDetail|null $timetableDetail
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAttendance newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAttendance newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAttendance query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAttendance whereAttendedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAttendance whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAttendance whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAttendance whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAttendance whereMethod($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAttendance whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAttendance whereScannedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAttendance whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAttendance whereTimetableDetailId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAttendance whereTimetableId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAttendance whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableAttendance whereUserId($value)
+ */
+	class TimetableAttendance extends \Eloquent {}
+}
+
+namespace App\Models\Master\Timetable{
+/**
+ * @property string $id
+ * @property string $timetable_id
+ * @property string $code ID QRCODE Detail
+ * @property string|null $exam_room_id
+ * @property string|null $exam_session_id
+ * @property array<array-key, mixed>|null $supervisors
+ * @property \Illuminate\Support\Carbon|null $exam_date
+ * @property \Illuminate\Support\Carbon|null $start_time
+ * @property \Illuminate\Support\Carbon|null $end_time
+ * @property string $type exam, material
+ * @property string|null $module_id
+ * @property string|null $exam_type
+ * @property bool $allow_repeat
+ * @property bool $require_token
+ * @property string|null $token
+ * @property bool $is_camera
+ * @property bool $is_recording
+ * @property bool $is_streaming
+ * @property string|null $digital_book_id
+ * @property bool $require_attendance
+ * @property string|null $company_id
+ * @property int $order
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Timetable\TimetableAttendance> $attendances
+ * @property-read int|null $attendances_count
+ * @property-read \App\Models\Company\Company|null $company
+ * @property-read \App\Models\Master\DigitalBook\DigitalBook|null $digitalBook
+ * @property-read \App\Models\Master\Exam\ExamRoom|null $examRoom
+ * @property-read \App\Models\Master\Exam\ExamSession|null $examSession
+ * @property-read \App\Models\Master\Question\Module|null $module
+ * @property-read \App\Models\Master\Timetable\Timetable|null $timetable
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereAllowRepeat($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereDigitalBookId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereEndTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereExamDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereExamRoomId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereExamSessionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereExamType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereIsCamera($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereIsRecording($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereIsStreaming($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereModuleId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereRequireAttendance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereRequireToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereStartTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereSupervisors($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereTimetableId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail withoutTrashed()
+ */
+	class TimetableDetail extends \Eloquent {}
 }
 
 namespace App\Models\Notification{

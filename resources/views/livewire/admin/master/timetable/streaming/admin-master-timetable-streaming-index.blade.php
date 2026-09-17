@@ -3,13 +3,20 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 line-clamp-1">
-                    Monitor Streaming: {{ $timetable->module->name ?? 'Ujian' }}
+                    @if(is_lemes() && $timetable->classmate)
+                        Monitor Streaming: {{ $timetable->classmate->name }} ({{ $timetable->name }})
+                    @else
+                        Monitor Streaming: {{ $timetable->module->name ?? $timetable->name ?? 'Ujian' }}
+                    @endif
                 </h1>
                 <p class="text-sm text-gray-500">
                     Sesi: {{ $timetable->name }} | {{ Carbon\Carbon::parse($timetable->start_date)->format('d M Y H:i') }}
                 </p>
             </div>
             <div class="flex items-center gap-3">
+                <a href="{{ route('admin.master.timetable') }}" class="btn btn-outline btn-sm">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Kembali
+                </a>
                 <div id="connection-status-dot" class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
                 <span class="text-sm font-medium text-gray-600">LiveKit Cloud Activated</span>
             </div>

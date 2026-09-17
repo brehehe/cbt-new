@@ -216,7 +216,7 @@ class QuestionImportJob implements ShouldQueue
                         $material_category = MaterialCategory::create([
                             'company_id' => $this->user?->company?->id,
                             'topic_id' => $topic->id,
-                            'name' => $materialCategoryName,
+                            'name' => \Illuminate\Support\Str::limit($materialCategoryName, 250, ''),
                         ]);
                     }
                 }
@@ -245,7 +245,7 @@ class QuestionImportJob implements ShouldQueue
                             'topic_id' => $topic->id,
                             'material_category_id' => $material_category?->id,
                             'level' => 1,
-                            'name' => $materialName,
+                            'name' => \Illuminate\Support\Str::limit($materialName, 250, ''),
                         ]);
                     }
                 }

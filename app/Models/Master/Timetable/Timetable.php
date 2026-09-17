@@ -56,6 +56,16 @@ class Timetable extends Model
         return $this->hasOne(TimetableModule::class, 'timetable_id', 'id');
     }
 
+    public function timetableDetails()
+    {
+        return $this->hasMany(TimetableDetail::class, 'timetable_id', 'id')->orderBy('order', 'asc');
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(TimetableAttendance::class, 'timetable_id', 'id');
+    }
+
     protected $casts = [
         'supervisors' => 'array',
         'start_time' => 'datetime',

@@ -24,6 +24,11 @@ namespace App\Helpers {
         {
             return (bool) config('app.is_shorinji', false);
         }
+
+        public static function isLemes(): bool
+        {
+            return (bool) config('app.is_lemes', false);
+        }
     }
 }
 
@@ -53,6 +58,13 @@ namespace {
         function is_shorinji(): bool
         {
             return (bool) config('app.is_shorinji', false);
+        }
+    }
+
+    if (! function_exists('is_lemes')) {
+        function is_lemes(): bool
+        {
+            return (bool) config('app.is_lemes', false);
         }
     }
 }

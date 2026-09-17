@@ -38,73 +38,88 @@
             </div>
         </div>
     </div>
-    <div class="grid grid-cols-2 gap-4 mb-4">
-        <div>
-            <label for="name" class="block text-sm font-medium text-gray-700">Nama</label>
-            <input type="text" id="name" value="{{ $timetable['name'] }}" disabled placeholder="Masukkan Nama"
-                class="mt-1 form-control">
+    @if(is_lemes())
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 mb-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="space-y-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center font-bold text-base border border-purple-200 shadow-xs">
+                        <i class="fa-solid fa-video"></i>
+                    </span>
+                    <h1 class="text-xl font-black text-slate-800">{{ $timetable['name'] }}</h1>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">
+                        <i class="fas fa-users text-[10px]"></i>
+                        Kelas: {{ \App\Models\Master\Timetable\Timetable::find($timetable_id)?->classmate?->name ?? 'Semua Kelas' }}
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500">Kumpulan rekaman kamera video peserta selama pengerjaan ujian.</p>
+            </div>
+            <a href="{{ route('admin.master.timetable') }}"
+                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 shadow-xs transition">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Kembali</span>
+            </a>
         </div>
-        <div>
-            <label for="module_id" class="block text-sm font-medium text-gray-700">Modul</label>
-            <div wire:key="select-{{ rand() }}">
-                <select disabled class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
-                    dropdownParent: 'body',
-                    allowClear: true,
-                    onChange: function(e) {
-                        @this.set('module_id', e ? e : '');
-                    }
-                });" wire:model='module_id' id="module_id">
-                    <option value="">-- Pilih Modul --</option>
-                    @foreach ($modules as $key_module => $module)
-                        <option value="{{ $key_module }}">{{ $module }}</option>
-                    @endforeach
-                </select>
+    @else
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-700">Nama</label>
+                <input type="text" id="name" value="{{ $timetable['name'] }}" disabled placeholder="Masukkan Nama"
+                    class="mt-1 form-control">
+            </div>
+            <div>
+                <label for="module_id" class="block text-sm font-medium text-gray-700">Modul</label>
+                <div wire:key="select-{{ rand() }}">
+                    <select disabled class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
+                        dropdownParent: 'body',
+                        allowClear: true,
+                        onChange: function(e) {
+                            @this.set('module_id', e ? e : '');
+                        }
+                    });" wire:model='module_id' id="module_id">
+                        <option value="">-- Pilih Modul --</option>
+                        @foreach ($modules as $key_module => $module)
+                            <option value="{{ $key_module }}">{{ $module }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="md:col-span-2">
+                <label for="supervisors" class="block text-sm font-medium text-gray-700">Pengawas</label>
+                <div wire:key="select-{{ rand() }}">
+                    <select disabled class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
+                        dropdownParent: 'body',
+                        allowClear: true,
+                        onChange: function(e) {
+                            @this.set('supervisors', e ? e : '');
+                        }
+                    });" wire:model.lazy="supervisors" id="supervisors" multiple>
+                        <option value="">-- Pilih Pengawas --</option>
+                        @foreach ($getSupervisors as $key_getSupervisor => $getSupervisor)
+                            <option value="{{ $key_getSupervisor }}">{{ $getSupervisor }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                @error('supervisors')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+            <div>
+                <label for="start_time" class="block text-sm font-medium text-gray-700">Waktu Mulai</label>
+                <input disabled type="text" id="start_time" value="{{ $start_time }}" placeholder="Masukkan"
+                    class="mt-1 form-control">
+            </div>
+            <div>
+                <label for="end_time" class="block text-sm font-medium text-gray-700">Waktu Selesai</label>
+                <input disabled type="text" id="end_time" value="{{ $end_time }}" placeholder="Masukkan"
+                    class="mt-1 form-control">
+            </div>
+            <div class="md:col-span-2">
+                <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                <textarea id="description" disabled value="{{ $timetable['description'] }}" placeholder="Masukkan Deskripsi"
+                    class="mt-1 form-control"></textarea>
             </div>
         </div>
-        <div class="md:col-span-2">
-            <label for="supervisors" class="block text-sm font-medium text-gray-700">Pengawas</label>
-            <div wire:key="select-{{ rand() }}">
-                <select disabled class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
-                    dropdownParent: 'body',
-                    allowClear: true,
-                    onChange: function(e) {
-                        @this.set('supervisors', e ? e : '');
-                    }
-                });" wire:model.lazy="supervisors" id="supervisors" multiple>
-                    <option value="">-- Pilih Pengawas --</option>
-                    @foreach ($getSupervisors as $key_getSupervisor => $getSupervisor)
-                        <option value="{{ $key_getSupervisor }}">{{ $getSupervisor }}</option>
-                    @endforeach
-                </select>
-            </div>
-            @error('supervisors')
-                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-        <div>
-            <label for="start_time" class="block text-sm font-medium text-gray-700">Waktu Mulai</label>
-            <input disabled type="text" id="start_time" value="{{ $start_time }}" placeholder="Masukkan"
-                class="mt-1 form-control">
-        </div>
-        <div>
-            <label for="end_time" class="block text-sm font-medium text-gray-700">Waktu Selesai</label>
-            <input disabled type="text" id="end_time" value="{{ $end_time }}" placeholder="Masukkan"
-                class="mt-1 form-control">
-        </div>
-        {{-- <div>
-            <label for="room" class="block text-sm font-medium text-gray-700">Ruangan <span
-                    class="text-red-600">*</span></label>
-            <input type="text" id="room" wire:model.defer="room" placeholder="Masukkan" class="mt-1 form-control">
-            @error('room')
-            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-            @enderror
-        </div> --}}
-        <div class="md:col-span-2">
-            <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
-            <textarea id="description" disabled value="{{ $timetable['description'] }}" placeholder="Masukkan Deskripsi"
-                class="mt-1 form-control"></textarea>
-        </div>
-    </div>
+    @endif
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <div class="flex items-center bg-white rounded-lg shadow-sm border border-gray-200 px-3 py-2 w-full md:w-auto">
             <span class="text-sm text-gray-600 mr-2">Tampil</span>

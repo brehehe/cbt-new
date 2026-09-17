@@ -7,7 +7,7 @@
     $secondary = $company->color_secondary;
 @endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="light">
 
 <head>
     <meta charset="utf-8">
@@ -59,18 +59,30 @@
         }
 
         /* User Info Watermark */
+        /* User Info Watermark */
         .watermark-user {
             position: fixed;
-            bottom: 0px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 8px 12px;
+            bottom: 6px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 6px 12px;
             border-radius: 8px;
-            font-size: 12px;
+            font-size: 11px;
             color: #666;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            z-index: 30;
             backdrop-filter: blur(10px);
+            pointer-events: none;
+        }
+
+        @media (max-width: 640px) {
+            .watermark-user {
+                font-size: 10px;
+                padding: 4px 8px;
+                bottom: 4px;
+                right: 8px;
+                opacity: 0.75;
+            }
         }
 
         /* Alternative: Corner watermark */
@@ -143,8 +155,14 @@
             background: #2563eb;
         }
     </style>
+    @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+    <script>
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+        try { localStorage.setItem('flux.appearance', 'light'); } catch(e){}
+    </script>
 </head>
 
 <body class="bg-white">
@@ -203,6 +221,9 @@
     <script src="{{ asset('vendor/flatpickr/flatpickr.min.js') }}"></script>
     <!-- Summernote Lite JS -->
     <script src="{{ asset('vendor/summernote/summernote-lite.min.js') }}"></script>
+
+    <!-- HTML5-QRCode Scanner -->
+    <script src="{{ asset('vendor/html5-qrcode/html5-qrcode.min.js') }}"></script>
 
     <!-- file pond -->
     <script src="{{ asset('vendor/filepond-plugin-image-preview/filepond-plugin-image-preview.js') }}"></script>
@@ -329,6 +350,43 @@
         // Disable autocomplete on all inputs
         document.querySelectorAll('input, form').forEach(el => {
             el.setAttribute('autocomplete', 'off');
+        });
+
+        // Force fresh reload if page is restored from browser Back-Forward cache (BFCache)
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+
+        // Unregister any rogue Service Worker and purge CacheStorage so fresh CSRF tokens are always served
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for (let registration of registrations) {
+                    registration.unregister();
+                }
+            });
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    for (let name of names) {
+                        caches.delete(name);
+                    }
+                });
+            }
+        }
+
+        // Handle Livewire 419 (Page Expired / Session Expired after migrate:fresh) automatically without ugly browser popup
+        document.addEventListener('livewire:init', () => {
+            if (window.Livewire) {
+                Livewire.hook('request', ({ fail }) => {
+                    fail(({ status, preventDefault }) => {
+                        if (status === 419) {
+                            preventDefault();
+                            window.location.reload();
+                        }
+                    });
+                });
+            }
         });
     </script>
 

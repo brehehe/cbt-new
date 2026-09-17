@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,10 +14,16 @@
 
 
     <!-- App -->
+    @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <tallstackui:script />
     @livewireStyles
     @stack('styles')
+    <script>
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+        try { localStorage.setItem('flux.appearance', 'light'); } catch(e){}
+    </script>
 </head>
 
 <body class="min-h-screen">

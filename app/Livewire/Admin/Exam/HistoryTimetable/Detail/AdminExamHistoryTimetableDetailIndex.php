@@ -51,14 +51,20 @@ class AdminExamHistoryTimetableDetailIndex extends Component
 
         $timetable = Timetable::with('userTimetables')->find($this->timetable_id);
         if (! $timetable) {
-            return redirect()->route('admin.master.timetable');
+            $fallback = Auth::user()?->hasRole(['Mahasiswa', 'mahasiswa', 'Kenshi', 'kenshi'])
+                ? 'admin.exam.timetable'
+                : 'admin.master.timetable';
+            return redirect()->route($fallback);
         }
 
         $this->timetable = $timetable->toArray();
 
         $this->user_timetable = $timetable->userTimetables()->find($this->user_timetable_id);
         if (! $this->user_timetable) {
-            return redirect()->route('admin.master.timetable.detail', ['timetable_id' => $this->timetable_id]);
+            $fallback = Auth::user()?->hasRole(['Mahasiswa', 'mahasiswa', 'Kenshi', 'kenshi'])
+                ? 'admin.exam.timetable'
+                : 'admin.master.timetable.detail';
+            return redirect()->route($fallback, ['timetable_id' => $this->timetable_id]);
         }
 
         $this->start_time = Carbon::parse($timetable->start_time)->format('d/m/Y H:i');

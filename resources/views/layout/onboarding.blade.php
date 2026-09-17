@@ -7,7 +7,7 @@
     $secondary = $company->color_secondary;
 @endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="light">
 
 <head>
     <meta charset="utf-8">
@@ -44,6 +44,11 @@
     </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+    <script>
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+        try { localStorage.setItem('flux.appearance', 'light'); } catch(e){}
+    </script>
 </head>
 
 <body class="bg-gray-50 min-h-screen w-full text-gray-900 font-sans antialiased overflow-x-hidden">

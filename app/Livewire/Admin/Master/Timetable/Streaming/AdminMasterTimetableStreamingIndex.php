@@ -58,7 +58,7 @@ class AdminMasterTimetableStreamingIndex extends Component
 
     public function loadTimetable()
     {
-        $this->timetable = Timetable::with(['module', 'company'])->findOrFail($this->timetableId);
+        $this->timetable = Timetable::with(['module', 'company', 'classmate', 'timetableDetails.module'])->findOrFail($this->timetableId);
     }
 
     public function refreshStreamData()

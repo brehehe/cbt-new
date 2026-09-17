@@ -47,6 +47,10 @@ class AuthLoginIndex extends Component
         // $this->is_credentials = in_array(config('app.env'), ['local', 'development']) ? true : false;
         $this->is_credentials = config('app.login_is_credentials', true);
 
+        $isShorinji = function_exists('is_shorinji') && is_shorinji();
+        $studentKey = $isShorinji ? 'kenshi' : 'mahasiswa';
+        $studentUsername = $isShorinji ? 'kenshi1' : 'mahasiswa1';
+
         $this->credentials = [
             'admin' => [
                 'username_or_email' => 'procbt',
@@ -60,17 +64,21 @@ class AuthLoginIndex extends Component
                 'username_or_email' => 'ahmad.supervisor@cbt.test',
                 'password' => 'password123',
             ],
-            'mahasiswa' => [
-                'username_or_email' => 'mahasiswa1',
+            $studentKey => [
+                'username_or_email' => $studentUsername,
                 'password' => 'password123',
             ],
         ];
 
         $this->company = Company::getCached();
 
-        // Jika sudah login, langsung redirect ke dashboard
+        // Jika sudah login, langsung redirect sesuai role
         if (Auth::check()) {
-            return redirect()->route('admin.dashboard'); // ubah 'dashboard' sesuai nama route kamu
+            $currentUser = Auth::user();
+            if ($currentUser->hasRole(['Mahasiswa', 'mahasiswa', 'Kenshi', 'kenshi']) || $currentUser->type_study === 'mahasiswa') {
+                return redirect()->route('admin.exam.timetable');
+            }
+            return redirect()->route('admin.dashboard');
         }
 
         $this->generateCaptcha();
@@ -96,9 +104,10 @@ class AuthLoginIndex extends Component
         } elseif ($role == 'pengawas') {
             $this->username_or_email = $this->credentials['pengawas']['username_or_email'];
             $this->password = $this->credentials['pengawas']['password'];
-        } elseif ($role == 'mahasiswa') {
-            $this->username_or_email = $this->credentials['mahasiswa']['username_or_email'];
-            $this->password = $this->credentials['mahasiswa']['password'];
+        } elseif ($role == 'mahasiswa' || $role == 'kenshi') {
+            $key = isset($this->credentials['kenshi']) ? 'kenshi' : 'mahasiswa';
+            $this->username_or_email = $this->credentials[$key]['username_or_email'] ?? 'kenshi1';
+            $this->password = $this->credentials[$key]['password'] ?? 'password123';
         }
     }
 
@@ -191,7 +200,14 @@ class AuthLoginIndex extends Component
             'text' => 'Anda berhasil login ke sistem!',
         ]);
 
-        return $this->redirect(route('admin.dashboard'));
+        $redirectUrl = route('admin.dashboard');
+        if ($user->hasRole(['Mahasiswa', 'mahasiswa', 'Kenshi', 'kenshi']) || $user->type_study === 'mahasiswa') {
+            $redirectUrl = route('admin.exam.timetable');
+        } elseif ($user->hasRole(['Pengawas', 'pengawas'])) {
+            $redirectUrl = route('admin.master.timetable');
+        }
+
+        return $this->redirect($redirectUrl);
     }
 
     public function ikmbLogin()
@@ -240,7 +256,14 @@ class AuthLoginIndex extends Component
                     'text' => 'Anda berhasil login ke sistem!',
                 ]);
 
-                return redirect()->intended(route('admin.dashboard'));
+                $redirectUrl = route('admin.dashboard');
+                if ($user->hasRole(['Mahasiswa', 'mahasiswa', 'Kenshi', 'kenshi']) || $user->type_study === 'mahasiswa') {
+                    $redirectUrl = route('admin.exam.timetable');
+                } elseif ($user->hasRole(['Pengawas', 'pengawas'])) {
+                    $redirectUrl = route('admin.master.timetable');
+                }
+
+                return redirect()->intended($redirectUrl);
             } else {
                 RateLimiter::hit($this->throttleKey());
                 Log::channel('security')->warning('Login failed: invalid password (ikmb)', [

@@ -30,14 +30,21 @@ class RoleBasedDashboardRedirect
         if (Auth::check()) {
             $user = Auth::user();
 
+            // In LEMES mode, onboarding is skipped and students directly access timetable/materials
+            if (function_exists('is_lemes') && is_lemes()) {
+                return $next($request);
+            }
+
             // Check if user is a student (either by role or type_study)
-            $isStudent = ($user->type_study === 'mahasiswa' || $user->hasRole('Mahasiswa'));
+            $isStudent = ($user->type_study === 'mahasiswa' || $user->hasRole(['Mahasiswa', 'mahasiswa']));
 
             if ($isStudent && ! $user->user_check) {
                 // Allow specific routes to avoid infinite loop
                 if (
                     $request->routeIs('student.onboarding') ||
                     $request->routeIs('logout') ||
+                    $request->is('admin/exam/*') ||
+                    $request->routeIs('admin.exam.timetable') ||
                     $request->is('livewire/*') ||
                     $request->is('*/livewire/*') ||
                     $request->is('admin/security/log') ||

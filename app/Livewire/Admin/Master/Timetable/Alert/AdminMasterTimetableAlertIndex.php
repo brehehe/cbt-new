@@ -53,9 +53,9 @@ class AdminMasterTimetableAlertIndex extends Component
         $this->timetable = $timetable->toArray();
         $supervisorsData = $timetable->supervisors ?? $timetable['supervisors'] ?? [];
         $this->supervisors = is_array($supervisorsData) ? $supervisorsData : (json_decode($supervisorsData, true) ?: []);
-        $this->module_id = $timetable['module_id'];
-        $this->start_time = Carbon::parse($timetable->start_time)->format('d/m/Y H:i');
-        $this->end_time = Carbon::parse($timetable->end_time)->format('d/m/Y H:i');
+        $this->module_id = $timetable['module_id'] ?? null;
+        $this->start_time = $timetable->start_time ? Carbon::parse($timetable->start_time)->format('d/m/Y H:i') : '-';
+        $this->end_time = $timetable->end_time ? Carbon::parse($timetable->end_time)->format('d/m/Y H:i') : '-';
     }
 
     public function render()

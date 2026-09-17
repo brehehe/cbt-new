@@ -16,58 +16,84 @@
         </div>
     </div>
 
-    {{-- Info Jadwal --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-        <div>
-            <label for="name" class="block text-sm font-medium text-gray-700">Nama</label>
-            <input type="text" id="name" value="{{ $timetable['name'] }}" disabled placeholder="Masukkan Nama"
-                class="mt-1 form-control">
-        </div>
-        <div>
-            <label for="module_id" class="block text-sm font-medium text-gray-700">Modul</label>
-            <div wire:key="select-{{ rand() }}">
-                <select disabled class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
-                    dropdownParent: 'body',
-                    allowClear: true,
-                    onChange: function(e) {
-                        @this.set('module_id', e ? e : '');
-                    }
-                });" wire:model='module_id' id="module_id">
-                    <option value="">-- Pilih Modul --</option>
-                    @foreach ($modules as $key_module => $module)
-                        <option value="{{ $key_module }}">{{ $module }}</option>
-                    @endforeach
-                </select>
+    @if(is_lemes())
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 mb-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="space-y-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center font-bold text-base border border-blue-200 shadow-xs">
+                        <i class="fa-solid fa-file-lines"></i>
+                    </span>
+                    <h1 class="text-xl font-black text-slate-800">{{ $timetable['name'] }}</h1>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">
+                        <i class="fas fa-users text-[10px]"></i>
+                        Kelas: {{ \App\Models\Master\Timetable\Timetable::find($timetable_id)?->classmate?->name ?? 'Semua Kelas' }}
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500">
+                    Lembar Jawaban Peserta: <strong class="text-slate-800">{{ $user_timetable->user->name }}</strong> ({{ $user_timetable->user->nim ?? $user_timetable->user->username }})
+                </p>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('admin.master.timetable.detail', ['timetable_id' => $timetable_id, 'tab' => 'scores']) }}"
+                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 shadow-xs transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Kembali ke Detail</span>
+                </a>
             </div>
         </div>
-        <div>
-            <label for="start_time" class="block text-sm font-medium text-gray-700">Waktu Mulai</label>
-            <input disabled type="text" id="start_time" value="{{ $start_time }}" placeholder="Masukkan"
-                class="mt-1 form-control">
-        </div>
-        <div>
-            <label for="end_time" class="block text-sm font-medium text-gray-700">Waktu Selesai</label>
-            <input disabled type="text" id="end_time" value="{{ $end_time }}" placeholder="Masukkan"
-                class="mt-1 form-control">
-        </div>
-        <div class="col-span-1 md:col-span-2 lg:col-span-4">
-            <label for="supervisors" class="block text-sm font-medium text-gray-700">Pengawas</label>
-            <div wire:key="select-{{ rand() }}">
-                <select disabled class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
-                    dropdownParent: 'body',
-                    allowClear: true,
-                    onChange: function(e) {
-                        @this.set('supervisors', e ? e : '');
-                    }
-                });" wire:model.lazy="supervisors" id="supervisors" multiple>
-                    <option value="">-- Pilih Pengawas --</option>
-                    @foreach ($getSupervisors as $key_getSupervisor => $getSupervisor)
-                        <option value="{{ $key_getSupervisor }}">{{ $getSupervisor }}</option>
-                    @endforeach
-                </select>
+    @else
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-700">Nama</label>
+                <input type="text" id="name" value="{{ $timetable['name'] }}" disabled placeholder="Masukkan Nama"
+                    class="mt-1 form-control">
+            </div>
+            <div>
+                <label for="module_id" class="block text-sm font-medium text-gray-700">Modul</label>
+                <div wire:key="select-{{ rand() }}">
+                    <select disabled class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
+                        dropdownParent: 'body',
+                        allowClear: true,
+                        onChange: function(e) {
+                            @this.set('module_id', e ? e : '');
+                        }
+                    });" wire:model='module_id' id="module_id">
+                        <option value="">-- Pilih Modul --</option>
+                        @foreach ($modules as $key_module => $module)
+                            <option value="{{ $key_module }}">{{ $module }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label for="start_time" class="block text-sm font-medium text-gray-700">Waktu Mulai</label>
+                <input disabled type="text" id="start_time" value="{{ $start_time }}" placeholder="Masukkan"
+                    class="mt-1 form-control">
+            </div>
+            <div>
+                <label for="end_time" class="block text-sm font-medium text-gray-700">Waktu Selesai</label>
+                <input disabled type="text" id="end_time" value="{{ $end_time }}" placeholder="Masukkan"
+                    class="mt-1 form-control">
+            </div>
+            <div class="col-span-1 md:col-span-2 lg:col-span-4">
+                <label for="supervisors" class="block text-sm font-medium text-gray-700">Pengawas</label>
+                <div wire:key="select-{{ rand() }}">
+                    <select disabled class="mt-1 form-control" x-data x-ref="input" x-init="$($refs.input).selectize({
+                        dropdownParent: 'body',
+                        allowClear: true,
+                        onChange: function(e) {
+                            @this.set('supervisors', e ? e : '');
+                        }
+                    });" wire:model.lazy="supervisors" id="supervisors" multiple>
+                        <option value="">-- Pilih Pengawas --</option>
+                        @foreach ($getSupervisors as $key_getSupervisor => $getSupervisor)
+                            <option value="{{ $key_getSupervisor }}">{{ $getSupervisor }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
         </div>
-    </div>
+    @endif
 
     {{-- Statistik --}}
     <div class="grid grid-cols-2 md:grid-cols-3 {{ auth()->user()->hasRole(['Pengawas', 'pengawas']) ? 'lg:grid-cols-1' : 'lg:grid-cols-6' }} gap-4 mb-6">

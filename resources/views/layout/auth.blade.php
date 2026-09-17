@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="light">
 
 <head>
     <meta charset="utf-8">
@@ -21,7 +21,13 @@
     <link href="{{ asset('vendor/remixicon/remixicon.css') }}" rel="stylesheet" />
     <tallstackui:script />
     @livewireStyles
+    @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script>
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+        try { localStorage.setItem('flux.appearance', 'light'); } catch(e){}
+    </script>
     <title>{{ $setting?->website_name ?? 'Burningroom Technology' }}</title>
     <style>
         /* Disable text selection */
@@ -53,8 +59,8 @@
         // document.addEventListener('copy', event => event.preventDefault());
         // document.addEventListener('cut', event => event.preventDefault());
 
-
         // HYPER-AGGRESIVE SHORTCUT DETECTION (Capture Phase)
+        /*
         window.addEventListener('keydown', function(e) {
             // Pengecualian khusus: Izinkan Refresh Halaman (Cmd+Shift+R atau Ctrl+Shift+R atau F5 atau Cmd+R)
             if (
@@ -65,27 +71,40 @@
                 return true; 
             }
 
-
             // Disable Ctrl+C, Ctrl+V, Ctrl+U, F12
-            /* if (
+            if (
                 (e.ctrlKey && (e.keyCode === 67 || e.keyCode === 86 || e.keyCode === 85 || e.keyCode === 73 || e.keyCode === 74)) ||
                 e.keyCode === 123 ||
                 e.keyCode === 44 // PrintScreen
             ) {
-                
                 if (e.ctrlKey || e.metaKey || e.keyCode === 123 || e.keyCode === 44) {
                     e.preventDefault();
                 }
                 return false;
             }
         }, true);
-
-        // });
+        */
 
         // Disable autocomplete on all inputs
         document.querySelectorAll('input, form').forEach(el => {
             el.setAttribute('autocomplete', 'off');
         });
+
+        // Unregister any rogue Service Worker and purge CacheStorage
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for (let registration of registrations) {
+                    registration.unregister();
+                }
+            });
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    for (let name of names) {
+                        caches.delete(name);
+                    }
+                });
+            }
+        }
     </script>
 
     @stack('scripts')

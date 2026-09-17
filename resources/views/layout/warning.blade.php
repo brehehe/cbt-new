@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en" class="h-full light">
 
 <head>
     <meta charset="UTF-8">
@@ -9,6 +9,11 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('vendor/font-awesome/css/all.min.css') }}">
+    <script>
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+        try { localStorage.setItem('flux.appearance', 'light'); } catch(e){}
+    </script>
     <style>
         /* Watermark Logo Styles */
         .watermark-logo {

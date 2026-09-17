@@ -24,6 +24,9 @@
 
         <!-- Body (Scrollable) -->
         <div class="px-6 py-5 text-gray-600 overflow-y-auto space-y-6 flex-1">
+            @if(is_lemes())
+                @include('livewire.admin.master.timetable.admin-master-timetable-modal-lemes')
+            @else
             <!-- Section 1: Informasi Utama & Pelaksanaan -->
             <div class="space-y-4">
                 <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 border-b pb-1 flex items-center gap-1.5">
@@ -266,6 +269,7 @@
                     </label>
                 </div>
             </div>
+            @endif
         </div>
 
         <!-- Footer -->
@@ -359,7 +363,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Pengawas Ujian</label>
                     <div class="space-y-2 max-h-60 overflow-y-auto border border-gray-200 rounded-xl p-3 bg-gray-50">
-                        @forelse ($availableSupervisors as $supervisorId => $supervisorName)
+                        @forelse (($availableSupervisors ?? $this->availableSupervisors ?? []) as $supervisorId => $supervisorName)
                             <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-white transition cursor-pointer text-sm font-medium text-gray-700">
                                 <input type="checkbox"
                                     wire:model="selectedSupervisors"

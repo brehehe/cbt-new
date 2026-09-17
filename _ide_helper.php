@@ -26299,6 +26299,20 @@ namespace App\Livewire\Admin\Master\Material {
             }
     }
 
+namespace App\Livewire\Admin\Master\DigitalBook\Category {
+    /**
+     */
+    class AdminMasterDigitalBookCategoryIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\DigitalBook\Book {
+    /**
+     */
+    class AdminMasterDigitalBookIndex extends \Livewire\Component {
+            }
+    }
+
 namespace App\Livewire\Admin\Master\QuestionType {
     /**
      */

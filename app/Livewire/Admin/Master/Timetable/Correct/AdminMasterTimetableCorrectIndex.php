@@ -21,7 +21,7 @@ class AdminMasterTimetableCorrectIndex extends Component
     public function mount($timetable_id)
     {
         $this->timetable_id = $timetable_id;
-        $this->timetable = Timetable::findOrFail($this->timetable_id);
+        $this->timetable = Timetable::with(['module', 'classmate', 'timetableDetails.module'])->findOrFail($this->timetable_id);
     }
 
     public function render()

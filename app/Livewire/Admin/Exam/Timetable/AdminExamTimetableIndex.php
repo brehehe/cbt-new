@@ -3,8 +3,11 @@
 namespace App\Livewire\Admin\Exam\Timetable;
 
 use App\Helpers\AlertHelper;
+use App\Models\Master\DigitalBook\DigitalBook;
 use App\Models\Master\Question\ModuleQuestion;
 use App\Models\Master\Timetable\Timetable;
+use App\Models\Master\Timetable\TimetableAttendance;
+use App\Models\Master\Timetable\TimetableDetail;
 use App\Models\Timetable\TimetableQuestion;
 use App\Models\User;
 use App\Models\User\UserModuleQuestion;
@@ -16,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Milon\Barcode\DNS2D;
 use Session;
 
 class AdminExamTimetableIndex extends Component
@@ -43,6 +47,16 @@ class AdminExamTimetableIndex extends Component
 
     public $availableSupervisors = [];
 
+    // LEMES Mode Properties
+    public $selectedDigitalBook = null;
+    public $selectedDetail = null;
+    public $materialTokenInput = '';
+    public $studentQrBase64 = null;
+    public $studentQrInfo = [];
+    public $scan_target_detail_id = null;
+    public $target_detail_id = null;
+    public $manual_qr_code = '';
+
     public function mount()
     {
         if (session()->has('saved')) {
@@ -55,13 +69,17 @@ class AdminExamTimetableIndex extends Component
         Session::forget('user_timetable_id');
     }
 
-    public function openModalStartExam($id)
+    public function openModalStartExam($id, $detailId = null)
     {
         $this->data_id = $id;
+        $this->target_detail_id = $detailId;
         $timetable = Timetable::withoutGlobalScopes()->find($id);
+        $detail = $detailId ? TimetableDetail::find($detailId) : null;
 
-        if ($timetable && !$timetable->requiresToken()) {
-            $this->code = $timetable->code ?? 'NO_TOKEN';
+        $requiresToken = $detail ? (bool)$detail->require_token : ($timetable ? $timetable->requiresToken() : true);
+
+        if (!$requiresToken) {
+            $this->code = $detail?->token ?? $timetable?->code ?? 'NO_TOKEN';
             return $this->submitStartExam();
         }
 
@@ -70,7 +88,7 @@ class AdminExamTimetableIndex extends Component
 
     public function closeModalStartExam()
     {
-        $this->reset(['data_id', 'code']);
+        $this->reset(['data_id', 'target_detail_id', 'code']);
 
         return $this->dispatch('close-modal', ['id' => 'modal-start-exam']);
     }
@@ -78,7 +96,48 @@ class AdminExamTimetableIndex extends Component
     public function submitStartExam()
     {
         $targetTimetable = Timetable::withoutGlobalScopes()->find($this->data_id);
-        $requiresToken = $targetTimetable ? $targetTimetable->requiresToken() : true;
+        $targetDetail = $this->target_detail_id 
+            ? TimetableDetail::find($this->target_detail_id) 
+            : ($targetTimetable?->timetableDetails?->first());
+
+        $checkItem = $targetDetail ?? $targetTimetable;
+
+        if ($checkItem) {
+            $now = Carbon::now();
+            if ($checkItem->start_time) {
+                $earlyAllowed = Carbon::parse($checkItem->start_time)->subMinutes(5);
+                if ($now->lt($earlyAllowed)) {
+                    return AlertHelper::error('Belum Dibuka', 'Jadwal ujian belum dapat dibuka. Ujian dimulai pukul ' . Carbon::parse($checkItem->start_time)->format('H:i') . ' (dapat diakses 5 menit sebelum waktu mulai).');
+                }
+            }
+            if ($checkItem->end_time) {
+                $lateAllowed = Carbon::parse($checkItem->end_time)->addMinutes(5);
+                if ($now->gt($lateAllowed)) {
+                    return AlertHelper::error('Jadwal Berakhir', 'Waktu pelaksanaan ujian ini telah berakhir.');
+                }
+            }
+        }
+
+        if (is_lemes() && $targetTimetable) {
+            $mustAttend = $targetDetail ? (bool)$targetDetail->require_attendance : $targetTimetable->timetableDetails()->where('require_attendance', true)->exists();
+            if ($mustAttend) {
+                $attended = TimetableAttendance::where('timetable_id', $targetTimetable->id)
+                    ->where(function ($q) use ($targetDetail) {
+                        if ($targetDetail) {
+                            $q->whereNull('timetable_detail_id')->orWhere('timetable_detail_id', $targetDetail->id);
+                        }
+                    })
+                    ->where('user_id', Auth::id())
+                    ->exists();
+                if (!$attended) {
+                    $this->openStudentScanner($targetDetail?->id);
+                    return AlertHelper::error('Presensi Wajib', 'Anda belum melakukan scan absensi kehadiran untuk jadwal ini. Silakan scan QRCODE sesi yang telah dicetak oleh Admin / Pengawas.');
+                }
+            }
+        }
+
+        $requiresToken = $targetDetail ? (bool)$targetDetail->require_token : ($targetTimetable ? $targetTimetable->requiresToken() : true);
+        $expectedToken = $targetDetail?->token ?: ($targetTimetable?->code);
 
         if ($requiresToken) {
             $this->validate([
@@ -90,18 +149,22 @@ class AdminExamTimetableIndex extends Component
 
         try {
             DB::beginTransaction();
-            $query = Timetable::withoutGlobalScopes()
-                ->select('id', 'code', 'company_id', 'studys', 'is_camera', 'is_recording', 'is_streaming', 'require_token')
-                ->where('company_id', Auth::user()->company_id);
-
             if ($requiresToken) {
-                $query->where('code', trim($this->code));
+                $tokenMatches = (trim($this->code) === trim($expectedToken)) || (trim($this->code) === trim($targetTimetable?->code));
+                if (! $tokenMatches) {
+                    AlertHelper::error('Gagal', 'Token Yang Dimasukan Tidak Sesuai');
+
+                    return;
+                }
             }
 
-            $timeTable = $query->find($this->data_id);
+            $timeTable = Timetable::withoutGlobalScopes()
+                ->select('id', 'code', 'company_id', 'studys', 'is_camera', 'is_recording', 'is_streaming', 'require_token')
+                ->where('company_id', Auth::user()->company_id)
+                ->find($this->data_id);
 
             if (! $timeTable) {
-                AlertHelper::error('Gagal', 'Token Yang Dimasukan Tidak Sesuai');
+                AlertHelper::error('Gagal', 'Data jadwal ujian tidak ditemukan');
 
                 return;
             }
@@ -401,14 +464,10 @@ class AdminExamTimetableIndex extends Component
         }
 
         if (in_array($userTimetable->status, ['done', 'suspend'])) {
-            if ($userTimetable->canResetOrRepeat()) {
-                Session::put('user_timetable_id', $id);
-                return redirect()->route('admin.exam.detail.react', [
-                    'userTimetableId' => $id,
-                ]);
-            }
-
-            return AlertHelper::error('Gagal', 'Ujian Sudah Selesai');
+            return redirect()->route('admin.exam.history-timetable.detail', [
+                'timetable_id' => $userTimetable->timetable_id,
+                'user_timetable_id' => $userTimetable->id,
+            ]);
         }
 
         if ($userTimetable->status == 'warning') {
@@ -424,6 +483,14 @@ class AdminExamTimetableIndex extends Component
                 'userTimetableId' => $id,
             ]);
         }
+    }
+
+    public function viewResult($timetableId, $userTimetableId)
+    {
+        return redirect()->route('admin.exam.history-timetable.detail', [
+            'timetable_id' => $timetableId,
+            'user_timetable_id' => $userTimetableId,
+        ]);
     }
 
     public function repeatExam($userTimetableId)
@@ -587,6 +654,284 @@ class AdminExamTimetableIndex extends Component
         }
     }
 
+    // ==========================================
+    // LEMES METHODS (STUDENT QR & DIGITAL BOOK)
+    // ==========================================
+
+    public function showMyQrCode()
+    {
+        $user = Auth::user();
+        if (!$user) return;
+
+        $payload = json_encode([
+            'user_id' => $user->id,
+            'username' => $user->username,
+            'name' => $user->name,
+        ]);
+
+        $this->studentQrBase64 = (new DNS2D())->getBarcodePNG($payload, 'QRCODE', 6, 6);
+        $this->studentQrInfo = [
+            'name' => $user->name,
+            'username' => $user->username,
+            'company' => $user->company?->name ?? 'CBT System',
+            'role' => student_label(),
+        ];
+
+        return $this->dispatch('open-modal', ['id' => 'modal-student-qr']);
+    }
+
+    public function closeMyQrCode()
+    {
+        $this->reset(['studentQrBase64', 'studentQrInfo']);
+        return $this->dispatch('close-modal', ['id' => 'modal-student-qr']);
+    }
+
+    public function openMaterial($detailId)
+    {
+        $detail = TimetableDetail::with(['digitalBook.category', 'timetable'])->find($detailId);
+        if (!$detail || !$detail->digitalBook) {
+            return AlertHelper::error('Gagal', 'Data materi tidak ditemukan.');
+        }
+
+        // Cek waktu pelaksanaan materi (toleransi 5 menit sebelum mulai hingga selesai)
+        $now = Carbon::now();
+        if ($detail->start_time) {
+            $earlyAllowed = Carbon::parse($detail->start_time)->subMinutes(5);
+            if ($now->lt($earlyAllowed)) {
+                return AlertHelper::error('Belum Dibuka', 'Materi pembelajaran belum dapat dibuka. Materi dimulai pukul ' . Carbon::parse($detail->start_time)->format('H:i') . ' (dapat diakses 5 menit sebelum waktu mulai).');
+            }
+        }
+        if ($detail->end_time) {
+            $lateAllowed = Carbon::parse($detail->end_time)->addMinutes(5);
+            if ($now->gt($lateAllowed)) {
+                return AlertHelper::error('Jadwal Berakhir', 'Waktu akses untuk materi pembelajaran ini telah berakhir.');
+            }
+        }
+
+        $this->selectedDetail = $detail;
+
+        // Cek absensi jika wajib
+        if ($detail->require_attendance) {
+            $attended = TimetableAttendance::where('timetable_id', $detail->timetable_id)
+                ->where(function ($q) use ($detail) {
+                    $q->whereNull('timetable_detail_id')
+                      ->orWhere('timetable_detail_id', $detail->id);
+                })
+                ->where('user_id', Auth::id())
+                ->exists();
+
+            if (!$attended) {
+                $this->openStudentScanner($detail->id);
+                return AlertHelper::error('Presensi Wajib', 'Anda belum melakukan scan absensi untuk materi ini. Silakan scan QRCODE sesi yang telah dicetak oleh Admin / Pengawas.');
+            }
+        }
+
+        // Cek token jika wajib
+        if ($detail->require_token) {
+            $this->materialTokenInput = '';
+            return $this->dispatch('open-modal', ['id' => 'modal-material-token']);
+        }
+
+        // Buka materi langsung
+        $this->selectedDigitalBook = $detail->digitalBook;
+        return $this->dispatch('open-modal', ['id' => 'modal-view-material']);
+    }
+
+    public function submitMaterialToken()
+    {
+        if (!$this->selectedDetail) {
+            return AlertHelper::error('Gagal', 'Detail materi tidak ditemukan.');
+        }
+
+        if (trim($this->materialTokenInput) !== trim($this->selectedDetail->token)) {
+            return AlertHelper::error('Token Salah', 'Token materi yang Anda masukkan tidak sesuai.');
+        }
+
+        $this->selectedDigitalBook = $this->selectedDetail->digitalBook;
+        $this->dispatch('close-modal', ['id' => 'modal-material-token']);
+        return $this->dispatch('open-modal', ['id' => 'modal-view-material']);
+    }
+
+    public function closeMaterialToken()
+    {
+        $this->reset(['materialTokenInput']);
+        return $this->dispatch('close-modal', ['id' => 'modal-material-token']);
+    }
+
+    public function closeMaterial()
+    {
+        $this->reset(['selectedDigitalBook', 'selectedDetail', 'materialTokenInput']);
+        return $this->dispatch('close-modal', ['id' => 'modal-view-material']);
+    }
+
+    // ==========================================
+    // STUDENT CAMERA SCANNER FOR ATTENDANCE
+    // ==========================================
+
+    public function openStudentScanner($detailId = null)
+    {
+        $this->scan_target_detail_id = $detailId;
+        $this->manual_qr_code = '';
+        return $this->dispatch('open-modal', ['id' => 'modal-student-camera-scan']);
+    }
+
+    public function closeStudentScanner()
+    {
+        $this->reset(['scan_target_detail_id', 'manual_qr_code']);
+        return $this->dispatch('close-modal', ['id' => 'modal-student-camera-scan']);
+    }
+
+    public function processStudentAttendanceScan($qrPayload)
+    {
+        try {
+            $user = Auth::user();
+            if (!$user) {
+                $this->dispatch('student-scan-error', ['message' => 'Sesi login Anda telah kedaluwarsa. Silakan login kembali.']);
+                return;
+            }
+
+            $cleanPayload = trim($qrPayload);
+            if (empty($cleanPayload)) {
+                $this->dispatch('student-scan-error', ['message' => 'QRCODE kosong atau tidak terbaca!']);
+                return;
+            }
+
+            $detailCode = null;
+            $detailId = null;
+
+            $decoded = json_decode($cleanPayload, true);
+            if (is_array($decoded)) {
+                $detailCode = $decoded['code'] ?? null;
+                $detailId = $decoded['detail_id'] ?? $decoded['timetable_detail_id'] ?? null;
+            } else {
+                $detailCode = $cleanPayload;
+            }
+
+            // Cari detail berdasarkan Code atau ID (dengan validasi UUID untuk PostgreSQL)
+            $isPayloadUuid = Str::isUuid($cleanPayload);
+            $isDetailIdUuid = $detailId && Str::isUuid($detailId);
+
+            $detail = TimetableDetail::withoutGlobalScopes()
+                ->with(['timetable.classmate.classmateStudents', 'examRoom', 'examSession', 'module', 'digitalBook'])
+                ->where(function ($q) use ($detailCode, $detailId, $cleanPayload, $isPayloadUuid, $isDetailIdUuid) {
+                    if ($detailCode) {
+                        $q->where('code', $detailCode);
+                    }
+                    if ($isDetailIdUuid) {
+                        $q->orWhere('id', $detailId);
+                    }
+                    if ($isPayloadUuid) {
+                        $q->orWhere('id', $cleanPayload);
+                    }
+                })
+                ->first();
+
+            // Jika tidak langsung ketemu detail, coba cari timetable dan ambil detail pertamanya
+            if (!$detail) {
+                $timetable = Timetable::withoutGlobalScopes()
+                    ->with(['timetableDetails.examRoom', 'timetableDetails.examSession', 'timetableDetails.module', 'timetableDetails.digitalBook', 'classmate.classmateStudents'])
+                    ->where(function ($q) use ($cleanPayload, $isPayloadUuid) {
+                        $q->where('code', $cleanPayload);
+                        if ($isPayloadUuid) {
+                            $q->orWhere('id', $cleanPayload);
+                        }
+                    })
+                    ->first();
+
+                if ($timetable && $timetable->timetableDetails->isNotEmpty()) {
+                    $detail = $timetable->timetableDetails->first();
+                }
+            }
+
+            if (!$detail || !$detail->timetable) {
+                $this->dispatch('student-scan-error', [
+                    'message' => 'QRCODE sesi tidak terdaftar di sistem. Pastikan Anda scan lembar QRCODE yang dicetak oleh Admin / Pengawas.'
+                ]);
+                return;
+            }
+
+            $timetable = $detail->timetable;
+
+            // Validasi jadwal dan toleransi waktu presensi (5 menit sebelum waktu mulai hingga waktu selesai)
+            if ($detail->start_time) {
+                $now = Carbon::now();
+                $earlyAllowed = Carbon::parse($detail->start_time)->subMinutes(5);
+                if ($now->lt($earlyAllowed)) {
+                    $this->dispatch('student-scan-error', [
+                        'message' => 'Presensi belum dibuka. Sesi ini dimulai pukul ' . Carbon::parse($detail->start_time)->format('H:i') . ' (dapat presensi 5 menit sebelum waktu mulai).'
+                    ]);
+                    return;
+                }
+                if ($detail->end_time) {
+                    $lateAllowed = Carbon::parse($detail->end_time)->addMinutes(5);
+                    if ($now->gt($lateAllowed)) {
+                        $this->dispatch('student-scan-error', [
+                            'message' => 'Waktu presensi untuk sesi ini telah berakhir.'
+                        ]);
+                        return;
+                    }
+                }
+            }
+
+            // Validasi apakah user terdaftar di kelas (classmateStudent)
+            if ($timetable->classmate) {
+                $isEnrolled = $timetable->classmate->classmateStudents()->where('user_id', $user->id)->exists();
+                if (!$isEnrolled) {
+                    $studentLabel = student_label();
+                    $this->dispatch('student-scan-error', [
+                        'message' => "Anda tidak terdaftar sebagai {$studentLabel} di kelas " . ($timetable->classmate->name ?? '-') . " untuk jadwal ini!"
+                    ]);
+                    return;
+                }
+            }
+
+            // Simpan / update Presensi
+            TimetableAttendance::updateOrCreate(
+                [
+                    'timetable_id' => $timetable->id,
+                    'timetable_detail_id' => $detail->id,
+                    'user_id' => $user->id,
+                ],
+                [
+                    'attended_at' => now(),
+                    'status' => 'present',
+                    'method' => 'student_scan',
+                    'company_id' => $user->company_id,
+                ]
+            );
+
+            $activityName = $detail->isMaterial()
+                ? ($detail->digitalBook?->title ?? 'Materi Pembelajaran')
+                : ($detail->module?->name ?? 'Ujian CBT');
+
+            $sessionName = $detail->examSession?->name ?? 'Sesi Pelaksanaan';
+            $roomName = $detail->examRoom?->name ?? 'Ruang';
+
+            $this->dispatch('student-scan-success', [
+                'message' => "Presensi Berhasil! Kehadiran Anda pada {$sessionName} ({$activityName} - {$roomName}) telah dicatat.",
+                'detail_id' => $detail->id,
+                'timetable_id' => $timetable->id,
+            ]);
+
+            AlertHelper::success('Presensi Berhasil', "Kehadiran Anda pada sesi {$sessionName} ({$activityName}) telah berhasil dicatat.");
+
+        } catch (\Throwable $th) {
+            Log::error('processStudentAttendanceScan error: ' . $th->getMessage());
+            $this->dispatch('student-scan-error', [
+                'message' => 'Terjadi kesalahan sistem saat memproses presensi: ' . $th->getMessage()
+            ]);
+        }
+    }
+
+    public function submitManualQrCode()
+    {
+        if (empty(trim($this->manual_qr_code))) {
+            return AlertHelper::error('Kode Kosong', 'Silakan masukkan ID QRCODE sesi terlebih dahulu.');
+        }
+
+        return $this->processStudentAttendanceScan($this->manual_qr_code);
+    }
+
     public function render()
     {
         $userTimetableStatusDone = UserTimetable::withoutGlobalScopes()
@@ -606,8 +951,54 @@ class AdminExamTimetableIndex extends Component
 
         $auth = Auth::user();
 
+        $now = Carbon::now();
+        $earlyOpen = $now->copy()->addMinutes(5); // Toleransi buka 5 menit sebelum waktu mulai (contoh mulai 08:00, muncul mulai 07:55)
+        $lateEnd = $now->copy()->subMinutes(5);   // Toleransi setelah waktu selesai
+
+        // Filter detail kegiatan untuk Mode LEMES:
+        // 1. Sesuai jadwal waktu (+ toleransi 5 menit)
+        // 2. Jika require_attendance = true, HANYA MUNCUL JIKA SISWA SUDAH SCAN ABSENSI
+        // 3. Jika require_attendance = false / null, muncul langsung sesuai jadwal waktu
+        $lemesDetailFilter = function ($q) use ($earlyOpen, $lateEnd) {
+            $q->where(function ($timeQ) use ($earlyOpen, $lateEnd) {
+                $timeQ->where(function ($t) use ($earlyOpen) {
+                    $t->whereNull('start_time')
+                      ->orWhere('start_time', '<=', $earlyOpen);
+                })
+                ->where(function ($t) use ($lateEnd) {
+                    $t->whereNull('end_time')
+                      ->orWhere('end_time', '>=', $lateEnd);
+                });
+            })
+            ->where(function ($attQ) {
+                $attQ->where(function ($noReq) {
+                    $noReq->where('require_attendance', false)
+                          ->orWhereNull('require_attendance');
+                })
+                ->orWhere(function ($mustAtt) {
+                    $mustAtt->where('require_attendance', true)
+                            ->whereHas('attendances', function ($a) {
+                                $a->where('user_id', Auth::id());
+                            });
+                });
+            });
+        };
+
+        $withRelations = ['timetableModule.questionType', 'userTimetable'];
+        if (is_lemes()) {
+            $withRelations[] = 'classmate';
+            $withRelations['timetableDetails'] = function ($q) use ($lemesDetailFilter) {
+                $lemesDetailFilter($q);
+                $q->with(['module', 'digitalBook.category', 'examRoom', 'examSession'])
+                  ->orderBy('order', 'asc');
+            };
+            $withRelations['attendances'] = function ($q) {
+                $q->where('user_id', Auth::id());
+            };
+        }
+
         $timetables = Timetable::query()
-            ->with(['timetableModule.questionType', 'userTimetable'])
+            ->with($withRelations)
             // ->whereNotNull('code')
             ->when($this->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
@@ -620,10 +1011,30 @@ class AdminExamTimetableIndex extends Component
                 $q->where('is_simulation', 'false')
                   ->orWhere('is_simulation', 'true');
             })
-            ->where(function ($query) {
-                $now = Carbon::now();
-                $query->where('start_time', '<=', $now->copy()->addMinutes(5))
-                    ->where('end_time', '>=', $now->copy()->subMinutes(5));
+            ->where(function ($query) use ($earlyOpen, $lateEnd, $lemesDetailFilter) {
+                if (is_lemes()) {
+                    // Mode LEMES: Jadwal muncul jika memiliki rincian detail yang sesuai waktu dan syarat absensi (jika wajib, harus sudah absensi)
+                    $query->whereHas('timetableDetails', function ($sub) use ($lemesDetailFilter) {
+                        $lemesDetailFilter($sub);
+                    });
+                } else {
+                    // Standar CBT: start_time <= earlyOpen (now + 5 min) dan end_time >= lateEnd (now - 5 min)
+                    $query->where(function ($q) use ($earlyOpen, $lateEnd) {
+                        $q->where(function ($t) use ($earlyOpen) {
+                            $t->whereNull('start_time')
+                              ->orWhere('start_time', '<=', $earlyOpen);
+                        })
+                        ->where(function ($t) use ($lateEnd) {
+                            $t->whereNull('end_time')
+                              ->orWhere('end_time', '>=', $lateEnd);
+                        });
+                    });
+                }
+
+                // Tetap tampil jika siswa sedang dalam pengerjaan ujian aktif (exam atau warning)
+                $query->orWhereHas('userTimetable', function ($ut) {
+                    $ut->whereIn('status', ['exam', 'warning']);
+                });
             });
 
         // Filter berdasarkan study_id user
@@ -650,6 +1061,23 @@ class AdminExamTimetableIndex extends Component
             $timetables->whereNotIn('id', $userTimetableStatusDone);
         }
 
+        if (! is_lemes()) {
+            // Ketika is_lemes = false, bagian materi tidak perlu muncul (hanya ujian CBT)
+            $timetables->where(function ($q) {
+                $q->whereNotNull('module_id')
+                  ->orWhereHas('timetableDetails', function ($sub) {
+                      $sub->whereIn('type', ['exam', 'ujian']);
+                  })
+                  ->orWhereHas('timetableModule');
+            })
+            ->where(function ($q) {
+                $q->whereDoesntHave('timetableDetails')
+                  ->orWhereHas('timetableDetails', function ($sub) {
+                      $sub->whereIn('type', ['exam', 'ujian']);
+                  });
+            });
+        }
+
         $viewName = config('app.new_template', false)
             ? 'livewire.admin.exam.timetable.admin-exam-timetable-index-new'
             : 'livewire.admin.exam.timetable.admin-exam-timetable-index';
@@ -660,6 +1088,7 @@ class AdminExamTimetableIndex extends Component
 
         return view($viewName, [
             'timetables' => $timetables->paginate($this->perPage),
+            'availableSupervisors' => $this->availableSupervisors ?? [],
         ])
             ->extends($layoutName)
             ->section('content');

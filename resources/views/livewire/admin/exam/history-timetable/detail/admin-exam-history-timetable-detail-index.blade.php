@@ -7,6 +7,13 @@
                 </h1>
                 <p class="text-gray-600 text-sm mt-1">Lihat detail hasil ujian dan statistik pengerjaan Anda.</p>
             </div>
+            <div>
+                <a href="{{ route('admin.exam.timetable') }}"
+                   class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 shadow-sm transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Kembali ke Jadwal</span>
+                </a>
+            </div>
         </div>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">

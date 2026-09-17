@@ -131,4 +131,5 @@ return [
     'login_is_credentials' => env('LOGIN_IS_CREDENTIALS', false),
     'new_template' => env('NEW_TEMPLATE', false),
     'is_shorinji' => (bool) env('IS_SHORINJI', false),
+    'is_lemes' => (bool) env('IS_LEMES', false),
 ];

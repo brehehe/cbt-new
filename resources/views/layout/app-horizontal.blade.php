@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="light">
 
 <head>
     @include('partials.head')
@@ -18,6 +18,7 @@
         </main>
     </div>
 
+    <script src="{{ asset('vendor/html5-qrcode/html5-qrcode.min.js') }}"></script>
     @stack('scripts')
 </body>
 

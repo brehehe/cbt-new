@@ -56,14 +56,14 @@ class AdminMasterTimetableAnswerIndex extends Component
             return redirect()->route('admin.master.timetable.detail', ['timetable_id' => $this->timetable_id]);
         }
 
-        $this->start_time = Carbon::parse($timetable->start_time)->format('d/m/Y H:i');
-        $this->end_time = Carbon::parse($timetable->end_time)->format('d/m/Y H:i');
+        $this->start_time = $timetable->start_time ? Carbon::parse($timetable->start_time)->format('d/m/Y H:i') : '-';
+        $this->end_time = $timetable->end_time ? Carbon::parse($timetable->end_time)->format('d/m/Y H:i') : '-';
         $this->modules = Module::select('id', 'name')->get()->pluck('name', 'id')->toArray();
         $this->getSupervisors = User::companyRole('Pengawas', Auth::user()->company_id)->select('name', 'id')->get()->pluck('name', 'id')->toArray();
 
         $supervisorsData = $timetable->supervisors ?? $timetable['supervisors'] ?? [];
         $this->supervisors = is_array($supervisorsData) ? $supervisorsData : (json_decode($supervisorsData, true) ?: []);
-        $this->module_id = $timetable['module_id'];
+        $this->module_id = $timetable['module_id'] ?? null;
     }
 
     public function render()

@@ -34,6 +34,10 @@
                 ['label' => 'Pengaturan', 'url' => route('admin.master.setting'), 'pattern' => 'admin/master/setting*', 'icon' => 'fa-cog'],
                 ['label' => 'Log Keamanan', 'url' => route('admin.security.log.index'), 'pattern' => 'admin/master/security-log*', 'icon' => 'fa-shield-halved'],
             ];
+            if (is_lemes()) {
+                $masters[] = ['label' => 'Kategori Buku Digital', 'url' => route('admin.master.digital-book-category'), 'pattern' => 'admin/master/digital-book-category*', 'icon' => 'fa-layer-group'];
+                $masters[] = ['label' => 'Buku Digital', 'url' => route('admin.master.digital-book'), 'pattern' => ['admin/master/digital-book', 'admin/master/digital-book/*'], 'icon' => 'fa-book-open'];
+            }
             if (auth()->user()->username === 'procbt') {
                 $masters[] = ['label' => 'Backup Database', 'url' => route('admin.master.backup'), 'pattern' => 'admin/master/backup*', 'icon' => 'fa-database'];
             }

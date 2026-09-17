@@ -65,7 +65,7 @@ class AdminMasterTimetableSessionIndex extends Component
             return redirect()->route('admin.master.timetable');
         }
 
-        $timetable = Timetable::with(['module', 'company'])->find($this->timetable_id);
+        $timetable = Timetable::with(['module', 'company', 'classmate', 'timetableDetails.module'])->find($this->timetable_id);
         if (! $timetable) {
             return redirect()->route('admin.master.timetable');
         }

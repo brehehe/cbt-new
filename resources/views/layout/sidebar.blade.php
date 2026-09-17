@@ -220,6 +220,21 @@
                                 ],
                             ];
 
+                            if (is_lemes()) {
+                                $masters[] = [
+                                    'label' => 'Kategori Buku Digital',
+                                    'url' => route('admin.master.digital-book-category'),
+                                    'pattern' => ['admin/master/digital-book-category*'],
+                                    'icon' => 'fa-layer-group',
+                                ];
+                                $masters[] = [
+                                    'label' => 'Buku Digital',
+                                    'url' => route('admin.master.digital-book'),
+                                    'pattern' => ['admin/master/digital-book', 'admin/master/digital-book/*'],
+                                    'icon' => 'fa-book-open',
+                                ];
+                            }
+
                             $examSchedules = [
                                 [
                                     'label' => 'Ruang Ujian',

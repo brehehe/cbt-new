@@ -37,14 +37,21 @@
         }
         .photo-cell {
             display: table-cell;
-            width: 80px;
+            width: 75px;
             vertical-align: top;
             text-align: center;
+        }
+        .qr-cell {
+            display: table-cell;
+            width: 75px;
+            vertical-align: top;
+            text-align: center;
+            padding-left: 5px;
         }
         .info-cell {
             display: table-cell;
             vertical-align: top;
-            padding-left: 10px;
+            padding-left: 5px;
         }
         .photo-box {
             width: 70px;
@@ -120,6 +127,19 @@
                                             <td>: {{ $timetable->examRoom->name ?? '-' }}</td>
                                         </tr>
                                     </table>
+                                </div>
+                                <div class="qr-cell">
+                                    @php
+                                        $d = new \Milon\Barcode\DNS2D();
+                                        $qrPayload = json_encode([
+                                            'user_id' => (string) $student->user->id,
+                                            'username' => (string) $student->user->username,
+                                            'timetable_id' => (string) $timetable->id,
+                                        ]);
+                                        $base64Qr = $d->getBarcodePNG($qrPayload, 'QRCODE', 3, 3);
+                                    @endphp
+                                    <img src="data:image/png;base64,{{ $base64Qr }}" style="width: 65px; height: 65px; display: block; margin: 0 auto;">
+                                    <div style="font-size: 6.5pt; text-align: center; color: #555; margin-top: 3px; font-weight: bold;">QRCODE ABSEN</div>
                                 </div>
                             </div>
 

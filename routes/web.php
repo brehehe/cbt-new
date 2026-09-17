@@ -19,6 +19,8 @@ use App\Livewire\Admin\Master\Backup\AdminMasterBackupIndex;
 use App\Livewire\Admin\Master\CategoryQuestion\AdminMasterCategoryQuestionIndex;
 use App\Livewire\Admin\Master\Classmate\AdminMasterClassmateIndex;
 use App\Livewire\Admin\Master\Classmate\Detail\AdminMasterClassmateDetailIndex;
+use App\Livewire\Admin\Master\DigitalBook\Book\AdminMasterDigitalBookIndex;
+use App\Livewire\Admin\Master\DigitalBook\Category\AdminMasterDigitalBookCategoryIndex;
 use App\Livewire\Admin\Master\ExamRoom\AdminMasterExamRoomIndex;
 use App\Livewire\Admin\Master\ExamSession\AdminMasterExamSessionIndex;
 use App\Livewire\Admin\Master\ExamType\AdminMasterExamTypeIndex;
@@ -228,9 +230,16 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
                     'text' => 'Anda berhasil login ke sistem!',
                 ]);
 
+                $redirectUrl = route('admin.dashboard');
+                if ($user->hasRole(['Mahasiswa', 'mahasiswa', 'Kenshi', 'kenshi']) || $user->type_study === 'mahasiswa') {
+                    $redirectUrl = route('admin.exam.timetable');
+                } elseif ($user->hasRole(['Pengawas', 'pengawas'])) {
+                    $redirectUrl = route('admin.master.timetable');
+                }
+
                 return response()->json([
                     'success' => true,
-                    'redirect_url' => route('admin.dashboard')
+                    'redirect_url' => $redirectUrl
                 ]);
             }
 
@@ -299,9 +308,16 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
                 'text' => 'Anda berhasil login ke sistem!',
             ]);
 
+            $redirectUrl = route('admin.dashboard');
+            if ($user->hasRole(['Mahasiswa', 'mahasiswa', 'Kenshi', 'kenshi']) || $user->type_study === 'mahasiswa') {
+                $redirectUrl = route('admin.exam.timetable');
+            } elseif ($user->hasRole(['Pengawas', 'pengawas'])) {
+                $redirectUrl = route('admin.master.timetable');
+            }
+
             return response()->json([
                 'success' => true,
-                'redirect_url' => route('admin.dashboard')
+                'redirect_url' => $redirectUrl
             ]);
         });
     });
@@ -310,18 +326,17 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
     Route::get('/dashboard', function () {
         $user = Auth::user();
 
-        if ($user->hasRole('admin')) {
+        if ($user->hasRole(['admin', 'Admin', 'superadmin', 'Super Admin'])) {
             return redirect()->route('admin.dashboard');
-        } elseif ($user->hasRole('dosen')) {
+        } elseif ($user->hasRole(['dosen', 'Dosen'])) {
             return redirect()->route('dosen.dashboard');
-        } elseif ($user->hasRole('mahasiswa')) {
-            return redirect()->route('mahasiswa.dashboard');
-        } elseif ($user->hasRole('pengawas')) {
+        } elseif ($user->hasRole(['mahasiswa', 'Mahasiswa', 'kenshi', 'Kenshi']) || $user->type_study === 'mahasiswa') {
+            return redirect()->route('admin.exam.timetable');
+        } elseif ($user->hasRole(['pengawas', 'Pengawas'])) {
             return redirect()->route('pengawas.dashboard');
         }
 
-        // Default fallback
-        return redirect()->route('login');
+        return redirect()->route('admin.exam.timetable');
     })->middleware(['auth'])->name('dashboard');
 
     // Admin Dashboard Routes
@@ -391,6 +406,8 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
             Route::get('/timetable/{timetable_id}/correct', 'Timetable\Correct\AdminMasterTimetableCorrectIndex')->name('admin.master.timetable.correct');
             Route::get('/timetable/user-timetable/{user_timetable_id}/correct', AdminMasterTimetableUserTimetableCorrectIndex::class)->name('admin.master.timetable.user-timetable.correct');
             Route::get('/material', AdminMasterMaterialIndex::class)->name('admin.master.material');
+            Route::get('/digital-book-category', AdminMasterDigitalBookCategoryIndex::class)->name('admin.master.digital-book-category');
+            Route::get('/digital-book', AdminMasterDigitalBookIndex::class)->name('admin.master.digital-book');
             Route::get('/question-type', AdminMasterQuestionTypeIndex::class)->name('admin.master.question-type');
             Route::get('/category-question', AdminMasterCategoryQuestionIndex::class)->name('admin.master.category-question');
             Route::get('/exam-type', AdminMasterExamTypeIndex::class)->name('admin.master.exam-type');
@@ -695,6 +712,11 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
 
     // React-based Exam Detail Migration
     Route::get('/exam/detail/{userTimetableId}/react', function ($userTimetableId) {
+        $ut = \App\Models\User\UserTimetable::find($userTimetableId);
+        if ($ut && in_array($ut->status, ['done', 'suspend'])) {
+            return redirect()->route('admin.exam.history-timetable');
+        }
+
         return view('exam-react', ['userTimetableId' => $userTimetableId]);
     })->name('admin.exam.detail.react')->middleware(['auth']);
 

@@ -1,5 +1,10 @@
 <div>
     @include('livewire.admin.master.timetable.admin-master-timetable-modal')
+    @if(is_lemes())
+        @include('livewire.admin.master.timetable.admin-master-timetable-modal-camera-attendance')
+        @include('livewire.admin.master.timetable.admin-master-timetable-modal-recap-attendance')
+        @include('livewire.admin.master.timetable.admin-master-timetable-modal-detail-qrcode')
+    @endif
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
@@ -8,6 +13,13 @@
                 {{-- <p class="text-gray-600">Kelola produk yang tersedia di toko Anda dengan mudah.</p> --}}
             </div>
             <div class="flex items-center gap-2">
+                @if(is_lemes())
+                    <button wire:click="openAttendanceScanner"
+                        class="flex items-center gap-1.5 px-3.5 py-2 text-sm font-bold text-slate-950 bg-amber-400 hover:bg-amber-500 rounded-lg shadow-sm transition cursor-pointer">
+                        <i class="fas fa-camera"></i>
+                        <span>Absen (Buka Kamera)</span>
+                    </button>
+                @endif
                 @if(!auth()->user()->hasRole(['Pengawas', 'pengawas']))
                     <button wire:click="syncAllQuestions()" wire:loading.attr="disabled" wire:target="syncAllQuestions"
                         class="flex items-center px-3 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm transition">
@@ -81,6 +93,23 @@
     </div>
 
     <!-- Table Section -->
+    @if(is_lemes())
+        <div class="mb-6">
+            @include('livewire.admin.master.timetable.admin-master-timetable-index-lemes')
+        </div>
+
+        <!-- Pagination for LEMES -->
+        <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600 mb-6">
+            <div>
+                Menampilkan <span class="font-bold text-slate-900">{{ $timetables->firstItem() ?? 0 }}</span> sampai
+                <span class="font-bold text-slate-900">{{ $timetables->lastItem() ?? 0 }}</span> dari
+                <span class="font-bold text-slate-900">{{ $timetables->total() }}</span> hasil
+            </div>
+            <div>
+                {{ $timetables->links('vendor.livewire.custom') }}
+            </div>
+        </div>
+    @else
     <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
         <!-- Table Wrapper -->
         <div class="table-container overflow-x-auto">
@@ -447,6 +476,7 @@
             </div>
         </div>
     </div>
+    @endif
 </div>
 
 @push('scripts')

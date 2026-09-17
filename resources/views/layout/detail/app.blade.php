@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="light">
 
 <head>
     <meta charset="UTF-8">
@@ -110,6 +110,11 @@
     </style>
     @livewireStyles
     @stack('styles')
+    <script>
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+        try { localStorage.setItem('flux.appearance', 'light'); } catch(e){}
+    </script>
 </head>
 
 <body class="min-h-screen bg-gray-50">
