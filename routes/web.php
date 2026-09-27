@@ -67,6 +67,12 @@ Route::get('/exam-demo', function () {
     return view('exam-demo');
 })->name('exam.demo');
 
+// Public Questionnaire Routes
+Route::get('/kuisioner/{slug}', \App\Livewire\Public\Questionnaire\PublicQuestionnaireFill::class)->name('public.kuisioner.fill');
+Route::get('/kuisoner/{slug}', function ($slug) {
+    return redirect()->route('public.kuisioner.fill', ['slug' => $slug]);
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
@@ -420,6 +426,11 @@ Route::group(['middleware' => [BlockBots::class, RoleBasedDashboardRedirect::cla
 
             Route::get('/classmate', AdminMasterClassmateIndex::class)->name('admin.master.classmate');
             Route::get('/classmate/{id}/detail', AdminMasterClassmateDetailIndex::class)->name('admin.master.classmate.detail');
+
+            // Kuisioner Routes
+            Route::get('/kuisioner', 'Questionnaire\AdminMasterQuestionnaireIndex')->name('admin.master.kuisioner');
+            Route::get('/kuisioner/create', 'Questionnaire\AdminMasterQuestionnaireCreate')->name('admin.master.kuisioner.create');
+            Route::get('/kuisioner/{slug}/detail', 'Questionnaire\AdminMasterQuestionnaireDetail')->name('admin.master.kuisioner.detail');
         });
 
         Route::group(['namespace' => 'Report', 'prefix' => 'report'], function () {

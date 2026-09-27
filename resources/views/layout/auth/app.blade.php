@@ -18,7 +18,17 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <tallstackui:script />
     @livewireStyles
-    @stack('styles')
+    @php
+        $company = \App\Models\Company\Company::getCached();
+        $primary = $company?->color_primary ?? '#008001';
+        $secondary = $company?->color_secondary ?? '#008001';
+    @endphp
+    <style>
+        :root {
+            --primary: {{ $primary }};
+            --secondary: {{ $secondary }};
+        }
+    </style>
     <script>
         document.documentElement.classList.remove('dark');
         document.documentElement.classList.add('light');

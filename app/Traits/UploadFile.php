@@ -115,6 +115,7 @@ trait UploadFile
 
         if (! File::isDirectory($fullPath)) {
             File::makeDirectory($fullPath, 0777, true, true);
+            @chmod($fullPath, 0777);
         }
     }
 

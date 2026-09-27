@@ -207,6 +207,12 @@
                                     'icon' => 'fa-folder-open',
                                 ],
                                 [
+                                    'label' => 'Kuisioner',
+                                    'url' => route('admin.master.kuisioner'),
+                                    'pattern' => ['admin/master/kuisioner*'],
+                                    'icon' => 'fa-clipboard-question',
+                                ],
+                                [
                                     'label' => 'Pengaturan',
                                     'url' => route('admin.master.setting'),
                                     'pattern' => ['admin/master/setting', 'admin/master/setting/*'],
@@ -324,6 +330,12 @@
                                         'url' => route('admin.master.module'),
                                         'pattern' => ['admin/master/module-question', 'admin/master/module-question/*'],
                                         'icon' => 'fa-folder-open',
+                                    ],
+                                    [
+                                        'label' => 'Kuisioner',
+                                        'url' => route('admin.master.kuisioner'),
+                                        'pattern' => ['admin/master/kuisioner*'],
+                                        'icon' => 'fa-clipboard-question',
                                     ],
                                 ];
 
