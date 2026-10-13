@@ -87,7 +87,7 @@ class QuestionImportJob implements ShouldQueue
 
                 // Detect if this row has an extra column shifted before Tipe Soal (e.g. 14 columns where index 5 is 'Pilihan Ganda')
                 $cell5 = strtolower(trim((string) ($rowArray[5] ?? '')));
-                $isShiftedRow = ($cell5 === 'pilihan ganda' || $cell5 === 'essay' || $cell5 === 'single' || $cell5 === 'multiple');
+                $isShiftedRow = in_array($cell5, ['pilihan ganda', 'mcq', 'pg', 'multiple choice', 'single', 'essay', 'multiple']);
 
                 if ($isShiftedRow && count($rowArray) >= 13) {
                     $studyName = trim((string) ($rowArray[0] ?? ''));
@@ -142,32 +142,8 @@ class QuestionImportJob implements ShouldQueue
                     continue;
                 }
 
-                // Find or create QuestionType
-                $question_type = null;
-                if ($typeName) {
-                    $question_type = QuestionType::withoutGlobalScopes()
-                        ->where('company_id', $this->user?->company?->id)
-                        ->where('name', 'ilike', $typeName)
-                        ->first();
-
-                    if (! $question_type) {
-                        $question_type = QuestionType::create([
-                            'company_id' => $this->user?->company?->id,
-                            'name' => $typeName,
-                        ]);
-                    }
-                } else {
-                    $question_type = QuestionType::withoutGlobalScopes()
-                        ->where('company_id', $this->user?->company?->id)
-                        ->first();
-
-                    if (! $question_type) {
-                        $question_type = QuestionType::create([
-                            'company_id' => $this->user?->company?->id,
-                            'name' => 'Ujian',
-                        ]);
-                    }
-                }
+                // Find or create QuestionType with alias support (e.g. MCQ -> Pilihan Ganda)
+                $question_type = $this->resolveQuestionType($typeName);
 
                 // Find or create Study
                 $study = null;
@@ -275,6 +251,17 @@ class QuestionImportJob implements ShouldQueue
                     ->where('question', $questionText)
                     ->first();
 
+                // Determine row question type: check if row typeName is explicitly MCQ/PG or Essay
+                $isRowEssay = ($this->import_type === 'essay');
+                if ($typeName) {
+                    $lowerType = strtolower(trim($typeName));
+                    if (in_array($lowerType, ['essay', 'esai', 'uraian', 'isian'])) {
+                        $isRowEssay = true;
+                    } elseif (in_array($lowerType, ['mcq', 'pilihan ganda', 'pg', 'multiple choice', 'single', 'pilihan-ganda'])) {
+                        $isRowEssay = false;
+                    }
+                }
+
                 $request_question = [
                     'id' => $existingQuestion?->id,
                     'user_id' => $this->user?->id,
@@ -292,7 +279,7 @@ class QuestionImportJob implements ShouldQueue
                     'weight_correct' => null,
                     'weight_incorrect' => null,
                     'order' => $orderIndex++,
-                    'type' => ($this->import_type == 'essay') ? Question::TYPE_ESSAY : Question::TYPE_SINGLE,
+                    'type' => $isRowEssay ? Question::TYPE_ESSAY : Question::TYPE_SINGLE,
                 ];
 
                 $question = app(QuestionService::class)->updateOrCreate($request_question);
@@ -300,7 +287,7 @@ class QuestionImportJob implements ShouldQueue
                     throw new Exception('Ada kesalahan saat QuestionImportJob => QuestionService => updateOrCreate', 500);
                 }
 
-                if ($this->import_type == 'pg') {
+                if (! $isRowEssay) {
                     $letters = ['A', 'B', 'C', 'D', 'E'];
                     foreach ($letters as $lIdx => $letter) {
                         if ($isShiftedRow) {
@@ -408,7 +395,7 @@ class QuestionImportJob implements ShouldQueue
                 $map['material_category'] = $index;
             } elseif (in_array($name, ['materi soal', 'materi'])) {
                 $map['material'] = $index;
-            } elseif (in_array($name, ['tipe soal', 'tipe ujian', 'tipe'])) {
+            } elseif (in_array($name, ['tipe soal', 'tipe ujian', 'tipe', 'jenis soal', 'jenis ujian', 'tipe pertanyaan'])) {
                 $map['type'] = $index;
             } elseif (in_array($name, ['kategori soal', 'kategori'])) {
                 $map['category'] = $index;
@@ -418,27 +405,27 @@ class QuestionImportJob implements ShouldQueue
                 $map['description'] = $index;
             } elseif (in_array($name, ['url gambar soal', 'gambar soal', 'gambar'])) {
                 $map['question_image'] = $index;
-            } elseif ($name === 'a') {
+            } elseif (in_array($name, ['a', 'pilihan a', 'opsi a'])) {
                 $map['opt_a'] = $index;
             } elseif (in_array($name, ['url gambar a', 'gambar a'])) {
                 $map['opt_img_a'] = $index;
-            } elseif ($name === 'b') {
+            } elseif (in_array($name, ['b', 'pilihan b', 'opsi b'])) {
                 $map['opt_b'] = $index;
             } elseif (in_array($name, ['url gambar b', 'gambar b'])) {
                 $map['opt_img_b'] = $index;
-            } elseif ($name === 'c') {
+            } elseif (in_array($name, ['c', 'pilihan c', 'opsi c'])) {
                 $map['opt_c'] = $index;
             } elseif (in_array($name, ['url gambar c', 'gambar c'])) {
                 $map['opt_img_c'] = $index;
-            } elseif ($name === 'd') {
+            } elseif (in_array($name, ['d', 'pilihan d', 'opsi d'])) {
                 $map['opt_d'] = $index;
             } elseif (in_array($name, ['url gambar d', 'gambar d'])) {
                 $map['opt_img_d'] = $index;
-            } elseif ($name === 'e') {
+            } elseif (in_array($name, ['e', 'pilihan e', 'opsi e'])) {
                 $map['opt_e'] = $index;
             } elseif (in_array($name, ['url gambar e', 'gambar e'])) {
                 $map['opt_img_e'] = $index;
-            } elseif (in_array($name, ['jawaban', 'kunci jawaban', 'jawaban benar', 'kunci'])) {
+            } elseif (in_array($name, ['jawaban', 'kunci jawaban', 'jawaban benar', 'kunci', 'kunci pg'])) {
                 $map['answer_key'] = $index;
             } elseif (in_array($name, ['jawaban referensi', 'referensi jawaban', 'kunci essay'])) {
                 $map['reference_answer'] = $index;
@@ -467,5 +454,93 @@ class QuestionImportJob implements ShouldQueue
         }
 
         return $val === '' || $val === null ? null : (string) $val;
+    }
+
+    /**
+     * Resolve QuestionType with alias support (e.g. MCQ -> Pilihan Ganda).
+     */
+    private function resolveQuestionType(?string $typeName): ?QuestionType
+    {
+        $companyId = $this->user?->company?->id;
+        $rawName = trim((string) $typeName);
+
+        if ($rawName !== '') {
+            $lower = strtolower($rawName);
+
+            // Alias mapping: MCQ, PG, Multiple Choice, dsb dianggap Pilihan Ganda
+            $mcqAliases = ['mcq', 'pilihan ganda', 'pg', 'multiple choice', 'single', 'pilihan-ganda'];
+            $essayAliases = ['essay', 'esai', 'uraian', 'isian'];
+
+            if (in_array($lower, $mcqAliases)) {
+                // Cari QuestionType yang sudah ada di database yang cocok dengan salah satu alias
+                $existing = QuestionType::withoutGlobalScopes()
+                    ->where('company_id', $companyId)
+                    ->where(function ($q) use ($mcqAliases) {
+                        foreach ($mcqAliases as $alias) {
+                            $q->orWhere('name', 'ilike', $alias);
+                        }
+                    })
+                    ->first();
+
+                if ($existing) {
+                    return $existing;
+                }
+
+                // Jika belum ada satupun, buat 'Pilihan Ganda'
+                return QuestionType::create([
+                    'company_id' => $companyId,
+                    'name' => 'Pilihan Ganda',
+                ]);
+            }
+
+            if (in_array($lower, $essayAliases)) {
+                $existing = QuestionType::withoutGlobalScopes()
+                    ->where('company_id', $companyId)
+                    ->where(function ($q) use ($essayAliases) {
+                        foreach ($essayAliases as $alias) {
+                            $q->orWhere('name', 'ilike', $alias);
+                        }
+                    })
+                    ->first();
+
+                if ($existing) {
+                    return $existing;
+                }
+
+                return QuestionType::create([
+                    'company_id' => $companyId,
+                    'name' => 'Essay',
+                ]);
+            }
+
+            // Tipe kustom lainnya (misal PMB, Ujian, dll)
+            $existing = QuestionType::withoutGlobalScopes()
+                ->where('company_id', $companyId)
+                ->where('name', 'ilike', $rawName)
+                ->first();
+
+            if ($existing) {
+                return $existing;
+            }
+
+            return QuestionType::create([
+                'company_id' => $companyId,
+                'name' => $rawName,
+            ]);
+        }
+
+        // Jika kolom Tipe Soal kosong di baris ini
+        $default = QuestionType::withoutGlobalScopes()
+            ->where('company_id', $companyId)
+            ->first();
+
+        if ($default) {
+            return $default;
+        }
+
+        return QuestionType::create([
+            'company_id' => $companyId,
+            'name' => 'Pilihan Ganda',
+        ]);
     }
 }
