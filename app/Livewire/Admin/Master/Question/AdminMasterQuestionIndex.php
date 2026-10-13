@@ -130,20 +130,34 @@ class AdminMasterQuestionIndex extends Component
                     $summary = \Illuminate\Support\Facades\Cache::get($summaryKey);
                     \Illuminate\Support\Facades\Cache::forget($summaryKey);
 
-                    if (\Illuminate\Support\Facades\Cache::has($warningKey)) {
+                    $imported = $summary['imported'] ?? 0;
+                    $alreadyExists = $summary['already_exists'] ?? 0;
+                    $failed = $summary['failed'] ?? 0;
+
+                    if (\Illuminate\Support\Facades\Cache::has($warningKey) && ! empty(\Illuminate\Support\Facades\Cache::get($warningKey))) {
                         $this->importWarnings = \Illuminate\Support\Facades\Cache::get($warningKey);
                         \Illuminate\Support\Facades\Cache::forget($warningKey);
 
-                        $imported = $summary['imported'] ?? 0;
-                        $skipped = $summary['skipped'] ?? count($this->importWarnings);
                         AlertHelper::warning(
                             'Import Selesai dengan Catatan',
-                            "Berhasil mengimport {$imported} soal. {$skipped} baris soal dilewati (sudah ada atau data tidak lengkap)."
+                            "{$imported} soal berhasil diimport. {$failed} baris gagal diimport."
                         );
                         $this->dispatch('open-modal', ['id' => 'modal-import-warnings']);
                     } else {
-                        $imported = $summary['imported'] ?? 0;
-                        AlertHelper::success('Import Berhasil', "Semua soal ({$imported} soal) berhasil diimport.");
+                        $this->importWarnings = [];
+                        \Illuminate\Support\Facades\Cache::forget($warningKey);
+
+                        if ($imported > 0 && $alreadyExists > 0) {
+                            $msg = "{$imported} soal baru berhasil diimport ({$alreadyExists} soal yang sudah ada tidak ditambahkan lagi).";
+                        } elseif ($imported > 0) {
+                            $msg = "Semua soal ({$imported} soal) berhasil diimport.";
+                        } elseif ($alreadyExists > 0) {
+                            $msg = "Semua soal ({$alreadyExists} soal) sudah ada di sistem (tidak ada duplikasi).";
+                        } else {
+                            $msg = "Proses import selesai.";
+                        }
+
+                        AlertHelper::success('Import Berhasil', $msg);
                     }
                 } elseif (str_starts_with((string) $status, 'failed:')) {
                     \Illuminate\Support\Facades\Cache::forget($statusKey);

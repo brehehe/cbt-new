@@ -48,11 +48,12 @@ class QuestionImportJob implements ShouldQueue
     public function handle(): void
     {
         try {
-            $warnings = [];
+            $errors = [];
             $headerMap = [];
             $orderIndex = 1;
 
             $importedCount = 0;
+            $skippedExistingCount = 0;
 
             foreach ($this->collections as $key => $row) {
                 // Convert row to array
@@ -136,7 +137,7 @@ class QuestionImportJob implements ShouldQueue
                     if (! $topicName) $missingFields[] = 'Topik Soal';
                     if (! $questionText) $missingFields[] = 'Soal';
 
-                    $warnings[] = [
+                    $errors[] = [
                         'row' => $key + 1,
                         'reason' => 'Ada field wajib yang kosong: ' . implode(', ', $missingFields),
                     ];
@@ -261,13 +262,10 @@ class QuestionImportJob implements ShouldQueue
 
                 $existingQuestion = $existingQuestionQuery->first();
 
-                // Sesuai permintaan user: "ketika yang sudah ada coba jangan tambah lagi"
-                // Jangan buat duplikat baru dan jangan timpa soal yang sudah ada
+                // Jika soal sudah ada di sistem, lewati secara otomatis agar tidak duplikat
+                // (tidak dimasukkan ke daftar error modal sesuai permintaan user)
                 if ($existingQuestion) {
-                    $warnings[] = [
-                        'row' => $key + 1,
-                        'reason' => 'Soal sudah ada di sistem (dilewati agar tidak duplikat): "' . \Illuminate\Support\Str::limit($questionText, 50) . '"',
-                    ];
+                    $skippedExistingCount++;
                     continue;
                 }
 
@@ -364,7 +362,7 @@ class QuestionImportJob implements ShouldQueue
 
                     $importedCount++;
                 } catch (\Throwable $rowError) {
-                    $warnings[] = [
+                    $errors[] = [
                         'row' => $key + 1,
                         'reason' => 'Gagal memproses baris soal ini: ' . $rowError->getMessage(),
                     ];
@@ -374,12 +372,15 @@ class QuestionImportJob implements ShouldQueue
             if ($this->user) {
                 $summary = [
                     'imported' => $importedCount,
-                    'skipped' => count($warnings),
-                    'warnings' => $warnings,
+                    'already_exists' => $skippedExistingCount,
+                    'failed' => count($errors),
+                    'errors' => $errors,
                 ];
                 \Illuminate\Support\Facades\Cache::put('import_summary_' . $this->user->id, $summary, 3600);
-                if (! empty($warnings)) {
-                    \Illuminate\Support\Facades\Cache::put('import_warnings_' . $this->user->id, $warnings, 3600);
+                if (! empty($errors)) {
+                    \Illuminate\Support\Facades\Cache::put('import_warnings_' . $this->user->id, $errors, 3600);
+                } else {
+                    \Illuminate\Support\Facades\Cache::forget('import_warnings_' . $this->user->id);
                 }
                 \Illuminate\Support\Facades\Cache::put('import_status_' . $this->user->id, 'success', 3600);
             }

@@ -17,13 +17,13 @@
             <!-- Header -->
             <div class="flex justify-between items-center p-6 border-b">
                 <div class="flex items-center gap-2">
-                    <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                     <div>
-                        <h2 class="text-xl font-semibold text-gray-800">Detail Catatan / Error Import Soal</h2>
+                        <h2 class="text-xl font-semibold text-gray-800">Detail Soal Gagal Diimport</h2>
                         @if (!empty($importWarnings))
-                            <p class="text-xs text-gray-500 mt-0.5">Ditemukan {{ count($importWarnings) }} baris yang dilewati / memiliki catatan</p>
+                            <p class="text-xs text-gray-500 mt-0.5">Ditemukan {{ count($importWarnings) }} baris yang gagal diimport</p>
                         @endif
                     </div>
                 </div>
@@ -37,11 +37,8 @@
             <div class="px-6 py-4 text-gray-600 overflow-auto" style="max-height: 60vh">
                 <div class="space-y-3">
                     @foreach ($importWarnings as $warn)
-                        @php
-                            $isError = str_contains(strtolower($warn['reason']), 'gagal') || str_contains(strtolower($warn['reason']), 'kosong') || str_contains(strtolower($warn['reason']), 'tidak valid');
-                        @endphp
-                        <div class="flex items-start gap-3 p-3 rounded-xl border {{ $isError ? 'bg-red-50/50 border-red-200' : 'bg-amber-50/50 border-amber-200' }}">
-                            <span class="font-bold whitespace-nowrap px-2.5 py-0.5 rounded-full text-xs shrink-0 {{ $isError ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700' }}">
+                        <div class="flex items-start gap-3 p-3 rounded-xl border bg-red-50/50 border-red-200">
+                            <span class="font-bold whitespace-nowrap px-2.5 py-0.5 rounded-full text-xs shrink-0 bg-red-100 text-red-700">
                                 Baris {{ $warn['row'] }}
                             </span>
                             <span class="flex-grow text-gray-700 leading-relaxed text-xs">{{ $warn['reason'] }}</span>
@@ -124,23 +121,23 @@
     </div>
 
     @if (!empty($importWarnings))
-        <div class="mb-6 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-2xl shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fade-in transition-all">
+        <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-2xl shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fade-in transition-all">
             <div class="flex items-center gap-3">
-                <span class="flex items-center justify-center w-8 h-8 rounded-full bg-amber-100 text-amber-600 shrink-0">
+                <span class="flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-600 shrink-0">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                 </span>
                 <div>
-                    <h3 class="text-sm font-bold text-amber-800">Import Selesai dengan Catatan</h3>
-                    <p class="text-xs text-amber-600 mt-0.5">Beberapa baris soal dilewati karena data tidak lengkap.</p>
+                    <h3 class="text-sm font-bold text-red-800">Terdapat Soal Gagal Diimport</h3>
+                    <p class="text-xs text-red-600 mt-0.5">Beberapa baris soal gagal diproses. Klik tombol untuk melihat rincian.</p>
                 </div>
             </div>
             <div class="flex items-center gap-3 self-end sm:self-center">
-                <button wire:click="openModalImportWarnings()" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-sm transition-all hover:scale-[1.02] active:scale-95 cursor-pointer">
+                <button wire:click="openModalImportWarnings()" class="px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl shadow-sm transition-all hover:scale-[1.02] active:scale-95 cursor-pointer">
                     Lihat Detail
                 </button>
-                <button wire:click="$set('importWarnings', [])" class="text-amber-400 hover:text-amber-600 transition-colors p-1 rounded-lg hover:bg-amber-100">
+                <button wire:click="$set('importWarnings', [])" class="text-red-400 hover:text-red-600 transition-colors p-1 rounded-lg hover:bg-red-100">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
