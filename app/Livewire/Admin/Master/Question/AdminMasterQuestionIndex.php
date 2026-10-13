@@ -124,14 +124,26 @@ class AdminMasterQuestionIndex extends Component
                 $status = \Illuminate\Support\Facades\Cache::get($statusKey);
                 if ($status === 'success') {
                     \Illuminate\Support\Facades\Cache::forget($statusKey);
-                    
+
                     $warningKey = 'import_warnings_' . Auth::id();
+                    $summaryKey = 'import_summary_' . Auth::id();
+                    $summary = \Illuminate\Support\Facades\Cache::get($summaryKey);
+                    \Illuminate\Support\Facades\Cache::forget($summaryKey);
+
                     if (\Illuminate\Support\Facades\Cache::has($warningKey)) {
                         $this->importWarnings = \Illuminate\Support\Facades\Cache::get($warningKey);
                         \Illuminate\Support\Facades\Cache::forget($warningKey);
-                        AlertHelper::warning('Import Selesai dengan Catatan', 'Beberapa baris soal dilewati karena data tidak lengkap.');
+
+                        $imported = $summary['imported'] ?? 0;
+                        $skipped = $summary['skipped'] ?? count($this->importWarnings);
+                        AlertHelper::warning(
+                            'Import Selesai dengan Catatan',
+                            "Berhasil mengimport {$imported} soal. {$skipped} baris soal dilewati (sudah ada atau data tidak lengkap)."
+                        );
+                        $this->dispatch('open-modal', ['id' => 'modal-import-warnings']);
                     } else {
-                        AlertHelper::success('Import Berhasil', 'Data soal berhasil diimport secara background.');
+                        $imported = $summary['imported'] ?? 0;
+                        AlertHelper::success('Import Berhasil', "Semua soal ({$imported} soal) berhasil diimport.");
                     }
                 } elseif (str_starts_with((string) $status, 'failed:')) {
                     \Illuminate\Support\Facades\Cache::forget($statusKey);
@@ -674,6 +686,11 @@ class AdminMasterQuestionIndex extends Component
     public function openModalImport()
     {
         return $this->dispatch('open-modal', ['id' => 'modal-import-question']);
+    }
+
+    public function checkImportStatus()
+    {
+        // Polling hook to trigger Livewire render cycle during background import
     }
 
     public function openModalImportWarnings()

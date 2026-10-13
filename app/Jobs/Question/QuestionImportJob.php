@@ -52,6 +52,8 @@ class QuestionImportJob implements ShouldQueue
             $headerMap = [];
             $orderIndex = 1;
 
+            $importedCount = 0;
+
             foreach ($this->collections as $key => $row) {
                 // Convert row to array
                 if ($row instanceof Collection) {
@@ -209,7 +211,7 @@ class QuestionImportJob implements ShouldQueue
                     } else {
                         $material = Material::withoutGlobalScopes()
                             ->where('company_id', $this->user?->company?->id)
-                            ->where('topic_id', $topic->id)
+                            ->where('topic_id', $topic?->id)
                             ->whereNull('material_category_id')
                             ->where('name', 'ilike', $materialName)
                             ->first();
@@ -242,107 +244,140 @@ class QuestionImportJob implements ShouldQueue
                     }
                 }
 
-                // Prevent duplicates: search for existing question by company, study, topic, material, and question text
-                $existingQuestion = Question::withoutGlobalScopes()
+                // Check if question already exists in this study & topic with the same question text AND description
+                $existingQuestionQuery = Question::withoutGlobalScopes()
                     ->where('company_id', $this->user?->company?->id)
                     ->where('study_id', $study?->id)
                     ->where('topic_id', $topic?->id)
-                    ->where('material_id', $material?->id)
-                    ->where('question', $questionText)
-                    ->first();
+                    ->where('question', $questionText);
 
-                // Determine row question type: check if row typeName is explicitly MCQ/PG or Essay
-                $isRowEssay = ($this->import_type === 'essay');
-                if ($typeName) {
-                    $lowerType = strtolower(trim($typeName));
-                    if (in_array($lowerType, ['essay', 'esai', 'uraian', 'isian'])) {
-                        $isRowEssay = true;
-                    } elseif (in_array($lowerType, ['mcq', 'pilihan ganda', 'pg', 'multiple choice', 'single', 'pilihan-ganda'])) {
-                        $isRowEssay = false;
-                    }
-                }
-
-                $request_question = [
-                    'id' => $existingQuestion?->id,
-                    'user_id' => $this->user?->id,
-                    'company_id' => $this->user?->company?->id,
-                    'study_id' => $study?->id,
-                    'topic_id' => $topic?->id,
-                    'material_category_id' => $material_category?->id,
-                    'material_id' => $material?->id,
-                    'question_type_id' => $question_type?->id,
-                    'category_question_id' => $categoryQuestion?->id,
-                    'question' => $questionText,
-                    'images' => $questionImageUrl ? [$questionImageUrl] : null,
-                    'old_images' => null,
-                    'description' => $description,
-                    'weight_correct' => null,
-                    'weight_incorrect' => null,
-                    'order' => $orderIndex++,
-                    'type' => $isRowEssay ? Question::TYPE_ESSAY : Question::TYPE_SINGLE,
-                ];
-
-                $question = app(QuestionService::class)->updateOrCreate($request_question);
-                if (! $question) {
-                    throw new Exception('Ada kesalahan saat QuestionImportJob => QuestionService => updateOrCreate', 500);
-                }
-
-                if (! $isRowEssay) {
-                    $letters = ['A', 'B', 'C', 'D', 'E'];
-                    foreach ($letters as $lIdx => $letter) {
-                        if ($isShiftedRow) {
-                            $answerText = trim((string) ($rowArray[8 + $lIdx] ?? ''));
-                            $answerImageUrl = null;
-                        } else {
-                            $keyText = 'opt_' . strtolower($letter);
-                            $keyImg = 'opt_img_' . strtolower($letter);
-
-                            $answerText = $this->getMappedValue($rowArray, $headerMap, $keyText);
-                            $answerImageUrl = $this->getMappedValue($rowArray, $headerMap, $keyImg);
-                        }
-
-                        $isE = ($letter === 'E');
-                        if ($isE && ($answerText === null || $answerText === '') && $answerImageUrl === null) {
-                            continue;
-                        }
-
-                        $contextVal = $answerText;
-                        if (($contextVal === null || $contextVal === '') && ! $answerImageUrl) {
-                            $contextVal = "'";
-                        }
-
-                        $request_answer = [
-                            'company_id' => $this->user?->company?->id,
-                            'alphabet' => $letter,
-                            'context' => $contextVal,
-                            'images' => $answerImageUrl ? [$answerImageUrl] : null,
-                            'old_images' => null,
-                            'is_correct' => strtoupper(trim((string) $correctKey)) === $letter,
-                        ];
-
-                        $answer = app(AnswerService::class)->updateOrCreate($question, $request_answer);
-                        if (! $answer) {
-                            throw new Exception('Ada kesalahan saat QuestionImportJob => AnswerService => updateOrCreate', 500);
-                        }
-                    }
+                if ($description !== null && trim($description) !== '') {
+                    $existingQuestionQuery->where('description', trim($description));
                 } else {
-                    // Create one reference answer for essay if provided
-                    if (! empty($referenceAnswer)) {
-                        $request_answer = [
-                            'company_id' => $this->user?->company?->id,
-                            'alphabet' => null,
-                            'context' => $referenceAnswer,
-                            'images' => $referenceAnswerImageUrl ? [$referenceAnswerImageUrl] : null,
-                            'old_images' => null,
-                            'is_correct' => true,
-                        ];
+                    $existingQuestionQuery->where(function ($q) {
+                        $q->whereNull('description')->orWhere('description', '');
+                    });
+                }
 
-                        app(AnswerService::class)->updateOrCreate($question, $request_answer);
+                $existingQuestion = $existingQuestionQuery->first();
+
+                // Sesuai permintaan user: "ketika yang sudah ada coba jangan tambah lagi"
+                // Jangan buat duplikat baru dan jangan timpa soal yang sudah ada
+                if ($existingQuestion) {
+                    $warnings[] = [
+                        'row' => $key + 1,
+                        'reason' => 'Soal sudah ada di sistem (dilewati agar tidak duplikat): "' . \Illuminate\Support\Str::limit($questionText, 50) . '"',
+                    ];
+                    continue;
+                }
+
+                try {
+                    // Determine row question type: check if row typeName is explicitly MCQ/PG or Essay
+                    $isRowEssay = ($this->import_type === 'essay');
+                    if ($typeName) {
+                        $lowerType = strtolower(trim($typeName));
+                        if (in_array($lowerType, ['essay', 'esai', 'uraian', 'isian'])) {
+                            $isRowEssay = true;
+                        } elseif (in_array($lowerType, ['mcq', 'pilihan ganda', 'pg', 'multiple choice', 'single', 'pilihan-ganda'])) {
+                            $isRowEssay = false;
+                        }
                     }
+
+                    $request_question = [
+                        'id' => null,
+                        'user_id' => $this->user?->id,
+                        'company_id' => $this->user?->company?->id,
+                        'study_id' => $study?->id,
+                        'topic_id' => $topic?->id,
+                        'material_category_id' => $material_category?->id,
+                        'material_id' => $material?->id,
+                        'question_type_id' => $question_type?->id,
+                        'category_question_id' => $categoryQuestion?->id,
+                        'question' => $questionText,
+                        'images' => $questionImageUrl ? [$questionImageUrl] : null,
+                        'old_images' => null,
+                        'description' => $description,
+                        'weight_correct' => null,
+                        'weight_incorrect' => null,
+                        'order' => $orderIndex++,
+                        'type' => $isRowEssay ? Question::TYPE_ESSAY : Question::TYPE_SINGLE,
+                    ];
+
+                    $question = app(QuestionService::class)->updateOrCreate($request_question);
+                    if (! $question) {
+                        throw new Exception('Gagal menyimpan soal ke database');
+                    }
+
+                    if (! $isRowEssay) {
+                        $letters = ['A', 'B', 'C', 'D', 'E'];
+                        foreach ($letters as $lIdx => $letter) {
+                            if ($isShiftedRow) {
+                                $answerText = trim((string) ($rowArray[8 + $lIdx] ?? ''));
+                                $answerImageUrl = null;
+                            } else {
+                                $keyText = 'opt_' . strtolower($letter);
+                                $keyImg = 'opt_img_' . strtolower($letter);
+
+                                $answerText = $this->getMappedValue($rowArray, $headerMap, $keyText);
+                                $answerImageUrl = $this->getMappedValue($rowArray, $headerMap, $keyImg);
+                            }
+
+                            $isE = ($letter === 'E');
+                            if ($isE && ($answerText === null || $answerText === '') && $answerImageUrl === null) {
+                                continue;
+                            }
+
+                            $contextVal = $answerText;
+                            if (($contextVal === null || $contextVal === '') && ! $answerImageUrl) {
+                                $contextVal = "'";
+                            }
+
+                            $request_answer = [
+                                'company_id' => $this->user?->company?->id,
+                                'alphabet' => $letter,
+                                'context' => $contextVal,
+                                'images' => $answerImageUrl ? [$answerImageUrl] : null,
+                                'old_images' => null,
+                                'is_correct' => strtoupper(trim((string) $correctKey)) === $letter,
+                            ];
+
+                            $answer = app(AnswerService::class)->updateOrCreate($question, $request_answer);
+                            if (! $answer) {
+                                throw new Exception("Gagal menyimpan opsi {$letter}");
+                            }
+                        }
+                    } else {
+                        // Create one reference answer for essay if provided
+                        if (! empty($referenceAnswer)) {
+                            $request_answer = [
+                                'company_id' => $this->user?->company?->id,
+                                'alphabet' => null,
+                                'context' => $referenceAnswer,
+                                'images' => $referenceAnswerImageUrl ? [$referenceAnswerImageUrl] : null,
+                                'old_images' => null,
+                                'is_correct' => true,
+                            ];
+
+                            app(AnswerService::class)->updateOrCreate($question, $request_answer);
+                        }
+                    }
+
+                    $importedCount++;
+                } catch (\Throwable $rowError) {
+                    $warnings[] = [
+                        'row' => $key + 1,
+                        'reason' => 'Gagal memproses baris soal ini: ' . $rowError->getMessage(),
+                    ];
                 }
             }
 
             if ($this->user) {
+                $summary = [
+                    'imported' => $importedCount,
+                    'skipped' => count($warnings),
+                    'warnings' => $warnings,
+                ];
+                \Illuminate\Support\Facades\Cache::put('import_summary_' . $this->user->id, $summary, 3600);
                 if (! empty($warnings)) {
                     \Illuminate\Support\Facades\Cache::put('import_warnings_' . $this->user->id, $warnings, 3600);
                 }

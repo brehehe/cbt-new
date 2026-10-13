@@ -20,7 +20,12 @@
                     <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
-                    <h2 class="text-xl font-semibold text-gray-800">Detail Catatan Import Soal</h2>
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800">Detail Catatan / Error Import Soal</h2>
+                        @if (!empty($importWarnings))
+                            <p class="text-xs text-gray-500 mt-0.5">Ditemukan {{ count($importWarnings) }} baris yang dilewati / memiliki catatan</p>
+                        @endif
+                    </div>
                 </div>
                 <button wire:click="closeModalImportWarnings()"
                     class="text-gray-500 hover:text-red-500 transition-colors text-2xl leading-none cursor-pointer">
@@ -32,8 +37,13 @@
             <div class="px-6 py-4 text-gray-600 overflow-auto" style="max-height: 60vh">
                 <div class="space-y-3">
                     @foreach ($importWarnings as $warn)
-                        <div class="flex items-start gap-3 p-3 bg-amber-50/50 rounded-xl border border-amber-100">
-                            <span class="font-bold text-amber-600 whitespace-nowrap bg-amber-100 px-2 py-0.5 rounded-full text-xs">Baris {{ $warn['row'] }}</span>
+                        @php
+                            $isError = str_contains(strtolower($warn['reason']), 'gagal') || str_contains(strtolower($warn['reason']), 'kosong') || str_contains(strtolower($warn['reason']), 'tidak valid');
+                        @endphp
+                        <div class="flex items-start gap-3 p-3 rounded-xl border {{ $isError ? 'bg-red-50/50 border-red-200' : 'bg-amber-50/50 border-amber-200' }}">
+                            <span class="font-bold whitespace-nowrap px-2.5 py-0.5 rounded-full text-xs shrink-0 {{ $isError ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700' }}">
+                                Baris {{ $warn['row'] }}
+                            </span>
                             <span class="flex-grow text-gray-700 leading-relaxed text-xs">{{ $warn['reason'] }}</span>
                         </div>
                     @endforeach
@@ -49,6 +59,22 @@
             </div>
         </div>
     </div>
+
+    @if (Auth::check() && \Illuminate\Support\Facades\Cache::get('import_status_' . Auth::id()) === 'processing')
+        <div wire:poll.2s="checkImportStatus" class="mb-4 p-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-2xl flex items-center justify-between gap-3 shadow-sm animate-pulse">
+            <div class="flex items-center gap-3">
+                <svg class="animate-spin h-5 w-5 text-blue-600 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-blue-900">Sedang Memproses Import Soal</h4>
+                    <p class="text-xs text-blue-700 mt-0.5">Sistem sedang mengimpor data soal di background. Halaman akan diperbarui otomatis begitu selesai.</p>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <div class="mb-4">
         <div class="flex items-center justify-between">
             <div>
