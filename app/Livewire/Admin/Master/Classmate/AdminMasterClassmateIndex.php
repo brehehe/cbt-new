@@ -62,10 +62,15 @@ class AdminMasterClassmateIndex extends Component
         ])->extends('layout.app')->section('content');
     }
 
-    // public function hydrate()
-    // {
-    //     $this->resetPage();
-    // }
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
 
     public function openModal()
     {

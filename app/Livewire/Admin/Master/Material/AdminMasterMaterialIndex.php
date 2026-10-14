@@ -70,10 +70,15 @@ class AdminMasterMaterialIndex extends Component
             ->where('topic_id', $value)->whereDoesntHave('childs')->get();
     }
 
-    // public function hydrate()
-    // {
-    //     $this->resetPage();
-    // }
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
 
     public function openModal()
     {

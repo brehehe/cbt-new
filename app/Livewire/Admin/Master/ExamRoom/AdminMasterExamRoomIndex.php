@@ -47,10 +47,15 @@ class AdminMasterExamRoomIndex extends Component
         //
     }
 
-    // public function hydrate ()
-    // {
-    //     $this->resetPage();
-    // }
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
 
     public function openModal()
     {

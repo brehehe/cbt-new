@@ -51,14 +51,15 @@ class Classmate extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
-        if (empty($term)) {
+        $term = trim((string) $term);
+        if ($term === '') {
             return;
         }
 
         $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id', 'name', 'description'], 'ilike', $term);
+            $query->whereAny(['name', 'description'], 'ilike', $term);
         });
     }
 

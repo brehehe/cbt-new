@@ -24,6 +24,16 @@ class AdminMasterTopicIndex extends Component
 
     public $search;
 
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
+
     public $studies;
 
     public $data_id;

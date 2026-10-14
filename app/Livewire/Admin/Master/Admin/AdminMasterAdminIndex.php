@@ -36,6 +36,16 @@ class AdminMasterAdminIndex extends Component
 
     public $perPage = 5;
 
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
+
     // User
     public $data_id;
 

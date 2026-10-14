@@ -46,10 +46,15 @@ class Study extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
+        $term = trim((string) $term);
+        if ($term === '') {
+            return;
+        }
+
         $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id'], 'ilike', $term);
+            $query->whereAny(['name', 'description'], 'ilike', $term);
         });
     }
 

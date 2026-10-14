@@ -43,6 +43,26 @@ class AdminMasterSupervisorIndex extends Component
 
     public $perPage = 5;
 
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedStatusFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedDepartmentFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
+
     // Import file
     public $importFile;
 

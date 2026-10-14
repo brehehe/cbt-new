@@ -24,6 +24,26 @@ class AdminMasterDigitalBookIndex extends Component
     public $filter_category = '';
     public $filter_type = '';
 
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedFilterCategory()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedFilterType()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
+
     // Form inputs
     public $data_id;
     public $digital_book_category_id;

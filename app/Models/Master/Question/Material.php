@@ -46,12 +46,17 @@ class Material extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
+        $term = trim((string) $term);
+        if ($term === '') {
+            return;
+        }
+
         $term = '%'.$term.'%';
 
         $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id', 'material_category_id', 'name', 'level', 'description'], 'ilike', $term)
+            $query->whereAny(['name', 'level', 'description'], 'ilike', $term)
                 ->orWhereHas('materialCategory', function ($query) use ($term) {
-                    $query->whereAny(['company_id', 'name', 'description'], 'ilike', $term);
+                    $query->whereAny(['name', 'description'], 'ilike', $term);
                 });
         });
     }

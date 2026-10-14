@@ -21,6 +21,16 @@ class AdminMasterStudyIndex extends Component
 
     public $perPage = 5;
 
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
+
     public $data_id;
 
     public $name;
@@ -112,9 +122,7 @@ class AdminMasterStudyIndex extends Component
 
     public function render()
     {
-        $studies = Study::query()
-            ->where('name', 'ilike', '%'.$this->search.'%')
-            ->orWhere('description', 'ilike', '%'.$this->search.'%')
+        $studies = Study::search($this->search)
             ->orderBy('created_at', 'desc')
             ->paginate($this->perPage);
 

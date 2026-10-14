@@ -39,6 +39,16 @@ class AdminExamTimetableIndex extends Component
 
     public $search;
 
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
+
     public $code;
 
     public $timetable_id_supervisor;

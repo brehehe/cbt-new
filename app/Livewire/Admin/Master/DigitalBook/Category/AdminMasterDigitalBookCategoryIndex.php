@@ -18,6 +18,16 @@ class AdminMasterDigitalBookCategoryIndex extends Component
 
     public $perPage = 10;
     public $search = '';
+
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
     public $data_id;
     public $name;
     public $description;

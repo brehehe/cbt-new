@@ -43,10 +43,15 @@ class AdminMasterExamTypeIndex extends Component
         // dd(Auth::user()?->company);
     }
 
-    // public function hydrate ()
-    // {
-    //     $this->resetPage();
-    // }
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
 
     public function openModal()
     {

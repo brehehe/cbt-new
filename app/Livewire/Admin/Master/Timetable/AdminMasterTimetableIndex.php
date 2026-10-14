@@ -38,6 +38,21 @@ class AdminMasterTimetableIndex extends Component
 
     public $perPage = 5;
 
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedFilterSimulation()
+    {
+        $this->resetPage();
+    }
+
     public $data_id;
 
     public $modules;
@@ -882,10 +897,15 @@ class AdminMasterTimetableIndex extends Component
                 });
             })
             ->when($this->search, function ($query, $search) {
-                $query->where('name', 'ilike', '%'.$search.'%')
-                    ->orWhere('start_time', 'ilike', '%'.$search.'%')
-                    ->orWhere('end_time', 'ilike', '%'.$search.'%')
-                    ->orWhere('description', 'ilike', '%'.$search.'%');
+                $search = trim((string) $search);
+                if ($search !== '') {
+                    $query->where(function ($q) use ($search) {
+                        $q->where('name', 'ilike', '%'.$search.'%')
+                            ->orWhere('start_time', 'ilike', '%'.$search.'%')
+                            ->orWhere('end_time', 'ilike', '%'.$search.'%')
+                            ->orWhere('description', 'ilike', '%'.$search.'%');
+                    });
+                }
             })
             ->when($this->filter_simulation !== 'all', function ($query) {
                 $query->where('is_simulation', $this->filter_simulation);

@@ -59,6 +59,10 @@ class DigitalBook extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
+        $term = trim((string) $term);
+        if ($term === '') {
+            return;
+        }
         $term = '%' . $term . '%';
         $query->where(function ($q) use ($term) {
             $q->where('title', 'ilike', $term)

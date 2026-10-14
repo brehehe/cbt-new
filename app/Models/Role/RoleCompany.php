@@ -38,15 +38,17 @@ class RoleCompany extends Model
 
     public function scopeSearch($query, $search)
     {
-        if ($search) {
-            $query->whereHas('role', function ($q) use ($search) {
-                $q->where('name', 'ilike', '%'.$search.'%');
-            })->orWhereHas('company', function ($q) use ($search) {
-                $q->where('name', 'ilike', '%'.$search.'%');
+        $search = trim((string) $search);
+        if ($search !== '') {
+            $query->where(function ($sub) use ($search) {
+                $sub->whereHas('role', function ($q) use ($search) {
+                    $q->where('name', 'ilike', '%'.$search.'%');
+                })->orWhereHas('company', function ($q) use ($search) {
+                    $q->where('name', 'ilike', '%'.$search.'%');
+                });
             });
         }
 
         return $query;
-
     }
 }

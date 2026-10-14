@@ -24,6 +24,16 @@ class AdminMasterMaterialCategoryIndex extends Component
 
     public $search;
 
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
+
     public $data_id;
 
     public $topic_id;
