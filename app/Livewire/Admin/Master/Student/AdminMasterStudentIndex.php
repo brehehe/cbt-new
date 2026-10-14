@@ -37,6 +37,7 @@ class AdminMasterStudentIndex extends Component
         'search' => ['except' => ''],
         'programFilter' => ['except' => ''],
         'statusFilter' => ['except' => ''],
+        'isStudentFilter' => ['except' => ''],
     ];
 
     public $search = '';
@@ -45,7 +46,42 @@ class AdminMasterStudentIndex extends Component
 
     public $statusFilter = '';
 
+    public $isStudentFilter = '';
+
     public $perPage = 5;
+
+    public function updatedSearch()
+    {
+        $this->resetPage();
+        $this->selectedRows = [];
+        $this->selectAll = false;
+    }
+
+    public function updatedProgramFilter()
+    {
+        $this->resetPage();
+        $this->selectedRows = [];
+        $this->selectAll = false;
+    }
+
+    public function updatedStatusFilter()
+    {
+        $this->resetPage();
+        $this->selectedRows = [];
+        $this->selectAll = false;
+    }
+
+    public function updatedIsStudentFilter()
+    {
+        $this->resetPage();
+        $this->selectedRows = [];
+        $this->selectAll = false;
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
 
     public $selectedRows = [];
 
@@ -174,8 +210,6 @@ class AdminMasterStudentIndex extends Component
     public $study_id;
 
     public $isStudent;
-
-    public $isStudentFilter;
 
     public $type_study;
 
@@ -1242,9 +1276,9 @@ class AdminMasterStudentIndex extends Component
             });
         }
 
-        if ($this->isStudentFilter) {
+        if (! empty($this->isStudentFilter)) {
             $user->where('type_study', $this->isStudentFilter);
-        } else {
+        } elseif (empty(trim((string) $this->search))) {
             $company = auth()->user()->company;
             if ($company) {
                 if ($company->is_pmb === 'pmb') {

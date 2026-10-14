@@ -272,7 +272,12 @@ class User extends Authenticatable
 
     public function scopeSearch($query, $search)
     {
-        $operator = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'ilike';
+        $search = trim((string) $search);
+        if ($search === '') {
+            return $query;
+        }
+
+        $operator = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
 
         return $query->where(function ($q) use ($search, $operator) {
             $q->where('name', $operator, "%{$search}%")
@@ -282,7 +287,11 @@ class User extends Authenticatable
                 ->orWhere('username', $operator, "%{$search}%")
                 ->orWhereHas('userDetail', function ($qd) use ($search, $operator) {
                     $qd->where('identity_number', $operator, "%{$search}%")
+                        ->orWhere('student_id', $operator, "%{$search}%")
                         ->orWhere('address', $operator, "%{$search}%");
+                })
+                ->orWhereHas('study', function ($qs) use ($search, $operator) {
+                    $qs->where('name', $operator, "%{$search}%");
                 });
         });
     }

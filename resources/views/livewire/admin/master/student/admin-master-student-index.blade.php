@@ -215,12 +215,8 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
                 <select wire:model.live="isStudentFilter" class="form-control mt-1">
                     <option value="">Semua Kategori</option>
-                    @if(in_array(auth()->user()->company->is_pmb, ['non_pmb', 'all']) || is_shorinji())
-                        <option value="mahasiswa">{{ student_label() }}</option>
-                    @endif
-                    @if(in_array(auth()->user()->company->is_pmb, ['pmb', 'all']) && !is_shorinji())
-                        <option value="general">{{ auth()->user()->company->is_pmb === 'pmb' ? 'PMB' : 'PMB / General' }}</option>
-                    @endif
+                    <option value="mahasiswa">{{ student_label() }}</option>
+                    <option value="general">{{ (auth()->user()->company && auth()->user()->company->is_pmb === 'pmb') ? 'PMB' : 'PMB / General' }}</option>
                 </select>
             </div>
 
