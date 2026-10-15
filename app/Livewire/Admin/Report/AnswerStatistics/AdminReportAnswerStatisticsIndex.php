@@ -44,7 +44,7 @@ class AdminReportAnswerStatisticsIndex extends Component
             return;
         }
 
-        $this->timetable = Timetable::with('module')->find($this->timetable_id);
+        $this->timetable = Timetable::withoutGlobalScopes()->with('module')->find($this->timetable_id);
         $hasEssayAnswerColumn = $this->hasEssayAnswerColumn();
 
         // Fetch all questions for this timetable via TimetableModule
@@ -179,11 +179,11 @@ class AdminReportAnswerStatisticsIndex extends Component
             return;
         }
 
-        $timetable = $this->timetable ?: Timetable::with('module')->find($this->timetable_id);
+        $timetable = $this->timetable ?: Timetable::withoutGlobalScopes()->with('module')->find($this->timetable_id);
         if (! $timetable) {
             return;
         }
-        $company = Auth::user()->company()->with('companyDetail')->first();
+        $company = Auth::user()?->company ?: ($timetable->company ?? \App\Models\Company\Company::first());
 
         $pdf = Pdf::loadView('livewire.admin.report.answer-statistics.admin-report-answer-statistics-pdf', [
             'timetable' => $timetable,
