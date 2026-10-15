@@ -14,6 +14,8 @@ class AdminReportAnswerStatisticsIndex extends Component
 {
     public $timetable_id = '';
 
+    public $statusFilter = 'all';
+
     public $answerStats = [];
 
     public $timetable = null;
@@ -24,6 +26,11 @@ class AdminReportAnswerStatisticsIndex extends Component
     }
 
     public function updatedTimetableId($value)
+    {
+        $this->loadStatistics();
+    }
+
+    public function updatedStatusFilter($value)
     {
         $this->loadStatistics();
     }
@@ -50,15 +57,16 @@ class AdminReportAnswerStatisticsIndex extends Component
             ->get();
 
         // Fetch all user answers for this timetable
-        // Fetch all user answers for this timetable
         $answerSelects = ['timetable_question_id', 'timetable_answer_id', 'status'];
         if ($hasEssayAnswerColumn) {
             $answerSelects[] = 'essay_answer';
         }
 
         $userAnswers = UserModuleQuestion::whereHas('userTimetable', function ($q) {
-            $q->where('timetable_id', $this->timetable_id)
-                ->where('status', 'done');
+            $q->where('timetable_id', $this->timetable_id);
+            if ($this->statusFilter && $this->statusFilter !== 'all') {
+                $q->where('status', $this->statusFilter);
+            }
         })
             ->select($answerSelects)
             ->get()
@@ -103,9 +111,13 @@ class AdminReportAnswerStatisticsIndex extends Component
                     ],
                 ];
             } else {
+                $correctAnswerIds = $question->answers->where('is_correct', true)->pluck('id')->all();
+
                 $totalAnswered = $answersForQuestion->whereNotNull('timetable_answer_id')->count();
-                $totalCorrect = $answersForQuestion->where('status', 'correct')->count();
-                $totalWrong = $answersForQuestion->where('status', 'wrong')->count();
+                $totalCorrect = $answersForQuestion->filter(function ($ans) use ($correctAnswerIds) {
+                    return $ans->status === 'correct' || (! empty($ans->timetable_answer_id) && in_array($ans->timetable_answer_id, $correctAnswerIds));
+                })->count();
+                $totalWrong = max(0, $totalAnswered - $totalCorrect);
                 $totalPending = 0;
 
                 $distribution = [];
@@ -174,6 +186,7 @@ class AdminReportAnswerStatisticsIndex extends Component
             'timetable' => $timetable,
             'answerStats' => $this->answerStats,
             'company' => $company,
+            'statusFilter' => $this->statusFilter,
         ])
             ->setPaper('a4', 'portrait');
 
