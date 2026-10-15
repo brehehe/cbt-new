@@ -16,12 +16,12 @@ class AdminMasterTimetableUserTimetableCorrectIndex extends Component
     public function mount($user_timetable_id)
     {
         $this->user_timetable_id = $user_timetable_id;
-        $this->user_timetable = UserTimetable::with(['user', 'timetable.module'])->findOrFail($this->user_timetable_id);
+        $this->user_timetable = UserTimetable::withoutGlobalScope('user_scope')->with(['user', 'timetable.module'])->findOrFail($this->user_timetable_id);
     }
 
     public function setCorrect($id)
     {
-        $question = UserModuleQuestion::findOrFail($id);
+        $question = UserModuleQuestion::withoutGlobalScope('user_scope')->findOrFail($id);
         $question->update(['status' => 'correct']);
 
         $this->user_timetable->recalculateMark();
@@ -30,7 +30,7 @@ class AdminMasterTimetableUserTimetableCorrectIndex extends Component
 
     public function setWrong($id)
     {
-        $question = UserModuleQuestion::findOrFail($id);
+        $question = UserModuleQuestion::withoutGlobalScope('user_scope')->findOrFail($id);
         $question->update(['status' => 'wrong']);
 
         $this->user_timetable->recalculateMark();
@@ -40,10 +40,11 @@ class AdminMasterTimetableUserTimetableCorrectIndex extends Component
     public function render()
     {
         $essayQuestions = $this->user_timetable->userModuleQuestions()
+            ->withoutGlobalScope('user_scope')
             ->whereHas('timetableQuestion', function ($q) {
-                $q->where('type', 'essay');
+                $q->withoutGlobalScope('user_scope')->whereRaw('LOWER(TRIM(type)) = ?', ['essay']);
             })
-            ->with('timetableQuestion')
+            ->with(['timetableQuestion' => fn($q) => $q->withoutGlobalScope('user_scope')])
             ->get();
 
         return view('livewire.admin.master.timetable.user-timetable.correct.admin-master-timetable-user-timetable-correct-index', [

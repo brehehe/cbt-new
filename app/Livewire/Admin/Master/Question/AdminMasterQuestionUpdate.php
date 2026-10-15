@@ -97,6 +97,8 @@ class AdminMasterQuestionUpdate extends Component
 
     public $study_id;
 
+    public $essay_answer;
+
     public function render()
     {
         $answers = $this->get_question->answers()->orderBy('order', 'asc')->orderBy('alphabet', 'asc')->search($this->search)->get();
@@ -122,6 +124,11 @@ class AdminMasterQuestionUpdate extends Component
         $this->weight_correct = $this->get_question?->weight_correct;
         $this->weight_incorrect = $this->get_question?->weight_incorrect;
         $this->category_question_id = $this->get_question?->category_question_id;
+
+        if ($this->type === 'essay') {
+            $essayAns = Answer::withoutGlobalScope('user_scope')->where('question_id', $this->data_id)->first();
+            $this->essay_answer = $essayAns?->context ?? '';
+        }
         $this->topics = Topic::select('id', 'name')->get();
         $this->material_categories = MaterialCategory::select('id', 'topic_id', 'name')->where('topic_id', $this->get_question?->topic_id)->get();
         $this->question_types = QuestionType::select('id', 'name')->get();
@@ -326,6 +333,21 @@ class AdminMasterQuestionUpdate extends Component
                 throw new Exception('Ada kesalahaan saat QuestionService => updateOrCreate', 500);
             }
 
+            if (($this->type ?? '') === 'essay') {
+                if (! empty(trim((string) $this->essay_answer))) {
+                    Answer::withoutGlobalScope('user_scope')->updateOrCreate(
+                        ['question_id' => $question->id],
+                        [
+                            'company_id' => Auth::user()?->company?->id,
+                            'alphabet' => 'A',
+                            'order' => 1,
+                            'context' => trim((string) $this->essay_answer),
+                            'is_correct' => true,
+                        ]
+                    );
+                }
+            }
+
             $this->get_question = $question;
 
             DB::commit();
@@ -397,15 +419,19 @@ class AdminMasterQuestionUpdate extends Component
     public function submitAnswer()
     {
         $this->answer_correct = (bool) $this->answer_correct;
+        $hasImages = ! empty($this->answer_images) || ! empty($this->old_answer_images);
+        $hasLatex = ! empty(trim((string) $this->answer_latex));
+        $contextRule = ($hasImages || $hasLatex) ? 'nullable' : 'required';
+
         $this->validate(
             [
-                'answer_context' => 'required',
+                'answer_context' => $contextRule,
                 // 'answer_images.*'    => 'nullable|image|mimes:jpg,jpeg,png',
                 'answer_description' => 'nullable',
                 'answer_latex' => 'nullable',
             ],
             [
-                'answer_context.required' => 'Konteks jawaban wajib diisi.',
+                'answer_context.required' => 'Konteks jawaban wajib diisi jika tidak menyertakan gambar atau rumus LaTeX.',
                 // 'answer_images.*.image'   => 'Gambar jawaban wajib berupa gambar.',
                 // 'answer_images.*.mimes'   => 'Gambar jawaban hanya berformat : .jpg, .jpeg, .png.',
             ]
@@ -458,7 +484,7 @@ class AdminMasterQuestionUpdate extends Component
 
     public function edit($id)
     {
-        $result = Answer::findOrFail($id);
+        $result = Answer::withoutGlobalScope('user_scope')->findOrFail($id);
         $this->answer_id = $result?->id;
         $this->answer_alphabet = $result?->alphabet;
         $this->answer_context = $result?->context;
@@ -466,6 +492,7 @@ class AdminMasterQuestionUpdate extends Component
         $this->answer_correct = $result?->is_correct;
         $this->isEditingAnswer = true;
         $this->dispatch('open-modal', ['id' => 'modal']);
+        $this->dispatch('set-answer-context', ['context' => $result?->context ?? '']);
 
         return $this->dispatch('sync-answer-latex-preview');
     }
@@ -492,7 +519,7 @@ class AdminMasterQuestionUpdate extends Component
 
     public function modalAnswerImage($id, $alphabet)
     {
-        $result = Answer::findOrFail($id);
+        $result = Answer::withoutGlobalScope('user_scope')->findOrFail($id);
         $this->answer_alphabet = $alphabet;
         $this->answer_id = $result?->id;
         $this->answer_context = $result?->context;

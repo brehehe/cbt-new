@@ -314,12 +314,27 @@
                     </table>
                 </div>
             </div>
+        @else
+            <div class="p-6 bg-white shadow rounded-xl border border-indigo-100">
+                <h3 class="text-sm font-bold text-indigo-900 flex items-center gap-2 mb-1">
+                    <i class="fas fa-file-lines text-indigo-600"></i>
+                    Referensi / Kunci Jawaban Essay
+                </h3>
+                <p class="text-xs text-gray-500 mb-3">Tuliskan referensi jawaban atau poin-poin utama jawaban untuk soal essay ini.</p>
+                <textarea wire:model.defer="essay_answer" rows="4" placeholder="Tulis referensi jawaban essay di sini..."
+                    class="form-control text-sm w-full rounded-lg border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+            </div>
         @endif
     </div>
 </div>
 @push('scripts')
     @include('partials.admin-latex-scripts')
     <script>
+        window.addEventListener('set-answer-context', function (e) {
+            if (typeof $ !== 'undefined' && $('#answer_context').length) {
+                $('#answer_context').summernote('code', e.detail?.context || '');
+            }
+        });
         function initTextareaAutosize() {
             const textareas = document.querySelectorAll('textarea[data-autosize="true"]');
             textareas.forEach((textarea) => {
