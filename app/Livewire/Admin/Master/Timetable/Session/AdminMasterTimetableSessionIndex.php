@@ -8,11 +8,13 @@ use App\Models\Exam\ExamAlert;
 use App\Models\Exam\ExamLiveSession;
 use App\Models\Exam\ExamRecording;
 use App\Models\Master\Timetable\Timetable;
+use App\Models\User\UserModuleQuestion;
 use App\Models\User\UserTimetable;
 use App\Services\Exam\RecordingFinalizer;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Livewire\Component;
@@ -55,6 +57,8 @@ class AdminMasterTimetableSessionIndex extends Component
         'pauseTimeIndividual',
         'resumeTimeIndividual',
         'sendMessage',
+        'resetStudentExam',
+        'generateStudentQuestions',
     ];
 
     public function mount($timetable_id = null)
@@ -502,6 +506,56 @@ class AdminMasterTimetableSessionIndex extends Component
         ]);
 
         AlertHelper::success('Berhasil', 'Status ujian peserta telah dikembalikan menjadi Aktif (Exam) tanpa mereset soal & jawaban.');
+    }
+
+    public function resetStudentExam($userTimetableId)
+    {
+        try {
+            DB::beginTransaction();
+            $userTimetable = UserTimetable::withoutGlobalScopes()->find($userTimetableId);
+            if (! $userTimetable) {
+                AlertHelper::error('Gagal', 'Data Ujian Peserta Tidak Ditemukan');
+                return;
+            }
+
+            // Hapus UserModuleQuestion
+            UserModuleQuestion::withoutGlobalScopes()->where('user_timetable_id', $userTimetable->id)->delete();
+
+            // Putuskan session live & recording
+            ExamLiveSession::where('user_timetable_id', $userTimetable->id)->delete();
+            ExamAlert::where('user_timetable_id', $userTimetable->id)->delete();
+
+            // Hapus UserTimetable agar siswa bisa mulai dari awal
+            $userTimetable->delete();
+
+            DB::commit();
+            AlertHelper::success('Berhasil', 'Sesi ujian peserta telah di-reset. Peserta dapat memulai kembali ujian dari awal.');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            Log::error('Reset Student Exam Error: ' . $th->getMessage());
+            AlertHelper::error('Gagal', 'Terjadi kesalahan saat mereset sesi: ' . $th->getMessage());
+        }
+    }
+
+    public function generateStudentQuestions($userTimetableId)
+    {
+        try {
+            DB::beginTransaction();
+            $userTimetable = UserTimetable::withoutGlobalScopes()->find($userTimetableId);
+            if (! $userTimetable) {
+                AlertHelper::error('Gagal', 'Data Ujian Peserta Tidak Ditemukan');
+                return;
+            }
+
+            app(\App\Http\Controllers\Api\Exam\ExamApiController::class)->autoPopulateUserQuestionsPublic($userTimetable);
+
+            DB::commit();
+            AlertHelper::success('Berhasil', 'Soal untuk peserta berhasil di-generate ulang.');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            Log::error('Generate Student Questions Error: ' . $th->getMessage());
+            AlertHelper::error('Gagal', 'Gagal generate soal: ' . $th->getMessage());
+        }
     }
 
     public function openMessageModal($userTimetableId, $studentName)

@@ -9,6 +9,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Exam\ExamAlert;
 use App\Models\Exam\ExamLiveSession;
 use App\Models\Exam\ExamRecording;
+use App\Models\Master\Question\ModuleQuestion;
+use App\Models\Master\Timetable\Timetable;
+use App\Models\Timetable\TimetableQuestion;
 use App\Models\User\UserModuleQuestion;
 use App\Models\User\UserTimetable;
 use Illuminate\Http\Request;
@@ -17,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ExamApiController extends Controller
 {
@@ -76,6 +80,27 @@ class ExamApiController extends Controller
             ->orderBy('order')
             ->get()
             ->values();
+
+        // Auto-healing: Jika soal masih kosong pada sesi ini, coba generate dari jadwal/modul
+        if ($questions->isEmpty()) {
+            $this->autoPopulateUserQuestions($userTimetable);
+
+            $questions = UserModuleQuestion::withoutGlobalScopes()
+                ->whereNull('deleted_at')
+                ->select($questionSelects)
+                ->with([
+                    'timetableQuestion' => function ($q) {
+                        $q->withoutGlobalScopes()->select('id', 'type', 'question', 'description', 'latex', 'latex_preview_png', 'images');
+                    },
+                    'timetableQuestion.answers' => function ($q) {
+                        $q->withoutGlobalScopes()->select('id', 'timetable_question_id', 'context', 'images', 'latex', 'latex_preview_png', 'order');
+                    },
+                ])
+                ->where('user_timetable_id', $userTimetableId)
+                ->orderBy('order')
+                ->get()
+                ->values();
+        }
 
         $navigation = $questions->map(function ($q) use ($hasEssayAnswerColumn) {
             $essayAnswer = $hasEssayAnswerColumn ? ($q->essay_answer ?? null) : null;
@@ -960,6 +985,233 @@ class ExamApiController extends Controller
 
         $endTime = $startTime->addMinutes($duration)->addSeconds($pauseSeconds)->addSeconds($additionalSeconds);
         $this->remainingTime = max(0, $endTime->timestamp - now()->timestamp);
+    }
+
+    /**
+     * Public wrapper for autoPopulateUserQuestions so it can be called from Livewire/Session management.
+     */
+    public function autoPopulateUserQuestionsPublic(UserTimetable $userTimetable)
+    {
+        return $this->autoPopulateUserQuestions($userTimetable);
+    }
+
+    /**
+     * Auto-populate questions for a user timetable if empty.
+     */
+    protected function autoPopulateUserQuestions(UserTimetable $userTimetable)
+    {
+        try {
+            // Cek apakah soal sudah ada
+            $hasQuestions = UserModuleQuestion::withoutGlobalScopes()
+                ->where('user_timetable_id', $userTimetable->id)
+                ->exists();
+
+            if ($hasQuestions) {
+                return;
+            }
+
+            $timetable = Timetable::withoutGlobalScopes()
+                ->with(['timetableModule.module'])
+                ->find($userTimetable->timetable_id);
+
+            if (! $timetable) {
+                return;
+            }
+
+            $transactionModule = $timetable->timetableModule;
+            $hasQuestionsInTimetable = false;
+            if ($transactionModule) {
+                $hasQuestionsInTimetable = TimetableQuestion::withoutGlobalScope('user_scope')
+                    ->where('timetable_module_id', $transactionModule->id)
+                    ->exists();
+            }
+
+            // Jika timetableModule belum ada atau belum punya TimetableQuestion, lakukan sinkronisasi
+            if (! $hasQuestionsInTimetable) {
+                Timetable::syncModuleQuestions($timetable);
+                $timetable->load('timetableModule.module');
+                $transactionModule = $timetable->timetableModule;
+            }
+
+            if (! $transactionModule) {
+                return;
+            }
+
+            $module = $transactionModule->module;
+            $questionPickType = $module?->question_pick_type ?? 'manual';
+            $categorySettings = $module?->category_question_settings ?? [];
+            $topicSettings = $module?->topic_question_settings ?? [];
+            $materialCategorySettings = $module?->material_category_question_settings ?? [];
+
+            if (is_string($categorySettings)) {
+                $categorySettings = json_decode($categorySettings, true) ?? [];
+            }
+            if (is_string($topicSettings)) {
+                $topicSettings = json_decode($topicSettings, true) ?? [];
+            }
+            if (is_string($materialCategorySettings)) {
+                $materialCategorySettings = json_decode($materialCategorySettings, true) ?? [];
+            }
+
+            $randomQuestionMode = optional($userTimetable->user?->company)->random_question_mode ?? 'topic_grouped';
+
+            $allowedQuestionIds = null;
+            if ($module) {
+                $moduleQuestionQuery = ModuleQuestion::withoutGlobalScope('user_scope')
+                    ->where('module_id', $module->id);
+
+                if ($questionPickType === 'manual') {
+                    $moduleQuestionQuery->where(function ($q) {
+                        $q->whereNull('question_pick_type')
+                            ->orWhere('question_pick_type', 'manual');
+                    });
+                } else {
+                    $moduleQuestionQuery->where('question_pick_type', $questionPickType);
+                }
+
+                $allowedQuestionIds = $moduleQuestionQuery->pluck('question_id')->all();
+            }
+
+            $isAllQuestions = $module?->is_all_questions ?? false;
+            $modulesQuestions = collect();
+
+            if (! $isAllQuestions) {
+                if ($questionPickType === 'category' && ! empty($categorySettings)) {
+                    foreach ($categorySettings as $categoryId => $settings) {
+                        foreach (['default', 'easy', 'medium', 'hard'] as $difficulty) {
+                            $take = (int) ($settings[$difficulty] ?? 0);
+                            if ($take <= 0) continue;
+
+                            $query = TimetableQuestion::withoutGlobalScope('user_scope')
+                                ->select('id', 'study_id', 'question_id', 'order')
+                                ->where('timetable_module_id', $transactionModule->id)
+                                ->where('category_question_id', $categoryId);
+
+                            if (is_array($allowedQuestionIds)) {
+                                $query->whereIn('question_id', $allowedQuestionIds);
+                            }
+
+                            if ($difficulty === 'default') {
+                                $query->where(function ($q) {
+                                    $q->where('difficulty', 'default')->orWhereNull('difficulty');
+                                });
+                            } else {
+                                $query->where('difficulty', $difficulty);
+                            }
+
+                            if ($transactionModule->random_question) {
+                                $query->inRandomOrder();
+                            } else {
+                                $query->orderBy('order');
+                            }
+
+                            $modulesQuestions = $modulesQuestions->merge($query->limit($take)->get());
+                        }
+                    }
+                } elseif ($questionPickType === 'topic' && ! empty($topicSettings)) {
+                    foreach ($topicSettings as $topicId => $settings) {
+                        foreach (['default', 'easy', 'medium', 'hard'] as $difficulty) {
+                            $take = (int) ($settings[$difficulty] ?? 0);
+                            if ($take <= 0) continue;
+
+                            $query = TimetableQuestion::withoutGlobalScope('user_scope')
+                                ->select('id', 'study_id', 'question_id', 'order')
+                                ->where('timetable_module_id', $transactionModule->id)
+                                ->where('topic_id', $topicId);
+
+                            if (is_array($allowedQuestionIds)) {
+                                $query->whereIn('question_id', $allowedQuestionIds);
+                            }
+
+                            if ($difficulty === 'default') {
+                                $query->where(function ($q) {
+                                    $q->where('difficulty', 'default')->orWhereNull('difficulty');
+                                });
+                            } else {
+                                $query->where('difficulty', $difficulty);
+                            }
+
+                            if ($transactionModule->random_question) {
+                                $query->inRandomOrder();
+                            } else {
+                                $query->orderBy('order');
+                            }
+
+                            $modulesQuestions = $modulesQuestions->merge($query->limit($take)->get());
+                        }
+                    }
+                }
+            }
+
+            if ($modulesQuestions->isEmpty()) {
+                $query = TimetableQuestion::withoutGlobalScope('user_scope')
+                    ->select('id', 'study_id', 'question_id', 'order', 'topic_id')
+                    ->where('timetable_module_id', $transactionModule->id);
+
+                if (is_array($allowedQuestionIds)) {
+                    $query->whereIn('question_id', $allowedQuestionIds);
+                }
+
+                if ($transactionModule->random_question) {
+                    if ($randomQuestionMode === 'topic_grouped') {
+                        $query->orderBy('topic_id', 'asc');
+                    } else {
+                        $query->inRandomOrder();
+                    }
+                } else {
+                    $query->orderBy('order');
+                }
+
+                $modulesQuestions = $query->get();
+            }
+
+            if ($modulesQuestions->isNotEmpty()) {
+                $modulesQuestions = $modulesQuestions->unique('id')->values();
+
+                if ($transactionModule->random_question) {
+                    if ($randomQuestionMode === 'fully_random') {
+                        $modulesQuestions = $modulesQuestions->shuffle()->values();
+                    } else {
+                        $modulesQuestions = $modulesQuestions->values();
+                    }
+                } else {
+                    $modulesQuestions = $modulesQuestions->sortBy('order')->values();
+                }
+
+                $limitTotalQuestions = $timetable->total_questions ?? $transactionModule->total_questions ?? $module?->total_questions ?? null;
+                if ($limitTotalQuestions && (int) $limitTotalQuestions > 0 && $modulesQuestions->count() > (int) $limitTotalQuestions) {
+                    $modulesQuestions = $modulesQuestions->take((int) $limitTotalQuestions)->values();
+                }
+
+                $userModuleQuestionsData = [];
+                $now = Carbon::now();
+                $companyId = $userTimetable->company_id ?: optional($userTimetable->user)->company_id;
+
+                foreach ($modulesQuestions as $index => $moduleQuestion) {
+                    $userModuleQuestionsData[] = [
+                        'id' => (string) Str::uuid(),
+                        'user_timetable_id' => $userTimetable->id,
+                        'timetable_module_id' => $transactionModule->id,
+                        'timetable_question_id' => $moduleQuestion->id,
+                        'study_id' => $moduleQuestion->study_id,
+                        'company_id' => $companyId,
+                        'order' => $index + 1,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+
+                if (! empty($userModuleQuestionsData)) {
+                    $chunks = array_chunk($userModuleQuestionsData, 200);
+                    foreach ($chunks as $chunk) {
+                        UserModuleQuestion::insert($chunk);
+                    }
+                    Log::info("AutoPopulateUserQuestions: inserted " . count($userModuleQuestionsData) . " questions for UserTimetable #{$userTimetable->id}.");
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::error("AutoPopulateUserQuestions error for UserTimetable #{$userTimetable->id}: " . $e->getMessage());
+        }
     }
 }
 

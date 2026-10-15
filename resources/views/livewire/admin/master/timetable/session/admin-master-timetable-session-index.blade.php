@@ -212,7 +212,13 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-center font-semibold text-slate-700">
-                                {{ $totalSoal }} / {{ $terjawab }}
+                                @if ($userTimetable && $totalSoal == 0)
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-700 border border-rose-300" title="Soal belum terbentuk untuk peserta ini">
+                                        <i class="fa-solid fa-triangle-exclamation text-rose-500"></i> 0 Soal
+                                    </span>
+                                @else
+                                    {{ $totalSoal }} / {{ $terjawab }}
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ $liveSession?->last_activity ?? '-' }}
@@ -352,6 +358,27 @@
                                                             </li>
                                                         @endif
                                                     @endif
+
+                                                    @if ($totalSoal == 0)
+                                                        <li>
+                                                            <button wire:click="generateStudentQuestions('{{ $userTimetable->id }}')"
+                                                                @click="open = false"
+                                                                class="w-full text-left px-4 py-2 hover:bg-emerald-50 text-emerald-700 font-semibold flex items-center gap-2">
+                                                                <i class="fa-solid fa-wand-magic-sparkles text-emerald-600"></i>
+                                                                Generate Soal Peserta
+                                                            </button>
+                                                        </li>
+                                                    @endif
+
+                                                    <li>
+                                                        <button wire:click="resetStudentExam('{{ $userTimetable->id }}')"
+                                                            wire:confirm="Apakah Anda yakin ingin me-reset sesi ujian peserta ini? Soal dan sesi akan dihapus agar mahasiswa dapat mulai kembali dari awal."
+                                                            @click="open = false"
+                                                            class="w-full text-left px-4 py-2 hover:bg-rose-50 text-rose-700 font-semibold flex items-center gap-2">
+                                                            <i class="fa-solid fa-rotate text-rose-600"></i>
+                                                            Reset Ujian Peserta
+                                                        </button>
+                                                    </li>
                                                 </ul>
                                             </div>
                                         </template>

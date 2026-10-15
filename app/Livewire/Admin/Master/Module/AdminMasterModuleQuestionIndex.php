@@ -778,7 +778,9 @@ class AdminMasterModuleQuestionIndex extends Component
             $this->applyMaterialCategoryQuestionSettings($module->material_category_question_settings ?? []);
 
             // Sync all active timetables using this module
-            $timetables = \App\Models\Master\Timetable\Timetable::where('module_id', $module->id)->get();
+            $timetables = \App\Models\Master\Timetable\Timetable::where('module_id', $module->id)
+                ->orWhereHas('timetableDetails', fn($q) => $q->where('module_id', $module->id))
+                ->get();
             foreach ($timetables as $timetable) {
                 \App\Models\Master\Timetable\Timetable::syncModuleQuestions($timetable);
             }
@@ -809,7 +811,9 @@ class AdminMasterModuleQuestionIndex extends Component
                 return AlertHelper::error('Gagal', 'Modul tidak ditemukan.');
             }
 
-            $timetables = \App\Models\Master\Timetable\Timetable::where('module_id', $module->id)->get();
+            $timetables = \App\Models\Master\Timetable\Timetable::where('module_id', $module->id)
+                ->orWhereHas('timetableDetails', fn($q) => $q->where('module_id', $module->id))
+                ->get();
             if ($timetables->isEmpty()) {
                 return AlertHelper::info('Info', 'Tidak ada jadwal ujian aktif menggunakan modul ini.');
             }

@@ -113,10 +113,18 @@ class Timetable extends Model
 
     public static function syncModuleQuestions(Timetable $timetable)
     {
-        if ($timetable->module_id) {
-            DB::transaction(function () use ($timetable) {
+        $moduleId = $timetable->module_id;
+        if (! $moduleId) {
+            $moduleId = $timetable->timetableDetails()->whereNotNull('module_id')->value('module_id');
+            if ($moduleId && ! $timetable->module_id) {
+                $timetable->update(['module_id' => $moduleId]);
+            }
+        }
+
+        if ($moduleId) {
+            DB::transaction(function () use ($timetable, $moduleId) {
                 $module = Module::select('id', 'studys', 'user_id', 'question_type_id', 'name', 'description', 'duration', 'random_question', 'question_pick_type', 'total_questions')
-                    ->find($timetable->module_id);
+                    ->find($moduleId);
                 if (! $module) {
                     return;
                 }
@@ -140,7 +148,9 @@ class Timetable extends Model
 
                 $questionPickType = $module->question_pick_type ?? 'manual';
 
-                ModuleQuestion::where('module_id', $module->id)
+                $moduleQuestionsQuery = ModuleQuestion::where('module_id', $module->id);
+                // Check if any questions match the strict questionPickType
+                $hasStrictMatches = (clone $moduleQuestionsQuery)
                     ->when($questionPickType === 'manual', function ($query) {
                         $query->where(function ($q) {
                             $q->whereNull('question_pick_type')
@@ -148,6 +158,18 @@ class Timetable extends Model
                         });
                     }, function ($query) use ($questionPickType) {
                         $query->where('question_pick_type', $questionPickType);
+                    })->exists();
+
+                $moduleQuestionsQuery
+                    ->when($hasStrictMatches, function ($query) use ($questionPickType) {
+                        $query->when($questionPickType === 'manual', function ($q) {
+                            $q->where(function ($sub) {
+                                $sub->whereNull('question_pick_type')
+                                    ->orWhere('question_pick_type', 'manual');
+                            });
+                        }, function ($q) use ($questionPickType) {
+                            $q->where('question_pick_type', $questionPickType);
+                        });
                     })
                     ->with([
                         'question' => function ($q) {
