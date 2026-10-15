@@ -5,7 +5,7 @@
     </div>
 
     <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <div>
                 <label for="timetable_id" class="block text-sm font-medium text-gray-700">Pilih Jadwal Ujian</label>
                 <div wire:key="select-timetable-{{ rand() }}">
@@ -23,17 +23,6 @@
                 </div>
             </div>
 
-            {{--<div>
-                <label for="statusFilter" class="block text-sm font-medium text-gray-700">Status Peserta</label>
-                <select
-                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                    wire:model.live="statusFilter" id="statusFilter">
-                    <option value="all">Semua Status (Langsung Tampil)</option>
-                    <option value="done">Hanya Selesai (Done)</option>
-                    <option value="exam">Sedang Mengerjakan (Exam)</option>
-                </select>
-            </div>--}}
-
             <div class="text-right flex items-center justify-end gap-2">
                 @if($timetable_id && !empty($answerStats))
                     <button wire:click="exportPdf" class="btn btn-primary">
@@ -50,7 +39,7 @@
     @if($timetable_id)
         @if(empty($answerStats))
             <div class="text-center py-10 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                <p class="text-gray-500">Belum ada data jawaban yang tercatat untuk jadwal dan filter status ini.</p>
+                <p class="text-gray-500">Belum ada data soal atau jawaban yang tercatat untuk jadwal ini.</p>
             </div>
         @else
             <div class="bg-white shadow overflow-hidden rounded-lg border border-gray-200">

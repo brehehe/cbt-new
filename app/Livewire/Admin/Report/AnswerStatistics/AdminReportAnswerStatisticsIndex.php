@@ -14,8 +14,6 @@ class AdminReportAnswerStatisticsIndex extends Component
 {
     public $timetable_id = '';
 
-    public $statusFilter = 'all';
-
     public $answerStats = [];
 
     public $timetable = null;
@@ -26,11 +24,6 @@ class AdminReportAnswerStatisticsIndex extends Component
     }
 
     public function updatedTimetableId($value)
-    {
-        $this->loadStatistics();
-    }
-
-    public function updatedStatusFilter($value)
     {
         $this->loadStatistics();
     }
@@ -47,27 +40,52 @@ class AdminReportAnswerStatisticsIndex extends Component
         $this->timetable = Timetable::withoutGlobalScopes()->with('module')->find($this->timetable_id);
         $hasEssayAnswerColumn = $this->hasEssayAnswerColumn();
 
-        // Fetch all questions for this timetable via TimetableModule
-        $questions = TimetableQuestion::with('answers')
-            ->whereHas('timetableModule', function ($q) {
-                $q->where('timetable_id', $this->timetable_id);
+        // 1. Fetch questions associated with this timetable (without is_check restriction)
+        $questions = TimetableQuestion::withoutGlobalScopes()
+            ->with(['answers' => function ($q) {
+                $q->withoutGlobalScopes()->orderBy('order', 'asc');
+            }])
+            ->where(function ($q) {
+                $q->whereHas('timetableModule', function ($tm) {
+                    $tm->where('timetable_id', $this->timetable_id);
+                })
+                ->orWhere('timetable_module_id', $this->timetable_id);
             })
-            ->where('is_check', true)
-            ->orderBy('order', 'asc') // Ensure consistent ordering
+            ->orderBy('order', 'asc')
             ->get();
 
-        // Fetch all user answers for this timetable
+        // 2. Fallback: If empty, fetch questions directly from question IDs used in user_module_questions
+        if ($questions->isEmpty()) {
+            $questionIds = UserModuleQuestion::withoutGlobalScopes()
+                ->whereHas('userTimetable', function ($q) {
+                    $q->where('timetable_id', $this->timetable_id);
+                })
+                ->whereNotNull('timetable_question_id')
+                ->pluck('timetable_question_id')
+                ->unique()
+                ->values();
+
+            if ($questionIds->isNotEmpty()) {
+                $questions = TimetableQuestion::withoutGlobalScopes()
+                    ->with(['answers' => function ($q) {
+                        $q->withoutGlobalScopes()->orderBy('order', 'asc');
+                    }])
+                    ->whereIn('id', $questionIds)
+                    ->orderBy('order', 'asc')
+                    ->get();
+            }
+        }
+
+        // Fetch all user answers for this timetable without filtering status
         $answerSelects = ['timetable_question_id', 'timetable_answer_id', 'status'];
         if ($hasEssayAnswerColumn) {
             $answerSelects[] = 'essay_answer';
         }
 
-        $userAnswers = UserModuleQuestion::whereHas('userTimetable', function ($q) {
-            $q->where('timetable_id', $this->timetable_id);
-            if ($this->statusFilter && $this->statusFilter !== 'all') {
-                $q->where('status', $this->statusFilter);
-            }
-        })
+        $userAnswers = UserModuleQuestion::withoutGlobalScopes()
+            ->whereHas('userTimetable', function ($q) {
+                $q->where('timetable_id', $this->timetable_id);
+            })
             ->select($answerSelects)
             ->get()
             ->groupBy('timetable_question_id');
@@ -133,7 +151,7 @@ class AdminReportAnswerStatisticsIndex extends Component
             }
 
             $stats[] = [
-                'question_text' => $question->question, // Keep tags for limit later
+                'question_text' => $question->question,
                 'question_type' => $question->type,
                 'total_answered' => $totalAnswered,
                 'total_correct' => $totalCorrect,
@@ -189,7 +207,6 @@ class AdminReportAnswerStatisticsIndex extends Component
             'timetable' => $timetable,
             'answerStats' => $this->answerStats,
             'company' => $company,
-            'statusFilter' => $this->statusFilter,
         ])
             ->setPaper('a4', 'portrait');
 

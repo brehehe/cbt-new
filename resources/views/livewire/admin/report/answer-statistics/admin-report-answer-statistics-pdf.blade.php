@@ -68,12 +68,8 @@
         <tr>
             <td><strong>Waktu</strong></td>
             <td>: {{ \Carbon\Carbon::parse($timetable->start_time)->format('d M Y H:i') }}</td>
-            <td><strong>Status Peserta</strong></td>
-            <td>: {{ ($statusFilter ?? 'all') === 'done' ? 'Hanya Selesai (Done)' : (($statusFilter ?? 'all') === 'exam' ? 'Sedang Mengerjakan (Exam)' : 'Semua Peserta') }}</td>
-        </tr>
-        <tr>
             <td><strong>Dicetak</strong></td>
-            <td colspan="3">: {{ now()->format('d M Y H:i') }}</td>
+            <td>: {{ now()->format('d M Y H:i') }}</td>
         </tr>
     </table>
 
