@@ -1300,18 +1300,18 @@ class AdminMasterTimetableIndex extends Component
     {
         try {
             DB::beginTransaction();
-            $timetable = Timetable::find($id);
+            $timetable = Timetable::withoutGlobalScopes()->find($id);
             if (!$timetable) {
                 return AlertHelper::error('Gagal', 'Jadwal tidak ditemukan.');
             }
 
-            Timetable::syncModuleQuestions($timetable);
+            $count = Timetable::syncModuleQuestions($timetable);
             DB::commit();
-            AlertHelper::success('Berhasil', 'Jadwal "' . $timetable->name . '" berhasil disinkronkan.');
+            AlertHelper::success('Berhasil', 'Jadwal "' . $timetable->name . '" berhasil disinkronkan (' . $count . ' butir soal terhubung).');
         } catch (\Throwable $th) {
             DB::rollback();
             Log::error('Gagal Sinkronisasi Jadwal: ' . $th);
-            AlertHelper::error('Gagal', 'Gagal menyinkronkan jadwal!');
+            AlertHelper::error('Gagal', 'Gagal menyinkronkan jadwal: ' . $th->getMessage());
         }
     }
 
@@ -1319,21 +1319,26 @@ class AdminMasterTimetableIndex extends Component
     {
         try {
             DB::beginTransaction();
-            $timetables = Timetable::where('company_id', Auth::user()->company_id)->get();
+            $companyId = Auth::user()?->company_id;
+            $timetables = Timetable::withoutGlobalScopes()
+                ->when($companyId, fn($q) => $q->where('company_id', $companyId))
+                ->get();
+
             if ($timetables->isEmpty()) {
                 return AlertHelper::info('Info', 'Tidak ada jadwal ujian untuk disinkronkan.');
             }
 
+            $totalSynced = 0;
             foreach ($timetables as $timetable) {
-                Timetable::syncModuleQuestions($timetable);
+                $totalSynced += Timetable::syncModuleQuestions($timetable);
             }
 
             DB::commit();
-            AlertHelper::success('Berhasil', 'Semua jadwal ujian berhasil disinkronkan.');
+            AlertHelper::success('Berhasil', 'Semua jadwal ujian (' . $timetables->count() . ' jadwal, total ' . $totalSynced . ' butir soal) berhasil disinkronkan.');
         } catch (\Throwable $th) {
             DB::rollback();
             Log::error('Gagal Sinkronisasi Semua Jadwal: ' . $th);
-            AlertHelper::error('Gagal', 'Gagal menyinkronkan semua jadwal!');
+            AlertHelper::error('Gagal', 'Gagal menyinkronkan semua jadwal: ' . $th->getMessage());
         }
     }
 
