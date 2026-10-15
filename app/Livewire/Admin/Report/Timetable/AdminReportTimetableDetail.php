@@ -26,19 +26,17 @@ class AdminReportTimetableDetail extends Component
     public function render()
     {
         $hasEssayAnswerColumn = $this->hasEssayAnswerColumn();
-
-        $timetable_questions = $this->timetable_module->questions()
-            ->with(['question'])
-            ->where('is_check', true)
-            ->orderBy('order')
-            ->get();
+        $timetable_questions = $this->getTimetableQuestions();
 
         $questionSelects = ['id', 'user_timetable_id', 'timetable_question_id', 'status'];
         if ($hasEssayAnswerColumn) {
             $questionSelects[] = 'essay_answer';
         }
 
-        $user_timetables = UserTimetable::where('timetable_id', $this->timetable_module?->timetable_id)
+        $timetableId = $this->timetable_module?->timetable_id;
+
+        $user_timetables = UserTimetable::withoutGlobalScopes()
+            ->where('timetable_id', $timetableId)
             ->search($this->search)
             ->with([
                 'user',
@@ -54,25 +52,68 @@ class AdminReportTimetableDetail extends Component
         ])->extends('layout.app')->section('content');
     }
 
+    public function getTimetableQuestions()
+    {
+        $questions = collect();
+
+        if ($this->timetable_module) {
+            $questions = $this->timetable_module->questions()
+                ->withoutGlobalScopes()
+                ->with(['question'])
+                ->orderBy('order', 'asc')
+                ->get();
+        }
+
+        if ($questions->isEmpty() && $this->timetable_module) {
+            $timetableId = $this->timetable_module->timetable_id;
+            $questions = \App\Models\Timetable\TimetableQuestion::withoutGlobalScopes()
+                ->with(['question'])
+                ->where(function ($q) use ($timetableId) {
+                    $q->whereHas('timetableModule', fn($tm) => $tm->where('timetable_id', $timetableId))
+                        ->orWhere('timetable_module_id', $timetableId)
+                        ->orWhere('timetable_module_id', $this->timetable_module->id);
+                })
+                ->orderBy('order', 'asc')
+                ->get();
+        }
+
+        if ($questions->isEmpty() && $this->timetable_module) {
+            $timetableId = $this->timetable_module->timetable_id;
+            $questionIds = UserModuleQuestion::withoutGlobalScopes()
+                ->whereHas('userTimetable', fn($q) => $q->withoutGlobalScopes()->where('timetable_id', $timetableId))
+                ->whereNotNull('timetable_question_id')
+                ->pluck('timetable_question_id')
+                ->unique()
+                ->values();
+
+            if ($questionIds->isNotEmpty()) {
+                $questions = \App\Models\Timetable\TimetableQuestion::withoutGlobalScopes()
+                    ->with(['question'])
+                    ->whereIn('id', $questionIds)
+                    ->orderBy('order', 'asc')
+                    ->get();
+            }
+        }
+
+        return $questions;
+    }
+
     public function exportPdf()
     {
         $hasEssayAnswerColumn = $this->hasEssayAnswerColumn();
-
-        $questions = $this->timetable_module->questions()
-            ->with(['question'])
-            ->where('is_check', true)
-            ->orderBy('order')
-            ->get();
-
+        $questions = $this->getTimetableQuestions();
         $questionIds = $questions->pluck('id')->filter()->values();
+        $timetableId = $this->timetable_module?->timetable_id;
 
-        $user_timetables = UserTimetable::where('timetable_id', $this->timetable_module?->timetable_id)
+        $user_timetables = UserTimetable::withoutGlobalScopes()
+            ->where('timetable_id', $timetableId)
             ->with(['user'])
             ->get();
 
         $userTimetableIds = $user_timetables->pluck('id')->filter()->values();
 
-        $answerMap = TimetableAnswer::whereIn('timetable_question_id', $questionIds)
+        $answerMap = TimetableAnswer::withoutGlobalScopes()
+            ->whereIn('timetable_question_id', $questionIds)
             ->where('is_correct', true)
             ->get(['timetable_question_id', 'order'])
             ->groupBy('timetable_question_id')
@@ -88,7 +129,8 @@ class AdminReportTimetableDetail extends Component
             $statusSelects[] = 'essay_answer';
         }
 
-        $userQuestionStatuses = UserModuleQuestion::whereIn('user_timetable_id', $userTimetableIds)
+        $userQuestionStatuses = UserModuleQuestion::withoutGlobalScopes()
+            ->whereIn('user_timetable_id', $userTimetableIds)
             ->whereIn('timetable_question_id', $questionIds)
             ->get($statusSelects)
             ->groupBy('user_timetable_id')
@@ -119,15 +161,33 @@ class AdminReportTimetableDetail extends Component
 
     public function mount($id)
     {
-        $this->timetable_module = TimetableModule::with(['module'])->where('timetable_id', $id)->firstOrFail();
+        $this->timetable_module = TimetableModule::withoutGlobalScopes()
+            ->with(['module'])
+            ->where('timetable_id', $id)
+            ->first();
+
+        if (! $this->timetable_module) {
+            $this->timetable_module = TimetableModule::withoutGlobalScopes()
+                ->with(['module'])
+                ->find($id);
+        }
+
+        if (! $this->timetable_module) {
+            abort(404, 'Data jadwal ujian tidak ditemukan.');
+        }
     }
 
     public function getAnswerCorrect($timetable_question_id)
     {
-        $timetable_question = TimetableAnswer::where('timetable_question_id', $timetable_question_id)->get();
+        $timetable_question = TimetableAnswer::withoutGlobalScopes()
+            ->where('timetable_question_id', $timetable_question_id)
+            ->orderBy('order', 'asc')
+            ->get();
+
         foreach ($timetable_question as $key => $value) {
             if ($value->is_correct) {
-                return [chr(64 + ($key + 1)), $value];
+                $letter = $value->order ? chr(64 + $value->order) : chr(65 + $key);
+                return [$letter, $value];
             }
         }
 

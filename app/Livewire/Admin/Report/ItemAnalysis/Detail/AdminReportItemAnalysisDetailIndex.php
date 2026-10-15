@@ -37,36 +37,116 @@ class AdminReportItemAnalysisDetailIndex extends Component
 
     public function loadTimetableData()
     {
-        $this->timetable = Timetable::with(['module', 'timetableModule'])->findOrFail($this->timetableId);
+        $this->timetable = Timetable::withoutGlobalScopes()->with(['module', 'timetableModule'])->findOrFail($this->timetableId);
         $this->timetableModule = $this->timetable->timetableModule;
-        $this->timetableQuestions = $this->timetableModule->questions()
-            ->where('is_check', true)
-            ->with(['answers', 'user'])
-            ->get();
-        $this->userTimetables = UserTimetable::where('timetable_id', $this->timetableId)
-            ->where('status', 'done')
+
+        // Fetch questions without restricting to is_check
+        $questions = collect();
+        if ($this->timetableModule) {
+            $questions = $this->timetableModule->questions()
+                ->withoutGlobalScopes()
+                ->with(['answers' => function ($q) {
+                    $q->withoutGlobalScopes()->orderBy('order', 'asc');
+                }, 'user'])
+                ->orderBy('order', 'asc')
+                ->get();
+        }
+
+        // Fallback 1: via timetable_module_id = timetable_id
+        if ($questions->isEmpty()) {
+            $questions = \App\Models\Timetable\TimetableQuestion::withoutGlobalScopes()
+                ->with(['answers' => function ($q) {
+                    $q->withoutGlobalScopes()->orderBy('order', 'asc');
+                }, 'user'])
+                ->where(function ($q) {
+                    $q->whereHas('timetableModule', function ($tm) {
+                        $tm->where('timetable_id', $this->timetableId);
+                    })
+                    ->orWhere('timetable_module_id', $this->timetableId);
+                })
+                ->orderBy('order', 'asc')
+                ->get();
+        }
+
+        // Fallback 2: via user_module_questions for this timetable
+        if ($questions->isEmpty()) {
+            $questionIds = UserModuleQuestion::withoutGlobalScopes()
+                ->whereHas('userTimetable', function ($q) {
+                    $q->withoutGlobalScopes()->where('timetable_id', $this->timetableId);
+                })
+                ->whereNotNull('timetable_question_id')
+                ->pluck('timetable_question_id')
+                ->unique()
+                ->values();
+
+            if ($questionIds->isNotEmpty()) {
+                $questions = \App\Models\Timetable\TimetableQuestion::withoutGlobalScopes()
+                    ->with(['answers' => function ($q) {
+                        $q->withoutGlobalScopes()->orderBy('order', 'asc');
+                    }, 'user'])
+                    ->whereIn('id', $questionIds)
+                    ->orderBy('order', 'asc')
+                    ->get();
+            }
+        }
+
+        $this->timetableQuestions = $questions;
+
+        // Load all participants for this timetable regardless of strict done status
+        $this->userTimetables = UserTimetable::withoutGlobalScopes()
+            ->where('timetable_id', $this->timetableId)
             ->with(['user', 'userModuleQuestions'])
             ->get();
     }
 
     public function calculateItemAnalysis()
     {
+        if (empty($this->timetableQuestions)) {
+            $this->loadTimetableData();
+        }
+
+        // Pre-calculate user scores once
+        $userScores = [];
+        foreach ($this->userTimetables as $userTimetable) {
+            $totalCorrect = $userTimetable->userModuleQuestions->where('status', 'correct')->count();
+            $userScores[$userTimetable->id] = [
+                'score' => $totalCorrect,
+                'user_id' => $userTimetable->user_id,
+                'user_name' => $userTimetable->user?->name ?? 'Peserta',
+            ];
+        }
+
+        uasort($userScores, function ($a, $b) {
+            return $b['score'] <=> $a['score'];
+        });
+
+        // Eager load all responses for this timetable once
+        $allUserResponses = UserModuleQuestion::withoutGlobalScopes()
+            ->whereHas('userTimetable', function ($query) {
+                $query->withoutGlobalScopes()->where('timetable_id', $this->timetableId);
+            })
+            ->with(['userTimetable.user', 'timetableAnswer'])
+            ->get()
+            ->groupBy('timetable_question_id');
+
+        $this->itemAnalysisData = [];
         foreach ($this->timetableQuestions as $question) {
-            $this->itemAnalysisData[$question->id] = $this->analyzeItem($question);
+            $responses = $allUserResponses->get($question->id, collect());
+            $this->itemAnalysisData[$question->id] = $this->analyzeItem($question, $responses, $userScores);
         }
     }
 
-    public function analyzeItem($question)
+    public function analyzeItem($question, $userResponses = null, $userScores = null)
     {
-        // Get all user responses for this question
-        $userResponses = UserModuleQuestion::where('timetable_question_id', $question->id)
-            ->whereHas('userTimetable', function ($query) {
-                $query->where('timetable_id', $this->timetableId)
-                    ->where('status', 'done');
-            })
-            ->whereIn('status', ['correct', 'wrong'])
-            ->with(['userTimetable.user', 'timetableAnswer'])
-            ->get();
+        if ($userResponses === null) {
+            $userResponses = UserModuleQuestion::withoutGlobalScopes()
+                ->where('timetable_question_id', $question->id)
+                ->whereHas('userTimetable', function ($query) {
+                    $query->withoutGlobalScopes()->where('timetable_id', $this->timetableId);
+                })
+                ->with(['userTimetable.user', 'timetableAnswer'])
+                ->get();
+        }
 
         $totalParticipants = $userResponses->count();
 
@@ -81,24 +161,24 @@ class AdminReportItemAnalysisDetailIndex extends Component
         // Difficulty Index (P) = Jumlah yang benar / Total peserta
         $difficultyIndex = $totalParticipants > 0 ? $correctAnswers / $totalParticipants : 0;
 
-        // Get scores for discrimination analysis
-        $userScores = [];
-        foreach ($this->userTimetables as $userTimetable) {
-            $totalCorrect = $userTimetable->userModuleQuestions()->where('status', 'correct')->count();
-            $userScores[$userTimetable->id] = [
-                'score' => $totalCorrect,
-                'user_id' => $userTimetable->user_id,
-                'user_name' => $userTimetable->user->name,
-            ];
+        // Build user scores if not passed
+        if ($userScores === null) {
+            $userScores = [];
+            foreach ($this->userTimetables as $userTimetable) {
+                $totalCorrect = $userTimetable->userModuleQuestions->where('status', 'correct')->count();
+                $userScores[$userTimetable->id] = [
+                    'score' => $totalCorrect,
+                    'user_id' => $userTimetable->user_id,
+                    'user_name' => $userTimetable->user?->name ?? 'Peserta',
+                ];
+            }
+            uasort($userScores, function ($a, $b) {
+                return $b['score'] <=> $a['score'];
+            });
         }
 
-        // Sort by total score (descending)
-        uasort($userScores, function ($a, $b) {
-            return $b['score'] <=> $a['score'];
-        });
-
-        // Calculate discrimination index using upper and lower 27% groups
-        $discriminationData = $this->calculateDiscrimination($question, $userScores);
+        // Calculate discrimination index using upper and lower groups
+        $discriminationData = $this->calculateDiscrimination($question, $userScores, $userResponses);
 
         // Analyze answer options
         $optionAnalysis = $this->analyzeAnswerOptions($question, $userResponses);
@@ -121,7 +201,7 @@ class AdminReportItemAnalysisDetailIndex extends Component
         ];
     }
 
-    public function calculateDiscrimination($question, $userScores)
+    public function calculateDiscrimination($question, $userScores, $userResponses = null)
     {
         $totalUsers = count($userScores);
 
@@ -150,33 +230,42 @@ class AdminReportItemAnalysisDetailIndex extends Component
         $upperGroupIds = array_keys($upperGroup);
         $lowerGroupIds = array_keys($lowerGroup);
 
-        // Count correct answers in each group
-        $upperCorrect = UserModuleQuestion::where('timetable_question_id', $question->id)
-            ->whereIn('user_timetable_id', $upperGroupIds)
-            ->where('status', 'correct')
-            ->count();
+        if ($userResponses !== null) {
+            $upperResponses = $userResponses->whereIn('user_timetable_id', $upperGroupIds);
+            $lowerResponses = $userResponses->whereIn('user_timetable_id', $lowerGroupIds);
 
-        $lowerCorrect = UserModuleQuestion::where('timetable_question_id', $question->id)
-            ->whereIn('user_timetable_id', $lowerGroupIds)
-            ->where('status', 'correct')
-            ->count();
+            $upperCorrect = $upperResponses->where('status', 'correct')->count();
+            $lowerCorrect = $lowerResponses->where('status', 'correct')->count();
 
-        // Discrimination Index = (Upper Correct / Upper Total) - (Lower Correct / Lower Total)
-        // Note: For this to be accurate, we need to compare against graded attempts in those groups
+            $upperTotal = $upperResponses->count();
+            $lowerTotal = $lowerResponses->count();
+        } else {
+            $upperCorrect = UserModuleQuestion::withoutGlobalScope('user_scope')
+                ->where('timetable_question_id', $question->id)
+                ->whereIn('user_timetable_id', $upperGroupIds)
+                ->where('status', 'correct')
+                ->count();
 
-        $upperGradedCount = UserModuleQuestion::where('timetable_question_id', $question->id)
-            ->whereIn('user_timetable_id', $upperGroupIds)
-            ->whereIn('status', ['correct', 'wrong'])
-            ->count();
+            $lowerCorrect = UserModuleQuestion::withoutGlobalScope('user_scope')
+                ->where('timetable_question_id', $question->id)
+                ->whereIn('user_timetable_id', $lowerGroupIds)
+                ->where('status', 'correct')
+                ->count();
 
-        $lowerGradedCount = UserModuleQuestion::where('timetable_question_id', $question->id)
-            ->whereIn('user_timetable_id', $lowerGroupIds)
-            ->whereIn('status', ['correct', 'wrong'])
-            ->count();
+            $upperTotal = UserModuleQuestion::withoutGlobalScope('user_scope')
+                ->where('timetable_question_id', $question->id)
+                ->whereIn('user_timetable_id', $upperGroupIds)
+                ->count();
+
+            $lowerTotal = UserModuleQuestion::withoutGlobalScope('user_scope')
+                ->where('timetable_question_id', $question->id)
+                ->whereIn('user_timetable_id', $lowerGroupIds)
+                ->count();
+        }
 
         $discriminationIndex = 0;
-        if ($upperGradedCount > 0 && $lowerGradedCount > 0) {
-            $discriminationIndex = ($upperCorrect / $upperGradedCount) - ($lowerCorrect / $lowerGradedCount);
+        if ($upperTotal > 0 && $lowerTotal > 0) {
+            $discriminationIndex = ($upperCorrect / $upperTotal) - ($lowerCorrect / $lowerTotal);
         }
 
         return [
@@ -184,8 +273,8 @@ class AdminReportItemAnalysisDetailIndex extends Component
             'discrimination_level' => $this->getDiscriminationLevel($discriminationIndex),
             'upper_group_correct' => $upperCorrect,
             'lower_group_correct' => $lowerCorrect,
-            'upper_group_total' => $upperGradedCount,
-            'lower_group_total' => $lowerGradedCount,
+            'upper_group_total' => $upperTotal,
+            'lower_group_total' => $lowerTotal,
         ];
     }
 
@@ -196,23 +285,27 @@ class AdminReportItemAnalysisDetailIndex extends Component
         }
         $options = $question->answers;
         $optionAnalysis = [];
+        $totalCount = $userResponses->count();
 
         foreach ($options as $option) {
             $selectedCount = $userResponses->where('timetable_answer_id', $option->id)->count();
-            $percentage = $userResponses->count() > 0 ? ($selectedCount / $userResponses->count()) * 100 : 0;
+            $percentage = $totalCount > 0 ? ($selectedCount / $totalCount) * 100 : 0;
 
             $optionAnalysis[] = [
                 'option' => $option,
                 'selected_count' => $selectedCount,
                 'percentage' => round($percentage, 1),
-                'is_correct' => $option->is_correct,
+                'is_correct' => (bool) $option->is_correct,
             ];
         }
 
-        // Count unanswered
-        $unanswered = $userResponses->whereNull('timetable_answer_id')->count();
+        // Count unanswered (no timetable_answer_id or status is unanswered)
+        $unanswered = $userResponses->filter(function ($r) {
+            return empty($r->timetable_answer_id) || $r->status === 'unanswered';
+        })->count();
+
         if ($unanswered > 0) {
-            $percentage = ($unanswered / $userResponses->count()) * 100;
+            $percentage = $totalCount > 0 ? ($unanswered / $totalCount) * 100 : 0;
             $optionAnalysis[] = [
                 'option' => (object) ['alphabet' => 'X', 'context' => 'Tidak dijawab'],
                 'selected_count' => $unanswered,
@@ -292,7 +385,8 @@ class AdminReportItemAnalysisDetailIndex extends Component
 
     public function exportPdf()
     {
-        if (empty($this->itemAnalysisData)) {
+        if (empty($this->timetableQuestions) || empty($this->itemAnalysisData)) {
+            $this->loadTimetableData();
             $this->calculateItemAnalysis();
         }
 

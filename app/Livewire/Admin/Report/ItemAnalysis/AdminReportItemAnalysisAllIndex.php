@@ -71,13 +71,16 @@ class AdminReportItemAnalysisAllIndex extends Component
         $questionId = is_array($params) ? $params[0] : $params;
 
         DB::transaction(function () use ($questionId) {
-            $timetableQuestionIds = TimetableQuestion::where('question_id', $questionId)->pluck('id');
+            $timetableQuestionIds = TimetableQuestion::withoutGlobalScope('user_scope')
+                ->where('question_id', $questionId)
+                ->pluck('id');
 
             // Set is_show = false: data tetap ada, tidak ikut dihitung di item analisis.
             // History ujian siswa masih terlihat di halaman riwayat detail.
+            $companyId = auth()->user()?->company_id;
             UserModuleQuestion::withoutGlobalScope('user_scope')
                 ->whereIn('timetable_question_id', $timetableQuestionIds)
-                ->where('company_id', auth()->user()?->company_id)
+                ->when($companyId, fn($q) => $q->where('company_id', $companyId))
                 ->update(['is_show' => false]);
         });
 
@@ -90,11 +93,14 @@ class AdminReportItemAnalysisAllIndex extends Component
     public function restoreAttempts(string $questionId): void
     {
         DB::transaction(function () use ($questionId) {
-            $timetableQuestionIds = TimetableQuestion::where('question_id', $questionId)->pluck('id');
+            $timetableQuestionIds = TimetableQuestion::withoutGlobalScope('user_scope')
+                ->where('question_id', $questionId)
+                ->pluck('id');
 
+            $companyId = auth()->user()?->company_id;
             UserModuleQuestion::withoutGlobalScope('user_scope')
                 ->whereIn('timetable_question_id', $timetableQuestionIds)
-                ->where('company_id', auth()->user()?->company_id)
+                ->when($companyId, fn($q) => $q->where('company_id', $companyId))
                 ->update(['is_show' => true]);
         });
 
@@ -103,22 +109,20 @@ class AdminReportItemAnalysisAllIndex extends Component
 
     public function generateAll(): void
     {
+        $companyId = auth()->user()?->company_id;
+
         $rows = UserModuleQuestion::withoutGlobalScope('user_scope')
             ->join('timetable_questions', 'user_module_questions.timetable_question_id', '=', 'timetable_questions.id')
             ->join('questions', 'timetable_questions.question_id', '=', 'questions.id')
-            ->where('timetable_questions.is_check', true)
-            ->where('user_module_questions.company_id', auth()->user()?->company_id)
-            ->where('user_module_questions.is_show', true) // hanya yang tidak disembunyikan
-            ->whereExists(function ($subQuery) {
-                $subQuery->select(DB::raw(1))
-                    ->from('module_questions')
-                    ->whereColumn('module_questions.question_id', 'questions.id')
-                    ->where('module_questions.is_check', true);
+            ->when($companyId, fn($q) => $q->where('user_module_questions.company_id', $companyId))
+            ->where(function ($q) {
+                $q->whereNull('user_module_questions.is_show')
+                    ->orWhere('user_module_questions.is_show', true);
             })
             ->groupBy('questions.id')
             ->select([
                 'questions.id as question_id',
-                DB::raw("sum(case when user_module_questions.status in ('correct', 'wrong') then 1 else 0 end) as total_attempts"),
+                DB::raw("count(user_module_questions.id) as total_attempts"),
                 DB::raw("sum(case when user_module_questions.status = 'correct' then 1 else 0 end) as total_correct"),
             ])
             ->get();
@@ -155,17 +159,15 @@ class AdminReportItemAnalysisAllIndex extends Component
 
     public function render()
     {
+        $companyId = auth()->user()?->company_id;
+
         $query = UserModuleQuestion::withoutGlobalScope('user_scope')
             ->join('timetable_questions', 'user_module_questions.timetable_question_id', '=', 'timetable_questions.id')
             ->join('questions', 'timetable_questions.question_id', '=', 'questions.id')
-            ->where('timetable_questions.is_check', true)
-            ->where('user_module_questions.company_id', auth()->user()?->company_id)
-            ->where('user_module_questions.is_show', true) // hanya yang tidak disembunyikan admin
-            ->whereExists(function ($subQuery) {
-                $subQuery->select(DB::raw(1))
-                    ->from('module_questions')
-                    ->whereColumn('module_questions.question_id', 'questions.id')
-                    ->where('module_questions.is_check', true);
+            ->when($companyId, fn($q) => $q->where('user_module_questions.company_id', $companyId))
+            ->where(function ($q) {
+                $q->whereNull('user_module_questions.is_show')
+                    ->orWhere('user_module_questions.is_show', true);
             })
             ->when($this->search, function ($q) {
                 $term = '%'.$this->search.'%';
@@ -176,7 +178,7 @@ class AdminReportItemAnalysisAllIndex extends Component
                 'questions.id as question_id',
                 'questions.question as question_text',
                 'questions.difficulty as difficulty',
-                DB::raw("sum(case when user_module_questions.status in ('correct', 'wrong') then 1 else 0 end) as total_attempts"),
+                DB::raw("count(user_module_questions.id) as total_attempts"),
                 DB::raw("sum(case when user_module_questions.status = 'correct' then 1 else 0 end) as total_correct"),
             ])
             ->orderBy('questions.question', 'asc');
