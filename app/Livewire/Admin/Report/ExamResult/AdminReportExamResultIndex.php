@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\User\UserTimetable;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Maatwebsite\Excel\Facades\Excel;
@@ -81,7 +82,17 @@ class AdminReportExamResultIndex extends Component
 
     public function exportPdf()
     {
-        $examResults = UserTimetable::with(['user', 'timetable.module', 'userModuleQuestions.timetableQuestion.topic'])
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(300);
+
+        // Fetch lightweight user timetables without eager loading 100k+ userModuleQuestions
+        $examResults = UserTimetable::query()
+            ->select(['id', 'user_id', 'timetable_id', 'mark', 'created_at'])
+            ->with([
+                'user:id,name,nim,username',
+                'timetable:id,name,module_id,start_time,end_time',
+                'timetable.module:id,name',
+            ])
             ->search($this->search)
             ->when($this->user_id, function ($query) {
                 $query->where('user_id', $this->user_id);
@@ -98,56 +109,138 @@ class AdminReportExamResultIndex extends Component
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $filterSummary = $this->getFilterSummary();
-        $gradeDetails = [];
+        $userTimetableIds = $examResults->pluck('id');
 
+        $overallStats = [];
+        $topicStatsByUser = [];
         $allTopics = [];
-        foreach ($examResults as $result) {
-            $gradeDetails[$result->id] = $this->getGradeDetail($result->mark);
-            foreach ($result->userModuleQuestions as $umq) {
-                $tq = $umq->timetableQuestion;
-                if ($tq && $tq->topic_id) {
-                    $allTopics[$tq->topic_id] = $tq->topic?->name ?? 'Tanpa Topik';
-                }
+
+        if ($userTimetableIds->isNotEmpty()) {
+            // Aggregate question counts directly in PostgreSQL
+            $overallRows = DB::table('user_module_questions')
+                ->whereIn('user_timetable_id', $userTimetableIds)
+                ->whereNull('deleted_at')
+                ->groupBy('user_timetable_id')
+                ->select(
+                    'user_timetable_id',
+                    DB::raw('COUNT(*) as total_questions'),
+                    DB::raw("COUNT(CASE WHEN status = 'correct' THEN 1 END) as correct"),
+                    DB::raw("COUNT(CASE WHEN status = 'wrong' THEN 1 END) as wrong"),
+                    DB::raw("COUNT(CASE WHEN timetable_answer_id IS NULL THEN 1 END) as unanswered")
+                )
+                ->get();
+
+            foreach ($overallRows as $row) {
+                $overallStats[$row->user_timetable_id] = [
+                    'total' => (int) $row->total_questions,
+                    'correct' => (int) $row->correct,
+                    'wrong' => (int) $row->wrong,
+                    'unanswered' => (int) $row->unanswered,
+                ];
             }
+
+            // Aggregate topic breakdown counts directly in PostgreSQL
+            $topicRows = DB::table('user_module_questions as umq')
+                ->join('timetable_questions as tq', 'tq.id', '=', 'umq.timetable_question_id')
+                ->leftJoin('topics as top', 'top.id', '=', 'tq.topic_id')
+                ->whereIn('umq.user_timetable_id', $userTimetableIds)
+                ->whereNull('umq.deleted_at')
+                ->whereNotNull('tq.topic_id')
+                ->groupBy('umq.user_timetable_id', 'tq.topic_id', 'top.name')
+                ->select(
+                    'umq.user_timetable_id',
+                    'tq.topic_id',
+                    DB::raw("COALESCE(top.name, 'Tanpa Topik') as topic_name"),
+                    DB::raw('COUNT(*) as total_questions'),
+                    DB::raw("COUNT(CASE WHEN umq.status = 'correct' THEN 1 END) as correct"),
+                    DB::raw("COUNT(CASE WHEN umq.status = 'wrong' THEN 1 END) as wrong"),
+                    DB::raw("COUNT(CASE WHEN umq.timetable_answer_id IS NULL THEN 1 END) as unanswered")
+                )
+                ->get();
+
+            foreach ($topicRows as $row) {
+                $allTopics[$row->topic_id] = $row->topic_name;
+                $topicStatsByUser[$row->user_timetable_id][$row->topic_id] = [
+                    'total' => (int) $row->total_questions,
+                    'correct' => (int) $row->correct,
+                    'wrong' => (int) $row->wrong,
+                    'unanswered' => (int) $row->unanswered,
+                ];
+            }
+            asort($allTopics);
         }
-        asort($allTopics);
 
-        $company = Auth::user()->company()->with('companyDetail')->first();
+        $filterSummary = $this->getFilterSummary();
+        $company = Auth::user()?->company()?->with('companyDetail')->first();
 
-        $count = $examResults->count();
-        $stats = [
-            'total_students' => $count,
-            'average_score' => $count > 0 ? $examResults->avg('mark') : 0,
-            'highest_score' => $count > 0 ? $examResults->max('mark') : 0,
-            'lowest_score' => $count > 0 ? $examResults->min('mark') : 0,
-        ];
-
+        // Rating scales loaded once
+        $ratingScales = RatingScale::orderBy('order')->get();
         $gradeDistribution = [];
+        $rows = [];
+
         foreach ($examResults as $result) {
-            $grade = $this->getGradeDetail($result->mark);
-            $letter = $grade ? $grade->grade_letter : '-';
-            if (! isset($gradeDistribution[$letter])) {
-                $gradeDistribution[$letter] = 0;
+            $mark = $result->mark;
+            $scale = null;
+            if ($mark !== null) {
+                $scale = $ratingScales->first(function ($item) use ($mark) {
+                    return $item->min_score <= $mark && $item->max_score >= $mark;
+                });
             }
-            $gradeDistribution[$letter]++;
+            $gradeLetter = $scale?->grade_letter ?? '-';
+            if (! isset($gradeDistribution[$gradeLetter])) {
+                $gradeDistribution[$gradeLetter] = 0;
+            }
+            $gradeDistribution[$gradeLetter]++;
+
+            $overall = $overallStats[$result->id] ?? [
+                'total' => 0,
+                'correct' => 0,
+                'wrong' => 0,
+                'unanswered' => 0,
+            ];
+
+            $rows[] = [
+                'id' => $result->id,
+                'name' => $result->user?->name ?? '-',
+                'nim' => $result->user?->nim ?? ($result->user?->username ?? '-'),
+                'module' => $result->timetable?->module?->name ?? '-',
+                'timetable' => $result->timetable?->name ?? '-',
+                'start_time' => $result->timetable?->start_time?->format('d/m/y H:i') ?? '-',
+                'end_time' => $result->timetable?->end_time?->format('d/m/y H:i') ?? '-',
+                'total' => $overall['total'],
+                'correct' => $overall['correct'],
+                'wrong' => $overall['wrong'],
+                'unanswered' => $overall['unanswered'],
+                'mark' => $mark !== null ? number_format((float) $mark, 2) : '-',
+                'grade_letter' => $gradeLetter,
+                'topic_stats' => $topicStatsByUser[$result->id] ?? [],
+            ];
         }
         ksort($gradeDistribution);
 
+        $count = count($rows);
+        $numericMarks = $examResults->pluck('mark')->filter(fn ($m) => !is_null($m));
+        $stats = [
+            'total_students' => $count,
+            'average_score' => $numericMarks->isNotEmpty() ? $numericMarks->avg() : 0,
+            'highest_score' => $numericMarks->isNotEmpty() ? $numericMarks->max() : 0,
+            'lowest_score' => $numericMarks->isNotEmpty() ? $numericMarks->min() : 0,
+        ];
+
         $pdf = Pdf::loadView('livewire.admin.report.exam-result.admin-report-exam-result-pdf', [
-            'examResults' => $examResults,
+            'rows' => $rows,
             'filterSummary' => $filterSummary,
-            'gradeDetails' => $gradeDetails,
             'allTopics' => $allTopics,
             'company' => $company,
             'stats' => $stats,
             'gradeDistribution' => $gradeDistribution,
         ])
             ->setPaper('a4', 'landscape')
-            ->setOption('margin-top', 10)
-            ->setOption('margin-right', 10)
-            ->setOption('margin-bottom', 10)
-            ->setOption('margin-left', 10);
+            ->setOption('isHtml5ParserEnabled', true)
+            ->setOption('margin-top', 8)
+            ->setOption('margin-right', 8)
+            ->setOption('margin-bottom', 8)
+            ->setOption('margin-left', 8);
 
         return response()->streamDownload(
             fn () => print ($pdf->output()),
@@ -158,6 +251,9 @@ class AdminReportExamResultIndex extends Component
     public function exportExcel()
     {
         try {
+            @ini_set('memory_limit', '512M');
+            @set_time_limit(300);
+
             $fileName = 'exam-result-report-'.date('YmdHis').'.xlsx';
 
             return Excel::download(
@@ -166,7 +262,7 @@ class AdminReportExamResultIndex extends Component
             );
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Exam Result Excel Export Error: '.$e->getMessage());
-            session()->flash('error', 'Gagal mengekspor data ke Excel.');
+            session()->flash('error', 'Gagal mengekspor data ke Excel: '.$e->getMessage());
         }
     }
 

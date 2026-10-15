@@ -5,45 +5,45 @@
     <title>Laporan Hasil Ujian</title>
     <style>
         * { box-sizing: border-box; }
-        body { font-family: sans-serif; font-size: 10px; color: #1f2937; margin: 0; padding: 20px; }
+        body { font-family: sans-serif; font-size: 9px; color: #1f2937; margin: 0; padding: 15px; }
         
         /* Header Styling */
         .header-container {
             display: table;
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-bottom: 2px solid #374151;
-            padding-bottom: 15px;
+            padding-bottom: 12px;
         }
         .header-logo {
             display: table-cell;
-            width: 80px;
+            width: 70px;
             vertical-align: middle;
         }
         .header-logo img {
-            max-width: 80px;
-            max-height: 80px;
+            max-width: 70px;
+            max-height: 70px;
         }
         .header-content {
             display: table-cell;
             vertical-align: middle;
-            padding-left: 15px;
+            padding-left: 12px;
         }
         .company-name {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: bold;
             color: #111827;
             text-transform: uppercase;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
         .company-address {
-            font-size: 10px;
+            font-size: 9px;
             color: #4b5563;
-            line-height: 1.4;
+            line-height: 1.3;
         }
         .report-title {
-            margin-top: 10px;
-            font-size: 16px;
+            margin-top: 6px;
+            font-size: 14px;
             font-weight: bold;
             color: #1e40af;
             text-decoration: underline;
@@ -53,7 +53,7 @@
         .stats-container {
             display: table;
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             background-color: #f3f4f6;
             border: 1px solid #d1d5db;
             border-radius: 4px;
@@ -61,7 +61,7 @@
         .stats-box {
             display: table-cell;
             width: 25%;
-            padding: 10px;
+            padding: 8px;
             text-align: center;
             border-right: 1px solid #d1d5db;
         }
@@ -69,66 +69,77 @@
             border-right: none;
         }
         .stats-label {
-            font-size: 9px;
+            font-size: 8px;
             color: #6b7280;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             text-transform: uppercase;
             font-weight: bold;
         }
         .stats-value {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             color: #111827;
         }
         .grade-dist {
             text-align: left;
-            font-size: 9px;
+            font-size: 8px;
         }
         .grade-item {
             display: inline-block;
-            margin-right: 8px;
+            margin-right: 5px;
             background-color: #e5e7eb;
-            padding: 2px 5px;
+            padding: 1px 4px;
             border-radius: 3px;
             margin-bottom: 2px;
         }
 
         /* Filter Summary */
         .filter-section {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             border-left: 3px solid #3b82f6;
-            padding: 8px 12px;
+            padding: 6px 10px;
             background-color: #eff6ff;
-            font-size: 9px;
+            font-size: 8px;
         }
         .filter-row {
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
         .filter-label {
             font-weight: bold;
             color: #1e40af;
-            width: 80px;
+            width: 70px;
             display: inline-block;
         }
 
         /* Table Styling */
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid #e5e7eb; padding: 6px; text-align: center; vertical-align: middle; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        tr { page-break-inside: avoid; }
+        th, td { border: 1px solid #d1d5db; padding: 4px 3px; text-align: center; vertical-align: middle; font-size: 8px; }
         th { 
             background-color: #1f2937; 
             color: #ffffff; 
             font-weight: bold; 
-            font-size: 9px; 
+            font-size: 8px; 
             text-transform: uppercase;
         }
         tr:nth-child(even) { background-color: #f9fafb; }
-        td { font-size: 9px; color: #374151; }
+        td { color: #374151; }
         .text-left { text-align: left; }
         .fw-bold { font-weight: bold; }
-        .col-no { width: 30px; }
+        .col-no { width: 25px; }
+
+        .grade-badge {
+            font-weight: bold;
+            background-color: #eff6ff;
+            color: #1e40af;
+            border-radius: 3px;
+            padding: 2px 4px;
+            display: inline-block;
+            min-width: 20px;
+        }
 
         .no-data {
-            padding: 30px;
+            padding: 20px;
             color: #9ca3af;
             font-style: italic;
             background-color: #f9fafb;
@@ -140,10 +151,10 @@
             bottom: 0px;
             left: 0px;
             right: 0px;
-            height: 30px;
+            height: 20px;
             border-top: 1px solid #e5e7eb;
-            padding-top: 10px;
-            font-size: 8px;
+            padding-top: 5px;
+            font-size: 7px;
             color: #9ca3af;
             text-align: right;
         }
@@ -155,12 +166,9 @@
 <body>
     <!-- Header -->
     <div class="header-container">
-        @if($company && $company->logo)
+        @if($company && $company->logo && file_exists(public_path('storage/' . $company->logo)))
             <div class="header-logo">
-                 {{-- Assuming logo is stored as path, might need asset() or public_path() depending on DOMPDF setup. 
-                      Using a placeholder if typical storage link doesn't work out of the box in this env, 
-                      but attempting standard img tag first. --}}
-                <img src="{{ public_path('storage/' . $company->logo) }}" alt="Logo" onerror="this.style.display='none'">
+                <img src="{{ public_path('storage/' . $company->logo) }}" alt="Logo">
             </div>
         @endif
         <div class="header-content">
@@ -192,10 +200,10 @@
             </div>
         </div>
         <div class="stats-box grade-dist">
-            <div class="stats-label" style="text-align: center; margin-bottom: 5px;">Distribusi Grade</div>
+            <div class="stats-label" style="text-align: center; margin-bottom: 3px;">Distribusi Grade</div>
             <div style="text-align: center;">
-                @forelse($gradeDistribution as $grade => $count)
-                    <span class="grade-item"><strong>{{ $grade }}:</strong> {{ $count }}</span>
+                @forelse($gradeDistribution as $grade => $gCount)
+                    <span class="grade-item"><strong>{{ $grade }}:</strong> {{ $gCount }}</span>
                 @empty
                     <span>-</span>
                 @endforelse
@@ -206,7 +214,7 @@
     <!-- Filter Information -->
     @if (!empty($filterSummary))
         <div class="filter-section">
-            <div style="font-weight: bold; margin-bottom: 5px; text-decoration: underline;">Filter Data:</div>
+            <div style="font-weight: bold; margin-bottom: 4px; text-decoration: underline;">Filter Data:</div>
             @if (isset($filterSummary['user']))
                 <div class="filter-row"><span class="filter-label">Peserta</span>: {{ $filterSummary['user'] }}</div>
             @endif
@@ -222,104 +230,118 @@
         </div>
     @endif
 
+    @php
+        $topicCount = count($allTopics);
+        $isFewTopics = $topicCount <= 3;
+        $totalColumns = 12 + ($isFewTopics ? ($topicCount * 4) : $topicCount);
+    @endphp
+
     <!-- Main Table -->
     <table>
         <thead>
-            <tr>
-                <th rowspan="2" class="col-no">No</th>
-                <th rowspan="2" class="text-left">Nama {{ student_label() }}</th>
-                <th rowspan="2">NIM/Username</th>
-                <th rowspan="2">Modul</th>
-                <th rowspan="2">Jadwal Ujian</th>
-                <th rowspan="2">Waktu Ujian</th>
-                <th rowspan="2">Soal</th>
-                <th rowspan="2">Benar</th>
-                <th rowspan="2">Salah</th>
-                <th rowspan="2">TJ</th>
-                @foreach ($allTopics as $topicId => $topicName)
-                    <th colspan="4" style="background-color: #374151; font-size: 8px;">{{ $topicName }}</th>
-                @endforeach
-                <th rowspan="2">Nilai</th>
-                <th rowspan="2">Grade</th>
-            </tr>
-            <tr>
-                @foreach ($allTopics as $topicId => $topicName)
-                    <th style="font-size: 7px; background-color: #4b5563;">Soal</th>
-                    <th style="font-size: 7px; background-color: #4b5563; color: #10b981;">B</th>
-                    <th style="font-size: 7px; background-color: #4b5563; color: #f59e0b;">S</th>
-                    <th style="font-size: 7px; background-color: #4b5563; color: #ef4444;">TJ</th>
-                @endforeach
-            </tr>
+            @if ($isFewTopics && $topicCount > 0)
+                {{-- Multi-row header for few topics (<= 3 topics) --}}
+                <tr>
+                    <th rowspan="2" class="col-no">No</th>
+                    <th rowspan="2" class="text-left">Nama {{ student_label() }}</th>
+                    <th rowspan="2">NIM/Username</th>
+                    <th rowspan="2">Modul</th>
+                    <th rowspan="2">Jadwal Ujian</th>
+                    <th rowspan="2">Waktu Ujian</th>
+                    <th rowspan="2">Soal</th>
+                    <th rowspan="2">Benar</th>
+                    <th rowspan="2">Salah</th>
+                    <th rowspan="2">TJ</th>
+                    @foreach ($allTopics as $topicId => $topicName)
+                        <th colspan="4" style="background-color: #374151; font-size: 7px;">{{ $topicName }}</th>
+                    @endforeach
+                    <th rowspan="2">Nilai</th>
+                    <th rowspan="2">Grade</th>
+                </tr>
+                <tr>
+                    @foreach ($allTopics as $topicId => $topicName)
+                        <th style="font-size: 7px; background-color: #4b5563;">Soal</th>
+                        <th style="font-size: 7px; background-color: #4b5563; color: #10b981;">B</th>
+                        <th style="font-size: 7px; background-color: #4b5563; color: #f59e0b;">S</th>
+                        <th style="font-size: 7px; background-color: #4b5563; color: #ef4444;">TJ</th>
+                    @endforeach
+                </tr>
+            @else
+                {{-- Single-row header (compact for > 3 topics or 0 topics to avoid DomPDF crash) --}}
+                <tr>
+                    <th class="col-no">No</th>
+                    <th class="text-left">Nama {{ student_label() }}</th>
+                    <th style="width: 75px;">NIM/Username</th>
+                    <th>Modul</th>
+                    <th>Jadwal Ujian</th>
+                    <th style="width: 75px;">Waktu Ujian</th>
+                    <th style="width: 30px;">Soal</th>
+                    <th style="width: 30px; color: #10b981;">Benar</th>
+                    <th style="width: 30px; color: #f59e0b;">Salah</th>
+                    <th style="width: 30px; color: #ef4444;">TJ</th>
+                    @foreach ($allTopics as $topicId => $topicName)
+                        <th style="background-color: #374151; font-size: 7px;">
+                            {{ $topicName }}<br>
+                            <span style="font-size: 6px; color: #d1d5db; font-weight: normal;">B / Soal (S/TJ)</span>
+                        </th>
+                    @endforeach
+                    <th style="width: 38px;">Nilai</th>
+                    <th style="width: 32px;">Grade</th>
+                </tr>
+            @endif
         </thead>
         <tbody>
-            @forelse ($examResults as $index => $result)
-                @php
-                    $gradeDetail = $gradeDetails[$result->id] ?? null;
-                    $totalQ = $result->userModuleQuestions->count();
-                    $correct = $result->userModuleQuestions->where('status', 'correct')->count();
-                    $wrong = $result->userModuleQuestions->where('status', 'wrong')->count();
-                    $unanswered = $result->userModuleQuestions->whereNull('timetable_answer_id')->count();
-
-                    // Calculate topic stats for this student
-                    $topicStats = [];
-                    foreach ($result->userModuleQuestions as $umq) {
-                        $tq = $umq->timetableQuestion;
-                        if ($tq && $tq->topic_id) {
-                            $topicId = $tq->topic_id;
-                            if (!isset($topicStats[$topicId])) {
-                                $topicStats[$topicId] = ['total' => 0, 'correct' => 0, 'wrong' => 0, 'unanswered' => 0];
-                            }
-                            $topicStats[$topicId]['total']++;
-                            if (empty($umq->timetable_answer_id)) {
-                                $topicStats[$topicId]['unanswered']++;
-                            } elseif ($umq->status === 'correct') {
-                                $topicStats[$topicId]['correct']++;
-                            } elseif ($umq->status === 'wrong') {
-                                $topicStats[$topicId]['wrong']++;
-                            }
-                        }
-                    }
-                @endphp
+            @forelse ($rows as $index => $row)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td class="text-left fw-bold">{{ $result->user?->name ?? '-' }}</td>
-                    <td>{{ $result->user?->nim ?? ($result->user?->username ?? '-') }}</td>
-                    <td>{{ $result->timetable?->module?->name ?? '-' }}</td>
-                    <td>{{ $result->timetable?->name ?? '-' }}</td>
+                    <td class="text-left fw-bold">{{ $row['name'] }}</td>
+                    <td>{{ $row['nim'] }}</td>
+                    <td>{{ $row['module'] }}</td>
+                    <td>{{ $row['timetable'] }}</td>
                     <td>
-                        {{ $result->timetable?->start_time?->format('d/m/y H:i') ?? '-' }} <br> 
-                        <span style="color: #6b7280; font-size: 8px;">s.d.</span> <br>
-                        {{ $result->timetable?->end_time?->format('d/m/y H:i') ?? '-' }}
+                        {{ $row['start_time'] }}<br>
+                        <span style="color: #6b7280; font-size: 7px;">s.d.</span><br>
+                        {{ $row['end_time'] }}
                     </td>
-                    <td>{{ $totalQ }}</td>
-                    <td style="color: #059669; font-weight: bold;">{{ $correct }}</td>
-                    <td style="color: #dc2626; font-weight: bold;">{{ $wrong }}</td>
-                    <td style="color: #d97706; font-weight: bold;">{{ $unanswered }}</td>
+                    <td>{{ $row['total'] }}</td>
+                    <td style="color: #059669; font-weight: bold;">{{ $row['correct'] }}</td>
+                    <td style="color: #dc2626; font-weight: bold;">{{ $row['wrong'] }}</td>
+                    <td style="color: #d97706; font-weight: bold;">{{ $row['unanswered'] }}</td>
 
-                    @foreach ($allTopics as $topicId => $topicName)
-                        @php
-                            $tStat = $topicStats[$topicId] ?? ['total' => 0, 'correct' => 0, 'wrong' => 0, 'unanswered' => 0];
-                        @endphp
-                        <td>{{ $tStat['total'] }}</td>
-                        <td style="color: #059669;">{{ $tStat['correct'] }}</td>
-                        <td style="color: #dc2626;">{{ $tStat['wrong'] }}</td>
-                        <td style="color: #d97706;">{{ $tStat['unanswered'] }}</td>
-                    @endforeach
+                    @if ($isFewTopics && $topicCount > 0)
+                        {{-- 4 columns per topic --}}
+                        @foreach ($allTopics as $topicId => $topicName)
+                            @php
+                                $tStat = $row['topic_stats'][$topicId] ?? ['total' => 0, 'correct' => 0, 'wrong' => 0, 'unanswered' => 0];
+                            @endphp
+                            <td>{{ $tStat['total'] }}</td>
+                            <td style="color: #059669;">{{ $tStat['correct'] }}</td>
+                            <td style="color: #dc2626;">{{ $tStat['wrong'] }}</td>
+                            <td style="color: #d97706;">{{ $tStat['unanswered'] }}</td>
+                        @endforeach
+                    @else
+                        {{-- 1 compact column per topic --}}
+                        @foreach ($allTopics as $topicId => $topicName)
+                            @php
+                                $tStat = $row['topic_stats'][$topicId] ?? ['total' => 0, 'correct' => 0, 'wrong' => 0, 'unanswered' => 0];
+                            @endphp
+                            <td>
+                                <strong style="color: #059669;">{{ $tStat['correct'] }}</strong>/{{ $tStat['total'] }}<br>
+                                <span style="color: #6b7280; font-size: 7px;">(S:{{ $tStat['wrong'] }} TJ:{{ $tStat['unanswered'] }})</span>
+                            </td>
+                        @endforeach
+                    @endif
 
-                    <td class="fw-bold" style="font-size: 11px;">{{ number_format($result->mark, 2) }}</td>
+                    <td class="fw-bold" style="font-size: 10px;">{{ $row['mark'] }}</td>
                     <td>
-                        @if ($gradeDetail)
-                            <div class="fw-bold" style="background-color: #eff6ff; color: #1e40af; border-radius: 4px; padding: 2px; display: inline-block; min-width: 25px;">
-                                {{ $gradeDetail->grade_letter }}
-                            </div>
-                        @else
-                            -
-                        @endif
+                        <div class="grade-badge">
+                            {{ $row['grade_letter'] }}
+                        </div>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="{{ 12 + (count($allTopics) * 4) }}" class="no-data">Tidak ada data yang sesuai dengan kriteria filter.</td>
+                    <td colspan="{{ $totalColumns }}" class="no-data">Tidak ada data yang sesuai dengan kriteria filter.</td>
                 </tr>
             @endforelse
         </tbody>

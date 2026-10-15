@@ -5,46 +5,50 @@ namespace App\Exports;
 use App\Models\Master\RatingScale\RatingScale;
 use App\Models\User\UserTimetable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class ExamResultExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping
+class ExamResultExport implements FromCollection, WithColumnWidths, WithHeadings, WithMapping, WithStyles
 {
     protected $search;
     protected $user_id;
     protected $module_id;
     protected $timetable_id;
-    protected $allTopics;
+    protected $allTopics = [];
     protected $ratingScales;
+    protected $examResults;
+    protected $overallStats = [];
+    protected $topicStatsByUser = [];
 
     public function __construct($search = '', $user_id = '', $module_id = '', $timetable_id = '')
     {
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(300);
+
         $this->search = $search;
         $this->user_id = $user_id;
         $this->module_id = $module_id;
         $this->timetable_id = $timetable_id;
         $this->ratingScales = RatingScale::orderBy('order')->get();
-        
-        // Query results to find all unique topics
-        $results = $this->queryResults();
-        
-        $this->allTopics = [];
-        foreach ($results as $result) {
-            foreach ($result->userModuleQuestions as $umq) {
-                $tq = $umq->timetableQuestion;
-                if ($tq && $tq->topic_id) {
-                    $this->allTopics[$tq->topic_id] = $tq->topic?->name ?? 'Tanpa Topik';
-                }
-            }
-        }
-        asort($this->allTopics);
+
+        $this->loadData();
     }
 
-    private function queryResults()
+    private function loadData()
     {
-        return UserTimetable::with(['user', 'timetable.module', 'userModuleQuestions.timetableQuestion.topic'])
+        // 1. Fetch only necessary user timetables and eager-load lightweight relations (no heavy userModuleQuestions)
+        $this->examResults = UserTimetable::query()
+            ->select(['id', 'user_id', 'timetable_id', 'mark', 'created_at'])
+            ->with([
+                'user:id,name,nim,username',
+                'timetable:id,name,module_id,start_time,end_time',
+                'timetable.module:id,name',
+            ])
             ->search($this->search)
             ->when($this->user_id, function ($query) {
                 $query->where('user_id', $this->user_id);
@@ -60,6 +64,65 @@ class ExamResultExport implements FromCollection, ShouldAutoSize, WithHeadings, 
             ->where('status', 'done')
             ->orderBy('created_at', 'desc')
             ->get();
+
+        $userTimetableIds = $this->examResults->pluck('id');
+
+        if ($userTimetableIds->isEmpty()) {
+            return;
+        }
+
+        // 2. Aggregate overall question counts directly in the database
+        $overallRows = DB::table('user_module_questions')
+            ->whereIn('user_timetable_id', $userTimetableIds)
+            ->whereNull('deleted_at')
+            ->groupBy('user_timetable_id')
+            ->select(
+                'user_timetable_id',
+                DB::raw('COUNT(*) as total_questions'),
+                DB::raw("COUNT(CASE WHEN status = 'correct' THEN 1 END) as correct"),
+                DB::raw("COUNT(CASE WHEN status = 'wrong' THEN 1 END) as wrong"),
+                DB::raw("COUNT(CASE WHEN timetable_answer_id IS NULL THEN 1 END) as unanswered")
+            )
+            ->get();
+
+        foreach ($overallRows as $row) {
+            $this->overallStats[$row->user_timetable_id] = [
+                'total' => (int) $row->total_questions,
+                'correct' => (int) $row->correct,
+                'wrong' => (int) $row->wrong,
+                'unanswered' => (int) $row->unanswered,
+            ];
+        }
+
+        // 3. Aggregate topic counts directly in the database
+        $topicRows = DB::table('user_module_questions as umq')
+            ->join('timetable_questions as tq', 'tq.id', '=', 'umq.timetable_question_id')
+            ->leftJoin('topics as top', 'top.id', '=', 'tq.topic_id')
+            ->whereIn('umq.user_timetable_id', $userTimetableIds)
+            ->whereNull('umq.deleted_at')
+            ->whereNotNull('tq.topic_id')
+            ->groupBy('umq.user_timetable_id', 'tq.topic_id', 'top.name')
+            ->select(
+                'umq.user_timetable_id',
+                'tq.topic_id',
+                DB::raw("COALESCE(top.name, 'Tanpa Topik') as topic_name"),
+                DB::raw('COUNT(*) as total_questions'),
+                DB::raw("COUNT(CASE WHEN umq.status = 'correct' THEN 1 END) as correct"),
+                DB::raw("COUNT(CASE WHEN umq.status = 'wrong' THEN 1 END) as wrong"),
+                DB::raw("COUNT(CASE WHEN umq.timetable_answer_id IS NULL THEN 1 END) as unanswered")
+            )
+            ->get();
+
+        foreach ($topicRows as $row) {
+            $this->allTopics[$row->topic_id] = $row->topic_name;
+            $this->topicStatsByUser[$row->user_timetable_id][$row->topic_id] = [
+                'total' => (int) $row->total_questions,
+                'correct' => (int) $row->correct,
+                'wrong' => (int) $row->wrong,
+                'unanswered' => (int) $row->unanswered,
+            ];
+        }
+        asort($this->allTopics);
     }
 
     /**
@@ -67,7 +130,7 @@ class ExamResultExport implements FromCollection, ShouldAutoSize, WithHeadings, 
      */
     public function collection()
     {
-        return $this->queryResults();
+        return $this->examResults;
     }
 
     public function headings(): array
@@ -106,35 +169,12 @@ class ExamResultExport implements FromCollection, ShouldAutoSize, WithHeadings, 
         static $no = 0;
         $no++;
 
-        $totalQuestions = $result->userModuleQuestions->count();
-        $correct = $result->userModuleQuestions->where('status', 'correct')->count();
-        $wrong = $result->userModuleQuestions->where('status', 'wrong')->count();
-        $unanswered = $result->userModuleQuestions->whereNull('timetable_answer_id')->count();
-
-        // Calculate topic stats
-        $topicStats = [];
-        foreach ($result->userModuleQuestions as $umq) {
-            $tq = $umq->timetableQuestion;
-            if ($tq && $tq->topic_id) {
-                $topicId = $tq->topic_id;
-                if (!isset($topicStats[$topicId])) {
-                    $topicStats[$topicId] = [
-                        'total' => 0,
-                        'correct' => 0,
-                        'wrong' => 0,
-                        'unanswered' => 0,
-                    ];
-                }
-                $topicStats[$topicId]['total']++;
-                if (empty($umq->timetable_answer_id)) {
-                    $topicStats[$topicId]['unanswered']++;
-                } elseif ($umq->status === 'correct') {
-                    $topicStats[$topicId]['correct']++;
-                } elseif ($umq->status === 'wrong') {
-                    $topicStats[$topicId]['wrong']++;
-                }
-            }
-        }
+        $overall = $this->overallStats[$result->id] ?? [
+            'total' => 0,
+            'correct' => 0,
+            'wrong' => 0,
+            'unanswered' => 0,
+        ];
 
         $row = [
             $no,
@@ -142,15 +182,20 @@ class ExamResultExport implements FromCollection, ShouldAutoSize, WithHeadings, 
             $result->user?->nim ?? ($result->user?->username ?? '-'),
             $result->timetable?->module?->name ?? '-',
             $result->timetable?->name ?? '-',
-            $totalQuestions,
-            $correct,
-            $wrong,
-            $unanswered,
+            $overall['total'],
+            $overall['correct'],
+            $overall['wrong'],
+            $overall['unanswered'],
         ];
 
         // Map topic columns
         foreach ($this->allTopics as $topicId => $topicName) {
-            $stats = $topicStats[$topicId] ?? ['total' => 0, 'correct' => 0, 'wrong' => 0, 'unanswered' => 0];
+            $stats = $this->topicStatsByUser[$result->id][$topicId] ?? [
+                'total' => 0,
+                'correct' => 0,
+                'wrong' => 0,
+                'unanswered' => 0,
+            ];
             $row[] = $stats['total'];
             $row[] = $stats['correct'];
             $row[] = $stats['wrong'];
@@ -166,9 +211,37 @@ class ExamResultExport implements FromCollection, ShouldAutoSize, WithHeadings, 
             $grade = $scale?->grade_letter ?? '-';
         }
 
-        $row[] = $mark ?? 0;
+        $row[] = $mark !== null ? (float) $mark : 0;
         $row[] = $grade;
 
         return $row;
+    }
+
+    public function columnWidths(): array
+    {
+        return [
+            'A' => 6,   // No
+            'B' => 28,  // Nama Mahasiswa
+            'C' => 18,  // NIM/Username
+            'D' => 24,  // Modul
+            'E' => 24,  // Jadwal Ujian
+            'F' => 12,  // Total Soal
+            'G' => 10,  // Benar
+            'H' => 10,  // Salah
+            'I' => 14,  // Tidak Dijawab
+        ];
+    }
+
+    public function styles(Worksheet $sheet)
+    {
+        return [
+            1 => [
+                'font' => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']],
+                'fill' => [
+                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'startColor' => ['argb' => 'FF1F2937'],
+                ],
+            ],
+        ];
     }
 }
