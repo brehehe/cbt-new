@@ -83,7 +83,7 @@
 </head>
 <body>
     @php
-        $students = $timetable->classmate->classmateStudents;
+        $students = $timetable->classmate?->classmateStudents ?? collect();
         $chunkedStudents = $students->chunk(2); // 2 cards per row
     @endphp
 
@@ -101,7 +101,7 @@
                             <div class="content">
                                 <div class="photo-cell">
                                     <div class="photo-box">
-                                        @if($student->user->userDetail && $student->user->profile)
+                                        @if($student->user?->userDetail && $student->user?->profile)
                                             <img src="{{ public_path('storage/' . $student->user->profile) }}" class="photo-img">
                                         @else
                                             <div style="padding-top: 35px; font-size: 8pt; color: #ccc;">FOTO</div>
@@ -112,11 +112,11 @@
                                     <table class="info-table">
                                         <tr>
                                             <td class="label">Nama</td>
-                                            <td>: {{ $student->user->name }}</td>
+                                            <td>: {{ $student->user?->name ?? '-' }}</td>
                                         </tr>
                                         <tr>
                                             <td class="label">Username</td>
-                                            <td>: {{ $student->user->username }}</td>
+                                            <td>: {{ $student->user?->username ?? '-' }}</td>
                                         </tr>
                                         <tr>
                                             <td class="label">Sesi</td>
@@ -132,8 +132,8 @@
                                     @php
                                         $d = new \Milon\Barcode\DNS2D();
                                         $qrPayload = json_encode([
-                                            'user_id' => (string) $student->user->id,
-                                            'username' => (string) $student->user->username,
+                                            'user_id' => (string) ($student->user?->id ?? ''),
+                                            'username' => (string) ($student->user?->username ?? ''),
                                             'timetable_id' => (string) $timetable->id,
                                         ]);
                                         $base64Qr = $d->getBarcodePNG($qrPayload, 'QRCODE', 3, 3);

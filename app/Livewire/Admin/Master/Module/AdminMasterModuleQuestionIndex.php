@@ -875,6 +875,9 @@ class AdminMasterModuleQuestionIndex extends Component
 
     public function exportPdf()
     {
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(300);
+
         if (! $this->get_module) {
             return AlertHelper::error('Gagal', 'Modul tidak ditemukan.');
         }
@@ -891,7 +894,7 @@ class AdminMasterModuleQuestionIndex extends Component
             return AlertHelper::error('Gagal', 'Tidak ada soal dalam modul ini untuk di-export.');
         }
 
-        $company = Auth::user()->company;
+        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : \App\Models\Company\Company::with('companyDetail')->first();
 
         $pdf = Pdf::loadView('livewire.admin.master.module.admin-master-module-question-pdf', [
             'module' => $this->get_module,

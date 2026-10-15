@@ -181,7 +181,7 @@ class AdminReportExamResultIndex extends Component
         }
 
         $filterSummary = $this->getFilterSummary();
-        $company = Auth::user()?->company()?->with('companyDetail')->first();
+        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : \App\Models\Company\Company::with('companyDetail')->first();
 
         // Rating scales loaded once
         $ratingScales = RatingScale::orderBy('order')->get();

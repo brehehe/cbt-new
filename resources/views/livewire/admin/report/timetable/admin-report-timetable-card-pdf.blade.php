@@ -105,19 +105,19 @@
                 <div class="card-body">
                     <div class="card-row clearfix">
                         <div class="card-label">Nama</div>
-                        <div class="card-value">: {{ $ut->user->name ?? '-' }}</div>
+                        <div class="card-value">: {{ $ut->user?->name ?? '-' }}</div>
                     </div>
                     <div class="card-row clearfix">
                         <div class="card-label">NIM / ID</div>
-                        <div class="card-value">: {{ $ut->user->nim ?? $ut->user->username }}</div>
+                        <div class="card-value">: {{ $ut->user?->nim ?? ($ut->user?->username ?? '-') }}</div>
                     </div>
                     <div class="card-row clearfix">
                         <div class="card-label">Username</div>
-                        <div class="card-value">: <strong>{{ $ut->user->username }}</strong></div>
+                        <div class="card-value">: <strong>{{ $ut->user?->username ?? '-' }}</strong></div>
                     </div>
                     <div class="card-row clearfix">
                         <div class="card-label">Password</div>
-                        <div class="card-value">: <strong>{{ $ut->user->password_str ?? '******' }}</strong></div>
+                        <div class="card-value">: <strong>{{ $ut->user?->password_str ?? '******' }}</strong></div>
                     </div>
                     <div class="card-row clearfix">
                         <div class="card-label">Jadwal</div>

@@ -94,12 +94,12 @@
                 <tr>
                     <td class="text-center">{{ $index + 1 }}</td>
                     <td>
-                        {{ $result->user->name ?? '-' }}<br>
-                        <small>{{ $result->user->nim ?? ($result->user->username ?? '-') }}</small>
+                        {{ $result->user?->name ?? '-' }}<br>
+                        <small>{{ $result->user?->nim ?? ($result->user?->username ?? '-') }}</small>
                     </td>
                     <td>
-                        {{ $result->timetable->name ?? '-' }}<br>
-                        <small>{{ $result->timetable->module->name ?? '-' }}</small>
+                        {{ $result->timetable?->name ?? '-' }}<br>
+                        <small>{{ $result->timetable?->module?->name ?? '-' }}</small>
                     </td>
                     <td class="text-center">
                         <small>
@@ -130,7 +130,7 @@
     </table>
 
     <div class="footer">
-        <p>Dicetak oleh: {{ Auth::user()->name }}</p>
+        <p>Dicetak oleh: {{ Auth::user()?->name ?? 'Admin' }}</p>
     </div>
 </body>
 </html>

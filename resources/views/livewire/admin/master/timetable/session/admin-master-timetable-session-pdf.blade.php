@@ -71,9 +71,9 @@
                 @endphp
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td class="left">{{ $user->nim ?? ($user->username ?? '-') }}</td>
-                    <td class="left">{{ $user->decrypted_password ?? '-' }}</td>
-                    <td class="left">{{ $user->name ?? '-' }}</td>
+                    <td class="left">{{ $user?->nim ?? ($user?->username ?? '-') }}</td>
+                    <td class="left">{{ $user?->decrypted_password ?? '-' }}</td>
+                    <td class="left">{{ $user?->name ?? '-' }}</td>
                     <td class="{{ $kehadiranClass }}">{{ $kehadiranText }}</td>
                     <td class="{{ $statusClass }}">{{ $statusText }}</td>
                     <td>{{ $totalSoal }}</td>

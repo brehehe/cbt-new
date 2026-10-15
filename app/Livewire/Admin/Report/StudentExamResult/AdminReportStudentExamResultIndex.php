@@ -109,7 +109,7 @@ class AdminReportStudentExamResultIndex extends Component
             $gradeDetails[$result->id] = $this->getGradeDetail($result->mark);
         }
 
-        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : ($user->company ?? null);
+        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : \App\Models\Company\Company::with('companyDetail')->first();
 
         // Calculate summary stats
         $stats = [

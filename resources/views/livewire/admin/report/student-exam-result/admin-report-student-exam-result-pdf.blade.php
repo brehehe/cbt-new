@@ -93,11 +93,11 @@
 
 <body>
     <div class="header">
-        @if($company->logo)
+        @if($company?->logo && file_exists(public_path('storage/' . $company->logo)))
             <img src="{{ public_path('storage/' . $company->logo) }}" class="company-logo">
         @endif
-        <div class="company-name">{{ $company->name }}</div>
-        <div class="company-address">{{ $company->companyDetail->address ?? '' }}</div>
+        <div class="company-name">{{ $company?->name ?? 'INSTITUSI' }}</div>
+        <div class="company-address">{{ $company?->companyDetail?->address ?? '' }}</div>
 
         <div class="report-title">LAPORAN HASIL UJIAN {{ strtoupper(student_label()) }}</div>
     </div>
@@ -105,13 +105,13 @@
     <table class="student-info">
         <tr>
             <td class="info-label">Nama {{ student_label() }}</td>
-            <td>: {{ $user->name }}</td>
+            <td>: {{ $user?->name ?? '-' }}</td>
             <td class="info-label">Dicetak Tanggal</td>
             <td>: {{ date('d M Y') }}</td>
         </tr>
         <tr>
             <td class="info-label">NIM / ID</td>
-            <td>: {{ $user->nim ?? $user->username }}</td>
+            <td>: {{ $user?->nim ?? ($user?->username ?? '-') }}</td>
             <td class="info-label">Total Ujian</td>
             <td>: {{ $stats['total_exams'] }}</td>
         </tr>

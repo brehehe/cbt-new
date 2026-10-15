@@ -66,7 +66,7 @@
 
 <body>
     <h1>Nilai Ujian Detail</h1>
-    <div class="subtitle">{{ $timetable['name'] ?? 'Jadwal' }} - {{ $user_timetable->user->name ?? '-' }}</div>
+    <div class="subtitle">{{ $timetable['name'] ?? 'Jadwal' }} - {{ $user_timetable->user?->name ?? '-' }}</div>
 
     <table>
         <thead>

@@ -1218,6 +1218,9 @@ class AdminMasterTimetableIndex extends Component
     public function printCard($id)
     {
         try {
+            @ini_set('memory_limit', '512M');
+            @set_time_limit(300);
+
             $timetable = Timetable::with([
                 'module',
                 'timetableModule',
@@ -1228,7 +1231,7 @@ class AdminMasterTimetableIndex extends Component
                 },
             ])->findOrFail($id);
 
-            $company = Auth::user()->company()->with('companyDetail')->first();
+            $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : \App\Models\Company\Company::with('companyDetail')->first();
 
             $pdf = Pdf::loadView('livewire.admin.master.timetable.admin-master-timetable-card-pdf', [
                 'timetable' => $timetable,
@@ -1272,8 +1275,11 @@ class AdminMasterTimetableIndex extends Component
     public function printDetailQrPdf($detailId)
     {
         try {
+            @ini_set('memory_limit', '512M');
+            @set_time_limit(300);
+
             $detail = TimetableDetail::with(['timetable.classmate', 'examRoom', 'examSession', 'module', 'digitalBook'])->findOrFail($detailId);
-            $company = Auth::user()->company()->with('companyDetail')->first();
+            $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : \App\Models\Company\Company::with('companyDetail')->first();
             $base64Qr = (new DNS2D())->getBarcodePNG($detail->code, 'QRCODE', 12, 12);
 
             $pdf = Pdf::loadView('livewire.admin.master.timetable.admin-master-timetable-session-qrcode-pdf', [

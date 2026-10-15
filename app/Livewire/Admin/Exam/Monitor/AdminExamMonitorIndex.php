@@ -469,6 +469,9 @@ class AdminExamMonitorIndex extends Component
     public function exportPdf()
     {
         try {
+            @ini_set('memory_limit', '512M');
+            @set_time_limit(300);
+
             $query = ExamLiveSession::with(['user', 'timetable.module', 'userTimetable.userModuleQuestions'])
                 ->orderBy('last_activity', 'desc');
 

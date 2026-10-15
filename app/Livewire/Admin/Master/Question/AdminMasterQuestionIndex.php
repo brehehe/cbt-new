@@ -780,11 +780,14 @@ class AdminMasterQuestionIndex extends Component
             return AlertHelper::error('Gagal', 'Fitur export dinonaktifkan.');
         }
 
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(300);
+
         $questions = $this->buildQuestionsQuery()
             ->with(['study', 'topic', 'materialCategory', 'material', 'questionType', 'categoryQuestion', 'answers'])
             ->get();
 
-        $company = Auth::user()->company;
+        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : \App\Models\Company\Company::with('companyDetail')->first();
 
         $pdf = Pdf::loadView('livewire.admin.master.question.admin-master-question-pdf', [
             'questions' => $questions,

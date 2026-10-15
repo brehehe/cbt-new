@@ -226,6 +226,9 @@ class AdminMasterTimetableSessionIndex extends Component
     public function exportPdf()
     {
         try {
+            @ini_set('memory_limit', '512M');
+            @set_time_limit(300);
+
             $classmateId = $this->timetable->classmate_id;
 
             $sessions = \App\Models\Classmate\ClassmateStudent::query()

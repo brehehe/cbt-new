@@ -56,7 +56,7 @@ class AdminReportOfficialIndex extends Component
             return;
         }
 
-        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : ($timetable->company ?? null);
+        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : \App\Models\Company\Company::with('companyDetail')->first();
 
         $totalStudents = $timetable->userTimetables->count();
         $presentStudents = $timetable->userTimetables->whereNotNull('start_exam')->count();

@@ -41,8 +41,8 @@
         @endif
         <div class="company-name">{{ $company->name ?? 'INSTITUSI' }}</div>
         <div class="company-address">
-            {{ $company->companyDetail->address ?? '' }}<br>
-            {{ $company->companyDetail->city ?? '' }}, {{ $company->companyDetail->province ?? '' }}
+            {{ $company?->companyDetail?->address ?? '' }}<br>
+            {{ $company?->companyDetail?->city ?? '' }}, {{ $company?->companyDetail?->province ?? '' }}
         </div>
         <div class="report-title">BERITA ACARA PELAKSANAAN UJIAN</div>
     </div>
@@ -98,7 +98,7 @@
                     ( ........................................... )
                 </td>
                 <td width="50%">
-                    {{ $company->companyDetail->city ?? 'Tempat' }}, {{ now()->translatedFormat('d F Y') }}<br>
+                    {{ $company?->companyDetail?->city ?? 'Tempat' }}, {{ now()->translatedFormat('d F Y') }}<br>
                     Koordinator / Penanggung Jawab<br><br><br><br><br>
                     ( ........................................... )
                 </td>

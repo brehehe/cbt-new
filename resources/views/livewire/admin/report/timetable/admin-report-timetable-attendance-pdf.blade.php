@@ -67,8 +67,8 @@
             @forelse($timetable->userTimetables as $index => $ut)
                 <tr>
                     <td class="col-no">{{ $index + 1 }}</td>
-                    <td class="col-nim">{{ $ut->user->nim ?? $ut->user->username  }}</td>
-                    <td>{{ $ut->user->name ?? '-' }}</td>
+                    <td class="col-nim">{{ $ut->user?->nim ?? ($ut->user?->username ?? '-') }}</td>
+                    <td>{{ $ut->user?->name ?? '-' }}</td>
                     <td class="col-ttd" style="font-size: 9px; color: #888;">
                         @if($index % 2 == 0)
                             {{ $index + 1 }} . . . . . . . .
@@ -86,7 +86,7 @@
     </table>
 
     <div style="margin-top: 30px; float: right; width: 250px; text-align: center;">
-        {{ $company->companyDetail->city ?? 'Tempat' }}, {{ now()->translatedFormat('d F Y') }}<br>
+        {{ $company?->companyDetail?->city ?? 'Tempat' }}, {{ now()->translatedFormat('d F Y') }}<br>
         Pengawas Ujian,<br><br><br><br>
         ( ........................................... )
     </div>

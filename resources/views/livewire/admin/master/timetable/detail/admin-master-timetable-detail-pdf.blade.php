@@ -43,8 +43,8 @@
                 @endphp
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td class="left">{{ $userTimetable->user->nim ?? ($userTimetable->user->username ?? '-') }}</td>
-                    <td class="left">{{ $userTimetable->user->name ?? '-' }}</td>
+                    <td class="left">{{ $userTimetable->user?->nim ?? ($userTimetable->user?->username ?? '-') }}</td>
+                    <td class="left">{{ $userTimetable->user?->name ?? '-' }}</td>
                     <td>{{ $counts['total'] }}</td>
                     <td>{{ $counts['answered'] }}</td>
                     <td>{{ $counts['unanswered'] }}</td>

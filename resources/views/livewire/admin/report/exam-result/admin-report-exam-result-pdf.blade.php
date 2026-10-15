@@ -174,8 +174,8 @@
         <div class="header-content">
             <div class="company-name">{{ $company->name ?? 'NAMA INSTITUSI' }}</div>
             <div class="company-address">
-                {{ $company->companyDetail->address ?? '' }}<br>
-                {{ $company->companyDetail->city ?? '' }}, {{ $company->companyDetail->province ?? '' }} {{ $company->companyDetail->postal_code ?? '' }}<br>
+                {{ $company?->companyDetail?->address ?? '' }}<br>
+                {{ $company?->companyDetail?->city ?? '' }}, {{ $company?->companyDetail?->province ?? '' }} {{ $company?->companyDetail?->postal_code ?? '' }}<br>
                 Email: {{ $company->email ?? '-' }} | Telp: {{ $company->phone ?? '-' }}
             </div>
             <div class="report-title">LAPORAN HASIL UJIAN</div>

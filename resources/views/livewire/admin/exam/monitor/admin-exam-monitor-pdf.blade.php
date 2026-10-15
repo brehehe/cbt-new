@@ -66,10 +66,10 @@
                 @endphp
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td class="left">{{ $session->user->name ?? 'Unknown' }}</td>
-                    <td class="left">{{ $session->user->nim ?? ($session->user->username ?? 'N/A') }}</td>
-                    <td class="left">{{ $session->timetable->name ?? 'N/A' }}</td>
-                    <td class="left">{{ $session->timetable->module->name ?? 'N/A' }}</td>
+                    <td class="left">{{ $session->user?->name ?? 'Unknown' }}</td>
+                    <td class="left">{{ $session->user?->nim ?? ($session->user?->username ?? 'N/A') }}</td>
+                    <td class="left">{{ $session->timetable?->name ?? 'N/A' }}</td>
+                    <td class="left">{{ $session->timetable?->module?->name ?? 'N/A' }}</td>
                     <td>{{ $stats['total'] }}</td>
                     <td>{{ $stats['answered'] }}</td>
                     <td>{{ $stats['correct'] }}</td>

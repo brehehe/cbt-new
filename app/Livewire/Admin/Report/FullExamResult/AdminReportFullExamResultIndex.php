@@ -7,9 +7,10 @@ use App\Models\Master\RatingScale\RatingScale;
 use App\Models\Master\Timetable\Timetable;
 use App\Models\User;
 use App\Models\User\UserModuleQuestion;
-use App\Models\User\UserTimetable; // Added for answer stats
+use App\Models\User\UserTimetable;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -34,24 +35,10 @@ class AdminReportFullExamResultIndex extends Component
         return RatingScale::getGrade($mark);
     }
 
-    // Process additional stats for a single result result
-    public function getResultStats($userTimetableId)
-    {
-        $questions = UserModuleQuestion::where('user_timetable_id', $userTimetableId)->get();
-
-        return [
-            'total' => $questions->count(),
-            'correct' => $questions->where('status', 'correct')->count(),
-            'wrong' => $questions->where('status', 'wrong')->count(),
-            'check' => $questions->where('status', 'check')->count(), // For essay/manual check
-            'unanswered' => $questions->whereNull('answer_id')->count(), // Assuming null answer_id means unanswered, or check logic
-        ];
-    }
-
     public function render()
     {
         $examResults = UserTimetable::withoutGlobalScopes()
-            ->with(['user', 'timetable.module', 'userModuleQuestions'])
+            ->with(['user:id,name,nim,username', 'timetable:id,name,module_id', 'timetable.module:id,name'])
             ->search($this->search)
             ->when($this->user_id, function ($query) {
                 $query->where('user_id', $this->user_id);
@@ -68,20 +55,36 @@ class AdminReportFullExamResultIndex extends Component
 
         $paginatedResults = $examResults->paginate($this->perPage);
 
-        // Calculate stats for the current page
+        // Calculate stats for the current page via fast DB aggregation (No N+1)
+        $currentPageIds = $paginatedResults->pluck('id');
         $resultStats = [];
-        foreach ($paginatedResults as $result) {
-            $questions = $result->userModuleQuestions;
-            $resultStats[$result->id] = [
-                'total' => $questions->count(),
-                'correct' => $questions->where('status', 'correct')->count(),
-                'wrong' => $questions->where('status', 'wrong')->count(),
-                'check' => $questions->where('status', 'check')->count(),
-                'answered' => $questions->whereNotNull('timetable_answer_id')->count(),
-                'unanswered' => $questions->filter(function ($q) {
-                    return empty($q->answer_id) && empty($q->essay_answer);
-                })->count(),
-            ];
+
+        if ($currentPageIds->isNotEmpty()) {
+            $statsRows = DB::table('user_module_questions')
+                ->whereIn('user_timetable_id', $currentPageIds)
+                ->whereNull('deleted_at')
+                ->groupBy('user_timetable_id')
+                ->select(
+                    'user_timetable_id',
+                    DB::raw('COUNT(*) as total'),
+                    DB::raw("COUNT(CASE WHEN status = 'correct' THEN 1 END) as correct"),
+                    DB::raw("COUNT(CASE WHEN status = 'wrong' THEN 1 END) as wrong"),
+                    DB::raw("COUNT(CASE WHEN status = 'check' THEN 1 END) as check_count"),
+                    DB::raw("COUNT(CASE WHEN timetable_answer_id IS NOT NULL THEN 1 END) as answered"),
+                    DB::raw("COUNT(CASE WHEN timetable_answer_id IS NULL AND (essay_answer IS NULL OR essay_answer = '') THEN 1 END) as unanswered")
+                )
+                ->get();
+
+            foreach ($statsRows as $row) {
+                $resultStats[$row->user_timetable_id] = [
+                    'total' => (int) $row->total,
+                    'correct' => (int) $row->correct,
+                    'wrong' => (int) $row->wrong,
+                    'check' => (int) $row->check_count,
+                    'answered' => (int) $row->answered,
+                    'unanswered' => (int) $row->unanswered,
+                ];
+            }
         }
 
         $companyId = Auth::user()?->company_id;
@@ -123,12 +126,17 @@ class AdminReportFullExamResultIndex extends Component
 
     public function exportPdf()
     {
-        // Increase memory limit for PDF generation if needed
         @ini_set('memory_limit', '512M');
         @set_time_limit(300);
 
+        // Fetch lightweight user timetables without thousands of Eloquent question models
         $examResults = UserTimetable::withoutGlobalScopes()
-            ->with(['user', 'timetable.module', 'userModuleQuestions'])
+            ->select(['id', 'user_id', 'timetable_id', 'mark', 'start_exam', 'end_exam', 'created_at'])
+            ->with([
+                'user:id,name,nim,username',
+                'timetable:id,name,module_id',
+                'timetable.module:id,name',
+            ])
             ->search($this->search)
             ->when($this->user_id, function ($query) {
                 $query->where('user_id', $this->user_id);
@@ -144,27 +152,45 @@ class AdminReportFullExamResultIndex extends Component
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $userTimetableIds = $examResults->pluck('id');
+        $resultStats = [];
+
+        if ($userTimetableIds->isNotEmpty()) {
+            $statsRows = DB::table('user_module_questions')
+                ->whereIn('user_timetable_id', $userTimetableIds)
+                ->whereNull('deleted_at')
+                ->groupBy('user_timetable_id')
+                ->select(
+                    'user_timetable_id',
+                    DB::raw('COUNT(*) as total'),
+                    DB::raw("COUNT(CASE WHEN status = 'correct' THEN 1 END) as correct"),
+                    DB::raw("COUNT(CASE WHEN status = 'wrong' THEN 1 END) as wrong"),
+                    DB::raw("COUNT(CASE WHEN status = 'check' THEN 1 END) as check_count"),
+                    DB::raw("COUNT(CASE WHEN timetable_answer_id IS NOT NULL THEN 1 END) as answered"),
+                    DB::raw("COUNT(CASE WHEN timetable_answer_id IS NULL AND (essay_answer IS NULL OR essay_answer = '') THEN 1 END) as unanswered")
+                )
+                ->get();
+
+            foreach ($statsRows as $row) {
+                $resultStats[$row->user_timetable_id] = [
+                    'total' => (int) $row->total,
+                    'correct' => (int) $row->correct,
+                    'wrong' => (int) $row->wrong,
+                    'check' => (int) $row->check_count,
+                    'answered' => (int) $row->answered,
+                    'unanswered' => (int) $row->unanswered,
+                ];
+            }
+        }
+
         $filterSummary = $this->getFilterSummary();
         $gradeDetails = [];
-        $resultStats = [];
 
         foreach ($examResults as $result) {
             $gradeDetails[$result->id] = $this->getGradeDetail($result->mark);
-
-            $questions = $result->userModuleQuestions;
-            $resultStats[$result->id] = [
-                'total' => $questions->count(),
-                'correct' => $questions->where('status', 'correct')->count(),
-                'wrong' => $questions->where('status', 'wrong')->count(),
-                'check' => $questions->where('status', 'check')->count(),
-                'answered' => $questions->whereNotNull('timetable_answer_id')->count(), // Explicitly answered
-                'unanswered' => $questions->filter(function ($q) {
-                    return empty($q->answer_id) && empty($q->essay_answer);
-                })->count(),
-            ];
         }
 
-        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : null;
+        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : \App\Models\Company\Company::with('companyDetail')->first();
 
         $pdf = Pdf::loadView('livewire.admin.report.full-exam-result.admin-report-full-exam-result-pdf', [
             'examResults' => $examResults,

@@ -16,6 +16,7 @@ use Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -285,14 +286,45 @@ class AdminMasterTimetableDetailIndex extends Component
 
     public function exportPdf()
     {
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(300);
+
         $userTimetables = UserTimetable::search($this->search)
             ->where('timetable_id', $this->timetable_id)
-            ->with(['user', 'timetable', 'userModuleQuestions'])
+            ->with(['user', 'timetable'])
             ->get();
+
+        $userTimetableIds = $userTimetables->pluck('id');
+        $countMap = [];
+
+        if ($userTimetableIds->isNotEmpty()) {
+            $aggregatedCounts = DB::table('user_module_questions')
+                ->whereIn('user_timetable_id', $userTimetableIds)
+                ->whereNull('deleted_at')
+                ->groupBy('user_timetable_id')
+                ->select(
+                    'user_timetable_id',
+                    DB::raw('COUNT(*) as total'),
+                    DB::raw('COUNT(timetable_answer_id) as answered'),
+                    DB::raw('COUNT(CASE WHEN timetable_answer_id IS NULL THEN 1 END) as unanswered'),
+                    DB::raw("COUNT(CASE WHEN status = 'correct' THEN 1 END) as correct"),
+                    DB::raw("COUNT(CASE WHEN status = 'wrong' THEN 1 END) as wrong")
+                )
+                ->get();
+
+            foreach ($aggregatedCounts as $row) {
+                $countMap[$row->user_timetable_id] = [
+                    'total' => (int) $row->total,
+                    'answered' => (int) $row->answered,
+                    'unanswered' => (int) $row->unanswered,
+                    'correct' => (int) $row->correct,
+                    'wrong' => (int) $row->wrong,
+                ];
+            }
+        }
 
         $ratingScales = RatingScale::orderBy('order')->get();
         $gradeMap = [];
-        $countMap = [];
 
         foreach ($userTimetables as $userTimetable) {
             $mark = $userTimetable->mark;
@@ -304,13 +336,15 @@ class AdminMasterTimetableDetailIndex extends Component
                 $grade = $scale?->grade_letter ?? '-';
             }
 
-            $countMap[$userTimetable->id] = [
-                'total' => $userTimetable->userModuleQuestions->count(),
-                'answered' => $userTimetable->userModuleQuestions->whereNotNull('timetable_answer_id')->count(),
-                'unanswered' => $userTimetable->userModuleQuestions->whereNull('timetable_answer_id')->count(),
-                'correct' => $userTimetable->userModuleQuestions->where('status', 'correct')->count(),
-                'wrong' => $userTimetable->userModuleQuestions->where('status', 'wrong')->count(),
-            ];
+            if (! isset($countMap[$userTimetable->id])) {
+                $countMap[$userTimetable->id] = [
+                    'total' => 0,
+                    'answered' => 0,
+                    'unanswered' => 0,
+                    'correct' => 0,
+                    'wrong' => 0,
+                ];
+            }
 
             $gradeMap[$userTimetable->id] = $grade;
         }

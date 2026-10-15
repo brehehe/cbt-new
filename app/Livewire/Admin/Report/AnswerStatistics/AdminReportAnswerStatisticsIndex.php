@@ -204,7 +204,7 @@ class AdminReportAnswerStatisticsIndex extends Component
         if (! $timetable) {
             return;
         }
-        $company = Auth::user()?->company ?: ($timetable->company ?? \App\Models\Company\Company::first());
+        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : \App\Models\Company\Company::with('companyDetail')->first();
 
         $pdf = Pdf::loadView('livewire.admin.report.answer-statistics.admin-report-answer-statistics-pdf', [
             'timetable' => $timetable,

@@ -82,9 +82,15 @@ class AdminMasterTimetableAnswerIndex extends Component
 
     public function exportPdf()
     {
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(300);
+
         if (Auth::user()->hasRole('Pengawas')) {
             return;
         }
+
+        $this->user_timetable?->loadMissing('user');
+
         $userModuleQuestions = $this->user_timetable->userModuleQuestions()
             ->search($this->search)
             ->with(['timetableQuestion', 'timetableModule', 'timetableAnswer', 'timetableQuestion.answers'])
