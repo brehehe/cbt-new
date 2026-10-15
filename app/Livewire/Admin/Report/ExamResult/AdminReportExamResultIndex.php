@@ -38,7 +38,8 @@ class AdminReportExamResultIndex extends Component
 
     public function render()
     {
-        $examResults = UserTimetable::with(['user', 'timetable.module', 'userModuleQuestions.timetableQuestion.topic'])
+        $examResults = UserTimetable::withoutGlobalScopes()
+            ->with(['user', 'timetable.module', 'userModuleQuestions.timetableQuestion.topic'])
             ->search($this->search)
             ->when($this->user_id, function ($query) {
                 $query->where('user_id', $this->user_id);
@@ -51,22 +52,32 @@ class AdminReportExamResultIndex extends Component
             ->when($this->timetable_id, function ($query) {
                 $query->where('timetable_id', $this->timetable_id);
             })
-            ->where('status', 'done')
             ->orderBy('created_at', 'desc');
 
         $companyId = Auth::user()?->company_id;
 
         $users = User::query()
-            ->where('company_id', $companyId)
+            ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
+            ->whereHas('userTimetables')
             ->orderBy('name')
+            ->limit(300)
             ->get(['id', 'name', 'nim', 'username', 'email']);
 
+        if ($this->user_id && ! $users->contains('id', $this->user_id)) {
+            $selected = User::find($this->user_id, ['id', 'name', 'nim', 'username', 'email']);
+            if ($selected) {
+                $users->prepend($selected);
+            }
+        }
+
         $modules = Module::query()
+            ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
             ->orderBy('name')
             ->get(['id', 'name']);
 
         $timetables = Timetable::query()
             ->with('module:id,name')
+            ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
             ->orderBy('start_time', 'desc')
             ->get(['id', 'name', 'module_id', 'start_time', 'end_time']);
 
@@ -105,7 +116,6 @@ class AdminReportExamResultIndex extends Component
             ->when($this->timetable_id, function ($query) {
                 $query->where('timetable_id', $this->timetable_id);
             })
-            ->where('status', 'done')
             ->orderBy('created_at', 'desc')
             ->get();
 

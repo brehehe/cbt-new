@@ -180,7 +180,7 @@ class AdminReportAnswerStatisticsIndex extends Component
         $companyId = Auth::user()?->company_id;
         $timetables = Timetable::query()
             ->with('module:id,name')
-            ->where('company_id', $companyId)
+            ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
             ->orderBy('start_time', 'desc')
             ->get(['id', 'name', 'module_id', 'start_time']);
 
@@ -193,6 +193,9 @@ class AdminReportAnswerStatisticsIndex extends Component
 
     public function exportPdf()
     {
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(300);
+
         if (! $this->timetable_id || empty($this->answerStats)) {
             return;
         }

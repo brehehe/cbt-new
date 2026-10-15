@@ -25,7 +25,7 @@ class AdminReportAttendanceIndex extends Component
         $companyData = Company::first();
 
         $query = Timetable::with(['module'])
-            ->where('company_id', $user->company_id);
+            ->when($user?->company_id, fn ($q, $cid) => $q->where('company_id', $cid));
 
         if ($this->search) {
             $query->where(function ($q) {
@@ -46,16 +46,19 @@ class AdminReportAttendanceIndex extends Component
 
     public function printAttendanceList($timetableId)
     {
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(300);
+
         $timetable = Timetable::with(['module', 'userTimetables.user'])->find($timetableId);
         if (! $timetable) {
             return;
         }
 
-        $company = Auth::user()->company()->with('companyDetail')->first();
+        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : ($timetable->company ?? null);
 
-        // Sort by name
+        // Sort by name safely
         $timetable->userTimetables = $timetable->userTimetables->sortBy(function ($ut) {
-            return $ut->user->name;
+            return $ut->user?->name ?? '';
         });
 
         $pdf = Pdf::loadView('livewire.admin.report.timetable.admin-report-timetable-attendance-pdf', [
@@ -65,7 +68,7 @@ class AdminReportAttendanceIndex extends Component
 
         return response()->streamDownload(
             fn () => print ($pdf->output()),
-            'daftar-hadir-'.$timetable->name.'.pdf'
+            'daftar-hadir-'.\Str::slug($timetable->name).'.pdf'
         );
     }
 }

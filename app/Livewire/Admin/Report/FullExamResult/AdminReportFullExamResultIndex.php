@@ -50,7 +50,8 @@ class AdminReportFullExamResultIndex extends Component
 
     public function render()
     {
-        $examResults = UserTimetable::with(['user', 'timetable.module', 'userModuleQuestions']) // Eager load answers for stats
+        $examResults = UserTimetable::withoutGlobalScopes()
+            ->with(['user', 'timetable.module', 'userModuleQuestions'])
             ->search($this->search)
             ->when($this->user_id, function ($query) {
                 $query->where('user_id', $this->user_id);
@@ -63,7 +64,6 @@ class AdminReportFullExamResultIndex extends Component
             ->when($this->timetable_id, function ($query) {
                 $query->where('timetable_id', $this->timetable_id);
             })
-            ->where('status', 'done')
             ->orderBy('created_at', 'desc');
 
         $paginatedResults = $examResults->paginate($this->perPage);
@@ -71,7 +71,6 @@ class AdminReportFullExamResultIndex extends Component
         // Calculate stats for the current page
         $resultStats = [];
         foreach ($paginatedResults as $result) {
-            // We can calculate stats from the eager loaded relation to save queries
             $questions = $result->userModuleQuestions;
             $resultStats[$result->id] = [
                 'total' => $questions->count(),
@@ -88,9 +87,18 @@ class AdminReportFullExamResultIndex extends Component
         $companyId = Auth::user()?->company_id;
 
         $users = User::query()
-            ->where('company_id', $companyId)
+            ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
+            ->whereHas('userTimetables')
             ->orderBy('name')
+            ->limit(300)
             ->get(['id', 'name', 'nim', 'username', 'email']);
+
+        if ($this->user_id && ! $users->contains('id', $this->user_id)) {
+            $selected = User::find($this->user_id, ['id', 'name', 'nim', 'username', 'email']);
+            if ($selected) {
+                $users->prepend($selected);
+            }
+        }
 
         $modules = Module::query()
             ->orderBy('name')
@@ -98,6 +106,7 @@ class AdminReportFullExamResultIndex extends Component
 
         $timetables = Timetable::query()
             ->with('module:id,name')
+            ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
             ->orderBy('start_time', 'desc')
             ->get(['id', 'name', 'module_id', 'start_time', 'end_time']);
 
@@ -115,10 +124,11 @@ class AdminReportFullExamResultIndex extends Component
     public function exportPdf()
     {
         // Increase memory limit for PDF generation if needed
-        ini_set('memory_limit', '512M');
-        ini_set('max_execution_time', 300);
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(300);
 
-        $examResults = UserTimetable::with(['user', 'timetable.module', 'userModuleQuestions'])
+        $examResults = UserTimetable::withoutGlobalScopes()
+            ->with(['user', 'timetable.module', 'userModuleQuestions'])
             ->search($this->search)
             ->when($this->user_id, function ($query) {
                 $query->where('user_id', $this->user_id);
@@ -131,7 +141,6 @@ class AdminReportFullExamResultIndex extends Component
             ->when($this->timetable_id, function ($query) {
                 $query->where('timetable_id', $this->timetable_id);
             })
-            ->where('status', 'done')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -155,7 +164,7 @@ class AdminReportFullExamResultIndex extends Component
             ];
         }
 
-        $company = Auth::user()->company()->with('companyDetail')->first();
+        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : null;
 
         $pdf = Pdf::loadView('livewire.admin.report.full-exam-result.admin-report-full-exam-result-pdf', [
             'examResults' => $examResults,

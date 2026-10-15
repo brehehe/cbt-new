@@ -61,7 +61,6 @@ class ExamResultExport implements FromCollection, WithColumnWidths, WithHeadings
             ->when($this->timetable_id, function ($query) {
                 $query->where('timetable_id', $this->timetable_id);
             })
-            ->where('status', 'done')
             ->orderBy('created_at', 'desc')
             ->get();
 

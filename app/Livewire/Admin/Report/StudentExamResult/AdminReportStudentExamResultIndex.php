@@ -41,9 +41,9 @@ class AdminReportStudentExamResultIndex extends Component
         $examResults = collect();
 
         if ($this->user_id) {
-            $examResults = UserTimetable::with(['timetable.module', 'timetable.examSession', 'timetable.examRoom'])
+            $examResults = UserTimetable::withoutGlobalScopes()
+                ->with(['timetable.module', 'timetable.examSession', 'timetable.examRoom'])
                 ->where('user_id', $this->user_id)
-                ->where('status', 'done')
                 ->where(function ($query) {
                     $query->whereHas('timetable', function ($q) {
                         $q->search($this->search);
@@ -55,11 +55,20 @@ class AdminReportStudentExamResultIndex extends Component
 
         $companyId = Auth::user()?->company_id;
 
+        // Lightweight user selection: prioritize users who have taken exams
         $users = User::query()
-            ->where('company_id', $companyId)
-            // ->role('Mahasiswa')
+            ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
+            ->whereHas('userTimetables')
             ->orderBy('name', 'asc')
+            ->limit(300)
             ->get(['id', 'name', 'nim', 'username']);
+
+        if ($this->user_id && ! $users->contains('id', $this->user_id)) {
+            $selected = User::find($this->user_id, ['id', 'name', 'nim', 'username']);
+            if ($selected) {
+                $users->prepend($selected);
+            }
+        }
 
         return view('livewire.admin.report.student-exam-result.admin-report-student-exam-result-index', [
             'examResults' => $examResults,
@@ -72,18 +81,21 @@ class AdminReportStudentExamResultIndex extends Component
 
     public function exportPdf()
     {
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(300);
+
         if (! $this->user_id) {
             return;
         }
 
-        $user = User::find($this->user_id);
+        $user = User::withoutGlobalScopes()->find($this->user_id);
         if (! $user) {
             return;
         }
 
-        $examResults = UserTimetable::with(['timetable.module', 'timetable.examSession', 'timetable.examRoom'])
+        $examResults = UserTimetable::withoutGlobalScopes()
+            ->with(['timetable.module', 'timetable.examSession', 'timetable.examRoom'])
             ->where('user_id', $this->user_id)
-            ->where('status', 'done')
             ->where(function ($query) {
                 $query->whereHas('timetable', function ($q) {
                     $q->search($this->search);
@@ -97,13 +109,13 @@ class AdminReportStudentExamResultIndex extends Component
             $gradeDetails[$result->id] = $this->getGradeDetail($result->mark);
         }
 
-        $company = Auth::user()->company()->with('companyDetail')->first();
+        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : ($user->company ?? null);
 
         // Calculate summary stats
         $stats = [
             'total_exams' => $examResults->count(),
-            'average_score' => $examResults->count() > 0 ? $examResults->avg('mark') : 0,
-            'passed_exams' => 0, // Need passing grade logic if available, skipping for now or assume > 0
+            'average_score' => $examResults->count() > 0 ? round($examResults->avg('mark'), 2) : 0,
+            'passed_exams' => 0,
         ];
 
         $pdf = Pdf::loadView('livewire.admin.report.student-exam-result.admin-report-student-exam-result-pdf', [

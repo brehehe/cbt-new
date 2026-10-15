@@ -26,7 +26,7 @@ class AdminReportOfficialIndex extends Component
 
         // Base query
         $query = Timetable::with(['module', 'userTimetables'])
-            ->where('company_id', $user->company_id);
+            ->when($user?->company_id, fn ($q, $cid) => $q->where('company_id', $cid));
 
         // Search filter
         if ($this->search) {
@@ -48,12 +48,15 @@ class AdminReportOfficialIndex extends Component
 
     public function printOfficialReport($timetableId)
     {
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(300);
+
         $timetable = Timetable::with(['module', 'userTimetables'])->find($timetableId);
         if (! $timetable) {
             return;
         }
 
-        $company = Auth::user()->company()->with('companyDetail')->first();
+        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : ($timetable->company ?? null);
 
         $totalStudents = $timetable->userTimetables->count();
         $presentStudents = $timetable->userTimetables->whereNotNull('start_exam')->count();
@@ -71,7 +74,7 @@ class AdminReportOfficialIndex extends Component
 
         return response()->streamDownload(
             fn () => print ($pdf->output()),
-            'berita-acara-'.$timetable->name.'.pdf'
+            'berita-acara-'.\Str::slug($timetable->name).'.pdf'
         );
     }
 }

@@ -20,10 +20,14 @@ class AdminReportTimetableIndex extends Component
 
     public function render()
     {
+        $companyId = Auth::user()?->company_id;
+
         $timetables = Timetable::search($this->search)
+            ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
             ->with(['module'])
             ->select('id', 'name', 'module_id', 'start_time', 'end_time', 'description', 'code')
-            ->latest()->paginate($this->perPage);
+            ->latest()
+            ->paginate($this->perPage);
 
         return view('livewire.admin.report.timetable.admin-report-timetable-index', [
             'timetables' => $timetables,
@@ -32,12 +36,15 @@ class AdminReportTimetableIndex extends Component
 
     public function printOfficialReport($timetableId)
     {
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(300);
+
         $timetable = Timetable::with(['module', 'userTimetables'])->find($timetableId);
         if (! $timetable) {
             return;
         }
 
-        $company = Auth::user()->company()->with('companyDetail')->first();
+        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : ($timetable->company ?? null);
 
         $totalStudents = $timetable->userTimetables->count();
         $presentStudents = $timetable->userTimetables->whereNotNull('start_exam')->count();
@@ -55,22 +62,25 @@ class AdminReportTimetableIndex extends Component
 
         return response()->streamDownload(
             fn () => print ($pdf->output()),
-            'berita-acara-'.$timetable->name.'.pdf'
+            'berita-acara-'.\Str::slug($timetable->name).'.pdf'
         );
     }
 
     public function printAttendanceList($timetableId)
     {
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(300);
+
         $timetable = Timetable::with(['module', 'userTimetables.user'])->find($timetableId);
         if (! $timetable) {
             return;
         }
 
-        $company = Auth::user()->company()->with('companyDetail')->first();
+        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : ($timetable->company ?? null);
 
-        // Sort by name
+        // Sort by name safely
         $timetable->userTimetables = $timetable->userTimetables->sortBy(function ($ut) {
-            return $ut->user->name;
+            return $ut->user?->name ?? '';
         });
 
         $pdf = Pdf::loadView('livewire.admin.report.timetable.admin-report-timetable-attendance-pdf', [
@@ -80,22 +90,25 @@ class AdminReportTimetableIndex extends Component
 
         return response()->streamDownload(
             fn () => print ($pdf->output()),
-            'daftar-hadir-'.$timetable->name.'.pdf'
+            'daftar-hadir-'.\Str::slug($timetable->name).'.pdf'
         );
     }
 
     public function printParticipantCards($timetableId)
     {
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(300);
+
         $timetable = Timetable::with(['module', 'userTimetables.user'])->find($timetableId);
         if (! $timetable) {
             return;
         }
 
-        $company = Auth::user()->company()->with('companyDetail')->first();
+        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : ($timetable->company ?? null);
 
-        // Sort by name
+        // Sort by name safely
         $timetable->userTimetables = $timetable->userTimetables->sortBy(function ($ut) {
-            return $ut->user->name;
+            return $ut->user?->name ?? '';
         });
 
         $pdf = Pdf::loadView('livewire.admin.report.timetable.admin-report-timetable-card-pdf', [
@@ -105,7 +118,7 @@ class AdminReportTimetableIndex extends Component
 
         return response()->streamDownload(
             fn () => print ($pdf->output()),
-            'kartu-peserta-'.$timetable->name.'.pdf'
+            'kartu-peserta-'.\Str::slug($timetable->name).'.pdf'
         );
     }
 }
