@@ -179,7 +179,10 @@ class AdminReportAnswerStatisticsIndex extends Component
             return;
         }
 
-        $timetable = Timetable::with('module')->findOrFail($this->timetable_id);
+        $timetable = $this->timetable ?: Timetable::with('module')->find($this->timetable_id);
+        if (! $timetable) {
+            return;
+        }
         $company = Auth::user()->company()->with('companyDetail')->first();
 
         $pdf = Pdf::loadView('livewire.admin.report.answer-statistics.admin-report-answer-statistics-pdf', [
