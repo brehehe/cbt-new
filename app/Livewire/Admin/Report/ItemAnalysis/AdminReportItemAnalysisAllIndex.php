@@ -6,6 +6,8 @@ use App\Helpers\AlertHelper;
 use App\Models\Master\Question\Question;
 use App\Models\Timetable\TimetableQuestion;
 use App\Models\User\UserModuleQuestion;
+use App\Services\Report\ItemAnalysisService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -19,6 +21,30 @@ class AdminReportItemAnalysisAllIndex extends Component
     public $perPage = 10;
 
     public $search = '';
+
+    public $selectedQuestionId = null;
+
+    public function showDetail(string $id): void
+    {
+        $this->selectedQuestionId = $id;
+    }
+
+    public function closeDetail(): void
+    {
+        $this->selectedQuestionId = null;
+    }
+
+    public function exportOverview()
+    {
+        $service = new ItemAnalysisService;
+        $ids = $this->selectedQuestionId ? [$this->selectedQuestionId] : $this->itemsQuery()->pluck('questions.id')->all();
+        $analyses = array_map(fn ($id) => $service->aggregate($id), $ids);
+        $pdf = Pdf::loadView('livewire.admin.report.shared.overview-pdf', [
+            'title' => 'Analisis Butir Soal — Semua Jadwal', 'analyses' => $analyses,
+        ])->setPaper('a4', 'portrait');
+
+        return response()->streamDownload(fn () => print ($pdf->output()), 'overview-analisis-semua-soal.pdf');
+    }
 
     public $difficultySelections = [];
 
@@ -80,7 +106,7 @@ class AdminReportItemAnalysisAllIndex extends Component
             $companyId = auth()->user()?->company_id;
             UserModuleQuestion::withoutGlobalScope('user_scope')
                 ->whereIn('timetable_question_id', $timetableQuestionIds)
-                ->when($companyId, fn($q) => $q->where('company_id', $companyId))
+                ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
                 ->update(['is_show' => false]);
         });
 
@@ -100,7 +126,7 @@ class AdminReportItemAnalysisAllIndex extends Component
             $companyId = auth()->user()?->company_id;
             UserModuleQuestion::withoutGlobalScope('user_scope')
                 ->whereIn('timetable_question_id', $timetableQuestionIds)
-                ->when($companyId, fn($q) => $q->where('company_id', $companyId))
+                ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
                 ->update(['is_show' => true]);
         });
 
@@ -114,7 +140,7 @@ class AdminReportItemAnalysisAllIndex extends Component
         $rows = UserModuleQuestion::withoutGlobalScope('user_scope')
             ->join('timetable_questions', 'user_module_questions.timetable_question_id', '=', 'timetable_questions.id')
             ->join('questions', 'timetable_questions.question_id', '=', 'questions.id')
-            ->when($companyId, fn($q) => $q->where('user_module_questions.company_id', $companyId))
+            ->when($companyId, fn ($q) => $q->where('user_module_questions.company_id', $companyId))
             ->where(function ($q) {
                 $q->whereNull('user_module_questions.is_show')
                     ->orWhere('user_module_questions.is_show', true);
@@ -122,7 +148,7 @@ class AdminReportItemAnalysisAllIndex extends Component
             ->groupBy('questions.id')
             ->select([
                 'questions.id as question_id',
-                DB::raw("count(user_module_questions.id) as total_attempts"),
+                DB::raw('count(user_module_questions.id) as total_attempts'),
                 DB::raw("sum(case when user_module_questions.status = 'correct' then 1 else 0 end) as total_correct"),
             ])
             ->get();
@@ -157,14 +183,14 @@ class AdminReportItemAnalysisAllIndex extends Component
         session()->flash('message', 'Generate difficulty selesai.');
     }
 
-    public function render()
+    protected function itemsQuery()
     {
         $companyId = auth()->user()?->company_id;
 
         $query = UserModuleQuestion::withoutGlobalScope('user_scope')
             ->join('timetable_questions', 'user_module_questions.timetable_question_id', '=', 'timetable_questions.id')
             ->join('questions', 'timetable_questions.question_id', '=', 'questions.id')
-            ->when($companyId, fn($q) => $q->where('user_module_questions.company_id', $companyId))
+            ->when($companyId, fn ($q) => $q->where('user_module_questions.company_id', $companyId))
             ->where(function ($q) {
                 $q->whereNull('user_module_questions.is_show')
                     ->orWhere('user_module_questions.is_show', true);
@@ -178,12 +204,22 @@ class AdminReportItemAnalysisAllIndex extends Component
                 'questions.id as question_id',
                 'questions.question as question_text',
                 'questions.difficulty as difficulty',
-                DB::raw("count(user_module_questions.id) as total_attempts"),
+                DB::raw('count(user_module_questions.id) as total_attempts'),
                 DB::raw("sum(case when user_module_questions.status = 'correct' then 1 else 0 end) as total_correct"),
             ])
             ->orderBy('questions.question', 'asc');
 
-        $items = $query->paginate($this->perPage);
+        return $query;
+    }
+
+    public function render()
+    {
+        $items = $this->itemsQuery()->paginate($this->perPage);
+        $service = new ItemAnalysisService;
+        $analyses = [];
+        foreach ($items as $item) {
+            $analyses[$item->question_id] = $service->aggregate($item->question_id);
+        }
 
         foreach ($items as $item) {
             if (! array_key_exists($item->question_id, $this->difficultySelections)) {
@@ -193,6 +229,8 @@ class AdminReportItemAnalysisAllIndex extends Component
 
         return view('livewire.admin.report.item-analysis.admin-report-item-analysis-all-index', [
             'items' => $items,
+            'analyses' => $analyses,
+            'selectedAnalysis' => $this->selectedQuestionId ? $service->aggregate($this->selectedQuestionId) : null,
         ])->extends('layout.app')->section('content');
     }
 }

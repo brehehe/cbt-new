@@ -38,6 +38,16 @@
         </div>
     </div>
 
+    @include('livewire.admin.report.shared.overview-styles')
+    <button wire:click="exportOverview" wire:loading.attr="disabled" class="btn btn-primary mb-4">Unduh PDF Overview {{ $selectedQuestionId ? 'Soal Ini' : 'Semua Hasil Pencarian' }}</button>
+    <div wire:loading wire:target="exportOverview">Menyiapkan PDF…</div>
+    @if($selectedAnalysis)
+        <div role="region" aria-label="Detail analisis soal">
+            <button wire:click="closeDetail" class="btn btn-secondary mb-3">Tutup detail</button>
+            <p class="text-sm text-gray-500 mb-3">Gabungan riwayat yang ditampilkan. Kelompok 27% dihitung per jadwal/versi soal; opsi yang berubah ditampilkan terpisah. Peserta dihitung per pengerjaan.</p>
+            @include('livewire.admin.report.shared.overview-card', ['analysis' => $selectedAnalysis, 'number' => ''])
+        </div>
+    @endif
     @php
         $pageAttempts = $items->sum('total_attempts');
         $pageCorrect = $items->sum('total_correct');
@@ -173,9 +183,7 @@
                             $totalCorrect = (int) ($item->total_correct ?? 0);
                             $totalWrong = max(0, $totalAttempts - $totalCorrect);
                             $pIndex = $totalAttempts > 0 ? $totalCorrect / $totalAttempts : 0;
-                            // Dummy D index for now as logic wasn't fully present in original
-                            $dIndex = 0; 
-                            
+                            $dIndex = $analyses[$item->question_id]['discrimination_index'];
                             $tingkatLabel = $pIndex >= 0.7 ? 'Mudah' : ($pIndex >= 0.3 ? 'Sedang' : 'Sukar');
                             $tingkatColor = $pIndex >= 0.7 
                                 ? 'bg-green-100 text-green-800 border-green-200' 
@@ -203,8 +211,8 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-2 mb-1">
-                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase {{ $item->question_type === 'essay' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700' }}">
-                                        {{ $item->question_type === 'essay' ? 'Essay' : 'PG' }}
+                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase {{ $analyses[$item->question_id]['question']->type === 'essay' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700' }}">
+                                        {{ $analyses[$item->question_id]['question']->type === 'essay' ? 'Essay' : 'PG' }}
                                     </span>
                                     <div class="text-sm text-gray-900 line-clamp-1" title="{{ strip_tags($item->question_text ?? '') }}">
                                         {!! \Str::limit(strip_tags($item->question_text ?? ''), 100) !!}
@@ -233,10 +241,11 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full border {{ $discriminationColor }}">
-                                    {{ $discriminationLabel }}
+                                    {{ $analyses[$item->question_id]['discrimination_level'] }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                <button wire:click="showDetail('{{ $item->question_id }}')" class="text-blue-600 p-2">Detail</button>
                                 <button wire:click="confirmDeleteAttempts('{{ $item->question_id }}')"
                                         class="text-red-600 hover:text-red-900 transition-colors duration-150 p-2 rounded-lg hover:bg-red-50"
                                         title="Hapus Data Jawaban">
