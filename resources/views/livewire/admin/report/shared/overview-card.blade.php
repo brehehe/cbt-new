@@ -1,11 +1,15 @@
 <article class="analysis-card">
     <h2>Detail Soal {{ $number }}</h2>
+    @if(!empty($analysis['aggregate_note']))<p class="analysis-note">{{ $analysis['aggregate_note'] }}</p>@endif
     <div class="analysis-question"><strong>Soal:</strong><div>{!! $analysis['question']->question ?? $analysis['question']->description !!}</div></div>
     <table class="analysis-columns"><tbody><tr><td>
         <h3>Statistik Utama</h3>
         <div class="analysis-metric">Total Peserta <span class="analysis-value">{{ $analysis['total_participants'] }}</span></div>
         <div class="analysis-metric analysis-green">Jawaban Benar <span class="analysis-value">{{ $analysis['correct_answers'] }}</span></div>
         <div class="analysis-metric analysis-red">Jawaban Salah / Tidak Dijawab <span class="analysis-value">{{ $analysis['incorrect_answers'] }}</span></div>
+        @if(($analysis['pending_answers'] ?? 0) > 0)
+        <div class="analysis-metric analysis-orange">Belum Dinilai <span class="analysis-value">{{ $analysis['pending_answers'] }}</span></div>
+        @endif
     </td><td>
         <h3>Indeks Analisis</h3>
         <div class="analysis-metric analysis-blue">Tingkat Kesukaran (P) <span class="analysis-value">{{ number_format($analysis['difficulty_index'], 3) }}</span>

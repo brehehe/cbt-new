@@ -37,6 +37,9 @@ class AdminReportItemAnalysisDetailIndex extends Component
 
     public function exportPdf()
     {
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(300);
+        $this->skipRender();
         $report = $this->report();
         $pdf = Pdf::loadView('livewire.admin.report.shared.overview-pdf', [
             'title' => 'Analisis Butir Soal — '.$report->timetable->name,

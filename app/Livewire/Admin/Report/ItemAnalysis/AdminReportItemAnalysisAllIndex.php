@@ -36,9 +36,14 @@ class AdminReportItemAnalysisAllIndex extends Component
 
     public function exportOverview()
     {
-        $service = new ItemAnalysisService;
-        $ids = $this->selectedQuestionId ? [$this->selectedQuestionId] : $this->itemsQuery()->pluck('questions.id')->all();
-        $analyses = array_map(fn ($id) => $service->aggregate($id), $ids);
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(300);
+
+        $service = app(ItemAnalysisService::class);
+        // The grouped query exposes questions.id as question_id.
+        $ids = $this->selectedQuestionId ? [$this->selectedQuestionId] : $this->itemsQuery()->get()->pluck('question_id')->all();
+        $analyses = $service->aggregateMany($ids);
+        $this->skipRender();
         $pdf = Pdf::loadView('livewire.admin.report.shared.overview-pdf', [
             'title' => 'Analisis Butir Soal — Semua Jadwal', 'analyses' => $analyses,
         ])->setPaper('a4', 'portrait');
@@ -215,11 +220,11 @@ class AdminReportItemAnalysisAllIndex extends Component
     public function render()
     {
         $items = $this->itemsQuery()->paginate($this->perPage);
-        $service = new ItemAnalysisService;
-        $analyses = [];
-        foreach ($items as $item) {
-            $analyses[$item->question_id] = $service->aggregate($item->question_id);
+        $ids = $items->pluck('question_id')->all();
+        if ($this->selectedQuestionId) {
+            $ids[] = $this->selectedQuestionId;
         }
+        $analyses = app(ItemAnalysisService::class)->aggregateMany($ids);
 
         foreach ($items as $item) {
             if (! array_key_exists($item->question_id, $this->difficultySelections)) {
@@ -230,7 +235,7 @@ class AdminReportItemAnalysisAllIndex extends Component
         return view('livewire.admin.report.item-analysis.admin-report-item-analysis-all-index', [
             'items' => $items,
             'analyses' => $analyses,
-            'selectedAnalysis' => $this->selectedQuestionId ? $service->aggregate($this->selectedQuestionId) : null,
+            'selectedAnalysis' => $this->selectedQuestionId ? $analyses[$this->selectedQuestionId] : null,
         ])->extends('layout.app')->section('content');
     }
 }

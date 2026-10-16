@@ -2,21 +2,19 @@
 
 namespace App\Livewire\Admin\Report\AnswerStatistics;
 
-use App\Models\Company\Company;
 use App\Models\Master\Timetable\Timetable;
 use App\Services\Report\ItemAnalysisService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Schema;
 use Livewire\Component;
 
 class AdminReportAnswerStatisticsIndex extends Component
 {
     public $timetable_id = '';
 
-    public $answerStats = [];
+    protected $answerStats = [];
 
-    public $timetable = null;
+    protected $timetable = null;
 
     public function mount()
     {
@@ -43,19 +41,11 @@ class AdminReportAnswerStatisticsIndex extends Component
         $this->answerStats = $report->itemAnalysisData;
     }
 
-    private function hasEssayAnswerColumn(): bool
-    {
-        static $hasColumn;
-
-        if ($hasColumn === null) {
-            $hasColumn = Schema::hasColumn('user_module_questions', 'essay_answer');
-        }
-
-        return $hasColumn;
-    }
-
     public function render()
     {
+        if ($this->timetable_id && $this->timetable === null) {
+            $this->loadStatistics();
+        }
         $companyId = Auth::user()?->company_id;
         $timetables = Timetable::query()
             ->with('module:id,name')
@@ -65,6 +55,7 @@ class AdminReportAnswerStatisticsIndex extends Component
 
         return view('livewire.admin.report.answer-statistics.admin-report-answer-statistics-index', [
             'timetables' => $timetables,
+            'answerStats' => $this->answerStats,
         ])
             ->extends('layout.app')
             ->section('content');
@@ -75,15 +66,14 @@ class AdminReportAnswerStatisticsIndex extends Component
         @ini_set('memory_limit', '512M');
         @set_time_limit(300);
 
-        if (! $this->timetable_id || empty($this->answerStats)) {
+        if (! $this->timetable_id) {
             return;
         }
 
-        $timetable = $this->timetable ?: Timetable::withoutGlobalScopes()->with('module')->find($this->timetable_id);
-        if (! $timetable) {
-            return;
-        }
-        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : Company::with('companyDetail')->first();
+        // Rebuild on the server instead of hydrating one Eloquent model per question/option.
+        $this->loadStatistics();
+        $this->skipRender();
+        $timetable = $this->timetable;
 
         $pdf = Pdf::loadView('livewire.admin.report.shared.overview-pdf', [
             'title' => 'Statistik Jawaban — '.$timetable->name,
