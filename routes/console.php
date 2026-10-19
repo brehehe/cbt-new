@@ -8,5 +8,5 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
+Schedule::command('backup:clean')->dailyAt('23:30');
 Schedule::command('backup:run')->dailyAt('23:59');
-Schedule::command('backup:clean')->dailyAt('01:00');
