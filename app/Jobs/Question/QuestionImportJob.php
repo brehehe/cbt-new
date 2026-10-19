@@ -145,6 +145,14 @@ class QuestionImportJob implements ShouldQueue
                     continue;
                 }
 
+                // Normalisasi spasi ganda (misal 'Antropologi  Kedokteran' -> 'Antropologi Kedokteran')
+                $cleanSpaces = fn(?string $val) => $val !== null ? trim(preg_replace('/\s+/', ' ', $val)) : null;
+                $studyName = $cleanSpaces($studyName);
+                $topicName = $cleanSpaces($topicName);
+                $materialCategoryName = $cleanSpaces($materialCategoryName);
+                $materialName = $cleanSpaces($materialName);
+                $categoryName = $cleanSpaces($categoryName);
+
                 // Find or create QuestionType with alias support (e.g. MCQ -> Pilihan Ganda)
                 $question_type = $this->resolveQuestionType($typeName);
 
@@ -153,7 +161,10 @@ class QuestionImportJob implements ShouldQueue
                 if ($studyName) {
                     $study = Study::withoutGlobalScopes()
                         ->where('company_id', $this->user?->company?->id)
-                        ->where('name', 'ilike', $studyName)
+                        ->where(function ($q) use ($studyName) {
+                            $q->where('name', 'ilike', $studyName)
+                              ->orWhere('name', 'ilike', preg_replace('/\s+/', ' ', $studyName));
+                        })
                         ->first();
 
                     if (! $study) {
@@ -170,7 +181,10 @@ class QuestionImportJob implements ShouldQueue
                     $topic = $study->topics()
                         ->withoutGlobalScopes()
                         ->where('company_id', $this->user?->company?->id)
-                        ->where('name', 'ilike', $topicName)
+                        ->where(function ($q) use ($topicName) {
+                            $q->where('name', 'ilike', $topicName)
+                              ->orWhere('name', 'ilike', preg_replace('/\s+/', ' ', $topicName));
+                        })
                         ->first();
 
                     if (! $topic) {
