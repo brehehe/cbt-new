@@ -33,7 +33,7 @@ class PublicQuestionnaireFill extends Component
         $this->slug = $slug;
         $this->questionnaire = Questionnaire::withoutGlobalScopes()
             ->where('slug', $slug)
-            ->with(['sections.questions'])
+            ->with(['sections.questions', 'company'])
             ->firstOrFail();
 
         // Auto-detect logged-in user
@@ -169,7 +169,7 @@ class PublicQuestionnaireFill extends Component
 
     public function render()
     {
-        $company = Company::first();
+        $company = $this->questionnaire->company ?? Company::first();
 
         $viewErrorBag = new \Illuminate\Support\ViewErrorBag();
         $viewErrorBag->put('default', $this->getErrorBag());

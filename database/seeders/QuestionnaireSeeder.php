@@ -14,13 +14,14 @@ class QuestionnaireSeeder extends Seeder
     {
         $company = Company::first();
         $companyId = $company?->id;
+        $companyName = $company?->name ?? 'Institusi';
 
         $questionnaire = Questionnaire::withoutGlobalScopes()->updateOrCreate(
             ['slug' => 'evaluasi-modul-mahasiswa'],
             [
                 'company_id' => $companyId,
-                'title' => 'Form Evaluasi Modul Mahasiswa - FK UINAR',
-                'description' => 'Evaluasi proses modul, tutor KKD, fasilitator diskusi kelompok, narasumber kuliah, dan saran pengembangan untuk Program Studi Pendidikan Dokter FK UINAR.',
+                'title' => 'Form Evaluasi Modul Mahasiswa' . ($company?->name ? ' - ' . $company->name : ''),
+                'description' => 'Evaluasi proses modul, tutor KKD, fasilitator diskusi kelompok, narasumber kuliah, dan saran pengembangan untuk ' . $companyName . '.',
                 'academic_year' => '2025/2026',
                 'semester' => 'Ganjil',
                 'is_active' => true,

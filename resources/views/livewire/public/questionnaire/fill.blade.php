@@ -93,13 +93,17 @@
 
             <!-- Top Institution Branding -->
             <div class="text-center mb-6">
-                @if(!empty($company?->logo_portrait) && \Illuminate\Support\Facades\Storage::disk('public')->exists($company->logo_portrait))
+                @if(!empty($company?->logo_potrait) && \Illuminate\Support\Facades\Storage::disk('public')->exists($company->logo_potrait))
+                    <img src="{{ asset('storage/' . $company->logo_potrait) }}" alt="Logo" class="h-16 mx-auto mb-2.5 object-contain drop-shadow-xs">
+                @elseif(!empty($company?->logo_portrait) && \Illuminate\Support\Facades\Storage::disk('public')->exists($company->logo_portrait))
                     <img src="{{ asset('storage/' . $company->logo_portrait) }}" alt="Logo" class="h-16 mx-auto mb-2.5 object-contain drop-shadow-xs">
+                @elseif(!empty($company?->logo) && \Illuminate\Support\Facades\Storage::disk('public')->exists($company->logo))
+                    <img src="{{ asset('storage/' . $company->logo) }}" alt="Logo" class="h-14 mx-auto mb-2.5 object-contain drop-shadow-xs">
                 @elseif(!empty($company?->logo_landscape) && \Illuminate\Support\Facades\Storage::disk('public')->exists($company->logo_landscape))
                     <img src="{{ asset('storage/' . $company->logo_landscape) }}" alt="Logo" class="h-14 mx-auto mb-2.5 object-contain drop-shadow-xs">
                 @endif
                 <p class="text-xs sm:text-sm font-extrabold uppercase tracking-wider" style="color: {{ $primary }};">
-                    PROGRAM STUDI PENDIDIKAN DOKTER FK UINAR
+                    {{ strtoupper($company?->name ?? 'PROGRAM STUDI PENDIDIKAN DOKTER') }}
                 </p>
                 <p class="text-[11px] text-gray-500 font-medium">Sistem Evaluasi Modul & Penjaminan Mutu Pembelajaran</p>
             </div>
@@ -113,7 +117,7 @@
                     </div>
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-2">Terima Kasih!</h2>
                     <p class="text-sm sm:text-base text-gray-600 max-w-lg mx-auto leading-relaxed">
-                        Evaluasi Anda terhadap <strong class="text-gray-900 font-bold">{{ $questionnaire->title }}</strong> telah berhasil tersimpan dalam sistem. Masukan Anda sangat berharga bagi peningkatan mutu pendidikan kedokteran kita.
+                        Evaluasi Anda terhadap <strong class="text-gray-900 font-bold">{{ $questionnaire->title }}</strong> telah berhasil tersimpan dalam sistem. Masukan Anda sangat berharga bagi peningkatan mutu pendidikan{{ !empty($company?->name) ? ' di ' . $company->name : '' }}.
                     </p>
 
                     <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -453,7 +457,7 @@
 
             <!-- Footer Note -->
             <div class="text-center text-xs text-gray-400 pt-4 pb-14 mt-4">
-                &copy; {{ date('Y') }} Program Studi Pendidikan Dokter FK UINAR &bull; Powered by PROCBT Healthcare System
+                &copy; {{ date('Y') }} {{ $company?->name ?? 'Program Studi Pendidikan Dokter' }} &bull; Powered by PROCBT Healthcare System
             </div>
         </div>
     </div>

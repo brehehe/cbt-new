@@ -98,7 +98,7 @@
                 <input type="checkbox" id="use_template" wire:model="use_template" 
                        class="mt-1 h-4 w-4 rounded border-gray-300 text-[color:var(--primary)] focus:ring-[color:var(--primary)] cursor-pointer">
                 <label for="use_template" class="cursor-pointer">
-                    <span class="block text-sm font-bold text-gray-900">Gunakan Template Standar Evaluasi Modul FK UINAR</span>
+                    <span class="block text-sm font-bold text-gray-900">Gunakan Template Standar Evaluasi Modul{{ !empty($companyData?->name) ? ' (' . $companyData->name . ')' : '' }}</span>
                     <span class="block text-xs text-gray-600 mt-0.5 leading-relaxed">
                         Otomatis membuat 5 Bagian & 32 butir pertanyaan standar berdasarkan template Word resmi (Evaluasi Proses Modul, Evaluasi Tutor KKD, Evaluasi Fasil DK, Evaluasi Narasumber Kuliah, dan Saran ke Prodi/MEU/CSU/MIT). Anda dapat menyesuaikan pertanyaan ini nanti.
                     </span>
