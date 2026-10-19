@@ -245,22 +245,7 @@ class QuestionImportJob implements ShouldQueue
                     }
                 }
 
-                // Jika soal sebelumnya ada di trash (pernah dihapus user),
-                // bersihkan data lama di trash tersebut beserta opsi jawabannya
-                // agar database tetap bersih dan tidak ada duplikat sampah
-                $trashedQuestion = Question::onlyTrashed()
-                    ->withoutGlobalScope('user_scope')
-                    ->where('company_id', $this->user?->company?->id)
-                    ->where('study_id', $study?->id)
-                    ->where('topic_id', $topic?->id)
-                    ->where('question', $questionText)
-                    ->first();
-
-                if ($trashedQuestion) {
-                    Answer::withTrashed()->where('question_id', $trashedQuestion->id)->forceDelete();
-                    \App\Models\Master\Question\ModuleQuestion::withTrashed()->where('question_id', $trashedQuestion->id)->forceDelete();
-                    $trashedQuestion->forceDelete();
-                }
+                // Langsung simpan setiap baris soal dari Excel sebagai soal baru tanpa cek duplikasi
 
                 try {
                     // Determine row question type: check if row typeName is explicitly MCQ/PG or Essay
