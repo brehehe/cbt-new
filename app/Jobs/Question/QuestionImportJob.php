@@ -245,34 +245,9 @@ class QuestionImportJob implements ShouldQueue
                     }
                 }
 
-                // Check if active (non-deleted) question already exists in this study & topic with the same question text AND description
-                $existingQuestionQuery = Question::withoutGlobalScope('user_scope')
-                    ->whereNull('deleted_at')
-                    ->where('company_id', $this->user?->company?->id)
-                    ->where('study_id', $study?->id)
-                    ->where('topic_id', $topic?->id)
-                    ->where('question', $questionText);
-
-                if ($description !== null && trim($description) !== '') {
-                    $existingQuestionQuery->where('description', trim($description));
-                } else {
-                    $existingQuestionQuery->where(function ($q) {
-                        $q->whereNull('description')->orWhere('description', '');
-                    });
-                }
-
-                $existingQuestion = $existingQuestionQuery->first();
-
-                // Jika soal AKTIF sudah ada di sistem, lewati secara otomatis agar tidak duplikat
-                // (tidak dimasukkan ke daftar error modal sesuai permintaan user)
-                if ($existingQuestion) {
-                    $skippedExistingCount++;
-                    continue;
-                }
-
                 // Jika soal sebelumnya ada di trash (pernah dihapus user),
                 // bersihkan data lama di trash tersebut beserta opsi jawabannya
-                // agar soal baru yang diimport dari Excel bisa masuk bersih
+                // agar database tetap bersih dan tidak ada duplikat sampah
                 $trashedQuestion = Question::onlyTrashed()
                     ->withoutGlobalScope('user_scope')
                     ->where('company_id', $this->user?->company?->id)
