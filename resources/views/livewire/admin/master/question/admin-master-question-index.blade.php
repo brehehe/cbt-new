@@ -86,6 +86,14 @@
                     </svg>
                     Refresh
                 </button>
+                <button wire:click="deleteDuplicateQuestions"
+                    wire:confirm="Apakah Anda yakin ingin membersihkan semua soal duplikat? Sistem akan mempertahankan 1 soal asli (tertua) dan menghapus salinan yang sama."
+                    class="btn btn-warning flex items-center gap-2" type="button" title="Bersihkan dan hapus soal-soal duplikat">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Hapus Duplikat
+                </button>
                 @if (config('app.import_question'))
                     <button wire:click="openModalImport()" class="btn btn-primary flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -178,7 +186,7 @@
                     </select>
                 </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Difficulty</label>
                     <select wire:model.live="filterDifficulty" class="mt-1 form-control">
@@ -198,10 +206,38 @@
                         @endforeach
                     </select>
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Filter Duplikasi</label>
+                    <select wire:model.live="filterDuplicate" class="mt-1 form-control">
+                        <option value="all">Semua Soal</option>
+                        <option value="only_duplicate">⚠️ Hanya Soal Duplikat</option>
+                    </select>
+                </div>
             </div>
         </div>
     </div>
     {{-- Remove global alert --}}
+
+    @if ($filterDuplicate === 'only_duplicate')
+        <div class="mb-6 p-4 bg-amber-50 border border-amber-300 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm animate-fade-in">
+            <div class="flex items-center gap-3">
+                <span class="flex items-center justify-center w-8 h-8 rounded-full bg-amber-100 text-amber-700 shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </span>
+                <div>
+                    <h3 class="text-sm font-bold text-amber-900">Mode Menampilkan Soal Duplikat</h3>
+                    <p class="text-xs text-amber-700 mt-0.5">Tabel sedang menyaring soal yang memiliki kembaran (teks & deskripsi sama). Anda dapat meninjau atau mengklik tombol di samping untuk menghapus salinannya.</p>
+                </div>
+            </div>
+            <button wire:click="deleteDuplicateQuestions"
+                wire:confirm="Apakah Anda yakin ingin membersihkan semua soal duplikat? Sistem akan mempertahankan 1 soal asli (tertua) dan menghapus salinannya yang sama."
+                class="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-sm transition-all whitespace-nowrap cursor-pointer">
+                Hapus Salinan Duplikat
+            </button>
+        </div>
+    @endif
 
     <!-- Table Controls -->
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
@@ -219,14 +255,14 @@
             <span class="text-sm text-gray-600 ml-2">data</span>
         </div>
 
-        <div class="w-full md:w-72">
+        <div class="w-full md:w-96">
             <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <i class="fas fa-search text-gray-400"></i>
                 </div>
                 <input type="text"
                     class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition duration-150 ease-in-out"
-                    placeholder="Cari Sesuatu..." wire:model.live='search'>
+                    placeholder="Cari soal, deskripsi, opsi, prodi, topik, materi..." wire:model.live='search'>
             </div>
         </div>
     </div>

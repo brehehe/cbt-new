@@ -91,12 +91,36 @@ class Question extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
+        if (empty($term)) {
+            return;
+        }
+
+        $op = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
         $term = '%'.$term.'%';
 
-        $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id', 'question', 'description'], 'ilike', $term)
-                ->orWhereHas('answers', function ($q) use ($term) {
-                    $q->where('context', 'ilike', $term);
+        $query->where(function ($query) use ($term, $op) {
+            $query->where('question', $op, $term)
+                ->orWhere('description', $op, $term)
+                ->orWhereHas('answers', function ($q) use ($term, $op) {
+                    $q->where('context', $op, $term);
+                })
+                ->orWhereHas('study', function ($q) use ($term, $op) {
+                    $q->where('name', $op, $term);
+                })
+                ->orWhereHas('topic', function ($q) use ($term, $op) {
+                    $q->where('name', $op, $term);
+                })
+                ->orWhereHas('materialCategory', function ($q) use ($term, $op) {
+                    $q->where('name', $op, $term);
+                })
+                ->orWhereHas('material', function ($q) use ($term, $op) {
+                    $q->where('name', $op, $term);
+                })
+                ->orWhereHas('categoryQuestion', function ($q) use ($term, $op) {
+                    $q->where('name', $op, $term);
+                })
+                ->orWhereHas('questionType', function ($q) use ($term, $op) {
+                    $q->where('name', $op, $term);
                 });
         });
     }

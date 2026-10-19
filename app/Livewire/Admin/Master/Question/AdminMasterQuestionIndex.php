@@ -106,6 +106,8 @@ class AdminMasterQuestionIndex extends Component
 
     public $filterCategoryQuestionId;
 
+    public $filterDuplicate = 'all';
+
     public $study_id_import;
 
     public $file_import;
@@ -203,6 +205,21 @@ class AdminMasterQuestionIndex extends Component
             $questions->where('category_question_id', $this->filterCategoryQuestionId);
         }
 
+        if ($this->filterDuplicate === 'only_duplicate') {
+            $companyId = Auth::user()?->company?->id;
+            $dupSigs = Question::withoutGlobalScope('user_scope')
+                ->where('company_id', $companyId)
+                ->where('is_simulation', 'false')
+                ->select(DB::raw("CONCAT(TRIM(question), '___', COALESCE(TRIM(description), '')) as sig"))
+                ->groupBy(DB::raw("CONCAT(TRIM(question), '___', COALESCE(TRIM(description), ''))"))
+                ->havingRaw('COUNT(*) > 1');
+
+            $questions->whereIn(
+                DB::raw("CONCAT(TRIM(question), '___', COALESCE(TRIM(description), ''))"),
+                $dupSigs
+            );
+        }
+
         return $questions;
     }
 
@@ -287,6 +304,12 @@ class AdminMasterQuestionIndex extends Component
     }
 
     public function updatedFilterCategoryQuestionId()
+    {
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function updatedFilterDuplicate()
     {
         $this->resetPage();
         $this->resetSelection();
@@ -648,6 +671,82 @@ class AdminMasterQuestionIndex extends Component
         }
 
         return AlertHelper::success('Berhasil', 'Data berhasil dihapus.');
+    }
+
+    public function deleteDuplicateQuestions()
+    {
+        $companyId = Auth::user()?->company?->id;
+        if (! $companyId) {
+            return AlertHelper::error('Gagal', 'Company tidak ditemukan.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $query = Question::withoutGlobalScope('user_scope')
+                ->whereNull('deleted_at')
+                ->where('company_id', $companyId)
+                ->where('is_simulation', 'false');
+
+            if ($this->filterStudyId) {
+                $query->where('study_id', $this->filterStudyId);
+            }
+
+            if ($this->filterTopicId) {
+                $query->where('topic_id', $this->filterTopicId);
+            }
+
+            $allQuestions = $query->orderBy('created_at', 'asc')->orderBy('id', 'asc')->get();
+
+            // Kelompokkan berdasarkan teks soal dan deskripsi
+            $grouped = $allQuestions->groupBy(function ($item) {
+                return trim((string) $item->question) . '___' . trim((string) $item->description);
+            });
+
+            $idsToDelete = [];
+            foreach ($grouped as $key => $group) {
+                if ($group->count() > 1) {
+                    // Sisakan 1 soal pertama (tertua), hapus salinan berikutnya
+                    $duplicates = $group->slice(1);
+                    foreach ($duplicates as $dup) {
+                        $idsToDelete[] = $dup->id;
+                    }
+                }
+            }
+
+            if (empty($idsToDelete)) {
+                DB::rollBack();
+                return AlertHelper::info('Informasi', 'Tidak ditemukan soal duplikat' . ($this->filterTopicId || $this->filterStudyId ? ' pada filter saat ini.' : '.'));
+            }
+
+            $count = count($idsToDelete);
+
+            foreach (array_chunk($idsToDelete, 200) as $chunk) {
+                \App\Models\Master\Question\Answer::withoutGlobalScope('user_scope')->whereIn('question_id', $chunk)->delete();
+                \App\Models\Master\Question\ModuleQuestion::withoutGlobalScope('user_scope')->whereIn('question_id', $chunk)->delete();
+                Question::withoutGlobalScope('user_scope')->whereIn('id', $chunk)->delete();
+            }
+
+            // Catat log aktivitas audit
+            activity('audit')
+                ->event('duplicate_cleanup')
+                ->withProperties([
+                    'ids' => $idsToDelete,
+                    'count' => $count,
+                ])
+                ->log("Cleaned up {$count} duplicate Questions");
+
+            DB::commit();
+
+            $this->resetPage();
+            $this->resetSelection();
+
+            return AlertHelper::success('Berhasil', "{$count} soal duplikat berhasil dihapus. Setiap soal kini tersisa 1 data unik.");
+        } catch (Exception|Throwable $th) {
+            DB::rollBack();
+            Log::error('Gagal deleteDuplicateQuestions', ['error' => $th->getMessage()]);
+            return AlertHelper::error('Gagal', 'Ada kesalahan saat membersihkan soal duplikat: ' . $th->getMessage());
+        }
     }
 
     public function bulkDelete()
