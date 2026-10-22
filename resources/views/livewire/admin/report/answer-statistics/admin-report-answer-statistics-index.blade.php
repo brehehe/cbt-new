@@ -36,10 +36,31 @@
         </div>
     </div>
 
+    @if($timetable_id)
+        <!-- Question Filters -->
+        @include('livewire.admin.report.shared.question-filter-bar')
+
+        <!-- Search Controls -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
+            <div class="relative w-full">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fas fa-search text-gray-400"></i>
+                </div>
+                <input type="text" 
+                       wire:model.live.debounce.300ms='search'
+                       class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out"
+                       placeholder="Cari teks soal, pembahasan, opsi jawaban, topik, materi...">
+            </div>
+        </div>
+    @endif
+
     @include('livewire.admin.report.shared.overview-styles')
     @forelse($answerStats as $analysis)
         @include('livewire.admin.report.shared.overview-card', ['number' => $loop->iteration])
     @empty
-        <p class="p-6 text-gray-500">{{ $timetable_id ? 'Belum ada data soal.' : 'Pilih jadwal ujian untuk melihat statistik.' }}</p>
+        <div class="bg-white rounded-xl p-8 text-center text-gray-500 border border-gray-100">
+            <i class="fas {{ $timetable_id ? 'fa-filter' : 'fa-calendar-days' }} text-gray-300 text-3xl mb-2"></i>
+            <p>{{ $timetable_id ? 'Belum ada data soal atau tidak ada soal yang sesuai dengan filter.' : 'Pilih jadwal ujian untuk melihat statistik.' }}</p>
+        </div>
     @endforelse
 </div>

@@ -36,8 +36,11 @@
     </div>
 
     @if($user_id)
+        <!-- Question Filters -->
+        @include('livewire.admin.report.shared.question-filter-bar')
+
         <div class="bg-white shadow overflow-hidden rounded-lg border border-gray-200">
-            <div class="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+            <div class="p-4 border-b border-gray-200 bg-gray-50 flex flex-col sm:flex-row justify-between items-center gap-3">
                 <div class="flex items-center">
                     <div class="h-10 w-10 flex-shrink-0">
                         <img class="h-10 w-10 rounded-full"
@@ -49,10 +52,10 @@
                         <div class="text-sm text-gray-500">{{ $selectedUser->nim ?? $selectedUser->username }}</div>
                     </div>
                 </div>
-                <div>
+                <div class="w-full sm:w-80">
                     <input wire:model.live.debounce.300ms="search" type="text"
                         class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                        placeholder="Cari ujian...">
+                        placeholder="Cari ujian, modul, atau teks soal...">
                 </div>
             </div>
 

@@ -4,13 +4,18 @@ namespace App\Livewire\Admin\Report\AnswerStatistics;
 
 use App\Models\Master\Timetable\Timetable;
 use App\Services\Report\ItemAnalysisService;
+use App\Traits\HasQuestionReportFilters;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class AdminReportAnswerStatisticsIndex extends Component
 {
+    use HasQuestionReportFilters;
+
     public $timetable_id = '';
+
+    public $search = '';
 
     protected $answerStats = [];
 
@@ -26,6 +31,48 @@ class AdminReportAnswerStatisticsIndex extends Component
         $this->loadStatistics();
     }
 
+    public function updatedFilterTopicId()
+    {
+        $this->loadStatistics();
+    }
+
+    public function updatedFilterMaterialCategoryId()
+    {
+        $this->filterMaterialId = '';
+        $this->loadStatistics();
+    }
+
+    public function updatedFilterMaterialId()
+    {
+        $this->loadStatistics();
+    }
+
+    public function updatedFilterQuestionTypeId()
+    {
+        $this->loadStatistics();
+    }
+
+    public function updatedFilterCategoryQuestionId()
+    {
+        $this->loadStatistics();
+    }
+
+    public function updatedSearch()
+    {
+        $this->loadStatistics();
+    }
+
+    public function resetQuestionFilters(): void
+    {
+        $this->filterTopicId = '';
+        $this->filterMaterialCategoryId = '';
+        $this->filterMaterialId = '';
+        $this->filterQuestionTypeId = '';
+        $this->filterCategoryQuestionId = '';
+        $this->search = '';
+        $this->loadStatistics();
+    }
+
     public function loadStatistics()
     {
         if (! $this->timetable_id) {
@@ -36,7 +83,14 @@ class AdminReportAnswerStatisticsIndex extends Component
         }
 
         $report = new ItemAnalysisService;
-        $report->mount($this->timetable_id);
+        $report->mount($this->timetable_id, [
+            'filterTopicId' => $this->filterTopicId,
+            'filterMaterialCategoryId' => $this->filterMaterialCategoryId,
+            'filterMaterialId' => $this->filterMaterialId,
+            'filterQuestionTypeId' => $this->filterQuestionTypeId,
+            'filterCategoryQuestionId' => $this->filterCategoryQuestionId,
+            'search' => $this->search,
+        ]);
         $this->timetable = $report->timetable;
         $this->answerStats = $report->itemAnalysisData;
     }

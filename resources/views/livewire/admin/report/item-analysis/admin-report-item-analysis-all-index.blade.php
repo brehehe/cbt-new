@@ -102,7 +102,10 @@
         </div>
     </div>
 
-    <!-- Filters & Search -->
+    <!-- Question Filters -->
+    @include('livewire.admin.report.shared.question-filter-bar')
+
+    <!-- Pagination & Search Controls -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center space-x-3 w-full sm:w-auto">
@@ -120,14 +123,14 @@
                 <span class="text-sm text-gray-500 font-medium whitespace-nowrap">data per halaman</span>
             </div>
 
-            <div class="relative w-full sm:w-72">
+            <div class="relative w-full sm:w-96">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <i class="fas fa-search text-gray-400"></i>
                 </div>
                 <input type="text" 
                        wire:model.live='search'
                        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out"
-                       placeholder="Cari soal berdasarkan teks...">
+                       placeholder="Cari teks soal, opsi, topik, materi...">
             </div>
         </div>
     </div>

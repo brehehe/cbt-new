@@ -28,11 +28,35 @@ class ItemAnalysisService
 
     public $search = '';
 
-    public function mount($id)
+    public $filters = [];
+
+    public function mount($id, array $filters = [])
     {
         $this->timetableId = $id;
+        $this->filters = $filters;
         $this->loadTimetableData();
         $this->calculateItemAnalysis();
+    }
+
+    protected function filterQuestionsQuery($query)
+    {
+        if (empty($this->filters)) {
+            return $query;
+        }
+
+        $filters = $this->filters;
+
+        $query->when(! empty($filters['filterTopicId']), fn ($q) => $q->where('timetable_questions.topic_id', $filters['filterTopicId']))
+            ->when(! empty($filters['filterMaterialCategoryId']), fn ($q) => $q->where('timetable_questions.material_category_id', $filters['filterMaterialCategoryId']))
+            ->when(! empty($filters['filterMaterialId']), fn ($q) => $q->where('timetable_questions.material_id', $filters['filterMaterialId']))
+            ->when(! empty($filters['filterQuestionTypeId']), fn ($q) => $q->where('timetable_questions.question_type_id', $filters['filterQuestionTypeId']))
+            ->when(! empty($filters['filterCategoryQuestionId']), fn ($q) => $q->where('timetable_questions.category_question_id', $filters['filterCategoryQuestionId']));
+
+        if (! empty($filters['search'])) {
+            $query->search($filters['search']);
+        }
+
+        return $query;
     }
 
     public function loadTimetableData()
@@ -43,18 +67,19 @@ class ItemAnalysisService
         // Fetch questions without restricting to is_check
         $questions = collect();
         if ($this->timetableModule) {
-            $questions = $this->timetableModule->questions()
+            $questionsQuery = $this->timetableModule->questions()
                 ->withoutGlobalScopes()
                 ->with(['answers' => function ($q) {
                     $q->withoutGlobalScopes()->orderBy('order', 'asc');
-                }])
+                }]);
+            $questions = $this->filterQuestionsQuery($questionsQuery)
                 ->orderBy('order', 'asc')
                 ->get();
         }
 
         // Fallback 1: via timetable_module_id = timetable_id
         if ($questions->isEmpty()) {
-            $questions = TimetableQuestion::withoutGlobalScopes()
+            $questionsQuery = TimetableQuestion::withoutGlobalScopes()
                 ->with(['answers' => function ($q) {
                     $q->withoutGlobalScopes()->orderBy('order', 'asc');
                 }])
@@ -63,7 +88,8 @@ class ItemAnalysisService
                         $tm->where('timetable_id', $this->timetableId);
                     })
                         ->orWhere('timetable_module_id', $this->timetableId);
-                })
+                });
+            $questions = $this->filterQuestionsQuery($questionsQuery)
                 ->orderBy('order', 'asc')
                 ->get();
         }
@@ -80,11 +106,12 @@ class ItemAnalysisService
                 ->values();
 
             if ($questionIds->isNotEmpty()) {
-                $questions = TimetableQuestion::withoutGlobalScopes()
+                $questionsQuery = TimetableQuestion::withoutGlobalScopes()
                     ->with(['answers' => function ($q) {
                         $q->withoutGlobalScopes()->orderBy('order', 'asc');
                     }])
-                    ->whereIn('id', $questionIds)
+                    ->whereIn('id', $questionIds);
+                $questions = $this->filterQuestionsQuery($questionsQuery)
                     ->orderBy('order', 'asc')
                     ->get();
             }

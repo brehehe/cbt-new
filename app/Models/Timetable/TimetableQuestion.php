@@ -79,10 +79,35 @@ class TimetableQuestion extends Model
 
     public function scopeSearch(Builder $query, $term): void
     {
-        $term = '%'.$term.'%';
+        $term = trim((string) $term);
+        if ($term === '') {
+            return;
+        }
 
-        $query->where(function ($query) use ($term) {
-            $query->whereAny(['company_id'], 'ilike', $term);
+        $op = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+        $termLike = '%'.$term.'%';
+
+        $query->where(function ($query) use ($termLike, $op) {
+            $query->where('question', $op, $termLike)
+                ->orWhere('description', $op, $termLike)
+                ->orWhereHas('answers', function ($q) use ($termLike, $op) {
+                    $q->where('context', $op, $termLike);
+                })
+                ->orWhereHas('topic', function ($q) use ($termLike, $op) {
+                    $q->where('name', $op, $termLike);
+                })
+                ->orWhereHas('materialCategory', function ($q) use ($termLike, $op) {
+                    $q->where('name', $op, $termLike);
+                })
+                ->orWhereHas('material', function ($q) use ($termLike, $op) {
+                    $q->where('name', $op, $termLike);
+                })
+                ->orWhereHas('categoryQuestion', function ($q) use ($termLike, $op) {
+                    $q->where('name', $op, $termLike);
+                })
+                ->orWhereHas('questionType', function ($q) use ($termLike, $op) {
+                    $q->where('name', $op, $termLike);
+                });
         });
     }
 
@@ -97,6 +122,21 @@ class TimetableQuestion extends Model
     public function topic(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Master\Question\Topic::class, 'topic_id', 'id');
+    }
+
+    public function materialCategory(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Master\Question\MaterialCategory::class, 'material_category_id', 'id');
+    }
+
+    public function material(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Master\Question\Material::class, 'material_id', 'id');
+    }
+
+    public function questionType(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Master\Question\QuestionType::class, 'question_type_id', 'id');
     }
 
     public function user()

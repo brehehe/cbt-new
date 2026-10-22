@@ -3,11 +3,14 @@
 namespace App\Livewire\Admin\Report\ItemAnalysis\Detail;
 
 use App\Services\Report\ItemAnalysisService;
+use App\Traits\HasQuestionReportFilters;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Livewire\Component;
 
 class AdminReportItemAnalysisDetailIndex extends Component
 {
+    use HasQuestionReportFilters;
+
     public $timetableId;
 
     public $search = '';
@@ -20,7 +23,14 @@ class AdminReportItemAnalysisDetailIndex extends Component
     protected function report()
     {
         $report = new ItemAnalysisService;
-        $report->mount($this->timetableId);
+        $report->mount($this->timetableId, [
+            'filterTopicId' => $this->filterTopicId,
+            'filterMaterialCategoryId' => $this->filterMaterialCategoryId,
+            'filterMaterialId' => $this->filterMaterialId,
+            'filterQuestionTypeId' => $this->filterQuestionTypeId,
+            'filterCategoryQuestionId' => $this->filterCategoryQuestionId,
+            'search' => $this->search,
+        ]);
 
         return $report;
     }

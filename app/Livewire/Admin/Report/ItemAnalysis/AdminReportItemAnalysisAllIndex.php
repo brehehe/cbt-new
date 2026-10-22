@@ -7,6 +7,7 @@ use App\Models\Master\Question\Question;
 use App\Models\Timetable\TimetableQuestion;
 use App\Models\User\UserModuleQuestion;
 use App\Services\Report\ItemAnalysisService;
+use App\Traits\HasQuestionReportFilters;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -14,7 +15,7 @@ use Livewire\WithPagination;
 
 class AdminReportItemAnalysisAllIndex extends Component
 {
-    use WithPagination;
+    use HasQuestionReportFilters, WithPagination;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -199,12 +200,11 @@ class AdminReportItemAnalysisAllIndex extends Component
             ->where(function ($q) {
                 $q->whereNull('user_module_questions.is_show')
                     ->orWhere('user_module_questions.is_show', true);
-            })
-            ->when($this->search, function ($q) {
-                $term = '%'.$this->search.'%';
-                $q->where('questions.question', 'ilike', $term);
-            })
-            ->groupBy('questions.id', 'questions.question', 'questions.difficulty')
+            });
+
+        $query = $this->applyQuestionFilters($query, 'questions');
+
+        $query->groupBy('questions.id', 'questions.question', 'questions.difficulty')
             ->select([
                 'questions.id as question_id',
                 'questions.question as question_text',

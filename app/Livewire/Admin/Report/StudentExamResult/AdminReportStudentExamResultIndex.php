@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Report\StudentExamResult;
 use App\Models\Master\RatingScale\RatingScale;
 use App\Models\User;
 use App\Models\User\UserTimetable;
+use App\Traits\HasQuestionReportFilters;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -12,7 +13,7 @@ use Livewire\WithPagination;
 
 class AdminReportStudentExamResultIndex extends Component
 {
-    use WithPagination;
+    use HasQuestionReportFilters, WithPagination;
 
     public $search = '';
 
@@ -36,21 +37,35 @@ class AdminReportStudentExamResultIndex extends Component
         return RatingScale::getGrade($mark);
     }
 
+    protected function buildQuery()
+    {
+        $query = UserTimetable::withoutGlobalScopes()
+            ->with(['timetable.module', 'timetable.examSession', 'timetable.examRoom', 'userModuleQuestions.timetableQuestion'])
+            ->where('user_id', $this->user_id);
+
+        if (! empty($this->search)) {
+            $query->search($this->search);
+        }
+
+        if ($this->filterTopicId || $this->filterMaterialCategoryId || $this->filterMaterialId || $this->filterQuestionTypeId || $this->filterCategoryQuestionId) {
+            $query->whereHas('userModuleQuestions.timetableQuestion', function ($q) {
+                $q->when($this->filterTopicId, fn ($sub) => $sub->where('topic_id', $this->filterTopicId))
+                    ->when($this->filterMaterialCategoryId, fn ($sub) => $sub->where('material_category_id', $this->filterMaterialCategoryId))
+                    ->when($this->filterMaterialId, fn ($sub) => $sub->where('material_id', $this->filterMaterialId))
+                    ->when($this->filterQuestionTypeId, fn ($sub) => $sub->where('question_type_id', $this->filterQuestionTypeId))
+                    ->when($this->filterCategoryQuestionId, fn ($sub) => $sub->where('category_question_id', $this->filterCategoryQuestionId));
+            });
+        }
+
+        return $query->orderBy('created_at', 'desc');
+    }
+
     public function render()
     {
         $examResults = collect();
 
         if ($this->user_id) {
-            $examResults = UserTimetable::withoutGlobalScopes()
-                ->with(['timetable.module', 'timetable.examSession', 'timetable.examRoom'])
-                ->where('user_id', $this->user_id)
-                ->where(function ($query) {
-                    $query->whereHas('timetable', function ($q) {
-                        $q->search($this->search);
-                    });
-                })
-                ->orderBy('created_at', 'desc')
-                ->paginate($this->perPage);
+            $examResults = $this->buildQuery()->paginate($this->perPage);
         }
 
         $companyId = Auth::user()?->company_id;
@@ -93,16 +108,7 @@ class AdminReportStudentExamResultIndex extends Component
             return;
         }
 
-        $examResults = UserTimetable::withoutGlobalScopes()
-            ->with(['timetable.module', 'timetable.examSession', 'timetable.examRoom'])
-            ->where('user_id', $this->user_id)
-            ->where(function ($query) {
-                $query->whereHas('timetable', function ($q) {
-                    $q->search($this->search);
-                });
-            })
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $examResults = $this->buildQuery()->get();
 
         $gradeDetails = [];
         foreach ($examResults as $result) {

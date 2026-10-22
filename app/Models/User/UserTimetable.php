@@ -120,6 +120,9 @@ class UserTimetable extends Model
                                 ->orWhere('description', 'ilike', "%{$search}%");
                         });
                 })
+                ->orWhereHas('userModuleQuestions.timetableQuestion', function ($qd) use ($search) {
+                    $qd->where('question', 'ilike', "%{$search}%");
+                })
                 ->orWhereHas('company', function ($qd) use ($search) {
                     $qd->where('name', 'ilike', "%{$search}%");
                 });

@@ -8,6 +8,7 @@ use App\Models\Master\RatingScale\RatingScale;
 use App\Models\Master\Timetable\Timetable;
 use App\Models\User;
 use App\Models\User\UserTimetable;
+use App\Traits\HasQuestionReportFilters;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +18,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class AdminReportExamResultIndex extends Component
 {
-    use WithPagination;
+    use HasQuestionReportFilters, WithPagination;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -51,6 +52,15 @@ class AdminReportExamResultIndex extends Component
             })
             ->when($this->timetable_id, function ($query) {
                 $query->where('timetable_id', $this->timetable_id);
+            })
+            ->when($this->filterTopicId || $this->filterMaterialCategoryId || $this->filterMaterialId || $this->filterQuestionTypeId || $this->filterCategoryQuestionId, function ($query) {
+                $query->whereHas('userModuleQuestions.timetableQuestion', function ($q) {
+                    $q->when($this->filterTopicId, fn ($sub) => $sub->where('topic_id', $this->filterTopicId))
+                        ->when($this->filterMaterialCategoryId, fn ($sub) => $sub->where('material_category_id', $this->filterMaterialCategoryId))
+                        ->when($this->filterMaterialId, fn ($sub) => $sub->where('material_id', $this->filterMaterialId))
+                        ->when($this->filterQuestionTypeId, fn ($sub) => $sub->where('question_type_id', $this->filterQuestionTypeId))
+                        ->when($this->filterCategoryQuestionId, fn ($sub) => $sub->where('category_question_id', $this->filterCategoryQuestionId));
+                });
             })
             ->orderBy('created_at', 'desc');
 
@@ -284,6 +294,23 @@ class AdminReportExamResultIndex extends Component
             if (!$tq) {
                 continue;
             }
+
+            if ($this->filterTopicId && $tq->topic_id !== $this->filterTopicId) {
+                continue;
+            }
+            if ($this->filterMaterialCategoryId && $tq->material_category_id !== $this->filterMaterialCategoryId) {
+                continue;
+            }
+            if ($this->filterMaterialId && $tq->material_id !== $this->filterMaterialId) {
+                continue;
+            }
+            if ($this->filterQuestionTypeId && $tq->question_type_id !== $this->filterQuestionTypeId) {
+                continue;
+            }
+            if ($this->filterCategoryQuestionId && $tq->category_question_id !== $this->filterCategoryQuestionId) {
+                continue;
+            }
+
             $topicName = $tq->topic?->name ?? 'Tanpa Topik';
             $topicId = $tq->topic_id ?? 'no-topic';
 

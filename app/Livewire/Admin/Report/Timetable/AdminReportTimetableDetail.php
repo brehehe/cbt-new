@@ -6,6 +6,7 @@ use App\Models\Timetable\TimetableAnswer;
 use App\Models\Timetable\TimetableModule;
 use App\Models\User\UserModuleQuestion;
 use App\Models\User\UserTimetable;
+use App\Traits\HasQuestionReportFilters;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Component;
@@ -13,7 +14,7 @@ use Livewire\WithPagination;
 
 class AdminReportTimetableDetail extends Component
 {
-    use WithPagination;
+    use HasQuestionReportFilters, WithPagination;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -21,7 +22,35 @@ class AdminReportTimetableDetail extends Component
 
     public $search;
 
+    public $questionSearch = '';
+
     public $timetable_module;
+
+    public function updatedQuestionSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function resetQuestionFilters(): void
+    {
+        $this->filterTopicId = '';
+        $this->filterMaterialCategoryId = '';
+        $this->filterMaterialId = '';
+        $this->filterQuestionTypeId = '';
+        $this->filterCategoryQuestionId = '';
+        $this->questionSearch = '';
+        $this->resetPage();
+    }
+
+    public function hasActiveQuestionFilters(): bool
+    {
+        return ! empty($this->filterTopicId)
+            || ! empty($this->filterMaterialCategoryId)
+            || ! empty($this->filterMaterialId)
+            || ! empty($this->filterQuestionTypeId)
+            || ! empty($this->filterCategoryQuestionId)
+            || ! empty($this->questionSearch);
+    }
 
     public function render()
     {
@@ -52,27 +81,44 @@ class AdminReportTimetableDetail extends Component
         ])->extends('layout.app')->section('content');
     }
 
+    protected function filterQuestionsQuery($query)
+    {
+        $query->when($this->filterTopicId, fn ($q) => $q->where('timetable_questions.topic_id', $this->filterTopicId))
+            ->when($this->filterMaterialCategoryId, fn ($q) => $q->where('timetable_questions.material_category_id', $this->filterMaterialCategoryId))
+            ->when($this->filterMaterialId, fn ($q) => $q->where('timetable_questions.material_id', $this->filterMaterialId))
+            ->when($this->filterQuestionTypeId, fn ($q) => $q->where('timetable_questions.question_type_id', $this->filterQuestionTypeId))
+            ->when($this->filterCategoryQuestionId, fn ($q) => $q->where('timetable_questions.category_question_id', $this->filterCategoryQuestionId));
+
+        if (! empty($this->questionSearch)) {
+            $query->search($this->questionSearch);
+        }
+
+        return $query;
+    }
+
     public function getTimetableQuestions()
     {
         $questions = collect();
 
         if ($this->timetable_module) {
-            $questions = $this->timetable_module->questions()
+            $qQuery = $this->timetable_module->questions()
                 ->withoutGlobalScopes()
-                ->with(['question'])
+                ->with(['question']);
+            $questions = $this->filterQuestionsQuery($qQuery)
                 ->orderBy('order', 'asc')
                 ->get();
         }
 
         if ($questions->isEmpty() && $this->timetable_module) {
             $timetableId = $this->timetable_module->timetable_id;
-            $questions = \App\Models\Timetable\TimetableQuestion::withoutGlobalScopes()
+            $qQuery = \App\Models\Timetable\TimetableQuestion::withoutGlobalScopes()
                 ->with(['question'])
                 ->where(function ($q) use ($timetableId) {
                     $q->whereHas('timetableModule', fn($tm) => $tm->where('timetable_id', $timetableId))
                         ->orWhere('timetable_module_id', $timetableId)
                         ->orWhere('timetable_module_id', $this->timetable_module->id);
-                })
+                });
+            $questions = $this->filterQuestionsQuery($qQuery)
                 ->orderBy('order', 'asc')
                 ->get();
         }
@@ -87,9 +133,10 @@ class AdminReportTimetableDetail extends Component
                 ->values();
 
             if ($questionIds->isNotEmpty()) {
-                $questions = \App\Models\Timetable\TimetableQuestion::withoutGlobalScopes()
+                $qQuery = \App\Models\Timetable\TimetableQuestion::withoutGlobalScopes()
                     ->with(['question'])
-                    ->whereIn('id', $questionIds)
+                    ->whereIn('id', $questionIds);
+                $questions = $this->filterQuestionsQuery($qQuery)
                     ->orderBy('order', 'asc')
                     ->get();
             }

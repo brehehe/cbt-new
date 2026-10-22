@@ -16,6 +16,9 @@
             </div>
         </div>
     </div>
+    <!-- Question Filters -->
+    @include('livewire.admin.report.shared.question-filter-bar')
+
     <!-- Table Controls -->
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <div class="flex items-center bg-white rounded-lg shadow-sm border border-gray-200 px-3 py-2 w-full md:w-auto">
@@ -32,14 +35,22 @@
             <span class="text-sm text-gray-600 ml-2">data</span>
         </div>
 
-        <div class="w-full md:w-72">
-            <div class="relative">
+        <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            <div class="relative w-full sm:w-64">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <i class="fas fa-search text-gray-400"></i>
                 </div>
                 <input type="text"
                     class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition duration-150 ease-in-out"
-                    placeholder="Cari Sesuatu..." wire:model.live='search'>
+                    placeholder="Cari siswa (Nama/NIM)..." wire:model.live='search'>
+            </div>
+            <div class="relative w-full sm:w-72">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fas fa-question text-gray-400"></i>
+                </div>
+                <input type="text"
+                    class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition duration-150 ease-in-out"
+                    placeholder="Cari teks soal / opsi..." wire:model.live.debounce.300ms='questionSearch'>
             </div>
         </div>
     </div>
@@ -47,6 +58,16 @@
     <!-- Results Card List -->
     <div class="space-y-6">
         @forelse ($user_timetables as $index => $user_timetable)
+            @php
+                $filteredQuestionIds = $timetable_questions->pluck('id')->all();
+                $isFiltered = $this->hasActiveQuestionFilters();
+                $correctCount = $isFiltered 
+                    ? $user_timetable->userModuleQuestions->whereIn('timetable_question_id', $filteredQuestionIds)->where('status', 'correct')->count()
+                    : $user_timetable->userModuleQuestions->where('status', 'correct')->count();
+                $wrongCount = $isFiltered
+                    ? $user_timetable->userModuleQuestions->whereIn('timetable_question_id', $filteredQuestionIds)->where('status', 'wrong')->count()
+                    : $user_timetable->userModuleQuestions->where('status', 'wrong')->count();
+            @endphp
             <div
                 class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300">
                 <!-- Card Header: Student Info -->
@@ -70,16 +91,16 @@
                     <div class="flex flex-wrap items-center gap-3">
                         <div
                             class="px-4 py-2 rounded-xl bg-green-50 border border-green-100 flex flex-col items-center min-w-[80px]">
-                            <span class="text-[10px] uppercase tracking-wider font-bold text-green-600">Benar (JB)</span>
+                            <span class="text-[10px] uppercase tracking-wider font-bold text-green-600">Benar (JB){{ $isFiltered ? ' *' : '' }}</span>
                             <span class="text-lg font-black text-green-700">
-                                {{ $user_timetable->userModuleQuestions->where('status', 'correct')->count() }}
+                                {{ $correctCount }}
                             </span>
                         </div>
                         <div
                             class="px-4 py-2 rounded-xl bg-red-50 border border-red-100 flex flex-col items-center min-w-[80px]">
-                            <span class="text-[10px] uppercase tracking-wider font-bold text-red-600">Salah</span>
+                            <span class="text-[10px] uppercase tracking-wider font-bold text-red-600">Salah{{ $isFiltered ? ' *' : '' }}</span>
                             <span class="text-lg font-black text-red-700">
-                                {{ $user_timetable->userModuleQuestions->where('status', 'wrong')->count() }}
+                                {{ $wrongCount }}
                             </span>
                         </div>
                         <div
