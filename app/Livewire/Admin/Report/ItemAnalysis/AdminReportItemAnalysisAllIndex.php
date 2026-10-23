@@ -23,7 +23,28 @@ class AdminReportItemAnalysisAllIndex extends Component
 
     public $search = '';
 
+    public $sortBy = 'question';
+
+    public $sortDirection = 'asc';
+
     public $selectedQuestionId = null;
+
+    public function setSorting(string $field): void
+    {
+        if ($this->sortBy === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortBy = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
+
+    public function toggleSortDirection(): void
+    {
+        $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        $this->resetPage();
+    }
 
     public function showDetail(string $id): void
     {
@@ -211,8 +232,19 @@ class AdminReportItemAnalysisAllIndex extends Component
                 'questions.difficulty as difficulty',
                 DB::raw('count(user_module_questions.id) as total_attempts'),
                 DB::raw("sum(case when user_module_questions.status = 'correct' then 1 else 0 end) as total_correct"),
-            ])
-            ->orderBy('questions.question', 'asc');
+            ]);
+
+        $dir = strtolower($this->sortDirection) === 'desc' ? 'desc' : 'asc';
+
+        if ($this->sortBy === 'difficulty') {
+            $query->orderBy('questions.difficulty', $dir);
+        } elseif ($this->sortBy === 'total_attempts') {
+            $query->orderBy('total_attempts', $dir);
+        } elseif ($this->sortBy === 'total_correct') {
+            $query->orderBy('total_correct', $dir);
+        } else {
+            $query->orderBy('questions.question', $dir);
+        }
 
         return $query;
     }

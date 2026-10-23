@@ -24,7 +24,28 @@ class AdminReportTimetableDetail extends Component
 
     public $questionSearch = '';
 
+    public $sortBy = 'name';
+
+    public $sortDirection = 'asc';
+
     public $timetable_module;
+
+    public function setSorting(string $field): void
+    {
+        if ($this->sortBy === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortBy = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
+
+    public function toggleSortDirection(): void
+    {
+        $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        $this->resetPage();
+    }
 
     public function updatedQuestionSearch()
     {
@@ -64,7 +85,9 @@ class AdminReportTimetableDetail extends Component
 
         $timetableId = $this->timetable_module?->timetable_id;
 
-        $user_timetables = UserTimetable::withoutGlobalScopes()
+        $dir = strtolower($this->sortDirection) === 'desc' ? 'desc' : 'asc';
+
+        $query = UserTimetable::withoutGlobalScopes()
             ->where('timetable_id', $timetableId)
             ->search($this->search)
             ->with([
@@ -72,8 +95,23 @@ class AdminReportTimetableDetail extends Component
                 'userModuleQuestions' => function ($q) use ($questionSelects) {
                     $q->select($questionSelects);
                 },
-            ])
-            ->paginate($this->perPage);
+            ]);
+
+        if ($this->sortBy === 'name') {
+            $query->join('users', 'user_timetables.user_id', '=', 'users.id')
+                ->select('user_timetables.*')
+                ->orderByRaw('LOWER(TRIM(users.name)) '.$dir);
+        } elseif ($this->sortBy === 'nim') {
+            $query->join('users', 'user_timetables.user_id', '=', 'users.id')
+                ->select('user_timetables.*')
+                ->orderByRaw('LOWER(TRIM(COALESCE(users.nim, users.username, \'\'))) '.$dir);
+        } elseif ($this->sortBy === 'mark') {
+            $query->orderBy('user_timetables.mark', $dir);
+        } else {
+            $query->orderBy('user_timetables.created_at', $dir);
+        }
+
+        $user_timetables = $query->paginate($this->perPage);
 
         return view('livewire.admin.report.timetable.admin-report-timetable-detail', [
             'user_timetables' => $user_timetables,

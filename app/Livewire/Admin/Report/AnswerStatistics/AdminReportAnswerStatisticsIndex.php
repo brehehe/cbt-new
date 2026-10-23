@@ -17,6 +17,10 @@ class AdminReportAnswerStatisticsIndex extends Component
 
     public $search = '';
 
+    public $sortBy = 'order';
+
+    public $sortDirection = 'asc';
+
     protected $answerStats = [];
 
     protected $timetable = null;
@@ -62,6 +66,33 @@ class AdminReportAnswerStatisticsIndex extends Component
         $this->loadStatistics();
     }
 
+    public function updatedSortBy()
+    {
+        $this->loadStatistics();
+    }
+
+    public function updatedSortDirection()
+    {
+        $this->loadStatistics();
+    }
+
+    public function setSorting(string $field): void
+    {
+        if ($this->sortBy === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortBy = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->loadStatistics();
+    }
+
+    public function toggleSortDirection(): void
+    {
+        $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        $this->loadStatistics();
+    }
+
     public function resetQuestionFilters(): void
     {
         $this->filterTopicId = '';
@@ -70,6 +101,8 @@ class AdminReportAnswerStatisticsIndex extends Component
         $this->filterQuestionTypeId = '';
         $this->filterCategoryQuestionId = '';
         $this->search = '';
+        $this->sortBy = 'order';
+        $this->sortDirection = 'asc';
         $this->loadStatistics();
     }
 
@@ -90,6 +123,8 @@ class AdminReportAnswerStatisticsIndex extends Component
             'filterQuestionTypeId' => $this->filterQuestionTypeId,
             'filterCategoryQuestionId' => $this->filterCategoryQuestionId,
             'search' => $this->search,
+            'sortBy' => $this->sortBy,
+            'sortDirection' => $this->sortDirection,
         ]);
         $this->timetable = $report->timetable;
         $this->answerStats = $report->itemAnalysisData;

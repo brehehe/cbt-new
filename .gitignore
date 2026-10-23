@@ -39,3 +39,5 @@ _ide_helper_models.php
 **/caddy
 frankenphp
 frankenphp-worker.php
+/storage/ssl/*
+!/storage/ssl/.gitignore

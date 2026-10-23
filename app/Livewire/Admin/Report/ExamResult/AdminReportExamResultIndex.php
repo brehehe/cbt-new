@@ -32,6 +32,27 @@ class AdminReportExamResultIndex extends Component
 
     public $timetable_id = '';
 
+    public $sortBy = 'name';
+
+    public $sortDirection = 'asc';
+
+    public function setSorting(string $field): void
+    {
+        if ($this->sortBy === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortBy = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
+
+    public function toggleSortDirection(): void
+    {
+        $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        $this->resetPage();
+    }
+
     public function getGradeDetail($mark)
     {
         return RatingScale::getGrade($mark);
@@ -61,16 +82,34 @@ class AdminReportExamResultIndex extends Component
                         ->when($this->filterQuestionTypeId, fn ($sub) => $sub->where('question_type_id', $this->filterQuestionTypeId))
                         ->when($this->filterCategoryQuestionId, fn ($sub) => $sub->where('category_question_id', $this->filterCategoryQuestionId));
                 });
-            })
-            ->orderBy('created_at', 'desc');
+            });
+
+        $dir = strtolower($this->sortDirection) === 'desc' ? 'desc' : 'asc';
+
+        if ($this->sortBy === 'name') {
+            $examResults->join('users', 'user_timetables.user_id', '=', 'users.id')
+                ->select('user_timetables.*')
+                ->orderByRaw('LOWER(TRIM(users.name)) '.$dir);
+        } elseif ($this->sortBy === 'nim') {
+            $examResults->join('users', 'user_timetables.user_id', '=', 'users.id')
+                ->select('user_timetables.*')
+                ->orderByRaw('LOWER(TRIM(COALESCE(users.nim, users.username, \'\'))) '.$dir);
+        } elseif ($this->sortBy === 'timetable') {
+            $examResults->join('timetables', 'user_timetables.timetable_id', '=', 'timetables.id')
+                ->select('user_timetables.*')
+                ->orderByRaw('LOWER(TRIM(timetables.name)) '.$dir);
+        } elseif ($this->sortBy === 'mark') {
+            $examResults->orderBy('user_timetables.mark', $dir);
+        } else {
+            $examResults->orderBy('user_timetables.created_at', $dir);
+        }
 
         $companyId = Auth::user()?->company_id;
 
         $users = User::query()
             ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
             ->whereHas('userTimetables')
-            ->orderBy('name')
-            ->limit(300)
+            ->orderByRaw('LOWER(TRIM(name)) ASC')
             ->get(['id', 'name', 'nim', 'username', 'email']);
 
         if ($this->user_id && ! $users->contains('id', $this->user_id)) {

@@ -139,6 +139,34 @@ class ItemAnalysisService
         foreach ($this->timetableQuestions as $question) {
             $this->itemAnalysisData[$question->id] = $this->analyzeItem($question, $byQuestion->get($question->id, collect()), $scores);
         }
+
+        $sortBy = $this->filters['sortBy'] ?? 'order';
+        $sortDir = strtolower($this->filters['sortDirection'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
+
+        uasort($this->itemAnalysisData, function ($a, $b) use ($sortBy, $sortDir) {
+            if ($sortBy === 'difficulty') {
+                $valA = $a['difficulty_index'] ?? 0;
+                $valB = $b['difficulty_index'] ?? 0;
+            } elseif ($sortBy === 'discrimination') {
+                $valA = $a['discrimination_index'] ?? 0;
+                $valB = $b['discrimination_index'] ?? 0;
+            } elseif ($sortBy === 'participants') {
+                $valA = $a['total_participants'] ?? 0;
+                $valB = $b['total_participants'] ?? 0;
+            } elseif ($sortBy === 'correct') {
+                $valA = $a['correct_answers'] ?? 0;
+                $valB = $b['correct_answers'] ?? 0;
+            } else {
+                $valA = (int) ($a['question']->order ?? 0);
+                $valB = (int) ($b['question']->order ?? 0);
+            }
+
+            if ($valA == $valB) {
+                return ((int) ($a['question']->order ?? 0)) <=> ((int) ($b['question']->order ?? 0));
+            }
+
+            return $sortDir === 'asc' ? ($valA <=> $valB) : ($valB <=> $valA);
+        });
     }
 
     protected function scoresFromResponses($responses): array

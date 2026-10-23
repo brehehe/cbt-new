@@ -15,6 +15,37 @@ class AdminReportItemAnalysisDetailIndex extends Component
 
     public $search = '';
 
+    public $sortBy = 'order';
+
+    public $sortDirection = 'asc';
+
+    public function setSorting(string $field): void
+    {
+        if ($this->sortBy === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortBy = $field;
+            $this->sortDirection = 'asc';
+        }
+    }
+
+    public function toggleSortDirection(): void
+    {
+        $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+    }
+
+    public function resetQuestionFilters(): void
+    {
+        $this->filterTopicId = '';
+        $this->filterMaterialCategoryId = '';
+        $this->filterMaterialId = '';
+        $this->filterQuestionTypeId = '';
+        $this->filterCategoryQuestionId = '';
+        $this->search = '';
+        $this->sortBy = 'order';
+        $this->sortDirection = 'asc';
+    }
+
     public function mount($id)
     {
         $this->timetableId = $id;
@@ -30,6 +61,8 @@ class AdminReportItemAnalysisDetailIndex extends Component
             'filterQuestionTypeId' => $this->filterQuestionTypeId,
             'filterCategoryQuestionId' => $this->filterCategoryQuestionId,
             'search' => $this->search,
+            'sortBy' => $this->sortBy,
+            'sortDirection' => $this->sortDirection,
         ]);
 
         return $report;

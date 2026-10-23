@@ -21,6 +21,27 @@ class AdminReportStudentExamResultIndex extends Component
 
     public $perPage = 10;
 
+    public $sortBy = 'created_at';
+
+    public $sortDirection = 'desc';
+
+    public function setSorting(string $field): void
+    {
+        if ($this->sortBy === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortBy = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
+
+    public function toggleSortDirection(): void
+    {
+        $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        $this->resetPage();
+    }
+
     // Cache users list for dropdown
     public function updatingSearch()
     {
@@ -57,7 +78,19 @@ class AdminReportStudentExamResultIndex extends Component
             });
         }
 
-        return $query->orderBy('created_at', 'desc');
+        $dir = strtolower($this->sortDirection) === 'asc' ? 'asc' : 'desc';
+
+        if ($this->sortBy === 'timetable') {
+            $query->join('timetables', 'user_timetables.timetable_id', '=', 'timetables.id')
+                ->select('user_timetables.*')
+                ->orderByRaw('LOWER(TRIM(timetables.name)) '.$dir);
+        } elseif ($this->sortBy === 'mark') {
+            $query->orderBy('user_timetables.mark', $dir);
+        } else {
+            $query->orderBy('user_timetables.created_at', $dir);
+        }
+
+        return $query;
     }
 
     public function render()
@@ -70,12 +103,11 @@ class AdminReportStudentExamResultIndex extends Component
 
         $companyId = Auth::user()?->company_id;
 
-        // Lightweight user selection: prioritize users who have taken exams
+        // Lightweight user selection: prioritize users who have taken exams, sorted A-Z strictly
         $users = User::query()
             ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
             ->whereHas('userTimetables')
-            ->orderBy('name', 'asc')
-            ->limit(300)
+            ->orderByRaw('LOWER(TRIM(name)) ASC')
             ->get(['id', 'name', 'nim', 'username']);
 
         if ($this->user_id && ! $users->contains('id', $this->user_id)) {

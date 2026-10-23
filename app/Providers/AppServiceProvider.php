@@ -28,7 +28,12 @@ class AppServiceProvider extends ServiceProvider
         // Prevent lazy loading in non-production environments to detect N+1 queries
         // \Illuminate\Database\Eloquent\Model::preventLazyLoading(! $this->app->isProduction());
 
-        if (env('APP_ENV') !== 'local') {
+        $isHttps = request()->server('HTTPS') === 'on'
+            || request()->server('HTTPS') === 1
+            || request()->header('X-Forwarded-Proto') === 'https'
+            || str_starts_with((string) config('app.url'), 'https://');
+
+        if ($isHttps) {
             URL::forceScheme('https');
             $this->app['request']->server->set('HTTPS', true);
         }

@@ -107,23 +107,46 @@
 
     <!-- Pagination & Search Controls -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
-        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center space-x-3 w-full sm:w-auto">
-                <span class="text-sm text-gray-500 font-medium whitespace-nowrap">Tampilkan</span>
-                <div class="relative">
+        <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
+            <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm text-gray-500 font-medium whitespace-nowrap">Tampilkan</span>
                     <select wire:model.live='perPage' 
-                            class="appearance-none block w-24 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg transition-shadow duration-200 ease-in-out cursor-pointer hover:border-gray-400">
+                            class="appearance-none block w-20 pl-3 pr-8 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg transition-shadow duration-200 ease-in-out cursor-pointer hover:border-gray-400">
                         <option value="5">5</option>
                         <option value="10">10</option>
                         <option value="25">25</option>
                         <option value="50">50</option>
                         <option value="100">100</option>
                     </select>
+                    <span class="text-sm text-gray-500 font-medium whitespace-nowrap">data</span>
                 </div>
-                <span class="text-sm text-gray-500 font-medium whitespace-nowrap">data per halaman</span>
+
+                <!-- Sorting Controls -->
+                <div class="flex items-center bg-gray-50 rounded-lg border border-gray-200 px-3 py-1.5 gap-2">
+                    <span class="text-xs text-gray-500 font-semibold">Urutkan:</span>
+                    <select wire:model.live="sortBy" class="form-select text-xs border-none focus:ring-0 p-0 text-gray-700 font-bold bg-transparent cursor-pointer">
+                        <option value="question">Teks Soal</option>
+                        <option value="difficulty">Difficulty</option>
+                        <option value="total_attempts">Jumlah Peserta</option>
+                        <option value="total_correct">Jumlah Benar</option>
+                    </select>
+                    <button type="button" 
+                            wire:click="toggleSortDirection" 
+                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-white border border-gray-200 hover:bg-gray-100 text-xs font-bold text-gray-700 transition cursor-pointer shadow-sm"
+                            title="{{ $sortDirection === 'asc' ? 'Urutkan dari Awal ke Akhir (A-Z / Nilai Terkecil). Klik untuk beralih ke DESC.' : 'Urutkan dari Akhir ke Awal (Z-A / Nilai Terbesar). Klik untuk beralih ke ASC.' }}">
+                        @if ($sortDirection === 'asc')
+                            <i class="fas fa-arrow-down-a-z text-indigo-600"></i>
+                            <span>ASC (A-Z)</span>
+                        @else
+                            <i class="fas fa-arrow-down-z-a text-indigo-600"></i>
+                            <span>DESC (Z-A)</span>
+                        @endif
+                    </button>
+                </div>
             </div>
 
-            <div class="relative w-full sm:w-96">
+            <div class="relative w-full lg:w-96">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <i class="fas fa-search text-gray-400"></i>
                 </div>
@@ -150,17 +173,45 @@
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-16">
                             No
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Soal
+                        <th scope="col" wire:click="setSorting('question')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition">
+                            <div class="flex items-center gap-1.5">
+                                <span>Soal</span>
+                                @if ($sortBy === 'question')
+                                    <i class="fas fa-sort-{{ $sortDirection === 'asc' ? 'up text-indigo-600' : 'down text-indigo-600' }} text-xs"></i>
+                                @else
+                                    <i class="fas fa-sort text-gray-300 text-xs"></i>
+                                @endif
+                            </div>
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Difficulty
+                        <th scope="col" wire:click="setSorting('difficulty')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition">
+                            <div class="flex items-center gap-1.5">
+                                <span>Difficulty</span>
+                                @if ($sortBy === 'difficulty')
+                                    <i class="fas fa-sort-{{ $sortDirection === 'asc' ? 'up text-indigo-600' : 'down text-indigo-600' }} text-xs"></i>
+                                @else
+                                    <i class="fas fa-sort text-gray-300 text-xs"></i>
+                                @endif
+                            </div>
                         </th>
-                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
-                            Peserta
+                        <th scope="col" wire:click="setSorting('total_attempts')" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24 cursor-pointer hover:bg-gray-100 transition">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <span>Peserta</span>
+                                @if ($sortBy === 'total_attempts')
+                                    <i class="fas fa-sort-{{ $sortDirection === 'asc' ? 'up text-indigo-600' : 'down text-indigo-600' }} text-xs"></i>
+                                @else
+                                    <i class="fas fa-sort text-gray-300 text-xs"></i>
+                                @endif
+                            </div>
                         </th>
-                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
-                            Benar
+                        <th scope="col" wire:click="setSorting('total_correct')" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24 cursor-pointer hover:bg-gray-100 transition">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <span>Benar</span>
+                                @if ($sortBy === 'total_correct')
+                                    <i class="fas fa-sort-{{ $sortDirection === 'asc' ? 'up text-indigo-600' : 'down text-indigo-600' }} text-xs"></i>
+                                @else
+                                    <i class="fas fa-sort text-gray-300 text-xs"></i>
+                                @endif
+                            </div>
                         </th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
                             Index P

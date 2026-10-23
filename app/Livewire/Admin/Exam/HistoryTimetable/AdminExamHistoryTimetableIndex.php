@@ -30,6 +30,27 @@ class AdminExamHistoryTimetableIndex extends Component
 
     public $timetables = [];
 
+    public $sortBy = 'created_at';
+
+    public $sortDirection = 'desc';
+
+    public function setSorting(string $field): void
+    {
+        if ($this->sortBy === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortBy = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
+
+    public function toggleSortDirection(): void
+    {
+        $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        $this->resetPage();
+    }
+
     public function mount()
     {
         $this->timetables = Timetable::select('id', 'name')->get()->pluck('name', 'id')->toArray();
@@ -42,6 +63,8 @@ class AdminExamHistoryTimetableIndex extends Component
 
     public function render()
     {
+        $dir = strtolower($this->sortDirection) === 'asc' ? 'asc' : 'desc';
+
         $userTimetables = UserTimetable::with(['timetable.module', 'user'])
             ->whereHas('timetable') // <-- hanya tampil jika timetable masih ada
             ->where(function ($query) {
@@ -54,8 +77,17 @@ class AdminExamHistoryTimetableIndex extends Component
                     });
             })
             ->where('user_id', Auth::id())
-            ->where('status', 'done')
-            ->orderBy('created_at', 'desc');
+            ->where('status', 'done');
+
+        if ($this->sortBy === 'timetable') {
+            $userTimetables->join('timetables', 'user_timetables.timetable_id', '=', 'timetables.id')
+                ->select('user_timetables.*')
+                ->orderByRaw('LOWER(TRIM(timetables.name)) '.$dir);
+        } elseif ($this->sortBy === 'mark') {
+            $userTimetables->orderBy('user_timetables.mark', $dir);
+        } else {
+            $userTimetables->orderBy('user_timetables.created_at', $dir);
+        }
 
         $viewName = config('app.new_template', false)
             ? 'livewire.admin.exam.history-timetable.admin-exam-history-timetable-index-new'

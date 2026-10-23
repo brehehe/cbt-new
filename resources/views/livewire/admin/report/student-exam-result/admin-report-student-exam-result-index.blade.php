@@ -8,7 +8,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <div>
                 <label for="user_id" class="block text-sm font-medium text-gray-700">Pilih {{ student_label() }}</label>
-                <div wire:key="select-user-{{ rand() }}">
+                <div wire:key="select-user-filter">
                     <select
                         class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                         wire:model.live="user_id" id="user_id">
@@ -52,10 +52,32 @@
                         <div class="text-sm text-gray-500">{{ $selectedUser->nim ?? $selectedUser->username }}</div>
                     </div>
                 </div>
-                <div class="w-full sm:w-80">
-                    <input wire:model.live.debounce.300ms="search" type="text"
-                        class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                        placeholder="Cari ujian, modul, atau teks soal...">
+                <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                    <div class="flex items-center bg-white rounded-lg shadow-sm border border-gray-200 px-3 py-1.5 gap-2">
+                        <span class="text-xs text-gray-500 font-semibold">Urutkan:</span>
+                        <select wire:model.live="sortBy" class="form-select text-xs border-none focus:ring-0 p-0 text-gray-700 font-bold bg-transparent cursor-pointer">
+                            <option value="created_at">Waktu Pelaksanaan</option>
+                            <option value="timetable">Nama Ujian / Modul</option>
+                            <option value="mark">Nilai</option>
+                        </select>
+                        <button type="button" 
+                                wire:click="toggleSortDirection" 
+                                class="inline-flex items-center gap-1 px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 text-xs font-bold text-gray-700 transition cursor-pointer"
+                                title="{{ $sortDirection === 'asc' ? 'Urutkan dari Awal ke Akhir (A-Z / Terlama). Klik untuk beralih ke DESC.' : 'Urutkan dari Akhir ke Awal (Z-A / Terbaru). Klik untuk beralih ke ASC.' }}">
+                            @if ($sortDirection === 'asc')
+                                <i class="fas fa-arrow-down-a-z text-indigo-600"></i>
+                                <span>ASC</span>
+                            @else
+                                <i class="fas fa-arrow-down-z-a text-indigo-600"></i>
+                                <span>DESC</span>
+                            @endif
+                        </button>
+                    </div>
+                    <div class="w-full sm:w-64">
+                        <input wire:model.live.debounce.300ms="search" type="text"
+                            class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                            placeholder="Cari ujian, modul, atau teks soal...">
+                    </div>
                 </div>
             </div>
 
@@ -72,17 +94,38 @@
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     No
                                 </th>
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Nama Ujian / Modul
+                                <th scope="col" wire:click="setSorting('timetable')"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition">
+                                    <div class="flex items-center gap-1.5">
+                                        <span>Nama Ujian / Modul</span>
+                                        @if ($sortBy === 'timetable')
+                                            <i class="fas fa-sort-{{ $sortDirection === 'asc' ? 'up text-indigo-600' : 'down text-indigo-600' }} text-xs"></i>
+                                        @else
+                                            <i class="fas fa-sort text-gray-300 text-xs"></i>
+                                        @endif
+                                    </div>
                                 </th>
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Waktu Pelaksanaan
+                                <th scope="col" wire:click="setSorting('created_at')"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition">
+                                    <div class="flex items-center gap-1.5">
+                                        <span>Waktu Pelaksanaan</span>
+                                        @if ($sortBy === 'created_at')
+                                            <i class="fas fa-sort-{{ $sortDirection === 'asc' ? 'up text-indigo-600' : 'down text-indigo-600' }} text-xs"></i>
+                                        @else
+                                            <i class="fas fa-sort text-gray-300 text-xs"></i>
+                                        @endif
+                                    </div>
                                 </th>
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Nilai
+                                <th scope="col" wire:click="setSorting('mark')"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition">
+                                    <div class="flex items-center gap-1.5">
+                                        <span>Nilai</span>
+                                        @if ($sortBy === 'mark')
+                                            <i class="fas fa-sort-{{ $sortDirection === 'asc' ? 'up text-indigo-600' : 'down text-indigo-600' }} text-xs"></i>
+                                        @else
+                                            <i class="fas fa-sort text-gray-300 text-xs"></i>
+                                        @endif
+                                    </div>
                                 </th>
                                 <th scope="col"
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
