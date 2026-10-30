@@ -102,6 +102,30 @@ class ExamApiController extends Controller
                 ->values();
         }
 
+        $questions->each(function ($q) {
+            if ($q->timetableQuestion) {
+                $tqImages = $q->timetableQuestion->images;
+                if (is_string($tqImages)) {
+                    $tqImages = json_decode($tqImages, true) ?? [];
+                }
+                if (is_array($tqImages)) {
+                    $q->timetableQuestion->images = array_values(array_map(fn ($img) => media_url($img), $tqImages));
+                }
+
+                if ($q->timetableQuestion->answers) {
+                    $q->timetableQuestion->answers->each(function ($ans) {
+                        $ansImages = $ans->images;
+                        if (is_string($ansImages)) {
+                            $ansImages = json_decode($ansImages, true) ?? [];
+                        }
+                        if (is_array($ansImages)) {
+                            $ans->images = array_values(array_map(fn ($img) => media_url($img), $ansImages));
+                        }
+                    });
+                }
+            }
+        });
+
         $navigation = $questions->map(function ($q) use ($hasEssayAnswerColumn) {
             $essayAnswer = $hasEssayAnswerColumn ? ($q->essay_answer ?? null) : null;
             $isAnswered = ! is_null($q->timetable_answer_id) || (! is_null($essayAnswer) && trim($essayAnswer) !== '');

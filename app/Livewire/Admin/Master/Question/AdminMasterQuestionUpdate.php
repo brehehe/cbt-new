@@ -75,6 +75,8 @@ class AdminMasterQuestionUpdate extends Component
 
     public $new_images = [];
 
+    public $new_image_link = '';
+
     public $answer_id;
 
     public $answer_context;
@@ -92,6 +94,8 @@ class AdminMasterQuestionUpdate extends Component
     public $old_answer_images = [];
 
     public $answer_new_images = [];
+
+    public $answer_new_image_link = '';
 
     public $studys = [];
 
@@ -371,7 +375,7 @@ class AdminMasterQuestionUpdate extends Component
     public function openModal()
     {
         $this->isEditingAnswer = false;
-        $this->reset(['answer_id', 'answer_context', 'answer_description', 'answer_latex', 'answer_correct', 'answer_images', 'old_answer_images', 'answer_alphabet']);
+        $this->reset(['answer_id', 'answer_context', 'answer_description', 'answer_latex', 'answer_correct', 'answer_images', 'old_answer_images', 'answer_alphabet', 'new_image_link', 'answer_new_image_link']);
         $this->answer_correct = false;
         $this->dispatch('reset-answer-latex-preview');
         $this->dispatch('sync-answer-latex-preview');
@@ -386,6 +390,7 @@ class AdminMasterQuestionUpdate extends Component
         // Reset gambar ke state database agar perubahan filepond tidak disimpan jika dibatalkan
         $this->images = [];
         $this->old_images = [];
+        $this->new_image_link = '';
         foreach (json_decode($this->get_question?->images, true) ?? [] as $image) {
             $cleanPath = Str::after($image, '/storage/');
             $cleanPath = ltrim($cleanPath, '/');
@@ -393,7 +398,7 @@ class AdminMasterQuestionUpdate extends Component
             $this->images[] = $cleanPath;
         }
 
-        $this->reset(['answer_id', 'answer_context', 'answer_description', 'answer_latex', 'answer_correct', 'answer_images', 'old_answer_images', 'answer_alphabet']);
+        $this->reset(['answer_id', 'answer_context', 'answer_description', 'answer_latex', 'answer_correct', 'answer_images', 'old_answer_images', 'answer_alphabet', 'new_image_link', 'answer_new_image_link']);
         $this->dispatch('close-modal', ['id' => 'modal-images']);
         $this->dispatch('close-modal', ['id' => 'modal-answer-images']);
 
@@ -405,6 +410,7 @@ class AdminMasterQuestionUpdate extends Component
         // Reset dan reload gambar dari database agar filepond menampilkan state terbaru
         $this->images = [];
         $this->old_images = [];
+        $this->new_image_link = '';
 
         foreach (json_decode($this->get_question?->images, true) ?? [] as $image) {
             $cleanPath = Str::after($image, '/storage/');
@@ -491,6 +497,18 @@ class AdminMasterQuestionUpdate extends Component
         $this->answer_latex = $result?->latex;
         $this->answer_correct = $result?->is_correct;
         $this->isEditingAnswer = true;
+
+        $this->answer_images = [];
+        $this->old_answer_images = [];
+        $this->answer_new_image_link = '';
+
+        foreach (json_decode($result?->images, true) ?? [] as $image) {
+            $cleanPath = Str::after($image, '/storage/');
+            $cleanPath = ltrim($cleanPath, '/');
+            $this->answer_images[] = $cleanPath;
+            $this->old_answer_images[] = $cleanPath;
+        }
+
         $this->dispatch('open-modal', ['id' => 'modal']);
         $this->dispatch('set-answer-context', ['context' => $result?->context ?? '']);
 
@@ -529,6 +547,7 @@ class AdminMasterQuestionUpdate extends Component
         // Reset dan reload gambar dari database agar filepond menampilkan state terbaru
         $this->answer_images = [];
         $this->old_answer_images = [];
+        $this->answer_new_image_link = '';
 
         foreach (json_decode($result?->images, true) ?? [] as $image) {
             $cleanPath = Str::after($image, '/storage/');
@@ -561,6 +580,15 @@ class AdminMasterQuestionUpdate extends Component
         }
     }
 
+    public function addImageLink()
+    {
+        $link = trim((string) $this->new_image_link);
+        if (! empty($link)) {
+            $this->images[] = $link;
+            $this->new_image_link = '';
+        }
+    }
+
     public function updatedAnswerNewImages($value)
     {
         $folder = '/public/answer/'.Carbon::now()->isoFormat('Y').'/'.Carbon::now()->isoFormat('MM');
@@ -570,6 +598,15 @@ class AdminMasterQuestionUpdate extends Component
             $this->answer_images[] = $upload[0];
         }
         $this->answer_new_images = [];
+    }
+
+    public function addAnswerImageLink()
+    {
+        $link = trim((string) $this->answer_new_image_link);
+        if (! empty($link)) {
+            $this->answer_images[] = $link;
+            $this->answer_new_image_link = '';
+        }
     }
 
     public function removeAnswerImage($index)

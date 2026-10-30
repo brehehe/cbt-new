@@ -179,10 +179,33 @@
                             </div>
                         </div>
                         <div class="md:col-span-2">
-                            <label for="question" class="block text-sm font-medium text-gray-700">Gambar<span
-                                    class="text-red-600">*</span></label>
-                            <button class="bg-primary text-white px-2 py-1 rounded"
-                                wire:click='modalImages()'>Gambar</button>
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="block text-sm font-medium text-gray-700">Gambar / Lampiran Soal</label>
+                                <button type="button" class="btn btn-sm btn-primary inline-flex items-center gap-1 text-xs"
+                                    wire:click='modalImages()'>
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    <span>Kelola / Tambah Gambar & Link</span>
+                                </button>
+                            </div>
+
+                            <!-- Live Preview Gambar Soal -->
+                            @if (!empty($images) && count($images) > 0)
+                                <div class="p-3 bg-gray-50 rounded-xl border border-gray-200">
+                                    <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Pratinjau Gambar Soal Terpasang:</span>
+                                    <div class="flex flex-wrap gap-2.5">
+                                        @foreach ($images as $qImg)
+                                            <div class="relative group border border-gray-200 rounded-lg overflow-hidden bg-white shadow-2xs h-24 w-32 flex items-center justify-center p-1">
+                                                <img src="{{ media_url($qImg) }}" class="max-h-full max-w-full object-contain rounded" alt="Gambar Soal">
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @else
+                                <div class="p-3 bg-gray-50/60 rounded-xl border border-dashed border-gray-200 text-xs text-gray-400 italic flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    Belum ada gambar soal yang diunggah atau ditautkan.
+                                </div>
+                            @endif
                         </div>
                         <div class="md:col-span-2" wire:ignore>
                             <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi
@@ -267,8 +290,24 @@
                                 <tr>
                                     <td class="center">{{ $result?->alphabet ?? chr(64 + $loop->iteration) }} </td>
                                     <td>
-                                        <button class="bg-primary text-white px-2 py-1 rounded"
-                                            wire:click="modalAnswerImage('{{ $result?->id }}', '{{ $result?->alphabet ?? chr(64 + $loop->iteration) }}')">Gambar</button>
+                                        @php
+                                            $ansImgs = is_array($result->images) ? $result->images : json_decode($result->images ?? '[]', true);
+                                        @endphp
+                                        <div class="flex flex-col items-center gap-1.5 py-1">
+                                            @if (!empty($ansImgs) && count($ansImgs) > 0)
+                                                <div class="flex flex-wrap gap-1 justify-center">
+                                                    @foreach ($ansImgs as $aImg)
+                                                        <div class="h-10 w-14 rounded border border-gray-200 bg-white shadow-2xs overflow-hidden flex items-center justify-center p-0.5">
+                                                            <img src="{{ media_url($aImg) }}" class="max-h-full max-w-full object-contain" alt="Gambar {{ $result->alphabet }}">
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                            <button type="button" class="btn btn-xs {{ !empty($ansImgs) ? 'btn-secondary text-gray-700' : 'btn-primary text-white' }} px-2 py-1 rounded text-[11px] whitespace-nowrap"
+                                                wire:click="modalAnswerImage('{{ $result?->id }}', '{{ $result?->alphabet ?? chr(64 + $loop->iteration) }}')">
+                                                {{ !empty($ansImgs) ? 'Ubah Gambar' : '+ Gambar/Link' }}
+                                            </button>
+                                        </div>
                                     </td>
                                     <td>{{ $result?->context }}</td>
                                     <td>

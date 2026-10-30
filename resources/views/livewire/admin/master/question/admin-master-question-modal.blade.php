@@ -131,6 +131,23 @@
                     </div>
                     <div class="mb-4">
                         <label for="images" class="block text-sm font-medium text-gray-700 mb-2">Gambar Soal</label>
+
+                        <!-- Input Link Gambar / Google Drive -->
+                        <div class="mb-3 p-3 bg-blue-50/60 rounded-xl border border-blue-200">
+                            <label class="block text-xs font-semibold text-blue-900 mb-1 flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                                <span>Input Link Gambar Soal (Google Drive / URL)</span>
+                            </label>
+                            <div class="flex gap-2">
+                                <input type="text" wire:model="new_image_link" wire:keydown.enter.prevent="addImageLink"
+                                    placeholder="Tempel link Google Drive atau URL gambar di sini..."
+                                    class="form-control text-xs flex-1 rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 bg-white">
+                                <button type="button" wire:click="addImageLink" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium shadow-xs transition cursor-pointer shrink-0">
+                                    + Tambah Link
+                                </button>
+                            </div>
+                            <p class="text-[11px] text-gray-500 mt-1">Mendukung link Google Drive (pastikan akses "Siapa saja dengan link") atau URL web.</p>
+                        </div>
                         
                         <!-- Grid Preview Gambar -->
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
@@ -259,31 +276,56 @@
                                         @enderror
 
                                         <!-- Gambar Opsi Jawaban (Opsional) -->
-                                        <div class="mt-2 flex flex-wrap items-center gap-3">
+                                        <div class="mt-2">
                                             @if (!empty($ans['images']) && count($ans['images']) > 0)
                                                 @foreach ($ans['images'] as $imgIdx => $img)
                                                     @php
                                                         $isString = is_string($img);
                                                         $imgUrl = $isString ? media_url($img) : (method_exists($img, 'temporaryUrl') ? $img->temporaryUrl() : '');
                                                     @endphp
-                                                    <div class="relative group border rounded-lg overflow-hidden flex items-center justify-center bg-gray-50 h-16 w-24">
-                                                        <img src="{{ $imgUrl }}" class="max-h-full max-w-full object-contain" alt="Gambar Opsi">
-                                                        <button type="button" wire:click="removeAnswerOptionImage({{ $index }})"
-                                                            class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-80 group-hover:opacity-100 transition shadow cursor-pointer"
-                                                            title="Hapus gambar">
-                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                                        </button>
+                                                    <div class="flex items-center gap-2">
+                                                        <div class="relative group border rounded-lg overflow-hidden flex items-center justify-center bg-gray-50 h-16 w-24 shadow-2xs">
+                                                            <img src="{{ $imgUrl }}" class="max-h-full max-w-full object-contain" alt="Gambar Opsi">
+                                                            <button type="button" wire:click="removeAnswerOptionImage({{ $index }})"
+                                                                class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-80 group-hover:opacity-100 transition shadow cursor-pointer"
+                                                                title="Hapus gambar">
+                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                            </button>
+                                                        </div>
+                                                        <span class="text-[11px] text-emerald-600 font-medium flex items-center gap-1">
+                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                            Gambar opsi terpasang
+                                                        </span>
                                                     </div>
                                                 @endforeach
                                             @else
-                                                <label class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 rounded-lg text-[11px] font-medium text-gray-600 hover:text-blue-600 transition cursor-pointer shadow-2xs">
-                                                    <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                                    <span>+ Gambar Opsi (Opsional)</span>
-                                                    <input type="file" wire:model="answer_option_images.{{ $index }}" accept=".jpg,.jpeg,.png,.webp" class="hidden">
-                                                </label>
+                                                <div class="flex flex-wrap items-center gap-2">
+                                                    <label class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 rounded-lg text-[11px] font-medium text-gray-600 hover:text-blue-600 transition cursor-pointer shadow-2xs">
+                                                        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                                        <span>Upload Berkas</span>
+                                                        <input type="file" wire:model="answer_option_images.{{ $index }}" accept=".jpg,.jpeg,.png,.webp" class="hidden">
+                                                    </label>
+
+                                                    <button type="button" wire:click="toggleAnswerLinkInput({{ $index }})"
+                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 rounded-lg text-[11px] font-medium text-gray-600 hover:text-blue-600 transition cursor-pointer shadow-2xs">
+                                                        <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                                                        <span>Input Link</span>
+                                                    </button>
+                                                </div>
+
+                                                @if ($show_answer_link_input[$index] ?? false)
+                                                    <div class="mt-2 p-2 bg-blue-50/60 rounded-lg border border-blue-200 flex items-center gap-1.5">
+                                                        <input type="text" wire:model="answer_option_links.{{ $index }}" wire:keydown.enter.prevent="setAnswerOptionLink({{ $index }})"
+                                                            placeholder="Tempel link Google Drive / URL gambar opsi..."
+                                                            class="form-control text-xs flex-1 rounded border-gray-300 bg-white">
+                                                        <button type="button" wire:click="setAnswerOptionLink({{ $index }})" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium shadow-xs">
+                                                            OK
+                                                        </button>
+                                                    </div>
+                                                @endif
                                             @endif
 
-                                            <div wire:loading wire:target="answer_option_images.{{ $index }}" class="text-xs text-blue-600 font-medium flex items-center gap-1.5">
+                                            <div wire:loading wire:target="answer_option_images.{{ $index }}" class="text-xs text-blue-600 font-medium flex items-center gap-1.5 mt-1">
                                                 <svg class="animate-spin h-3.5 w-3.5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>

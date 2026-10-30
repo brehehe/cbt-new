@@ -92,6 +92,12 @@ class AdminMasterQuestionIndex extends Component
 
     public $new_images = [];
 
+    public $new_image_link = '';
+
+    public $answer_option_links = [];
+
+    public $show_answer_link_input = [];
+
     public $studys = [];
 
     public $study_id;
@@ -460,6 +466,31 @@ class AdminMasterQuestionIndex extends Component
         }
     }
 
+    public function addImageLink()
+    {
+        $link = trim((string) $this->new_image_link);
+        if (! empty($link)) {
+            $this->images[] = $link;
+            $this->old_images = $this->images;
+            $this->new_image_link = '';
+        }
+    }
+
+    public function toggleAnswerLinkInput($index)
+    {
+        $this->show_answer_link_input[$index] = ! ($this->show_answer_link_input[$index] ?? false);
+    }
+
+    public function setAnswerOptionLink($index)
+    {
+        $link = trim((string) ($this->answer_option_links[$index] ?? ''));
+        if (! empty($link)) {
+            $this->answers_data[$index]['images'] = [$link];
+            $this->answer_option_links[$index] = '';
+            $this->show_answer_link_input[$index] = false;
+        }
+    }
+
     public function updated()
     {
         //
@@ -495,7 +526,7 @@ class AdminMasterQuestionIndex extends Component
     public function closeModal()
     {
         $this->resetValidation();
-        $this->reset(['data_id', 'study_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'type', 'question', 'description', 'latex', 'images', 'old_images', 'new_images', 'weight_correct', 'weight_incorrect', 'study_id_import', 'file_import', 'category_question_id', 'import_type']);
+        $this->reset(['data_id', 'study_id', 'topic_id', 'material_category_id', 'material_id', 'question_type_id', 'type', 'question', 'description', 'latex', 'images', 'old_images', 'new_images', 'new_image_link', 'answer_option_links', 'show_answer_link_input', 'weight_correct', 'weight_incorrect', 'study_id_import', 'file_import', 'category_question_id', 'import_type']);
         $this->initDefaultAnswers();
         $this->dispatch('close-modal', ['id' => 'modal-import-question']);
 
@@ -587,21 +618,30 @@ class AdminMasterQuestionIndex extends Component
             if ($this->type === 'single' || $this->type === Question::TYPE_SINGLE) {
                 foreach ($this->answers_data as $index => $ans) {
                     $context = trim($ans['context'] ?? '');
-                    if ($context === '') {
+                    $ansImages = [];
+                    if (! empty($ans['images'])) {
+                        foreach ($ans['images'] as $img) {
+                            $imgStr = (string) $img;
+                            if (filter_var($imgStr, FILTER_VALIDATE_URL)) {
+                                if (Str::contains($imgStr, '/storage/')) {
+                                    $ansImages[] = '/' . ltrim(Str::after($imgStr, '/storage/'), '/');
+                                } else {
+                                    $ansImages[] = \App\Helpers\FormatHelper::downloadExternalImage($imgStr, 'answer');
+                                }
+                            } else {
+                                $cleanPath = Str::after($imgStr, '/storage/');
+                                $ansImages[] = '/' . ltrim($cleanPath, '/');
+                            }
+                        }
+                    }
+
+                    if ($context === '' && empty($ansImages)) {
                         continue;
                     }
 
                     $alphabet = $ans['alphabet'] ?? chr(65 + $index);
                     $order = $index + 1;
                     $isCorrect = ($alphabet === $this->correct_answer_alphabet);
-
-                    $ansImages = [];
-                    if (! empty($ans['images'])) {
-                        foreach ($ans['images'] as $img) {
-                            $cleanPath = Str::after((string) $img, '/storage/');
-                            $ansImages[] = '/' . ltrim($cleanPath, '/');
-                        }
-                    }
 
                     Answer::withoutGlobalScope('user_scope')->create([
                         'question_id' => $question->id,

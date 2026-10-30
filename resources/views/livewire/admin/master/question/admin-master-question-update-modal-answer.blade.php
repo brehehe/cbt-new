@@ -56,6 +56,29 @@
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Gambar Jawaban</label>
+                        @if (!empty($answer_images) && count($answer_images) > 0)
+                            <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg border border-gray-200">
+                                @foreach ($answer_images as $aImg)
+                                    <div class="h-16 w-24 rounded border border-gray-200 bg-white overflow-hidden flex items-center justify-center p-1">
+                                        <img src="{{ media_url($aImg) }}" class="max-h-full max-w-full object-contain" alt="Gambar Jawaban">
+                                    </div>
+                                @endforeach
+                                <button type="button" class="btn btn-xs btn-secondary text-xs"
+                                    wire:click="modalAnswerImage('{{ $answer_id }}', '{{ $answer_alphabet }}')">
+                                    Kelola / Ubah Gambar
+                                </button>
+                            </div>
+                        @else
+                            <button type="button" class="btn btn-xs btn-outline-primary text-xs inline-flex items-center gap-1 border border-blue-400 text-blue-600 px-2.5 py-1.5 rounded-lg hover:bg-blue-50"
+                                wire:click="modalAnswerImage('{{ $answer_id }}', '{{ $answer_alphabet }}')">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                Tambah Gambar / Link
+                            </button>
+                        @endif
+                    </div>
                 </div>
                 <div>
                     <div class="mb-4">

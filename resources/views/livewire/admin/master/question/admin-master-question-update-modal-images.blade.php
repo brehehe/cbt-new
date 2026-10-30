@@ -22,6 +22,23 @@
         <div class="px-6 py-4 text-gray-600 overflow-auto" style="max-height: 85vh">
             <div class="mb-4">
                 <label for="images" class="block text-sm font-medium text-gray-700 mb-2">Pilih & Kelola Gambar</label>
+
+                <!-- Input Link Gambar / Google Drive -->
+                <div class="mb-4 p-3 bg-blue-50/60 rounded-xl border border-blue-200">
+                    <label class="block text-xs font-semibold text-blue-900 mb-1 flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                        <span>Input Link Gambar Soal (Google Drive / URL)</span>
+                    </label>
+                    <div class="flex gap-2">
+                        <input type="text" wire:model="new_image_link" wire:keydown.enter.prevent="addImageLink"
+                            placeholder="Tempel link Google Drive atau URL gambar di sini..."
+                            class="form-control text-xs flex-1 rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 bg-white">
+                        <button type="button" wire:click="addImageLink" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium shadow-xs transition cursor-pointer shrink-0">
+                            + Tambah Link
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-gray-500 mt-1">Mendukung link Google Drive (pastikan akses "Siapa saja yang memiliki link") atau URL web.</p>
+                </div>
                 
                 <!-- Grid Preview Gambar -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
