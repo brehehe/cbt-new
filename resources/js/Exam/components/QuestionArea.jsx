@@ -10,6 +10,12 @@ const ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 const getMediaUrl = (path) => {
     if (!path) return '';
+    if (typeof path === 'string' && (path.includes('drive.google.com') || path.includes('docs.google.com'))) {
+        const fileMatch = path.match(/(?:drive|docs)\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+        if (fileMatch) return `https://lh3.googleusercontent.com/d/${fileMatch[1]}`;
+        const idMatch = path.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+        if (idMatch) return `https://lh3.googleusercontent.com/d/${idMatch[1]}`;
+    }
     if (path.startsWith('http://') || path.startsWith('https://')) return path;
     const cleanPath = path.replace(/^\/?storage\/?/, '').replace(/^\//, '');
     return `/storage/${cleanPath}`;

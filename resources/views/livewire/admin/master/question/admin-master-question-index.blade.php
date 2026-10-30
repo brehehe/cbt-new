@@ -428,8 +428,7 @@
                                                 <div class="flex flex-wrap gap-2">
                                                     @foreach ($qImages as $image)
                                                         @php
-                                                            $isUrl = \Illuminate\Support\Str::startsWith($image, ['http://', 'https://']);
-                                                            $src = $isUrl ? $image : asset('storage/' . ltrim($image, '/'));
+                                                            $src = media_url($image);
                                                         @endphp
                                                         <div class="overflow-hidden rounded-xl border border-gray-200 bg-white p-1.5 shadow-2xs">
                                                             @if(preg_match('/\.(mp4|mov|avi|wmv|webm)$/i', $image))
@@ -474,8 +473,7 @@
                                                                         <div class="mt-2 flex flex-wrap gap-1.5">
                                                                             @foreach ($ansImages as $image)
                                                                                 @php
-                                                                                    $isUrl = \Illuminate\Support\Str::startsWith($image, ['http://', 'https://']);
-                                                                                    $src = $isUrl ? $image : asset('storage/' . ltrim($image, '/'));
+                                                                                    $src = media_url($image);
                                                                                 @endphp
                                                                                 <div class="overflow-hidden rounded-lg border border-gray-200 bg-white p-1 shadow-2xs">
                                                                                     <img src="{{ $src }}" alt="Gambar opsi" class="object-contain max-h-[90px] max-w-[140px] rounded">

@@ -138,8 +138,7 @@
                                 <div class="relative group border rounded-lg overflow-hidden flex items-center justify-center bg-gray-50 h-32">
                                     @php
                                         $isString = is_string($img);
-                                        $isUrl = $isString && (Str::startsWith($img, 'http://') || Str::startsWith($img, 'https://'));
-                                        $imgUrl = $isString ? ($isUrl ? $img : asset('storage/' . ltrim($img, '/'))) : $img->temporaryUrl();
+                                        $imgUrl = $isString ? media_url($img) : $img->temporaryUrl();
                                         $fileName = $isString ? $img : $img->getClientOriginalName();
                                     @endphp
                                     @if(preg_match('/\.(mp4|mov|avi|wmv|webm)$/i', $fileName))
@@ -265,8 +264,7 @@
                                                 @foreach ($ans['images'] as $imgIdx => $img)
                                                     @php
                                                         $isString = is_string($img);
-                                                        $isUrl = $isString && (Str::startsWith($img, 'http://') || Str::startsWith($img, 'https://'));
-                                                        $imgUrl = $isString ? ($isUrl ? $img : asset('storage/' . ltrim($img, '/'))) : (method_exists($img, 'temporaryUrl') ? $img->temporaryUrl() : '');
+                                                        $imgUrl = $isString ? media_url($img) : (method_exists($img, 'temporaryUrl') ? $img->temporaryUrl() : '');
                                                     @endphp
                                                     <div class="relative group border rounded-lg overflow-hidden flex items-center justify-center bg-gray-50 h-16 w-24">
                                                         <img src="{{ $imgUrl }}" class="max-h-full max-w-full object-contain" alt="Gambar Opsi">

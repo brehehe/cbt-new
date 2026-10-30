@@ -51,6 +51,9 @@ class QuestionService
                         $path = Str::after($valStr, '/storage/');
                         return '/' . ltrim($path, '/');
                     }
+                    if (Str::contains($valStr, 'drive.google.com') || Str::contains($valStr, 'docs.google.com')) {
+                        return \App\Helpers\FormatHelper::downloadExternalImage($valStr, 'question');
+                    }
                     return $valStr;
                 }
 

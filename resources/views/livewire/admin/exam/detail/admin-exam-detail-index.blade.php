@@ -239,8 +239,7 @@
                             <div class="mt-4 flex flex-wrap gap-3">
                                 @foreach ($images as $image)
                                     @php
-                                        $isUrl = Str::startsWith($image, ['http://', 'https://']);
-                                        $src = $isUrl ? $image : asset('storage/' . ltrim($image, '/'));
+                                        $src = media_url($image);
                                     @endphp
                                     <div
                                         class="overflow-hidden rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
@@ -314,8 +313,7 @@
                                                              <div class="mt-3 grid grid-cols-2 md:grid-cols-3 gap-2">
                                                                  @foreach ($question_answer['images'] as $image)
                                                                      @php
-                                                                         $isUrl = Str::startsWith($image, ['http://', 'https://']);
-                                                                         $src = $isUrl ? $image : asset('storage/' . ltrim($image, '/'));
+                                                                         $src = media_url($image);
                                                                      @endphp
                                                                      <div class="overflow-hidden rounded-lg border border-gray-200 shadow-sm flex items-center justify-center bg-gray-50 max-h-40 p-2">
                                                                          @if(preg_match('/\.(mp4|mov|avi|wmv|webm)$/i', $image))

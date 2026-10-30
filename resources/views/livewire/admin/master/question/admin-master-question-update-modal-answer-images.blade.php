@@ -30,8 +30,7 @@
                         <div class="relative group border rounded-lg overflow-hidden flex items-center justify-center bg-gray-50 h-32">
                             @php
                                 $isString = is_string($img);
-                                $isUrl = $isString && (Str::startsWith($img, 'http://') || Str::startsWith($img, 'https://'));
-                                $imgUrl = $isString ? ($isUrl ? $img : asset('storage/' . ltrim($img, '/'))) : $img->temporaryUrl();
+                                $imgUrl = $isString ? media_url($img) : $img->temporaryUrl();
                                 $fileName = $isString ? $img : $img->getClientOriginalName();
                             @endphp
                             @if(preg_match('/\.(mp4|mov|avi|wmv|webm)$/i', $fileName))

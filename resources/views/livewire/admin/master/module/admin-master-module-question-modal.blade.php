@@ -291,8 +291,7 @@
                                                         <div class="mt-2 flex flex-wrap gap-2">
                                                             @foreach ($qImages as $image)
                                                                 @php
-                                                                    $isUrl = Str::startsWith($image, ['http://', 'https://']);
-                                                                    $src = $isUrl ? $image : asset('storage/' . ltrim($image, '/'));
+                                                                    $src = media_url($image);
                                                                 @endphp
                                                                 <div class="overflow-hidden rounded-lg border border-gray-100 shadow-sm bg-white p-1">
                                                                     @if(preg_match('/\.(mp4|mov|avi|wmv|webm)$/i', $image))
@@ -339,8 +338,7 @@
                                                                                 <div class="mt-1.5 flex flex-wrap gap-1.5">
                                                                                     @foreach($ansImages as $ansImg)
                                                                                         @php
-                                                                                            $isUrl = Str::startsWith($ansImg, ['http://', 'https://']);
-                                                                                            $src = $isUrl ? $ansImg : asset('storage/' . ltrim($ansImg, '/'));
+                                                                                            $src = media_url($ansImg);
                                                                                         @endphp
                                                                                         <div class="overflow-hidden rounded border border-gray-100 bg-white p-0.5">
                                                                                             @if(preg_match('/\.(mp4|mov|avi|wmv|webm)$/i', $ansImg))
