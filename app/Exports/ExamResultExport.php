@@ -43,29 +43,40 @@ class ExamResultExport implements FromCollection, WithColumnWidths, WithHeadings
     {
         $companyId = auth()->user()?->company_id;
 
-        // 1. Fetch only necessary user timetables and eager-load lightweight relations (no heavy userModuleQuestions)
-        $this->examResults = UserTimetable::query()
-            ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
-            ->select(['id', 'user_id', 'timetable_id', 'mark', 'created_at'])
-            ->with([
-                'user:id,name,nim,username',
-                'timetable:id,name,module_id,start_time,end_time',
-                'timetable.module:id,name',
-            ])
-            ->search($this->search)
-            ->when($this->user_id, function ($query) {
-                $query->where('user_id', $this->user_id);
-            })
-            ->when($this->module_id, function ($query) {
-                $query->whereHas('timetable', function ($q) {
-                    $q->where('module_id', $this->module_id);
+        // 1. Fetch only necessary user timetables using lightweight DB::table query (no heavy model hydration)
+        $query = DB::table('user_timetables as ut')
+            ->leftJoin('users as u', 'u.id', '=', 'ut.user_id')
+            ->leftJoin('timetables as t', 't.id', '=', 'ut.timetable_id')
+            ->leftJoin('modules as m', 'm.id', '=', 't.module_id')
+            ->when($companyId, fn ($q) => $q->where('ut.company_id', $companyId))
+            ->when($this->user_id, fn ($q) => $q->where('ut.user_id', $this->user_id))
+            ->when($this->module_id, fn ($q) => $q->where('t.module_id', $this->module_id))
+            ->when($this->timetable_id, fn ($q) => $q->where('ut.timetable_id', $this->timetable_id))
+            ->when($this->search, function ($q) {
+                $search = '%'.$this->search.'%';
+                $q->where(function ($sub) use ($search) {
+                    $sub->where('u.name', 'ilike', $search)
+                        ->orWhere('u.nim', 'ilike', $search)
+                        ->orWhere('u.username', 'ilike', $search)
+                        ->orWhere('t.name', 'ilike', $search)
+                        ->orWhere('m.name', 'ilike', $search);
                 });
             })
-            ->when($this->timetable_id, function ($query) {
-                $query->where('timetable_id', $this->timetable_id);
-            })
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->select([
+                'ut.id',
+                'ut.user_id',
+                'ut.timetable_id',
+                'ut.mark',
+                'ut.created_at',
+                'u.name as user_name',
+                'u.nim as user_nim',
+                'u.username as user_username',
+                't.name as timetable_name',
+                'm.name as module_name',
+            ])
+            ->orderBy('ut.created_at', 'desc');
+
+        $this->examResults = $query->get();
 
         $userTimetableIds = $this->examResults->pluck('id');
 
@@ -73,57 +84,59 @@ class ExamResultExport implements FromCollection, WithColumnWidths, WithHeadings
             return;
         }
 
-        // 2. Aggregate overall question counts directly in the database
-        $overallRows = DB::table('user_module_questions')
-            ->whereIn('user_timetable_id', $userTimetableIds)
-            ->whereNull('deleted_at')
-            ->groupBy('user_timetable_id')
-            ->select(
-                'user_timetable_id',
-                DB::raw('COUNT(*) as total_questions'),
-                DB::raw("COUNT(CASE WHEN status = 'correct' THEN 1 END) as correct"),
-                DB::raw("COUNT(CASE WHEN status = 'wrong' THEN 1 END) as wrong"),
-                DB::raw("COUNT(CASE WHEN timetable_answer_id IS NULL THEN 1 END) as unanswered")
-            )
-            ->get();
+        // 2. Chunking in 500-record blocks to prevent parameter limit and memory spikes
+        $userTimetableIds->chunk(500)->each(function ($chunk) {
+            $overallRows = DB::table('user_module_questions')
+                ->whereIn('user_timetable_id', $chunk)
+                ->whereNull('deleted_at')
+                ->groupBy('user_timetable_id')
+                ->select(
+                    'user_timetable_id',
+                    DB::raw('COUNT(*) as total_questions'),
+                    DB::raw("COUNT(CASE WHEN status = 'correct' THEN 1 END) as correct"),
+                    DB::raw("COUNT(CASE WHEN status = 'wrong' THEN 1 END) as wrong"),
+                    DB::raw("COUNT(CASE WHEN timetable_answer_id IS NULL THEN 1 END) as unanswered")
+                )
+                ->get();
 
-        foreach ($overallRows as $row) {
-            $this->overallStats[$row->user_timetable_id] = [
-                'total' => (int) $row->total_questions,
-                'correct' => (int) $row->correct,
-                'wrong' => (int) $row->wrong,
-                'unanswered' => (int) $row->unanswered,
-            ];
-        }
+            foreach ($overallRows as $row) {
+                $this->overallStats[$row->user_timetable_id] = [
+                    'total' => (int) $row->total_questions,
+                    'correct' => (int) $row->correct,
+                    'wrong' => (int) $row->wrong,
+                    'unanswered' => (int) $row->unanswered,
+                ];
+            }
 
-        // 3. Aggregate topic counts directly in the database
-        $topicRows = DB::table('user_module_questions as umq')
-            ->join('timetable_questions as tq', 'tq.id', '=', 'umq.timetable_question_id')
-            ->leftJoin('topics as top', 'top.id', '=', 'tq.topic_id')
-            ->whereIn('umq.user_timetable_id', $userTimetableIds)
-            ->whereNull('umq.deleted_at')
-            ->whereNotNull('tq.topic_id')
-            ->groupBy('umq.user_timetable_id', 'tq.topic_id', 'top.name')
-            ->select(
-                'umq.user_timetable_id',
-                'tq.topic_id',
-                DB::raw("COALESCE(top.name, 'Tanpa Topik') as topic_name"),
-                DB::raw('COUNT(*) as total_questions'),
-                DB::raw("COUNT(CASE WHEN umq.status = 'correct' THEN 1 END) as correct"),
-                DB::raw("COUNT(CASE WHEN umq.status = 'wrong' THEN 1 END) as wrong"),
-                DB::raw("COUNT(CASE WHEN umq.timetable_answer_id IS NULL THEN 1 END) as unanswered")
-            )
-            ->get();
+            $topicRows = DB::table('user_module_questions as umq')
+                ->join('timetable_questions as tq', 'tq.id', '=', 'umq.timetable_question_id')
+                ->leftJoin('topics as top', 'top.id', '=', 'tq.topic_id')
+                ->whereIn('umq.user_timetable_id', $chunk)
+                ->whereNull('umq.deleted_at')
+                ->whereNotNull('tq.topic_id')
+                ->groupBy('umq.user_timetable_id', 'tq.topic_id', 'top.name')
+                ->select(
+                    'umq.user_timetable_id',
+                    'tq.topic_id',
+                    DB::raw("COALESCE(top.name, 'Tanpa Topik') as topic_name"),
+                    DB::raw('COUNT(*) as total_questions'),
+                    DB::raw("COUNT(CASE WHEN umq.status = 'correct' THEN 1 END) as correct"),
+                    DB::raw("COUNT(CASE WHEN umq.status = 'wrong' THEN 1 END) as wrong"),
+                    DB::raw("COUNT(CASE WHEN umq.timetable_answer_id IS NULL THEN 1 END) as unanswered")
+                )
+                ->get();
 
-        foreach ($topicRows as $row) {
-            $this->allTopics[$row->topic_id] = $row->topic_name;
-            $this->topicStatsByUser[$row->user_timetable_id][$row->topic_id] = [
-                'total' => (int) $row->total_questions,
-                'correct' => (int) $row->correct,
-                'wrong' => (int) $row->wrong,
-                'unanswered' => (int) $row->unanswered,
-            ];
-        }
+            foreach ($topicRows as $row) {
+                $this->allTopics[$row->topic_id] = $row->topic_name;
+                $this->topicStatsByUser[$row->user_timetable_id][$row->topic_id] = [
+                    'total' => (int) $row->total_questions,
+                    'correct' => (int) $row->correct,
+                    'wrong' => (int) $row->wrong,
+                    'unanswered' => (int) $row->unanswered,
+                ];
+            }
+        });
+
         asort($this->allTopics);
     }
 
@@ -178,12 +191,17 @@ class ExamResultExport implements FromCollection, WithColumnWidths, WithHeadings
             'unanswered' => 0,
         ];
 
+        $userName = $result->user_name ?? ($result->user?->name ?? '-');
+        $userNim = $result->user_nim ?? ($result->user_username ?? ($result->user?->nim ?? ($result->user?->username ?? '-')));
+        $moduleName = $result->module_name ?? ($result->timetable?->module?->name ?? '-');
+        $timetableName = $result->timetable_name ?? ($result->timetable?->name ?? '-');
+
         $row = [
             $no,
-            $result->user?->name ?? '-',
-            $result->user?->nim ?? ($result->user?->username ?? '-'),
-            $result->timetable?->module?->name ?? '-',
-            $result->timetable?->name ?? '-',
+            $userName,
+            $userNim,
+            $moduleName,
+            $timetableName,
             $overall['total'],
             $overall['correct'],
             $overall['wrong'],

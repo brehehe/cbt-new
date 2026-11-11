@@ -65,13 +65,31 @@ class ItemAnalysisService
         $this->timetable = Timetable::query()->with('timetableModule')->findOrFail($this->timetableId);
         $this->timetableModule = $this->timetable->timetableModule;
 
+        $questionCols = [
+            'timetable_questions.id',
+            'timetable_questions.question_id',
+            'timetable_questions.timetable_module_id',
+            'timetable_questions.type',
+            'timetable_questions.order',
+            'timetable_questions.question',
+            'timetable_questions.description',
+            'timetable_questions.topic_id',
+            'timetable_questions.material_category_id',
+            'timetable_questions.material_id',
+            'timetable_questions.question_type_id',
+            'timetable_questions.category_question_id',
+        ];
+
         // Fetch questions without restricting to is_check
         $questions = collect();
         if ($this->timetableModule) {
             $questionsQuery = $this->timetableModule->questions()
                 ->withoutGlobalScopes()
+                ->select($questionCols)
                 ->with(['answers' => function ($q) {
-                    $q->withoutGlobalScopes()->orderBy('order', 'asc');
+                    $q->withoutGlobalScopes()
+                        ->select(['id', 'timetable_question_id', 'alphabet', 'context', 'is_correct', 'order'])
+                        ->orderBy('order', 'asc');
                 }]);
             $questions = $this->filterQuestionsQuery($questionsQuery)
                 ->orderBy('order', 'asc')
@@ -81,8 +99,11 @@ class ItemAnalysisService
         // Fallback 1: via timetable_module_id = timetable_id
         if ($questions->isEmpty()) {
             $questionsQuery = TimetableQuestion::withoutGlobalScopes()
+                ->select($questionCols)
                 ->with(['answers' => function ($q) {
-                    $q->withoutGlobalScopes()->orderBy('order', 'asc');
+                    $q->withoutGlobalScopes()
+                        ->select(['id', 'timetable_question_id', 'alphabet', 'context', 'is_correct', 'order'])
+                        ->orderBy('order', 'asc');
                 }])
                 ->where(function ($q) {
                     $q->whereHas('timetableModule', function ($tm) {
@@ -108,8 +129,11 @@ class ItemAnalysisService
 
             if ($questionIds->isNotEmpty()) {
                 $questionsQuery = TimetableQuestion::withoutGlobalScopes()
+                    ->select($questionCols)
                     ->with(['answers' => function ($q) {
-                        $q->withoutGlobalScopes()->orderBy('order', 'asc');
+                        $q->withoutGlobalScopes()
+                            ->select(['id', 'timetable_question_id', 'alphabet', 'context', 'is_correct', 'order'])
+                            ->orderBy('order', 'asc');
                     }])
                     ->whereIn('id', $questionIds);
                 $questions = $this->filterQuestionsQuery($questionsQuery)
@@ -119,7 +143,6 @@ class ItemAnalysisService
         }
 
         $this->timetableQuestions = $questions;
-
     }
 
     public function calculateItemAnalysis()
@@ -151,13 +174,15 @@ class ItemAnalysisService
         }
 
         // 2. Fast score calculation in DB to rank participants for upper/lower 27% groups
-        $userScoresRaw = DB::table('user_module_questions')
-            ->whereIn('user_timetable_id', $userTimetableIds)
-            ->where('status', 'correct')
-            ->whereNull('deleted_at')
-            ->groupBy('user_timetable_id')
-            ->select('user_timetable_id', DB::raw('COUNT(*) as score'))
-            ->pluck('score', 'user_timetable_id')
+        $userScoresRaw = DB::table('user_module_questions as umq')
+            ->join('user_timetables as ut', 'ut.id', '=', 'umq.user_timetable_id')
+            ->where('ut.timetable_id', $this->timetableId)
+            ->where('umq.status', 'correct')
+            ->whereNull('umq.deleted_at')
+            ->whereNull('ut.deleted_at')
+            ->groupBy('umq.user_timetable_id')
+            ->select('umq.user_timetable_id', DB::raw('COUNT(*) as score'))
+            ->pluck('score', 'umq.user_timetable_id')
             ->toArray();
 
         $scores = [];
@@ -181,16 +206,18 @@ class ItemAnalysisService
 
         // 3. Question-level participant, correct, and pending counts in a single query
         $questionIds = $this->timetableQuestions->pluck('id')->toArray();
-        $qStats = DB::table('user_module_questions')
-            ->whereIn('user_timetable_id', $userTimetableIds)
-            ->whereIn('timetable_question_id', $questionIds)
-            ->whereNull('deleted_at')
-            ->groupBy('timetable_question_id')
+        $qStats = DB::table('user_module_questions as umq')
+            ->join('user_timetables as ut', 'ut.id', '=', 'umq.user_timetable_id')
+            ->where('ut.timetable_id', $this->timetableId)
+            ->whereIn('umq.timetable_question_id', $questionIds)
+            ->whereNull('umq.deleted_at')
+            ->whereNull('ut.deleted_at')
+            ->groupBy('umq.timetable_question_id')
             ->select(
-                'timetable_question_id',
+                'umq.timetable_question_id',
                 DB::raw('COUNT(*) as total_participants'),
-                DB::raw("COUNT(CASE WHEN status = 'correct' THEN 1 END) as correct_answers"),
-                DB::raw("COUNT(CASE WHEN status = 'check' THEN 1 END) as pending_answers")
+                DB::raw("COUNT(CASE WHEN umq.status = 'correct' THEN 1 END) as correct_answers"),
+                DB::raw("COUNT(CASE WHEN umq.status = 'check' THEN 1 END) as pending_answers")
             )
             ->get()
             ->keyBy('timetable_question_id');
@@ -227,16 +254,18 @@ class ItemAnalysisService
         }
 
         // 5. Option choice counts in a single grouped query
-        $optionRows = DB::table('user_module_questions')
-            ->whereIn('user_timetable_id', $userTimetableIds)
-            ->whereIn('timetable_question_id', $questionIds)
-            ->whereNull('deleted_at')
-            ->whereNotNull('timetable_answer_id')
+        $optionRows = DB::table('user_module_questions as umq')
+            ->join('user_timetables as ut', 'ut.id', '=', 'umq.user_timetable_id')
+            ->where('ut.timetable_id', $this->timetableId)
+            ->whereIn('umq.timetable_question_id', $questionIds)
+            ->whereNull('umq.deleted_at')
+            ->whereNull('ut.deleted_at')
+            ->whereNotNull('umq.timetable_answer_id')
             ->where(function ($q) {
-                $q->whereNull('status')->orWhere('status', '!=', 'unanswered');
+                $q->whereNull('umq.status')->orWhere('umq.status', '!=', 'unanswered');
             })
-            ->groupBy('timetable_question_id', 'timetable_answer_id')
-            ->select('timetable_question_id', 'timetable_answer_id', DB::raw('COUNT(*) as selected_count'))
+            ->groupBy('umq.timetable_question_id', 'umq.timetable_answer_id')
+            ->select('umq.timetable_question_id', 'umq.timetable_answer_id', DB::raw('COUNT(*) as selected_count'))
             ->get();
 
         $optionCounts = [];
@@ -245,16 +274,18 @@ class ItemAnalysisService
         }
 
         // 6. Unanswered count per question in a single query
-        $unansweredCounts = DB::table('user_module_questions')
-            ->whereIn('user_timetable_id', $userTimetableIds)
-            ->whereIn('timetable_question_id', $questionIds)
-            ->whereNull('deleted_at')
+        $unansweredCounts = DB::table('user_module_questions as umq')
+            ->join('user_timetables as ut', 'ut.id', '=', 'umq.user_timetable_id')
+            ->where('ut.timetable_id', $this->timetableId)
+            ->whereIn('umq.timetable_question_id', $questionIds)
+            ->whereNull('umq.deleted_at')
+            ->whereNull('ut.deleted_at')
             ->where(function ($q) {
-                $q->whereNull('timetable_answer_id')->orWhere('status', 'unanswered');
+                $q->whereNull('umq.timetable_answer_id')->orWhere('umq.status', 'unanswered');
             })
-            ->groupBy('timetable_question_id')
-            ->select('timetable_question_id', DB::raw('COUNT(*) as unanswered_count'))
-            ->pluck('unanswered_count', 'timetable_question_id')
+            ->groupBy('umq.timetable_question_id')
+            ->select('umq.timetable_question_id', DB::raw('COUNT(*) as unanswered_count'))
+            ->pluck('unanswered_count', 'umq.timetable_question_id')
             ->toArray();
 
         // 7. Assemble $this->itemAnalysisData without instantiating thousands of Eloquent models

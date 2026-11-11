@@ -189,26 +189,42 @@ class AdminReportAnswerStatisticsIndex extends Component
 
     public function exportPdf()
     {
-        @ini_set('memory_limit', '512M');
-        @set_time_limit(300);
+        @ini_set('memory_limit', '1024M');
+        @set_time_limit(600);
 
         if (! $this->timetable_id) {
             return;
         }
 
-        // Rebuild on the server instead of hydrating one Eloquent model per question/option.
-        $this->loadStatistics();
-        $this->skipRender();
-        $timetable = $this->timetable;
+        try {
+            $this->loadStatistics();
+            $this->skipRender();
+            $timetable = $this->timetable;
 
-        $pdf = Pdf::loadView('livewire.admin.report.shared.overview-pdf', [
-            'title' => 'Statistik Jawaban — '.$timetable->name,
-            'analyses' => $this->answerStats,
-        ])->setPaper('a4', 'portrait');
+            if (empty($this->answerStats)) {
+                session()->flash('error', 'Tidak ada butir soal untuk diekspor ke PDF.');
 
-        return response()->streamDownload(
-            fn () => print ($pdf->output()),
-            'laporan-statistik-jawaban-'.date('Y-m-d-H-i-s').'.pdf'
-        );
+                return;
+            }
+
+            $pdf = Pdf::loadView('livewire.admin.report.shared.overview-pdf', [
+                'title' => 'Statistik Jawaban — '.($timetable?->name ?? 'Jadwal Ujian'),
+                'analyses' => $this->answerStats,
+            ])
+                ->setPaper('a4', 'portrait')
+                ->setOption('isHtml5ParserEnabled', true)
+                ->setOption('isRemoteEnabled', false)
+                ->setOption('isFontSubsettingEnabled', true)
+                ->setOption('defaultFont', 'sans-serif')
+                ->setOption('chroot', public_path());
+
+            return response()->streamDownload(
+                fn () => print ($pdf->output()),
+                'laporan-statistik-jawaban-'.date('Y-m-d-H-i-s').'.pdf'
+            );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Answer Statistics PDF Export Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            session()->flash('error', 'Gagal membuat file PDF: '.$e->getMessage());
+        }
     }
 }

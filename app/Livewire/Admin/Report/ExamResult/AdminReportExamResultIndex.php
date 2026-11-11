@@ -237,172 +237,211 @@ class AdminReportExamResultIndex extends Component
 
     public function exportPdf()
     {
-        @ini_set('memory_limit', '512M');
-        @set_time_limit(300);
+        @ini_set('memory_limit', '1024M');
+        @set_time_limit(600);
+        $this->skipRender();
 
-        $companyId = Auth::user()?->company_id;
+        try {
+            $companyId = Auth::user()?->company_id;
 
-        // Fetch lightweight user timetables without eager loading 100k+ userModuleQuestions
-        $examResults = UserTimetable::query()
-            ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
-            ->select(['id', 'user_id', 'timetable_id', 'mark', 'created_at'])
-            ->with([
-                'user:id,name,nim,username',
-                'timetable:id,name,module_id,start_time,end_time',
-                'timetable.module:id,name',
+            // Direct DB::table query with joins - zero Eloquent model hydration overhead
+            $query = DB::table('user_timetables as ut')
+                ->leftJoin('users as u', 'u.id', '=', 'ut.user_id')
+                ->leftJoin('timetables as t', 't.id', '=', 'ut.timetable_id')
+                ->leftJoin('modules as m', 'm.id', '=', 't.module_id')
+                ->whereNull('ut.deleted_at')
+                ->when($companyId, fn ($q) => $q->where('ut.company_id', $companyId))
+                ->when($this->user_id, fn ($q) => $q->where('ut.user_id', $this->user_id))
+                ->when($this->module_id, fn ($q) => $q->where('t.module_id', $this->module_id))
+                ->when($this->timetable_id, fn ($q) => $q->where('ut.timetable_id', $this->timetable_id));
+
+            if (! empty($this->search)) {
+                $term = '%' . trim($this->search) . '%';
+                $query->where(function ($q) use ($term) {
+                    $q->where('u.name', 'ilike', $term)
+                        ->orWhere('u.nim', 'ilike', $term)
+                        ->orWhere('u.username', 'ilike', $term)
+                        ->orWhere('t.name', 'ilike', $term)
+                        ->orWhere('m.name', 'ilike', $term);
+                });
+            }
+
+            if ($this->filterTopicId || $this->filterMaterialCategoryId || $this->filterMaterialId || $this->filterQuestionTypeId || $this->filterCategoryQuestionId) {
+                $query->whereExists(function ($sub) {
+                    $sub->select(DB::raw(1))
+                        ->from('user_module_questions as sub_umq')
+                        ->join('timetable_questions as sub_tq', 'sub_tq.id', '=', 'sub_umq.timetable_question_id')
+                        ->whereColumn('sub_umq.user_timetable_id', 'ut.id')
+                        ->when($this->filterTopicId, fn ($q) => $q->where('sub_tq.topic_id', $this->filterTopicId))
+                        ->when($this->filterMaterialCategoryId, fn ($q) => $q->where('sub_tq.material_category_id', $this->filterMaterialCategoryId))
+                        ->when($this->filterMaterialId, fn ($q) => $q->where('sub_tq.material_id', $this->filterMaterialId))
+                        ->when($this->filterQuestionTypeId, fn ($q) => $q->where('sub_tq.question_type_id', $this->filterQuestionTypeId))
+                        ->when($this->filterCategoryQuestionId, fn ($q) => $q->where('sub_tq.category_question_id', $this->filterCategoryQuestionId));
+                });
+            }
+
+            $examResults = $query->orderBy('ut.created_at', 'desc')
+                ->select([
+                    'ut.id',
+                    'ut.user_id',
+                    'ut.timetable_id',
+                    'ut.mark',
+                    'ut.created_at',
+                    'u.name as user_name',
+                    'u.nim as user_nim',
+                    'u.username as user_username',
+                    't.name as timetable_name',
+                    't.start_time as timetable_start_time',
+                    't.end_time as timetable_end_time',
+                    'm.name as module_name',
+                ])
+                ->get();
+
+            $userTimetableIds = $examResults->pluck('id')->all();
+
+            $overallStats = [];
+            $topicStatsByUser = [];
+            $allTopics = [];
+
+            if (! empty($userTimetableIds)) {
+                // Chunk queries in 500-record blocks to prevent PostgreSQL parameter limits and RAM spikes
+                foreach (array_chunk($userTimetableIds, 500) as $chunkIds) {
+                    $overallRows = DB::table('user_module_questions')
+                        ->whereIn('user_timetable_id', $chunkIds)
+                        ->whereNull('deleted_at')
+                        ->groupBy('user_timetable_id')
+                        ->select(
+                            'user_timetable_id',
+                            DB::raw('COUNT(*) as total_questions'),
+                            DB::raw("COUNT(CASE WHEN status = 'correct' THEN 1 END) as correct"),
+                            DB::raw("COUNT(CASE WHEN status = 'wrong' THEN 1 END) as wrong"),
+                            DB::raw("COUNT(CASE WHEN timetable_answer_id IS NULL THEN 1 END) as unanswered")
+                        )
+                        ->get();
+
+                    foreach ($overallRows as $row) {
+                        $overallStats[$row->user_timetable_id] = [
+                            'total' => (int) $row->total_questions,
+                            'correct' => (int) $row->correct,
+                            'wrong' => (int) $row->wrong,
+                            'unanswered' => (int) $row->unanswered,
+                        ];
+                    }
+
+                    $topicRows = DB::table('user_module_questions as umq')
+                        ->join('timetable_questions as tq', 'tq.id', '=', 'umq.timetable_question_id')
+                        ->leftJoin('topics as top', 'top.id', '=', 'tq.topic_id')
+                        ->whereIn('umq.user_timetable_id', $chunkIds)
+                        ->whereNull('umq.deleted_at')
+                        ->whereNotNull('tq.topic_id')
+                        ->groupBy('umq.user_timetable_id', 'tq.topic_id', 'top.name')
+                        ->select(
+                            'umq.user_timetable_id',
+                            'tq.topic_id',
+                            DB::raw("COALESCE(top.name, 'Tanpa Topik') as topic_name"),
+                            DB::raw('COUNT(*) as total_questions'),
+                            DB::raw("COUNT(CASE WHEN umq.status = 'correct' THEN 1 END) as correct"),
+                            DB::raw("COUNT(CASE WHEN umq.status = 'wrong' THEN 1 END) as wrong"),
+                            DB::raw("COUNT(CASE WHEN umq.timetable_answer_id IS NULL THEN 1 END) as unanswered")
+                        )
+                        ->get();
+
+                    foreach ($topicRows as $row) {
+                        $allTopics[$row->topic_id] = $row->topic_name;
+                        $topicStatsByUser[$row->user_timetable_id][$row->topic_id] = [
+                            'total' => (int) $row->total_questions,
+                            'correct' => (int) $row->correct,
+                            'wrong' => (int) $row->wrong,
+                            'unanswered' => (int) $row->unanswered,
+                        ];
+                    }
+                }
+                asort($allTopics);
+            }
+
+            $filterSummary = $this->getFilterSummary();
+            $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : \App\Models\Company\Company::with('companyDetail')->first();
+
+            $ratingScales = RatingScale::orderBy('order')->get();
+            $gradeDistribution = [];
+            $rows = [];
+
+            foreach ($examResults as $result) {
+                $mark = $result->mark;
+                $scale = null;
+                if ($mark !== null) {
+                    $scale = $ratingScales->first(function ($item) use ($mark) {
+                        return $item->min_score <= $mark && $item->max_score >= $mark;
+                    });
+                }
+                $gradeLetter = $scale?->grade_letter ?? '-';
+                if (! isset($gradeDistribution[$gradeLetter])) {
+                    $gradeDistribution[$gradeLetter] = 0;
+                }
+                $gradeDistribution[$gradeLetter]++;
+
+                $overall = $overallStats[$result->id] ?? [
+                    'total' => 0,
+                    'correct' => 0,
+                    'wrong' => 0,
+                    'unanswered' => 0,
+                ];
+
+                $rows[] = [
+                    'id' => $result->id,
+                    'name' => $result->user_name ?? '-',
+                    'nim' => $result->user_nim ?? ($result->user_username ?? '-'),
+                    'module' => $result->module_name ?? '-',
+                    'timetable' => $result->timetable_name ?? '-',
+                    'start_time' => $result->timetable_start_time ? \Carbon\Carbon::parse($result->timetable_start_time)->format('d/m/y H:i') : '-',
+                    'end_time' => $result->timetable_end_time ? \Carbon\Carbon::parse($result->timetable_end_time)->format('d/m/y H:i') : '-',
+                    'total' => $overall['total'],
+                    'correct' => $overall['correct'],
+                    'wrong' => $overall['wrong'],
+                    'unanswered' => $overall['unanswered'],
+                    'mark' => $mark !== null ? number_format((float) $mark, 2) : '-',
+                    'grade_letter' => $gradeLetter,
+                    'topic_stats' => $topicStatsByUser[$result->id] ?? [],
+                ];
+            }
+            ksort($gradeDistribution);
+
+            $count = count($rows);
+            $numericMarks = $examResults->pluck('mark')->filter(fn ($m) => ! is_null($m));
+            $stats = [
+                'total_students' => $count,
+                'average_score' => $numericMarks->isNotEmpty() ? $numericMarks->avg() : 0,
+                'highest_score' => $numericMarks->isNotEmpty() ? $numericMarks->max() : 0,
+                'lowest_score' => $numericMarks->isNotEmpty() ? $numericMarks->min() : 0,
+            ];
+
+            $pdf = Pdf::loadView('livewire.admin.report.exam-result.admin-report-exam-result-pdf', [
+                'rows' => $rows,
+                'filterSummary' => $filterSummary,
+                'allTopics' => $allTopics,
+                'company' => $company,
+                'stats' => $stats,
+                'gradeDistribution' => $gradeDistribution,
             ])
-            ->search($this->search)
-            ->when($this->user_id, function ($query) {
-                $query->where('user_id', $this->user_id);
-            })
-            ->when($this->module_id, function ($query) {
-                $query->whereHas('timetable', function ($q) {
-                    $q->where('module_id', $this->module_id);
-                });
-            })
-            ->when($this->timetable_id, function ($query) {
-                $query->where('timetable_id', $this->timetable_id);
-            })
-            ->orderBy('created_at', 'desc')
-            ->get();
+                ->setPaper('a4', 'landscape')
+                ->setOption('isHtml5ParserEnabled', true)
+                ->setOption('isRemoteEnabled', false)
+                ->setOption('isFontSubsettingEnabled', true)
+                ->setOption('defaultFont', 'sans-serif')
+                ->setOption('chroot', public_path())
+                ->setOption('margin-top', 8)
+                ->setOption('margin-right', 8)
+                ->setOption('margin-bottom', 8)
+                ->setOption('margin-left', 8);
 
-        $userTimetableIds = $examResults->pluck('id');
-
-        $overallStats = [];
-        $topicStatsByUser = [];
-        $allTopics = [];
-
-        if ($userTimetableIds->isNotEmpty()) {
-            // Aggregate question counts directly in PostgreSQL
-            $overallRows = DB::table('user_module_questions')
-                ->whereIn('user_timetable_id', $userTimetableIds)
-                ->whereNull('deleted_at')
-                ->groupBy('user_timetable_id')
-                ->select(
-                    'user_timetable_id',
-                    DB::raw('COUNT(*) as total_questions'),
-                    DB::raw("COUNT(CASE WHEN status = 'correct' THEN 1 END) as correct"),
-                    DB::raw("COUNT(CASE WHEN status = 'wrong' THEN 1 END) as wrong"),
-                    DB::raw("COUNT(CASE WHEN timetable_answer_id IS NULL THEN 1 END) as unanswered")
-                )
-                ->get();
-
-            foreach ($overallRows as $row) {
-                $overallStats[$row->user_timetable_id] = [
-                    'total' => (int) $row->total_questions,
-                    'correct' => (int) $row->correct,
-                    'wrong' => (int) $row->wrong,
-                    'unanswered' => (int) $row->unanswered,
-                ];
-            }
-
-            // Aggregate topic breakdown counts directly in PostgreSQL
-            $topicRows = DB::table('user_module_questions as umq')
-                ->join('timetable_questions as tq', 'tq.id', '=', 'umq.timetable_question_id')
-                ->leftJoin('topics as top', 'top.id', '=', 'tq.topic_id')
-                ->whereIn('umq.user_timetable_id', $userTimetableIds)
-                ->whereNull('umq.deleted_at')
-                ->whereNotNull('tq.topic_id')
-                ->groupBy('umq.user_timetable_id', 'tq.topic_id', 'top.name')
-                ->select(
-                    'umq.user_timetable_id',
-                    'tq.topic_id',
-                    DB::raw("COALESCE(top.name, 'Tanpa Topik') as topic_name"),
-                    DB::raw('COUNT(*) as total_questions'),
-                    DB::raw("COUNT(CASE WHEN umq.status = 'correct' THEN 1 END) as correct"),
-                    DB::raw("COUNT(CASE WHEN umq.status = 'wrong' THEN 1 END) as wrong"),
-                    DB::raw("COUNT(CASE WHEN umq.timetable_answer_id IS NULL THEN 1 END) as unanswered")
-                )
-                ->get();
-
-            foreach ($topicRows as $row) {
-                $allTopics[$row->topic_id] = $row->topic_name;
-                $topicStatsByUser[$row->user_timetable_id][$row->topic_id] = [
-                    'total' => (int) $row->total_questions,
-                    'correct' => (int) $row->correct,
-                    'wrong' => (int) $row->wrong,
-                    'unanswered' => (int) $row->unanswered,
-                ];
-            }
-            asort($allTopics);
+            return response()->streamDownload(
+                fn () => print ($pdf->output()),
+                'exam-result-report-'.date('Y-m-d-H-i-s').'.pdf'
+            );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Exam Result PDF Export Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            session()->flash('error', 'Gagal membuat file PDF: '.$e->getMessage());
         }
-
-        $filterSummary = $this->getFilterSummary();
-        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : \App\Models\Company\Company::with('companyDetail')->first();
-
-        // Rating scales loaded once
-        $ratingScales = RatingScale::orderBy('order')->get();
-        $gradeDistribution = [];
-        $rows = [];
-
-        foreach ($examResults as $result) {
-            $mark = $result->mark;
-            $scale = null;
-            if ($mark !== null) {
-                $scale = $ratingScales->first(function ($item) use ($mark) {
-                    return $item->min_score <= $mark && $item->max_score >= $mark;
-                });
-            }
-            $gradeLetter = $scale?->grade_letter ?? '-';
-            if (! isset($gradeDistribution[$gradeLetter])) {
-                $gradeDistribution[$gradeLetter] = 0;
-            }
-            $gradeDistribution[$gradeLetter]++;
-
-            $overall = $overallStats[$result->id] ?? [
-                'total' => 0,
-                'correct' => 0,
-                'wrong' => 0,
-                'unanswered' => 0,
-            ];
-
-            $rows[] = [
-                'id' => $result->id,
-                'name' => $result->user?->name ?? '-',
-                'nim' => $result->user?->nim ?? ($result->user?->username ?? '-'),
-                'module' => $result->timetable?->module?->name ?? '-',
-                'timetable' => $result->timetable?->name ?? '-',
-                'start_time' => $result->timetable?->start_time?->format('d/m/y H:i') ?? '-',
-                'end_time' => $result->timetable?->end_time?->format('d/m/y H:i') ?? '-',
-                'total' => $overall['total'],
-                'correct' => $overall['correct'],
-                'wrong' => $overall['wrong'],
-                'unanswered' => $overall['unanswered'],
-                'mark' => $mark !== null ? number_format((float) $mark, 2) : '-',
-                'grade_letter' => $gradeLetter,
-                'topic_stats' => $topicStatsByUser[$result->id] ?? [],
-            ];
-        }
-        ksort($gradeDistribution);
-
-        $count = count($rows);
-        $numericMarks = $examResults->pluck('mark')->filter(fn ($m) => !is_null($m));
-        $stats = [
-            'total_students' => $count,
-            'average_score' => $numericMarks->isNotEmpty() ? $numericMarks->avg() : 0,
-            'highest_score' => $numericMarks->isNotEmpty() ? $numericMarks->max() : 0,
-            'lowest_score' => $numericMarks->isNotEmpty() ? $numericMarks->min() : 0,
-        ];
-
-        $pdf = Pdf::loadView('livewire.admin.report.exam-result.admin-report-exam-result-pdf', [
-            'rows' => $rows,
-            'filterSummary' => $filterSummary,
-            'allTopics' => $allTopics,
-            'company' => $company,
-            'stats' => $stats,
-            'gradeDistribution' => $gradeDistribution,
-        ])
-            ->setPaper('a4', 'landscape')
-            ->setOption('isHtml5ParserEnabled', true)
-            ->setOption('margin-top', 8)
-            ->setOption('margin-right', 8)
-            ->setOption('margin-bottom', 8)
-            ->setOption('margin-left', 8);
-
-        return response()->streamDownload(
-            fn () => print ($pdf->output()),
-            'exam-result-report-'.date('Y-m-d-H-i-s').'.pdf'
-        );
     }
 
     public function exportExcel()
