@@ -58,11 +58,14 @@ class AdminReportFullExamResultIndex extends Component
 
     public function render()
     {
+        $companyId = Auth::user()?->company_id;
+
         $examResults = UserTimetable::withoutGlobalScopes()
+            ->when($companyId, fn ($q) => $q->where('user_timetables.company_id', $companyId))
             ->with(['user:id,name,nim,username', 'timetable:id,name,module_id', 'timetable.module:id,name'])
             ->search($this->search)
             ->when($this->user_id, function ($query) {
-                $query->where('user_id', $this->user_id);
+                $query->where('user_timetables.user_id', $this->user_id);
             })
             ->when($this->module_id, function ($query) {
                 $query->whereHas('timetable', function ($q) {
@@ -70,7 +73,7 @@ class AdminReportFullExamResultIndex extends Component
                 });
             })
             ->when($this->timetable_id, function ($query) {
-                $query->where('timetable_id', $this->timetable_id);
+                $query->where('user_timetables.timetable_id', $this->timetable_id);
             });
 
         $dir = strtolower($this->sortDirection) === 'desc' ? 'desc' : 'asc';
@@ -111,7 +114,7 @@ class AdminReportFullExamResultIndex extends Component
                     DB::raw("COUNT(CASE WHEN status = 'wrong' THEN 1 END) as wrong"),
                     DB::raw("COUNT(CASE WHEN status = 'check' THEN 1 END) as check_count"),
                     DB::raw("COUNT(CASE WHEN timetable_answer_id IS NOT NULL THEN 1 END) as answered"),
-                    DB::raw("COUNT(CASE WHEN timetable_answer_id IS NULL AND (essay_answer IS NULL OR essay_answer = '') THEN 1 END) as unanswered")
+                    DB::raw("COUNT(CASE WHEN timetable_answer_id IS NULL OR status = 'unanswered' THEN 1 END) as unanswered")
                 )
                 ->get();
 
@@ -165,89 +168,105 @@ class AdminReportFullExamResultIndex extends Component
 
     public function exportPdf()
     {
-        @ini_set('memory_limit', '512M');
-        @set_time_limit(300);
+        @ini_set('memory_limit', '1024M');
+        @set_time_limit(600);
+        $this->skipRender();
 
-        // Fetch lightweight user timetables without thousands of Eloquent question models
-        $examResults = UserTimetable::withoutGlobalScopes()
-            ->select(['id', 'user_id', 'timetable_id', 'mark', 'start_exam', 'end_exam', 'created_at'])
-            ->with([
-                'user:id,name,nim,username',
-                'timetable:id,name,module_id',
-                'timetable.module:id,name',
-            ])
-            ->search($this->search)
-            ->when($this->user_id, function ($query) {
-                $query->where('user_id', $this->user_id);
-            })
-            ->when($this->module_id, function ($query) {
-                $query->whereHas('timetable', function ($q) {
-                    $q->where('module_id', $this->module_id);
-                });
-            })
-            ->when($this->timetable_id, function ($query) {
-                $query->where('timetable_id', $this->timetable_id);
-            })
-            ->orderBy('created_at', 'desc')
-            ->get();
+        try {
+            $companyId = Auth::user()?->company_id;
 
-        $userTimetableIds = $examResults->pluck('id');
-        $resultStats = [];
-
-        if ($userTimetableIds->isNotEmpty()) {
-            $statsRows = DB::table('user_module_questions')
-                ->whereIn('user_timetable_id', $userTimetableIds)
-                ->whereNull('deleted_at')
-                ->groupBy('user_timetable_id')
-                ->select(
-                    'user_timetable_id',
-                    DB::raw('COUNT(*) as total'),
-                    DB::raw("COUNT(CASE WHEN status = 'correct' THEN 1 END) as correct"),
-                    DB::raw("COUNT(CASE WHEN status = 'wrong' THEN 1 END) as wrong"),
-                    DB::raw("COUNT(CASE WHEN status = 'check' THEN 1 END) as check_count"),
-                    DB::raw("COUNT(CASE WHEN timetable_answer_id IS NOT NULL THEN 1 END) as answered"),
-                    DB::raw("COUNT(CASE WHEN timetable_answer_id IS NULL AND (essay_answer IS NULL OR essay_answer = '') THEN 1 END) as unanswered")
-                )
+            // Fetch lightweight user timetables without thousands of Eloquent question models
+            $examResults = UserTimetable::withoutGlobalScopes()
+                ->when($companyId, fn ($q) => $q->where('user_timetables.company_id', $companyId))
+                ->select(['id', 'user_id', 'timetable_id', 'mark', 'start_exam', 'end_exam', 'created_at'])
+                ->with([
+                    'user:id,name,nim,username',
+                    'timetable:id,name,module_id',
+                    'timetable.module:id,name',
+                ])
+                ->search($this->search)
+                ->when($this->user_id, function ($query) {
+                    $query->where('user_timetables.user_id', $this->user_id);
+                })
+                ->when($this->module_id, function ($query) {
+                    $query->whereHas('timetable', function ($q) {
+                        $q->where('module_id', $this->module_id);
+                    });
+                })
+                ->when($this->timetable_id, function ($query) {
+                    $query->where('user_timetables.timetable_id', $this->timetable_id);
+                })
+                ->orderBy('created_at', 'desc')
                 ->get();
 
-            foreach ($statsRows as $row) {
-                $resultStats[$row->user_timetable_id] = [
-                    'total' => (int) $row->total,
-                    'correct' => (int) $row->correct,
-                    'wrong' => (int) $row->wrong,
-                    'check' => (int) $row->check_count,
-                    'answered' => (int) $row->answered,
-                    'unanswered' => (int) $row->unanswered,
-                ];
+            $userTimetableIds = $examResults->pluck('id');
+            $resultStats = [];
+
+            if ($userTimetableIds->isNotEmpty()) {
+                $userTimetableIds->chunk(500)->each(function ($chunk) use (&$resultStats) {
+                    $statsRows = DB::table('user_module_questions')
+                        ->whereIn('user_timetable_id', $chunk)
+                        ->whereNull('deleted_at')
+                        ->groupBy('user_timetable_id')
+                        ->select(
+                            'user_timetable_id',
+                            DB::raw('COUNT(*) as total'),
+                            DB::raw("COUNT(CASE WHEN status = 'correct' THEN 1 END) as correct"),
+                            DB::raw("COUNT(CASE WHEN status = 'wrong' THEN 1 END) as wrong"),
+                            DB::raw("COUNT(CASE WHEN status = 'check' THEN 1 END) as check_count"),
+                            DB::raw("COUNT(CASE WHEN timetable_answer_id IS NOT NULL THEN 1 END) as answered"),
+                            DB::raw("COUNT(CASE WHEN timetable_answer_id IS NULL OR status = 'unanswered' THEN 1 END) as unanswered")
+                        )
+                        ->get();
+
+                    foreach ($statsRows as $row) {
+                        $resultStats[$row->user_timetable_id] = [
+                            'total' => (int) $row->total,
+                            'correct' => (int) $row->correct,
+                            'wrong' => (int) $row->wrong,
+                            'check' => (int) $row->check_count,
+                            'answered' => (int) $row->answered,
+                            'unanswered' => (int) $row->unanswered,
+                        ];
+                    }
+                });
             }
+
+            $filterSummary = $this->getFilterSummary();
+            $gradeDetails = [];
+
+            foreach ($examResults as $result) {
+                $gradeDetails[$result->id] = $this->getGradeDetail($result->mark);
+            }
+
+            $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : \App\Models\Company\Company::with('companyDetail')->first();
+
+            $pdf = Pdf::loadView('livewire.admin.report.full-exam-result.admin-report-full-exam-result-pdf', [
+                'examResults' => $examResults,
+                'filterSummary' => $filterSummary,
+                'gradeDetails' => $gradeDetails,
+                'resultStats' => $resultStats,
+                'company' => $company,
+            ])
+                ->setPaper('a4', 'landscape')
+                ->setOption('isHtml5ParserEnabled', true)
+                ->setOption('isRemoteEnabled', false)
+                ->setOption('isFontSubsettingEnabled', true)
+                ->setOption('defaultFont', 'sans-serif')
+                ->setOption('chroot', public_path())
+                ->setOption('margin-top', 10)
+                ->setOption('margin-right', 10)
+                ->setOption('margin-bottom', 10)
+                ->setOption('margin-left', 10);
+
+            return response()->streamDownload(
+                fn () => print ($pdf->output()),
+                'laporan-hasil-lengkap-'.date('Y-m-d-H-i-s').'.pdf'
+            );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Full Exam Result PDF Export Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            session()->flash('error', 'Gagal membuat file PDF: '.$e->getMessage());
         }
-
-        $filterSummary = $this->getFilterSummary();
-        $gradeDetails = [];
-
-        foreach ($examResults as $result) {
-            $gradeDetails[$result->id] = $this->getGradeDetail($result->mark);
-        }
-
-        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : \App\Models\Company\Company::with('companyDetail')->first();
-
-        $pdf = Pdf::loadView('livewire.admin.report.full-exam-result.admin-report-full-exam-result-pdf', [
-            'examResults' => $examResults,
-            'filterSummary' => $filterSummary,
-            'gradeDetails' => $gradeDetails,
-            'resultStats' => $resultStats,
-            'company' => $company,
-        ])
-            ->setPaper('a4', 'landscape')
-            ->setOption('margin-top', 10)
-            ->setOption('margin-right', 10)
-            ->setOption('margin-bottom', 10)
-            ->setOption('margin-left', 10);
-
-        return response()->streamDownload(
-            fn () => print ($pdf->output()),
-            'laporan-hasil-lengkap-'.date('Y-m-d-H-i-s').'.pdf'
-        );
     }
 
     private function getFilterSummary()

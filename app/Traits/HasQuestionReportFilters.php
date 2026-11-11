@@ -134,16 +134,21 @@ trait HasQuestionReportFilters
             ->get(['id', 'name']);
     }
 
+    protected function isValidUuid($value): bool
+    {
+        return is_string($value) && preg_match('/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/', $value) === 1;
+    }
+
     /**
      * Apply the question filters and comprehensive search to a query builder.
      */
     public function applyQuestionFilters($query, string $tablePrefix = 'questions')
     {
-        $query->when($this->filterTopicId, fn ($q) => $q->where("{$tablePrefix}.topic_id", $this->filterTopicId))
-            ->when($this->filterMaterialCategoryId, fn ($q) => $q->where("{$tablePrefix}.material_category_id", $this->filterMaterialCategoryId))
-            ->when($this->filterMaterialId, fn ($q) => $q->where("{$tablePrefix}.material_id", $this->filterMaterialId))
-            ->when($this->filterQuestionTypeId, fn ($q) => $q->where("{$tablePrefix}.question_type_id", $this->filterQuestionTypeId))
-            ->when($this->filterCategoryQuestionId, fn ($q) => $q->where("{$tablePrefix}.category_question_id", $this->filterCategoryQuestionId));
+        $query->when($this->isValidUuid($this->filterTopicId), fn ($q) => $q->where("{$tablePrefix}.topic_id", $this->filterTopicId))
+            ->when($this->isValidUuid($this->filterMaterialCategoryId), fn ($q) => $q->where("{$tablePrefix}.material_category_id", $this->filterMaterialCategoryId))
+            ->when($this->isValidUuid($this->filterMaterialId), fn ($q) => $q->where("{$tablePrefix}.material_id", $this->filterMaterialId))
+            ->when($this->isValidUuid($this->filterQuestionTypeId), fn ($q) => $q->where("{$tablePrefix}.question_type_id", $this->filterQuestionTypeId))
+            ->when($this->isValidUuid($this->filterCategoryQuestionId), fn ($q) => $q->where("{$tablePrefix}.category_question_id", $this->filterCategoryQuestionId));
 
         if (! empty($this->search)) {
             $term = trim($this->search);

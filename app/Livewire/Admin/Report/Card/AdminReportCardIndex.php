@@ -47,29 +47,48 @@ class AdminReportCardIndex extends Component
 
     public function printParticipantCards($timetableId)
     {
-        @ini_set('memory_limit', '512M');
-        @set_time_limit(300);
+        @ini_set('memory_limit', '1024M');
+        @set_time_limit(600);
+        $this->skipRender();
 
-        $timetable = Timetable::with(['module', 'userTimetables.user'])->find($timetableId);
-        if (! $timetable) {
-            return;
+        try {
+            $timetable = Timetable::with([
+                'module:id,name',
+                'userTimetables:id,timetable_id,user_id',
+                'userTimetables.user:id,name,nim,username',
+            ])->find($timetableId);
+
+            if (! $timetable) {
+                session()->flash('error', 'Jadwal ujian tidak ditemukan.');
+
+                return;
+            }
+
+            $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : \App\Models\Company\Company::with('companyDetail')->first();
+
+            // Sort by name safely
+            $timetable->userTimetables = $timetable->userTimetables->sortBy(function ($ut) {
+                return $ut->user?->name ?? '';
+            });
+
+            $pdf = Pdf::loadView('livewire.admin.report.timetable.admin-report-timetable-card-pdf', [
+                'timetable' => $timetable,
+                'company' => $company,
+            ])
+                ->setPaper('a4', 'portrait')
+                ->setOption('isHtml5ParserEnabled', true)
+                ->setOption('isRemoteEnabled', false)
+                ->setOption('isFontSubsettingEnabled', true)
+                ->setOption('defaultFont', 'sans-serif')
+                ->setOption('chroot', public_path());
+
+            return response()->streamDownload(
+                fn () => print ($pdf->output()),
+                'kartu-peserta-'.\Str::slug($timetable->name).'.pdf'
+            );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Print Participant Cards Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            session()->flash('error', 'Gagal membuat file PDF: '.$e->getMessage());
         }
-
-        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : \App\Models\Company\Company::with('companyDetail')->first();
-
-        // Sort by name safely
-        $timetable->userTimetables = $timetable->userTimetables->sortBy(function ($ut) {
-            return $ut->user?->name ?? '';
-        });
-
-        $pdf = Pdf::loadView('livewire.admin.report.timetable.admin-report-timetable-card-pdf', [
-            'timetable' => $timetable,
-            'company' => $company,
-        ])->setPaper('a4', 'portrait');
-
-        return response()->streamDownload(
-            fn () => print ($pdf->output()),
-            'kartu-peserta-'.\Str::slug($timetable->name).'.pdf'
-        );
     }
 }

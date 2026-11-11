@@ -58,19 +58,45 @@ class AdminReportItemAnalysisAllIndex extends Component
 
     public function exportOverview()
     {
-        @ini_set('memory_limit', '512M');
-        @set_time_limit(300);
-
-        $service = app(ItemAnalysisService::class);
-        // The grouped query exposes questions.id as question_id.
-        $ids = $this->selectedQuestionId ? [$this->selectedQuestionId] : $this->itemsQuery()->get()->pluck('question_id')->all();
-        $analyses = $service->aggregateMany($ids);
+        @ini_set('memory_limit', '1024M');
+        @set_time_limit(600);
         $this->skipRender();
-        $pdf = Pdf::loadView('livewire.admin.report.shared.overview-pdf', [
-            'title' => 'Analisis Butir Soal — Semua Jadwal', 'analyses' => $analyses,
-        ])->setPaper('a4', 'portrait');
 
-        return response()->streamDownload(fn () => print ($pdf->output()), 'overview-analisis-semua-soal.pdf');
+        try {
+            $service = app(ItemAnalysisService::class);
+            // The grouped query exposes questions.id as question_id.
+            $ids = $this->selectedQuestionId ? [$this->selectedQuestionId] : $this->itemsQuery()->get()->pluck('question_id')->all();
+
+            if (empty($ids)) {
+                session()->flash('message', 'Tidak ada data butir soal untuk diekspor ke PDF.');
+
+                return;
+            }
+
+            $analyses = $service->aggregateMany($ids);
+
+            if (empty($analyses)) {
+                session()->flash('message', 'Tidak ada hasil analisis yang dapat diekspor ke PDF.');
+
+                return;
+            }
+
+            $pdf = Pdf::loadView('livewire.admin.report.shared.overview-pdf', [
+                'title' => 'Analisis Butir Soal — Semua Jadwal',
+                'analyses' => $analyses,
+            ])
+                ->setPaper('a4', 'portrait')
+                ->setOption('isHtml5ParserEnabled', true)
+                ->setOption('isRemoteEnabled', false)
+                ->setOption('isFontSubsettingEnabled', true)
+                ->setOption('defaultFont', 'sans-serif')
+                ->setOption('chroot', public_path());
+
+            return response()->streamDownload(fn () => print ($pdf->output()), 'overview-analisis-semua-soal.pdf');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Export Overview PDF Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            session()->flash('message', 'Gagal membuat file PDF: '.$e->getMessage());
+        }
     }
 
     public $difficultySelections = [];
@@ -162,12 +188,18 @@ class AdminReportItemAnalysisAllIndex extends Component
 
     public function generateAll(): void
     {
+        @ini_set('memory_limit', '1024M');
+        @set_time_limit(600);
+
         $companyId = auth()->user()?->company_id;
 
         $rows = UserModuleQuestion::withoutGlobalScope('user_scope')
             ->join('timetable_questions', 'user_module_questions.timetable_question_id', '=', 'timetable_questions.id')
             ->join('questions', 'timetable_questions.question_id', '=', 'questions.id')
             ->when($companyId, fn ($q) => $q->where('user_module_questions.company_id', $companyId))
+            ->whereNull('user_module_questions.deleted_at')
+            ->whereNull('timetable_questions.deleted_at')
+            ->whereNull('questions.deleted_at')
             ->where(function ($q) {
                 $q->whereNull('user_module_questions.is_show')
                     ->orWhere('user_module_questions.is_show', true);
@@ -186,24 +218,32 @@ class AdminReportItemAnalysisAllIndex extends Component
             return;
         }
 
-        DB::transaction(function () use ($rows) {
-            foreach ($rows as $row) {
-                $total = (int) ($row->total_attempts ?? 0);
-                $correct = (int) ($row->total_correct ?? 0);
-                if ($total <= 0) {
-                    continue;
+        $updates = [
+            'easy' => [],
+            'medium' => [],
+            'hard' => [],
+        ];
+
+        foreach ($rows as $row) {
+            $total = (int) ($row->total_attempts ?? 0);
+            $correct = (int) ($row->total_correct ?? 0);
+            if ($total <= 0) {
+                continue;
+            }
+
+            $p = $correct / $total;
+            $difficulty = $p >= 0.7 ? 'easy' : ($p >= 0.3 ? 'medium' : 'hard');
+            $updates[$difficulty][] = $row->question_id;
+        }
+
+        DB::transaction(function () use ($updates) {
+            foreach ($updates as $difficulty => $ids) {
+                if (! empty($ids)) {
+                    foreach (array_chunk($ids, 500) as $chunkIds) {
+                        Question::whereIn('id', $chunkIds)->update(['difficulty' => $difficulty]);
+                        TimetableQuestion::whereIn('question_id', $chunkIds)->update(['difficulty' => $difficulty]);
+                    }
                 }
-
-                $p = $correct / $total;
-                $difficulty = $p >= 0.7 ? 'easy' : ($p >= 0.3 ? 'medium' : 'hard');
-
-                Question::where('id', $row->question_id)->update([
-                    'difficulty' => $difficulty,
-                ]);
-
-                TimetableQuestion::where('question_id', $row->question_id)->update([
-                    'difficulty' => $difficulty,
-                ]);
             }
         });
 

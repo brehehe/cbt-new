@@ -80,15 +80,34 @@ class AdminReportItemAnalysisDetailIndex extends Component
 
     public function exportPdf()
     {
-        @ini_set('memory_limit', '512M');
-        @set_time_limit(300);
+        @ini_set('memory_limit', '1024M');
+        @set_time_limit(600);
         $this->skipRender();
-        $report = $this->report();
-        $pdf = Pdf::loadView('livewire.admin.report.shared.overview-pdf', [
-            'title' => 'Analisis Butir Soal — '.$report->timetable->name,
-            'analyses' => $report->itemAnalysisData,
-        ])->setPaper('a4', 'portrait');
 
-        return response()->streamDownload(fn () => print ($pdf->output()), 'analisis-butir-soal.pdf');
+        try {
+            $report = $this->report();
+
+            if (empty($report->itemAnalysisData)) {
+                session()->flash('error', 'Tidak ada data butir soal untuk diekspor ke PDF.');
+
+                return;
+            }
+
+            $pdf = Pdf::loadView('livewire.admin.report.shared.overview-pdf', [
+                'title' => 'Analisis Butir Soal — '.($report->timetable?->name ?? 'Jadwal Ujian'),
+                'analyses' => $report->itemAnalysisData,
+            ])
+                ->setPaper('a4', 'portrait')
+                ->setOption('isHtml5ParserEnabled', true)
+                ->setOption('isRemoteEnabled', false)
+                ->setOption('isFontSubsettingEnabled', true)
+                ->setOption('defaultFont', 'sans-serif')
+                ->setOption('chroot', public_path());
+
+            return response()->streamDownload(fn () => print ($pdf->output()), 'analisis-butir-soal.pdf');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Item Analysis Detail PDF Export Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            session()->flash('error', 'Gagal membuat file PDF: '.$e->getMessage());
+        }
     }
 }

@@ -19,35 +19,50 @@ class ExamResultExport implements FromCollection, WithColumnWidths, WithHeadings
     protected $user_id;
     protected $module_id;
     protected $timetable_id;
+    protected $questionFilters = [];
     protected $allTopics = [];
     protected $ratingScales;
     protected $examResults;
     protected $overallStats = [];
     protected $topicStatsByUser = [];
 
-    public function __construct($search = '', $user_id = '', $module_id = '', $timetable_id = '')
+    public function __construct($search = '', $user_id = '', $module_id = '', $timetable_id = '', array $questionFilters = [])
     {
-        @ini_set('memory_limit', '512M');
-        @set_time_limit(300);
+        @ini_set('memory_limit', '1024M');
+        @set_time_limit(600);
 
         $this->search = $search;
         $this->user_id = $user_id;
         $this->module_id = $module_id;
         $this->timetable_id = $timetable_id;
+        $this->questionFilters = $questionFilters;
         $this->ratingScales = RatingScale::orderBy('order')->get();
 
         $this->loadData();
+    }
+
+    private function isValidUuid($value): bool
+    {
+        return is_string($value) && preg_match('/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/', $value) === 1;
     }
 
     private function loadData()
     {
         $companyId = auth()->user()?->company_id;
 
+        $filterTopicId = $this->isValidUuid($this->questionFilters['filterTopicId'] ?? null) ? $this->questionFilters['filterTopicId'] : null;
+        $filterMaterialCategoryId = $this->isValidUuid($this->questionFilters['filterMaterialCategoryId'] ?? null) ? $this->questionFilters['filterMaterialCategoryId'] : null;
+        $filterMaterialId = $this->isValidUuid($this->questionFilters['filterMaterialId'] ?? null) ? $this->questionFilters['filterMaterialId'] : null;
+        $filterQuestionTypeId = $this->isValidUuid($this->questionFilters['filterQuestionTypeId'] ?? null) ? $this->questionFilters['filterQuestionTypeId'] : null;
+        $filterCategoryQuestionId = $this->isValidUuid($this->questionFilters['filterCategoryQuestionId'] ?? null) ? $this->questionFilters['filterCategoryQuestionId'] : null;
+        $hasQuestionFilter = $filterTopicId || $filterMaterialCategoryId || $filterMaterialId || $filterQuestionTypeId || $filterCategoryQuestionId;
+
         // 1. Fetch only necessary user timetables using lightweight DB::table query (no heavy model hydration)
         $query = DB::table('user_timetables as ut')
             ->leftJoin('users as u', 'u.id', '=', 'ut.user_id')
             ->leftJoin('timetables as t', 't.id', '=', 'ut.timetable_id')
             ->leftJoin('modules as m', 'm.id', '=', 't.module_id')
+            ->whereNull('ut.deleted_at')
             ->when($companyId, fn ($q) => $q->where('ut.company_id', $companyId))
             ->when($this->user_id, fn ($q) => $q->where('ut.user_id', $this->user_id))
             ->when($this->module_id, fn ($q) => $q->where('t.module_id', $this->module_id))
@@ -61,8 +76,23 @@ class ExamResultExport implements FromCollection, WithColumnWidths, WithHeadings
                         ->orWhere('t.name', 'ilike', $search)
                         ->orWhere('m.name', 'ilike', $search);
                 });
-            })
-            ->select([
+            });
+
+        if ($hasQuestionFilter) {
+            $query->whereExists(function ($sub) use ($filterTopicId, $filterMaterialCategoryId, $filterMaterialId, $filterQuestionTypeId, $filterCategoryQuestionId) {
+                $sub->select(DB::raw(1))
+                    ->from('user_module_questions as sub_umq')
+                    ->join('timetable_questions as sub_tq', 'sub_tq.id', '=', 'sub_umq.timetable_question_id')
+                    ->whereColumn('sub_umq.user_timetable_id', 'ut.id')
+                    ->when($filterTopicId, fn ($q) => $q->where('sub_tq.topic_id', $filterTopicId))
+                    ->when($filterMaterialCategoryId, fn ($q) => $q->where('sub_tq.material_category_id', $filterMaterialCategoryId))
+                    ->when($filterMaterialId, fn ($q) => $q->where('sub_tq.material_id', $filterMaterialId))
+                    ->when($filterQuestionTypeId, fn ($q) => $q->where('sub_tq.question_type_id', $filterQuestionTypeId))
+                    ->when($filterCategoryQuestionId, fn ($q) => $q->where('sub_tq.category_question_id', $filterCategoryQuestionId));
+            });
+        }
+
+        $this->examResults = $query->select([
                 'ut.id',
                 'ut.user_id',
                 'ut.timetable_id',
@@ -74,9 +104,8 @@ class ExamResultExport implements FromCollection, WithColumnWidths, WithHeadings
                 't.name as timetable_name',
                 'm.name as module_name',
             ])
-            ->orderBy('ut.created_at', 'desc');
-
-        $this->examResults = $query->get();
+            ->orderBy('ut.created_at', 'desc')
+            ->get();
 
         $userTimetableIds = $this->examResults->pluck('id');
 
@@ -85,17 +114,27 @@ class ExamResultExport implements FromCollection, WithColumnWidths, WithHeadings
         }
 
         // 2. Chunking in 500-record blocks to prevent parameter limit and memory spikes
-        $userTimetableIds->chunk(500)->each(function ($chunk) {
-            $overallRows = DB::table('user_module_questions')
-                ->whereIn('user_timetable_id', $chunk)
-                ->whereNull('deleted_at')
-                ->groupBy('user_timetable_id')
+        $userTimetableIds->chunk(500)->each(function ($chunk) use ($hasQuestionFilter, $filterTopicId, $filterMaterialCategoryId, $filterMaterialId, $filterQuestionTypeId, $filterCategoryQuestionId) {
+            $overallQuery = DB::table('user_module_questions as umq')
+                ->whereIn('umq.user_timetable_id', $chunk)
+                ->whereNull('umq.deleted_at');
+
+            if ($hasQuestionFilter) {
+                $overallQuery->join('timetable_questions as sub_tq', 'sub_tq.id', '=', 'umq.timetable_question_id')
+                    ->when($filterTopicId, fn ($q) => $q->where('sub_tq.topic_id', $filterTopicId))
+                    ->when($filterMaterialCategoryId, fn ($q) => $q->where('sub_tq.material_category_id', $filterMaterialCategoryId))
+                    ->when($filterMaterialId, fn ($q) => $q->where('sub_tq.material_id', $filterMaterialId))
+                    ->when($filterQuestionTypeId, fn ($q) => $q->where('sub_tq.question_type_id', $filterQuestionTypeId))
+                    ->when($filterCategoryQuestionId, fn ($q) => $q->where('sub_tq.category_question_id', $filterCategoryQuestionId));
+            }
+
+            $overallRows = $overallQuery->groupBy('umq.user_timetable_id')
                 ->select(
-                    'user_timetable_id',
+                    'umq.user_timetable_id',
                     DB::raw('COUNT(*) as total_questions'),
-                    DB::raw("COUNT(CASE WHEN status = 'correct' THEN 1 END) as correct"),
-                    DB::raw("COUNT(CASE WHEN status = 'wrong' THEN 1 END) as wrong"),
-                    DB::raw("COUNT(CASE WHEN timetable_answer_id IS NULL THEN 1 END) as unanswered")
+                    DB::raw("COUNT(CASE WHEN umq.status = 'correct' THEN 1 END) as correct"),
+                    DB::raw("COUNT(CASE WHEN umq.status = 'wrong' THEN 1 END) as wrong"),
+                    DB::raw("COUNT(CASE WHEN umq.timetable_answer_id IS NULL THEN 1 END) as unanswered")
                 )
                 ->get();
 
@@ -108,13 +147,22 @@ class ExamResultExport implements FromCollection, WithColumnWidths, WithHeadings
                 ];
             }
 
-            $topicRows = DB::table('user_module_questions as umq')
+            $topicQuery = DB::table('user_module_questions as umq')
                 ->join('timetable_questions as tq', 'tq.id', '=', 'umq.timetable_question_id')
                 ->leftJoin('topics as top', 'top.id', '=', 'tq.topic_id')
                 ->whereIn('umq.user_timetable_id', $chunk)
                 ->whereNull('umq.deleted_at')
-                ->whereNotNull('tq.topic_id')
-                ->groupBy('umq.user_timetable_id', 'tq.topic_id', 'top.name')
+                ->whereNotNull('tq.topic_id');
+
+            if ($hasQuestionFilter) {
+                $topicQuery->when($filterTopicId, fn ($q) => $q->where('tq.topic_id', $filterTopicId))
+                    ->when($filterMaterialCategoryId, fn ($q) => $q->where('tq.material_category_id', $filterMaterialCategoryId))
+                    ->when($filterMaterialId, fn ($q) => $q->where('tq.material_id', $filterMaterialId))
+                    ->when($filterQuestionTypeId, fn ($q) => $q->where('tq.question_type_id', $filterQuestionTypeId))
+                    ->when($filterCategoryQuestionId, fn ($q) => $q->where('tq.category_question_id', $filterCategoryQuestionId));
+            }
+
+            $topicRows = $topicQuery->groupBy('umq.user_timetable_id', 'tq.topic_id', 'top.name')
                 ->select(
                     'umq.user_timetable_id',
                     'tq.topic_id',

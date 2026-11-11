@@ -69,19 +69,19 @@ class AdminReportStudentExamResultIndex extends Component
                 'timetable:id,name,module_id,start_time,end_time',
                 'timetable.module:id,name',
             ])
-            ->where('user_id', $this->user_id);
+            ->where('user_timetables.user_id', $this->user_id);
 
         if (! empty($this->search)) {
             $query->search($this->search);
         }
 
-        if ($this->filterTopicId || $this->filterMaterialCategoryId || $this->filterMaterialId || $this->filterQuestionTypeId || $this->filterCategoryQuestionId) {
+        if ($this->isValidUuid($this->filterTopicId) || $this->isValidUuid($this->filterMaterialCategoryId) || $this->isValidUuid($this->filterMaterialId) || $this->isValidUuid($this->filterQuestionTypeId) || $this->isValidUuid($this->filterCategoryQuestionId)) {
             $query->whereHas('userModuleQuestions.timetableQuestion', function ($q) {
-                $q->when($this->filterTopicId, fn ($sub) => $sub->where('topic_id', $this->filterTopicId))
-                    ->when($this->filterMaterialCategoryId, fn ($sub) => $sub->where('material_category_id', $this->filterMaterialCategoryId))
-                    ->when($this->filterMaterialId, fn ($sub) => $sub->where('material_id', $this->filterMaterialId))
-                    ->when($this->filterQuestionTypeId, fn ($sub) => $sub->where('question_type_id', $this->filterQuestionTypeId))
-                    ->when($this->filterCategoryQuestionId, fn ($sub) => $sub->where('category_question_id', $this->filterCategoryQuestionId));
+                $q->when($this->isValidUuid($this->filterTopicId), fn ($sub) => $sub->where('topic_id', $this->filterTopicId))
+                    ->when($this->isValidUuid($this->filterMaterialCategoryId), fn ($sub) => $sub->where('material_category_id', $this->filterMaterialCategoryId))
+                    ->when($this->isValidUuid($this->filterMaterialId), fn ($sub) => $sub->where('material_id', $this->filterMaterialId))
+                    ->when($this->isValidUuid($this->filterQuestionTypeId), fn ($sub) => $sub->where('question_type_id', $this->filterQuestionTypeId))
+                    ->when($this->isValidUuid($this->filterCategoryQuestionId), fn ($sub) => $sub->where('category_question_id', $this->filterCategoryQuestionId));
             });
         }
 
@@ -136,46 +136,57 @@ class AdminReportStudentExamResultIndex extends Component
 
     public function exportPdf()
     {
-        @ini_set('memory_limit', '512M');
-        @set_time_limit(300);
+        @ini_set('memory_limit', '1024M');
+        @set_time_limit(600);
+        $this->skipRender();
 
         if (! $this->user_id) {
             return;
         }
 
-        $user = User::withoutGlobalScopes()->find($this->user_id);
-        if (! $user) {
-            return;
+        try {
+            $user = User::withoutGlobalScopes()->find($this->user_id);
+            if (! $user) {
+                return;
+            }
+
+            $examResults = $this->buildQuery()->get();
+
+            $gradeDetails = [];
+            foreach ($examResults as $result) {
+                $gradeDetails[$result->id] = $this->getGradeDetail($result->mark);
+            }
+
+            $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : \App\Models\Company\Company::with('companyDetail')->first();
+
+            // Calculate summary stats
+            $stats = [
+                'total_exams' => $examResults->count(),
+                'average_score' => $examResults->count() > 0 ? round($examResults->avg('mark'), 2) : 0,
+                'passed_exams' => 0,
+            ];
+
+            $pdf = Pdf::loadView('livewire.admin.report.student-exam-result.admin-report-student-exam-result-pdf', [
+                'user' => $user,
+                'examResults' => $examResults,
+                'gradeDetails' => $gradeDetails,
+                'company' => $company,
+                'stats' => $stats,
+            ])
+                ->setPaper('a4', 'portrait')
+                ->setOption('isHtml5ParserEnabled', true)
+                ->setOption('isRemoteEnabled', false)
+                ->setOption('isFontSubsettingEnabled', true)
+                ->setOption('defaultFont', 'sans-serif')
+                ->setOption('chroot', public_path());
+
+            return response()->streamDownload(
+                fn () => print ($pdf->output()),
+                'hasil-ujian-mahasiswa_'.\Str::slug($user->name).'_'.date('Y-m-d').'.pdf'
+            );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Student Exam Result PDF Export Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            session()->flash('error', 'Gagal membuat file PDF: '.$e->getMessage());
         }
-
-        $examResults = $this->buildQuery()->get();
-
-        $gradeDetails = [];
-        foreach ($examResults as $result) {
-            $gradeDetails[$result->id] = $this->getGradeDetail($result->mark);
-        }
-
-        $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : \App\Models\Company\Company::with('companyDetail')->first();
-
-        // Calculate summary stats
-        $stats = [
-            'total_exams' => $examResults->count(),
-            'average_score' => $examResults->count() > 0 ? round($examResults->avg('mark'), 2) : 0,
-            'passed_exams' => 0,
-        ];
-
-        $pdf = Pdf::loadView('livewire.admin.report.student-exam-result.admin-report-student-exam-result-pdf', [
-            'user' => $user,
-            'examResults' => $examResults,
-            'gradeDetails' => $gradeDetails,
-            'company' => $company,
-            'stats' => $stats,
-        ])
-            ->setPaper('a4', 'portrait');
-
-        return response()->streamDownload(
-            fn () => print ($pdf->output()),
-            'hasil-ujian-mahasiswa_'.\Str::slug($user->name).'_'.date('Y-m-d').'.pdf'
-        );
     }
 }

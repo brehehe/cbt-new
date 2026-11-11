@@ -76,7 +76,7 @@ class AdminReportExamResultIndex extends Component
             ])
             ->search($this->search)
             ->when($this->user_id, function ($query) {
-                $query->where('user_id', $this->user_id);
+                $query->where('user_timetables.user_id', $this->user_id);
             })
             ->when($this->module_id, function ($query) {
                 $query->whereHas('timetable', function ($q) {
@@ -84,15 +84,15 @@ class AdminReportExamResultIndex extends Component
                 });
             })
             ->when($this->timetable_id, function ($query) {
-                $query->where('timetable_id', $this->timetable_id);
+                $query->where('user_timetables.timetable_id', $this->timetable_id);
             })
-            ->when($this->filterTopicId || $this->filterMaterialCategoryId || $this->filterMaterialId || $this->filterQuestionTypeId || $this->filterCategoryQuestionId, function ($query) {
+            ->when($this->isValidUuid($this->filterTopicId) || $this->isValidUuid($this->filterMaterialCategoryId) || $this->isValidUuid($this->filterMaterialId) || $this->isValidUuid($this->filterQuestionTypeId) || $this->isValidUuid($this->filterCategoryQuestionId), function ($query) {
                 $query->whereHas('userModuleQuestions.timetableQuestion', function ($q) {
-                    $q->when($this->filterTopicId, fn ($sub) => $sub->where('topic_id', $this->filterTopicId))
-                        ->when($this->filterMaterialCategoryId, fn ($sub) => $sub->where('material_category_id', $this->filterMaterialCategoryId))
-                        ->when($this->filterMaterialId, fn ($sub) => $sub->where('material_id', $this->filterMaterialId))
-                        ->when($this->filterQuestionTypeId, fn ($sub) => $sub->where('question_type_id', $this->filterQuestionTypeId))
-                        ->when($this->filterCategoryQuestionId, fn ($sub) => $sub->where('category_question_id', $this->filterCategoryQuestionId));
+                    $q->when($this->isValidUuid($this->filterTopicId), fn ($sub) => $sub->where('topic_id', $this->filterTopicId))
+                        ->when($this->isValidUuid($this->filterMaterialCategoryId), fn ($sub) => $sub->where('material_category_id', $this->filterMaterialCategoryId))
+                        ->when($this->isValidUuid($this->filterMaterialId), fn ($sub) => $sub->where('material_id', $this->filterMaterialId))
+                        ->when($this->isValidUuid($this->filterQuestionTypeId), fn ($sub) => $sub->where('question_type_id', $this->filterQuestionTypeId))
+                        ->when($this->isValidUuid($this->filterCategoryQuestionId), fn ($sub) => $sub->where('category_question_id', $this->filterCategoryQuestionId));
                 });
             });
 
@@ -124,7 +124,11 @@ class AdminReportExamResultIndex extends Component
         $topicStatsByUser = [];
 
         if (! empty($currentPageIds)) {
-            $hasQuestionFilter = $this->filterTopicId || $this->filterMaterialCategoryId || $this->filterMaterialId || $this->filterQuestionTypeId || $this->filterCategoryQuestionId;
+            $hasQuestionFilter = $this->isValidUuid($this->filterTopicId)
+                || $this->isValidUuid($this->filterMaterialCategoryId)
+                || $this->isValidUuid($this->filterMaterialId)
+                || $this->isValidUuid($this->filterQuestionTypeId)
+                || $this->isValidUuid($this->filterCategoryQuestionId);
 
             $overallQuery = DB::table('user_module_questions as umq')
                 ->whereIn('umq.user_timetable_id', $currentPageIds)
@@ -132,11 +136,11 @@ class AdminReportExamResultIndex extends Component
 
             if ($hasQuestionFilter) {
                 $overallQuery->join('timetable_questions as tq_filter', 'tq_filter.id', '=', 'umq.timetable_question_id')
-                    ->when($this->filterTopicId, fn ($q) => $q->where('tq_filter.topic_id', $this->filterTopicId))
-                    ->when($this->filterMaterialCategoryId, fn ($q) => $q->where('tq_filter.material_category_id', $this->filterMaterialCategoryId))
-                    ->when($this->filterMaterialId, fn ($q) => $q->where('tq_filter.material_id', $this->filterMaterialId))
-                    ->when($this->filterQuestionTypeId, fn ($q) => $q->where('tq_filter.question_type_id', $this->filterQuestionTypeId))
-                    ->when($this->filterCategoryQuestionId, fn ($q) => $q->where('tq_filter.category_question_id', $this->filterCategoryQuestionId));
+                    ->when($this->isValidUuid($this->filterTopicId), fn ($q) => $q->where('tq_filter.topic_id', $this->filterTopicId))
+                    ->when($this->isValidUuid($this->filterMaterialCategoryId), fn ($q) => $q->where('tq_filter.material_category_id', $this->filterMaterialCategoryId))
+                    ->when($this->isValidUuid($this->filterMaterialId), fn ($q) => $q->where('tq_filter.material_id', $this->filterMaterialId))
+                    ->when($this->isValidUuid($this->filterQuestionTypeId), fn ($q) => $q->where('tq_filter.question_type_id', $this->filterQuestionTypeId))
+                    ->when($this->isValidUuid($this->filterCategoryQuestionId), fn ($q) => $q->where('tq_filter.category_question_id', $this->filterCategoryQuestionId));
             }
 
             $overallRows = $overallQuery->groupBy('umq.user_timetable_id')
@@ -266,17 +270,23 @@ class AdminReportExamResultIndex extends Component
                 });
             }
 
-            if ($this->filterTopicId || $this->filterMaterialCategoryId || $this->filterMaterialId || $this->filterQuestionTypeId || $this->filterCategoryQuestionId) {
+            $hasQuestionFilter = $this->isValidUuid($this->filterTopicId)
+                || $this->isValidUuid($this->filterMaterialCategoryId)
+                || $this->isValidUuid($this->filterMaterialId)
+                || $this->isValidUuid($this->filterQuestionTypeId)
+                || $this->isValidUuid($this->filterCategoryQuestionId);
+
+            if ($hasQuestionFilter) {
                 $query->whereExists(function ($sub) {
                     $sub->select(DB::raw(1))
                         ->from('user_module_questions as sub_umq')
                         ->join('timetable_questions as sub_tq', 'sub_tq.id', '=', 'sub_umq.timetable_question_id')
                         ->whereColumn('sub_umq.user_timetable_id', 'ut.id')
-                        ->when($this->filterTopicId, fn ($q) => $q->where('sub_tq.topic_id', $this->filterTopicId))
-                        ->when($this->filterMaterialCategoryId, fn ($q) => $q->where('sub_tq.material_category_id', $this->filterMaterialCategoryId))
-                        ->when($this->filterMaterialId, fn ($q) => $q->where('sub_tq.material_id', $this->filterMaterialId))
-                        ->when($this->filterQuestionTypeId, fn ($q) => $q->where('sub_tq.question_type_id', $this->filterQuestionTypeId))
-                        ->when($this->filterCategoryQuestionId, fn ($q) => $q->where('sub_tq.category_question_id', $this->filterCategoryQuestionId));
+                        ->when($this->isValidUuid($this->filterTopicId), fn ($q) => $q->where('sub_tq.topic_id', $this->filterTopicId))
+                        ->when($this->isValidUuid($this->filterMaterialCategoryId), fn ($q) => $q->where('sub_tq.material_category_id', $this->filterMaterialCategoryId))
+                        ->when($this->isValidUuid($this->filterMaterialId), fn ($q) => $q->where('sub_tq.material_id', $this->filterMaterialId))
+                        ->when($this->isValidUuid($this->filterQuestionTypeId), fn ($q) => $q->where('sub_tq.question_type_id', $this->filterQuestionTypeId))
+                        ->when($this->isValidUuid($this->filterCategoryQuestionId), fn ($q) => $q->where('sub_tq.category_question_id', $this->filterCategoryQuestionId));
                 });
             }
 
@@ -304,18 +314,30 @@ class AdminReportExamResultIndex extends Component
             $allTopics = [];
 
             if (! empty($userTimetableIds)) {
+                $hasQuestionFilter = $this->filterTopicId || $this->filterMaterialCategoryId || $this->filterMaterialId || $this->filterQuestionTypeId || $this->filterCategoryQuestionId;
+
                 // Chunk queries in 500-record blocks to prevent PostgreSQL parameter limits and RAM spikes
                 foreach (array_chunk($userTimetableIds, 500) as $chunkIds) {
-                    $overallRows = DB::table('user_module_questions')
-                        ->whereIn('user_timetable_id', $chunkIds)
-                        ->whereNull('deleted_at')
-                        ->groupBy('user_timetable_id')
+                    $overallQuery = DB::table('user_module_questions as umq')
+                        ->whereIn('umq.user_timetable_id', $chunkIds)
+                        ->whereNull('umq.deleted_at');
+
+                    if ($hasQuestionFilter) {
+                        $overallQuery->join('timetable_questions as sub_tq', 'sub_tq.id', '=', 'umq.timetable_question_id')
+                            ->when($this->isValidUuid($this->filterTopicId), fn ($q) => $q->where('sub_tq.topic_id', $this->filterTopicId))
+                            ->when($this->isValidUuid($this->filterMaterialCategoryId), fn ($q) => $q->where('sub_tq.material_category_id', $this->filterMaterialCategoryId))
+                            ->when($this->isValidUuid($this->filterMaterialId), fn ($q) => $q->where('sub_tq.material_id', $this->filterMaterialId))
+                            ->when($this->isValidUuid($this->filterQuestionTypeId), fn ($q) => $q->where('sub_tq.question_type_id', $this->filterQuestionTypeId))
+                            ->when($this->isValidUuid($this->filterCategoryQuestionId), fn ($q) => $q->where('sub_tq.category_question_id', $this->filterCategoryQuestionId));
+                    }
+
+                    $overallRows = $overallQuery->groupBy('umq.user_timetable_id')
                         ->select(
-                            'user_timetable_id',
+                            'umq.user_timetable_id',
                             DB::raw('COUNT(*) as total_questions'),
-                            DB::raw("COUNT(CASE WHEN status = 'correct' THEN 1 END) as correct"),
-                            DB::raw("COUNT(CASE WHEN status = 'wrong' THEN 1 END) as wrong"),
-                            DB::raw("COUNT(CASE WHEN timetable_answer_id IS NULL THEN 1 END) as unanswered")
+                            DB::raw("COUNT(CASE WHEN umq.status = 'correct' THEN 1 END) as correct"),
+                            DB::raw("COUNT(CASE WHEN umq.status = 'wrong' THEN 1 END) as wrong"),
+                            DB::raw("COUNT(CASE WHEN umq.timetable_answer_id IS NULL THEN 1 END) as unanswered")
                         )
                         ->get();
 
@@ -447,17 +469,29 @@ class AdminReportExamResultIndex extends Component
     public function exportExcel()
     {
         try {
-            @ini_set('memory_limit', '512M');
-            @set_time_limit(300);
+            @ini_set('memory_limit', '1024M');
+            @set_time_limit(600);
 
             $fileName = 'exam-result-report-'.date('YmdHis').'.xlsx';
 
             return Excel::download(
-                new ExamResultExport($this->search, $this->user_id, $this->module_id, $this->timetable_id),
+                new ExamResultExport(
+                    $this->search,
+                    $this->user_id,
+                    $this->module_id,
+                    $this->timetable_id,
+                    [
+                        'filterTopicId' => $this->filterTopicId,
+                        'filterMaterialCategoryId' => $this->filterMaterialCategoryId,
+                        'filterMaterialId' => $this->filterMaterialId,
+                        'filterQuestionTypeId' => $this->filterQuestionTypeId,
+                        'filterCategoryQuestionId' => $this->filterCategoryQuestionId,
+                    ]
+                ),
                 $fileName
             );
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Exam Result Excel Export Error: '.$e->getMessage());
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Exam Result Excel Export Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
             session()->flash('error', 'Gagal mengekspor data ke Excel: '.$e->getMessage());
         }
     }
