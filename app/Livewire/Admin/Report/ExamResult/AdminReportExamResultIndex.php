@@ -36,6 +36,10 @@ class AdminReportExamResultIndex extends Component
 
     public $sortDirection = 'asc';
 
+    protected $cachedOverallStats = [];
+
+    protected $cachedTopicStatsByUser = [];
+
     public function setSorting(string $field): void
     {
         if ($this->sortBy === $field) {
@@ -60,8 +64,16 @@ class AdminReportExamResultIndex extends Component
 
     public function render()
     {
+        $companyId = Auth::user()?->company_id;
+
         $examResults = UserTimetable::withoutGlobalScopes()
-            ->with(['user', 'timetable.module', 'userModuleQuestions.timetableQuestion.topic'])
+            ->when($companyId, fn ($q) => $q->where('user_timetables.company_id', $companyId))
+            ->select(['user_timetables.id', 'user_timetables.user_id', 'user_timetables.timetable_id', 'user_timetables.mark', 'user_timetables.created_at'])
+            ->with([
+                'user:id,name,nim,username',
+                'timetable:id,name,module_id,start_time,end_time',
+                'timetable.module:id,name',
+            ])
             ->search($this->search)
             ->when($this->user_id, function ($query) {
                 $query->where('user_id', $this->user_id);
@@ -104,12 +116,93 @@ class AdminReportExamResultIndex extends Component
             $examResults->orderBy('user_timetables.created_at', $dir);
         }
 
-        $companyId = Auth::user()?->company_id;
+        $paginatedResults = $examResults->paginate($this->perPage);
+
+        // Pre-aggregate overall question stats and topic breakdown in DB for current page (No N+1, No memory bloat)
+        $currentPageIds = $paginatedResults->pluck('id')->all();
+        $overallStats = [];
+        $topicStatsByUser = [];
+
+        if (! empty($currentPageIds)) {
+            $hasQuestionFilter = $this->filterTopicId || $this->filterMaterialCategoryId || $this->filterMaterialId || $this->filterQuestionTypeId || $this->filterCategoryQuestionId;
+
+            $overallQuery = DB::table('user_module_questions as umq')
+                ->whereIn('umq.user_timetable_id', $currentPageIds)
+                ->whereNull('umq.deleted_at');
+
+            if ($hasQuestionFilter) {
+                $overallQuery->join('timetable_questions as tq_filter', 'tq_filter.id', '=', 'umq.timetable_question_id')
+                    ->when($this->filterTopicId, fn ($q) => $q->where('tq_filter.topic_id', $this->filterTopicId))
+                    ->when($this->filterMaterialCategoryId, fn ($q) => $q->where('tq_filter.material_category_id', $this->filterMaterialCategoryId))
+                    ->when($this->filterMaterialId, fn ($q) => $q->where('tq_filter.material_id', $this->filterMaterialId))
+                    ->when($this->filterQuestionTypeId, fn ($q) => $q->where('tq_filter.question_type_id', $this->filterQuestionTypeId))
+                    ->when($this->filterCategoryQuestionId, fn ($q) => $q->where('tq_filter.category_question_id', $this->filterCategoryQuestionId));
+            }
+
+            $overallRows = $overallQuery->groupBy('umq.user_timetable_id')
+                ->select(
+                    'umq.user_timetable_id',
+                    DB::raw('COUNT(*) as total_questions'),
+                    DB::raw("COUNT(CASE WHEN umq.status = 'correct' THEN 1 END) as correct"),
+                    DB::raw("COUNT(CASE WHEN umq.status = 'wrong' THEN 1 END) as wrong"),
+                    DB::raw("COUNT(CASE WHEN umq.timetable_answer_id IS NULL THEN 1 END) as unanswered")
+                )
+                ->get();
+
+            foreach ($overallRows as $row) {
+                $overallStats[$row->user_timetable_id] = [
+                    'total' => (int) $row->total_questions,
+                    'correct' => (int) $row->correct,
+                    'wrong' => (int) $row->wrong,
+                    'unanswered' => (int) $row->unanswered,
+                ];
+            }
+
+            $topicQuery = DB::table('user_module_questions as umq')
+                ->join('timetable_questions as tq', 'tq.id', '=', 'umq.timetable_question_id')
+                ->leftJoin('topics as top', 'top.id', '=', 'tq.topic_id')
+                ->whereIn('umq.user_timetable_id', $currentPageIds)
+                ->whereNull('umq.deleted_at')
+                ->whereNotNull('tq.topic_id')
+                ->when($this->filterTopicId, fn ($q) => $q->where('tq.topic_id', $this->filterTopicId))
+                ->when($this->filterMaterialCategoryId, fn ($q) => $q->where('tq.material_category_id', $this->filterMaterialCategoryId))
+                ->when($this->filterMaterialId, fn ($q) => $q->where('tq.material_id', $this->filterMaterialId))
+                ->when($this->filterQuestionTypeId, fn ($q) => $q->where('tq.question_type_id', $this->filterQuestionTypeId))
+                ->when($this->filterCategoryQuestionId, fn ($q) => $q->where('tq.category_question_id', $this->filterCategoryQuestionId));
+
+            $topicRows = $topicQuery->groupBy('umq.user_timetable_id', 'tq.topic_id', 'top.name')
+                ->select(
+                    'umq.user_timetable_id',
+                    'tq.topic_id',
+                    DB::raw("COALESCE(top.name, 'Tanpa Topik') as topic_name"),
+                    DB::raw('COUNT(*) as total_questions'),
+                    DB::raw("COUNT(CASE WHEN umq.status = 'correct' THEN 1 END) as correct"),
+                    DB::raw("COUNT(CASE WHEN umq.status = 'wrong' THEN 1 END) as wrong"),
+                    DB::raw("COUNT(CASE WHEN umq.timetable_answer_id IS NULL THEN 1 END) as unanswered")
+                )
+                ->get();
+
+            foreach ($topicRows as $row) {
+                $topicStatsByUser[$row->user_timetable_id][$row->topic_id] = [
+                    'name' => $row->topic_name,
+                    'total' => (int) $row->total_questions,
+                    'correct' => (int) $row->correct,
+                    'wrong' => (int) $row->wrong,
+                    'unanswered' => (int) $row->unanswered,
+                ];
+            }
+        }
+
+        $this->cachedOverallStats = $overallStats;
+        $this->cachedTopicStatsByUser = $topicStatsByUser;
 
         $users = User::query()
             ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
-            ->whereHas('userTimetables')
+            ->whereHas('userTimetables', function ($q) {
+                $q->when($this->timetable_id, fn ($sq) => $sq->where('timetable_id', $this->timetable_id));
+            })
             ->orderByRaw('LOWER(TRIM(name)) ASC')
+            ->limit(300)
             ->get(['id', 'name', 'nim', 'username', 'email']);
 
         if ($this->user_id && ! $users->contains('id', $this->user_id)) {
@@ -131,7 +224,9 @@ class AdminReportExamResultIndex extends Component
             ->get(['id', 'name', 'module_id', 'start_time', 'end_time']);
 
         return view('livewire.admin.report.exam-result.admin-report-exam-result-index', [
-            'examResults' => $examResults->paginate($this->perPage),
+            'examResults' => $paginatedResults,
+            'overallStats' => $overallStats,
+            'topicStatsByUser' => $topicStatsByUser,
             'users' => $users,
             'modules' => $modules,
             'timetables' => $timetables,
@@ -145,8 +240,11 @@ class AdminReportExamResultIndex extends Component
         @ini_set('memory_limit', '512M');
         @set_time_limit(300);
 
+        $companyId = Auth::user()?->company_id;
+
         // Fetch lightweight user timetables without eager loading 100k+ userModuleQuestions
         $examResults = UserTimetable::query()
+            ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
             ->select(['id', 'user_id', 'timetable_id', 'mark', 'created_at'])
             ->with([
                 'user:id,name,nim,username',
@@ -327,6 +425,14 @@ class AdminReportExamResultIndex extends Component
 
     public function getTopicStats($userTimetable)
     {
+        if (isset($this->cachedTopicStatsByUser[$userTimetable->id])) {
+            return $this->cachedTopicStatsByUser[$userTimetable->id];
+        }
+
+        if (! $userTimetable->relationLoaded('userModuleQuestions')) {
+            return [];
+        }
+
         $stats = [];
         foreach ($userTimetable->userModuleQuestions as $umq) {
             $tq = $umq->timetableQuestion;

@@ -24,7 +24,7 @@ class AdminReportTimetableIndex extends Component
 
         $timetables = Timetable::search($this->search)
             ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
-            ->with(['module'])
+            ->with(['module:id,name'])
             ->select('id', 'name', 'module_id', 'start_time', 'end_time', 'description', 'code')
             ->latest()
             ->paginate($this->perPage);

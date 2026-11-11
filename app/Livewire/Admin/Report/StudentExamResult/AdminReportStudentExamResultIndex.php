@@ -60,8 +60,15 @@ class AdminReportStudentExamResultIndex extends Component
 
     protected function buildQuery()
     {
+        $companyId = Auth::user()?->company_id;
+
         $query = UserTimetable::withoutGlobalScopes()
-            ->with(['timetable.module', 'timetable.examSession', 'timetable.examRoom', 'userModuleQuestions.timetableQuestion'])
+            ->when($companyId, fn ($q) => $q->where('user_timetables.company_id', $companyId))
+            ->select(['user_timetables.id', 'user_timetables.user_id', 'user_timetables.timetable_id', 'user_timetables.mark', 'user_timetables.created_at'])
+            ->with([
+                'timetable:id,name,module_id,start_time,end_time',
+                'timetable.module:id,name',
+            ])
             ->where('user_id', $this->user_id);
 
         if (! empty($this->search)) {
@@ -108,6 +115,7 @@ class AdminReportStudentExamResultIndex extends Component
             ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
             ->whereHas('userTimetables')
             ->orderByRaw('LOWER(TRIM(name)) ASC')
+            ->limit(300)
             ->get(['id', 'name', 'nim', 'username']);
 
         if ($this->user_id && ! $users->contains('id', $this->user_id)) {

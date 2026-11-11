@@ -6,12 +6,18 @@ use App\Models\Master\Timetable\Timetable;
 use App\Services\Report\ItemAnalysisService;
 use App\Traits\HasQuestionReportFilters;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class AdminReportAnswerStatisticsIndex extends Component
 {
-    use HasQuestionReportFilters;
+    use HasQuestionReportFilters, WithPagination;
+
+    protected $paginationTheme = 'bootstrap';
+
+    public $perPage = 10;
 
     public $timetable_id = '';
 
@@ -32,47 +38,61 @@ class AdminReportAnswerStatisticsIndex extends Component
 
     public function updatedTimetableId($value)
     {
+        $this->resetPage();
         $this->loadStatistics();
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
     }
 
     public function updatedFilterTopicId()
     {
+        $this->resetPage();
         $this->loadStatistics();
     }
 
     public function updatedFilterMaterialCategoryId()
     {
         $this->filterMaterialId = '';
+        $this->resetPage();
         $this->loadStatistics();
     }
 
     public function updatedFilterMaterialId()
     {
+        $this->resetPage();
         $this->loadStatistics();
     }
 
     public function updatedFilterQuestionTypeId()
     {
+        $this->resetPage();
         $this->loadStatistics();
     }
 
     public function updatedFilterCategoryQuestionId()
     {
+        $this->resetPage();
         $this->loadStatistics();
     }
 
     public function updatedSearch()
     {
+        $this->resetPage();
         $this->loadStatistics();
     }
 
     public function updatedSortBy()
     {
+        $this->resetPage();
         $this->loadStatistics();
     }
 
     public function updatedSortDirection()
     {
+        $this->resetPage();
         $this->loadStatistics();
     }
 
@@ -84,12 +104,14 @@ class AdminReportAnswerStatisticsIndex extends Component
             $this->sortBy = $field;
             $this->sortDirection = 'asc';
         }
+        $this->resetPage();
         $this->loadStatistics();
     }
 
     public function toggleSortDirection(): void
     {
         $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        $this->resetPage();
         $this->loadStatistics();
     }
 
@@ -103,6 +125,7 @@ class AdminReportAnswerStatisticsIndex extends Component
         $this->search = '';
         $this->sortBy = 'order';
         $this->sortDirection = 'asc';
+        $this->resetPage();
         $this->loadStatistics();
     }
 
@@ -142,9 +165,23 @@ class AdminReportAnswerStatisticsIndex extends Component
             ->orderBy('start_time', 'desc')
             ->get(['id', 'name', 'module_id', 'start_time']);
 
+        $statsToRender = $this->answerStats;
+        if ($this->perPage !== 'all' && is_numeric($this->perPage) && count($this->answerStats) > 0) {
+            $page = $this->getPage();
+            $perPage = (int) $this->perPage;
+            $items = array_slice($this->answerStats, ($page - 1) * $perPage, $perPage, true);
+            $statsToRender = new LengthAwarePaginator(
+                $items,
+                count($this->answerStats),
+                $perPage,
+                $page,
+                ['path' => request()->url(), 'pageName' => 'page']
+            );
+        }
+
         return view('livewire.admin.report.answer-statistics.admin-report-answer-statistics-index', [
             'timetables' => $timetables,
-            'answerStats' => $this->answerStats,
+            'answerStats' => $statsToRender,
         ])
             ->extends('layout.app')
             ->section('content');

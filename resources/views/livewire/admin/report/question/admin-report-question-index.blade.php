@@ -81,7 +81,7 @@
                                     <td class="center">{{ $this->getQuestionCorrect($result, $timetable) }}</td>
                                 @endforeach
                             @endif
-                            <td>{{ $this->getQuestionCorrect($result) }}</td>
+                            <td>{{ $correctCounts[$result?->timetableQuestion?->id] ?? $this->getQuestionCorrect($result) }}</td>
                         </tr>
                     @empty
                         <tr>

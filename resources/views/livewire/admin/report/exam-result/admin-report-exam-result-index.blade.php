@@ -190,10 +190,11 @@
                     @forelse ($examResults as $index => $result)
                         @php
                             $gradeDetail = $this->getGradeDetail($result->mark);
-                            $totalQ = $result->userModuleQuestions->count();
-                            $correct = $result->userModuleQuestions->where('status', 'correct')->count();
-                            $wrong = $result->userModuleQuestions->where('status', 'wrong')->count();
-                            $unanswered = $result->userModuleQuestions->whereNull('timetable_answer_id')->count();
+                            $overall = $overallStats[$result->id] ?? ['total' => 0, 'correct' => 0, 'wrong' => 0, 'unanswered' => 0];
+                            $totalQ = $overall['total'];
+                            $correct = $overall['correct'];
+                            $wrong = $overall['wrong'];
+                            $unanswered = $overall['unanswered'];
                         @endphp
                         <tr x-data="{ open: false }" wire:key="row-{{ $result->id }}">
                             <td class="center">
@@ -225,7 +226,7 @@
 
                         <!-- Collapsible topic breakdown details row -->
                         @php
-                            $topicStats = $this->getTopicStats($result);
+                            $topicStats = $topicStatsByUser[$result->id] ?? $this->getTopicStats($result);
                         @endphp
                         <tr x-show="open" x-cloak wire:key="details-{{ $result->id }}">
                             <td colspan="14" class="bg-gray-50/50 p-4 border-b border-gray-100 whitespace-normal">

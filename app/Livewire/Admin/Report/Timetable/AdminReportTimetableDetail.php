@@ -87,11 +87,14 @@ class AdminReportTimetableDetail extends Component
 
         $dir = strtolower($this->sortDirection) === 'desc' ? 'desc' : 'asc';
 
+        $companyId = auth()->user()?->company_id;
+
         $query = UserTimetable::withoutGlobalScopes()
+            ->when($companyId, fn ($q) => $q->where('user_timetables.company_id', $companyId))
             ->where('timetable_id', $timetableId)
             ->search($this->search)
             ->with([
-                'user',
+                'user:id,name,nim,username',
                 'userModuleQuestions' => function ($q) use ($questionSelects) {
                     $q->select($questionSelects);
                 },

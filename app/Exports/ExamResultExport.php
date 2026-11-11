@@ -41,8 +41,11 @@ class ExamResultExport implements FromCollection, WithColumnWidths, WithHeadings
 
     private function loadData()
     {
+        $companyId = auth()->user()?->company_id;
+
         // 1. Fetch only necessary user timetables and eager-load lightweight relations (no heavy userModuleQuestions)
         $this->examResults = UserTimetable::query()
+            ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
             ->select(['id', 'user_id', 'timetable_id', 'mark', 'created_at'])
             ->with([
                 'user:id,name,nim,username',

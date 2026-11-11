@@ -25,7 +25,8 @@ class AdminReportOfficialIndex extends Component
         $companyData = Company::first();
 
         // Base query
-        $query = Timetable::with(['module', 'userTimetables'])
+        $query = Timetable::with(['module:id,name'])
+            ->select(['id', 'name', 'module_id', 'start_time', 'end_time'])
             ->when($user?->company_id, fn ($q, $cid) => $q->where('company_id', $cid));
 
         // Search filter
