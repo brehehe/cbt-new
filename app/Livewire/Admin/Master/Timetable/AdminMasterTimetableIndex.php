@@ -1229,6 +1229,7 @@ class AdminMasterTimetableIndex extends Component
                 'classmate' => function ($q) {
                     $q->with(['classmateStudents.user.userDetail']);
                 },
+                'userTimetables.user.userDetail',
             ])->findOrFail($id);
 
             $company = Auth::user()?->company ? Auth::user()->company()->with('companyDetail')->first() : \App\Models\Company\Company::with('companyDetail')->first();

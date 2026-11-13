@@ -1,96 +1,186 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Kartu Peserta Ujian</title>
+    <meta charset="utf-8">
+    <title>Kartu Peserta Ujian - {{ $timetable->name }}</title>
     <style>
-        body { font-family: sans-serif; font-size: 10pt; }
-        .page-break { page-break-after: always; }
+        @page {
+            size: A4 portrait;
+            margin: 8mm;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: sans-serif;
+            font-size: 8pt;
+            margin: 0;
+            padding: 0;
+            color: #000;
+            background: #fff;
+        }
+        .page-break {
+            page-break-after: always;
+        }
         .card-container {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
         }
         .card-row {
             page-break-inside: avoid;
+            break-inside: avoid;
         }
         .card-cell {
             width: 50%;
-            padding: 10px;
+            padding: 4px 5px;
             vertical-align: top;
         }
         .card {
-            border: 1px solid #000;
-            padding: 10px;
-            height: 220px; /* Fixed height for consistency */
+            border: 1.5px solid #000;
+            padding: 8px;
+            min-height: 220px;
+            height: auto;
             position: relative;
+            background: #fff;
         }
         .header {
-            border-bottom: 2px solid #000;
-            padding-bottom: 5px;
-            margin-bottom: 10px;
+            border-bottom: 1.5px solid #000;
+            padding-bottom: 4px;
+            margin-bottom: 6px;
             text-align: center;
         }
-        .header h3 { margin: 0; font-size: 12pt; text-transform: uppercase; }
-        .header p { margin: 0; font-size: 8pt; }
-        .content {
-            display: table;
+        .header h3 {
+            margin: 0;
+            font-size: 9pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            line-height: 1.2;
+            letter-spacing: 0.3px;
+        }
+        .header p {
+            margin: 2px 0 0 0;
+            font-size: 7.5pt;
+            color: #222;
+            line-height: 1.2;
+            word-wrap: break-word;
+        }
+        .content-table {
             width: 100%;
+            border-collapse: collapse;
         }
         .photo-cell {
-            display: table-cell;
-            width: 75px;
+            width: 58px;
             vertical-align: top;
             text-align: center;
-        }
-        .qr-cell {
-            display: table-cell;
-            width: 75px;
-            vertical-align: top;
-            text-align: center;
-            padding-left: 5px;
-        }
-        .info-cell {
-            display: table-cell;
-            vertical-align: top;
-            padding-left: 5px;
         }
         .photo-box {
-            width: 70px;
-            height: 90px;
-            border: 1px solid #ddd;
-            background-color: #f9f9f9;
+            width: 54px;
+            height: 72px;
+            border: 1px solid #999;
+            background-color: #fafafa;
+            text-align: center;
+            overflow: hidden;
+            margin: 0 auto;
         }
         .photo-img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
+        .photo-placeholder {
+            padding-top: 26px;
+            font-size: 7pt;
+            color: #aaa;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .info-cell {
+            vertical-align: top;
+            padding: 0 6px;
+        }
         .info-table {
             width: 100%;
-            font-size: 9pt;
+            border-collapse: collapse;
+            font-size: 8pt;
+            line-height: 1.25;
         }
         .info-table td {
-            padding: 2px 0;
+            padding: 1.5px 0;
             vertical-align: top;
         }
-        .label { font-weight: bold; width: 70px; }
+        .label {
+            font-weight: bold;
+            width: 48px;
+            white-space: nowrap;
+            color: #000;
+        }
+        .colon {
+            width: 8px;
+            text-align: center;
+            color: #000;
+        }
+        .value {
+            color: #000;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+        .qr-cell {
+            width: 62px;
+            vertical-align: top;
+            text-align: center;
+        }
+        .qr-img {
+            width: 56px;
+            height: 56px;
+            display: block;
+            margin: 0 auto;
+        }
+        .qr-label {
+            font-size: 6pt;
+            text-align: center;
+            color: #333;
+            margin-top: 2px;
+            font-weight: bold;
+            letter-spacing: 0.3px;
+        }
         .footer {
-            margin-top: 10px;
-            font-size: 8pt;
+            margin-top: 6px;
+            padding-top: 3px;
+            border-top: 0.5px dashed #ccc;
+            font-size: 6.5pt;
             text-align: center;
             font-style: italic;
+            color: #555;
         }
     </style>
 </head>
 <body>
     @php
-        $students = $timetable->classmate?->classmateStudents ?? collect();
+        $students = $timetable->classmate?->classmateStudents;
+        if (!$students || $students->isEmpty()) {
+            $students = $timetable->userTimetables ?? collect();
+        }
         $chunkedStudents = $students->chunk(2); // 2 cards per row
+        $barcodeObj = new \Milon\Barcode\DNS2D();
     @endphp
 
     <table class="card-container">
         @foreach($chunkedStudents as $row)
             <tr class="card-row">
                 @foreach($row as $student)
+                    @php
+                        $user = $student->user;
+                        $photo = $user?->profile ?? $user?->photo;
+                        $hasPhoto = $photo && file_exists(public_path('storage/' . $photo));
+                        
+                        $qrPayload = json_encode([
+                            'user_id' => (string) ($user?->id ?? ''),
+                            'username' => (string) ($user?->username ?? ''),
+                            'timetable_id' => (string) $timetable->id,
+                        ]);
+                        $base64Qr = $barcodeObj->getBarcodePNG($qrPayload, 'QRCODE', 3, 3);
+                    @endphp
                     <td class="card-cell">
                         <div class="card">
                             <div class="header">
@@ -98,50 +188,47 @@
                                 <p>{{ $timetable->name }} | {{ $timetable->timetableModule?->name ?? $timetable->module?->name ?? '-' }}</p>
                             </div>
                             
-                            <div class="content">
-                                <div class="photo-cell">
-                                    <div class="photo-box">
-                                        @if($student->user?->userDetail && $student->user?->profile)
-                                            <img src="{{ public_path('storage/' . $student->user->profile) }}" class="photo-img">
-                                        @else
-                                            <div style="padding-top: 35px; font-size: 8pt; color: #ccc;">FOTO</div>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="info-cell">
-                                    <table class="info-table">
-                                        <tr>
-                                            <td class="label">Nama</td>
-                                            <td>: {{ $student->user?->name ?? '-' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="label">Username</td>
-                                            <td>: {{ $student->user?->username ?? '-' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="label">Sesi</td>
-                                            <td>: {{ $timetable->examSession->name ?? '-' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="label">Ruang</td>
-                                            <td>: {{ $timetable->examRoom->name ?? '-' }}</td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                <div class="qr-cell">
-                                    @php
-                                        $d = new \Milon\Barcode\DNS2D();
-                                        $qrPayload = json_encode([
-                                            'user_id' => (string) ($student->user?->id ?? ''),
-                                            'username' => (string) ($student->user?->username ?? ''),
-                                            'timetable_id' => (string) $timetable->id,
-                                        ]);
-                                        $base64Qr = $d->getBarcodePNG($qrPayload, 'QRCODE', 3, 3);
-                                    @endphp
-                                    <img src="data:image/png;base64,{{ $base64Qr }}" style="width: 65px; height: 65px; display: block; margin: 0 auto;">
-                                    <div style="font-size: 6.5pt; text-align: center; color: #555; margin-top: 3px; font-weight: bold;">QRCODE ABSEN</div>
-                                </div>
-                            </div>
+                            <table class="content-table">
+                                <tr>
+                                    <td class="photo-cell">
+                                        <div class="photo-box">
+                                            @if($hasPhoto)
+                                                <img src="{{ public_path('storage/' . $photo) }}" class="photo-img">
+                                            @else
+                                                <div class="photo-placeholder">FOTO</div>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="info-cell">
+                                        <table class="info-table">
+                                            <tr>
+                                                <td class="label">Nama</td>
+                                                <td class="colon">:</td>
+                                                <td class="value"><strong>{{ $user?->name ?? '-' }}</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="label">Username</td>
+                                                <td class="colon">:</td>
+                                                <td class="value">{{ $user?->username ?? '-' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="label">Sesi</td>
+                                                <td class="colon">:</td>
+                                                <td class="value">{{ $timetable->examSession->name ?? '-' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="label">Ruang</td>
+                                                <td class="colon">:</td>
+                                                <td class="value">{{ $timetable->examRoom->name ?? '-' }}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td class="qr-cell">
+                                        <img src="data:image/png;base64,{{ $base64Qr }}" class="qr-img">
+                                        <div class="qr-label">QRCODE ABSEN</div>
+                                    </td>
+                                </tr>
+                            </table>
 
                             <div class="footer">
                                 <em>Dicetak pada: {{ now()->format('d-m-Y H:i') }}</em>
