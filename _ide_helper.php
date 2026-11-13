@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 12.60.2.
+ * Generated for Laravel 12.70.2.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -2116,6 +2116,19 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
+         * Get the registered command instance with the given name, if any.
+         *
+         * @param string $name
+         * @return \Symfony\Component\Console\Command\Command|null
+         * @static
+         */
+        public static function findCommand($name)
+        {
+            /** @var \Illuminate\Foundation\Console\Kernel $instance */
+            return $instance->findCommand($name);
+        }
+
+        /**
          * Get all of the commands registered with the console.
          *
          * @return array
@@ -3350,6 +3363,19 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
+         * Get the path to the compiled version of a view.
+         *
+         * @param string $path
+         * @return string
+         * @static
+         */
+        public static function getCompiledPath($path)
+        {
+            /** @var \Illuminate\View\Compilers\BladeCompiler $instance */
+            return $instance->getCompiledPath($path);
+        }
+
+        /**
          * Execute the given callback using a custom echo format.
          *
          * @param string $format
@@ -3410,20 +3436,6 @@ namespace Illuminate\Support\Facades {
         {
             /** @var \Illuminate\View\Compilers\BladeCompiler $instance */
             $instance->withoutComponentTags();
-        }
-
-        /**
-         * Get the path to the compiled version of a view.
-         *
-         * @param string $path
-         * @return string
-         * @static
-         */
-        public static function getCompiledPath($path)
-        {
-            //Method inherited from \Illuminate\View\Compilers\Compiler 
-            /** @var \Illuminate\View\Compilers\BladeCompiler $instance */
-            return $instance->getCompiledPath($path);
         }
 
         /**
@@ -10368,6 +10380,20 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
+         * Execute a callback while requests are created without global middleware or global options.
+         *
+         * @template TReturn
+         * @param (\Closure(): TReturn) $callback
+         * @return TReturn
+         * @static
+         */
+        public static function withoutGlobalConfiguration($callback)
+        {
+            /** @var \Illuminate\Http\Client\Factory $instance */
+            return $instance->withoutGlobalConfiguration($callback);
+        }
+
+        /**
          * Create a new response instance for use during stubbing.
          *
          * @param array|string|null $body
@@ -13471,45 +13497,47 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
-         * Migrate the delayed jobs that are ready to the regular queue.
+         * Release a reserved job back onto the queue after (n) seconds.
          *
-         * @param string $from
-         * @param string $to
-         * @return array
+         * @param string $queue
+         * @param \Illuminate\Queue\Jobs\DatabaseJobRecord $job
+         * @param int $delay
+         * @return mixed
          * @static
          */
-        public static function migrateExpiredJobs($from, $to)
+        public static function release($queue, $job, $delay)
         {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
-            return $instance->migrateExpiredJobs($from, $to);
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            return $instance->release($queue, $job, $delay);
         }
 
         /**
          * Delete a reserved job from the queue.
          *
          * @param string $queue
-         * @param \Illuminate\Queue\Jobs\RedisJob $job
+         * @param string $id
          * @return void
+         * @throws \Throwable
          * @static
          */
-        public static function deleteReserved($queue, $job)
+        public static function deleteReserved($queue, $id)
         {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
-            $instance->deleteReserved($queue, $job);
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            $instance->deleteReserved($queue, $id);
         }
 
         /**
          * Delete a reserved job from the reserved queue and release it.
          *
          * @param string $queue
-         * @param \Illuminate\Queue\Jobs\RedisJob $job
+         * @param \Illuminate\Queue\Jobs\DatabaseJob $job
          * @param int $delay
          * @return void
          * @static
          */
         public static function deleteAndRelease($queue, $job, $delay)
         {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             $instance->deleteAndRelease($queue, $job, $delay);
         }
 
@@ -13522,7 +13550,7 @@ namespace Illuminate\Support\Facades {
          */
         public static function clear($queue)
         {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->clear($queue);
         }
 
@@ -13535,32 +13563,20 @@ namespace Illuminate\Support\Facades {
          */
         public static function getQueue($queue)
         {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getQueue($queue);
         }
 
         /**
-         * Get the connection for the queue.
+         * Get the underlying database instance.
          *
-         * @return \Illuminate\Redis\Connections\Connection
+         * @return \Illuminate\Database\Connection
          * @static
          */
-        public static function getConnection()
+        public static function getDatabase()
         {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
-            return $instance->getConnection();
-        }
-
-        /**
-         * Get the underlying Redis instance.
-         *
-         * @return \Illuminate\Contracts\Redis\Factory
-         * @static
-         */
-        public static function getRedis()
-        {
-            /** @var \Illuminate\Queue\RedisQueue $instance */
-            return $instance->getRedis();
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            return $instance->getDatabase();
         }
 
         /**
@@ -13573,7 +13589,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobTries($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getJobTries($job);
         }
 
@@ -13587,7 +13603,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobBackoff($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getJobBackoff($job);
         }
 
@@ -13601,7 +13617,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobExpiration($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getJobExpiration($job);
         }
 
@@ -13615,7 +13631,7 @@ namespace Illuminate\Support\Facades {
         public static function createPayloadUsing($callback)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            \Illuminate\Queue\RedisQueue::createPayloadUsing($callback);
+            \Illuminate\Queue\DatabaseQueue::createPayloadUsing($callback);
         }
 
         /**
@@ -13627,7 +13643,7 @@ namespace Illuminate\Support\Facades {
         public static function getConfig()
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getConfig();
         }
 
@@ -13635,13 +13651,13 @@ namespace Illuminate\Support\Facades {
          * Set the queue configuration array.
          *
          * @param array $config
-         * @return \Illuminate\Queue\RedisQueue
+         * @return \Illuminate\Queue\DatabaseQueue
          * @static
          */
         public static function setConfig($config)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->setConfig($config);
         }
 
@@ -13654,7 +13670,7 @@ namespace Illuminate\Support\Facades {
         public static function getContainer()
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getContainer();
         }
 
@@ -13668,7 +13684,7 @@ namespace Illuminate\Support\Facades {
         public static function setContainer($container)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             $instance->setContainer($container);
         }
 
@@ -15130,10 +15146,6 @@ namespace Illuminate\Support\Facades {
          * header value is a comma+space separated list of IP addresses, the left-most
          * being the original client, and each successive proxy that passed the request
          * adding the IP address where it received the request from.
-         *
-         * If your reverse proxy uses a different header name than "X-Forwarded-For",
-         * ("Client-Ip" for instance), configure it via the $trustedHeaderSet
-         * argument of the Request::setTrustedProxies() method instead.
          *
          * @see getClientIps()
          * @see https://wikipedia.org/wiki/X-Forwarded-For
@@ -26024,6 +26036,13 @@ namespace Illuminate\Testing {
             }
     }
 
+namespace App\Livewire\Public\Questionnaire {
+    /**
+     */
+    class PublicQuestionnaireFill extends \Livewire\Component {
+            }
+    }
+
 namespace App\Livewire\Admin\Profile {
     /**
      */
@@ -26391,6 +26410,21 @@ namespace App\Livewire\Admin\Master\Classmate\Detail {
     /**
      */
     class AdminMasterClassmateDetailIndex extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Admin\Master\Questionnaire {
+    /**
+     */
+    class AdminMasterQuestionnaireIndex extends \Livewire\Component {
+            }
+    /**
+     */
+    class AdminMasterQuestionnaireCreate extends \Livewire\Component {
+            }
+    /**
+     */
+    class AdminMasterQuestionnaireDetail extends \Livewire\Component {
             }
     }
 

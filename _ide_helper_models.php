@@ -958,6 +958,7 @@ namespace App\Models\Master\Question{
  * @property string $is_simulation
  * @property array<array-key, mixed>|null $material_category_question_settings pengaturan jumlah soal per kategori materi & difficulty
  * @property bool $is_all_questions apakah mengambil semua soal berdasarkan tipe pengambilan soal
+ * @property int|null $total_questions
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \App\Models\Company\Company|null $company
@@ -987,6 +988,7 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereRandomQuestion($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereStudys($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereTopicQuestionSettings($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereTotalQuestions($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Module withTrashed(bool $withTrashed = true)
@@ -1117,7 +1119,7 @@ namespace App\Models\Master\Question{
  * @property string $id
  * @property string|null $company_id
  * @property string $name nama Tipe Ujian
- * @property string|null $description keteranagan Tipe Ujian
+ * @property string $description keteranagan Tipe Ujian
  * @property int $order
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -1185,6 +1187,172 @@ namespace App\Models\Master\Question{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic withoutTrashed()
  */
 	class Topic extends \Eloquent {}
+}
+
+namespace App\Models\Master\Questionnaire{
+/**
+ * @property string $id
+ * @property string|null $company_id
+ * @property string $title
+ * @property string $slug
+ * @property string|null $description
+ * @property string|null $academic_year
+ * @property string|null $semester
+ * @property bool $is_active
+ * @property bool $allow_guest
+ * @property bool $require_nim
+ * @property string|null $created_by
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Company\Company|null $company
+ * @property-read \App\Models\User|null $creator
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Questionnaire\QuestionnaireQuestion> $questions
+ * @property-read int|null $questions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Questionnaire\QuestionnaireResponse> $responses
+ * @property-read int|null $responses_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Questionnaire\QuestionnaireSection> $sections
+ * @property-read int|null $sections_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire search($term)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire whereAcademicYear($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire whereAllowGuest($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire whereRequireNim($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire whereSemester($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Questionnaire withoutTrashed()
+ */
+	class Questionnaire extends \Eloquent {}
+}
+
+namespace App\Models\Master\Questionnaire{
+/**
+ * @property string $id
+ * @property string $response_id
+ * @property string $question_id
+ * @property int|null $score
+ * @property string|null $text_answer
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Master\Questionnaire\QuestionnaireQuestion $question
+ * @property-read \App\Models\Master\Questionnaire\QuestionnaireResponse $response
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireAnswer newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireAnswer newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireAnswer query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireAnswer whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireAnswer whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireAnswer whereQuestionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireAnswer whereResponseId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireAnswer whereScore($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireAnswer whereTextAnswer($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireAnswer whereUpdatedAt($value)
+ */
+	class QuestionnaireAnswer extends \Eloquent {}
+}
+
+namespace App\Models\Master\Questionnaire{
+/**
+ * @property string $id
+ * @property string $section_id
+ * @property string $question_text
+ * @property string $question_type
+ * @property string|null $min_label
+ * @property string|null $max_label
+ * @property bool $is_required
+ * @property int $order
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Questionnaire\QuestionnaireAnswer> $answers
+ * @property-read int|null $answers_count
+ * @property-read float $average_score
+ * @property-read \App\Models\Master\Questionnaire\QuestionnaireSection $section
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireQuestion newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireQuestion newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireQuestion query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireQuestion whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireQuestion whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireQuestion whereIsRequired($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireQuestion whereMaxLabel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireQuestion whereMinLabel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireQuestion whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireQuestion whereQuestionText($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireQuestion whereQuestionType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireQuestion whereSectionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireQuestion whereUpdatedAt($value)
+ */
+	class QuestionnaireQuestion extends \Eloquent {}
+}
+
+namespace App\Models\Master\Questionnaire{
+/**
+ * @property string $id
+ * @property string $questionnaire_id
+ * @property string|null $user_id
+ * @property string $respondent_name
+ * @property string|null $respondent_nim
+ * @property string|null $ip_address
+ * @property string|null $user_agent
+ * @property \Illuminate\Support\Carbon $submitted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Questionnaire\QuestionnaireAnswer> $answers
+ * @property-read int|null $answers_count
+ * @property-read \App\Models\Master\Questionnaire\Questionnaire|null $questionnaire
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireResponse newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireResponse newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireResponse query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireResponse whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireResponse whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireResponse whereIpAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireResponse whereQuestionnaireId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireResponse whereRespondentName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireResponse whereRespondentNim($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireResponse whereSubmittedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireResponse whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireResponse whereUserAgent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireResponse whereUserId($value)
+ */
+	class QuestionnaireResponse extends \Eloquent {}
+}
+
+namespace App\Models\Master\Questionnaire{
+/**
+ * @property string $id
+ * @property string $questionnaire_id
+ * @property string $title
+ * @property string|null $description
+ * @property int $order
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Master\Questionnaire\Questionnaire|null $questionnaire
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Questionnaire\QuestionnaireQuestion> $questions
+ * @property-read int|null $questions_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireSection newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireSection newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireSection query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireSection whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireSection whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireSection whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireSection whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireSection whereQuestionnaireId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireSection whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|QuestionnaireSection whereUpdatedAt($value)
+ */
+	class QuestionnaireSection extends \Eloquent {}
 }
 
 namespace App\Models\Master\RatingScale{
@@ -1397,6 +1565,9 @@ namespace App\Models\Master\Timetable{
  * @property string|null $extra_time
  * @property string $is_simulation
  * @property bool $is_camera
+ * @property bool $allow_repeat
+ * @property bool $require_token
+ * @property int|null $total_questions
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Master\Timetable\TimetableAttendance> $attendances
@@ -1417,6 +1588,7 @@ namespace App\Models\Master\Timetable{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable search($term)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereAllowRepeat($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereClassmateId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereCompanyId($value)
@@ -1436,10 +1608,12 @@ namespace App\Models\Master\Timetable{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereRequireSeb($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereRequireToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereStartTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereStudyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereStudys($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereSupervisors($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereTotalQuestions($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Timetable withoutTrashed()
@@ -1518,6 +1692,8 @@ namespace App\Models\Master\Timetable{
  * @property-read \App\Models\Master\DigitalBook\DigitalBook|null $digitalBook
  * @property-read \App\Models\Master\Exam\ExamRoom|null $examRoom
  * @property-read \App\Models\Master\Exam\ExamSession|null $examSession
+ * @property-read mixed $supervisor
+ * @property-read string $supervisor_names
  * @property-read \App\Models\Master\Question\Module|null $module
  * @property-read \App\Models\Master\Timetable\Timetable|null $timetable
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableDetail newModelQuery()
@@ -1895,6 +2071,7 @@ namespace App\Models\Timetable{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null $total_questions
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Timetable\TimetableAnswer> $answers
  * @property-read int|null $answers_count
  * @property-read \App\Models\Company\Company|null $company
@@ -1923,6 +2100,7 @@ namespace App\Models\Timetable{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereRandomQuestion($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereStudys($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereTimetableId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereTotalQuestions($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimetableModule withTrashed(bool $withTrashed = true)
@@ -2170,7 +2348,7 @@ namespace App\Models\User{
  * @property \Illuminate\Support\Carbon|null $birth_date Tanggal lahir
  * @property string|null $birth_place Tempat lahir
  * @property string|null $marital_status Status pernikahan
- * @property string|null $nim Nomor Induk Mahasiswa
+ * @property string|null $nim Nomor Induk Siswa
  * @property string|null $student_program Program studi untuk mahasiswa
  * @property string|null $student_faculty Fakultas untuk mahasiswa
  * @property string|null $student_department Jurusan untuk mahasiswa
@@ -2430,6 +2608,7 @@ namespace App\Models\User{
  * @property bool $is_streaming
  * @property bool $is_camera
  * @property int $additional_time_seconds
+ * @property int $attempt
  * @property-read \App\Models\Company\Company|null $company
  * @property-read \App\Models\Exam\ExamLiveSession|null $examLiveSession
  * @property-read \App\Models\Master\Timetable\Timetable|null $timetable
@@ -2442,6 +2621,7 @@ namespace App\Models\User{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable search($search)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereAdditionalTimeSeconds($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereAttempt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereCompanyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserTimetable whereDeletedAt($value)
