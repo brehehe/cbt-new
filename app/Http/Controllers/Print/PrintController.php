@@ -14,11 +14,39 @@ class PrintController extends Controller
     //
     public function printDaftarHadir($session_id)
     {
-        $company = Company::select('id', 'name', 'logo_potrait', 'code_name', 'code_region', 'region')->where('id', auth()->user()->company_id)->first();
-        $timetable = Timetable::find($session_id);
-        $exam_room = ExamRoom::find($timetable->exam_room_id);
-        $exam_session = ExamSession::find($timetable->exam_session_id);
-        $classmateDetail = ClassmateStudent::where('classmate_id', $timetable->classmate_id)->with('user')->get();
+        $timetable = Timetable::with(['examRoom', 'examSession', 'company'])->findOrFail($session_id);
+
+        $company = null;
+        if (auth()->check() && auth()->user()->company_id) {
+            $company = Company::select('id', 'name', 'logo_potrait', 'code_name', 'code_region', 'region')
+                ->where('id', auth()->user()->company_id)
+                ->first();
+        }
+        if (! $company && $timetable->company_id) {
+            $company = Company::select('id', 'name', 'logo_potrait', 'code_name', 'code_region', 'region')
+                ->where('id', $timetable->company_id)
+                ->first();
+        }
+        if (! $company) {
+            $company = Company::select('id', 'name', 'logo_potrait', 'code_name', 'code_region', 'region')->first();
+        }
+
+        $exam_room = $timetable->examRoom ?? ExamRoom::find($timetable->exam_room_id);
+        $exam_session = $timetable->examSession ?? ExamSession::find($timetable->exam_session_id);
+
+        $classmateDetail = ClassmateStudent::where('classmate_id', $timetable->classmate_id)
+            ->with(['user.userDetail'])
+            ->get()
+            ->sortBy(fn ($item) => strtolower($item->user?->name ?? ''))
+            ->values();
+
+        if ($classmateDetail->isEmpty()) {
+            $classmateDetail = \App\Models\User\UserTimetable::where('timetable_id', $timetable->id)
+                ->with(['user.userDetail'])
+                ->get()
+                ->sortBy(fn ($item) => strtolower($item->user?->name ?? ''))
+                ->values();
+        }
 
         return view('print.daftar-hadir', [
             'session_id' => $session_id,
@@ -32,11 +60,39 @@ class PrintController extends Controller
 
     public function printBeritaAcara($session_id)
     {
-        $company = Company::select('id', 'name', 'logo_potrait', 'code_name', 'code_region', 'region')->where('id', auth()->user()->company_id)->first();
-        $timetable = Timetable::with(['module.questionType', 'timetableModule.questionType'])->find($session_id);
-        $exam_room = ExamRoom::find($timetable->exam_room_id);
-        $exam_session = ExamSession::find($timetable->exam_session_id);
-        $classmateDetail = ClassmateStudent::where('classmate_id', $timetable->classmate_id)->with('user')->get();
+        $timetable = Timetable::with(['module.questionType', 'timetableModule.questionType', 'examRoom', 'examSession', 'company'])->findOrFail($session_id);
+
+        $company = null;
+        if (auth()->check() && auth()->user()->company_id) {
+            $company = Company::select('id', 'name', 'logo_potrait', 'code_name', 'code_region', 'region')
+                ->where('id', auth()->user()->company_id)
+                ->first();
+        }
+        if (! $company && $timetable->company_id) {
+            $company = Company::select('id', 'name', 'logo_potrait', 'code_name', 'code_region', 'region')
+                ->where('id', $timetable->company_id)
+                ->first();
+        }
+        if (! $company) {
+            $company = Company::select('id', 'name', 'logo_potrait', 'code_name', 'code_region', 'region')->first();
+        }
+
+        $exam_room = $timetable->examRoom ?? ExamRoom::find($timetable->exam_room_id);
+        $exam_session = $timetable->examSession ?? ExamSession::find($timetable->exam_session_id);
+
+        $classmateDetail = ClassmateStudent::where('classmate_id', $timetable->classmate_id)
+            ->with(['user.userDetail'])
+            ->get()
+            ->sortBy(fn ($item) => strtolower($item->user?->name ?? ''))
+            ->values();
+
+        if ($classmateDetail->isEmpty()) {
+            $classmateDetail = \App\Models\User\UserTimetable::where('timetable_id', $timetable->id)
+                ->with(['user.userDetail'])
+                ->get()
+                ->sortBy(fn ($item) => strtolower($item->user?->name ?? ''))
+                ->values();
+        }
 
         return view('print.berita-acara', [
             'session_id' => $session_id,
